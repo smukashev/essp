@@ -24,10 +24,64 @@ create or replace package PKG_EAV_XML_UTIL is
 
   c_tt_issue_debt constant number := 18;
   c_tt_issue_interest constant number := 19;
+  
+  c_log_level_info constant VARCHAR2(200 CHAR) := 'INFO';
+  c_log_level_error constant VARCHAR2(200 CHAR) := 'ERROR';
 
   PROCEDURE remove_by_rd
   (
     p_report_date  IN DATE
+  );
+
+  PROCEDURE write_log
+  (
+    p_log_date IN DATE,
+    p_log_text IN VARCHAR2,
+    p_log_level IN VARCHAR2,
+    p_procedure_call IN VARCHAR2
+  );
+  
+  PROCEDURE generate_credit_rd
+  (
+    p_credit_id    in varchar2,
+    p_report_date  in date,
+    p_version IN NUMBER DEFAULT 2
+  );
+  
+  PROCEDURE xml_file_upd
+  (
+    p_id           IN NUMBER,
+    p_creditor_id  IN NUMBER DEFAULT NULL,
+    p_report_date  IN DATE DEFAULT NULL,
+    p_begin_date   IN DATE DEFAULT NULL,
+    p_end_date     IN DATE DEFAULT NULL,
+    p_file_name    IN VARCHAR2 DEFAULT NULL,
+    p_file_content IN BLOB DEFAULT NULL,
+    p_status       IN VARCHAR2 DEFAULT NULL,
+    p_sent         IN NUMBER DEFAULT NULL,
+    p_type         IN NUMBER DEFAULT NULL
+  );
+
+  PROCEDURE generate_as_job
+  (
+    p_initial_report_date IN DATE,
+    p_report_date_count IN NUMBER,
+    p_batch_size IN NUMBER DEFAULT c_default_batch_size,
+    p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
+    p_version IN NUMBER DEFAULT 2,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
+  );
+
+  PROCEDURE generate
+  (
+    p_initial_report_date IN DATE,
+    p_report_date_count IN NUMBER,
+    p_batch_size IN NUMBER DEFAULT c_default_batch_size,
+    p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
+    p_version IN NUMBER DEFAULT 2,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
   );
 
   PROCEDURE generate_by_rd_as_job
@@ -81,11 +135,17 @@ create or replace package PKG_EAV_XML_UTIL is
   (
     p_xml_file_id IN NUMBER
   );
-  
+
   PROCEDURE generate_portfolio_xml
   (
     p_xml_file_id IN NUMBER
   );
+  
+  FUNCTION nillable_xml
+  (
+    p_xml_tag in varchar2,
+    p_val     in varchar2
+  ) RETURN XMLTYPE;
 
   FUNCTION get_ref_balance_account_xml
   (
@@ -239,6 +299,27 @@ create or replace package PKG_EAV_XML_UTIL is
     p_credit_id IN NUMBER,
     p_report_date IN DATE
   ) RETURN XMLTYPE;
+  
+  FUNCTION get_persons_xml
+  (
+    p_credit_id IN NUMBER,
+    p_report_date IN DATE,
+    p_tag_name IN VARCHAR2 DEFAULT 'person'
+  ) RETURN XMLTYPE;
+  
+  FUNCTION get_organizations_xml
+  (
+    p_credit_id IN NUMBER,
+    p_report_date IN DATE,
+    p_tag_name IN VARCHAR2 DEFAULT 'organization'
+  ) RETURN XMLTYPE;
+  
+  FUNCTION get_creditors_xml
+  (
+    p_credit_id IN NUMBER,
+    p_report_date IN DATE,
+    p_tag_name IN VARCHAR2 DEFAULT 'creditors'
+  ) RETURN XMLTYPE;  
 
   FUNCTION get_organization_xml
   (
@@ -307,9 +388,40 @@ create or replace package PKG_EAV_XML_UTIL is
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'pledges'
   ) RETURN XMLTYPE;
+  
+  FUNCTION get_persons
+  (
+    p_credit_id NUMBER,
+    p_report_date DATE
+  ) RETURN XMLType;
+  
+  FUNCTION get_organizations
+  (
+    p_credit_id NUMBER,
+    p_report_date DATE
+  ) RETURN XMLType;
+  
+  FUNCTION get_creditors
+  (
+    p_credit_id NUMBER,
+    p_report_date DATE
+  ) RETURN XMLType;
+  
+  FUNCTION get_portfolio_flows_kfn
+  (
+    p_creditor_id IN NUMBER,
+    p_report_date IN DATE
+  ) RETURN XMLTYPE;
+  
+  FUNCTION get_portfolio_flows_msfo
+  (
+    p_creditor_id IN NUMBER,
+    p_report_date IN DATE
+  ) RETURN XMLTYPE;
 
 end PKG_EAV_XML_UTIL;
 /
+
 CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
   PROCEDURE remove_by_rd
@@ -323,9 +435,150 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     COMMIT;
   END;
 
+  PROCEDURE write_log
+  (
+    p_log_date IN DATE,
+    p_log_text IN VARCHAR2,
+    p_log_level IN VARCHAR2,
+    p_procedure_call IN VARCHAR2
+  ) IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+  BEGIN
+    INSERT INTO core.xml_log VALUES (p_log_date, p_log_text, p_log_level, p_procedure_call);
+    COMMIT;
+  END;
+
+  PROCEDURE xml_file_upd
+  (
+    p_id           IN NUMBER,
+    p_creditor_id  IN NUMBER DEFAULT NULL,
+    p_report_date  IN DATE DEFAULT NULL,
+    p_begin_date   IN DATE DEFAULT NULL,
+    p_end_date     IN DATE DEFAULT NULL,
+    p_file_name    IN VARCHAR2 DEFAULT NULL,
+    p_file_content IN BLOB DEFAULT NULL,
+    p_status       IN VARCHAR2 DEFAULT NULL,
+    p_sent         IN NUMBER DEFAULT NULL,
+    p_type         IN NUMBER DEFAULT NULL
+  )
+  IS
+    PRAGMA AUTONOMOUS_TRANSACTION;
+  BEGIN
+    UPDATE xml_file xf
+       SET xf.creditor_id = nvl(p_creditor_id, (select t.creditor_id from xml_file t where t.id = xf.id)),
+           xf.report_date = nvl(p_report_date, (select t.report_date from xml_file t where t.id = xf.id)),
+           xf.begin_date = nvl(p_begin_date, (select t.begin_date from xml_file t where t.id = xf.id)),
+           xf.end_date = nvl(p_end_date, (select t.end_date from xml_file t where t.id = xf.id)),
+           xf.file_name = nvl(p_file_name, (select t.file_name from xml_file t where t.id = xf.id)),
+           xf.file_content = nvl(p_file_content, (select t.file_content from xml_file t where t.id = xf.id)),
+           xf.status = nvl(p_status, (select t.status from xml_file t where t.id = xf.id)),
+           xf.sent = nvl(p_sent, (select t.sent from xml_file t where t.id = xf.id)),
+           xf.type = nvl(p_type, (select t.type from xml_file t where t.id = xf.id))
+     WHERE xf.id = p_id;
+    COMMIT;
+  END;
+
+  PROCEDURE generate_as_job
+  (
+    p_initial_report_date IN DATE,
+    p_report_date_count IN NUMBER,
+    p_batch_size IN NUMBER DEFAULT c_default_batch_size,
+    p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
+    p_version IN NUMBER DEFAULT 2,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
+  )
+  IS
+    v_job_name   VARCHAR2(200 CHAR);
+    v_job_action VARCHAR2(1000 CHAR);
+  BEGIN
+    v_job_name := 'XML_GEN';
+    v_job_action := 'BEGIN ' ||
+                      'PKG_EAV_XML_UTIL.GENERATE(P_INITIAL_REPORT_DATE => TO_DATE(''' || to_char(p_initial_report_date, 'dd.MM.yyyy') || ''', ''dd.MM.yyyy''), ' ||
+                                                'P_REPORT_DATE_COUNT => ' || p_report_date_count || ', ' ||
+                                                'P_BATCH_SIZE => ' || p_batch_size || ', ' ||
+                                                'P_JOB_MAX_COUNT => ' || p_job_max_count || ', ' ||
+                                                'P_VERSION => ' || p_version || ', ' ||
+                                                'P_EXTRACT_CREDIT => ' || p_extract_credit || ', ' ||
+                                                'P_EXTRACT_PORTFOLIO => ' || p_extract_portfolio || '); ' ||
+                    'END;';
+    dbms_output.put_line(v_job_action);
+    dbms_scheduler.create_job(job_name        => v_job_name,
+                              job_type        => 'PLSQL_BLOCK',
+                              job_action      => v_job_action,
+                              start_date      => SYSTIMESTAMP,
+                              repeat_interval => NULL,
+                              enabled         => TRUE,
+                              auto_drop       => TRUE);
+  END;
+
+  PROCEDURE generate
+  (
+    p_initial_report_date IN DATE,
+    p_report_date_count IN NUMBER,
+    p_batch_size IN NUMBER DEFAULT c_default_batch_size,
+    p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
+    p_version IN NUMBER DEFAULT 2,
+    p_extract_credit IN NUMBER DEFAULT 1,
+    p_extract_portfolio IN NUMBER DEFAULT 1
+  )
+  IS
+    v_status NUMBER;
+    v_report_date DATE;
+    v_report_date_no NUMBER := 0;
+    v_procedure_call VARCHAR2(4000 CHAR) :=
+      'GENERATE(P_INITIAL_REPORT_DATE => TO_DATE(''' || to_char(p_initial_report_date, 'dd.MM.yyyy') || ''', ''dd.MM.yyyy''), ' ||
+               'P_REPORT_DATE_COUNT => ' || p_report_date_count || ', ' ||
+               'P_BATCH_SIZE => ' || p_batch_size || ', ' ||
+               'P_JOB_MAX_COUNT => ' || p_job_max_count || ', ' ||
+               'P_VERSION => ' || p_version || ', ' ||
+               'P_EXTRACT_CREDIT => ' || p_extract_credit || ', ' ||
+               'P_EXTRACT_PORTFOLIO => ' || p_extract_portfolio || ')';
+  BEGIN
+    write_log(p_log_date => sysdate, 
+              p_log_text => 'Procedure started.', 
+              p_log_level => c_log_level_info, 
+              p_procedure_call => v_procedure_call);
+    LOOP
+      SELECT to_number(xc.value)
+        INTO v_status
+        FROM xml_config xc
+       WHERE xc.code = 'XML_GENERATION_STATUS';
+
+      IF (v_status = 0) THEN
+        write_log(p_log_date => sysdate, 
+                  p_log_text => 'Procedure execution terminated.', 
+                  p_log_level => c_log_level_info, 
+                  p_procedure_call => v_procedure_call);
+        RETURN;
+      END IF;
+
+      SELECT add_months(p_initial_report_date, v_report_date_no)
+        INTO v_report_date
+        FROM dual;
+
+      generate_by_rd(v_report_date, p_batch_size, p_job_max_count, p_version, p_extract_credit, p_extract_portfolio);
+      v_report_date_no := v_report_date_no + 1;
+
+      IF (v_report_date_no >= p_report_date_count) THEN
+        write_log(p_log_date => sysdate, 
+                p_log_text => 'Procedure completed successfully.', 
+                p_log_level => c_log_level_info, 
+                p_procedure_call => v_procedure_call);
+        RETURN;
+      END IF;
+    END LOOP;
+  EXCEPTION
+    WHEN OTHERS THEN
+      write_log(p_log_date => sysdate, 
+                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.', 
+                p_log_level => c_log_level_error, 
+                p_procedure_call => v_procedure_call);
+  END;
+
   PROCEDURE generate_by_rd_as_job
   (
-    p_report_date  IN DATE,
+    p_report_date IN DATE,
     p_batch_size IN NUMBER DEFAULT c_default_batch_size,
     p_job_max_count IN NUMBER DEFAULT c_default_job_max_count,
     p_version IN NUMBER DEFAULT 2,
@@ -341,10 +594,11 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                       'PKG_EAV_XML_UTIL.GENERATE_BY_RD(P_REPORT_DATE => TO_DATE(''' || to_char(p_report_date, 'dd.MM.yyyy') || ''', ''dd.MM.yyyy''), ' ||
                                                       'P_BATCH_SIZE => ' || p_batch_size || ', ' ||
                                                       'P_JOB_MAX_COUNT => ' || p_job_max_count || ', ' ||
-                                                      'P_VERSION => ' || p_version || 
+                                                      'P_VERSION => ' || p_version || ', ' ||
                                                       'P_EXTRACT_CREDIT => ' || p_extract_credit || ', ' ||
                                                       'P_EXTRACT_PORTFOLIO => ' || p_extract_portfolio || '); ' ||
                     'END;';
+    dbms_output.put_line(v_job_action);
     dbms_scheduler.create_job(job_name        => v_job_name,
                               job_type        => 'PLSQL_BLOCK',
                               job_action      => v_job_action,
@@ -352,6 +606,49 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                               repeat_interval => NULL,
                               enabled         => TRUE,
                               auto_drop       => TRUE);
+  END;
+  
+  PROCEDURE generate_credit_rd
+  (
+    p_credit_id    in varchar2,
+    p_report_date  in date,
+    p_version IN NUMBER DEFAULT 2
+  )
+  IS
+    v_creditor_id  NUMBER;
+    v_xml_file_id  NUMBER;
+    v_job_name   VARCHAR2(200 CHAR);
+    v_job_action VARCHAR2(1000 CHAR);
+
+  BEGIN
+    SELECT vhs.creditor_id 
+      INTO v_creditor_id
+      FROM v_credit_his vhs
+     WHERE vhs.id = p_credit_id
+       AND ROWNUM = 1;
+       
+    SELECT seq_xml_file.nextval
+      INTO v_xml_file_id
+      FROM dual;
+      
+    INSERT INTO xml_file (id, creditor_id, report_date, begin_date, end_date, file_name, status, sent)
+      VALUES (v_xml_file_id, v_creditor_id, p_report_date, sysdate, sysdate, 'XML_DATA_BY_CID_' || v_creditor_id || '_RD_' || to_char(p_report_date, 'yyyyMMdd') || '_' || ltrim(to_char(v_xml_file_id, '00000')), NULL, 0);
+
+    INSERT INTO xml_credit_id (id, xml_file_id, credit_id )
+      VALUES (seq_xml_credit_id.nextval, v_xml_file_id, p_credit_id);
+      
+    commit;
+
+    dbms_scheduler.create_job(job_name        => 'XML_GEN' || dbms_random.string('X', 10),
+                              job_type        => 'PLSQL_BLOCK',
+                              job_action      => 'BEGIN
+                                                     PKG_EAV_XML_UTIL.GENERATE_XML_V' || p_version || '(' || 'P_XML_FILE_ID => ' || v_xml_file_id || ');
+                                                  END;',
+                              start_date      => SYSTIMESTAMP,
+                              repeat_interval => NULL,
+                              enabled         => TRUE,
+                              auto_drop       => TRUE);
+                                          
   END;
 
   PROCEDURE generate_by_rd
@@ -365,7 +662,19 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
   )
   IS
     v_status NUMBER;
+    v_procedure_call VARCHAR2(4000 CHAR) :=
+      'GENERATE_BY_RD(P_REPORT_DATE => TO_DATE(''' || to_char(p_report_date, 'dd.MM.yyyy') || ''', ''dd.MM.yyyy''), ' ||
+                     'P_BATCH_SIZE => ' || p_batch_size || ', ' ||
+                     'P_JOB_MAX_COUNT => ' || p_job_max_count || ', ' ||
+                     'P_VERSION => ' || p_version || ', ' ||
+                     'P_EXTRACT_CREDIT => ' || p_extract_credit || ', ' ||
+                     'P_EXTRACT_PORTFOLIO => ' || p_extract_portfolio || ')';
   BEGIN
+    write_log(p_log_date => sysdate, 
+              p_log_text => 'Procedure started.', 
+              p_log_level => c_log_level_info, 
+              p_procedure_call => v_procedure_call);
+
     FOR rec_creditor IN (SELECT r.creditor_id as id
                            FROM core.report r
                           where r.report_date = p_report_date
@@ -386,8 +695,19 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                          p_job_max_count => p_job_max_count,
                          p_version => p_version,
                          p_extract_credit => p_extract_credit,
-                         p_extract_portfolio => p_extract_portfolio);                     
+                         p_extract_portfolio => p_extract_portfolio);
     END LOOP;
+
+    write_log(p_log_date => sysdate, 
+              p_log_text => 'Procedure completed successfully.', 
+              p_log_level => c_log_level_info, 
+              p_procedure_call => v_procedure_call);
+  EXCEPTION
+    WHEN OTHERS THEN
+      write_log(p_log_date => sysdate, 
+                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.', 
+                p_log_level => c_log_level_error, 
+                p_procedure_call => v_procedure_call);
   END;
 
   PROCEDURE generate_by_cid_rd_as_job
@@ -410,7 +730,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                           'P_REPORT_DATE => TO_DATE(''' || to_char(p_report_date, 'dd.MM.yyyy') || ''', ''dd.MM.yyyy''), ' ||
                                                           'P_BATCH_SIZE => ' || p_batch_size || ', ' ||
                                                           'P_JOB_MAX_COUNT => ' || p_job_max_count || ', ' ||
-                                                          'P_VERSION => ' || p_version || 
+                                                          'P_VERSION => ' || p_version || ',' ||
                                                           'P_EXTRACT_CREDIT => ' || p_extract_credit || ', ' ||
                                                           'P_EXTRACT_PORTFOLIO => ' || p_extract_portfolio || '); ' ||
                     'END;';
@@ -444,17 +764,43 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_now                  DATE;
     v_job_count            NUMBER;
     v_status               NUMBER(1);
-    
+
     v_portfolio_exists     NUMBER;
+    v_procedure_call       VARCHAR2(4000 CHAR) :=
+      'GENERATE_BY_CID_RD(P_CREDITOR_ID => ' || p_creditor_id || ', ' ||
+                         'P_REPORT_DATE => TO_DATE(''' || to_char(p_report_date, 'dd.MM.yyyy') || ''', ''dd.MM.yyyy''), ' ||
+                         'P_BATCH_SIZE => ' || p_batch_size || ', ' ||
+                         'P_JOB_MAX_COUNT => ' || p_job_max_count || ', ' ||
+                         'P_VERSION => ' || p_version || ', ' ||
+                         'P_EXTRACT_CREDIT => ' || p_extract_credit || ', ' ||
+                         'P_EXTRACT_PORTFOLIO => ' || p_extract_portfolio || ')';
   BEGIN
-    SELECT add_months(p_report_date, -st.report_period_duration_months)
-      INTO v_previous_report_date
-      FROM ref.v_creditor_his vch,
-           ref.subject_type st
-     WHERE vch.id = p_creditor_id
-       AND vch.subject_type_id = st.id
-       AND vch.open_date <= p_report_date
-       AND (vch.close_date > p_report_date OR vch.close_date IS NULL);
+    write_log(p_log_date => sysdate, 
+              p_log_text => 'Procedure started.', 
+              p_log_level => c_log_level_info, 
+              p_procedure_call => v_procedure_call);
+
+    BEGIN
+      SELECT add_months(p_report_date, -st.report_period_duration_months)
+        INTO v_previous_report_date
+        FROM ref.v_creditor_his vch,
+             ref.subject_type st
+       WHERE vch.id = p_creditor_id
+         AND vch.subject_type_id = st.id
+         AND vch.open_date <= p_report_date
+         AND (vch.close_date > p_report_date OR vch.close_date IS NULL);
+    EXCEPTION
+      WHEN OTHERS THEN
+        write_log(p_log_date => sysdate, 
+                  p_log_text => 'Error occurred while retrieving previous report date.', 
+                  p_log_level => c_log_level_error, 
+                  p_procedure_call => v_procedure_call);
+        write_log(p_log_date => sysdate, 
+                  p_log_text => 'Procedure execution terminated.', 
+                  p_log_level => c_log_level_info, 
+                  p_procedure_call => v_procedure_call);        
+        RETURN;
+    END;
 
     UPDATE core.xml_file xf
        SET xf.status = 'RESTARTING',
@@ -512,7 +858,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                       repeat_interval => NULL,
                                       enabled         => TRUE,
                                       auto_drop       => TRUE);
-          END IF;   
+          END IF;
           EXIT;
         ELSE
           IF (v_wait_end_date < sysdate) THEN
@@ -576,6 +922,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
              WHERE xc.code = 'XML_GENERATION_STATUS';
 
             IF (v_status = 0) THEN
+              write_log(p_log_date => sysdate, 
+                        p_log_text => 'Procedure execution terminated.', 
+                        p_log_level => c_log_level_info, 
+                        p_procedure_call => v_procedure_call);
               RETURN;
             END IF;
 
@@ -645,7 +995,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         END IF;
       END LOOP;
     END IF;
-      
+
     IF (p_extract_portfolio = 1) THEN
       v_xml_file_id := NULL;
       BEGIN
@@ -659,9 +1009,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         WHEN others THEN
           v_xml_file_id := NULL;
       END;
-      
+
       IF (v_xml_file_id IS NOT NULL) THEN
-        generate_portfolio_xml(v_xml_file_id);         
+        generate_portfolio_xml(v_xml_file_id);
       ELSE
         SELECT count(*)
             INTO v_portfolio_exists
@@ -674,7 +1024,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                            FROM core.portfolio_flow_msfo_old pfm
                           WHERE pfm.creditor_id = p_creditor_id
                             AND pfm.rep_date = p_report_date);
-                            
+
           IF (v_portfolio_exists = 1) THEN
             SELECT seq_xml_file.nextval
               INTO v_xml_file_id
@@ -682,12 +1032,21 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
             INSERT INTO xml_file (id, creditor_id, report_date, begin_date, file_name, status, sent, type)
               VALUES (v_xml_file_id, p_creditor_id, p_report_date, sysdate, 'XML_PORTFOLIO_DATA_BY_CID_' || p_creditor_id || '_RD_' || to_char(p_report_date, 'yyyyMMdd') || '_' || ltrim(to_char(v_xml_file_id, '00000')), 'STARTING', 0, 1);
-          
-            generate_portfolio_xml(v_xml_file_id); 
-          END IF; 
-      END IF;  
-    END IF;
 
+            generate_portfolio_xml(v_xml_file_id);
+          END IF;
+      END IF;
+    END IF;
+    write_log(p_log_date => sysdate, 
+              p_log_text => 'Procedure completed successfully.', 
+              p_log_level => c_log_level_info, 
+              p_procedure_call => v_procedure_call);
+  EXCEPTION
+    WHEN OTHERS THEN
+      write_log(p_log_date => sysdate, 
+                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.', 
+                p_log_level => c_log_level_error, 
+                p_procedure_call => v_procedure_call);
   END;
 
   PROCEDURE generate_xml_v1
@@ -721,385 +1080,1033 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    decode(vch.actual_issue_date, null, null, xmlelement("actual_issue_date", to_char(vch.actual_issue_date, c_date_format))),
                    -- AMOUNT
                    decode(vch.amount, null, null, xmlelement("amount", vch.amount)),
-                   -- CHANGE
-                 (SELECT xmlelement("change",
-                           -- REMAINS
-                           (SELECT xmlelement("remains",
-                                     -- CORRECTION
-                                     (SELECT xmlelement("correction",
-                                               -- BALANCE_ACCOUNT
-                                               decode(dr.account_id, null, null, xmlelement("balance_account",
-                                                 -- NO_
-                                                 xmlelement("no_", ref_ba.no_)
-                                               )),
-                                               -- VALUE
-                                               xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                                               -- VALUE_CURRENCY
-                                               decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))))
-                                             )
-                                        FROM core.debt_remains dr,
-                                             (SELECT t.parent_id AS id,
-                                                     t.no_
-                                                FROM ref.balance_account t
-                                               WHERE t.open_date <= v_report_date
-                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                       WHERE dr.credit_id = vch.id
-                                         AND dr.type_id = 62
-                                         AND dr.rep_date = v_report_date
-                                         AND dr.value IS NOT NULL
-                                         AND dr.value <> 0
-                                         AND dr.account_id = ref_ba.id (+)),
-                                     -- DEBT
-                                     (SELECT xmlelement("debt",
-                                               -- CURRENT
-                                               (SELECT xmlelement("current",
-                                                         -- BALANCE_ACCOUNT
-                                                         decode(dr.account_id, null, null, xmlelement("balance_account",
-                                                           -- NO_
-                                                           xmlelement("no_", ref_ba.no_)
-                                                         )),
-                                                         -- VALUE
-                                                         xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                                                         -- VALUE_CURRENCY
-                                                         decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))))
+                   
+                   xmlelement("data_creditor", 
+                     -- CHANGE
+                     (SELECT xmlelement("change",
+                               -- REMAINS
+                               (SELECT xmlelement("remains",
+                                         -- CORRECTION
+                                         (SELECT xmlelement("correction",
+                                                   -- BALANCE_ACCOUNT
+                                                   decode(dr.account_id, null, null, xmlelement("balance_account",
+                                                     -- NO_
+                                                     xmlelement("no_", ref_ba.no_)
+                                                   )),
+                                                   -- VALUE
+                                                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                                                   -- VALUE_CURRENCY
+                                                   decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))))
+                                                 )
+                                            FROM core.debt_remains dr,
+                                                 (SELECT t.parent_id AS id,
+                                                         t.no_
+                                                    FROM ref.balance_account t
+                                                   WHERE t.open_date <= v_report_date
+                                                     AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                           WHERE dr.credit_id = vch.id
+                                             AND dr.type_id = 62
+                                             AND dr.rep_date = v_report_date
+                                             AND dr.value IS NOT NULL
+                                             AND dr.value <> 0
+                                             AND dr.account_id = ref_ba.id (+)),
+                                         -- DEBT
+                                         (SELECT xmlelement("debt",
+                                                   -- CURRENT
+                                                   (SELECT xmlelement("current",
+                                                             -- BALANCE_ACCOUNT
+                                                             decode(dr.account_id, null, null, xmlelement("balance_account",
+                                                               -- NO_
+                                                               xmlelement("no_", ref_ba.no_)
+                                                             )),
+                                                             -- VALUE
+                                                             xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                                                             -- VALUE_CURRENCY
+                                                             decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))))
+                                                           )
+                                                      FROM core.debt_remains dr,
+                                                           (SELECT t.parent_id AS id,
+                                                                   t.no_
+                                                              FROM ref.balance_account t
+                                                             WHERE t.open_date <= v_report_date
+                                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                                     WHERE dr.credit_id = vch.id
+                                                       AND dr.type_id = 55
+                                                       AND dr.rep_date = v_report_date
+                                                       AND dr.value IS NOT NULL
+                                                       AND dr.value <> 0
+                                                       AND dr.account_id = ref_ba.id (+)),
+                                                   -- PASTDUE
+                                                   (SELECT xmlelement("pastdue",
+                                                             -- BALANCE_ACCOUNT
+                                                             decode(dr.account_id, null, null, xmlelement("balance_account",
+                                                               -- NO_
+                                                               xmlelement("no_", ref_ba.no_)
+                                                             )),
+                                                             -- VALUE
+                                                             xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                                                             -- VALUE_CURRENCY
+                                                             decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))),
+                                                             -- OPEN_DATE
+                                                             xmlelement("open_date", to_char(dr.pastdue_open_date, c_date_format)),
+                                                             -- CLOSE_DATE
+                                                             nillable_xml('close_date', to_char(dr.pastdue_close_date, c_date_format))
+                                                           )
+                                                      FROM core.debt_remains dr,
+                                                           (SELECT t.parent_id AS id,
+                                                                   t.no_
+                                                              FROM ref.balance_account t
+                                                             WHERE t.open_date <= v_report_date
+                                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                                     WHERE dr.credit_id = vch.id
+                                                       AND dr.type_id = 56
+                                                       AND dr.rep_date = v_report_date
+                                                       AND dr.value IS NOT NULL
+                                                       AND dr.value <> 0
+                                                       AND dr.account_id = ref_ba.id (+)),
+                                                   -- WRITE_OFF
+                                                   (SELECT xmlelement("write_off",
+                                                             -- BALANCE_ACCOUNT
+                                                             decode(dr.account_id, null, null, xmlelement("balance_account",
+                                                               -- NO_
+                                                               xmlelement("no_", ref_ba.no_)
+                                                             )),
+                                                             -- VALUE
+                                                             xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                                                             -- VALUE_CURRENCY
+                                                             decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))),
+                                                             -- DATE
+                                                             xmlelement("date", to_char(dr.write_off_date, c_date_format))
+                                                           )
+                                                      FROM core.debt_remains dr,
+                                                           (SELECT t.parent_id AS id,
+                                                                   t.no_
+                                                              FROM ref.balance_account t
+                                                             WHERE t.open_date <= v_report_date
+                                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                                     WHERE dr.credit_id = vch.id
+                                                       AND dr.type_id = 57
+                                                       AND dr.rep_date = v_report_date
+                                                       AND dr.value IS NOT NULL
+                                                       AND dr.value <> 0
+                                                       AND dr.account_id = ref_ba.id (+))
+                                                 )
+                                            FROM dual
+                                           WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.type_id in (55, 56, 57) AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0)),
+                                         -- DISCOUNT
+                                         (SELECT xmlelement("discount",
+                                                   -- BALANCE_ACCOUNT
+                                                   decode(dr.account_id, null, null, xmlelement("balance_account",
+                                                     -- NO_
+                                                     xmlelement("no_", ref_ba.no_)
+                                                   )),
+                                                   -- VALUE
+                                                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                                                   -- VALUE_CURRENCY
+                                                   decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))))
+                                                 )
+                                            FROM core.debt_remains dr,
+                                                 (SELECT t.parent_id AS id,
+                                                         t.no_
+                                                    FROM ref.balance_account t
+                                                   WHERE t.open_date <= v_report_date
+                                                     AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                           WHERE dr.credit_id = vch.id
+                                             AND dr.type_id = 61
+                                             AND dr.rep_date = v_report_date
+                                             AND dr.value IS NOT NULL
+                                             AND dr.value <> 0
+                                             AND dr.account_id = ref_ba.id (+)),
+                                         -- DISCOUNTED_VALUE
+                                         (SELECT xmlelement("discounted_value",
+                                                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
+                                                 )
+                                            FROM core.debt_remains dr,
+                                                 (SELECT t.parent_id AS id,
+                                                         t.no_
+                                                    FROM ref.balance_account t
+                                                   WHERE t.open_date <= v_report_date
+                                                     AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                           WHERE dr.credit_id = vch.id
+                                             AND dr.type_id = 63
+                                             AND dr.rep_date = v_report_date
+                                             AND dr.value IS NOT NULL
+                                             AND dr.value <> 0
+                                             AND dr.account_id = ref_ba.id (+)),
+                                         -- INTEREST
+                                         (SELECT xmlelement("interest",
+                                                   -- CURRENT
+                                                   (SELECT xmlelement("current",
+                                                             -- BALANCE_ACCOUNT
+                                                             decode(dr.account_id, null, null, xmlelement("balance_account",
+                                                               -- NO_
+                                                               xmlelement("no_", ref_ba.no_)
+                                                             )),
+                                                             -- VALUE
+                                                             xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                                                             -- VALUE_CURRENCY
+                                                             decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))))
+                                                           )
+                                                      FROM core.debt_remains dr,
+                                                           (SELECT t.parent_id AS id,
+                                                                   t.no_
+                                                              FROM ref.balance_account t
+                                                             WHERE t.open_date <= v_report_date
+                                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                                     WHERE dr.credit_id = vch.id
+                                                       AND dr.type_id = 58
+                                                       AND dr.rep_date = v_report_date
+                                                       AND dr.value IS NOT NULL
+                                                       AND dr.value <> 0
+                                                       AND dr.account_id = ref_ba.id (+)),
+                                                   -- PASTDUE
+                                                   (SELECT xmlelement("pastdue",
+                                                             -- BALANCE_ACCOUNT
+                                                             decode(dr.account_id, null, null, xmlelement("balance_account",
+                                                               -- NO_
+                                                               xmlelement("no_", ref_ba.no_)
+                                                             )),
+                                                             -- VALUE
+                                                             xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                                                             -- VALUE_CURRENCY
+                                                             decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))),
+                                                             -- OPEN_DATE
+                                                             xmlelement("open_date", to_char(dr.pastdue_open_date, c_date_format)),
+                                                             -- CLOSE_DATE
+                                                             xmlelement("close_date", to_char(dr.pastdue_close_date, c_date_format))
+                                                           )
+                                                      FROM core.debt_remains dr,
+                                                           (SELECT t.parent_id AS id,
+                                                                   t.no_
+                                                              FROM ref.balance_account t
+                                                             WHERE t.open_date <= v_report_date
+                                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                                     WHERE dr.credit_id = vch.id
+                                                       AND dr.type_id = 59
+                                                       AND dr.rep_date = v_report_date
+                                                       AND dr.value IS NOT NULL
+                                                       AND dr.value <> 0
+                                                       AND dr.account_id = ref_ba.id (+)),
+                                                   -- WRITE_OFF
+                                                   (SELECT xmlelement("write_off",
+                                                             -- VALUE
+                                                             xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                                                             -- VALUE_CURRENCY
+                                                             decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))),
+                                                             -- DATE
+                                                             xmlelement("date", to_char(dr.write_off_date, c_date_format))
+                                                           )
+                                                      FROM core.debt_remains dr
+                                                     WHERE dr.credit_id = vch.id
+                                                       AND dr.type_id = 60
+                                                       AND dr.rep_date = v_report_date
+                                                       AND dr.value IS NOT NULL
+                                                       AND dr.value <> 0)
+                                                 )
+                                            FROM dual
+                                           WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.type_id in (58, 59, 60) AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0)),
+                                         -- LIMIT
+                                         (SELECT xmlelement("limit",
+                                                   -- BALANCE_ACCOUNT
+                                                   decode(dr.account_id, null, null, xmlelement("balance_account",
+                                                     -- NO_
+                                                     xmlelement("no_", ref_ba.no_)
+                                                   )),
+                                                   -- VALUE
+                                                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                                                   -- VALUE_CURRENCY
+                                                   decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))))
+                                                 )
+                                            FROM core.debt_remains dr,
+                                                 (SELECT t.parent_id AS id,
+                                                         t.no_
+                                                    FROM ref.balance_account t
+                                                   WHERE t.open_date <= v_report_date
+                                                     AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                           WHERE dr.credit_id = vch.id
+                                             AND dr.type_id = 102
+                                             AND dr.rep_date = v_report_date
+                                             AND dr.value IS NOT NULL
+                                             AND dr.value <> 0
+                                             AND dr.account_id = ref_ba.id (+))
+                                       )
+                                  FROM dual
+                                 WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0 AND t.type_id in (55, 56, 57, 58, 59, 60, 61, 62, 63, 102))),
+                               -- CREDIT_FLOW
+                               (SELECT xmlelement("credit_flow",
+                                         (SELECT xmlelement("classification",
+                                                   -- CODE
+                                                   xmlelement("code", ref_cs.code)
+                                                 )
+                                            FROM core.credit_flow cf,
+                                                 (SELECT t.parent_id AS id,
+                                                         t.code
+                                                    FROM ref.classification t
+                                                   WHERE t.open_date <= v_report_date
+                                                     AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_cs
+                                           WHERE cf.credit_id = vch.id
+                                             AND cf.rep_date = v_report_date
+                                             AND cf.classification_id IS NOT NULL
+                                             AND cf.classification_id = ref_cs.id),
+                                          -- PROVISION
+                                          (SELECT xmlelement("provision",
+                                                    -- PROVISION_KFN
+                                                    (SELECT xmlelement("provision_kfn",
+                                                              -- BALANCE_ACCOUNT
+                                                              decode(dr.account_id, null, null, xmlelement("balance_account",
+                                                                -- NO_
+                                                                xmlelement("no_", ref_ba.no_)
+                                                              )),
+                                                              -- VALUE
+                                                              xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
+                                                            )
+                                                       FROM core.debt_remains dr,
+                                                            (SELECT t.parent_id AS id,
+                                                                    t.no_
+                                                               FROM ref.balance_account t
+                                                              WHERE t.open_date <= v_report_date
+                                                                AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                                      WHERE dr.credit_id = vch.id
+                                                        AND dr.type_id = 103
+                                                        AND dr.rep_date = v_report_date
+                                                        AND dr.value IS NOT NULL
+                                                        AND dr.value <> 0
+                                                        AND dr.account_id = ref_ba.id (+)),
+                                                    -- PROVISION_MSFO
+                                                    (SELECT xmlelement("provision_msfo",
+                                                              -- BALANCE_ACCOUNT
+                                                              decode(dr.account_id, null, null, xmlelement("balance_account",
+                                                                -- NO_
+                                                                xmlelement("no_", ref_ba.no_)
+                                                              )),
+                                                              -- VALUE
+                                                              xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
+                                                            )
+                                                       FROM core.debt_remains dr,
+                                                            (SELECT t.parent_id AS id,
+                                                                    t.no_
+                                                               FROM ref.balance_account t
+                                                              WHERE t.open_date <= v_report_date
+                                                                AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                                      WHERE dr.credit_id = vch.id
+                                                        AND dr.type_id = 104
+                                                        AND dr.rep_date = v_report_date
+                                                        AND dr.value IS NOT NULL
+                                                        AND dr.value <> 0
+                                                        AND dr.account_id = ref_ba.id (+)),
+                                                    -- PROVISION_MSFO_OVER_BALANCE
+                                                    (SELECT xmlelement("provision_msfo_over_balance",
+                                                              -- BALANCE_ACCOUNT
+                                                              decode(dr.account_id, null, null, xmlelement("balance_account",
+                                                                -- NO_
+                                                                xmlelement("no_", ref_ba.no_)
+                                                              )),
+                                                              -- VALUE
+                                                              xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
+                                                            )
+                                                       FROM core.debt_remains dr,
+                                                            (SELECT t.parent_id AS id,
+                                                                    t.no_
+                                                               FROM ref.balance_account t
+                                                              WHERE t.open_date <= v_report_date
+                                                                AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
+                                                      WHERE dr.credit_id = vch.id
+                                                        AND dr.type_id = 129
+                                                        AND dr.rep_date = v_report_date
+                                                        AND dr.value IS NOT NULL
+                                                        AND dr.value <> 0
+                                                        AND dr.account_id = ref_ba.id (+))
+                                                  )
+                                             FROM dual
+                                            WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0 AND t.type_id in (103, 104, 129)))
+                                       )
+                                  FROM dual
+                                 WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0 AND t.type_id in (103, 104, 129))
+                                    OR EXISTS (SELECT t.* FROM core.credit_flow t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.classification_id IS NOT NULL)),
+                             -- TURNOVER
+                             (SELECT xmlelement("turnover",
+                                       -- ISSUE
+                                       xmlelement("issue",
+                                         -- DEBT
+                                         (SELECT xmlelement("debt",
+                                                   -- AMOUNT
+                                                   xmlelement("amount", ltrim(to_char(t.amount, c_number_format, c_nls_numeric_characters))),
+                                                   -- AMOUNT_CURRENCY
+                                                   decode(t.amount_currency, null, null, xmlelement("amount_currency", ltrim(to_char(t.amount_currency, c_number_format, c_nls_numeric_characters))))
+                                                 )
+                                            FROM core.turnover t
+                                           WHERE t.credit_id = vch.id
+                                             AND t.type_id = 18
+                                             AND t.rep_date = v_report_date
+                                             AND t.amount IS NOT NULL
+                                             AND t.amount <> 0),
+                                         -- INTEREST
+                                         (SELECT xmlelement("interest",
+                                                   -- AMOUNT
+                                                   xmlelement("amount", ltrim(to_char(t.amount, c_number_format, c_nls_numeric_characters))),
+                                                   -- AMOUNT_CURRENCY
+                                                   decode(t.amount_currency, null, null, xmlelement("amount_currency", ltrim(to_char(t.amount_currency, c_number_format, c_nls_numeric_characters))))
+                                                 )
+                                            FROM core.turnover t
+                                           WHERE t.credit_id = vch.id
+                                             AND t.type_id = 19
+                                             AND t.rep_date = v_report_date
+                                             AND t.amount IS NOT NULL
+                                             AND t.amount <> 0)
+                                       )
+                                     )
+                                FROM dual
+                               WHERE EXISTS (SELECT t.* FROM core.turnover t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.amount IS NOT NULL AND t.amount <> 0)))
+                        FROM dual
+                       WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0)
+                          OR EXISTS (SELECT t.* FROM core.credit_flow t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date)
+                          OR EXISTS (SELECT t.* FROM core.turnover t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.amount IS NOT NULL AND t.amount <> 0)),
+                     -- PERSONS
+                     get_persons_xml(vch.id, v_report_date, 'persons'),                         
+                     -- ORGANIZATIONS
+                     get_organizations_xml(vch.id, v_report_date, 'organizations'),              
+                     -- CREDITORS
+                     get_creditors_xml(vch.id, v_report_date, 'creditors'),
+
+                     -- SUBJECTS_OLD
+                     (SELECT xmlelement("subjects",
+                               xmlagg(
+                                 xmlelement("item",
+                                   -- ORGANIZATION
+                                   (SELECT xmlelement("organization",
+                                             -- ADDRESSES
+                                             (SELECT (SELECT xmlelement("addresses",
+                                                               xmlagg(
+                                                                 -- ITEM
+                                                                 xmlelement("item",
+                                                                   -- DETAILS
+                                                                   decode(a.details, null, null, xmlelement("details", a.details)),
+                                                                   -- REGION
+                                                                   decode(a.region_id, null, null, xmlelement("region",
+                                                                     -- CODE
+                                                                     xmlelement("code", ref_a_r.code)
+                                                                   )),
+                                                                   -- TYPE
+                                                                   xmlelement("type", ref_at.code)
+                                                                 )
+                                                               )
+                                                             )
+                                                        FROM core.address a,
+                                                             ref.shared ref_at,
+                                                             (SELECT t.parent_id AS id,
+                                                                     t.code
+                                                                FROM ref.region t
+                                                               WHERE t.open_date <= v_report_date
+                                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_a_r
+                                                       WHERE a.org_id = s_voh.id
+                                                         AND a.region_id = ref_a_r.id (+)
+                                                         AND a.type_id = ref_at.id)
+                                                FROM dual
+                                               WHERE EXISTS (SELECT t.* FROM core.address t WHERE t.org_id = s_voh.id)),
+                                             -- BANK_RELATIONS
+                                             (SELECT (SELECT xmlelement("bank_relations",
+                                                               xmlagg(
+                                                                 -- ITEM
+                                                                 xmlelement("item",
+                                                                   -- CREDITOR
+                                                                   (SELECT xmlelement("creditor",
+                                                                             -- CODE
+                                                                             decode(br_vch.code, null, null, xmlelement("code", br_vch.code)),
+                                                                             -- DOCS
+                                                                             (SELECT xmlelement("docs",
+                                                                                       xmlagg(
+                                                                                         -- ITEM
+                                                                                         xmlelement("item",
+                                                                                           -- DOC_TYPE
+                                                                                           decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
+                                                                                             xmlelement("code", ref_dt.code)
+                                                                                           )),
+                                                                                           -- NO
+                                                                                           xmlelement("no", ref_vcdh.no_)
+                                                                                         )
+                                                                                       )
+                                                                                     )
+                                                                                FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
+                                                                                     (SELECT t.parent_id AS id,
+                                                                                             t.code
+                                                                                        FROM ref.doc_type t
+                                                                                       WHERE t.open_date <= v_report_date
+                                                                                         AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_dt
+                                                                               WHERE ref_vcdh.creditor_id = br_vch.id
+                                                                                 AND ref_vcdh.type_id = ref_dt.id (+))
+                                                                           )
+                                                                      FROM ref.v_creditor_his br_vch
+                                                                     WHERE br_vch.id = di.creditor_id
+                                                                       AND br_vch.open_date <= v_report_date
+                                                                       AND (br_vch.close_date > v_report_date OR br_vch.close_date is null)),
+                                                                     xmlelement("bank_relation",
+                                                                       -- CODE
+                                                                       xmlelement("code", ref_br_br.code)
+                                                                     )
+                                                                 )
+                                                               )
+                                                             )
+                                                        FROM core.debtor_info di,
+                                                             (SELECT t.parent_id AS id,
+                                                                     t.code
+                                                                FROM ref.bank_relation t
+                                                               WHERE t.open_date <= v_report_date
+                                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_br_br
+                                                       WHERE di.org_id = s_voh.id
+                                                         --AND di.creditor_id = v_creditor_id
+                                                         AND di.bank_relation_id = ref_br_br.id (+)
+                                                         AND di.open_date <= v_report_date
+                                                         AND (di.close_date > v_report_date OR di.close_date is null))
+                                                FROM dual
+                                               WHERE EXISTS (SELECT t.*
+                                                               FROM core.debtor_info t
+                                                              WHERE t.org_id = s_voh.id
+                                                                --AND t.creditor_id = v_creditor_id
+                                                                AND t.open_date <= v_report_date
+                                                                AND (t.close_date > v_report_date OR t.close_date is null))),
+                                             -- CONTACTS
+                                             (SELECT (SELECT xmlelement("contacts",
+                                                               xmlagg(
+                                                                 -- ITEM
+                                                                 xmlelement("item",
+                                                                   -- CONTACT_TYPE
+                                                                   decode(c.type_id, null, null, xmlelement("contact_type",
+                                                                     -- CODE
+                                                                     xmlelement("code", ref_c_ct.code)
+                                                                   )),
+                                                                   -- DETAILS
+                                                                   decode(c.details, null, null, xmlelement("details", xmlelement("item", c.details)))
+                                                                 )
+                                                               )
+                                                             )
+                                                        FROM core.contact c,
+                                                             (SELECT t.parent_id AS id,
+                                                                     t.code
+                                                                FROM ref.contact_type t
+                                                               WHERE t.open_date <= v_report_date
+                                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_c_ct
+                                                       WHERE c.org_id = s_voh.id
+                                                         AND c.type_id = ref_c_ct.id (+))
+                                                FROM dual
+                                               WHERE EXISTS (SELECT t.* FROM core.contact t WHERE t.org_id = s_voh.id)),
+                                             -- COUNTRY
+                                             decode(s_voh.country_id, null, null, xmlelement("country",
+                                               xmlelement("code_numeric", ref_o_c.code_numeric)
+                                             )),
+                                             -- DOCS
+                                             (SELECT (SELECT xmlelement("docs",
+                                                               xmlagg(
+                                                                 -- ITEM
+                                                                 xmlelement("item",
+                                                                   -- DOC_TYPE
+                                                                   decode(vddh.type_id, null, null, xmlelement("doc_type",
+                                                                     -- CODE
+                                                                     xmlelement("code", ref_d_dt.code)
+                                                                   )),
+                                                                   -- NAME
+                                                                   decode(vddh.name, null, null, xmlelement("name", vddh.name)),
+                                                                   -- NO
+                                                                   decode(vddh.no_, null, null, xmlelement("no", vddh.no_))
+                                                                 )
+                                                               )
+                                                             )
+                                                        FROM core.v_debtor_doc_his vddh,
+                                                             (SELECT t.parent_id AS id,
+                                                                     t.code
+                                                                FROM ref.doc_type t
+                                                               WHERE t.open_date <= v_report_date
+                                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_d_dt
+                                                       WHERE vddh.org_id = s_voh.id
+                                                         AND vddh.type_id = ref_d_dt.id (+)
+                                                         AND vddh.open_date <= v_report_date
+                                                         AND (vddh.close_date > v_report_date OR vddh.close_date is null))
+                                                FROM dual
+                                               WHERE EXISTS (SELECT t.*
+                                                               FROM core.v_debtor_doc_his t
+                                                              WHERE t.org_id = s_voh.id
+                                                                AND t.open_date <= v_report_date
+                                                                AND (t.close_date > v_report_date OR t.close_date is null))),
+                                             -- ECON_TRADE
+                                             decode(s_voh.econ_trade_id, null, null, xmlelement("econ_trade",
+                                               xmlelement("code", ref_o_et.code)
+                                             )),
+                                             -- ENTERPRISE_TYPE
+                                             decode(s_voh.enterprise_type_id, null, null, xmlelement("enterprise_type",
+                                               xmlelement("code", ref_o_t.code)
+                                             )),
+                                             -- HEAD
+                                             (SELECT xmlelement("head",
+                                                       -- DOCS
+                                                       (SELECT (SELECT xmlelement("docs",
+                                                                         xmlagg(
+                                                                           -- ITEM
+                                                                           xmlelement("item",
+                                                                             -- DOC_TYPE
+                                                                             decode(vddh.type_id, null, null, xmlelement("doc_type",
+                                                                               -- CODE
+                                                                               xmlelement("code", ref_d_dt.code)
+                                                                             )),
+                                                                             -- NAME
+                                                                             decode(vddh.name, null, null, xmlelement("name", vddh.name)),
+                                                                             -- NO
+                                                                             decode(vddh.no_, null, null, xmlelement("no", vddh.no_))
+                                                                           )
+                                                                         )
+                                                                       )
+                                                                  FROM core.v_debtor_doc_his vddh,
+                                                                       (SELECT t.parent_id AS id,
+                                                                               t.code
+                                                                          FROM ref.doc_type t
+                                                                         WHERE t.open_date <= v_report_date
+                                                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_d_dt
+                                                                 WHERE vddh.person_id = h_vph.id
+                                                                   AND vddh.type_id = ref_d_dt.id (+)
+                                                                   AND vddh.open_date <= v_report_date
+                                                                   AND (vddh.close_date > v_report_date OR vddh.close_date is null))
+                                                          FROM dual
+                                                         WHERE EXISTS (SELECT t.*
+                                                                         FROM core.v_debtor_doc_his t
+                                                                        WHERE t.person_id = h_vph.id
+                                                                          AND t.open_date <= v_report_date
+                                                                          AND (t.close_date > v_report_date OR t.close_date is null))),
+                                                       -- NAMES
+                                                       (SELECT (SELECT xmlelement("names",
+                                                                         xmlagg(
+                                                                           -- ITEM
+                                                                           xmlelement("item",
+                                                                             -- FIRSTNAME
+                                                                             decode(vpnh.first_name, null, null, xmlelement("firstname", vpnh.first_name)),
+                                                                             -- LASTNAME
+                                                                             decode(vpnh.last_name, null, null, xmlelement("lastname", vpnh.last_name)),
+                                                                             -- MIDDLENAME
+                                                                             decode(vpnh.middle_name, null, null, xmlelement("middlename", vpnh.middle_name)),
+                                                                             -- CODE
+                                                                             xmlelement("lang", ref_l.code)
+                                                                           )
+                                                                         )
+                                                                       )
+                                                                  FROM core.v_person_name_his vpnh,
+                                                                       ref.shared ref_l
+                                                                 WHERE vpnh.person_id = h_vph.id
+                                                                   AND vpnh.lang_id = ref_l.id (+)
+                                                                   AND vpnh.open_date <= v_report_date
+                                                                   AND (vpnh.close_date > v_report_date OR vpnh.close_date is null))
+                                                          FROM dual
+                                                         WHERE EXISTS (SELECT t.*
+                                                                         FROM core.v_person_name_his t
+                                                                        WHERE t.person_id = h_vph.id
+                                                                          AND t.open_date <= v_report_date
+                                                                          AND (t.close_date > v_report_date OR t.close_date is null)))
+                                                     )
+                                                FROM core.v_person_his h_vph
+                                               WHERE h_vph.id = s_voh.head_id
+                                                 AND h_vph.open_date <= v_report_date
+                                                 AND (h_vph.close_date > v_report_date OR h_vph.close_date is null)),
+                                             -- IS_SE
+                                             decode(s_voh.is_se, null, null, xmlelement("is_se", decode(s_voh.is_se, 1, 'true', 'false'))),
+                                             -- LEGAL_FORM
+                                             decode(s_voh.legal_form_id, null, null, xmlelement("legal_form",
+                                               xmlelement("code", ref_o_lf.code)
+                                             )),
+                                             -- NAMES
+                                             (SELECT (SELECT xmlelement("names",
+                                                               xmlagg(
+                                                                 -- ITEM
+                                                                 xmlelement("item",
+                                                                   -- NAME
+                                                                   decode(vonh.name, null, null, xmlelement("name", vonh.name)),
+                                                                   -- CODE
+                                                                   xmlelement("lang", ref_l.code)
+                                                                 )
+                                                               )
+                                                             )
+                                                        FROM core.v_org_name_his vonh,
+                                                             ref.shared ref_l
+                                                       WHERE vonh.org_id = s_voh.id
+                                                         AND vonh.lang_id = ref_l.id (+)
+                                                         AND vonh.open_date <= v_report_date
+                                                         AND (vonh.close_date > v_report_date OR vonh.close_date is null))
+                                                FROM dual
+                                               WHERE EXISTS (SELECT t.*
+                                                               FROM core.v_org_name_his t
+                                                              WHERE t.org_id = s_voh.id
+                                                                AND t.open_date <= v_report_date
+                                                                AND (t.close_date > v_report_date OR t.close_date is null))),
+                                             -- OFFSHORE
+                                             decode(s_voh.offshore_id, null, null, xmlelement("offshore",
+                                               xmlelement("code", ref_o_o.code)
+                                             ))
+                                           )
+                                      FROM v_organization_his s_voh,
+                                           (SELECT t.parent_id AS id,
+                                                   t.code
+                                              FROM ref.enterprise_type t
+                                             WHERE t.open_date <= v_report_date
+                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_o_t,
+                                           (SELECT t.parent_id AS id,
+                                                   t.code
+                                              FROM ref.econ_trade t
+                                             WHERE t.open_date <= v_report_date
+                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_o_et,
+                                           (SELECT t.parent_id AS id,
+                                                   t.code
+                                              FROM ref.legal_form t
+                                             WHERE t.open_date <= v_report_date
+                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_o_lf,
+                                           (SELECT t.parent_id AS id,
+                                                   t.code_numeric
+                                              FROM ref.country t
+                                             WHERE t.open_date <= v_report_date
+                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_o_c,
+                                           (SELECT t.parent_id AS id,
+                                                   t.code
+                                              FROM ref.offshore t
+                                             WHERE t.open_date <= v_report_date
+                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_o_o
+                                     WHERE s_voh.id = vdh.org_id
+                                       AND s_voh.offshore_id = ref_o_o.id (+)
+                                       AND s_voh.country_id = ref_o_c.id (+)
+                                       AND s_voh.econ_trade_id = ref_o_et.id (+)
+                                       AND s_voh.legal_form_id = ref_o_lf.id (+)
+                                       AND s_voh.enterprise_type_id = ref_o_t.id (+)
+                                       AND s_voh.open_date <= v_report_date
+                                       AND (s_voh.close_date > v_report_date OR s_voh.close_date is null)),
+                                   -- PERSON
+                                   (SELECT xmlelement("person",
+                                             -- ADDRESSES
+                                             (SELECT (SELECT xmlelement("addresses",
+                                                               xmlagg(
+                                                                 -- ITEM
+                                                                 xmlelement("item",
+                                                                   -- DETAILS
+                                                                   decode(a.details, null, null, xmlelement("details", a.details)),
+                                                                   -- REGION
+                                                                   decode(a.region_id, null, null, xmlelement("region",
+                                                                     -- CODE
+                                                                     xmlelement("code", ref_a_r.code)
+                                                                   )),
+                                                                   -- TYPE
+                                                                   xmlelement("type", ref_at.code)
+                                                                 )
+                                                               )
+                                                             )
+                                                        FROM core.address a,
+                                                             ref.shared ref_at,
+                                                             (SELECT t.parent_id AS id,
+                                                                     t.code
+                                                                FROM ref.region t
+                                                               WHERE t.open_date <= v_report_date
+                                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_a_r
+                                                       WHERE a.person_id = s_vph.id
+                                                         AND a.region_id = ref_a_r.id (+)
+                                                         AND a.type_id = ref_at.id)
+                                                FROM dual
+                                               WHERE EXISTS (SELECT t.* FROM core.address t WHERE t.person_id = s_vph.id)),
+                                             -- BANK_RELATIONS
+                                             (SELECT (SELECT xmlelement("bank_relations",
+                                                               xmlagg(
+                                                                 -- ITEM
+                                                                 xmlelement("item",
+                                                                     -- CREDITOR
+                                                                   (SELECT xmlelement("creditor",
+                                                                             -- CODE
+                                                                             decode(br_vch.code, null, null, xmlelement("code", br_vch.code)),
+                                                                             -- DOCS
+                                                                             (SELECT xmlelement("docs",
+                                                                                       xmlagg(
+                                                                                         -- ITEM
+                                                                                         xmlelement("item",
+                                                                                           -- DOC_TYPE
+                                                                                           decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
+                                                                                             xmlelement("code", ref_dt.code)
+                                                                                           )),
+                                                                                           -- NO
+                                                                                           xmlelement("no", ref_vcdh.no_)
+                                                                                         )
+                                                                                       )
+                                                                                     )
+                                                                                FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
+                                                                                     (SELECT t.parent_id AS id,
+                                                                                             t.code
+                                                                                        FROM ref.doc_type t
+                                                                                       WHERE t.open_date <= v_report_date
+                                                                                         AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_dt
+                                                                               WHERE ref_vcdh.creditor_id = br_vch.id
+                                                                                 AND ref_vcdh.type_id = ref_dt.id (+))
+                                                                           )
+                                                                      FROM ref.v_creditor_his br_vch
+                                                                     WHERE br_vch.id = di.creditor_id
+                                                                       AND br_vch.open_date <= v_report_date
+                                                                       AND (br_vch.close_date > v_report_date OR br_vch.close_date is null)),
+                                                                     xmlelement("bank_relation",
+                                                                       -- CODE
+                                                                       xmlelement("code", ref_br_br.code)
+                                                                     )
+                                                                 )
+                                                               )
+                                                             )
+                                                        FROM core.debtor_info di,
+                                                             (SELECT t.parent_id AS id,
+                                                                     t.code
+                                                                FROM ref.bank_relation t
+                                                               WHERE t.open_date <= v_report_date
+                                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_br_br
+                                                       WHERE di.person_id = s_vph.id
+                                                         AND di.bank_relation_id = ref_br_br.id (+)
+                                                         AND di.open_date <= v_report_date
+                                                         AND (di.close_date > v_report_date OR di.close_date is null))
+                                                FROM dual
+                                               WHERE EXISTS (SELECT t.*
+                                                               FROM core.debtor_info t
+                                                              WHERE t.person_id = s_vph.id
+                                                                AND t.open_date <= v_report_date
+                                                                AND (t.close_date > v_report_date OR t.close_date is null))),
+                                             -- CONTACTS
+                                             (SELECT (SELECT xmlelement("contacts",
+                                                               xmlagg(
+                                                                 -- ITEM
+                                                                 xmlelement("item",
+                                                                   -- CONTACT_TYPE
+                                                                   decode(c.type_id, null, null, xmlelement("contact_type",
+                                                                     -- CODE
+                                                                     xmlelement("code", ref_c_ct.code)
+                                                                   )),
+                                                                   -- DETAILS
+                                                                   decode(c.details, null, null, xmlelement("details", xmlelement("item", c.details)))
+                                                                 )
+                                                               )
+                                                             )
+                                                        FROM core.contact c,
+                                                             (SELECT t.parent_id AS id,
+                                                                     t.code
+                                                                FROM ref.contact_type t
+                                                               WHERE t.open_date <= v_report_date
+                                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_c_ct
+                                                       WHERE c.person_id = s_vph.id
+                                                         AND c.type_id = ref_c_ct.id (+))
+                                                FROM dual
+                                               WHERE EXISTS (SELECT t.* FROM core.contact t WHERE t.person_id = s_vph.id)),
+                                             -- COUNTRY
+                                             decode(s_vph.country_id, null, null, xmlelement("country",
+                                               xmlelement("code_numeric", ref_p_c.code_numeric)
+                                             )),
+                                             -- DOCS
+                                             (SELECT (SELECT xmlelement("docs",
+                                                               xmlagg(
+                                                                 -- ITEM
+                                                                 xmlelement("item",
+                                                                   -- DOC_TYPE
+                                                                   decode(vddh.type_id, null, null, xmlelement("doc_type",
+                                                                     -- CODE
+                                                                     xmlelement("code", ref_d_dt.code)
+                                                                   )),
+                                                                   -- NAME
+                                                                   decode(vddh.name, null, null, xmlelement("name", vddh.name)),
+                                                                   -- NO
+                                                                   decode(vddh.no_, null, null, xmlelement("no", vddh.no_))
+                                                                 )
+                                                               )
+                                                             )
+                                                        FROM core.v_debtor_doc_his vddh,
+                                                             (SELECT t.parent_id AS id,
+                                                                     t.code
+                                                                FROM ref.doc_type t
+                                                               WHERE t.open_date <= v_report_date
+                                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_d_dt
+                                                       WHERE vddh.person_id = s_vph.id
+                                                         AND vddh.type_id = ref_d_dt.id (+)
+                                                         AND vddh.open_date <= v_report_date
+                                                         AND (vddh.close_date > v_report_date OR vddh.close_date is null))
+                                                FROM dual
+                                               WHERE EXISTS (SELECT t.*
+                                                               FROM core.v_debtor_doc_his t
+                                                              WHERE t.person_id = s_vph.id
+                                                                AND t.open_date <= v_report_date
+                                                                AND (t.close_date > v_report_date OR t.close_date is null))),
+                                             -- NAMES
+                                             (SELECT (SELECT xmlelement("names",
+                                                               xmlagg(
+                                                                 -- ITEM
+                                                                 xmlelement("item",
+                                                                   -- FIRSTNAME
+                                                                   decode(vpnh.first_name, null, null, xmlelement("firstname", vpnh.first_name)),
+                                                                   -- LASTNAME
+                                                                   decode(vpnh.last_name, null, null, xmlelement("lastname", vpnh.last_name)),
+                                                                   -- MIDDLENAME
+                                                                   decode(vpnh.middle_name, null, null, xmlelement("middlename", vpnh.middle_name)),
+                                                                   -- CODE
+                                                                   xmlelement("lang", ref_l.code)
+                                                                 )
+                                                               )
+                                                             )
+                                                        FROM core.v_person_name_his vpnh,
+                                                             ref.shared ref_l
+                                                       WHERE vpnh.person_id = s_vph.id
+                                                         AND vpnh.lang_id = ref_l.id (+)
+                                                         AND vpnh.open_date <= v_report_date
+                                                         AND (vpnh.close_date > v_report_date OR vpnh.close_date is null))
+                                                FROM dual
+                                               WHERE EXISTS (SELECT t.*
+                                                               FROM core.v_person_name_his t
+                                                              WHERE t.person_id = s_vph.id
+                                                                AND t.open_date <= v_report_date
+                                                                AND (t.close_date > v_report_date OR t.close_date is null))),
+                                             -- OFFSHORE
+                                             decode(s_vph.offshore_id, null, null, xmlelement("offshore",
+                                               xmlelement("code", ref_p_o.code)
+                                             ))
+                                           )
+                                      FROM v_person_his s_vph,
+                                           (SELECT t.parent_id AS id,
+                                                   t.code_numeric
+                                              FROM ref.country t
+                                             WHERE t.open_date <= v_report_date
+                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_p_c,
+                                           (SELECT t.parent_id AS id,
+                                                   t.code
+                                              FROM ref.offshore t
+                                             WHERE t.open_date <= v_report_date
+                                               AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_p_o
+                                     WHERE s_vph.id = vdh.person_id
+                                       AND s_vph.offshore_id = ref_p_o.id (+)
+                                       AND s_vph.country_id = ref_p_c.id (+)
+                                       AND s_vph.open_date <= v_report_date
+                                       AND (s_vph.close_date > v_report_date OR s_vph.close_date is null)),
+                                   -- CREDITOR
+                                   (SELECT xmlelement("creditor",
+                                             -- CODE
+                                             decode(s_vch.code, null, null, xmlelement("code", s_vch.code)),
+                                             -- DOCS
+                                             (SELECT xmlelement("docs",
+                                                       xmlagg(
+                                                         -- ITEM
+                                                         xmlelement("item",
+                                                           -- DOC_TYPE
+                                                           decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
+                                                             xmlelement("code", ref_dt.code)
+                                                           )),
+                                                           -- NO
+                                                           xmlelement("no", ref_vcdh.no_)
+                                                         )
                                                        )
-                                                  FROM core.debt_remains dr,
-                                                       (SELECT t.parent_id AS id,
-                                                               t.no_
-                                                          FROM ref.balance_account t
-                                                         WHERE t.open_date <= v_report_date
-                                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                                 WHERE dr.credit_id = vch.id
-                                                   AND dr.type_id = 55
-                                                   AND dr.rep_date = v_report_date
-                                                   AND dr.value IS NOT NULL
-                                                   AND dr.value <> 0
-                                                   AND dr.account_id = ref_ba.id (+)),
-                                               -- PASTDUE
-                                               (SELECT xmlelement("pastdue",
-                                                         -- BALANCE_ACCOUNT
-                                                         decode(dr.account_id, null, null, xmlelement("balance_account",
-                                                           -- NO_
-                                                           xmlelement("no_", ref_ba.no_)
-                                                         )),
-                                                         -- VALUE
-                                                         xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                                                         -- VALUE_CURRENCY
-                                                         decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))),
-                                                         -- OPEN_DATE
-                                                         xmlelement("open_date", to_char(dr.pastdue_open_date, c_date_format)),
-                                                         -- CLOSE_DATE
-                                                         xmlelement("close_date", to_char(dr.pastdue_close_date, c_date_format))
-                                                       )
-                                                  FROM core.debt_remains dr,
-                                                       (SELECT t.parent_id AS id,
-                                                               t.no_
-                                                          FROM ref.balance_account t
-                                                         WHERE t.open_date <= v_report_date
-                                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                                 WHERE dr.credit_id = vch.id
-                                                   AND dr.type_id = 56
-                                                   AND dr.rep_date = v_report_date
-                                                   AND dr.value IS NOT NULL
-                                                   AND dr.value <> 0
-                                                   AND dr.account_id = ref_ba.id (+)),
-                                               -- WRITE_OFF
-                                               (SELECT xmlelement("write_off",
-                                                         -- BALANCE_ACCOUNT
-                                                         decode(dr.account_id, null, null, xmlelement("balance_account",
-                                                           -- NO_
-                                                           xmlelement("no_", ref_ba.no_)
-                                                         )),
-                                                         -- VALUE
-                                                         xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                                                         -- VALUE_CURRENCY
-                                                         decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))),
-                                                         -- DATE
-                                                         xmlelement("date", to_char(dr.write_off_date, c_date_format))
-                                                       )
-                                                  FROM core.debt_remains dr,
-                                                       (SELECT t.parent_id AS id,
-                                                               t.no_
-                                                          FROM ref.balance_account t
-                                                         WHERE t.open_date <= v_report_date
-                                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                                 WHERE dr.credit_id = vch.id
-                                                   AND dr.type_id = 57
-                                                   AND dr.rep_date = v_report_date
-                                                   AND dr.value IS NOT NULL
-                                                   AND dr.value <> 0
-                                                   AND dr.account_id = ref_ba.id (+))
-                                             )
-                                        FROM dual
-                                       WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.type_id in (55, 56, 57) AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0)),
-                                     -- DISCOUNT
-                                     (SELECT xmlelement("discount",
-                                               -- BALANCE_ACCOUNT
-                                               decode(dr.account_id, null, null, xmlelement("balance_account",
-                                                 -- NO_
-                                                 xmlelement("no_", ref_ba.no_)
-                                               )),
-                                               -- VALUE
-                                               xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                                               -- VALUE_CURRENCY
-                                               decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))))
-                                             )
-                                        FROM core.debt_remains dr,
-                                             (SELECT t.parent_id AS id,
-                                                     t.no_
-                                                FROM ref.balance_account t
-                                               WHERE t.open_date <= v_report_date
-                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                       WHERE dr.credit_id = vch.id
-                                         AND dr.type_id = 61
-                                         AND dr.rep_date = v_report_date
-                                         AND dr.value IS NOT NULL
-                                         AND dr.value <> 0
-                                         AND dr.account_id = ref_ba.id (+)),
-                                     -- DISCOUNTED_VALUE
-                                     (SELECT xmlelement("discounted_value",
-                                               xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
-                                             )
-                                        FROM core.debt_remains dr,
-                                             (SELECT t.parent_id AS id,
-                                                     t.no_
-                                                FROM ref.balance_account t
-                                               WHERE t.open_date <= v_report_date
-                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                       WHERE dr.credit_id = vch.id
-                                         AND dr.type_id = 63
-                                         AND dr.rep_date = v_report_date
-                                         AND dr.value IS NOT NULL
-                                         AND dr.value <> 0
-                                         AND dr.account_id = ref_ba.id (+)),
-                                     -- INTEREST
-                                     (SELECT xmlelement("interest",
-                                               -- CURRENT
-                                               (SELECT xmlelement("current",
-                                                         -- BALANCE_ACCOUNT
-                                                         decode(dr.account_id, null, null, xmlelement("balance_account",
-                                                           -- NO_
-                                                           xmlelement("no_", ref_ba.no_)
-                                                         )),
-                                                         -- VALUE
-                                                         xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                                                         -- VALUE_CURRENCY
-                                                         decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))))
-                                                       )
-                                                  FROM core.debt_remains dr,
-                                                       (SELECT t.parent_id AS id,
-                                                               t.no_
-                                                          FROM ref.balance_account t
-                                                         WHERE t.open_date <= v_report_date
-                                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                                 WHERE dr.credit_id = vch.id
-                                                   AND dr.type_id = 58
-                                                   AND dr.rep_date = v_report_date
-                                                   AND dr.value IS NOT NULL
-                                                   AND dr.value <> 0
-                                                   AND dr.account_id = ref_ba.id (+)),
-                                               -- PASTDUE
-                                               (SELECT xmlelement("pastdue",
-                                                         -- BALANCE_ACCOUNT
-                                                         decode(dr.account_id, null, null, xmlelement("balance_account",
-                                                           -- NO_
-                                                           xmlelement("no_", ref_ba.no_)
-                                                         )),
-                                                         -- VALUE
-                                                         xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                                                         -- VALUE_CURRENCY
-                                                         decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))),
-                                                         -- OPEN_DATE
-                                                         xmlelement("open_date", to_char(dr.pastdue_open_date, c_date_format)),
-                                                         -- CLOSE_DATE
-                                                         xmlelement("close_date", to_char(dr.pastdue_close_date, c_date_format))
-                                                       )
-                                                  FROM core.debt_remains dr,
-                                                       (SELECT t.parent_id AS id,
-                                                               t.no_
-                                                          FROM ref.balance_account t
-                                                         WHERE t.open_date <= v_report_date
-                                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                                 WHERE dr.credit_id = vch.id
-                                                   AND dr.type_id = 59
-                                                   AND dr.rep_date = v_report_date
-                                                   AND dr.value IS NOT NULL
-                                                   AND dr.value <> 0
-                                                   AND dr.account_id = ref_ba.id (+)),
-                                               -- WRITE_OFF
-                                               (SELECT xmlelement("write_off",
-                                                         -- VALUE
-                                                         xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                                                         -- VALUE_CURRENCY
-                                                         decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))),
-                                                         -- DATE
-                                                         xmlelement("date", to_char(dr.write_off_date, c_date_format))
-                                                       )
-                                                  FROM core.debt_remains dr
-                                                 WHERE dr.credit_id = vch.id
-                                                   AND dr.type_id = 60
-                                                   AND dr.rep_date = v_report_date
-                                                   AND dr.value IS NOT NULL
-                                                   AND dr.value <> 0)
-                                             )
-                                        FROM dual
-                                       WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.type_id in (58, 59, 60) AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0)),
-                                     -- LIMIT
-                                     (SELECT xmlelement("limit",
-                                               -- BALANCE_ACCOUNT
-                                               decode(dr.account_id, null, null, xmlelement("balance_account",
-                                                 -- NO_
-                                                 xmlelement("no_", ref_ba.no_)
-                                               )),
-                                               -- VALUE
-                                               xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                                               -- VALUE_CURRENCY
-                                               decode(dr.value_currency, null, null, xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))))
-                                             )
-                                        FROM core.debt_remains dr,
-                                             (SELECT t.parent_id AS id,
-                                                     t.no_
-                                                FROM ref.balance_account t
-                                               WHERE t.open_date <= v_report_date
-                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                       WHERE dr.credit_id = vch.id
-                                         AND dr.type_id = 102
-                                         AND dr.rep_date = v_report_date
-                                         AND dr.value IS NOT NULL
-                                         AND dr.value <> 0
-                                         AND dr.account_id = ref_ba.id (+))
-                                   )
-                              FROM dual
-                             WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0 AND t.type_id in (55, 56, 57, 58, 59, 60, 61, 62, 63, 102))),
-                           -- CREDIT_FLOW
-                           (SELECT xmlelement("credit_flow",
-                                     (SELECT xmlelement("classification",
-                                               -- CODE
-                                               xmlelement("code", ref_cs.code)
-                                             )
-                                        FROM core.credit_flow cf,
-                                             (SELECT t.parent_id AS id,
-                                                     t.code
-                                                FROM ref.classification t
-                                               WHERE t.open_date <= v_report_date
-                                                 AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_cs
-                                       WHERE cf.credit_id = vch.id
-                                         AND cf.rep_date = v_report_date
-                                         AND cf.classification_id IS NOT NULL
-                                         AND cf.classification_id = ref_cs.id),
-                                      -- PROVISION
-                                      (SELECT xmlelement("provision",
-                                                -- PROVISION_KFN
-                                                (SELECT xmlelement("provision_kfn",
-                                                          -- BALANCE_ACCOUNT
-                                                          decode(dr.account_id, null, null, xmlelement("balance_account",
-                                                            -- NO_
-                                                            xmlelement("no_", ref_ba.no_)
-                                                          )),
-                                                          -- VALUE
-                                                          xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
-                                                        )
-                                                   FROM core.debt_remains dr,
-                                                        (SELECT t.parent_id AS id,
-                                                                t.no_
-                                                           FROM ref.balance_account t
-                                                          WHERE t.open_date <= v_report_date
-                                                            AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                                  WHERE dr.credit_id = vch.id
-                                                    AND dr.type_id = 103
-                                                    AND dr.rep_date = v_report_date
-                                                    AND dr.value IS NOT NULL
-                                                    AND dr.value <> 0
-                                                    AND dr.account_id = ref_ba.id (+)),
-                                                -- PROVISION_MSFO
-                                                (SELECT xmlelement("provision_msfo",
-                                                          -- BALANCE_ACCOUNT
-                                                          decode(dr.account_id, null, null, xmlelement("balance_account",
-                                                            -- NO_
-                                                            xmlelement("no_", ref_ba.no_)
-                                                          )),
-                                                          -- VALUE
-                                                          xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
-                                                        )
-                                                   FROM core.debt_remains dr,
-                                                        (SELECT t.parent_id AS id,
-                                                                t.no_
-                                                           FROM ref.balance_account t
-                                                          WHERE t.open_date <= v_report_date
-                                                            AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                                  WHERE dr.credit_id = vch.id
-                                                    AND dr.type_id = 104
-                                                    AND dr.rep_date = v_report_date
-                                                    AND dr.value IS NOT NULL
-                                                    AND dr.value <> 0
-                                                    AND dr.account_id = ref_ba.id (+)),
-                                                -- PROVISION_MSFO_OVER_BALANCE
-                                                (SELECT xmlelement("provision_msfo_over_balance",
-                                                          -- BALANCE_ACCOUNT
-                                                          decode(dr.account_id, null, null, xmlelement("balance_account",
-                                                            -- NO_
-                                                            xmlelement("no_", ref_ba.no_)
-                                                          )),
-                                                          -- VALUE
-                                                          xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
-                                                        )
-                                                   FROM core.debt_remains dr,
-                                                        (SELECT t.parent_id AS id,
-                                                                t.no_
-                                                           FROM ref.balance_account t
-                                                          WHERE t.open_date <= v_report_date
-                                                            AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_ba
-                                                  WHERE dr.credit_id = vch.id
-                                                    AND dr.type_id = 129
-                                                    AND dr.rep_date = v_report_date
-                                                    AND dr.value IS NOT NULL
-                                                    AND dr.value <> 0
-                                                    AND dr.account_id = ref_ba.id (+))
-                                              )
-                                         FROM dual
-                                        WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0 AND t.type_id in (103, 104, 129)))
-                                   )
-                              FROM dual
-                             WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0 AND t.type_id in (103, 104, 129))
-                                OR EXISTS (SELECT t.* FROM core.credit_flow t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.classification_id IS NOT NULL)),
-                         -- TURNOVER
-                         (SELECT xmlelement("turnover",
-                                   -- ISSUE
-                                   xmlelement("issue",
-                                     -- DEBT
-                                     (SELECT xmlelement("debt",
-                                               -- AMOUNT
-                                               xmlelement("amount", ltrim(to_char(t.amount, c_number_format, c_nls_numeric_characters))),
-                                               -- AMOUNT_CURRENCY
-                                               decode(t.amount_currency, null, null, xmlelement("amount_currency", ltrim(to_char(t.amount_currency, c_number_format, c_nls_numeric_characters))))
-                                             )
-                                        FROM core.turnover t
-                                       WHERE t.credit_id = vch.id
-                                         AND t.type_id = 18
-                                         AND t.rep_date = v_report_date
-                                         AND t.amount IS NOT NULL
-                                         AND t.amount <> 0),
-                                     -- INTEREST
-                                     (SELECT xmlelement("interest",
-                                               -- AMOUNT
-                                               xmlelement("amount", ltrim(to_char(t.amount, c_number_format, c_nls_numeric_characters))),
-                                               -- AMOUNT_CURRENCY
-                                               decode(t.amount_currency, null, null, xmlelement("amount_currency", ltrim(to_char(t.amount_currency, c_number_format, c_nls_numeric_characters))))
-                                             )
-                                        FROM core.turnover t
-                                       WHERE t.credit_id = vch.id
-                                         AND t.type_id = 19
-                                         AND t.rep_date = v_report_date
-                                         AND t.amount IS NOT NULL
-                                         AND t.amount <> 0)
-                                   )
+                                                     )
+                                                FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
+                                                     (SELECT t.parent_id AS id,
+                                                             t.code
+                                                        FROM ref.doc_type t
+                                                       WHERE t.open_date <= v_report_date
+                                                         AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_dt
+                                               WHERE ref_vcdh.creditor_id = s_vch.id
+                                                 AND ref_vcdh.type_id = ref_dt.id (+))
+                                           )
+                                      FROM ref.v_creditor_his s_vch
+                                     WHERE s_vch.id = vdh.creditor_id
+                                       AND s_vch.open_date <= v_report_date
+                                       AND (s_vch.close_date > v_report_date OR s_vch.close_date is null))
                                  )
-                            FROM dual
-                           WHERE EXISTS (SELECT t.* FROM core.turnover t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.amount IS NOT NULL AND t.amount <> 0)))
-                    FROM dual
-                   WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0)
-                      OR EXISTS (SELECT t.* FROM core.credit_flow t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date)
-                      OR EXISTS (SELECT t.* FROM core.turnover t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.amount IS NOT NULL AND t.amount <> 0)),
+                               )
+                             )
+                        FROM v_debtor_his vdh
+                       WHERE vdh.credit_id = vch.id
+                         AND vdh.type_id in (1, 7)
+                         AND (vdh.person_id IS NOT NULL OR vdh.org_id IS NOT NULL OR vdh.creditor_id IS NOT NULL)
+                         AND vdh.open_date <= v_report_date
+                         AND (vdh.close_date > v_report_date OR vdh.close_date IS NULL)),
+                     -- CREDITOR
+                     (SELECT xmlelement("creditor",
+                               -- CODE
+                               decode(s_vch.code, null, null, xmlelement("code", s_vch.code)),
+                               -- DOCS
+                               (SELECT xmlelement("docs",
+                                         xmlagg(
+                                           -- ITEM
+                                           xmlelement("item",
+                                             -- DOC_TYPE
+                                             decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
+                                               xmlelement("code", ref_dt.code)
+                                             )),
+                                             -- NO
+                                             xmlelement("no", ref_vcdh.no_)
+                                           )
+                                         )
+                                       )
+                                  FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
+                                       (SELECT t.parent_id AS id,
+                                               t.code
+                                          FROM ref.doc_type t
+                                         WHERE t.open_date <= v_report_date
+                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_dt
+                                 WHERE ref_vcdh.creditor_id = s_vch.id
+                                   AND ref_vcdh.type_id = ref_dt.id (+))
+                             )
+                        FROM ref.v_creditor_his s_vch
+                       WHERE s_vch.id = vch.creditor_id
+                         AND s_vch.open_date <= v_report_date
+                         AND (s_vch.close_date > v_report_date OR s_vch.close_date is null)),
+                     -- CREDITOR_BRANCH
+                     (SELECT xmlelement("creditor_branch",
+                             -- CODE
+                             decode(ref_vch.code, null, null, xmlelement("code", ref_vch.code)),
+                             -- DOCS
+                             (SELECT xmlelement("docs",
+                                       xmlagg(
+                                         -- ITEM
+                                         xmlelement("item",
+                                           -- DOC_TYPE
+                                           decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
+                                             xmlelement("code", ref_dt.code)
+                                           )),
+                                           -- NO
+                                           xmlelement("no", ref_vcdh.no_)
+                                         )
+                                       )
+                                     )
+                                FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
+                                     (SELECT t.parent_id AS id,
+                                             t.code
+                                        FROM ref.doc_type t
+                                       WHERE t.open_date <= v_report_date
+                                         AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_dt
+                               WHERE ref_vch.id = ref_vcdh.creditor_id
+                                 AND ref_vcdh.type_id = ref_dt.id (+))
+                             )
+                        FROM ref.v_creditor_his ref_vch
+                       WHERE ref_vch.id = vch.creditor_branch_id
+                         AND ref_vch.open_date <= v_report_date
+                         AND (ref_vch.close_date > v_report_date OR ref_vch.close_date IS NULL)),
+                     -- PLEDGES
+                     (SELECT xmlelement("pledges",
+                               (SELECT xmlagg(
+                                         xmlelement("item",
+                                           -- CONTRACT
+                                           decode(vph.contract_no, null, null, xmlelement("contract", vph.contract_no)),
+                                           -- PLEDGE_TYPE
+                                           decode(vph.type_id, null, null, xmlelement("pledge_type",
+                                             xmlelement("code", ref_p_pt.code)
+                                           )),
+    
+                                           -- VALUE
+                                           decode(vph.value_, null, null, xmlelement("value", ltrim(to_char(vph.value_, c_number_format, c_nls_numeric_characters))))
+                                         )
+                                       )
+                                  FROM v_pledge_his vph,
+                                       (SELECT t.parent_id AS id,
+                                               t.code
+                                          FROM ref.pledge_type t
+                                         WHERE t.open_date <= v_report_date
+                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_p_pt
+                                 WHERE vph.credit_id = vch.id
+                                   AND vph.type_id = ref_p_pt.id (+)
+                                   AND vph.open_date <= v_report_date
+                                   AND (vph.close_date > v_report_date OR vph.close_date is null))
+                             )
+                        FROM dual
+                       WHERE EXISTS (SELECT t.*
+                                       FROM v_pledge_his t
+                                      WHERE t.credit_id = vch.id
+                                        AND t.open_date <= v_report_date
+                                        AND (t.close_date > v_report_date OR t.close_date is null)))
+                   ),
                    -- CONTRACT
                    (SELECT xmlelement("contract",
                              -- NO
@@ -1124,68 +2131,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    decode(vch.type_id, null, null, xmlelement("credit_type",
                      xmlelement("code", ref_ct.code)
                    )),
-                   -- CREDITOR
-                   (SELECT xmlelement("creditor",
-                             -- CODE
-                             decode(s_vch.code, null, null, xmlelement("code", s_vch.code)),
-                             -- DOCS
-                             (SELECT xmlelement("docs",
-                                       xmlagg(
-                                         -- ITEM
-                                         xmlelement("item",
-                                           -- DOC_TYPE
-                                           decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
-                                             xmlelement("code", ref_dt.code)
-                                           )),
-                                           -- NO
-                                           xmlelement("no", ref_vcdh.no_)
-                                         )
-                                       )
-                                     )
-                                FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
-                                     (SELECT t.parent_id AS id,
-                                             t.code
-                                        FROM ref.doc_type t
-                                       WHERE t.open_date <= v_report_date
-                                         AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_dt
-                               WHERE ref_vcdh.creditor_id = s_vch.id
-                                 AND ref_vcdh.type_id = ref_dt.id (+))
-                           )
-                      FROM ref.v_creditor_his s_vch
-                     WHERE s_vch.id = vch.creditor_id
-                       AND s_vch.open_date <= v_report_date
-                       AND (s_vch.close_date > v_report_date OR s_vch.close_date is null)),
-                   -- CREDITOR_BRANCH
-                   (SELECT xmlelement("creditor_branch",
-                           -- CODE
-                           decode(ref_vch.code, null, null, xmlelement("code", ref_vch.code)),
-                           -- DOCS
-                           (SELECT xmlelement("docs",
-                                     xmlagg(
-                                       -- ITEM
-                                       xmlelement("item",
-                                         -- DOC_TYPE
-                                         decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
-                                           xmlelement("code", ref_dt.code)
-                                         )),
-                                         -- NO
-                                         xmlelement("no", ref_vcdh.no_)
-                                       )
-                                     )
-                                   )
-                              FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
-                                   (SELECT t.parent_id AS id,
-                                           t.code
-                                      FROM ref.doc_type t
-                                     WHERE t.open_date <= v_report_date
-                                       AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_dt
-                             WHERE ref_vch.id = ref_vcdh.creditor_id
-                               AND ref_vcdh.type_id = ref_dt.id (+))
-                           )
-                      FROM ref.v_creditor_his ref_vch
-                     WHERE ref_vch.id = vch.creditor_branch_id
-                       AND ref_vch.open_date <= v_report_date
-                       AND (ref_vch.close_date > v_report_date OR ref_vch.close_date IS NULL)),
                    -- CURRENCY
                    decode(vch.currency_id, null, null, xmlelement("currency",
                      xmlelement("code", ref_c.code)
@@ -1216,583 +2161,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    xmlelement("no", vch.primary_contract_no),
                    -- DATE
                    xmlelement("date", to_char(vch.primary_contract_date, c_date_format))
-                 ),
-                 -- SUBJECTS
-                 (SELECT xmlelement("subjects",
-                           xmlagg(
-                             xmlelement("item",
-                               -- ORGANIZATION
-                               (SELECT xmlelement("organization",
-                                         -- ADDRESSES
-                                         (SELECT (SELECT xmlelement("addresses",
-                                                           xmlagg(
-                                                             -- ITEM
-                                                             xmlelement("item",
-                                                               -- DETAILS
-                                                               decode(a.details, null, null, xmlelement("details", a.details)),
-                                                               -- REGION
-                                                               decode(a.region_id, null, null, xmlelement("region",
-                                                                 -- CODE
-                                                                 xmlelement("code", ref_a_r.code)
-                                                               )),
-                                                               -- TYPE
-                                                               xmlelement("type", ref_at.code)
-                                                             )
-                                                           )
-                                                         )
-                                                    FROM core.address a,
-                                                         ref.shared ref_at,
-                                                         (SELECT t.parent_id AS id,
-                                                                 t.code
-                                                            FROM ref.region t
-                                                           WHERE t.open_date <= v_report_date
-                                                             AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_a_r
-                                                   WHERE a.org_id = s_voh.id
-                                                     AND a.region_id = ref_a_r.id (+)
-                                                     AND a.type_id = ref_at.id)
-                                            FROM dual
-                                           WHERE EXISTS (SELECT t.* FROM core.address t WHERE t.org_id = s_voh.id)),
-                                         -- BANK_RELATIONS
-                                         (SELECT (SELECT xmlelement("bank_relations",
-                                                           xmlagg(
-                                                             -- ITEM
-                                                             xmlelement("item",
-                                                               -- CREDITOR
-                                                               (SELECT xmlelement("creditor",
-                                                                         -- CODE
-                                                                         decode(br_vch.code, null, null, xmlelement("code", br_vch.code)),
-                                                                         -- DOCS
-                                                                         (SELECT xmlelement("docs",
-                                                                                   xmlagg(
-                                                                                     -- ITEM
-                                                                                     xmlelement("item",
-                                                                                       -- DOC_TYPE
-                                                                                       decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
-                                                                                         xmlelement("code", ref_dt.code)
-                                                                                       )),
-                                                                                       -- NO
-                                                                                       xmlelement("no", ref_vcdh.no_)
-                                                                                     )
-                                                                                   )
-                                                                                 )
-                                                                            FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
-                                                                                 (SELECT t.parent_id AS id,
-                                                                                         t.code
-                                                                                    FROM ref.doc_type t
-                                                                                   WHERE t.open_date <= v_report_date
-                                                                                     AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_dt
-                                                                           WHERE ref_vcdh.creditor_id = br_vch.id
-                                                                             AND ref_vcdh.type_id = ref_dt.id (+))
-                                                                       )
-                                                                  FROM ref.v_creditor_his br_vch
-                                                                 WHERE br_vch.id = di.creditor_id
-                                                                   AND br_vch.open_date <= v_report_date
-                                                                   AND (br_vch.close_date > v_report_date OR br_vch.close_date is null)),
-                                                                 xmlelement("bank_relation",
-                                                                   -- CODE
-                                                                   xmlelement("code", ref_br_br.code)
-                                                                 )
-                                                             )
-                                                           )
-                                                         )
-                                                    FROM core.debtor_info di,
-                                                         (SELECT t.parent_id AS id,
-                                                                 t.code
-                                                            FROM ref.bank_relation t
-                                                           WHERE t.open_date <= v_report_date
-                                                             AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_br_br
-                                                   WHERE di.org_id = s_voh.id
-                                                     --AND di.creditor_id = v_creditor_id
-                                                     AND di.bank_relation_id = ref_br_br.id (+)
-                                                     AND di.open_date <= v_report_date
-                                                     AND (di.close_date > v_report_date OR di.close_date is null))
-                                            FROM dual
-                                           WHERE EXISTS (SELECT t.*
-                                                           FROM core.debtor_info t
-                                                          WHERE t.org_id = s_voh.id
-                                                            --AND t.creditor_id = v_creditor_id
-                                                            AND t.open_date <= v_report_date
-                                                            AND (t.close_date > v_report_date OR t.close_date is null))),
-                                         -- CONTACTS
-                                         (SELECT (SELECT xmlelement("contacts",
-                                                           xmlagg(
-                                                             -- ITEM
-                                                             xmlelement("item",
-                                                               -- CONTACT_TYPE
-                                                               decode(c.type_id, null, null, xmlelement("contact_type",
-                                                                 -- CODE
-                                                                 xmlelement("code", ref_c_ct.code)
-                                                               )),
-                                                               -- DETAILS
-                                                               decode(c.details, null, null, xmlelement("details", xmlelement("item", c.details)))
-                                                             )
-                                                           )
-                                                         )
-                                                    FROM core.contact c,
-                                                         (SELECT t.parent_id AS id,
-                                                                 t.code
-                                                            FROM ref.contact_type t
-                                                           WHERE t.open_date <= v_report_date
-                                                             AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_c_ct
-                                                   WHERE c.org_id = s_voh.id
-                                                     AND c.type_id = ref_c_ct.id (+))
-                                            FROM dual
-                                           WHERE EXISTS (SELECT t.* FROM core.contact t WHERE t.org_id = s_voh.id)),
-                                         -- COUNTRY
-                                         decode(s_voh.country_id, null, null, xmlelement("country",
-                                           xmlelement("code_numeric", ref_o_c.code_numeric)
-                                         )),
-                                         -- DOCS
-                                         (SELECT (SELECT xmlelement("docs",
-                                                           xmlagg(
-                                                             -- ITEM
-                                                             xmlelement("item",
-                                                               -- DOC_TYPE
-                                                               decode(vddh.type_id, null, null, xmlelement("doc_type",
-                                                                 -- CODE
-                                                                 xmlelement("code", ref_d_dt.code)
-                                                               )),
-                                                               -- NAME
-                                                               decode(vddh.name, null, null, xmlelement("name", vddh.name)),
-                                                               -- NO
-                                                               decode(vddh.no_, null, null, xmlelement("no", vddh.no_))
-                                                             )
-                                                           )
-                                                         )
-                                                    FROM core.v_debtor_doc_his vddh,
-                                                         (SELECT t.parent_id AS id,
-                                                                 t.code
-                                                            FROM ref.doc_type t
-                                                           WHERE t.open_date <= v_report_date
-                                                             AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_d_dt
-                                                   WHERE vddh.org_id = s_voh.id
-                                                     AND vddh.type_id = ref_d_dt.id (+)
-                                                     AND vddh.open_date <= v_report_date
-                                                     AND (vddh.close_date > v_report_date OR vddh.close_date is null))
-                                            FROM dual
-                                           WHERE EXISTS (SELECT t.*
-                                                           FROM core.v_debtor_doc_his t
-                                                          WHERE t.org_id = s_voh.id
-                                                            AND t.open_date <= v_report_date
-                                                            AND (t.close_date > v_report_date OR t.close_date is null))),
-                                         -- ECON_TRADE
-                                         decode(s_voh.econ_trade_id, null, null, xmlelement("econ_trade",
-                                           xmlelement("code", ref_o_et.code)
-                                         )),
-                                         -- ENTERPRISE_TYPE
-                                         decode(s_voh.enterprise_type_id, null, null, xmlelement("enterprise_type",
-                                           xmlelement("code", ref_o_t.code)
-                                         )),
-                                         -- HEAD
-                                         (SELECT xmlelement("head",
-                                                   -- DOCS
-                                                   (SELECT (SELECT xmlelement("docs",
-                                                                     xmlagg(
-                                                                       -- ITEM
-                                                                       xmlelement("item",
-                                                                         -- DOC_TYPE
-                                                                         decode(vddh.type_id, null, null, xmlelement("doc_type",
-                                                                           -- CODE
-                                                                           xmlelement("code", ref_d_dt.code)
-                                                                         )),
-                                                                         -- NAME
-                                                                         decode(vddh.name, null, null, xmlelement("name", vddh.name)),
-                                                                         -- NO
-                                                                         decode(vddh.no_, null, null, xmlelement("no", vddh.no_))
-                                                                       )
-                                                                     )
-                                                                   )
-                                                              FROM core.v_debtor_doc_his vddh,
-                                                                   (SELECT t.parent_id AS id,
-                                                                           t.code
-                                                                      FROM ref.doc_type t
-                                                                     WHERE t.open_date <= v_report_date
-                                                                       AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_d_dt
-                                                             WHERE vddh.person_id = h_vph.id
-                                                               AND vddh.type_id = ref_d_dt.id (+)
-                                                               AND vddh.open_date <= v_report_date
-                                                               AND (vddh.close_date > v_report_date OR vddh.close_date is null))
-                                                      FROM dual
-                                                     WHERE EXISTS (SELECT t.*
-                                                                     FROM core.v_debtor_doc_his t
-                                                                    WHERE t.person_id = h_vph.id
-                                                                      AND t.open_date <= v_report_date
-                                                                      AND (t.close_date > v_report_date OR t.close_date is null))),
-                                                   -- NAMES
-                                                   (SELECT (SELECT xmlelement("names",
-                                                                     xmlagg(
-                                                                       -- ITEM
-                                                                       xmlelement("item",
-                                                                         -- FIRSTNAME
-                                                                         decode(vpnh.first_name, null, null, xmlelement("firstname", vpnh.first_name)),
-                                                                         -- LASTNAME
-                                                                         decode(vpnh.last_name, null, null, xmlelement("lastname", vpnh.last_name)),
-                                                                         -- MIDDLENAME
-                                                                         decode(vpnh.middle_name, null, null, xmlelement("middlename", vpnh.middle_name)),
-                                                                         -- CODE
-                                                                         xmlelement("lang", ref_l.code)
-                                                                       )
-                                                                     )
-                                                                   )
-                                                              FROM core.v_person_name_his vpnh,
-                                                                   ref.shared ref_l
-                                                             WHERE vpnh.person_id = h_vph.id
-                                                               AND vpnh.lang_id = ref_l.id (+)
-                                                               AND vpnh.open_date <= v_report_date
-                                                               AND (vpnh.close_date > v_report_date OR vpnh.close_date is null))
-                                                      FROM dual
-                                                     WHERE EXISTS (SELECT t.*
-                                                                     FROM core.v_person_name_his t
-                                                                    WHERE t.person_id = h_vph.id
-                                                                      AND t.open_date <= v_report_date
-                                                                      AND (t.close_date > v_report_date OR t.close_date is null)))
-                                                 )
-                                            FROM core.v_person_his h_vph
-                                           WHERE h_vph.id = s_voh.head_id
-                                             AND h_vph.open_date <= v_report_date
-                                             AND (h_vph.close_date > v_report_date OR h_vph.close_date is null)),
-                                         -- IS_SE
-                                         decode(s_voh.is_se, null, null, xmlelement("is_se", decode(s_voh.is_se, 1, 'true', 'false'))),
-                                         -- LEGAL_FORM
-                                         decode(s_voh.legal_form_id, null, null, xmlelement("legal_form",
-                                           xmlelement("code", ref_o_lf.code)
-                                         )),
-                                         -- NAMES
-                                         (SELECT (SELECT xmlelement("names",
-                                                           xmlagg(
-                                                             -- ITEM
-                                                             xmlelement("item",
-                                                               -- NAME
-                                                               decode(vonh.name, null, null, xmlelement("name", vonh.name)),
-                                                               -- CODE
-                                                               xmlelement("lang", ref_l.code)
-                                                             )
-                                                           )
-                                                         )
-                                                    FROM core.v_org_name_his vonh,
-                                                         ref.shared ref_l
-                                                   WHERE vonh.org_id = s_voh.id
-                                                     AND vonh.lang_id = ref_l.id (+)
-                                                     AND vonh.open_date <= v_report_date
-                                                     AND (vonh.close_date > v_report_date OR vonh.close_date is null))
-                                            FROM dual
-                                           WHERE EXISTS (SELECT t.*
-                                                           FROM core.v_org_name_his t
-                                                          WHERE t.org_id = s_voh.id
-                                                            AND t.open_date <= v_report_date
-                                                            AND (t.close_date > v_report_date OR t.close_date is null))),
-                                         -- OFFSHORE
-                                         decode(s_voh.offshore_id, null, null, xmlelement("offshore",
-                                           xmlelement("code", ref_o_o.code)
-                                         ))
-                                       )
-                                  FROM v_organization_his s_voh,
-                                       (SELECT t.parent_id AS id,
-                                               t.code
-                                          FROM ref.enterprise_type t
-                                         WHERE t.open_date <= v_report_date
-                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_o_t,
-                                       (SELECT t.parent_id AS id,
-                                               t.code
-                                          FROM ref.econ_trade t
-                                         WHERE t.open_date <= v_report_date
-                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_o_et,
-                                       (SELECT t.parent_id AS id,
-                                               t.code
-                                          FROM ref.legal_form t
-                                         WHERE t.open_date <= v_report_date
-                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_o_lf,
-                                       (SELECT t.parent_id AS id,
-                                               t.code_numeric
-                                          FROM ref.country t
-                                         WHERE t.open_date <= v_report_date
-                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_o_c,
-                                       (SELECT t.parent_id AS id,
-                                               t.code
-                                          FROM ref.offshore t
-                                         WHERE t.open_date <= v_report_date
-                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_o_o
-                                 WHERE s_voh.id = vdh.org_id
-                                   AND s_voh.offshore_id = ref_o_o.id (+)
-                                   AND s_voh.country_id = ref_o_c.id (+)
-                                   AND s_voh.econ_trade_id = ref_o_et.id (+)
-                                   AND s_voh.legal_form_id = ref_o_lf.id (+)
-                                   AND s_voh.enterprise_type_id = ref_o_t.id (+)
-                                   AND s_voh.open_date <= v_report_date
-                                   AND (s_voh.close_date > v_report_date OR s_voh.close_date is null)),
-                               -- PERSON
-                               (SELECT xmlelement("person",
-                                         -- ADDRESSES
-                                         (SELECT (SELECT xmlelement("addresses",
-                                                           xmlagg(
-                                                             -- ITEM
-                                                             xmlelement("item",
-                                                               -- DETAILS
-                                                               decode(a.details, null, null, xmlelement("details", a.details)),
-                                                               -- REGION
-                                                               decode(a.region_id, null, null, xmlelement("region",
-                                                                 -- CODE
-                                                                 xmlelement("code", ref_a_r.code)
-                                                               )),
-                                                               -- TYPE
-                                                               xmlelement("type", ref_at.code)
-                                                             )
-                                                           )
-                                                         )
-                                                    FROM core.address a,
-                                                         ref.shared ref_at,
-                                                         (SELECT t.parent_id AS id,
-                                                                 t.code
-                                                            FROM ref.region t
-                                                           WHERE t.open_date <= v_report_date
-                                                             AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_a_r
-                                                   WHERE a.person_id = s_vph.id
-                                                     AND a.region_id = ref_a_r.id (+)
-                                                     AND a.type_id = ref_at.id)
-                                            FROM dual
-                                           WHERE EXISTS (SELECT t.* FROM core.address t WHERE t.person_id = s_vph.id)),
-                                         -- BANK_RELATIONS
-                                         (SELECT (SELECT xmlelement("bank_relations",
-                                                           xmlagg(
-                                                             -- ITEM
-                                                             xmlelement("item",
-                                                                 -- CREDITOR
-                                                               (SELECT xmlelement("creditor",
-                                                                         -- CODE
-                                                                         decode(br_vch.code, null, null, xmlelement("code", br_vch.code)),
-                                                                         -- DOCS
-                                                                         (SELECT xmlelement("docs",
-                                                                                   xmlagg(
-                                                                                     -- ITEM
-                                                                                     xmlelement("item",
-                                                                                       -- DOC_TYPE
-                                                                                       decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
-                                                                                         xmlelement("code", ref_dt.code)
-                                                                                       )),
-                                                                                       -- NO
-                                                                                       xmlelement("no", ref_vcdh.no_)
-                                                                                     )
-                                                                                   )
-                                                                                 )
-                                                                            FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
-                                                                                 (SELECT t.parent_id AS id,
-                                                                                         t.code
-                                                                                    FROM ref.doc_type t
-                                                                                   WHERE t.open_date <= v_report_date
-                                                                                     AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_dt
-                                                                           WHERE ref_vcdh.creditor_id = br_vch.id
-                                                                             AND ref_vcdh.type_id = ref_dt.id (+))
-                                                                       )
-                                                                  FROM ref.v_creditor_his br_vch
-                                                                 WHERE br_vch.id = di.creditor_id
-                                                                   AND br_vch.open_date <= v_report_date
-                                                                   AND (br_vch.close_date > v_report_date OR br_vch.close_date is null)),
-                                                                 xmlelement("bank_relation",
-                                                                   -- CODE
-                                                                   xmlelement("code", ref_br_br.code)
-                                                                 )
-                                                             )
-                                                           )
-                                                         )
-                                                    FROM core.debtor_info di,
-                                                         (SELECT t.parent_id AS id,
-                                                                 t.code
-                                                            FROM ref.bank_relation t
-                                                           WHERE t.open_date <= v_report_date
-                                                             AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_br_br
-                                                   WHERE di.person_id = s_vph.id
-                                                     AND di.bank_relation_id = ref_br_br.id (+)
-                                                     AND di.open_date <= v_report_date
-                                                     AND (di.close_date > v_report_date OR di.close_date is null))
-                                            FROM dual
-                                           WHERE EXISTS (SELECT t.*
-                                                           FROM core.debtor_info t
-                                                          WHERE t.person_id = s_vph.id
-                                                            AND t.open_date <= v_report_date
-                                                            AND (t.close_date > v_report_date OR t.close_date is null))),
-                                         -- CONTACTS
-                                         (SELECT (SELECT xmlelement("contacts",
-                                                           xmlagg(
-                                                             -- ITEM
-                                                             xmlelement("item",
-                                                               -- CONTACT_TYPE
-                                                               decode(c.type_id, null, null, xmlelement("contact_type",
-                                                                 -- CODE
-                                                                 xmlelement("code", ref_c_ct.code)
-                                                               )),
-                                                               -- DETAILS
-                                                               decode(c.details, null, null, xmlelement("details", xmlelement("item", c.details)))
-                                                             )
-                                                           )
-                                                         )
-                                                    FROM core.contact c,
-                                                         (SELECT t.parent_id AS id,
-                                                                 t.code
-                                                            FROM ref.contact_type t
-                                                           WHERE t.open_date <= v_report_date
-                                                             AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_c_ct
-                                                   WHERE c.person_id = s_vph.id
-                                                     AND c.type_id = ref_c_ct.id (+))
-                                            FROM dual
-                                           WHERE EXISTS (SELECT t.* FROM core.contact t WHERE t.person_id = s_vph.id)),
-                                         -- COUNTRY
-                                         decode(s_vph.country_id, null, null, xmlelement("country",
-                                           xmlelement("code_numeric", ref_p_c.code_numeric)
-                                         )),
-                                         -- DOCS
-                                         (SELECT (SELECT xmlelement("docs",
-                                                           xmlagg(
-                                                             -- ITEM
-                                                             xmlelement("item",
-                                                               -- DOC_TYPE
-                                                               decode(vddh.type_id, null, null, xmlelement("doc_type",
-                                                                 -- CODE
-                                                                 xmlelement("code", ref_d_dt.code)
-                                                               )),
-                                                               -- NAME
-                                                               decode(vddh.name, null, null, xmlelement("name", vddh.name)),
-                                                               -- NO
-                                                               decode(vddh.no_, null, null, xmlelement("no", vddh.no_))
-                                                             )
-                                                           )
-                                                         )
-                                                    FROM core.v_debtor_doc_his vddh,
-                                                         (SELECT t.parent_id AS id,
-                                                                 t.code
-                                                            FROM ref.doc_type t
-                                                           WHERE t.open_date <= v_report_date
-                                                             AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_d_dt
-                                                   WHERE vddh.person_id = s_vph.id
-                                                     AND vddh.type_id = ref_d_dt.id (+)
-                                                     AND vddh.open_date <= v_report_date
-                                                     AND (vddh.close_date > v_report_date OR vddh.close_date is null))
-                                            FROM dual
-                                           WHERE EXISTS (SELECT t.*
-                                                           FROM core.v_debtor_doc_his t
-                                                          WHERE t.person_id = s_vph.id
-                                                            AND t.open_date <= v_report_date
-                                                            AND (t.close_date > v_report_date OR t.close_date is null))),
-                                         -- NAMES
-                                         (SELECT (SELECT xmlelement("names",
-                                                           xmlagg(
-                                                             -- ITEM
-                                                             xmlelement("item",
-                                                               -- FIRSTNAME
-                                                               decode(vpnh.first_name, null, null, xmlelement("firstname", vpnh.first_name)),
-                                                               -- LASTNAME
-                                                               decode(vpnh.last_name, null, null, xmlelement("lastname", vpnh.last_name)),
-                                                               -- MIDDLENAME
-                                                               decode(vpnh.middle_name, null, null, xmlelement("middlename", vpnh.middle_name)),
-                                                               -- CODE
-                                                               xmlelement("lang", ref_l.code)
-                                                             )
-                                                           )
-                                                         )
-                                                    FROM core.v_person_name_his vpnh,
-                                                         ref.shared ref_l
-                                                   WHERE vpnh.person_id = s_vph.id
-                                                     AND vpnh.lang_id = ref_l.id (+)
-                                                     AND vpnh.open_date <= v_report_date
-                                                     AND (vpnh.close_date > v_report_date OR vpnh.close_date is null))
-                                            FROM dual
-                                           WHERE EXISTS (SELECT t.*
-                                                           FROM core.v_person_name_his t
-                                                          WHERE t.person_id = s_vph.id
-                                                            AND t.open_date <= v_report_date
-                                                            AND (t.close_date > v_report_date OR t.close_date is null))),
-                                         -- OFFSHORE
-                                         decode(s_vph.offshore_id, null, null, xmlelement("offshore",
-                                           xmlelement("code", ref_p_o.code)
-                                         ))
-                                       )
-                                  FROM v_person_his s_vph,
-                                       (SELECT t.parent_id AS id,
-                                               t.code_numeric
-                                          FROM ref.country t
-                                         WHERE t.open_date <= v_report_date
-                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_p_c,
-                                       (SELECT t.parent_id AS id,
-                                               t.code
-                                          FROM ref.offshore t
-                                         WHERE t.open_date <= v_report_date
-                                           AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_p_o
-                                 WHERE s_vph.id = vdh.person_id
-                                   AND s_vph.offshore_id = ref_p_o.id (+)
-                                   AND s_vph.country_id = ref_p_c.id (+)
-                                   AND s_vph.open_date <= v_report_date
-                                   AND (s_vph.close_date > v_report_date OR s_vph.close_date is null)),
-                               -- CREDITOR
-                               (SELECT xmlelement("creditor",
-                                         -- CODE
-                                         decode(s_vch.code, null, null, xmlelement("code", s_vch.code)),
-                                         -- DOCS
-                                         (SELECT xmlelement("docs",
-                                                   xmlagg(
-                                                     -- ITEM
-                                                     xmlelement("item",
-                                                       -- DOC_TYPE
-                                                       decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
-                                                         xmlelement("code", ref_dt.code)
-                                                       )),
-                                                       -- NO
-                                                       xmlelement("no", ref_vcdh.no_)
-                                                     )
-                                                   )
-                                                 )
-                                            FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
-                                                 (SELECT t.parent_id AS id,
-                                                         t.code
-                                                    FROM ref.doc_type t
-                                                   WHERE t.open_date <= v_report_date
-                                                     AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_dt
-                                           WHERE ref_vcdh.creditor_id = s_vch.id
-                                             AND ref_vcdh.type_id = ref_dt.id (+))
-                                       )
-                                  FROM ref.v_creditor_his s_vch
-                                 WHERE s_vch.id = vdh.creditor_id
-                                   AND s_vch.open_date <= v_report_date
-                                   AND (s_vch.close_date > v_report_date OR s_vch.close_date is null))
-                             )
-                           )
-                         )
-                    FROM v_debtor_his vdh
-                   WHERE vdh.credit_id = vch.id
-                     AND vdh.type_id in (1, 7)
-                     AND (vdh.person_id IS NOT NULL OR vdh.org_id IS NOT NULL OR vdh.creditor_id IS NOT NULL)
-                     AND vdh.open_date <= v_report_date
-                     AND (vdh.close_date > v_report_date OR vdh.close_date IS NULL)),
-                 -- PLEDGES
-                 (SELECT xmlelement("pledges",
-                           (SELECT xmlagg(
-                                     xmlelement("item",
-                                       -- CONTRACT
-                                       decode(vph.contract_no, null, null, xmlelement("contract", vph.contract_no)),
-                                       -- PLEDGE_TYPE
-                                       decode(vph.type_id, null, null, xmlelement("pledge_type",
-                                         xmlelement("code", ref_p_pt.code)
-                                       )),
-
-                                       -- VALUE
-                                       decode(vph.value_, null, null, xmlelement("value", ltrim(to_char(vph.value_, c_number_format, c_nls_numeric_characters))))
-                                     )
-                                   )
-                              FROM v_pledge_his vph,
-                                   (SELECT t.parent_id AS id,
-                                           t.code
-                                      FROM ref.pledge_type t
-                                     WHERE t.open_date <= v_report_date
-                                       AND (t.close_date > v_report_date OR t.close_date IS NULL)) ref_p_pt
-                             WHERE vph.credit_id = vch.id
-                               AND vph.type_id = ref_p_pt.id (+)
-                               AND vph.open_date <= v_report_date
-                               AND (vph.close_date > v_report_date OR vph.close_date is null))
-                         )
-                    FROM dual
-                   WHERE EXISTS (SELECT t.*
-                                   FROM v_pledge_his t
-                                  WHERE t.credit_id = vch.id
-                                    AND t.open_date <= v_report_date
-                                    AND (t.close_date > v_report_date OR t.close_date is null)))
+                 )
                )
                ORDER BY vch.primary_contract_no, vch.primary_contract_date
              )
@@ -1931,7 +2300,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_manifest_xml XMLTYPE;
     v_zip          BLOB;
     v_zip_comment  VARCHAR2(4000 CHAR);
+    v_procedure_call VARCHAR2(4000 CHAR) := 'GENERATE_XML_V2(P_XML_FILE_ID => ' || p_xml_file_id || ')';
   BEGIN
+    write_log(p_log_date => sysdate, 
+              p_log_text => 'Procedure started.', 
+              p_log_level => c_log_level_info, 
+              p_procedure_call => v_procedure_call);
 
     SELECT xf.creditor_id, xf.report_date
       INTO v_creditor_id, v_report_date
@@ -1943,122 +2317,104 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
      WHERE xf.id = p_xml_file_id;
     COMMIT;
 
-    SELECT xmlroot(xmlelement("entities",
+    SELECT xmlroot(xmlelement("entities", xmlattributes('http://www.w3.org/2001/XMLSchema-instance' AS "xmlns:xsi"),
              xmlagg(
-               xmlelement("entity",
-                 xmlattributes('credit' AS "class"),
+              xmlelement("credit",                 
                  -- ACTUAL_ISSUE_DATE
-                   xmlelement("actual_issue_date", to_char(vch.actual_issue_date, c_date_format)),
-                   -- AMOUNT
-                   xmlelement("amount", vch.amount),
-                   -- CHANGE
-                   xmlelement("change",
-                     -- REMAINS
-                     xmlelement("remains",
-                       -- CORRECTION
-                       get_debt_remains_xml(vch.id, c_drt_correction, v_report_date),
-                       -- DEBT
-                       xmlelement("debt",
-                         -- CURRENT
-                         get_debt_remains_xml(vch.id, c_drt_debt_current, v_report_date),
-                         -- PASTDUE
-                         get_debt_remains_xml(vch.id, c_drt_debt_pastdue, v_report_date),
-                         -- WRITE_OFF
-                         get_debt_remains_xml(vch.id, c_drt_debt_write_off, v_report_date)
-                       ),
-                       -- DISCOUNT
-                       get_debt_remains_xml(vch.id, c_drt_discount, v_report_date),
-                       -- DISCOUNTED_VALUE
-                       get_debt_remains_xml(vch.id, c_drt_discounted_value, v_report_date),
-                       -- INTEREST
-                       xmlelement("interest",
-                         -- CURRENT
-                         get_debt_remains_xml(vch.id, c_drt_interest_current, v_report_date),
-                         -- PASTDUE
-                         get_debt_remains_xml(vch.id, c_drt_interest_pastdue, v_report_date),
-                         -- WRITE_OFF
-                         get_debt_remains_xml(vch.id, c_drt_interest_write_off, v_report_date)
-                       ),
-                       -- LIMIT
-                       get_debt_remains_xml(vch.id, c_drt_limit, v_report_date)
-                     ),
-                     -- CREDIT_FLOW
-                     get_credit_flow_xml(vch.id, v_report_date),
-                     -- TURNOVER
-                     xmlelement("turnover",
-                       -- ISSUE
-                       xmlelement("issue",
-                         -- DEBT
-                         get_turnover_xml(vch.id, c_tt_issue_debt, v_report_date),
-                         -- INTEREST
-                         get_turnover_xml(vch.id, c_tt_issue_interest, v_report_date)
-                       )
-                     )
-                   ),
-                   -- CONTRACT
-                   xmlelement("contract",
-                     -- NO
-                     xmlelement("no", vch.contract_no),
-                     -- DATE
-                     xmlelement("date", to_char(vch.contract_date, c_date_format))
-                   ),
-                   -- CONTRACT_MATURITY_DATE
-                   xmlelement("contract_maturity_date", to_char(vch.contract_maturity_date, c_date_format)),
-                   -- CREDIT_OBJECT
-                   get_ref_credit_object_xml(vch.credit_object_id, v_report_date),
-                   -- CREDIT_PURPOSE
-                   get_ref_credit_purpose_xml(vch.credit_purpose_id, v_report_date),
-                   -- CREDIT_TYPE
-                   get_ref_credit_type_xml(vch.type_id, v_report_date),
-                   -- CREDITOR
-                   get_ref_creditor_xml(vch.creditor_id, v_report_date, 'creditor'),
-                   -- CREDITOR_BRANCH
-                   get_ref_creditor_xml(vch.creditor_branch_id, v_report_date, 'creditor_branch'),
-                   -- CURRENCY
-                   get_ref_currency_xml(vch.currency_id, v_report_date),
-                   -- FINANCE_SOURCE
-                   get_ref_finance_source_xml(vch.finance_source_id, v_report_date),
-                   -- HAS_CURRENCY_EARN
-                   xmlelement("has_currency_earn", decode(vch.has_currency_earn, 1, 'true', 'false')),
-                   -- INTEREST_RATE_YEARLY
-                   xmlelement("interest_rate_yearly", ltrim(to_char(vch.interest_rate_yearly, c_number_format, c_nls_numeric_characters))),
+                 nillable_xml('actual_issue_date', to_char(vch.actual_issue_date, c_date_format)),
+                 -- AMOUNT
+                 nillable_xml('amount', vch.amount),
+                 -- CONTRACT
+                 xmlelement("contract",
+                   -- NO
+                   nillable_xml('no', vch.contract_no),
+                   -- DATE
+                   nillable_xml('date', to_char(vch.contract_date, c_date_format))
+                 ),
+                 -- CONTRACT_MATURITY_DATE
+                 nillable_xml('contract_maturity_date', to_char(vch.contract_maturity_date, c_date_format)),
+                 -- CREDIT_OBJECT
+                 get_ref_credit_object_xml(vch.credit_object_id, v_report_date),
+                 -- CREDIT_PURPOSE
+                 get_ref_credit_purpose_xml(vch.credit_purpose_id, v_report_date),
+                 -- CREDIT_TYPE
+                 get_ref_credit_type_xml(vch.type_id, v_report_date),
+                 -- CURRENCY
+                 get_ref_currency_xml(vch.currency_id, v_report_date),
+                 -- FINANCE_SOURCE
+                 get_ref_finance_source_xml(vch.finance_source_id, v_report_date),
+                 -- HAS_CURRENCY_EARN
+                 xmlelement("has_currency_earn", decode(vch.has_currency_earn, 1, 'true', 'false')),
+                 -- INTEREST_RATE_YEARLY
+                 xmlelement("interest_rate_yearly", ltrim(to_char(vch.interest_rate_yearly, c_number_format, c_nls_numeric_characters))),
+                 -- PORTFOLIO
+                 xmlelement("portfolio",
                    -- PORTFOLIO
-                   xmlelement("portfolio",
-                     -- PORTFOLIO
-                     get_ref_portfolio_xml(vch.portfolio_id, v_report_date, 'portfolio'),
-                     -- PORTFOLIO_MSFO
-                     get_ref_portfolio_xml(vch.portfolio_msfo_id, v_report_date, 'portfolio_msfo')
+                   get_ref_portfolio_xml(vch.portfolio_id, v_report_date, 'portfolio'),
+                   -- PORTFOLIO_MSFO
+                   get_ref_portfolio_xml(vch.portfolio_msfo_id, v_report_date, 'portfolio_msfo')
+                 ),
+                 -- CHANGE
+                 xmlelement("change",
+                   -- REMAINS
+                   xmlelement("remains",
+                     -- CORRECTION
+                     get_debt_remains_xml(vch.id, c_drt_correction, v_report_date),
+                     -- DEBT
+                     xmlelement("debt",
+                       -- CURRENT
+                       get_debt_remains_xml(vch.id, c_drt_debt_current, v_report_date),
+                       -- PASTDUE
+                       get_debt_remains_xml(vch.id, c_drt_debt_pastdue, v_report_date),
+                       -- WRITE_OFF
+                       get_debt_remains_xml(vch.id, c_drt_debt_write_off, v_report_date)
+                     ),
+                     -- DISCOUNT
+                     get_debt_remains_xml(vch.id, c_drt_discount, v_report_date),
+                     -- DISCOUNTED_VALUE
+                     get_debt_remains_xml(vch.id, c_drt_discounted_value, v_report_date),
+                     -- INTEREST
+                     xmlelement("interest",
+                       -- CURRENT
+                       get_debt_remains_xml(vch.id, c_drt_interest_current, v_report_date),
+                       -- PASTDUE
+                       get_debt_remains_xml(vch.id, c_drt_interest_pastdue, v_report_date),
+                       -- WRITE_OFF
+                       get_debt_remains_xml(vch.id, c_drt_interest_write_off, v_report_date)
+                     ),
+                     -- LIMIT
+                     get_debt_remains_xml(vch.id, c_drt_limit, v_report_date)
                    ),
+                   -- CREDIT_FLOW
+                   get_credit_flow_xml(vch.id, v_report_date),
+                   -- TURNOVER
+                   xmlelement("turnover",
+                     -- ISSUE
+                     xmlelement("issue",
+                       -- DEBT
+                       get_turnover_xml(vch.id, c_tt_issue_debt, v_report_date),
+                       -- INTEREST
+                       get_turnover_xml(vch.id, c_tt_issue_interest, v_report_date)
+                     )
+                   )
+                 ),
+                 get_persons(vch.id, v_report_date),
+                 get_organizations(vch.id, v_report_date),
+                 get_creditors(vch.id, v_report_date),
+                 --PLEDGES
+                 get_pledges_xml(vch.id, v_report_date),
+                 -- CREDITOR
+                 get_ref_creditor_xml(vch.creditor_id, v_report_date, 'creditor'),
+                 -- CREDITOR_BRANCH
+                 get_ref_creditor_xml(vch.creditor_branch_id, v_report_date, 'creditor_branch'),
                  -- PRIMARY_CONTRACT
                  xmlelement("primary_contract",
-                   -- NO
-                   xmlelement("no", vch.primary_contract_no),
-                   -- DATE
-                   xmlelement("date", to_char(vch.primary_contract_date, c_date_format))
-                 ),
-                 -- SUBJECTS
-                 xmlelement("subjects",
-                   (SELECT xmlagg(
-                             -- ITEM
-                             xmlelement("item",
-                               -- ORGANIZATION
-                               get_organization_xml(vdh.org_id, v_report_date, 'organization'),
-                               -- PERSON
-                               get_person_xml(vdh.person_id, v_report_date, 'person'),
-                               -- CREDITOR
-                               get_ref_creditor_xml(vdh.creditor_id, v_report_date, 'creditor')
-                             )
-                           )
-                    FROM v_debtor_his vdh
-                   WHERE vdh.credit_id = vch.id
-                     AND vdh.type_id in (1, 7)
-                     AND (vdh.person_id IS NOT NULL OR vdh.org_id IS NOT NULL OR vdh.creditor_id IS NOT NULL)
-                     AND vdh.open_date <= v_report_date
-                     AND (vdh.close_date > v_report_date OR vdh.close_date IS NULL))
-                 ),
-                 -- PLEDGES
-                 get_pledges_xml(vch.id, v_report_date)
+                 -- NO
+                 xmlelement("no", vch.primary_contract_no),
+                 -- DATE
+                 xmlelement("date", to_char(vch.primary_contract_date, c_date_format))
                )
+             )
                ORDER BY vch.primary_contract_no, vch.primary_contract_date
              )
            ), version '1.0" encoding="utf-8')
@@ -2131,19 +2487,44 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
            xf.file_content = v_zip,
            xf.status = 'COMPLETED'
      WHERE xf.id = p_xml_file_id;
-
     COMMIT;
-  /*EXCEPTION
+
+    write_log(p_log_date => sysdate, 
+              p_log_text => 'Procedure completed successfully.', 
+              p_log_level => c_log_level_info, 
+              p_procedure_call => v_procedure_call);
+  EXCEPTION
     WHEN OTHERS THEN
-      BEGIN
-        UPDATE xml_file xf
-           SET xf.end_date = sysdate,
-               xf.file_content = null,
-               xf.status = 'FAILED'
-         WHERE xf.id = p_xml_file_id;
-      END;*/
+      ROLLBACK;
+      xml_file_upd(p_id => p_xml_file_id, 
+                   p_end_date => sysdate,
+                   p_status => 'FAILED');
+      write_log(p_log_date => sysdate, 
+                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.', 
+                p_log_level => c_log_level_error, 
+                p_procedure_call => v_procedure_call);
   END;
   
+  FUNCTION nillable_xml
+  (
+    p_xml_tag in varchar2,
+    p_val     in varchar2
+  ) RETURN XMLTYPE
+  IS
+    v_xml     XMLTYPE;
+  BEGIN
+    IF p_val IS NOT NULL THEN
+      SELECT xmlelement(evalname(p_xml_tag), p_val)
+        INTO v_xml
+        FROM dual;
+    ELSE
+      SELECT xmlelement(evalname(p_xml_tag), xmlattributes('true' AS "xsi:nil"), NULL)
+        INTO v_xml
+        FROM dual;
+    END IF;
+    RETURN v_xml;
+  END;
+
   PROCEDURE generate_portfolio_xml
   (
     p_xml_file_id IN NUMBER
@@ -2166,56 +2547,11 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
      WHERE xf.id = p_xml_file_id;
     COMMIT;
 
-    SELECT xmlroot(xmlelement("entities",
-               xmlelement("entity",
-                 xmlattributes('portfolio_data' AS "class"),
-                   pkg_eav_xml_util.get_ref_creditor_xml(v_creditor_id, v_report_date, 'creditor'),
-                   (select xmlelement("portfolio_flows_kfn",
-                             xmlagg(
-                               xmlelement("item",
-                                 pkg_eav_xml_util.get_ref_portfolio_xml(pfg.portfolio_id, v_report_date, 'portfolio'),
-                                 (select xmlelement("details",
-                                           xmlagg(
-                                             xmlelement("item",
-                                               pkg_eav_xml_util.get_ref_balance_account_xml(pfv.provision_account_id, v_report_date, 'balance_account'),
-                                               xmlelement("value", pfv.provision_value)
-                                             )
-                                           )
-                                         )
-                                    from portfolio_flow pfv
-                                   where pfv.creditor_id = pfg.creditor_id
-                                     and pfv.rep_date = pfg.rep_date
-                                     and pfv.portfolio_id = pfg.portfolio_id)
-                               )
-                             )
-                           )
-                      from (select pf.creditor_id, pf.portfolio_id, pf.rep_date from portfolio_flow pf group by pf.creditor_id, pf.portfolio_id, pf.rep_date) pfg
-                     where pfg.creditor_id = v_creditor_id
-                       and pfg.rep_date = v_report_date),
-                   (select xmlelement("portfolio_flows_msfo",
-                             xmlagg(
-                               xmlelement("item",
-                                 pkg_eav_xml_util.get_ref_portfolio_xml(pfmg.portfolio_id, v_report_date, 'portfolio'),
-                                 xmlelement("discounted_value", pfmg.discounted_value),
-                                 (select xmlelement("details",
-                                           xmlagg(
-                                             xmlelement("item",
-                                               pkg_eav_xml_util.get_ref_balance_account_xml(pfmv.provision_account_id, v_report_date, 'balance_account'),
-                                               xmlelement("value", pfmv.provision_value)
-                                             )
-                                           )
-                                         )
-                                    from portfolio_flow_msfo_old pfmv
-                                   where pfmv.creditor_id = pfmg.creditor_id
-                                     and pfmv.rep_date = pfmg.rep_date
-                                     and pfmv.portfolio_id = pfmg.portfolio_id
-                                     and pfmv.discounted_value = pfmg.discounted_value)
-                               )
-                             )
-                           )
-                      from (select pfm.creditor_id, pfm.portfolio_id, pfm.rep_date, pfm.discounted_value from portfolio_flow_msfo_old pfm group by pfm.creditor_id, pfm.portfolio_id, pfm.rep_date, pfm.discounted_value) pfmg
-                     where pfmg.creditor_id = v_creditor_id
-                       and pfmg.rep_date = v_report_date) 
+    SELECT xmlroot(xmlelement("entities", xmlattributes('http://www.w3.org/2001/XMLSchema-instance' AS "xmlns:xsi"),
+               xmlelement("portfolio_data",
+                 pkg_eav_xml_util.get_ref_creditor_xml(v_creditor_id, v_report_date, 'creditor'),
+                 get_portfolio_flows_kfn(v_creditor_id, v_report_date),
+                 get_portfolio_flows_msfo(v_creditor_id, v_report_date)
                  )
                )
            , version '1.0" encoding="utf-8')
@@ -2282,6 +2618,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
      WHERE xf.id = p_xml_file_id;
 
     COMMIT;
+    
+  EXCEPTION
+    WHEN OTHERS then
+      write_log(p_log_date => sysdate, 
+                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.', 
+                p_log_level => c_log_level_error, 
+                p_procedure_call => 'to do');
+    
   END;
 
   FUNCTION get_ref_balance_account_xml
@@ -2294,7 +2638,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_balance_account_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2319,7 +2663,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_credit_object_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2344,7 +2688,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_credit_type_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2369,7 +2713,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_credit_purpose_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2394,7 +2738,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_currency_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2419,7 +2763,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_portfolio_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2444,7 +2788,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_finance_source_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2469,7 +2813,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_doc_type_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2494,7 +2838,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_classification_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2519,7 +2863,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_country_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2544,7 +2888,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_legal_form_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2569,7 +2913,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_offshore_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2594,7 +2938,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_econ_trade_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2619,7 +2963,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_enterprise_type_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2644,7 +2988,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_contact_type_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2669,7 +3013,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_region_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2694,7 +3038,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_bank_relation_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2719,7 +3063,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_pledge_type_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2744,12 +3088,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_creditor_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     ELSE
       SELECT xmlelement(evalname(p_tag_name),
-               xmlelement("code", vch.code),
+               nillable_xml('code', vch.code),               
                xmlelement("docs",
                  (SELECT xmlagg(
                            -- ITEM
@@ -2766,6 +3110,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
              )
         INTO v_xml
         FROM ref.v_creditor_his vch
+
        WHERE vch.id = p_creditor_id
          AND vch.open_date <= p_report_date
          AND (vch.close_date > p_report_date OR vch.close_date IS NULL);
@@ -2783,6 +3128,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
   IS
     v_tag_name VARCHAR2(50 char);
     v_xml xmltype;
+    v_elem_cnt XMLTYPE;
   BEGIN
     SELECT CASE
              WHEN p_debt_remains_type_id = c_drt_debt_current THEN 'current'
@@ -2902,10 +3248,22 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
          AND dr.rep_date = p_report_date;
     EXCEPTION
       WHEN no_data_found THEN
-        SELECT xmlelement(evalname(v_tag_name), null)
+        SELECT xmlelement(evalname(v_tag_name), xmlattributes('true' as "xsi:nil"),null)
           INTO v_xml
           FROM dual;
     END;
+    /*
+    SELECT xmlquery('count($doc/row/descendant::*)'
+          passing v_xml as "doc"
+          returning content)
+    into v_elem_cnt from dual;
+    
+    IF v_elem_cnt.getstringval = '0' THEN
+      SELECT xmlelement("koiwna", xmlattributes('ok' as "true"), NULL)
+        INTO v_xml
+        FROM dual;
+    END IF;
+    */
 
     RETURN v_xml;
   END;
@@ -2942,7 +3300,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
          AND t.rep_date = p_report_date;
     EXCEPTION
       WHEN no_data_found THEN
-        SELECT xmlelement(evalname(v_tag_name), null)
+        SELECT xmlelement(evalname(v_tag_name), xmlattributes('true' as "xsi:nil"),null)
           INTO v_xml
           FROM dual;
     END;
@@ -2993,7 +3351,629 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
     RETURN v_xml;
   END;
+  
 
+  FUNCTION get_persons_xml
+  (
+    p_credit_id IN NUMBER,
+    p_report_date IN DATE,
+    p_tag_name IN VARCHAR2 DEFAULT 'person'
+  ) RETURN XMLTYPE
+  IS
+    v_xml xmltype;
+    v_control int;
+  BEGIN
+
+   SELECT xmlelement("persons_dev", 
+              xmlagg(                                     
+                (SELECT xmlelement("item",
+                           -- ADDRESSES
+                           (SELECT (SELECT xmlelement("addresses",
+                                                 xmlagg(
+                                                   -- ITEM
+                                                   xmlelement("item",
+                                                     -- DETAILS
+                                                     decode(a.details, null, null, xmlelement("details", a.details)),
+                                                     -- REGION
+                                                     decode(a.region_id, null, null, xmlelement("region",
+                                                       -- CODE
+                                                       xmlelement("code", ref_a_r.code)
+                                                     )),
+                                                     -- TYPE
+                                                     xmlelement("type", ref_at.code)
+                                                   )
+                                                 )
+                                               )
+                                          FROM core.address a,
+                                               ref.shared ref_at,
+                                               (SELECT t.parent_id AS id,
+                                                       t.code
+                                                  FROM ref.region t
+                                                 WHERE t.open_date <= p_report_date
+                                                   AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_a_r
+                                         WHERE a.person_id = s_vph.id
+                                           AND a.region_id = ref_a_r.id (+)
+                                           AND a.type_id = ref_at.id)
+                                  FROM dual
+                                 WHERE EXISTS (SELECT t.* FROM core.address t WHERE t.person_id = s_vph.id)),
+                           -- BANK_RELATIONS
+                           (SELECT (SELECT xmlelement("bank_relations",
+                                             xmlagg(
+                                               -- ITEM
+                                               xmlelement("item",
+                                                   -- CREDITOR
+                                                 (SELECT xmlelement("creditor",
+                                                           -- CODE
+                                                           decode(br_vch.code, null, null, xmlelement("code", br_vch.code)),
+                                                           -- DOCS
+                                                           (SELECT xmlelement("docs",
+                                                                     xmlagg(
+                                                                       -- ITEM
+                                                                       xmlelement("item",
+                                                                         -- DOC_TYPE
+                                                                         decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
+                                                                           xmlelement("code", ref_dt.code)
+                                                                         )),
+                                                                         -- NO
+                                                                         xmlelement("no", ref_vcdh.no_)
+                                                                       )
+                                                                     )
+                                                                   )
+                                                              FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
+                                                                   (SELECT t.parent_id AS id,
+                                                                           t.code
+                                                                      FROM ref.doc_type t
+                                                                     WHERE t.open_date <= p_report_date
+                                                                       AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_dt
+                                                             WHERE ref_vcdh.creditor_id = br_vch.id
+                                                               AND ref_vcdh.type_id = ref_dt.id (+))
+                                                         )
+                                                    FROM ref.v_creditor_his br_vch
+                                                   WHERE br_vch.id = di.creditor_id
+                                                     AND br_vch.open_date <= p_report_date
+                                                     AND (br_vch.close_date > p_report_date OR br_vch.close_date is null)),
+                                                   xmlelement("bank_relation",
+                                                     -- CODE
+                                                     xmlelement("code", ref_br_br.code)
+                                                   )
+                                               )
+                                             )
+                                           )
+                                      FROM core.debtor_info di,
+                                           (SELECT t.parent_id AS id,
+                                                   t.code
+                                              FROM ref.bank_relation t
+                                             WHERE t.open_date <= p_report_date
+                                               AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_br_br
+                                     WHERE di.person_id = s_vph.id
+                                       AND di.bank_relation_id = ref_br_br.id (+)
+                                       AND di.open_date <= p_report_date
+                                       AND (di.close_date > p_report_date OR di.close_date is null))
+                              FROM dual
+                             WHERE EXISTS (SELECT t.*
+                                             FROM core.debtor_info t
+                                            WHERE t.person_id = s_vph.id
+                                              AND t.open_date <= p_report_date
+                                              AND (t.close_date > p_report_date OR t.close_date is null))),
+                           -- CONTACTS
+                           (SELECT (SELECT xmlelement("contacts",
+                                             xmlagg(
+                                               -- ITEM
+                                               xmlelement("item",
+                                                 -- CONTACT_TYPE
+                                                 decode(c.type_id, null, null, xmlelement("contact_type",
+                                                   -- CODE
+                                                   xmlelement("code", ref_c_ct.code)
+                                                 )),
+                                                 -- DETAILS
+                                                 decode(c.details, null, null, xmlelement("details", xmlelement("item", c.details)))
+                                               )
+                                             )
+                                           )
+                                      FROM core.contact c,
+                                           (SELECT t.parent_id AS id,
+                                                   t.code
+                                              FROM ref.contact_type t
+                                             WHERE t.open_date <= p_report_date
+                                               AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_c_ct
+                                     WHERE c.person_id = s_vph.id
+                                       AND c.type_id = ref_c_ct.id (+))
+                              FROM dual
+                             WHERE EXISTS (SELECT t.* FROM core.contact t WHERE t.person_id = s_vph.id)),
+                           -- COUNTRY
+                           decode(s_vph.country_id, null, null, xmlelement("country",
+                             xmlelement("code_numeric", ref_p_c.code_numeric)
+                           )),
+                           -- DOCS
+                           (SELECT (SELECT xmlelement("docs",
+                                             xmlagg(
+                                               -- ITEM
+                                               xmlelement("item",
+                                                 -- DOC_TYPE
+                                                 decode(vddh.type_id, null, null, xmlelement("doc_type",
+                                                   -- CODE
+                                                   xmlelement("code", ref_d_dt.code)
+                                                 )),
+                                                 -- NAME
+                                                 decode(vddh.name, null, null, xmlelement("name", vddh.name)),
+                                                 -- NO
+                                                 decode(vddh.no_, null, null, xmlelement("no", vddh.no_))
+                                               )
+                                             )
+                                           )
+                                      FROM core.v_debtor_doc_his vddh,
+                                           (SELECT t.parent_id AS id,
+                                                   t.code
+                                              FROM ref.doc_type t
+                                             WHERE t.open_date <= p_report_date
+                                               AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_d_dt
+                                     WHERE vddh.person_id = s_vph.id
+                                       AND vddh.type_id = ref_d_dt.id (+)
+                                       AND vddh.open_date <= p_report_date
+                                       AND (vddh.close_date > p_report_date OR vddh.close_date is null))
+                              FROM dual
+                             WHERE EXISTS (SELECT t.*
+                                             FROM core.v_debtor_doc_his t
+                                            WHERE t.person_id = s_vph.id
+                                              AND t.open_date <= p_report_date
+                                              AND (t.close_date > p_report_date OR t.close_date is null))),
+                           -- NAMES
+                           (SELECT (SELECT xmlelement("names",
+                                             xmlagg(
+                                               -- ITEM
+                                               xmlelement("item",
+                                                 -- FIRSTNAME
+                                                 decode(vpnh.first_name, null, null, xmlelement("firstname", vpnh.first_name)),
+                                                 -- LASTNAME
+                                                 decode(vpnh.last_name, null, null, xmlelement("lastname", vpnh.last_name)),
+                                                 -- MIDDLENAME
+                                                 decode(vpnh.middle_name, null, null, xmlelement("middlename", vpnh.middle_name)),
+                                                 -- CODE
+                                                 xmlelement("lang", ref_l.code)
+                                               )
+                                             )
+                                           )
+                                      FROM core.v_person_name_his vpnh,
+                                           ref.shared ref_l
+                                     WHERE vpnh.person_id = s_vph.id
+                                       AND vpnh.lang_id = ref_l.id (+)
+                                       AND vpnh.open_date <= p_report_date
+                                       AND (vpnh.close_date > p_report_date OR vpnh.close_date is null))
+                              FROM dual
+                             WHERE EXISTS (SELECT t.*
+                                             FROM core.v_person_name_his t
+                                            WHERE t.person_id = s_vph.id
+                                              AND t.open_date <= p_report_date
+                                              AND (t.close_date > p_report_date OR t.close_date is null))),
+                           -- OFFSHORE
+                           decode(s_vph.offshore_id, null, null, xmlelement("offshore",
+                             xmlelement("code", ref_p_o.code)
+                           ))                          
+                )
+                   FROM v_person_his s_vph,
+                         (SELECT t.parent_id AS id,
+                                 t.code_numeric
+                            FROM ref.country t
+                           WHERE t.open_date <= p_report_date
+                             AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_p_c,
+                         (SELECT t.parent_id AS id,
+                                 t.code
+                            FROM ref.offshore t
+                           WHERE t.open_date <= p_report_date
+                             AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_p_o
+                   WHERE s_vph.id = vdh.person_id
+                     AND s_vph.offshore_id = ref_p_o.id (+)
+                     AND s_vph.country_id = ref_p_c.id (+)
+                     AND s_vph.open_date <= p_report_date
+                     AND (s_vph.close_date > p_report_date OR s_vph.close_date is null)
+                )
+              )
+           ), 1 as control
+      INTO v_xml, v_control
+      FROM v_debtor_his vdh
+     WHERE vdh.credit_id = p_credit_id
+       AND vdh.type_id in (1, 7)
+       AND (vdh.person_id IS NOT NULL)
+       AND vdh.open_date <= p_report_date
+       AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
+               
+    if v_control = 1 then
+      return v_xml;
+    end if;
+    
+    return null;
+  END;  
+  
+  FUNCTION get_creditors_xml
+  (
+    p_credit_id IN NUMBER,
+    p_report_date IN DATE,
+    p_tag_name IN VARCHAR2 DEFAULT 'creditors'
+  ) RETURN XMLTYPE
+  IS
+    v_xml xmltype;
+    v_control int;
+  BEGIN
+     SELECT xmlelement("creditors_dev", 
+                xmlagg(
+                  (SELECT xmlelement("item", 
+                             -- CODE
+                             decode(s_vch.code, null, null, xmlelement("code", s_vch.code)),
+                             -- DOCS
+                             (SELECT xmlelement("docs",
+                                       xmlagg(
+                                         -- ITEM
+                                         xmlelement("item",
+                                           -- DOC_TYPE
+                                           decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
+                                             xmlelement("code", ref_dt.code)
+                                           )),
+                                           -- NO
+                                           xmlelement("no", ref_vcdh.no_)
+                                         )
+                                       )
+                                     )
+                                FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
+                                     (SELECT t.parent_id AS id,
+                                             t.code
+                                        FROM ref.doc_type t
+                                       WHERE t.open_date <= p_report_date
+                                         AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_dt
+                               WHERE ref_vcdh.creditor_id = s_vch.id
+                                 AND ref_vcdh.type_id = ref_dt.id (+)))
+                      FROM ref.v_creditor_his s_vch                      
+                     WHERE s_vch.id = vdh.creditor_id
+                       AND s_vch.open_date <= p_report_date
+                       AND (s_vch.close_date > p_report_date OR s_vch.close_date is null)                                  
+                  )
+                )
+              ), 1 as control
+        INTO v_xml, v_control
+        FROM v_debtor_his vdh
+       WHERE vdh.credit_id = p_credit_id
+         AND vdh.type_id in (1, 7)
+         AND (vdh.creditor_id IS NOT NULL)
+         AND vdh.open_date <= p_report_date
+         AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
+
+         
+    if v_control = 1 then
+      return v_xml;
+    end if;
+    
+    return null;        
+  END;
+  
+  
+  FUNCTION get_organizations_xml
+  (
+    p_credit_id IN NUMBER,
+    p_report_date IN DATE,
+    p_tag_name IN VARCHAR2 DEFAULT 'organization'
+  ) RETURN XMLTYPE
+  IS
+    v_xml xmltype;
+    v_control int;
+  BEGIN
+  
+       SELECT xmlelement("organizations_dev", 
+                  xmlagg(
+                    (SELECT xmlelement("item",
+                               -- ADDRESSES
+                               (SELECT (SELECT xmlelement("addresses",
+                                                 xmlagg(
+                                                   -- ITEM
+                                                   xmlelement("item",
+                                                     -- DETAILS
+                                                     decode(a.details, null, null, xmlelement("details", a.details)),
+                                                     -- REGION
+                                                     decode(a.region_id, null, null, xmlelement("region",
+                                                       -- CODE
+                                                       xmlelement("code", ref_a_r.code)
+                                                     )),
+                                                     -- TYPE
+                                                     xmlelement("type", ref_at.code)
+                                                   )
+                                                 )
+                                               )
+                                          FROM core.address a,
+                                               ref.shared ref_at,
+                                               (SELECT t.parent_id AS id,
+                                                       t.code
+                                                  FROM ref.region t
+                                                 WHERE t.open_date <= p_report_date
+                                                   AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_a_r
+                                         WHERE a.org_id = s_voh.id
+                                           AND a.region_id = ref_a_r.id (+)
+                                           AND a.type_id = ref_at.id)
+                                  FROM dual
+                                 WHERE EXISTS (SELECT t.* FROM core.address t WHERE t.org_id = s_voh.id)),
+                               -- BANK_RELATIONS
+                               (SELECT (SELECT xmlelement("bank_relations",
+                                                 xmlagg(
+                                                   -- ITEM
+                                                   xmlelement("item",
+                                                     -- CREDITOR
+                                                     (SELECT xmlelement("creditor",
+                                                               -- CODE
+                                                               decode(br_vch.code, null, null, xmlelement("code", br_vch.code)),
+                                                               -- DOCS
+                                                               (SELECT xmlelement("docs",
+                                                                         xmlagg(
+                                                                           -- ITEM
+                                                                           xmlelement("item",
+                                                                             -- DOC_TYPE
+                                                                             decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
+                                                                               xmlelement("code", ref_dt.code)
+                                                                             )),
+                                                                             -- NO
+                                                                             xmlelement("no", ref_vcdh.no_)
+                                                                           )
+                                                                         )
+                                                                       )
+                                                                  FROM ref.creditor_doc ref_vcdh, -- MAY BE CREATE AND USE VIEW?!
+                                                                       (SELECT t.parent_id AS id,
+                                                                               t.code
+                                                                          FROM ref.doc_type t
+                                                                         WHERE t.open_date <= p_report_date
+                                                                           AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_dt
+                                                                 WHERE ref_vcdh.creditor_id = br_vch.id
+                                                                   AND ref_vcdh.type_id = ref_dt.id (+))
+                                                             )
+                                                        FROM ref.v_creditor_his br_vch
+                                                       WHERE br_vch.id = di.creditor_id
+                                                         AND br_vch.open_date <= p_report_date
+                                                         AND (br_vch.close_date > p_report_date OR br_vch.close_date is null)),
+                                                       xmlelement("bank_relation",
+                                                         -- CODE
+                                                         xmlelement("code", ref_br_br.code)
+                                                       )
+                                                   )
+                                                 )
+                                               )
+                                          FROM core.debtor_info di,
+                                               (SELECT t.parent_id AS id,
+                                                       t.code
+                                                  FROM ref.bank_relation t
+                                                 WHERE t.open_date <= p_report_date
+                                                   AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_br_br
+                                         WHERE di.org_id = s_voh.id
+                                           --AND di.creditor_id = v_creditor_id
+                                           AND di.bank_relation_id = ref_br_br.id (+)
+                                           AND di.open_date <= p_report_date
+                                           AND (di.close_date > p_report_date OR di.close_date is null))
+                                  FROM dual
+                                 WHERE EXISTS (SELECT t.*
+                                                 FROM core.debtor_info t
+                                                WHERE t.org_id = s_voh.id
+                                                  --AND t.creditor_id = v_creditor_id
+                                                  AND t.open_date <= p_report_date
+                                                  AND (t.close_date > p_report_date OR t.close_date is null))),
+                               -- CONTACTS
+                               (SELECT (SELECT xmlelement("contacts",
+                                                 xmlagg(
+                                                   -- ITEM
+                                                   xmlelement("item",
+                                                     -- CONTACT_TYPE
+                                                     decode(c.type_id, null, null, xmlelement("contact_type",
+                                                       -- CODE
+                                                       xmlelement("code", ref_c_ct.code)
+                                                     )),
+                                                     -- DETAILS
+                                                     decode(c.details, null, null, xmlelement("details", xmlelement("item", c.details)))
+                                                   )
+                                                 )
+                                               )
+                                          FROM core.contact c,
+                                               (SELECT t.parent_id AS id,
+                                                       t.code
+                                                  FROM ref.contact_type t
+                                                 WHERE t.open_date <= p_report_date
+                                                   AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_c_ct
+                                         WHERE c.org_id = s_voh.id
+                                           AND c.type_id = ref_c_ct.id (+))
+                                  FROM dual
+                                 WHERE EXISTS (SELECT t.* FROM core.contact t WHERE t.org_id = s_voh.id)),
+                               -- COUNTRY
+                               decode(s_voh.country_id, null, null, xmlelement("country",
+                                 xmlelement("code_numeric", ref_o_c.code_numeric)
+                               )),
+                               -- DOCS
+                               (SELECT (SELECT xmlelement("docs",
+                                                 xmlagg(
+                                                   -- ITEM
+                                                   xmlelement("item",
+                                                     -- DOC_TYPE
+                                                     decode(vddh.type_id, null, null, xmlelement("doc_type",
+                                                       -- CODE
+                                                       xmlelement("code", ref_d_dt.code)
+                                                     )),
+                                                     -- NAME
+                                                     decode(vddh.name, null, null, xmlelement("name", vddh.name)),
+                                                     -- NO
+                                                     decode(vddh.no_, null, null, xmlelement("no", vddh.no_))
+                                                   )
+                                                 )
+                                               )
+                                          FROM core.v_debtor_doc_his vddh,
+                                               (SELECT t.parent_id AS id,
+                                                       t.code
+                                                  FROM ref.doc_type t
+                                                 WHERE t.open_date <= p_report_date
+                                                   AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_d_dt
+                                         WHERE vddh.org_id = s_voh.id
+                                           AND vddh.type_id = ref_d_dt.id (+)
+                                           AND vddh.open_date <= p_report_date
+                                           AND (vddh.close_date > p_report_date OR vddh.close_date is null))
+                                  FROM dual
+                                 WHERE EXISTS (SELECT t.*
+                                                 FROM core.v_debtor_doc_his t
+                                                WHERE t.org_id = s_voh.id
+                                                  AND t.open_date <= p_report_date
+                                                  AND (t.close_date > p_report_date OR t.close_date is null))),
+                               -- ECON_TRADE
+                               decode(s_voh.econ_trade_id, null, null, xmlelement("econ_trade",
+                                 xmlelement("code", ref_o_et.code)
+                               )),
+                               -- ENTERPRISE_TYPE
+                               decode(s_voh.enterprise_type_id, null, null, xmlelement("enterprise_type",
+                                 xmlelement("code", ref_o_t.code)
+                               )),
+                               -- HEAD
+                               (SELECT xmlelement("head",
+                                         -- DOCS
+                                         (SELECT (SELECT xmlelement("docs",
+                                                           xmlagg(
+                                                             -- ITEM
+                                                             xmlelement("item",
+                                                               -- DOC_TYPE
+                                                               decode(vddh.type_id, null, null, xmlelement("doc_type",
+                                                                 -- CODE
+                                                                 xmlelement("code", ref_d_dt.code)
+                                                               )),
+                                                               -- NAME
+                                                               decode(vddh.name, null, null, xmlelement("name", vddh.name)),
+                                                               -- NO
+                                                               decode(vddh.no_, null, null, xmlelement("no", vddh.no_))
+                                                             )
+                                                           )
+                                                         )
+                                                    FROM core.v_debtor_doc_his vddh,
+                                                         (SELECT t.parent_id AS id,
+                                                                 t.code
+                                                            FROM ref.doc_type t
+                                                           WHERE t.open_date <= p_report_date
+                                                             AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_d_dt
+                                                   WHERE vddh.person_id = h_vph.id
+                                                     AND vddh.type_id = ref_d_dt.id (+)
+                                                     AND vddh.open_date <= p_report_date
+                                                     AND (vddh.close_date > p_report_date OR vddh.close_date is null))
+                                            FROM dual
+                                           WHERE EXISTS (SELECT t.*
+                                                           FROM core.v_debtor_doc_his t
+                                                          WHERE t.person_id = h_vph.id
+                                                            AND t.open_date <= p_report_date
+                                                            AND (t.close_date > p_report_date OR t.close_date is null))),
+                                         -- NAMES
+                                         (SELECT (SELECT xmlelement("names",
+                                                           xmlagg(
+                                                             -- ITEM
+                                                             xmlelement("item",
+                                                               -- FIRSTNAME
+                                                               decode(vpnh.first_name, null, null, xmlelement("firstname", vpnh.first_name)),
+                                                               -- LASTNAME
+                                                               decode(vpnh.last_name, null, null, xmlelement("lastname", vpnh.last_name)),
+                                                               -- MIDDLENAME
+                                                               decode(vpnh.middle_name, null, null, xmlelement("middlename", vpnh.middle_name)),
+                                                               -- CODE
+                                                               xmlelement("lang", ref_l.code)
+                                                             )
+                                                           )
+                                                         )
+                                                    FROM core.v_person_name_his vpnh,
+                                                         ref.shared ref_l
+                                                   WHERE vpnh.person_id = h_vph.id
+                                                     AND vpnh.lang_id = ref_l.id (+)
+                                                     AND vpnh.open_date <= p_report_date
+                                                     AND (vpnh.close_date > p_report_date OR vpnh.close_date is null))
+                                            FROM dual
+                                           WHERE EXISTS (SELECT t.*
+                                                           FROM core.v_person_name_his t
+                                                          WHERE t.person_id = h_vph.id
+                                                            AND t.open_date <= p_report_date
+                                                            AND (t.close_date > p_report_date OR t.close_date is null)))
+                                       )
+                                  FROM core.v_person_his h_vph
+                                 WHERE h_vph.id = s_voh.head_id
+                                   AND h_vph.open_date <= p_report_date
+                                   AND (h_vph.close_date > p_report_date OR h_vph.close_date is null)),
+                               -- IS_SE
+                               decode(s_voh.is_se, null, null, xmlelement("is_se", decode(s_voh.is_se, 1, 'true', 'false'))),
+                               -- LEGAL_FORM
+                               decode(s_voh.legal_form_id, null, null, xmlelement("legal_form",
+                                 xmlelement("code", ref_o_lf.code)
+                               )),
+                               -- NAMES
+                               (SELECT (SELECT xmlelement("names",
+                                                 xmlagg(
+                                                   -- ITEM
+                                                   xmlelement("item",
+                                                     -- NAME
+                                                     decode(vonh.name, null, null, xmlelement("name", vonh.name)),
+                                                     -- CODE
+                                                     xmlelement("lang", ref_l.code)
+                                                   )
+                                                 )
+                                               )
+                                          FROM core.v_org_name_his vonh,
+                                               ref.shared ref_l
+                                         WHERE vonh.org_id = s_voh.id
+                                           AND vonh.lang_id = ref_l.id (+)
+                                           AND vonh.open_date <= p_report_date
+                                           AND (vonh.close_date > p_report_date OR vonh.close_date is null))
+                                  FROM dual
+                                 WHERE EXISTS (SELECT t.*
+                                                 FROM core.v_org_name_his t
+                                                WHERE t.org_id = s_voh.id
+                                                  AND t.open_date <= p_report_date
+                                                  AND (t.close_date > p_report_date OR t.close_date is null))),
+                               -- OFFSHORE
+                               decode(s_voh.offshore_id, null, null, xmlelement("offshore",
+                                 xmlelement("code", ref_o_o.code)
+                               ))                                          
+                            )
+                        FROM v_organization_his s_voh,
+                             (SELECT t.parent_id AS id,
+                                     t.code
+                                FROM ref.enterprise_type t
+                               WHERE t.open_date <= p_report_date
+                                 AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_o_t,
+                             (SELECT t.parent_id AS id,
+                                     t.code
+                                FROM ref.econ_trade t
+                               WHERE t.open_date <= p_report_date
+                                 AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_o_et,
+                             (SELECT t.parent_id AS id,
+                                     t.code
+                                FROM ref.legal_form t
+                               WHERE t.open_date <= p_report_date
+                                 AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_o_lf,
+                             (SELECT t.parent_id AS id,
+                                     t.code_numeric
+                                FROM ref.country t
+                               WHERE t.open_date <= p_report_date
+                                 AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_o_c,
+                             (SELECT t.parent_id AS id,
+                                     t.code
+                                FROM ref.offshore t
+                               WHERE t.open_date <= p_report_date
+                                 AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_o_o
+                       WHERE s_voh.id = vdh.org_id
+                         AND s_voh.offshore_id = ref_o_o.id (+)
+                         AND s_voh.country_id = ref_o_c.id (+)
+                         AND s_voh.econ_trade_id = ref_o_et.id (+)
+                         AND s_voh.legal_form_id = ref_o_lf.id (+)
+                         AND s_voh.enterprise_type_id = ref_o_t.id (+)
+                         AND s_voh.open_date <= p_report_date
+                         AND (s_voh.close_date > p_report_date OR s_voh.close_date is null)   
+                     )
+                  )
+               ), 1 as control 
+          INTO v_xml,v_control 
+          FROM v_debtor_his vdh           
+         WHERE vdh.credit_id = p_credit_id
+           AND vdh.type_id in (1, 7)
+           AND (vdh.org_id IS NOT NULL)
+           AND vdh.open_date <= p_report_date
+           AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
+        
+    if(v_control = 1) then
+      return v_xml;
+    end if;
+      
+    return null;
+  END;  
+  
   FUNCTION get_organization_xml
   (
     p_organization_id IN NUMBER,
@@ -3043,7 +4023,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END IF;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -3105,7 +4085,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END IF;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -3147,7 +4127,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -3187,7 +4167,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"),null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -3233,7 +4213,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -3275,7 +4255,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -3319,7 +4299,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -3361,7 +4341,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -3384,7 +4364,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- ITEM
                  xmlelement("item",
                    -- CONTRACT
-                   xmlelement("contract", vph.contract_no),
+                   nillable_xml('contract', vph.contract_no),
                    -- PLEDGE_TYPE
                    get_ref_pledge_type_xml(vph.type_id, p_report_date),
 
@@ -3404,13 +4384,223 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), null)
+      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
         INTO v_xml
         FROM dual;
     END IF;
 
     RETURN v_xml;
   END;
+  
+  FUNCTION get_persons
+  (
+    p_credit_id NUMBER,
+    p_report_date DATE
+  ) RETURN XMLType
+  IS
+    v_xml XMLTYPE;
+    v_elem_cnt XMLTYPE;
+  BEGIN
+    SELECT xmlagg(get_person_xml(vdh.person_id, p_report_date, 'item'))
+      INTO v_elem_cnt
+      FROM v_debtor_his vdh
+     WHERE vdh.credit_id = p_credit_id
+       AND vdh.type_id in (1, 7)
+       AND vdh.person_id IS NOT NULL
+       AND vdh.open_date <= p_report_date
+       AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
+                   
+    if(v_elem_cnt is null) then
+      select xmlelement("persons", xmlattributes('true' as "xsi:nil"), NULL)
+        into v_xml
+        from dual;
+    else
+      select xmlelement("persons", v_elem_cnt)
+        into v_xml
+        from dual;    
+    end if;
+      
+    return v_xml;
+  END;
+  
+  FUNCTION get_organizations
+  (
+    p_credit_id NUMBER,
+    p_report_date DATE
+  ) RETURN XMLType
+  IS
+    v_xml XMLTYPE;
+    v_elem_cnt XMLTYPE;
+    v_cnt number;
+  BEGIN
+  
+    SELECT xmlagg(get_organization_xml(vdh.org_id, p_report_date, 'item'))
+      INTO v_elem_cnt
+      FROM v_debtor_his vdh
+     WHERE vdh.credit_id = p_credit_id
+       AND vdh.type_id in (1, 7)
+       AND vdh.org_id IS NOT NULL
+       AND vdh.open_date <= p_report_date
+       AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
+                   
+    if(v_elem_cnt is null) then
+      select xmlelement("organizations", xmlattributes('true' as "xsi:nil"), NULL)
+        into v_xml
+        from dual;
+    else
+      select xmlelement("organizations", v_elem_cnt)
+        into v_xml
+        from dual;    
+    end if;
+      
+    return v_xml;
+  END;
+  
+  FUNCTION get_creditors
+  (
+    p_credit_id NUMBER,
+    p_report_date DATE
+  ) RETURN XMLType
+  IS
+    v_xml XMLTYPE;
+    v_elem_cnt XMLTYPE;
+    v_cnt number;
+  BEGIN
+  
+    SELECT xmlagg(get_ref_creditor_xml(vdh.creditor_id, p_report_date, 'item'))
+      INTO v_elem_cnt
+      FROM v_debtor_his vdh
+     WHERE vdh.credit_id = p_credit_id
+       AND vdh.type_id in (1, 7)
+       AND vdh.creditor_id IS NOT NULL
+       AND vdh.open_date <= p_report_date
+       AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
+                   
+    if(v_elem_cnt is null) then
+      select xmlelement("creditors", xmlattributes('true' as "xsi:nil"), NULL)
+        into v_xml
+        from dual;
+    else
+      select xmlelement("creditors", v_elem_cnt)
+        into v_xml
+        from dual;    
+    end if;
+      
+    return v_xml;
+  END;
+  
+  FUNCTION get_portfolio_flows_kfn
+  (
+    p_creditor_id IN NUMBER,
+    p_report_date IN DATE
+  ) RETURN XMLTYPE
+  IS
+    v_xml XMLTYPE;
+  BEGIN
+     select xmlagg(
+              xmlelement("item",
+                         pkg_eav_xml_util.get_ref_portfolio_xml(pfg.portfolio_id, p_report_date, 'portfolio'),
+                         (select xmlelement("details",
+                                   xmlagg(
+                                     xmlelement("item",
+                                       pkg_eav_xml_util.get_ref_balance_account_xml(pfv.provision_account_id, p_report_date, 'balance_account'),
+                                       xmlelement("value", pfv.provision_value)
+                                     )
+                                   )
+                                 )
+                            from portfolio_flow pfv
+                           where pfv.creditor_id = pfg.creditor_id
+                             and pfv.rep_date = pfg.rep_date
+                             and pfv.portfolio_id = pfg.portfolio_id)
+                        )
+                   )
+            INTO v_xml
+            from (select pf.creditor_id, pf.portfolio_id, pf.rep_date from portfolio_flow pf group by pf.creditor_id, pf.portfolio_id, pf.rep_date) pfg
+           where pfg.creditor_id = p_creditor_id
+             and pfg.rep_date = p_report_date;
+             
+    IF(v_xml IS NULL) THEN
+      SELECT xmlelement("portfolio_flows_kfn", xmlattributes('true' as "xsi:nil"))
+        INTO v_xml
+        FROM dual;
+    ELSE
+      SELECT xmlelement("portfolio_flows_kfn" , v_xml)
+        INTO v_xml
+        FROM dual;
+    END IF;
+    
+    RETURN v_xml;    
+    
+  EXCEPTION
+    WHEN OTHERS THEN
+      write_log(p_log_date => sysdate,
+                p_log_text => 'Unexpected error occured: ' || SQLERRM || '.',
+                p_log_level => c_log_level_error,
+                p_procedure_call => 'to do');
+    
+
+  END;
+  
+  FUNCTION get_portfolio_flows_msfo
+  (
+    p_creditor_id IN NUMBER,
+    p_report_date IN DATE
+  ) RETURN XMLTYPE
+  IS
+    v_xml XMLTYPE;
+    v_procedure_call varchar2(4000 CHAR) :=
+      'PORTFOLIO_FLOWS_MSFO(P_CREDITOR_ID => ' || p_creditor_id || ',' ||
+                           'P_REPORT_DATE = > ' || p_report_date || ')';  
+  BEGIN
+       SELECT xmlagg(
+                 xmlelement("item",
+                   pkg_eav_xml_util.get_ref_portfolio_xml(pfmg.portfolio_id, p_report_date, 'portfolio'),
+                   xmlelement("discounted_value", pfmg.discounted_value),
+                   (select xmlelement("details",
+                             xmlagg(
+                               xmlelement("item",
+                                 pkg_eav_xml_util.get_ref_balance_account_xml(pfmv.provision_account_id, p_report_date, 'balance_account'),
+                                 xmlelement("value", pfmv.provision_value)
+                               )
+                             )
+                           )
+                      from portfolio_flow_msfo_old pfmv
+                     where pfmv.creditor_id = pfmg.creditor_id
+                       and pfmv.rep_date = pfmg.rep_date
+                       and pfmv.portfolio_id = pfmg.portfolio_id
+                       and pfmv.discounted_value = pfmg.discounted_value)
+                 )
+               )
+                         
+        INTO v_xml
+        FROM (select pfm.creditor_id, pfm.portfolio_id, pfm.rep_date, pfm.discounted_value from portfolio_flow_msfo_old pfm group by pfm.creditor_id, pfm.portfolio_id, pfm.rep_date, pfm.discounted_value) pfmg
+       WHERE pfmg.creditor_id = p_creditor_id
+         AND pfmg.rep_date = p_report_date;
+                     
+                     
+    IF v_xml IS NULL THEN
+      SELECT xmlelement("portfolio_flows_msfo", xmlattributes('true' as "xsi:nil"))
+        INTO v_xml
+        FROM dual;
+    ELSE
+      SELECT xmlelement("portfolio_flows_msfo" , v_xml)
+        INTO v_xml
+        FROM dual;
+    END IF;
+    
+    RETURN v_xml;    
+    
+  EXCEPTION
+  WHEN OTHERS THEN
+    write_log(p_log_date => sysdate,
+              p_log_text => 'Unexpected error occured: ' || SQLERRM || '.',
+              p_log_level => c_log_level_error,
+              p_procedure_call => v_procedure_call);
+              
+
+
+  END;
 
 end PKG_EAV_XML_UTIL;
 /
+
