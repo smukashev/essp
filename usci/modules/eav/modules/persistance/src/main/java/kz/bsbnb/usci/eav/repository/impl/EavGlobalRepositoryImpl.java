@@ -26,7 +26,7 @@ public class EavGlobalRepositoryImpl implements IEavGlobalRepository, Initializi
         for (EavGlobal eavGlobal : eavGlobalList)
             cache.put(eavGlobal.getType() + "___" + eavGlobal.getCode(), eavGlobal);
 
-        System.out.println(cache.size());
+        System.out.println("Eav global cache size: " + cache.size());
     }
 
     @Override

@@ -9,7 +9,6 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
-import kz.bsbnb.usci.eav.repository.IBaseEntityRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +35,6 @@ public abstract class BatchParser {
 
     @Autowired
     protected IMetaClassRepository metaClassRepository;
-
-    @Autowired
-    protected IBaseEntityRepository baseEntityRepository;
 
     @Autowired
     protected IBaseEntityLoadDao baseEntityLoadDao;
