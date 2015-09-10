@@ -206,7 +206,7 @@ public class KeySearcherForm implements ISearcherForm {
                 ));
         }
 
-        Long id = searcher.findSingle(baseEntity, /* TODO set creditorId */ 0);
+        Long id = searcher.findSingle(baseEntity, /* TODO set creditorId */ 0L);
         baseEntity.setId(id);
         ret.setData(Arrays.asList(new BaseEntity[]{baseEntity}));
         return ret;
