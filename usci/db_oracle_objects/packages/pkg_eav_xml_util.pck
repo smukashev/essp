@@ -2344,9 +2344,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- FINANCE_SOURCE
                  get_ref_finance_source_xml(vch.finance_source_id, v_report_date),
                  -- HAS_CURRENCY_EARN
-                 xmlelement("has_currency_earn", decode(vch.has_currency_earn, 1, 'true', 'false')),
+                 nillable_xml('has_currency_earn', decode(vch.has_currency_earn, 1, 'true', 'false')),
                  -- INTEREST_RATE_YEARLY
-                 xmlelement("interest_rate_yearly", ltrim(to_char(vch.interest_rate_yearly, c_number_format, c_nls_numeric_characters))),
+                 nillable_xml('interest_rate_yearly', ltrim(to_char(vch.interest_rate_yearly, c_number_format, c_nls_numeric_characters))),
                  -- PORTFOLIO
                  xmlelement("portfolio",
                    -- PORTFOLIO
@@ -2410,9 +2410,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- PRIMARY_CONTRACT
                  xmlelement("primary_contract",
                  -- NO
-                 xmlelement("no", vch.primary_contract_no),
+                 nillable_xml('no', vch.primary_contract_no),
                  -- DATE
-                 xmlelement("date", to_char(vch.primary_contract_date, c_date_format))
+                 nillable_xml('date', to_char(vch.primary_contract_date, c_date_format))
                )
              )
                ORDER BY vch.primary_contract_no, vch.primary_contract_date
@@ -3101,7 +3101,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                              -- DOC_TYPE
                              get_ref_doc_type_xml(vcdh.type_id, p_report_date),
                              -- NO
-                             xmlelement("no", vcdh.no_)
+                             nillable_xml('no', vcdh.no_)
                            )
                          )
                     FROM ref.creditor_doc vcdh -- MAY BE CREATE AND USE VIEW?!
@@ -3155,89 +3155,89 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                WHEN dr.type_id = c_drt_debt_current THEN
                  xmlelement("current",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('value_currency', ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
                  )
                -- DEBT_PASTDUE
                WHEN dr.type_id = c_drt_debt_pastdue THEN
                  xmlelement("pastdue",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("open_date", to_char(dr.pastdue_open_date, 'dd.MM.yyyy')),
-                   xmlelement("close_date", to_char(dr.pastdue_close_date, 'dd.MM.yyyy'))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('value_currency', ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('open_date', to_char(dr.pastdue_open_date, 'dd.MM.yyyy')),
+                   nillable_xml('close_date', to_char(dr.pastdue_close_date, 'dd.MM.yyyy'))
                  )
                -- DEBT_WRITE_OFF
                WHEN dr.type_id = c_drt_debt_write_off THEN
                  xmlelement("write_off",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("date", to_char(dr.write_off_date, 'dd.MM.yyyy'))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('value_currency', ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('date', to_char(dr.write_off_date, 'dd.MM.yyyy'))
                  )
                -- INTEREST_CURRENT
                WHEN dr.type_id = c_drt_interest_current THEN
                  xmlelement("current",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('value_currency', ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
                  )
                -- INTEREST_PASTDUE
                WHEN dr.type_id = c_drt_interest_pastdue THEN
                  xmlelement("pastdue",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("open_date", to_char(dr.pastdue_open_date, 'dd.MM.yyyy')),
-                   xmlelement("close_date", to_char(dr.pastdue_close_date, 'dd.MM.yyyy'))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('value_currency', ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('open_date', to_char(dr.pastdue_open_date, 'dd.MM.yyyy')),
+                   nillable_xml('close_date', to_char(dr.pastdue_close_date, 'dd.MM.yyyy'))
                  )
                -- INTEREST_WRITE_OFF
                WHEN dr.type_id = c_drt_interest_write_off THEN
                  xmlelement("write_off",
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("date", to_char(dr.write_off_date, 'dd.MM.yyyy'))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('value_currency', ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('date', to_char(dr.write_off_date, 'dd.MM.yyyy'))
                  )
                -- DISCOUNT
                WHEN dr.type_id = c_drt_discount THEN
                  xmlelement("discount",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('value_currency', ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
                  )
                -- CORRECTION
                WHEN dr.type_id = c_drt_correction THEN
                  xmlelement("correction",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('value_currency', ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
                  )
                -- DISCOUNTED_VALUE
                WHEN dr.type_id = c_drt_discounted_value THEN
                  xmlelement("discounted_value",
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
                  )
                -- LIMIT
                WHEN dr.type_id = c_drt_limit THEN
                  xmlelement("limit",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
-                   xmlelement("value_currency", ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
+                   nillable_xml('value_currency', ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters)))
                  )
                WHEN dr.type_id = c_drt_provision_kfn THEN
                  xmlelement("provision_kfn",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
                  )
                WHEN dr.type_id = c_drt_provision_msfo THEN
                  xmlelement("provision_msfo",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
                  )
                WHEN dr.type_id = c_drt_provision_msfo_ob THEN
                  xmlelement("provision_msfo_over_balance",
                    get_ref_balance_account_xml(dr.account_id, p_report_date),
-                   xmlelement("value", ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
+                   nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
                  )
                ELSE null
              END
@@ -3290,8 +3290,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
     BEGIN
       SELECT xmlelement(evalname(v_tag_name),
-               xmlelement("amount", ltrim(to_char(t.amount, c_number_format, c_nls_numeric_characters))),
-               xmlelement("amount_currency", ltrim(to_char(t.amount_currency, c_number_format, c_nls_numeric_characters)))
+               nillable_xml('amount', ltrim(to_char(t.amount, c_number_format, c_nls_numeric_characters))),
+               nillable_xml('amount_currency', ltrim(to_char(t.amount_currency, c_number_format, c_nls_numeric_characters)))
              )
         INTO v_xml
         FROM core.turnover t
@@ -3335,7 +3335,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     EXCEPTION
       WHEN no_data_found THEN
         SELECT xmlelement("credit_flow",
-                 xmlelement("classification", null),
+                 nillable_xml('classification', null),
                  xmlelement("provision",
                    -- PROVISION_KFN
                    get_debt_remains_xml(p_credit_id, c_drt_provision_kfn, p_report_date),
@@ -3377,10 +3377,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                      -- REGION
                                                      decode(a.region_id, null, null, xmlelement("region",
                                                        -- CODE
-                                                       xmlelement("code", ref_a_r.code)
+                                                       nillable_xml('code', ref_a_r.code)
                                                      )),
                                                      -- TYPE
-                                                     xmlelement("type", ref_at.code)
+                                                     nillable_xml('type', ref_at.code)
                                                    )
                                                  )
                                                )
@@ -3412,10 +3412,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                                        xmlelement("item",
                                                                          -- DOC_TYPE
                                                                          decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
-                                                                           xmlelement("code", ref_dt.code)
+                                                                           nillable_xml('code', ref_dt.code)
                                                                          )),
                                                                          -- NO
-                                                                         xmlelement("no", ref_vcdh.no_)
+                                                                         nillable_xml('no', ref_vcdh.no_)
                                                                        )
                                                                      )
                                                                    )
@@ -3434,7 +3434,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                      AND (br_vch.close_date > p_report_date OR br_vch.close_date is null)),
                                                    xmlelement("bank_relation",
                                                      -- CODE
-                                                     xmlelement("code", ref_br_br.code)
+                                                     nillable_xml('code', ref_br_br.code)
                                                    )
                                                )
                                              )
@@ -3463,7 +3463,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                  -- CONTACT_TYPE
                                                  decode(c.type_id, null, null, xmlelement("contact_type",
                                                    -- CODE
-                                                   xmlelement("code", ref_c_ct.code)
+                                                   nillable_xml('code', ref_c_ct.code)
                                                  )),
                                                  -- DETAILS
                                                  decode(c.details, null, null, xmlelement("details", xmlelement("item", c.details)))
@@ -3482,7 +3482,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                              WHERE EXISTS (SELECT t.* FROM core.contact t WHERE t.person_id = s_vph.id)),
                            -- COUNTRY
                            decode(s_vph.country_id, null, null, xmlelement("country",
-                             xmlelement("code_numeric", ref_p_c.code_numeric)
+                             nillable_xml('code_numeric', ref_p_c.code_numeric)
                            )),
                            -- DOCS
                            (SELECT (SELECT xmlelement("docs",
@@ -3492,7 +3492,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                  -- DOC_TYPE
                                                  decode(vddh.type_id, null, null, xmlelement("doc_type",
                                                    -- CODE
-                                                   xmlelement("code", ref_d_dt.code)
+                                                   nillable_xml('code', ref_d_dt.code)
                                                  )),
                                                  -- NAME
                                                  decode(vddh.name, null, null, xmlelement("name", vddh.name)),
@@ -3529,7 +3529,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                  -- MIDDLENAME
                                                  decode(vpnh.middle_name, null, null, xmlelement("middlename", vpnh.middle_name)),
                                                  -- CODE
-                                                 xmlelement("lang", ref_l.code)
+                                                 nillable_xml('lang', ref_l.code)
                                                )
                                              )
                                            )
@@ -3547,7 +3547,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                               AND (t.close_date > p_report_date OR t.close_date is null))),
                            -- OFFSHORE
                            decode(s_vph.offshore_id, null, null, xmlelement("offshore",
-                             xmlelement("code", ref_p_o.code)
+                             nillable_xml('code', ref_p_o.code)
                            ))                          
                 )
                    FROM v_person_his s_vph,
@@ -3606,10 +3606,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                          xmlelement("item",
                                            -- DOC_TYPE
                                            decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
-                                             xmlelement("code", ref_dt.code)
+                                             nillable_xml('code', ref_dt.code)
                                            )),
                                            -- NO
-                                           xmlelement("no", ref_vcdh.no_)
+                                           nillable_xml('no', ref_vcdh.no_)
                                          )
                                        )
                                      )
@@ -3669,10 +3669,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                      -- REGION
                                                      decode(a.region_id, null, null, xmlelement("region",
                                                        -- CODE
-                                                       xmlelement("code", ref_a_r.code)
+                                                       nillable_xml('code', ref_a_r.code)
                                                      )),
                                                      -- TYPE
-                                                     xmlelement("type", ref_at.code)
+                                                     nillable_xml('type', ref_at.code)
                                                    )
                                                  )
                                                )
@@ -3704,10 +3704,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                                            xmlelement("item",
                                                                              -- DOC_TYPE
                                                                              decode(ref_vcdh.type_id, null, null, xmlelement("doc_type",
-                                                                               xmlelement("code", ref_dt.code)
+                                                                               nillable_xml('code', ref_dt.code)
                                                                              )),
                                                                              -- NO
-                                                                             xmlelement("no", ref_vcdh.no_)
+                                                                             nillable_xml('no', ref_vcdh.no_)
                                                                            )
                                                                          )
                                                                        )
@@ -3726,7 +3726,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                          AND (br_vch.close_date > p_report_date OR br_vch.close_date is null)),
                                                        xmlelement("bank_relation",
                                                          -- CODE
-                                                         xmlelement("code", ref_br_br.code)
+                                                         nillable_xml('code', ref_br_br.code)
                                                        )
                                                    )
                                                  )
@@ -3757,7 +3757,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                      -- CONTACT_TYPE
                                                      decode(c.type_id, null, null, xmlelement("contact_type",
                                                        -- CODE
-                                                       xmlelement("code", ref_c_ct.code)
+                                                       nillable_xml('code', ref_c_ct.code)
                                                      )),
                                                      -- DETAILS
                                                      decode(c.details, null, null, xmlelement("details", xmlelement("item", c.details)))
@@ -3776,7 +3776,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                  WHERE EXISTS (SELECT t.* FROM core.contact t WHERE t.org_id = s_voh.id)),
                                -- COUNTRY
                                decode(s_voh.country_id, null, null, xmlelement("country",
-                                 xmlelement("code_numeric", ref_o_c.code_numeric)
+                                 nillable_xml('code_numeric', ref_o_c.code_numeric)
                                )),
                                -- DOCS
                                (SELECT (SELECT xmlelement("docs",
@@ -3786,7 +3786,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                      -- DOC_TYPE
                                                      decode(vddh.type_id, null, null, xmlelement("doc_type",
                                                        -- CODE
-                                                       xmlelement("code", ref_d_dt.code)
+                                                       nillable_xml('code', ref_d_dt.code)
                                                      )),
                                                      -- NAME
                                                      decode(vddh.name, null, null, xmlelement("name", vddh.name)),
@@ -3813,11 +3813,11 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                   AND (t.close_date > p_report_date OR t.close_date is null))),
                                -- ECON_TRADE
                                decode(s_voh.econ_trade_id, null, null, xmlelement("econ_trade",
-                                 xmlelement("code", ref_o_et.code)
+                                 nillable_xml('code', ref_o_et.code)
                                )),
                                -- ENTERPRISE_TYPE
                                decode(s_voh.enterprise_type_id, null, null, xmlelement("enterprise_type",
-                                 xmlelement("code", ref_o_t.code)
+                                 nillable_xml('code', ref_o_t.code)
                                )),
                                -- HEAD
                                (SELECT xmlelement("head",
@@ -3829,7 +3829,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                                -- DOC_TYPE
                                                                decode(vddh.type_id, null, null, xmlelement("doc_type",
                                                                  -- CODE
-                                                                 xmlelement("code", ref_d_dt.code)
+                                                                 nillable_xml('code', ref_d_dt.code)
                                                                )),
                                                                -- NAME
                                                                decode(vddh.name, null, null, xmlelement("name", vddh.name)),
@@ -3866,7 +3866,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                                -- MIDDLENAME
                                                                decode(vpnh.middle_name, null, null, xmlelement("middlename", vpnh.middle_name)),
                                                                -- CODE
-                                                               xmlelement("lang", ref_l.code)
+                                                               nillable_xml('lang', ref_l.code)
                                                              )
                                                            )
                                                          )
@@ -3891,7 +3891,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                decode(s_voh.is_se, null, null, xmlelement("is_se", decode(s_voh.is_se, 1, 'true', 'false'))),
                                -- LEGAL_FORM
                                decode(s_voh.legal_form_id, null, null, xmlelement("legal_form",
-                                 xmlelement("code", ref_o_lf.code)
+                                 nillable_xml('code', ref_o_lf.code)
                                )),
                                -- NAMES
                                (SELECT (SELECT xmlelement("names",
@@ -3901,7 +3901,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                      -- NAME
                                                      decode(vonh.name, null, null, xmlelement("name", vonh.name)),
                                                      -- CODE
-                                                     xmlelement("lang", ref_l.code)
+                                                     nillable_xml('lang', ref_l.code)
                                                    )
                                                  )
                                                )
@@ -3919,7 +3919,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                                   AND (t.close_date > p_report_date OR t.close_date is null))),
                                -- OFFSHORE
                                decode(s_voh.offshore_id, null, null, xmlelement("offshore",
-                                 xmlelement("code", ref_o_o.code)
+                                 nillable_xml('code', ref_o_o.code)
                                ))                                          
                             )
                         FROM v_organization_his s_voh,
@@ -4003,7 +4003,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- HEAD
                  get_person_xml(voh.head_id, p_report_date, 'head', 1),
                  -- IS_SE
-                 xmlelement("is_se", decode(voh.is_se, 1, 'true', 'false')),
+                 nillable_xml('is_se', decode(voh.is_se, 1, 'true', 'false')),
                  -- LEGAL_FORM
                  get_ref_legal_form_xml(voh.legal_form_id, p_report_date),
                  -- NAMES
@@ -4111,7 +4111,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    -- DOC_TYPE
                    get_ref_doc_type_xml(vddh.type_id, p_report_date),
                    -- NO
-                   xmlelement("no", vddh.no_)
+                   nillable_xml('no', vddh.no_)
                  )
                )
              )
@@ -4153,7 +4153,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    -- CONTACT_TYPE
                    get_ref_contact_type_xml(c.type_id, p_report_date, 'contact_type'),
                    -- DETAILS
-                   xmlelement("details", xmlelement("item", c.details))
+                   nillable_xml('details', nillable_xml("item", c.details))
                  )
                )
              )
@@ -4190,13 +4190,13 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- ITEM
                  xmlelement("item",
                    -- FIRSTNAME
-                   xmlelement("firstname", vpnh.first_name),
+                   nillable_xml('firstname', vpnh.first_name),
                    -- LASTNAME
-                   xmlelement("lastname", vpnh.last_name),
+                   nillable_xml('lastname', vpnh.last_name),
                    -- MIDDLENAME
-                   xmlelement("middlename", vpnh.middle_name),
+                   nillable_xml('middlename', vpnh.middle_name),
                    -- CODE
-                   xmlelement("lang", ref_l.code)
+                   nillable_xml('lang', ref_l.code)
                  )
                )
              )
@@ -4236,9 +4236,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- ITEM
                  xmlelement("item",
                    -- NAME
-                   xmlelement("name", vonh.name),
+                   nillable_xml('name', vonh.name),
                    -- CODE
-                   xmlelement("lang", ref_l.code)
+                   nillable_xml('lang', ref_l.code)
                  )
                )
              )
@@ -4279,11 +4279,11 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- ITEM
                  xmlelement("item",
                    -- DETAILS
-                   xmlelement("details", a.details),
+                   nillable_xml('details', a.details),
                    -- REGION
                    get_ref_region_xml(a.region_id, p_report_date),
                    -- TYPE
-                   xmlelement("type", ref_at.code)
+                   nillable_xml('type', ref_at.code)
                  )
                )
              )
@@ -4369,7 +4369,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    get_ref_pledge_type_xml(vph.type_id, p_report_date),
 
                    -- VALUE
-                   xmlelement("value", ltrim(to_char(vph.value_, c_number_format, c_nls_numeric_characters)))
+                   nillable_xml('value', ltrim(to_char(vph.value_, c_number_format, c_nls_numeric_characters)))
                  )
                )
              )
@@ -4504,7 +4504,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                    xmlagg(
                                      xmlelement("item",
                                        pkg_eav_xml_util.get_ref_balance_account_xml(pfv.provision_account_id, p_report_date, 'balance_account'),
-                                       xmlelement("value", pfv.provision_value)
+                                       nillable_xml('value', pfv.provision_value)
                                      )
                                    )
                                  )
@@ -4555,12 +4555,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        SELECT xmlagg(
                  xmlelement("item",
                    pkg_eav_xml_util.get_ref_portfolio_xml(pfmg.portfolio_id, p_report_date, 'portfolio'),
-                   xmlelement("discounted_value", pfmg.discounted_value),
+                   nillable_xml('discounted_value', pfmg.discounted_value),
                    (select xmlelement("details",
                              xmlagg(
                                xmlelement("item",
                                  pkg_eav_xml_util.get_ref_balance_account_xml(pfmv.provision_account_id, p_report_date, 'balance_account'),
-                                 xmlelement("value", pfmv.provision_value)
+                                 nillable_xml('value', pfmv.provision_value)
                                )
                              )
                            )
