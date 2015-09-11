@@ -285,7 +285,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         }
                     }
 
-                    if (childBaseEntityIds.size() > 0)
+                    if (childBaseEntityIds.size() == 0)
                         throw new IllegalStateException("Ни один элемент ключевого массива не был идентифицирован;");
 
                     String className = childMetaClass.getClassName();
