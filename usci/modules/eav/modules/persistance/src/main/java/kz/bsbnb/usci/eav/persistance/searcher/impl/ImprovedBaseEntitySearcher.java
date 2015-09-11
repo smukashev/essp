@@ -266,7 +266,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         throw new UnsupportedOperationException("Массив должен содержать элементы;");
 
                     if (!memberType.isComplex())
-                        throw new UnsupportedOperationException("Не реализовано;");
+                        throw new UnsupportedOperationException("Простой массив не может быть ключевым;");
 
                     MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
                     List<Long> childBaseEntityIds = new ArrayList<>();

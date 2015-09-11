@@ -68,6 +68,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     @Value("#{jobParameters['actualCount']}")
     private Long actualCount;
 
+    @Value("#{jobParameters['batchId']}")
+    private Long batchId;
+
     private static final long WAIT_TIMEOUT = 3600; // in sec
     private Logger logger = Logger.getLogger(StaxEventEntityReader.class);
     private Stack<IBaseContainer> stack = new Stack<>();
@@ -302,7 +305,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
         try {
             return readInner();
-
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);
@@ -354,6 +356,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                         break;
                     } else {
                         totalCount++;
+                        ((BaseEntity) currentContainer).setBatchId(batchId);
+                        ((BaseEntity) currentContainer).setIndex(index);
                         return (T) currentContainer;
                     }
                 }
