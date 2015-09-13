@@ -322,4 +322,9 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         }
         return baseValue;
     }
+
+    @Override
+    public String toString() {
+        return getValue().toString();
+    }
 }

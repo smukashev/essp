@@ -108,7 +108,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     } else {
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
                         if (childBaseEntity.getValueCount() != 0) {
-                            prepare((IBaseEntity) baseValue.getValue(), creditorId);
+                            IBaseEntity tmpEntity = prepare((IBaseEntity) baseValue.getValue(), creditorId);
+                            baseValue.setValue(tmpEntity); // TODO: fix
                         }
                     }
                 }
@@ -120,6 +121,16 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (baseEntityId > 0)
                 baseEntity.setId(baseEntityId);
+        }
+
+        // TODO: fix
+        if (metaClass.getClassName().equals("ref_doc_type")) {
+            try {
+                baseEntity = baseEntityLoadDao.load(baseEntity.getId(), baseEntity.getReportDate(),
+                        baseEntity.getReportDate());
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
         }
 
         return baseEntity;

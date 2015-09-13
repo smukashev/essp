@@ -924,11 +924,10 @@ public class CLI {
             while ((entity = reader.read()) != null) {
                 try {
                     long id = baseEntityProcessorDao.process(entity).getId();
-                    System.out.println("Instance of BaseEntity saved with id: " + id);
+                    System.out.println("Запись сохранилась с ИД: " + id);
                 } catch (Exception ex) {
                     lastException = ex;
-                    System.out.println("While processing instance of BaseEntity unexpected error occurred: " +
-                            ex.getMessage());
+                    System.out.println("Ошибка: " + ex.getMessage());
                 }
             }
 
@@ -945,11 +944,10 @@ public class CLI {
             while ((entity = reader.read()) != null) {
                 try {
                     long id = baseEntityProcessorDao.process(entity).getId();
-                    System.out.println("Instance of BaseEntity saved with id: " + id);
+                    System.out.println("Запись сохранилась с ИД: " + id);
                 } catch (Exception ex) {
                     lastException = ex;
-                    System.out.println("While processing instance of BaseEntity unexpected error occurred: " +
-                            ex.getMessage());
+                    System.out.println("Ошибка: " + ex.getMessage());
                 }
             }
         } catch (FileNotFoundException e) {
@@ -2536,12 +2534,10 @@ public class CLI {
                     try {
                         savedEntity = baseEntityProcessorDao.process(entityToWrite);
                         entityList.add(savedEntity);
-                        System.out.println("Instance of BaseEntity saved with id: " + savedEntity.getId());
-
+                        System.out.println("Запись сохранилась с ИД: " + savedEntity.getId());
                     } catch (Exception ex) {
                         lastException = ex;
-                        System.out.println("While processing instance of BaseEntity unexpected error occurred: "
-                                + ex.getMessage());
+                        System.out.println("Ошибка: " + ex.getMessage());
                         ex.printStackTrace();
                     }
                 }
