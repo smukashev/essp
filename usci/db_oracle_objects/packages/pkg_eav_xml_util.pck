@@ -4153,7 +4153,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    -- CONTACT_TYPE
                    get_ref_contact_type_xml(c.type_id, p_report_date, 'contact_type'),
                    -- DETAILS
-                   nillable_xml('details', nillable_xml("item", c.details))
+                   xmlelement("details", nillable_xml('item', c.details))
                  )
                )
              )
