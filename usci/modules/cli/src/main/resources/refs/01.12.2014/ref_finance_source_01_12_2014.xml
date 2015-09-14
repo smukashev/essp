@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_finance_source>
+      <code>03</code>
+      <name_kz>Коммерческие иностранные банки</name_kz>
+      <name_ru>Коммерческие иностранные банки</name_ru>
+    </ref_finance_source>
+    <ref_finance_source>
+      <code>02</code>
+      <name_kz>Международные финансовые организации </name_kz>
+      <name_ru>Международные финансовые организации </name_ru>
+    </ref_finance_source>
+    <ref_finance_source>
+      <code>01</code>
+      <name_kz>Собственные средства</name_kz>
+      <name_ru>Собственные средства</name_ru>
+    </ref_finance_source>
+    <ref_finance_source>
+      <code>07</code>
+      <name_kz>Средства местных, областных и республиканских бюджетов</name_kz>
+      <name_ru>Средства местных, областных и республиканских бюджетов</name_ru>
+    </ref_finance_source>
+    <ref_finance_source>
+      <code>06</code>
+      <name_kz>Средства Национального Фонда</name_kz>
+      <name_ru>Средства Национального Фонда</name_ru>
+    </ref_finance_source>
+    <ref_finance_source>
+      <code>05</code>
+      <name_kz>Государственные программы</name_kz>
+      <name_ru>Государственные программы</name_ru>
+    </ref_finance_source>
+    <ref_finance_source>
+      <code>04</code>
+      <name_kz>Банки второго уровня Республики Казахстан</name_kz>
+      <name_ru>Банки второго уровня Республики Казахстан</name_ru>
+    </ref_finance_source>
+    <ref_finance_source>
+      <code>08</code>
+      <name_kz>Иные средства</name_kz>
+      <name_ru>Иные средства</name_ru>
+    </ref_finance_source>
+  </entities>
+</batch>
