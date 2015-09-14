@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_pledge_type>
+      <code>19</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Индивидуальный жилой дом </name_kz>
+      <name_ru>Индивидуальный жилой дом </name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>17</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Жилой дом (жилое здание) </name_kz>
+      <name_ru>Жилой дом (жилое здание) </name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>35</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Водное судно</name_kz>
+      <name_ru>Водное судно</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>18</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Жилое помещение (квартира)</name_kz>
+      <name_ru>Жилое помещение (квартира)</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>36</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Воздушное судно </name_kz>
+      <name_ru>Воздушное судно </name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>15</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Земли лесного фонда</name_kz>
+      <name_ru>Земли лесного фонда</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>33</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Автомобильное транспортное средство</name_kz>
+      <name_ru>Автомобильное транспортное средство</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>16</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Земли водного фонда</name_kz>
+      <name_ru>Земли водного фонда</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>34</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Железнодорожный транспорт и подвижной состав </name_kz>
+      <name_ru>Железнодорожный транспорт и подвижной состав </name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>39</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Машины для сельского и лесного хозяйства </name_kz>
+      <name_ru>Машины для сельского и лесного хозяйства </name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>13</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Земли населенных пунктов (городов, поселков и сельских населенных пунктов) </name_kz>
+      <name_ru>Земли населенных пунктов (городов, поселков и сельских населенных пунктов) </name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>14</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Земли промышленности, транспорта, связи, для нужд космической деятельности, обороны, национальной безопасности и иного несельскохозяйственного назначения</name_kz>
+      <name_ru>Земли промышленности, транспорта, связи, для нужд космической деятельности, обороны, национальной безопасности и иного несельскохозяйственного назначения</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>11</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Прочие финансовые инструменты</name_kz>
+      <name_ru>Прочие финансовые инструменты</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>37</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Другие транспортные средства</name_kz>
+      <name_ru>Другие транспортные средства</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>12</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Земли сельскохозяйственного назначения </name_kz>
+      <name_ru>Земли сельскохозяйственного назначения </name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>38</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Турбины, насосы </name_kz>
+      <name_ru>Турбины, насосы </name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>21</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Иные жилые здания и строения, пригодные для проживания</name_kz>
+      <name_ru>Иные жилые здания и строения, пригодные для проживания</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>20</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Общежития</name_kz>
+      <name_ru>Общежития</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>43</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Другие материальные основные фонды (средства)</name_kz>
+      <name_ru>Другие материальные основные фонды (средства)</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>42</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Электронное оборудование и измерительные приборы</name_kz>
+      <name_ru>Электронное оборудование и измерительные приборы</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>41</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Компьютеры  и периферийное оборудование</name_kz>
+      <name_ru>Компьютеры  и периферийное оборудование</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>40</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Станки</name_kz>
+      <name_ru>Станки</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>45</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Нематериальные активы</name_kz>
+      <name_ru>Нематериальные активы</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>44</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Биологические активы</name_kz>
+      <name_ru>Биологические активы</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>47</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Без обеспечения (бланковый)</name_kz>
+      <name_ru>Без обеспечения (бланковый)</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>46</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Товарно-материальные ценности</name_kz>
+      <name_ru>Товарно-материальные ценности</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>22</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Промышленные и производственные здания и склады</name_kz>
+      <name_ru>Промышленные и производственные здания и склады</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>23</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Торговые здания и помещения</name_kz>
+      <name_ru>Торговые здания и помещения</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>24</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Здания культурно-развлекательного назначения</name_kz>
+      <name_ru>Здания культурно-развлекательного назначения</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>25</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Гостиницы, рестораны, кафе и аналогичные здания и помещения</name_kz>
+      <name_ru>Гостиницы, рестораны, кафе и аналогичные здания и помещения</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>26</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Здания и помещения учебных заведений</name_kz>
+      <name_ru>Здания и помещения учебных заведений</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>27</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Офисные здания и помещения</name_kz>
+      <name_ru>Офисные здания и помещения</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>28</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Прочие нежилые здания и помещения</name_kz>
+      <name_ru>Прочие нежилые здания и помещения</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>29</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Трубопроводы</name_kz>
+      <name_ru>Трубопроводы</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>03</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Акции</name_kz>
+      <name_ru>Акции</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>02</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Вклады в банке</name_kz>
+      <name_ru>Вклады в банке</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>10</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Гарантии и поручительства</name_kz>
+      <name_ru>Гарантии и поручительства</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>01</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Аффинированное золото в слитках</name_kz>
+      <name_ru>Аффинированное золото в слитках</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>07</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Вексель </name_kz>
+      <name_ru>Вексель </name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>30</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Автомагистрали, дороги, железнодорожные пути, железнодорожные тупики</name_kz>
+      <name_ru>Автомагистрали, дороги, железнодорожные пути, железнодорожные тупики</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>06</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Долговые ценные бумаги</name_kz>
+      <name_ru>Долговые ценные бумаги</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>05</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Паи инвестиционных фондов</name_kz>
+      <name_ru>Паи инвестиционных фондов</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>32</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Прочие сооружения</name_kz>
+      <name_ru>Прочие сооружения</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>31</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Взлетно-посадочная полоса</name_kz>
+      <name_ru>Взлетно-посадочная полоса</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>04</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Другие виды участия в уставном капитале</name_kz>
+      <name_ru>Другие виды участия в уставном капитале</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>09</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Производные финансовые инструменты</name_kz>
+      <name_ru>Производные финансовые инструменты</name_ru>
+    </ref_pledge_type>
+    <ref_pledge_type>
+      <code>08</code>
+      <is_liquid_all>0</is_liquid_all>
+      <is_liquid_invest>0</is_liquid_invest>
+      <name_kz>Страховые полисы</name_kz>
+      <name_ru>Страховые полисы</name_ru>
+    </ref_pledge_type>
+  </entities>
+</batch>
