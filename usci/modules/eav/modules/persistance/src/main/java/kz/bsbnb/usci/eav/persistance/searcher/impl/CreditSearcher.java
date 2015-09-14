@@ -72,7 +72,6 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
                         .from(EAV_BE_ENTITIES.as("en"))
                         .join(EAV_BE_COMPLEX_VALUES.as("co"))
                         .on(EAV_BE_ENTITIES.as("en").ID.equal(EAV_BE_COMPLEX_VALUES.as("co").ENTITY_ID))
-                        .and(EAV_BE_ENTITIES.as("en").DELETED.eq(DataUtils.convert(true)))
                         .and(EAV_BE_COMPLEX_VALUES.as("co").ATTRIBUTE_ID.equal(entity.
                                 getMetaAttribute("primary_contract").getId()))
                         .and(EAV_BE_COMPLEX_VALUES.as("co").ENTITY_VALUE_ID.equal(primaryContractId))
@@ -80,7 +79,8 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
                         .on(EAV_BE_ENTITIES.as("en").ID.equal(EAV_BE_COMPLEX_VALUES.as("co2").ENTITY_ID))
                         .and(EAV_BE_COMPLEX_VALUES.as("co2").ATTRIBUTE_ID.equal(entity.
                                 getMetaAttribute("creditor").getId()))
-                        .and(EAV_BE_COMPLEX_VALUES.as("co2").ENTITY_VALUE_ID.equal(creditorId));
+                        .and(EAV_BE_COMPLEX_VALUES.as("co2").ENTITY_VALUE_ID.equal(creditorId))
+                        .where(EAV_BE_ENTITIES.as("en").DELETED.eq(DataUtils.convert(false)));
 
                 List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
                         select.getBindValues().toArray());
