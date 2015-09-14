@@ -51,6 +51,16 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         this(id, creditorId, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
     }
 
+    //used in rules
+    public BaseValue(Date reportDate, T value) {
+        this(0, reportDate, value);
+    }
+
+    //used in rules
+    public BaseValue(T value) {
+        this(new Date(), value);
+    }
+
     public BaseValue(long id, long creditorId, Date reportDate, T value, boolean closed,
                      boolean last) {
         super(id);
