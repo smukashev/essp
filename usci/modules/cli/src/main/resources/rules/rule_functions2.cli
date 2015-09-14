@@ -1,8 +1,11 @@
 rule read $$$
 title: Общие функций(часть 2)
 
-function boolean hasBACT(IEntityService entityService, IMetaFactoryService metaService, String baNo, String creditCode, Date reportDate, BaseEntity entity){
+function boolean hasBACT(IEntityService entityService, IMetaFactoryService metaService, String baNo, String creditCode, BaseEntity entity){
     try{
+        //получить отчетную дату
+        Date reportDate = entity.getReportDate();
+
         //Инициализация сущности - для поиска
         //  поиск соответсвия из справочника бал счетов и типа кредита
         //  все классы с префиксом ref - справочники
@@ -14,17 +17,13 @@ function boolean hasBACT(IEntityService entityService, IMetaFactoryService metaS
         //Создание сущности тип кредита (пустой)
         BaseEntity creditType = new BaseEntity(metaService.getMetaClass("ref_credit_type"), reportDate);
 
-        //Батч объект - не используется при просмотре данных. Задаем произвольный ид. т.е 1
-        Batch b = new Batch(reportDate);
-        b.setId(1L);
-
         //заполняем параметры поиска
-        beAccount.put("no_", new BaseValue(b, 1, baNo));
-        creditType.put("code", new BaseValue(b, 1, creditCode));
+        beAccount.put("no_", new BaseValue(reportDate, baNo));
+        creditType.put("code", new BaseValue(reportDate, creditCode));
 
         //заполняем параметры поиска для родительской сущности
-        be.put("balance_account",  new BaseValue(b, 1, beAccount));
-        be.put("credit_type",  new BaseValue(b, 1, creditType));
+        be.put("balance_account",  new BaseValue(reportDate, beAccount));
+        be.put("credit_type",  new BaseValue(reportDate, creditType));
 
         //Поиск сущности (entityService - это сервис ЕССП)
         BaseEntity res = entityService.search(be);
@@ -52,15 +51,11 @@ function boolean isExclusiveIIN(String iin) {
 
         BaseEntity docType = new BaseEntity(metaService.getMetaClass("ref_doc_type"), new Date());
 
-        //Батч объект - не используется при просмотре данных. Задаем произвольный ид. т.е 1
-        Batch b = new Batch(new Date());
-        b.setId(1L);
-
-        docType.put("code", new BaseValue(b,1,"06"));
+        docType.put("code", new BaseValue("06"));
 
         //заполняем параметры поиска
-        be.put("code",new BaseValue(b, 1, iin));
-        be.put("doc_type", new BaseValue(b,1, docType));
+        be.put("code",new BaseValue(iin));
+        be.put("doc_type", new BaseValue(docType));
 
         //Поиск сущности
         BaseEntity res = entityService.prepare(be);

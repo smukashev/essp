@@ -10,12 +10,8 @@ function boolean isCurrencyConvertible(String currencyCode, Date reportDate){
         //Инициализавать сущность, тип <валюта> - для поиска
         BaseEntity be = new BaseEntity(metaService.getMetaClass("ref_currency"), reportDate);
 
-        //Батч объект - не используется при просмотре данных. Задать произвольный ид. т.е 1
-        Batch b = new Batch(new Date());
-        b.setId(1L);
-
         //заполнять параметры поиска
-        be.put("code",new BaseValue(b, 1, currencyCode));
+        be.put("code",new BaseValue(currencyCode));
 
         //находить все иденификаторы сущности (проставлять идшники)
         BaseEntity preparedBe  = entityService.prepare(be);

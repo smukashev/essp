@@ -7,17 +7,28 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityReportDateDao;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
+import kz.bsbnb.usci.eav.repository.IRefRepository;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 
 @Repository
-public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
+public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBean {
     @Autowired
     IPersistableDaoPool persistableDaoPool;
 
+    @Autowired
+    IRefRepository refRepositoryDao;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        refRepositoryDao.fillRefRepository();
+    }
+
     public IBaseEntity loadByMaxReportDate(long id, Date savingReportDate) {
+        IBaseEntity loadedEntity;
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
@@ -26,7 +37,14 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
             throw new RuntimeException("В базе нет данных для сущности(" + id + ") до отчетной даты(включительно): "
                     + savingReportDate + ";");
 
-        return load(id, maxReportDate, savingReportDate);
+         loadedEntity = refRepositoryDao.GetRef(id, savingReportDate);
+        if(loadedEntity==null) {
+            loadedEntity = load(id, maxReportDate, savingReportDate);
+            refRepositoryDao.SetRef(id, savingReportDate, loadedEntity);
+        }
+            return loadedEntity;
+
+
     }
 
     @Override
@@ -46,7 +64,6 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
     public IBaseEntity load(long id) {
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
-
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id);
         if (maxReportDate == null)
             throw new UnsupportedOperationException("В базе отсутсвует отчетная дата на ID: " + id + ";");
