@@ -126,8 +126,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         // TODO: fix
         if (metaClass.getClassName().equals("ref_doc_type")) {
             try {
-                baseEntity = baseEntityLoadDao.load(baseEntity.getId(), baseEntity.getReportDate(),
-                        baseEntity.getReportDate());
+                baseEntity = baseEntityLoadDao.load(baseEntity.getId());
             } catch (Exception e) {
                 logger.error(e.getMessage());
             }
