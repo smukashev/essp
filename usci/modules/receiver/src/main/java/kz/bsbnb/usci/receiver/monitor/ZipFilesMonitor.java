@@ -601,16 +601,28 @@ public class ZipFilesMonitor {
                 batchInfo.setTotalCount(0);
 
                 try {
-                    NamedNodeMap map = document.getElementsByTagName("doc").item(0).getAttributes();
-                    Node n = map.getNamedItem("doc_type");
-                    String docType = n.getTextContent();
+                    Element infoElement = (Element) document.getElementsByTagName("info").item(0);
+                    Element creditorElement = (Element) infoElement.getElementsByTagName("creditor").item(0);
+                    Element codeElement = (Element) creditorElement.getElementsByTagName("code").item(0);
+                    String code = null;
 
-                    String docValue = document.getElementsByTagName("doc").item(0).getTextContent();
+                    if (codeElement != null)
+                        code = codeElement.getTextContent();
 
-                    if (docType != null && docValue != null &&
-                            docType.length() > 0 && docValue.length() > 0) {
-                        batchInfo.addParam("DOC_TYPE", docType.replaceAll("\n", "").replaceAll("\t", ""));
-                        batchInfo.addParam("DOC_VALUE", docValue.replaceAll("\n", "").replaceAll("\t", ""));
+                    if (code != null && code.length() > 0) {
+                        batchInfo.addParam("CODE", code.replaceAll("\\s+", ""));
+                    } else {
+                        NamedNodeMap map = document.getElementsByTagName("doc").item(0).getAttributes();
+                        Node n = map.getNamedItem("doc_type");
+                        String docType = n.getTextContent();
+
+                        String docValue = document.getElementsByTagName("doc").item(0).getTextContent();
+
+                        if (docType != null && docValue != null &&
+                                docType.length() > 0 && docValue.length() > 0) {
+                            batchInfo.addParam("DOC_TYPE", docType.replaceAll("\\s+", ""));
+                            batchInfo.addParam("DOC_VALUE", docValue.replaceAll("\\s+", ""));
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -636,12 +648,18 @@ public class ZipFilesMonitor {
                     e.printStackTrace();
                 }
 
-                batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent());
-                batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent());
-                batchInfo.setUserId(userId == null ?
-                        Long.parseLong(document.getElementsByTagName("userid").item(0).getTextContent()) : userId);
+                batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent().
+                        replaceAll("\\s+", ""));
 
-                int actualCreditCount = Integer.parseInt(document.getElementsByTagName("size").item(0).getTextContent());
+                batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent().
+                        replaceAll("\\s+", ""));
+
+                batchInfo.setUserId(userId == null ?
+                        Long.parseLong(document.getElementsByTagName("userid").item(0).getTextContent().
+                                replaceAll("\\s+", "")) : userId);
+
+                int actualCreditCount = Integer.parseInt(document.getElementsByTagName("size").item(0).
+                        getTextContent().replaceAll("\\s+", ""));
 
                 batchInfo.setSize((long) actualCreditCount);
                 batchInfo.setActualCount(actualCreditCount);
@@ -651,7 +669,7 @@ public class ZipFilesMonitor {
 
                 try {
                     date = new SimpleDateFormat("dd.MM.yyyy").parse(
-                            document.getElementsByTagName("date").item(0).getTextContent());
+                            document.getElementsByTagName("date").item(0).getTextContent().replaceAll("\\s+", ""));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -674,8 +692,10 @@ public class ZipFilesMonitor {
                             if (propertyNode.getNodeType() == Node.ELEMENT_NODE) {
                                 Element propertyElement = (Element) propertyNode;
 
-                                String name = propertyElement.getElementsByTagName("name").item(0).getTextContent();
-                                String value = propertyElement.getElementsByTagName("value").item(0).getTextContent();
+                                String name = propertyElement.getElementsByTagName("name").item(0).getTextContent()
+                                        .replaceAll("\\s+", "");
+                                String value = propertyElement.getElementsByTagName("value").item(0).getTextContent()
+                                        .replaceAll("\\s+", "");
 
                                 batchInfo.addParam(name, value);
                             }
@@ -713,32 +733,38 @@ public class ZipFilesMonitor {
 
             Document document = null;
             try {
+                // TODO: Out of memory
                 document = documentBuilder.parse(inManifest);
             } catch (SAXException e) {
                 e.printStackTrace();
             }
 
 
-            batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent());
-            batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent());
+            batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent()
+                    .replaceAll("\\s+", ""));
+
+            batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent()
+                    .replaceAll("\\s+", ""));
 
             batchInfo.setUserId(100500L);
             NodeList nlist = document.getElementsByTagName("property");
-            HashMap<String, String> params = new HashMap<String, String>();
+            HashMap<String, String> params = new HashMap<>();
             for (int i = 0; i < nlist.getLength(); i++) {
                 Node node = nlist.item(i);
                 NodeList childrenList = node.getChildNodes();
                 String name = "";
                 String value = "";
+
                 for (int j = 0; j < childrenList.getLength(); j++) {
                     Node curChild = childrenList.item(j);
                     if (curChild.getNodeName().equals("name")) {
-                        name = curChild.getTextContent();
+                        name = curChild.getTextContent().replaceAll("\\s+", "");
                     }
                     if (curChild.getNodeName().equals("value")) {
-                        value = curChild.getTextContent();
+                        value = curChild.getTextContent().replaceAll("\\s+", "");
                     }
                 }
+
                 params.put(name, value);
             }
 
@@ -748,7 +774,8 @@ public class ZipFilesMonitor {
 
             Date date = null;
             try {
-                date = new SimpleDateFormat("dd.MM.yyyy").parse(document.getElementsByTagName("date").item(0).getTextContent());
+                date = new SimpleDateFormat("dd.MM.yyyy").parse(document.getElementsByTagName("date").
+                        item(0).getTextContent().replaceAll("\\s+", ""));
             } catch (ParseException e) {
                 e.printStackTrace();
             }

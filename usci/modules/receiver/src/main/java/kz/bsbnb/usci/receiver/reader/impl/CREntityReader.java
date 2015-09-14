@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.sync.service.IBatchService;
@@ -30,7 +31,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Stack;
-import java.util.zip.ZipInputStream;
 
 /**
  * @author k.tulbassiyev
@@ -58,6 +58,9 @@ public class CREntityReader<T> extends CommonReader<T> {
     @Value("#{jobParameters['actualCount']}")
     private Long actualCount;
 
+    @Value("#{jobParameters['batchId']}")
+    private Long batchId;
+
     @PostConstruct
     public void init() {
         logger.info("Reader init.");
@@ -77,17 +80,6 @@ public class CREntityReader<T> extends CommonReader<T> {
         try {
             zais.getNextZipEntry();
             int len;
-            /*
-            out = new ByteArrayOutputStream((int)entry.getSize());
-            int size = (int)entry.getSize();
-            while ((len = zis.read(buffer, 0, Math.min(buffer.length, size))) > 0) {
-                size -= len;
-                out.write(buffer, 0, len);
-                if (size <= 0)
-                    break;
-            }
-            */
-            // modified for generated batch files
             out = new ByteArrayOutputStream(4096);
             while ((len = zais.read(buffer, 0, 4096)) > 0) {
                 out.write(buffer, 0, len);
@@ -96,10 +88,10 @@ public class CREntityReader<T> extends CommonReader<T> {
             logger.error("Batch: " + batchId + " error in entity reader.");
 
             batchService.addBatchStatus(new BatchStatus()
-                    .setBatchId(batchId)
-                    .setStatus(BatchStatuses.ERROR)
-                    .setDescription(e.getMessage())
-                    .setReceiptDate(new Date())
+                            .setBatchId(batchId)
+                            .setStatus(BatchStatuses.ERROR)
+                            .setDescription(e.getMessage())
+                            .setReceiptDate(new Date())
             );
 
             throw new RuntimeException(e);
@@ -120,11 +112,9 @@ public class CREntityReader<T> extends CommonReader<T> {
             throw new RuntimeException(e);
         }
 
-        try
-        {
+        try {
             crParser.parse(xmlEventReader, batch, 1L);
-        } catch (SAXException e)
-        {
+        } catch (SAXException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
@@ -133,39 +123,31 @@ public class CREntityReader<T> extends CommonReader<T> {
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
         logger.info("Read called");
 
-        T entity = (T)crParser.getCurrentBaseEntity();
+        T entity = (T) crParser.getCurrentBaseEntity();
 
         long index = crParser.getIndex();
 
         if (crParser.hasMore()) {
-            try
-            {
+            try {
                 crParser.parse(xmlEventReader, batch, index);
-            } catch (SAXException e)
-            {
+            } catch (SAXException e) {
                 batchService.addEntityStatus(new EntityStatus()
-                        .setBatchId(batchId)
-                        .setReceiptDate(new Date())
-                        .setDescription("Can't parse")
-                        .setStatus(EntityStatuses.ERROR)
-                        .setIndex(index)
+                                .setBatchId(batchId)
+                                .setReceiptDate(new Date())
+                                .setDescription("Can't parse")
+                                .setStatus(EntityStatuses.ERROR)
+                                .setIndex(index)
                 );
 
                 e.printStackTrace();
                 return null;
             }
 
+            ((BaseEntity) entity).setBatchId(batchId);
+            ((BaseEntity) entity).setIndex(index);
+
             return entity;
         }
-
-        //statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-                //Global.BATCH_STATUS_COMPLETED, null, new Date(), userId));
-
-        //EntityStatusArrayJModel statusJModel = statusSingleton.endBatch(batchId);
-        //statusSingleton.endBatch(batchId);
-        //batchFullJModel.setStatus(statusJModel);
-
-        //couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
 
         saveTotalCounts();
 
@@ -176,17 +158,17 @@ public class CREntityReader<T> extends CommonReader<T> {
         reportService.setTotalCount(reportId, crParser.getPackageCount());
 
         batchService.addEntityStatus(new EntityStatus()
-                .setBatchId(batchId)
-                .setStatus(EntityStatuses.ACTUAL_COUNT)
-                .setDescription(String.valueOf(actualCount))
-                .setReceiptDate(new Date())
+                        .setBatchId(batchId)
+                        .setStatus(EntityStatuses.ACTUAL_COUNT)
+                        .setDescription(String.valueOf(actualCount))
+                        .setReceiptDate(new Date())
         );
 
         batchService.addEntityStatus(new EntityStatus()
-                .setBatchId(batchId)
-                .setStatus(EntityStatuses.TOTAL_COUNT)
-                .setDescription(String.valueOf(crParser.getPackageCount()))
-                .setReceiptDate(new Date())
+                        .setBatchId(batchId)
+                        .setStatus(EntityStatuses.TOTAL_COUNT)
+                        .setDescription(String.valueOf(crParser.getPackageCount()))
+                        .setReceiptDate(new Date())
         );
     }
 
