@@ -79,7 +79,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
                         .join(EAV_BE_COMPLEX_VALUES.as("co2"))
                         .on(EAV_BE_ENTITIES.as("en").ID.equal(EAV_BE_COMPLEX_VALUES.as("co2").ENTITY_ID))
                         .and(EAV_BE_COMPLEX_VALUES.as("co2").ATTRIBUTE_ID.equal(entity.
-                                getMetaAttribute("data_creditor").getId()))
+                                getMetaAttribute("creditor").getId()))
                         .and(EAV_BE_COMPLEX_VALUES.as("co2").ENTITY_VALUE_ID.equal(creditorId));
 
                 List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
