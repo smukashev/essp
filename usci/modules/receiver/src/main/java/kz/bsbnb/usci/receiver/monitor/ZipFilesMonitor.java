@@ -604,10 +604,13 @@ public class ZipFilesMonitor {
                     Element infoElement = (Element) document.getElementsByTagName("info").item(0);
                     Element creditorElement = (Element) infoElement.getElementsByTagName("creditor").item(0);
                     Element codeElement = (Element) creditorElement.getElementsByTagName("code").item(0);
-                    String code = codeElement.getTextContent().replaceAll("\\s+", "");
+                    String code = null;
+
+                    if (codeElement != null)
+                        code = codeElement.getTextContent();
 
                     if (code != null && code.length() > 0) {
-                        batchInfo.addParam("CODE", code);
+                        batchInfo.addParam("CODE", code.replaceAll("\\s+", ""));
                     } else {
                         NamedNodeMap map = document.getElementsByTagName("doc").item(0).getAttributes();
                         Node n = map.getNamedItem("doc_type");

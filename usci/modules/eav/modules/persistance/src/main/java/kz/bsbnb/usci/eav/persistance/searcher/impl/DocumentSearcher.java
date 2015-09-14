@@ -40,7 +40,7 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
         List<Long> ids = searcherPool.getSearcher(entity.getMeta().getClassName()).findAll(entity, creditorId);
 
         if (ids.size() > 1)
-            throw new RuntimeException("Найдено более одного документа;");
+            throw new IllegalStateException("Найдено более одного документа;\n" + entity);
 
         if (ids.size() < 1)
             return null;
@@ -80,6 +80,7 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
                         join(EAV_BE_STRING_VALUES).
                         on(EAV_BE_ENTITIES.ID.equal(EAV_BE_STRING_VALUES.ENTITY_ID))
                         .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.equal(entity.getMetaAttribute("no").getId()))
+                        .and(EAV_BE_STRING_VALUES.CREDITOR_ID.equal(creditorId))
                         .and(EAV_BE_STRING_VALUES.VALUE.equal((String) (entity.getBaseValue("no").getValue())));
 
                 List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
