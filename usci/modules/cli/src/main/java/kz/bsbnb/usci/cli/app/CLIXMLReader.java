@@ -202,12 +202,12 @@ public class CLIXMLReader {
                 }
 
                 IBaseValue baseValue = BaseValueFactory
-                        .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch,
-                                index, batch.getRepDate(), obj, false, true);
+                        .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(), obj,
+                                false, true);
 
                 if (hasOperationNew(startElement)) {
                     IBaseValue newBaseValue = BaseValueFactory.create(currentContainer.getBaseContainerType(),
-                            metaType, 0, -1, batch, index, batch.getRepDate(),
+                            metaType, 0, -1, batch.getRepDate(),
                             getCastObject(metaValue.getTypeCode(),
                                     startElement.getAttributeByName(new QName("data")).getValue()), false, true);
 
@@ -287,8 +287,8 @@ public class CLIXMLReader {
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
                         ((BaseSet) currentContainer).put(BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch, index,
-                                        batch.getRepDate(), o, false, true));
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(),
+                                        o, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
@@ -297,14 +297,14 @@ public class CLIXMLReader {
                 } else {
                     if (hasMembers) {
                         currentContainer.put(localName, BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch, index,
-                                        batch.getRepDate(), o, false, true));
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(),
+                                        o, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
                         currentContainer.put(localName, BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch, index,
-                                        batch.getRepDate(), null, false, true));
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(),
+                                        null, false, true));
                         hasMembers = flagsStack.pop();
                     }
                 }

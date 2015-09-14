@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.searcher.impl;
 
+import kz.bsbnb.usci.eav.comparator.impl.IdentificationDocComparator;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -16,11 +17,8 @@ import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherP
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -30,8 +28,6 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Component
 public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEntitySearcher {
-    private final Logger logger = LoggerFactory.getLogger(ImprovedBaseEntitySearcher.class);
-
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
@@ -45,7 +41,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public Long findSingle(BaseEntity entity, long creditorId) {
+    public Long findSingle(BaseEntity entity, Long creditorId) {
         if (entity.getId() > 0)
             return entity.getId();
 
@@ -59,7 +55,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     select.getBindValues().toArray());
 
             if (rows.size() > 1)
-                throw new IllegalStateException("Found more than one row(" +
+                throw new IllegalStateException("Найдено больше одной записи(" +
                         entity.getMeta().getClassName() + "), " + entity);
 
             if (rows.size() < 1)
@@ -71,11 +67,11 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         return null;
     }
 
-    public SelectConditionStep generateSQL(IBaseEntity entity, long creditorId, String entityName) {
+    public SelectConditionStep generateSQL(IBaseEntity entity, Long creditorId, String entityName) {
         return generateSQL(entity, creditorId, entityName, null);
     }
 
-    public SelectConditionStep generateSQL(IBaseEntity entity, long creditorId, String entityName,
+    public SelectConditionStep generateSQL(IBaseEntity entity, Long creditorId, String entityName,
                                            HashMap<String, ArrayList<String>> arrayKeyFilter) {
         MetaClass metaClass = entity.getMeta();
         String entityAlias = (entityName == null ? "root" : "e_" + entityName);
@@ -96,15 +92,14 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             if (metaAttribute.isKey()) {
                 IBaseValue baseValue = entity.safeGetValue(name);
 
-                if ((baseValue == null || baseValue.getValue() == null) && (metaClass.getComplexKeyType() ==
-                        ComplexKeyTypes.ALL))
-                    throw new IllegalArgumentException("Key attribute " + name + " can't be null. MetaClass: " +
-                            entity.getMeta().getClassName());
+                if ((baseValue == null || baseValue.getValue() == null) &&
+                        metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
+                    throw new IllegalArgumentException("Ключевой атрибут(" + name + ") не может быть пустым. " +
+                            "Мета класс: " + entity.getMeta().getClassName());
 
 
                 if ((baseValue == null || baseValue.getValue() == null) &&
-                        (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY))
-                    continue;
+                        (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY)) continue;
 
                 if (!memberType.isSet()) {
                     if (!memberType.isComplex()) {
@@ -226,8 +221,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                 }
                                 break;
                             default:
-                                throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
-                                        " for attribute: " + name);
+                                throw new IllegalStateException("Неизвестный тип данных: " + metaValue.getTypeCode() +
+                                        " для атрибута: " + name);
                         }
                     } else {
                         BaseEntity childBaseEntity = (BaseEntity) baseValue.getValue();
@@ -264,75 +259,132 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 } else {
                     BaseSet baseSet = (BaseSet) baseValue.getValue();
                     MetaSet metaSet = (MetaSet) memberType;
-                    if (baseSet.get().size() > 0) {
-                        if (!memberType.isComplex()) {
-                            throw new UnsupportedOperationException("Не реализовано;");
-                        } else {
+                    MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
 
-                            MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
-                            List<Long> childBaseEntityIds = new ArrayList<Long>();
-                            for (IBaseValue childBaseValue : baseSet.get()) {
-                                BaseEntity childBaseEntity = (BaseEntity) childBaseValue.getValue();
-                                Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().
-                                        getClassName()).findSingle(childBaseEntity, creditorId);
+                    if (baseSet.get().size() == 0)
+                        throw new UnsupportedOperationException("Массив должен содержать элементы;");
 
-                                if (childBaseEntityId != null) {
-                                    childBaseEntityIds.add(childBaseEntityId);
-                                } else {
-                                    if (metaSet.getArrayKeyType() == ComplexKeyTypes.ALL) {
-                                        return null;
-                                    }
-                                }
-                            }
+                    if (!memberType.isComplex())
+                        throw new UnsupportedOperationException("Простой массив не может быть ключевым;");
 
-                            if (childBaseEntityIds.size() > 0) {
-                                String className = childMetaClass.getClassName();
-                                String childEntityAlias = "e_" + className;
-                                String setValueAlias = "sv_" + className;
-                                String setAlias = "s_" + className;
-                                String entitySetAlias = "es_" + className;
-                                Select select = null;
+                    if (childMetaClass.getClassName().equals("document")) {
+                        List<IBaseValue> baseValues = new ArrayList<>(baseSet.get());
+                        Collections.sort(baseValues, new IdentificationDocComparator());
 
-                                if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY) {
-                                    select = context.select(
-                                            EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
-                                            .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
-                                            .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                            .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.
-                                                    equal(metaAttribute.getId()))
-                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.
-                                                    equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
-                                            .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.
-                                                    equal(EAV_BE_ENTITIES.as(entityAlias).ID))
-                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.
-                                                    in(childBaseEntityIds));
+                        String className = childMetaClass.getClassName();
+                        String setValueAlias = "sv_" + className;
+                        String entitySetAlias = "es_" + className;
 
-                                    condition = condition == null ? DSL.exists(select) :
-                                            metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
-                                                    condition.and(DSL.exists(select)) :
-                                                    condition.or(DSL.exists(select));
-                                } else {
-                                    Collections.sort(childBaseEntityIds);
-                                    String sChildBaseEntityIds =  StringUtils.arrayToDelimitedString(childBaseEntityIds.toArray(), "',' ");
+                        Long entityValueId = 0L;
 
-                                    select = context.select(
-                                            EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID
-                                    ).from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                        Select select = null;
+
+                        for (IBaseValue val : baseValues) {
+                            if (((BaseEntity) val.getValue()).getId() == 0)
+                                continue;
+
+                            select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
+                                    .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                     .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                    .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.eq(metaAttribute.getId()))
+                                    .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.
+                                            equal(metaAttribute.getId()))
                                     .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.
-                                            eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
-                                    .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.
-                                            eq(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds)) );
+                                            equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                    .where(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.
+                                            eq(((BaseEntity) val.getValue()).getId()));
 
-                                    //Condition setCondition = ;
+                            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
+                                    select.getBindValues().toArray());
 
-                                    condition = condition == null ? DSL.exists(select) :
-                                            metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
-                                                    condition.and(DSL.exists(select)) : condition.or(DSL.exists(select));
-                                }
+                            if (rows.size() > 1)
+                                throw new IllegalStateException("Найдено больше одного документа(" +
+                                        entity.getMeta().getClassName() + ");");
+
+                            if (rows.size() == 1) {
+                                entityValueId = ((BigDecimal) rows.get(0).get(EAV_BE_COMPLEX_SET_VALUES.
+                                        as(setValueAlias).ENTITY_VALUE_ID.getName())).longValue();
+                                break;
                             }
+                        }
+
+                        if (entityValueId > 0) {
+                            // TODO: remove repeated code
+                            select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
+                                    .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                                    .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
+                                    .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.
+                                            equal(metaAttribute.getId()))
+                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.
+                                            equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                    .where(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.
+                                            eq(entityValueId).
+                                            and(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.
+                                                    equal(EAV_BE_ENTITIES.as(entityAlias).ID)));
+
+                            condition = condition == null ? DSL.exists(select) :
+                                    metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
+                                            condition.and(DSL.exists(select)) : condition.or(DSL.exists(select));
+                        }
+                    } else {
+                        List<Long> childBaseEntityIds = new ArrayList<>();
+
+                        for (IBaseValue childBaseValue : baseSet.get()) {
+                            BaseEntity childBaseEntity = (BaseEntity) childBaseValue.getValue();
+
+                            Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().
+                                    getClassName()).findSingle(childBaseEntity, creditorId);
+
+                            if (childBaseEntityId != null) {
+                                childBaseEntityIds.add(childBaseEntityId);
+                            } else {
+                                if (metaSet.getArrayKeyType() == ComplexKeyTypes.ALL)
+                                    return null;
+                            }
+                        }
+
+                        if (childBaseEntityIds.size() == 0)
+                            throw new IllegalStateException("Ни один элемент ключевого массива " +
+                                    "не был идентифицирован;");
+
+                        String className = childMetaClass.getClassName();
+                        String setValueAlias = "sv_" + className;
+                        String entitySetAlias = "es_" + className;
+                        Select select;
+
+                        if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY) {
+                            select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
+                                    .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                                    .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
+                                    .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.
+                                            equal(metaAttribute.getId()))
+                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.
+                                            equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                    .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.
+                                            equal(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.
+                                            in(childBaseEntityIds));
+
+                            condition = condition == null ? DSL.exists(select) :
+                                    metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
+                                            condition.and(DSL.exists(select)) : condition.or(DSL.exists(select));
+                        } else {
+                            Collections.sort(childBaseEntityIds);
+
+                            select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID
+                            ).from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                                    .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
+                                    .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).
+                                            ATTRIBUTE_ID.eq(metaAttribute.getId()))
+                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).
+                                            SET_ID.eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                    .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).
+                                            ENTITY_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID)
+                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).
+                                                    ENTITY_VALUE_ID.in(childBaseEntityIds)));
+
+                            condition = condition == null ? DSL.exists(select) :
+                                    metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
+                                            condition.and(DSL.exists(select)) : condition.or(DSL.exists(select));
                         }
                     }
                 }
@@ -352,7 +404,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     }
 
     private SelectJoinStep generateJoins(SelectJoinStep joins, String entityAlias, String name, IMetaType type,
-                                         long creditorId, IMetaAttribute attribute) {
+                                         Long creditorId, IMetaAttribute attribute) {
         String valueAlias = "v_" + name;
         if (!type.isSet()) {
             if (!type.isComplex()) {
@@ -402,8 +454,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                                 equal(attribute.getId())));
                         break;
                     default:
-                        throw new IllegalStateException("Unknown data type: " + metaValue.getTypeCode() +
-                                " for attribute: " + name);
+                        throw new IllegalStateException("Неизвестный тип данных: " + metaValue.getTypeCode() +
+                                " для атрибута: " + name);
                 }
             } else {
                 joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias)).
@@ -416,7 +468,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public ArrayList<Long> findAll(BaseEntity baseEntity, long creditorId) {
+    public ArrayList<Long> findAll(BaseEntity baseEntity, Long creditorId) {
         ArrayList<Long> result = new ArrayList<>();
 
         if (baseEntity.getValueCount() == 0)

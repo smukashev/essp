@@ -24,11 +24,10 @@ public class BaseEntityGenerator  extends AbstractDataGenerator {
 
             if(metaType.isComplex()) {
                 BaseEntity tmpEntity = generateBaseEntity(batch, ((MetaClass) metaType), index);
-                entity.put(name, new BaseValue(0, batch, index, batch.getRepDate(), tmpEntity));
+                entity.put(name, new BaseValue(0, batch.getRepDate(), tmpEntity));
             } else {
                 MetaValue metaValue = (MetaValue) metaType;
-                entity.put(name, new BaseValue(0, batch, index, batch.getRepDate(),
-                        getCastObject(metaValue.getTypeCode())));
+                entity.put(name, new BaseValue(0, batch.getRepDate(), getCastObject(metaValue.getTypeCode())));
             }
         }
         return entity;

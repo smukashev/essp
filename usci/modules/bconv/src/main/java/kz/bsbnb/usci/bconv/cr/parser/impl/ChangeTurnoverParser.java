@@ -47,23 +47,23 @@ public class ChangeTurnoverParser extends BatchParser {
         } else if (localName.equals("amount")) {
             if (interestFlag) {
                 event = (XMLEvent) xmlReader.next();
-                currentInterest.put("amount", new BaseEntityDoubleValue(-1, batch, index,
-                        new Double(event.asCharacters().getData())));
+                currentInterest.put("amount", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                        new Double(event.asCharacters().getData()), false, true));
             } else if (debtFlag) {
                 event = (XMLEvent) xmlReader.next();
-                currentDebt.put("amount", new BaseEntityDoubleValue(-1, batch, index,
-                        new Double(event.asCharacters().getData())));
+                currentDebt.put("amount", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                        new Double(event.asCharacters().getData()), false, true));
             }
 
         } else if (localName.equals("amount_currency")) {
             if (interestFlag) {
                 event = (XMLEvent) xmlReader.next();
-                currentInterest.put("amount_currency", new BaseEntityDoubleValue(-1, batch, index,
-                        new Double(event.asCharacters().getData())));
+                currentInterest.put("amount_currency", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                        new Double(event.asCharacters().getData()), false, true));
             } else if (debtFlag) {
                 event = (XMLEvent) xmlReader.next();
-                currentDebt.put("amount_currency", new BaseEntityDoubleValue(-1, batch, index,
-                        new Double(event.asCharacters().getData())));
+                currentDebt.put("amount_currency", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                        new Double(event.asCharacters().getData()), false, true));
             }
         } else {
             throw new UnknownTagException(localName);
@@ -77,13 +77,13 @@ public class ChangeTurnoverParser extends BatchParser {
         if (localName.equals("turnover")) {
             return true;
         } else if (localName.equals("issue")) {
-            currentBaseEntity.put("issue", new BaseEntityComplexValue(-1, batch, index, currentIssue));
+            currentBaseEntity.put("issue", new BaseEntityComplexValue(0, -1, batch.getRepDate(), currentIssue, false, true));
         } else if (localName.equals("debt")) {
             debtFlag = false;
-            currentIssue.put("debt", new BaseEntityComplexValue(-1, batch, index, currentDebt));
+            currentIssue.put("debt", new BaseEntityComplexValue(0, -1, batch.getRepDate(), currentDebt, false, true));
         } else if (localName.equals("interest")) {
             interestFlag = false;
-            currentIssue.put("interest", new BaseEntityComplexValue(-1, batch, index, currentInterest));
+            currentIssue.put("interest", new BaseEntityComplexValue(0, -1, batch.getRepDate(), currentInterest, false, true));
         } else if (localName.equals("amount")) {
         } else if (localName.equals("amount_currency")) {
         } else {

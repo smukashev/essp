@@ -57,27 +57,24 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     public long insert(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
         IBaseEntity baseEntity = (IBaseEntity) baseValue.getValue();
+
         long baseValueId = insert(
                 baseValue.getBaseContainer().getId(),
-                baseValue.getBatch().getId(),
-                baseValue.getIndex(),
                 baseValue.getRepDate(),
                 baseEntity.getId(),
                 baseValue.isClosed(),
-                baseValue.isLast()
-        );
+                baseValue.isLast());
+
         baseValue.setId(baseValueId);
 
         return baseValueId;
     }
 
-    protected long insert(long setId, long batchId, long index, Date reportDate, Object value, boolean closed,
+    protected long insert(long setId, Date reportDate, Object value, boolean closed,
                           boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_COMPLEX_SET_VALUES)
                 .set(EAV_BE_COMPLEX_SET_VALUES.SET_ID, setId)
-                .set(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID, batchId)
-                .set(EAV_BE_COMPLEX_SET_VALUES.INDEX_, index)
                 .set(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE, DataUtils.convert(reportDate))
                 .set(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID, (Long) value)
                 .set(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED, DataUtils.convert(closed))
@@ -91,31 +88,31 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
         IBaseEntity baseEntity = (IBaseEntity) baseValue.getValue();
-        update(baseValue.getId(), baseValue.getBaseContainer().getId(), baseValue.getBatch().getId(),
-                baseValue.getIndex(), baseValue.getRepDate(), baseEntity.getId(), baseValue.isClosed(),
+
+        update(baseValue.getId(),
+                baseValue.getBaseContainer().getId(),
+                baseValue.getRepDate(),
+                baseEntity.getId(),
+                baseValue.isClosed(),
                 baseValue.isLast()
         );
     }
 
-    protected void update(long id, long setId, long batchId, long index, Date reportDate, Object value, boolean closed,
-                          boolean last) {
+    protected void update(long id, long setId, Date reportDate, Object value, boolean closed, boolean last) {
         String tableAlias = "csv";
         Update update = context
                 .update(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
                 .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID, setId)
-                .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).BATCH_ID, batchId)
-                .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).INDEX_, index)
                 .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE, DataUtils.convert(reportDate))
                 .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID, (Long) value)
                 .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_CLOSED, DataUtils.convert(closed))
                 .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_LAST, DataUtils.convert(last))
                 .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ID.equal(id));
 
-        logger.debug(update.toString());
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-        if (count != 1) {
-            throw new RuntimeException("UPDATE operation should be update only one record.");
-        }
+
+        if (count != 1)
+            throw new IllegalStateException("UPDATE operation should be update only one record.");
     }
 
     @Override
@@ -129,11 +126,10 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                 .delete(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ID.equal(id));
 
-        logger.debug(delete.toString());
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-        if (count != 1) {
-            throw new RuntimeException("DELETE operation should be delete only one record.");
-        }
+
+        if (count != 1)
+            throw new IllegalStateException("DELETE operation should be delete only one record.");
     }
 
     @Override
@@ -158,8 +154,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ID,
-                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).BATCH_ID,
-                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_LAST)
@@ -172,8 +166,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.INDEX_),
                         subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
                         subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
                         subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
@@ -192,29 +184,24 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
-            long index = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.INDEX_.getName())).longValue();
-            long batchId = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID.getName())).longValue();
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1;
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
-            Batch batch = batchRepository.getBatch(batchId);
-            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao
-                    .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate ?
-                            baseValue.getRepDate() : reportDate);
+            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(),
+                    currentReportDate ? baseValue.getRepDate() : reportDate);
 
             previousBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
                     metaType,
                     id,
                     0,
-                    batch,
-                    index,
                     reportDate,
                     childBaseEntityLoaded,
                     closed,
@@ -246,8 +233,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                                 .over().orderBy(EAV_BE_COMPLEX_SET_VALUES.
                                         as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ID,
-                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).BATCH_ID,
-                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_LAST)
@@ -260,8 +245,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.INDEX_),
                         subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
                         subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
                         subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
@@ -281,29 +264,24 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
-            long index = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.INDEX_.getName())).longValue();
-            long batchId = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID.getName())).longValue();
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1;
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
-            Batch batch = batchRepository.getBatch(batchId);
-            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao
-                    .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate
-                            ? baseValue.getRepDate() : reportDate);
+            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(),
+                    currentReportDate ? baseValue.getRepDate() : reportDate);
 
             nextBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
                     metaType,
                     id,
                     0,
-                    batch,
-                    index,
                     reportDate,
                     childBaseEntityLoaded,
                     closed,
@@ -329,8 +307,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         String tableAlias = "csv";
         Select select = context
                 .select(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ID,
-                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).BATCH_ID,
-                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
@@ -350,24 +326,18 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
-            long index = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.INDEX_.getName())).longValue();
-            long batchId = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID.getName())).longValue();
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            Batch batch = batchRepository.getBatch(batchId);
-            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao
-                    .loadByMaxReportDate(childBaseEntity.getId(), baseValue.getRepDate());
+            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(),
+                    baseValue.getRepDate());
 
             closedBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
                     metaType,
                     id,
                     0,
-                    batch,
-                    index,
                     baseValue.getRepDate(),
                     childBaseEntityLoaded,
                     true,
@@ -394,8 +364,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         String tableAlias = "csv";
         Select select = context
                 .select(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ID,
-                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).BATCH_ID,
-                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).INDEX_,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_CLOSED)
                 .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
@@ -415,16 +383,13 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
-            long index = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.INDEX_.getName())).longValue();
-            long batchId = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID.getName())).longValue();
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
-            Batch batch = batchRepository.getBatch(batchId);
             IBaseEntity childBaseEntityLoaded = baseEntityLoadDao
                     .loadByMaxReportDate(childBaseEntity.getId(), currentReportDate
                             ? baseValue.getRepDate() : reportDate);
@@ -434,8 +399,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     metaType,
                     id,
                     0,
-                    batch,
-                    index,
                     reportDate,
                     childBaseEntityLoaded,
                     closed,
@@ -456,8 +419,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         if (lastReportDate) {
             select = context
                     .select(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ID),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.INDEX_),
                             tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
                             tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
                             tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
@@ -473,8 +434,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                         .orderBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
                             tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ID),
                             tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.INDEX_),
                             tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
                             tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
                             tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
@@ -486,8 +445,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             select = context
                     .select(tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.ID),
-                            tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID),
-                            tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.INDEX_),
                             tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
                             tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
                             tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
@@ -504,8 +461,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
             Map<String, Object> row = it.next();
 
             long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
-            long batchId = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.BATCH_ID.getName())).longValue();
-            long index = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.INDEX_.getName())).longValue();
             long entityValueId = ((BigDecimal)
                     row.get(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID.getName())).longValue();
 
@@ -514,7 +469,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
-            Batch batch = batchRepository.getBatch(batchId);
             IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, actualReportDate);
 
             baseSet.put(BaseValueFactory.create(
@@ -522,8 +476,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     baseSet.getMemberType(),
                     id,
                     0,
-                    batch,
-                    index,
                     reportDate,
                     baseEntity,
                     false,

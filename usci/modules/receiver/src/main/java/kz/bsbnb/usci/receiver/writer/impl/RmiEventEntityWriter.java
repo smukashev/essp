@@ -99,7 +99,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 batchService.addEntityStatusParams(entityStatusId, params);
             }
 
-            List<String> errors = new LinkedList<String>(entity.getValidationErrors());
+            List<String> errors = new LinkedList<>(entity.getValidationErrors());
             String ruleRuntimeException = null;
 
             if(global.isRulesEnabled() && entity.getMeta() != null &&

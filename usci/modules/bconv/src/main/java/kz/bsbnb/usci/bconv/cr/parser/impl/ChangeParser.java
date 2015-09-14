@@ -43,21 +43,21 @@ public class ChangeParser extends BatchParser {
         if (localName.equals("change")) {
         } else if (localName.equals("turnover")) {
             changeTurnoverParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("turnover", new BaseEntityComplexValue(-1, batch, index,
-                    changeTurnoverParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("turnover", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    changeTurnoverParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("remains")) {
             changeRemainsParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("remains", new BaseEntityComplexValue(-1, batch, index,
-                    changeRemainsParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("remains", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    changeRemainsParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("credit_flow")) {
             changeCreditFlowParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("credit_flow", new BaseEntityComplexValue(-1, batch, index,
-                    changeCreditFlowParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("credit_flow", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    changeCreditFlowParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("maturity_date")) {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                maturityDate = new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw));
+                maturityDate = new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw), false, true);
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
@@ -65,7 +65,7 @@ public class ChangeParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                prolongationDate = new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw));
+                prolongationDate = new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw), false, true);
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }

@@ -52,12 +52,10 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-
         if (rows.size() < 1)
-            return;//throw new IllegalArgumentException("Classes not found.");
+            return;
 
         for (Map<String, Object> row : rows) {
-
             MetaClass metaClass = new MetaClass();
 
             metaClass.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
@@ -170,17 +168,14 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
     }
 
     //This method only for meta editor portlet
-    private void loadAllClass(MetaClass metaClass, boolean beginDateStrict)
-    {
+    private void loadAllClass(MetaClass metaClass, boolean beginDateStrict) {
         SelectForUpdateStep select;
 
-        if(metaClass.getId() < 1)
-        {
-            if(metaClass.getClassName() == null)
+        if (metaClass.getId() < 1) {
+            if (metaClass.getClassName() == null)
                 throw new IllegalArgumentException("Meta class does not have name or id. Can't load.");
 
-            if(beginDateStrict)
-            {
+            if (beginDateStrict) {
                 select = context.select(
                         EAV_M_CLASSES.IS_DISABLED,
                         EAV_M_CLASSES.BEGIN_DATE,
@@ -196,9 +191,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         ).and(
                         EAV_M_CLASSES.BEGIN_DATE.eq(DataUtils.convert(metaClass.getBeginDate()))
                 ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
-            }
-            else
-            {
+            } else {
                 select = context.select(
                         EAV_M_CLASSES.IS_DISABLED,
                         EAV_M_CLASSES.BEGIN_DATE,
@@ -216,9 +209,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
             }
 
-        }
-        else
-        {
+        } else {
             select = context.select(
                     EAV_M_CLASSES.IS_DISABLED,
                     EAV_M_CLASSES.BEGIN_DATE,
@@ -247,23 +238,23 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         Map<String, Object> row = rows.get(0);
 
-        if(row != null) {
+        if (row != null) {
 
 
-            metaClass.setDisabled(((BigDecimal)row.get("is_disabled")).longValue() == 1);
-            metaClass.setBeginDate(DataUtils.convert((Timestamp)row.get("begin_date")));
-            metaClass.setId(((BigDecimal)row.get("id")).longValue());
-            metaClass.setClassName((String)row.get("name"));
+            metaClass.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
+            metaClass.setBeginDate(DataUtils.convert((Timestamp) row.get("begin_date")));
+            metaClass.setId(((BigDecimal) row.get("id")).longValue());
+            metaClass.setClassName((String) row.get("name"));
             metaClass.setClassTitle((String) row.get("title"));
-            metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String)row.get("complex_key_type")));
-            metaClass.setReference(((BigDecimal)row.get("is_reference")).longValue() == 1);
+            metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String) row.get("complex_key_type")));
+            metaClass.setReference(((BigDecimal) row.get("is_reference")).longValue() == 1);
             metaClass.setParentIsKey(((BigDecimal) row.get("parent_is_key")).longValue() == 1);
         } else {
             logger.error("Can't load metaClass, empty data set.");
         }
     }
-	private long createClass(MetaClass metaClass)
-    {
+
+    private long createClass(MetaClass metaClass) {
 
         InsertOnDuplicateStep insert = context.insertInto(
                 EAV_M_CLASSES,
@@ -503,8 +494,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                                             EAV_M_SET_KEY_FILTER.VALUE).values(
                                     id,
                                     attrName,
-                                    val
-                            );
+                                    val);
 
                             t = 0;
                             if (sqlStats != null) {

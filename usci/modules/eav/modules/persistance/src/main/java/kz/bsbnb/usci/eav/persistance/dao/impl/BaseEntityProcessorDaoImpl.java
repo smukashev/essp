@@ -19,7 +19,6 @@ import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
-import kz.bsbnb.usci.eav.repository.IBaseEntityRepository;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.jooq.DSLContext;
@@ -44,9 +43,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Autowired
     IMetaClassRepository metaClassRepository;
-
-    @Autowired
-    IBaseEntityRepository baseEntityCacheDao;
 
     @Autowired
     IPersistableDaoPool persistableDaoPool;
@@ -112,7 +108,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     } else {
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
                         if (childBaseEntity.getValueCount() != 0) {
-                            prepare((IBaseEntity) baseValue.getValue(), creditorId);
+                            IBaseEntity tmpEntity = prepare((IBaseEntity) baseValue.getValue(), creditorId);
+                            baseValue.setValue(tmpEntity); // TODO: fix
                         }
                     }
                 }
@@ -124,6 +121,16 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             if (baseEntityId > 0)
                 baseEntity.setId(baseEntityId);
+        }
+
+        // TODO: fix
+        if (metaClass.getClassName().equals("ref_doc_type")) {
+            try {
+                baseEntity = baseEntityLoadDao.load(baseEntity.getId(), baseEntity.getReportDate(),
+                        baseEntity.getReportDate());
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
         }
 
         return baseEntity;

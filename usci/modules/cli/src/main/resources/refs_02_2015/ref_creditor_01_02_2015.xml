@@ -1480,44 +1480,6 @@
       </subject_type>
     </ref_creditor>
     <ref_creditor>
-      <name>Тестовая организация</name>
-      <short_name>Тестовая организация</short_name>
-      <code>000</code>
-      <docs>
-        <item>
-          <no>920140000084</no>
-          <doc_type>
-            <name_ru>Бизнес - идентификационный номер </name_ru>
-            <name_kz>Бизнес - идентификационный номер </name_kz>
-            <is_identification>1</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>0</is_person_doc>
-            <weight>10</weight>
-            <code>07</code>
-          </doc_type>
-        </item>
-        <item>
-          <no>TESTBIN111</no>
-          <doc_type>
-            <name_ru>Банковский идентификационный код </name_ru>
-            <name_kz>Банковский идентификационный код </name_kz>
-            <is_identification>0</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>0</is_person_doc>
-            <weight>30</weight>
-            <code>15</code>
-          </doc_type>
-        </item>
-      </docs>
-      <subject_type>
-        <kind_id>31</kind_id>
-        <name_kz>Банк второго уровня</name_kz>
-        <name_ru>Банк второго уровня</name_ru>
-        <code>0001</code>
-        <report_period_duration_months>1</report_period_duration_months>
-      </subject_type>
-    </ref_creditor>
-    <ref_creditor>
       <name>АО ДБ "Банк Китая в Казахстане"</name>
       <short_name>АО ДБ "БАНК КИТАЯ В КАЗАХСТАНЕ"</short_name>
       <docs>

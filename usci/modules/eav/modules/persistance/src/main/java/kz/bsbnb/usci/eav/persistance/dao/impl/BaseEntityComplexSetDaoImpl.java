@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -53,29 +52,27 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
     public long insert(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
         IBaseSet baseSet = (IBaseSet) baseValue.getValue();
+
         long baseValueId = insert(
                 baseValue.getBaseContainer().getId(),
                 baseValue.getMetaAttribute().getId(),
                 baseSet.getId(),
-                baseValue.getBatch().getId(),
-                baseValue.getIndex(),
                 baseValue.getRepDate(),
                 baseValue.isClosed(),
                 baseValue.isLast());
+
         baseValue.setId(baseValueId);
 
         return baseValueId;
     }
 
-    protected long insert(long baseEntityId, long metaAttributeId, long baseSetId, long batchId,
-                          long index, Date reportDate, boolean closed, boolean last) {
+    protected long insert(long baseEntityId, long metaAttributeId, long baseSetId, Date reportDate,
+                          boolean closed, boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_ENTITY_COMPLEX_SETS)
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID, baseEntityId)
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID, metaAttributeId)
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID, baseSetId)
-                .set(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID, batchId)
-                .set(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_, index)
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE, DataUtils.convert(reportDate))
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED, DataUtils.convert(closed))
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST, DataUtils.convert(last));
@@ -88,31 +85,34 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
         IBaseSet baseSet = (IBaseSet) baseValue.getValue();
-        update(baseValue.getId(), baseValue.getBaseContainer().getId(), baseValue.getMetaAttribute().getId(),
-                baseSet.getId(), baseValue.getBatch().getId(), baseValue.getIndex(), baseValue.getRepDate(),
+
+        update(baseValue.getId(),
+                baseValue.getBaseContainer().getId(),
+                baseValue.getMetaAttribute().getId(),
+                baseSet.getId(),
+                baseValue.getRepDate(),
                 baseValue.isClosed(), baseValue.isLast());
     }
 
-    protected void update(long id, long baseEntityId, long metaAttributeId, long baseSetId, long batchId,
-                          long index, Date reportDate, boolean closed, boolean last) {
+    protected void update(long id, long baseEntityId, long metaAttributeId, long baseSetId, Date reportDate,
+                          boolean closed, boolean last) {
         String tableAlias = "cs";
         Update update = context
                 .update(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias))
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ENTITY_ID, baseEntityId)
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ATTRIBUTE_ID, metaAttributeId)
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).SET_ID, baseSetId)
-                .set(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).BATCH_ID, batchId)
-                .set(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).INDEX_, index)
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).REPORT_DATE, DataUtils.convert(reportDate))
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).IS_CLOSED, DataUtils.convert(closed))
                 .set(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).IS_LAST, DataUtils.convert(last))
                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ID.equal(id));
 
         logger.debug(update.toString());
+
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-        if (count != 1) {
-            throw new RuntimeException("UPDATE operation should be update only one record.");
-        }
+
+        if (count != 1)
+            throw new IllegalStateException("UPDATE operation should be update only one record.");
     }
 
     @Override
@@ -127,10 +127,11 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ID.equal(id));
 
         logger.debug(delete.toString());
+
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-        if (count != 1) {
-            throw new RuntimeException("DELETE operation should be delete only one record.");
-        }
+
+        if (count != 1)
+            throw new IllegalStateException("DELETE operation should be delete only one record.");
     }
 
     @Override
@@ -153,8 +154,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ID,
-                        EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).BATCH_ID,
-                        EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).INDEX_,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).REPORT_DATE,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).SET_ID,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).IS_CLOSED,
@@ -168,8 +167,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
-                        subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID),
-                        subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_),
                         subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
                         subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
                         subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
@@ -181,18 +178,14 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
+        if (rows.size() > 1)
             throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
-        }
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
-
-            long index = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName())).longValue();
 
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED.getName())).longValue() == 1;
@@ -206,9 +199,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName()));
 
-            Batch batch = batchRepository.getBatch(((BigDecimal) row
-                    .get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue());
-
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
             baseSetComplexValueDao.loadBaseValues(baseSet, reportDate, false);
 
@@ -217,8 +207,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                     metaType,
                     id,
                     0,
-                    batch,
-                    index,
                     reportDate,
                     baseSet,
                     closed,
@@ -248,8 +236,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).REPORT_DATE.desc()).as("num_pp"),
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ID,
-                        EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).BATCH_ID,
-                        EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).INDEX_,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).REPORT_DATE,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).SET_ID,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).IS_CLOSED,
@@ -263,8 +249,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
-                        subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID),
-                        subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_),
                         subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
                         subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
                         subqueryTable.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
@@ -285,9 +269,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             long id = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
 
-            long index = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName())).longValue();
-
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED.getName())).longValue() == 1;
 
@@ -300,9 +281,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName()));
 
-            Batch batch = batchRepository.getBatch(((BigDecimal) row
-                    .get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue());
-
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
             baseSetComplexValueDao.loadBaseValues(baseSet, reportDate, false);
 
@@ -311,8 +289,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                     metaType,
                     id,
                     0,
-                    batch,
-                    index,
                     reportDate,
                     baseSet,
                     closed,
@@ -334,8 +310,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         String tableAlias = "ess";
         Select select = context
                 .select(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ID,
-                        EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).BATCH_ID,
-                        EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).INDEX_,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).SET_ID,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).IS_LAST)
                 .from(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias))
@@ -356,14 +330,12 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
-            long index = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName())).longValue();
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST.getName())).longValue() == 1;
+
             long setId = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.getName())).longValue();
-            Batch batch = batchRepository.getBatch(((BigDecimal) row
-                    .get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue());
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
             baseSetComplexValueDao.loadBaseValues(baseSet, baseValue.getRepDate(), false);
@@ -371,8 +343,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             closedBaseValue = BaseValueFactory.create(MetaContainerTypes.META_CLASS, metaType,
                     id,
                     0,
-                    batch,
-                    index,
                     baseValue.getRepDate(),
                     baseSet,
                     true,
@@ -394,8 +364,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         String tableAlias = "ess";
         Select select = context
                 .select(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ID,
-                        EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).BATCH_ID,
-                        EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).INDEX_,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).REPORT_DATE,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).SET_ID,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).IS_LAST)
@@ -416,9 +384,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             long id = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
 
-            long index = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName())).longValue();
-
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED.getName())).longValue() == 1;
 
@@ -428,9 +393,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName()));
 
-            Batch batch = batchRepository.getBatch(((BigDecimal) row
-                    .get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue());
-
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
             baseSetComplexValueDao.loadBaseValues(baseSet, baseValue.getRepDate(), false);
 
@@ -439,8 +401,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                     metaType,
                     id,
                     0,
-                    batch,
-                    index,
                     reportDate,
                     baseSet,
                     closed,
@@ -461,8 +421,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             select = context
                     .select(tableOfComplexSets.field(EAV_M_COMPLEX_SET.NAME),
                             tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_),
                             tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
                             tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
                             tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
@@ -482,12 +440,10 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         } else {
             Table tableNumbering = context
                     .select(DSL.rank().over()
-                        .partitionBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID))
-                        .orderBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE)).as("num_pp"),
+                                    .partitionBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID))
+                                    .orderBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE)).as("num_pp"),
                             tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
                             tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID),
-                            tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_),
                             tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
                             tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
                             tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
@@ -501,8 +457,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             select = context
                     .select(tableOfComplexSets.field(EAV_M_COMPLEX_SET.NAME),
                             tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
-                            tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID),
-                            tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_),
                             tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
                             tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
                             tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
@@ -528,8 +482,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             String attribute = (String) row.get(EAV_M_COMPLEX_SET.NAME.getName());
             long setId = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.getName())).longValue();
             long baseValueId = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
-            long batchId = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.BATCH_ID.getName())).longValue();
-            long index = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.INDEX_.getName())).longValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName()));
@@ -544,14 +496,11 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
             baseSetComplexValueDao.loadBaseValues(baseSet, actualReportDate, isLast);
 
-            Batch batch = batchRepository.getBatch(batchId);
             baseEntity.put(attribute, BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,
                     metaType,
                     baseValueId,
                     0,
-                    batch,
-                    index,
                     reportDate,
                     baseSet,
                     false,

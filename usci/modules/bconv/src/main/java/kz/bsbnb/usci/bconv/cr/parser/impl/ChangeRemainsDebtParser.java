@@ -51,8 +51,8 @@ public class ChangeRemainsDebtParser extends BatchParser {
             debtWay = localName;
         } else if (localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            BaseValue baseValue = new BaseEntityDoubleValue(-1, batch, index,
-                    new Double(event.asCharacters().getData()));
+            BaseValue baseValue = new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                    new Double(event.asCharacters().getData()), false, true);
             if (debtWay.equals("current")) {
                 fieldCurrent.put("value", baseValue);
             } else if (debtWay.equals("pastdue")) {
@@ -62,8 +62,8 @@ public class ChangeRemainsDebtParser extends BatchParser {
             }
         } else if (localName.equals("value_currency")) {
             event = (XMLEvent) xmlReader.next();
-            BaseValue baseValue = new BaseEntityDoubleValue(-1, batch, index,
-                    new Double(event.asCharacters().getData()));
+            BaseValue baseValue = new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                    new Double(event.asCharacters().getData()), false, true);
             if (debtWay.equals("current")) {
                 fieldCurrent.put("value_currency", baseValue);
             } else if (debtWay.equals("pastdue")) {
@@ -75,10 +75,10 @@ public class ChangeRemainsDebtParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
                     batch.getRepDate());
-            baseEntity.put("no_", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
-            BaseValue baseValue = new BaseEntityComplexValue(-1, batch, index, baseEntity);
+            baseEntity.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            BaseValue baseValue = new BaseEntityComplexValue(0, -1, batch.getRepDate(), baseEntity, false, true);
             if (debtWay.equals("current")) {
-                fieldCurrent.put("balance_account", new BaseEntityComplexValue(-1, batch, index, baseEntity));
+                fieldCurrent.put("balance_account", new BaseEntityComplexValue(0, -1, batch.getRepDate(), baseEntity, false, true));
             } else if (debtWay.equals("pastdue")) {
                 fieldPastDue.put("balance_account", baseValue);
             } else if (debtWay.equals("write_off")) {
@@ -88,7 +88,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                fieldPastDue.put("open_date", new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw)));
+                fieldPastDue.put("open_date", new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw), false, true));
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
@@ -96,7 +96,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                fieldPastDue.put("close_date", new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw)));
+                fieldPastDue.put("close_date", new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw), false, true));
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
@@ -104,7 +104,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                fieldWriteOf.put("date", new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw)));
+                fieldWriteOf.put("date", new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw), false, true));
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }
@@ -120,11 +120,11 @@ public class ChangeRemainsDebtParser extends BatchParser {
         if (localName.equals("debt")) {
             return true;
         } else if (localName.equals("current")) {
-            currentBaseEntity.put("current", new BaseEntityComplexValue(-1, batch, index, fieldCurrent));
+            currentBaseEntity.put("current", new BaseEntityComplexValue(0, -1, batch.getRepDate(), fieldCurrent, false, true));
         } else if (localName.equals("pastdue")) {
-            currentBaseEntity.put("pastdue", new BaseEntityComplexValue(-1, batch, index, fieldPastDue));
+            currentBaseEntity.put("pastdue", new BaseEntityComplexValue(0, -1, batch.getRepDate(), fieldPastDue, false, true));
         } else if (localName.equals("write_off")) {
-            currentBaseEntity.put("write_off", new BaseEntityComplexValue(-1, batch, index, fieldWriteOf));
+            currentBaseEntity.put("write_off", new BaseEntityComplexValue(0, -1, batch.getRepDate(), fieldWriteOf, false, true));
         } else if (localName.equals("value")) {
             if (debtWay.equals("current")) {
             } else if (debtWay.equals("pastdue")) {

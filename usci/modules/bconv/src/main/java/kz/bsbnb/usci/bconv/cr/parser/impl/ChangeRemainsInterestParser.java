@@ -48,8 +48,8 @@ public class ChangeRemainsInterestParser extends BatchParser {
             interestWay = localName;
         } else if (localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            BaseValue baseValue = new BaseEntityDoubleValue(-1, batch, index,
-                    new Double(event.asCharacters().getData()));
+            BaseValue baseValue = new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                    new Double(event.asCharacters().getData()), false, true);
 
             if (interestWay.equals("current")) {
                 fieldCurrent.put("value", baseValue);
@@ -60,8 +60,8 @@ public class ChangeRemainsInterestParser extends BatchParser {
             }
         } else if (localName.equals("value_currency")) {
             event = (XMLEvent) xmlReader.next();
-            BaseValue baseValue = new BaseEntityDoubleValue(-1, batch, index,
-                    new Double(event.asCharacters().getData()));
+            BaseValue baseValue = new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                    new Double(event.asCharacters().getData()), false, true);
 
             if (interestWay.equals("current")) {
                 fieldCurrent.put("value_currency", baseValue);
@@ -73,8 +73,8 @@ public class ChangeRemainsInterestParser extends BatchParser {
         } else if (localName.equals("balance_account")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"), batch.getRepDate());
-            baseEntity.put("no_", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
-            BaseValue baseValue = new BaseEntityComplexValue(-1, batch, index, baseEntity);
+            baseEntity.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            BaseValue baseValue = new BaseEntityComplexValue(0, -1, batch.getRepDate(), baseEntity, false, true);
             if (interestWay.equals("current")) {
                 fieldCurrent.put("balance_account", baseValue);
             } else if (interestWay.equals("pastdue")) {
@@ -86,7 +86,7 @@ public class ChangeRemainsInterestParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                fieldPastDue.put("open_date", new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw)));
+                fieldPastDue.put("open_date", new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw), false, true));
             } catch (ParseException e) {
                 getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
             }
@@ -94,7 +94,7 @@ public class ChangeRemainsInterestParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                fieldPastDue.put("close_date", new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw)));
+                fieldPastDue.put("close_date", new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw), false, true));
             } catch (ParseException e) {
                 getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
             }
@@ -102,7 +102,7 @@ public class ChangeRemainsInterestParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                fieldWriteOf.put("date", new BaseEntityDateValue(-1, batch, index, dateFormat.parse(dateRaw)));
+                fieldWriteOf.put("date", new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw), false, true));
             } catch (ParseException e) {
                 getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
             }
@@ -118,11 +118,11 @@ public class ChangeRemainsInterestParser extends BatchParser {
         if (localName.equals("interest")) {
             return true;
         } else if (localName.equals("current")) {
-            currentBaseEntity.put("current", new BaseEntityComplexValue(-1, batch, index, fieldCurrent));
+            currentBaseEntity.put("current", new BaseEntityComplexValue(0, -1, batch.getRepDate(), fieldCurrent, false, true));
         } else if (localName.equals("pastdue")) {
-            currentBaseEntity.put("pastdue", new BaseEntityComplexValue(-1, batch, index, fieldPastDue));
+            currentBaseEntity.put("pastdue", new BaseEntityComplexValue(0, -1, batch.getRepDate(), fieldPastDue, false, true));
         } else if (localName.equals("write_off")) {
-            currentBaseEntity.put("write_off", new BaseEntityComplexValue(-1, batch, index, fieldWriteOf));
+            currentBaseEntity.put("write_off", new BaseEntityComplexValue(0, -1, batch.getRepDate(), fieldWriteOf, false, true));
         } else if (localName.equals("value")) {
             if (interestWay.equals("current")) {
             } else if (interestWay.equals("pastdue")) {

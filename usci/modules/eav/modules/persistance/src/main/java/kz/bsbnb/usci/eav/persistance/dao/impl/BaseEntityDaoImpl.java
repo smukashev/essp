@@ -46,10 +46,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Override
     public long insert(IPersistable persistable) {
         IBaseEntity baseEntity = (IBaseEntity) persistable;
-        long baseEntityId =
-                insert(
-                        baseEntity.getMeta().getId()
-                );
+        long baseEntityId = insert(baseEntity.getMeta().getId());
         baseEntity.setId(baseEntityId);
 
         return baseEntityId;
@@ -81,7 +78,8 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
             logger.debug(update.toString());
             int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
             if (count > 1) {
-                throw new RuntimeException("DELETE operation should update only one record. ID: " + baseEntity.getId());
+                throw new IllegalStateException("DELETE operation should update only one record. ID: " +
+                        baseEntity.getId());
             }
             if (count < 1) {
                 logger.warn("DELETE operation should update a record. ID: " + baseEntity.getId());
@@ -138,7 +136,6 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         IBaseEntityReportDate baseEntityReportDate = baseEntityReportDateDao.load(id, reportDate);
         baseEntity.setBaseEntityReportDate(baseEntityReportDate);
 
-        // BUG-FIX: NullPointerException in BaseEntityReportDate.clone()
         baseEntityReportDate.setBaseEntity(baseEntity);
 
         Map<Class<? extends IBaseValue>, Long> baseValueCounts = new HashMap<>();

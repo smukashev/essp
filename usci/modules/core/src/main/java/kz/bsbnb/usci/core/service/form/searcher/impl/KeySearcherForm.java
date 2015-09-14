@@ -178,8 +178,6 @@ public class KeySearcherForm implements ISearcherForm {
                         itemMeta,
                         0,
                         /* TODO set creditorId */ 0,
-                        b,
-                        1,
                         new Date(),
                         childBaseEntity,
                         false,
@@ -201,8 +199,6 @@ public class KeySearcherForm implements ISearcherForm {
                     metaAttribute.getMetaType(),
                     0,
                     /* TODO set creditorId */ 0,
-                    b,
-                    1,
                     new Date(),
                     value,
                     false,
@@ -210,7 +206,7 @@ public class KeySearcherForm implements ISearcherForm {
                 ));
         }
 
-        Long id = searcher.findSingle(baseEntity, /* TODO set creditorId */ 0);
+        Long id = searcher.findSingle(baseEntity, /* TODO set creditorId */ 0L);
         baseEntity.setId(id);
         ret.setData(Arrays.asList(new BaseEntity[]{baseEntity}));
         return ret;

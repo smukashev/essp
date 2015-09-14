@@ -32,18 +32,18 @@ public class SubjectPersonDocsParser extends BatchParser {
         } else if (localName.equals("doc")) {
             BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate());
 
-            docType.put("code", new BaseEntityStringValue(-1, batch, index,
-                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue()));
+            docType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
 
-            currentBaseEntity.put("doc_type", new BaseEntityComplexValue(-1, batch, index, docType));
+            currentBaseEntity.put("doc_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), docType, false, true));
         } else if (localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("name", new BaseEntityStringValue(-1, batch, index,
-                    event.asCharacters().getData()));
+            currentBaseEntity.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("no", new BaseEntityStringValue(-1, batch, index,
-                    event.asCharacters().getData()));
+            currentBaseEntity.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else {
             throw new UnknownTagException(localName);
         }

@@ -30,8 +30,8 @@ public class ChangeRemainsDiscountedValueParser extends BatchParser {
         if (localName.equals("discounted_value")) {
         } else if (localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value", new BaseEntityDoubleValue(-1, batch, index,
-                    new Double(event.asCharacters().getData())));
+            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                    new Double(event.asCharacters().getData()), false, true));
         } else {
             throw new UnknownTagException(localName);
         }

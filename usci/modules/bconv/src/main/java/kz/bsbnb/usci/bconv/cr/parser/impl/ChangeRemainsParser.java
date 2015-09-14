@@ -47,29 +47,29 @@ public class ChangeRemainsParser extends BatchParser {
         if (localName.equals("remains")) {
         } else if (localName.equals("debt")) {
             changeRemainsDebtParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("debt", new BaseEntityComplexValue(-1, batch, index,
-                    changeRemainsDebtParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("debt", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    changeRemainsDebtParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("interest")) {
             changeRemainsInterestParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("interest", new BaseEntityComplexValue(-1, batch, index,
-                    changeRemainsInterestParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("interest", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    changeRemainsInterestParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("discount")) {
             changeRemainsDiscountParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("discount", new BaseEntityComplexValue(-1, batch, index,
-                    changeRemainsDiscountParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("discount", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    changeRemainsDiscountParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("correction")) {
             changeRemainsCorrectionParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("correction", new BaseEntityComplexValue(-1, batch, index,
-                    changeRemainsCorrectionParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("correction", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    changeRemainsCorrectionParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("discounted_value")) {
             changeRemainsDiscountedValueParser.parse(xmlReader, batch, index);
             currentBaseEntity.put("discounted_value",
-                    new BaseEntityComplexValue(-1, batch, index,
-                            changeRemainsDiscountedValueParser.getCurrentBaseEntity()));
+                    new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                            changeRemainsDiscountedValueParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("limit")) {
             changeRemainsLimitParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("limit", new BaseEntityComplexValue(-1, batch, index,
-                    changeRemainsLimitParser.getCurrentBaseEntity()));
+            currentBaseEntity.put("limit", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    changeRemainsLimitParser.getCurrentBaseEntity(), false, true));
         } else {
             throw new UnknownTagException(localName);
         }

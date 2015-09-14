@@ -46,7 +46,7 @@ public class CreditParser extends BatchParser {
         } else if (localName.equals("contract")) {
             creditContractParser.parse(xmlReader, batch, index);
             BaseEntity creditContract = creditContractParser.getCurrentBaseEntity();
-            currentBaseEntity.put("contract", new BaseEntityComplexValue(-1, batch, index, creditContract));
+            currentBaseEntity.put("contract", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditContract, false, true));
         } else if (localName.equals("currency")) {
 
             RefListResponse refListResponse = refProcessorDao.getRefListResponse(
@@ -60,8 +60,8 @@ public class CreditParser extends BatchParser {
                 if (o.get("SHORT_NAME") != null && o.get("SHORT_NAME").equals(crCode)) {
                     BaseEntity currency = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"),
                             batch.getRepDate());
-                    currency.put("code", new BaseValue(-1, batch, index, o.get("CODE")));
-                    currentBaseEntity.put("currency", new BaseEntityComplexValue(-1, batch, index, currency));
+                    currency.put("code", new BaseValue(0, -1, batch.getRepDate(), o.get("CODE")));
+                    currentBaseEntity.put("currency", new BaseEntityComplexValue(0, -1, batch.getRepDate(), currency, false, true));
                     found = true;
                     break;
                 }
@@ -71,15 +71,14 @@ public class CreditParser extends BatchParser {
 
         } else if (localName.equals("interest_rate_yearly")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("interest_rate_yearly", new BaseEntityDoubleValue(-1, batch, index,
-                    new Double(event.asCharacters().getData())
-            ));
+            currentBaseEntity.put("interest_rate_yearly", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                    new Double(event.asCharacters().getData()), false, true));
         } else if (localName.equals("contract_maturity_date")) {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                currentBaseEntity.put("contract_maturity_date", new BaseEntityDateValue(-1, batch, index,
-                        dateFormat.parse(dateRaw)));
+                currentBaseEntity.put("contract_maturity_date", new BaseEntityDateValue(0, -1, batch.getRepDate(),
+                        dateFormat.parse(dateRaw), false, true));
             } catch (ParseException e) {
                 getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
             }
@@ -87,8 +86,8 @@ public class CreditParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                currentBaseEntity.put("actual_issue_date", new BaseEntityDateValue(-1, batch, index,
-                        dateFormat.parse(event.asCharacters().getData())));
+                currentBaseEntity.put("actual_issue_date", new BaseEntityDateValue(0, -1, batch.getRepDate(),
+                        dateFormat.parse(event.asCharacters().getData()), false, true));
             } catch (ParseException e) {
                 getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
             }
@@ -97,40 +96,39 @@ public class CreditParser extends BatchParser {
             BaseEntity creditPurpose = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_purpose"),
                     batch.getRepDate());
 
-            creditPurpose.put("code", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
+            creditPurpose.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
 
-            currentBaseEntity.put("credit_purpose", new BaseEntityComplexValue(-1, batch, index,
-                    creditPurpose
-            ));
+            currentBaseEntity.put("credit_purpose", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    creditPurpose, false, true));
         } else if (localName.equals("credit_object")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity creditObject = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_object"),
                     batch.getRepDate());
 
-            creditObject.put("code", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
+            creditObject.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
 
-            currentBaseEntity.put("credit_object", new BaseEntityComplexValue(-1, batch, index, creditObject));
+            currentBaseEntity.put("credit_object", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditObject, false, true));
         } else if (localName.equals("amount")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("amount", new BaseEntityDoubleValue(-1, batch, index,
-                    new Double(event.asCharacters().getData())));
+            currentBaseEntity.put("amount", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                    new Double(event.asCharacters().getData()), false, true));
         } else if (localName.equals("finance_source")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity financeSource = new BaseEntity(metaClassRepository.getMetaClass("ref_finance_source"),
                     batch.getRepDate());
 
-            financeSource.put("code", new BaseEntityStringValue(-1, batch, index, event.asCharacters().getData()));
+            financeSource.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
 
-            currentBaseEntity.put("finance_source", new BaseEntityComplexValue(-1, batch, index,
-                    financeSource));
+            currentBaseEntity.put("finance_source", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    financeSource, false, true));
         } else if (localName.equals("has_currency_earn")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("has_currency_earn", new BaseEntityBooleanValue(-1, batch, index,
-                    new Boolean(event.asCharacters().getData())));
+            currentBaseEntity.put("has_currency_earn", new BaseEntityBooleanValue(0, -1, batch.getRepDate(),
+                    new Boolean(event.asCharacters().getData()), false, true));
         } else if (localName.equals("creditor_branch")) {
             creditorBranchParser.parse(xmlReader, batch, index);
             BaseEntity creditorBranch = creditorBranchParser.getCurrentBaseEntity();
-            currentBaseEntity.put("creditor_branch", new BaseEntityComplexValue(-1, batch, index, creditorBranch));
+            currentBaseEntity.put("creditor_branch", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditorBranch, false, true));
         } else if (localName.equals("portfolio")) {
             portfolioCount++;
 
@@ -139,10 +137,10 @@ public class CreditParser extends BatchParser {
 
                 if (value != null) {
                     BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),batch.getRepDate());
-                    portfolio.put("code", new BaseEntityStringValue(-1, batch, index, value));
-                    currentPortfolio.put("portfolio", new BaseEntityComplexValue(-1, batch, index, portfolio));
+                    portfolio.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), value, false, true));
+                    currentPortfolio.put("portfolio", new BaseEntityComplexValue(0, -1, batch.getRepDate(), portfolio, false, true));
                 } else {
-                    currentPortfolio.put("portfolio",new BaseEntityComplexValue(-1, batch,index,null));
+                    currentPortfolio.put("portfolio",new BaseEntityComplexValue(0, -1, batch.getRepDate(), null, false, true));
                 }
             } else{
                 currentPortfolio = new BaseEntity(metaClassRepository.getMetaClass("portfolio"), batch.getRepDate());
@@ -153,10 +151,10 @@ public class CreditParser extends BatchParser {
 
             if (value != null) {
                 BaseEntity portfolioMSFO = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),batch.getRepDate());
-                portfolioMSFO.put("code", new BaseEntityStringValue(-1, batch, index, value));
-                currentPortfolio.put("portfolio_msfo", new BaseEntityComplexValue(-1, batch, index, portfolioMSFO));
+                portfolioMSFO.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), value, false, true));
+                currentPortfolio.put("portfolio_msfo", new BaseEntityComplexValue(0, -1, batch.getRepDate(), portfolioMSFO, false, true));
             } else {
-                currentPortfolio.put("portfolio_msfo", new BaseEntityComplexValue(-1, batch, index, null));
+                currentPortfolio.put("portfolio_msfo", new BaseEntityComplexValue(0, -1, batch.getRepDate(), null, false, true));
             }
         } else {
             throw new UnknownTagException(localName);
@@ -193,7 +191,7 @@ public class CreditParser extends BatchParser {
         } else if (localName.equals("portfolio")) {
             portfolioCount--;
             if (portfolioCount == 0)
-                currentBaseEntity.put("portfolio", new BaseEntityComplexValue(-1, batch, index, currentPortfolio));
+                currentBaseEntity.put("portfolio", new BaseEntityComplexValue(0, -1, batch.getRepDate(), currentPortfolio, false, true));
 
         } else if (localName.equals("portfolio_msfo")) {
         } else {

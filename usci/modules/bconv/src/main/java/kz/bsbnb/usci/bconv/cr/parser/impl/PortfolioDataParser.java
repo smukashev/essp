@@ -41,13 +41,13 @@ public class PortfolioDataParser extends BatchParser {
             // do nothing
         } else if (localName.equals("portfolio_flow")) {
             portfolioFlowParser.parse(xmlReader, batch, index);
-            getPortfolioFlow().put(new BaseSetComplexValue(-1, batch, index,
-                    portfolioFlowParser.getCurrentBaseEntity()));
+            getPortfolioFlow().put(new BaseSetComplexValue(0, -1, batch.getRepDate(),
+                    portfolioFlowParser.getCurrentBaseEntity(), false, true));
 
         } else if (localName.equals("portfolio_flow_msfo")) {
             portfolioFlowMsfoParser.parse(xmlReader, batch, index);
-            getPortfolioFlowMsfo().put(new BaseSetComplexValue(-1, batch, index,
-                    portfolioFlowMsfoParser.getCurrentBaseEntity()));
+            getPortfolioFlowMsfo().put(new BaseSetComplexValue(0, -1, batch.getRepDate(),
+                    portfolioFlowMsfoParser.getCurrentBaseEntity(), false, true));
 
         } else {
             throw new UnknownTagException(localName);
@@ -60,12 +60,12 @@ public class PortfolioDataParser extends BatchParser {
     public boolean endElement(String localName) throws SAXException {
         if (localName.equals("portfolio_data")) {
             if (portfolioFlow != null) {
-                currentBaseEntity.put("portfolio_flows_kfn", new BaseEntityComplexSet(-1, batch, index,
-                        portfolioFlow));
+                currentBaseEntity.put("portfolio_flows_kfn", new BaseEntityComplexSet(0, -1, batch.getRepDate(),
+                        portfolioFlow, false, true));
             }
             if (portfolioFlowMsfo != null) {
-                currentBaseEntity.put("portfolio_flows_msfo", new BaseEntityComplexSet(-1, batch, index,
-                        portfolioFlowMsfo));
+                currentBaseEntity.put("portfolio_flows_msfo", new BaseEntityComplexSet(0, -1, batch.getRepDate(),
+                        portfolioFlowMsfo, false, true));
             }
             return true;
         } else {

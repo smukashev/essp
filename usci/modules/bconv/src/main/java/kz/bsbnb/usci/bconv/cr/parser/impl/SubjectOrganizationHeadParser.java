@@ -41,23 +41,23 @@ public class SubjectOrganizationHeadParser extends BatchParser {
             while (true) {
                 subjectOrganizationHeadNamesParser.parse(xmlReader, batch, index);
                 if (subjectOrganizationHeadNamesParser.hasMore()) {
-                    headNames.put(new BaseSetComplexValue(-1, batch, index,
-                            subjectOrganizationHeadNamesParser.getCurrentBaseEntity()));
+                    headNames.put(new BaseSetComplexValue(0, -1, batch.getRepDate(),
+                            subjectOrganizationHeadNamesParser.getCurrentBaseEntity(), false, true));
                 } else break;
             }
-            currentBaseEntity.put("names", new BaseEntityComplexSet(-1, batch, index, headNames));
+            currentBaseEntity.put("names", new BaseEntityComplexSet(0, -1, batch.getRepDate(), headNames, false, true));
         } else if (localName.equals("docs")) {
             BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("document"));
             while (true) {
                 subjectOrganizationHeadDocsParser.parse(xmlReader, batch, index);
                 if (subjectOrganizationHeadDocsParser.hasMore()) {
-                    docs.put(new BaseSetComplexValue(-1, batch, index,
-                            subjectOrganizationHeadDocsParser.getCurrentBaseEntity()));
+                    docs.put(new BaseSetComplexValue(0, -1, batch.getRepDate(),
+                            subjectOrganizationHeadDocsParser.getCurrentBaseEntity(), false, true));
                 } else {
                     break;
                 }
             }
-            currentBaseEntity.put("docs", new BaseEntityComplexSet(-1, batch, index, docs));
+            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, -1, batch.getRepDate(), docs, false, true));
 
         } else {
             throw new UnknownTagException(localName);

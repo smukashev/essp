@@ -13,7 +13,7 @@ import java.util.Date;
 
 public class BaseValueFactory {
     public static IBaseValue create(BaseContainerType baseContainerType, IMetaType metaType, long id, long creditorId,
-                                    Batch batch, long index, Date reportDate, Object value, boolean closed,
+                                    Date reportDate, Object value, boolean closed,
                                     boolean last) {
         int metaContainerType = 0;
         switch (baseContainerType) {
@@ -25,51 +25,51 @@ public class BaseValueFactory {
                 break;
         }
 
-        return create(metaContainerType, metaType, id, creditorId, batch, index, reportDate, value, closed, last);
+        return create(metaContainerType, metaType, id, creditorId, reportDate, value, closed, last);
     }
 
-    public static IBaseValue create(int metaContainerType, IMetaType metaType, long id, long creditorId, Batch batch,
-                                    long index, Date reportDate, Object value, boolean closed, boolean last) {
+    public static IBaseValue create(int metaContainerType, IMetaType metaType, long id, long creditorId,
+                                    Date reportDate, Object value, boolean closed, boolean last) {
         IBaseValue baseValue = null;
         switch (metaContainerType) {
             case MetaContainerTypes.META_CLASS: {
                 if (metaType.isSet()) {
                     IBaseSet baseSet = (IBaseSet) value;
                     if (metaType.isComplex())
-                        baseValue = new BaseEntityComplexSet(id, creditorId, batch, index, reportDate, baseSet,
+                        baseValue = new BaseEntityComplexSet(id, creditorId, reportDate, baseSet,
                                 closed, last);
                     else
-                        baseValue = new BaseEntitySimpleSet(id, creditorId, batch, index, reportDate, baseSet, closed, last);
+                        baseValue = new BaseEntitySimpleSet(id, creditorId, reportDate, baseSet, closed, last);
                 } else {
                     if (metaType.isComplex()) {
                         IBaseEntity baseEntity = (IBaseEntity) value;
-                        baseValue = new BaseEntityComplexValue(id, creditorId, batch, index, reportDate, baseEntity, closed, last);
+                        baseValue = new BaseEntityComplexValue(id, creditorId, reportDate, baseEntity, closed, last);
                     } else {
                         IMetaValue metaValue = (IMetaValue) metaType;
                         switch (metaValue.getTypeCode()) {
                             case INTEGER: {
                                 Integer integerValue = (Integer) value;
-                                baseValue = new BaseEntityIntegerValue(id, creditorId, batch, index, reportDate, integerValue, closed, last);
+                                baseValue = new BaseEntityIntegerValue(id, creditorId, reportDate, integerValue, closed, last);
                                 break;
                             }
                             case DATE: {
                                 Date dateValue = (Date) value;
-                                baseValue = new BaseEntityDateValue(id, creditorId, batch, index, reportDate, dateValue, closed, last);
+                                baseValue = new BaseEntityDateValue(id, creditorId, reportDate, dateValue, closed, last);
                                 break;
                             }
                             case STRING: {
                                 String stringValue = (String) value;
-                                baseValue = new BaseEntityStringValue(id, creditorId, batch, index, reportDate, stringValue, closed, last);
+                                baseValue = new BaseEntityStringValue(id, creditorId, reportDate, stringValue, closed, last);
                                 break;
                             }
                             case BOOLEAN: {
                                 Boolean booleanValue = (Boolean) value;
-                                baseValue = new BaseEntityBooleanValue(id, creditorId, batch, index, reportDate, booleanValue, closed, last);
+                                baseValue = new BaseEntityBooleanValue(id, creditorId, reportDate, booleanValue, closed, last);
                                 break;
                             }
                             case DOUBLE: {
                                 Double doubleValue = (Double) value;
-                                baseValue = new BaseEntityDoubleValue(id, creditorId, batch, index, reportDate, doubleValue, closed, last);
+                                baseValue = new BaseEntityDoubleValue(id, creditorId, reportDate, doubleValue, closed, last);
                                 break;
                             }
                             default:
@@ -85,33 +85,33 @@ public class BaseValueFactory {
                 } else {
                     if (metaType.isComplex()) {
                         IBaseEntity baseEntity = (IBaseEntity) value;
-                        baseValue = new BaseSetComplexValue(id, creditorId, batch, index, reportDate, baseEntity, closed, last);
+                        baseValue = new BaseSetComplexValue(id, creditorId, reportDate, baseEntity, closed, last);
                     } else {
                         IMetaValue metaValue = (IMetaValue) metaType;
                         switch (metaValue.getTypeCode()) {
                             case INTEGER: {
                                 Integer integerValue = (Integer) value;
-                                baseValue = new BaseSetIntegerValue(id, creditorId, batch, index, reportDate, integerValue, closed, last);
+                                baseValue = new BaseSetIntegerValue(id, creditorId, reportDate, integerValue, closed, last);
                                 break;
                             }
                             case DATE: {
                                 Date dateValue = (Date) value;
-                                baseValue = new BaseSetDateValue(id, creditorId, batch, index, reportDate, dateValue, closed, last);
+                                baseValue = new BaseSetDateValue(id, creditorId, reportDate, dateValue, closed, last);
                                 break;
                             }
                             case STRING: {
                                 String stringValue = (String) value;
-                                baseValue = new BaseSetStringValue(id, creditorId, batch, index, reportDate, stringValue, closed, last);
+                                baseValue = new BaseSetStringValue(id, creditorId, reportDate, stringValue, closed, last);
                                 break;
                             }
                             case BOOLEAN: {
                                 Boolean booleanValue = (Boolean) value;
-                                baseValue = new BaseSetBooleanValue(id, creditorId, batch, index, reportDate, booleanValue, closed, last);
+                                baseValue = new BaseSetBooleanValue(id, creditorId, reportDate, booleanValue, closed, last);
                                 break;
                             }
                             case DOUBLE: {
                                 Double doubleValue = (Double) value;
-                                baseValue = new BaseSetDoubleValue(id, creditorId, batch, index, reportDate, doubleValue, closed, last);
+                                baseValue = new BaseSetDoubleValue(id, creditorId, reportDate, doubleValue, closed, last);
                                 break;
                             }
                             default:

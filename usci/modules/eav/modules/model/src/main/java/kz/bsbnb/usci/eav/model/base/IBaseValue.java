@@ -22,14 +22,6 @@ public interface IBaseValue<T> extends IPersistable, Cloneable {
 
     void setMetaAttribute(IMetaAttribute metaAttribute);
 
-    Batch getBatch();
-
-    void setBatch(Batch batch);
-
-    long getIndex();
-
-    void setIndex(long index);
-
     T getValue();
 
     void setValue(T value);
