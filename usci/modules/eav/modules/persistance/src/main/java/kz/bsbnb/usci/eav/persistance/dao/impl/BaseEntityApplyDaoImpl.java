@@ -424,7 +424,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         baseValueClosed.setBaseContainer(baseEntityApplied);
                         baseValueClosed.setMetaAttribute(metaAttribute);
-                        baseEntityManager.registerAsUpdated(baseValueClosed);
+                        baseEntityManager.registerAsUpdated(baseValueClosed); // TODO: remove instead update
                     }
                 } else if (compare == 1) {
                     if (baseValueLoaded.isLast()) {
@@ -457,8 +457,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseValueClosed.setMetaAttribute(metaAttribute);
                     baseEntityManager.registerAsInserted(baseValueClosed);
                 } else {
-                    throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным. " +
-                            baseValueSaving.getMetaAttribute().getName() + ";");
+                    throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является " +
+                            "возможным. " + baseValueSaving.getMetaAttribute().getName() + ";");
                 }
 
                 return;
@@ -584,15 +584,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 if (baseValueClosed != null) {
                     baseValueClosed.setMetaAttribute(metaAttribute);
+                    baseValueClosed.setBaseContainer(baseEntityApplied);
 
                     if (baseValueClosed.equalsByValue(baseValueSaving)) {
-                        baseValueClosed.setBaseContainer(baseEntityApplied);
                         baseEntityManager.registerAsDeleted(baseValueClosed);
 
                         IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueClosed);
                         if (baseValueClosed.isLast()) {
                             baseValuePrevious.setLast(true);
-
                             baseEntityApplied.put(metaAttribute.getName(), baseValuePrevious);
                             baseEntityManager.registerAsUpdated(baseValuePrevious);
                         } else {
@@ -1913,10 +1912,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
                 //set deletion
                 reportDateSaving = baseValueSaving.getRepDate();
-                //boolean reportDateEquals = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded) == 0;
                 int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+
                 if (compare == 0) {
-                    if (metaAttribute.isFinal()) { // ? Should be not null for existing BaseSet ???
+                    if (metaAttribute.isFinal()) {
                         if (!childMetaClass.isSearchable() && childMetaClass.hasNotFinalAttributes()) {
                             throw new RuntimeException("Detected situation where one or more attributes " +
                                     "without final flag contains in attribute with final flag. Class name: " +
@@ -1945,7 +1944,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         if (!metaAttribute.isImmutable() && !childMetaClass.isSearchable()) {
                             for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
                                 IBaseEntity childBaseEntityLoaded = (IBaseEntity) childBaseValueLoaded.getValue();
-                                IBaseEntity childBaseEntitySaving = new BaseEntity(childBaseEntityLoaded, baseValueSaving.getRepDate());
+
+                                IBaseEntity childBaseEntitySaving = new BaseEntity(childBaseEntityLoaded,
+                                        baseValueSaving.getRepDate());
+
                                 for (String attributeName : childMetaClass.getAttributeNames()) {
                                     childBaseEntitySaving.put(attributeName,
                                             BaseValueFactory.create(
@@ -2340,21 +2342,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             .getPersistableDao(childBaseValueSaving.getClass(), IBaseSetValueDao.class);
 
                     if (!metaAttribute.isFinal()) {
-                        // Check closed value
-                        IBaseValue baseValueForSearch = BaseValueFactory.create(
-                                MetaContainerTypes.META_SET,
-                                childMetaType,
-                                0,
-                                creditorId,
-                                new Date(childBaseValueSaving.getRepDate().getTime()),
-                                childBaseValueSaving.getValue(),
-                                childBaseValueSaving.isClosed(),
-                                childBaseValueSaving.isLast());
+                        IBaseValue childBaseValueClosed = setValueDao.getClosedBaseValue(baseValueSaving);
 
-                        baseValueForSearch.setBaseContainer(childBaseSetApplied);
-
-
-                        IBaseValue childBaseValueClosed = setValueDao.getClosedBaseValue(baseValueForSearch);
                         if (childBaseValueClosed != null) {
                             childBaseValueClosed.setBaseContainer(childBaseSetApplied);
                             baseEntityManager.registerAsDeleted(childBaseValueClosed);
@@ -2420,14 +2409,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         //apply(childBaseEntitySaving, baseEntityManager),
                         baseEntitySavingTmp,
                         false,
-                        !isClosing
-                );
+                        !isClosing);
+
                 childBaseSetApplied.put(childBaseValueApplied);
                 baseEntityManager.registerAsInserted(childBaseValueApplied);
 
-
                 if (isClosing) { // case when compare=-2 && reportDateLoaded = null
-
                     //IBaseEntity baseEntityAAA = apply(childBaseEntitySaving, baseEntityManager);
                     IBaseValue childBaseValueAppliedClosed = BaseValueFactory.create(
                             MetaContainerTypes.META_SET,
@@ -2438,8 +2425,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             //baseEntityAAA,
                             baseEntitySavingTmp,
                             true,
-                            isClosing
-                    );
+                            isClosing);
+
                     //childBaseSetApplied.put(childBaseValueAppliedClosed);
                     childBaseValueAppliedClosed.setBaseContainer(childBaseSetApplied);
                     baseEntityManager.registerAsInserted(childBaseValueAppliedClosed);
