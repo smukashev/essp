@@ -21,7 +21,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
     IPersistableDaoPool persistableDaoPool;
 
     @Value("${refs.cache.enabled}")
-    protected String enabled;
+    private String enabled;
 
     @Autowired
     IRefRepository refRepositoryDao;
