@@ -106,12 +106,12 @@ public class RefRepository  extends JDBCSupport implements IRefRepository {
         }
     }
 
-    public IBaseEntity GetRef(long Id, Date reportDate)
+    public IBaseEntity getRef(long Id, Date reportDate)
     {
         return cache.get(new BaseEntityKey(Id, reportDate));
     }
 
-    public void SetRef(long Id, Date reportDate, IBaseEntity baseEntity)
+    public void setRef(long Id, Date reportDate, IBaseEntity baseEntity)
     {
         cache.put(new BaseEntityKey(Id, reportDate), baseEntity);
     }

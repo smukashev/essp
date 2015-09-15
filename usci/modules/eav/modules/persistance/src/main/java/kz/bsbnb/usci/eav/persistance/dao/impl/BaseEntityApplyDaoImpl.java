@@ -2552,8 +2552,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     if (insertedObjects instanceof IBaseEntity) {
                         IBaseEntity baseEntity = (IBaseEntity) insertedObjects;
                         if (baseEntity.getMeta().isReference()) {
-                            if (refRepositoryDao.GetRef(baseEntity.getId(), baseEntity.getReportDate()) == null)
-                                refRepositoryDao.SetRef(baseEntity.getId(), baseEntity.getReportDate(), baseEntity);
+                            if (refRepositoryDao.getRef(baseEntity.getId(), baseEntity.getReportDate()) == null)
+                                refRepositoryDao.setRef(baseEntity.getId(), baseEntity.getReportDate(), baseEntity);
                         }
                     }
                 }
@@ -2571,7 +2571,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     if (updatedObject instanceof IBaseEntity) {
                         IBaseEntity baseEntity = (IBaseEntity) updatedObject;
                         if (baseEntity.getMeta().isReference()) {
-                                refRepositoryDao.SetRef(baseEntity.getId(), baseEntity.getReportDate(), baseEntity);
+                                refRepositoryDao.setRef(baseEntity.getId(), baseEntity.getReportDate(), baseEntity);
                         }
                     }
                 }

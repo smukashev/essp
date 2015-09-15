@@ -46,14 +46,16 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
         if (enabled.equals("false")) {
             loadedEntity = load(id, maxReportDate, savingReportDate);
         } else {
-            loadedEntity = refRepositoryDao.GetRef(id, savingReportDate);
+            loadedEntity = refRepositoryDao.getRef(id, savingReportDate);
             if (loadedEntity == null) {
                 loadedEntity = load(id, maxReportDate, savingReportDate);
                 if (loadedEntity.getMeta().isReference())
-                    refRepositoryDao.SetRef(id, savingReportDate, loadedEntity);
+                    refRepositoryDao.setRef(id, savingReportDate, loadedEntity);
             }
         }
         return loadedEntity;
+
+
     }
 
     @Override

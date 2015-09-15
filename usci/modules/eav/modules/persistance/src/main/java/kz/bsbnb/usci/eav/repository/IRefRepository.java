@@ -10,7 +10,7 @@ import java.util.Date;
 public interface IRefRepository {
 
     public void fillRefRepository();
-    public IBaseEntity GetRef(long Id, Date reportDate);
+    public IBaseEntity getRef(long Id, Date reportDate);
 
-    public void SetRef(long Id, Date reportDate, IBaseEntity baseEntity);
+    public void setRef(long Id, Date reportDate, IBaseEntity baseEntity);
 }
