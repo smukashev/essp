@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -19,11 +20,16 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
     @Autowired
     IPersistableDaoPool persistableDaoPool;
 
+    @Value("${refs.cache.enabled}")
+    protected String enabled;
+
     @Autowired
     IRefRepository refRepositoryDao;
 
     @Override
     public void afterPropertiesSet() throws Exception {
+
+        if(enabled=="true")
         refRepositoryDao.fillRefRepository();
     }
 
