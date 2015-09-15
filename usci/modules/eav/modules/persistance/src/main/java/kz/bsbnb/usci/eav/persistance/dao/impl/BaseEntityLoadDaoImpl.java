@@ -21,7 +21,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
     IPersistableDaoPool persistableDaoPool;
 
     @Value("${refs.cache.enabled}")
-    protected String enabled;
+    private String enabled;
 
     @Autowired
     IRefRepository refRepositoryDao;
@@ -29,8 +29,8 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
     @Override
     public void afterPropertiesSet() throws Exception {
 
-        if(enabled=="true")
-        refRepositoryDao.fillRefRepository();
+        if (enabled.equals("true"))
+            refRepositoryDao.fillRefRepository();
     }
 
     public IBaseEntity loadByMaxReportDate(long id, Date savingReportDate) {
@@ -43,11 +43,9 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
             throw new RuntimeException("В базе нет данных для сущности(" + id + ") до отчетной даты(включительно): "
                     + savingReportDate + ";");
 
-        if(enabled=="false")
-        {
+        if (enabled.equals("false")) {
             loadedEntity = load(id, maxReportDate, savingReportDate);
-        }
-        else {
+        } else {
             loadedEntity = refRepositoryDao.GetRef(id, savingReportDate);
             if (loadedEntity == null) {
                 loadedEntity = load(id, maxReportDate, savingReportDate);
@@ -55,9 +53,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
                     refRepositoryDao.SetRef(id, savingReportDate, loadedEntity);
             }
         }
-            return loadedEntity;
-
-
+        return loadedEntity;
     }
 
     @Override
