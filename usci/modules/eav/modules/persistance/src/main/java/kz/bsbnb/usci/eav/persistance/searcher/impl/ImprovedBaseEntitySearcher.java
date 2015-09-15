@@ -95,7 +95,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 if ((baseValue == null || baseValue.getValue() == null) &&
                         metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
                     throw new IllegalArgumentException("Ключевой атрибут(" + name + ") не может быть пустым. " +
-                            "Мета класс: " + entity.getMeta().getClassName());
+                            "Мета класс: " + entity.getMeta().getClassName() + ";");
 
 
                 if ((baseValue == null || baseValue.getValue() == null) &&
@@ -222,7 +222,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                 break;
                             default:
                                 throw new IllegalStateException("Неизвестный тип данных: " + metaValue.getTypeCode() +
-                                        " для атрибута: " + name);
+                                        " для атрибута: " + name + ";");
                         }
                     } else {
                         BaseEntity childBaseEntity = (BaseEntity) baseValue.getValue();
@@ -262,10 +262,12 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
 
                     if (baseSet.get().size() == 0)
-                        throw new UnsupportedOperationException("Массив должен содержать элементы;");
+                        throw new UnsupportedOperationException("Массив должен содержать элементы(" +
+                                (childMetaClass).getClassName() + ";");
 
                     if (!memberType.isComplex())
-                        throw new UnsupportedOperationException("Простой массив не может быть ключевым;");
+                        throw new UnsupportedOperationException("Простой массив не может быть ключевым(" +
+                                childMetaClass.getClassName() + ");");
 
                     if (childMetaClass.getClassName().equals("document")) {
                         List<IBaseValue> baseValues = new ArrayList<>(baseSet.get());
@@ -277,7 +279,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                         Long entityValueId = 0L;
 
-                        Select select = null;
+                        Select select;
 
                         for (IBaseValue val : baseValues) {
                             if (((BaseEntity) val.getValue()).getId() == 0)
