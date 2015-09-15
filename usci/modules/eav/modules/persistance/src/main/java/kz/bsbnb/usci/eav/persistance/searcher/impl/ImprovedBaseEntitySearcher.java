@@ -285,6 +285,15 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                             if (((BaseEntity) val.getValue()).getId() == 0)
                                 continue;
 
+                            BaseEntity document = (BaseEntity) val.getValue();
+                            BaseEntity docType = (BaseEntity) document.getBaseValue("doc_type").getValue();
+                            boolean is_identification = (boolean) docType.getBaseValue("is_identification").getValue();
+
+                            if (!is_identification) {
+                                System.err.println("Не является идентификационным документом(" + document + ");");
+                                continue;
+                            }
+
                             select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
                                     .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                     .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
