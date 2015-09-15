@@ -284,12 +284,14 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         boolean identified = false;
 
                         for (IBaseValue val : baseValues) {
-                            if (((BaseEntity) val.getValue()).getId() == 0)
-                                continue;
-
                             BaseEntity document = (BaseEntity) val.getValue();
                             BaseEntity docType = (BaseEntity) document.getBaseValue("doc_type").getValue();
                             boolean is_identification = (boolean) docType.getBaseValue("is_identification").getValue();
+
+                            if (((BaseEntity) val.getValue()).getId() == 0) {
+                                if (is_identification) identified = true;
+                                continue;
+                            }
 
                             if (!is_identification) continue;
 
