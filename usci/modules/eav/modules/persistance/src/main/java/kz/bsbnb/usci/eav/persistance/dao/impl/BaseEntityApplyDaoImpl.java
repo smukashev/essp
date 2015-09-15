@@ -2583,9 +2583,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             List<IPersistable> deletedObjects = baseEntityManager.getDeletedObjects(objectClass);
             if (deletedObjects != null && deletedObjects.size() != 0) {
                 IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
-                for (IPersistable deletedObject : deletedObjects)
+                for (IPersistable deletedObject : deletedObjects) {
                     persistableDao.delete(deletedObject);
 
+                    if (deletedObject instanceof IBaseEntity) {
+                        IBaseEntity baseEntity = (IBaseEntity) deletedObject;
+                        if (baseEntity.getMeta().isReference()) {
+                            refRepositoryDao.delRef(baseEntity.getId(), baseEntity.getReportDate());
+                        }
+                    }
+                }
 
             }
         }
@@ -2594,6 +2601,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseEntityDao baseEntityDao = persistableDaoPool
                     .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
             baseEntityDao.deleteRecursive(unusedBaseEntity.getId(), unusedBaseEntity.getMeta());
+            if(unusedBaseEntity.getMeta().isReference())
+            {
+                refRepositoryDao.delRef(unusedBaseEntity.getId(), unusedBaseEntity.getReportDate());
+            }
         }
     }
 

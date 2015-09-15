@@ -115,4 +115,8 @@ public class RefRepository  extends JDBCSupport implements IRefRepository {
     {
         cache.put(new BaseEntityKey(Id, reportDate), baseEntity);
     }
+    public  void delRef(long Id, Date reportDate)
+    {
+        cache.remove(new BaseEntityKey(Id, reportDate));
+    }
 }
