@@ -112,6 +112,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         }
                     }
                 }
+            } else {
+                IBaseValue baseValue = baseEntity.getBaseValue(attribute);
+                baseValue.setCreditorId(creditorId);
             }
         }
 
