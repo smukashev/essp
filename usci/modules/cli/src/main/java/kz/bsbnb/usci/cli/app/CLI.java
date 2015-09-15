@@ -955,7 +955,6 @@ public class CLI {
         } catch (ParseException e) {
             System.out.println("Can't parse date " + repDate + " must be in format " + sdfout.toString());
         }
-
     }
 
     public void findEntityFromXML(String fileName, String repDate) {

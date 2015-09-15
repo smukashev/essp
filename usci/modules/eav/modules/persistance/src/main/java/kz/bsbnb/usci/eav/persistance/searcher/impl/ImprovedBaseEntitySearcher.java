@@ -281,9 +281,21 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                         Select select;
 
+                        boolean identified = false;
+
                         for (IBaseValue val : baseValues) {
-                            if (((BaseEntity) val.getValue()).getId() == 0)
+                            BaseEntity document = (BaseEntity) val.getValue();
+                            BaseEntity docType = (BaseEntity) document.getBaseValue("doc_type").getValue();
+                            boolean is_identification = (boolean) docType.getBaseValue("is_identification").getValue();
+
+                            if (((BaseEntity) val.getValue()).getId() == 0) {
+                                if (is_identification) identified = true;
                                 continue;
+                            }
+
+                            if (!is_identification) continue;
+
+                            identified = true;
 
                             select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
                                     .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
@@ -308,6 +320,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                 break;
                             }
                         }
+
+                        if (!identified)
+                            throw new IllegalStateException("Нет идентификационных документов;");
 
                         if (entityValueId > 0) {
                             // TODO: remove repeated code
