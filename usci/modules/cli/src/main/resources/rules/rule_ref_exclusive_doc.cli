@@ -1,0 +1,11 @@
+rule read $$$
+title: Исключительный иин
+rule "exclusive_doc"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "ref_exclusive_doc"
+                && getEl("doc_type.code") == "06"
+                ( $r : getInvalidIINs((List)getEls("{get}persons.docs[doc_type.code=06]no")) && $r.size() == 0))
+then
+  $entity.addValidationError("ИИН заполнен не верно: " + $r);
+end
+$$$
