@@ -70,14 +70,17 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             BaseEntity entity = (BaseEntity) baseEntityProcessorDao.process(baseEntity);
             long t2 = System.currentTimeMillis() - t1;
 
+            entity.setBatchId(baseEntity.getBatchId());
+            entity.setIndex(baseEntity.getBatchIndex());
+
             stats.put("coreService", t2);
 
             EntityStatus entityStatus = new EntityStatus();
-            entityStatus.setBatchId(baseEntity.getBatchId());
+            entityStatus.setBatchId(entity.getBatchId());
             entityStatus.setEntityId(entity.getId());
             entityStatus.setStatus(EntityStatuses.COMPLETED);
             entityStatus.setDescription("" + entity.getId());
-            entityStatus.setIndex(entity.getBatchIndex() - 1);
+            entityStatus.setIndex(entity.getBatchIndex());
             entityStatus.setReceiptDate(new Date());
 
             Map<String, String> params = StatusProperties.getSpecificParams(baseEntity);

@@ -13,7 +13,6 @@ import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
@@ -161,15 +160,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             switch (baseEntityPostPrepared.getOperation()) {
                 case DELETE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new RuntimeException("Сущность для удаления не найдена;");
+                        throw new IllegalStateException("Сущность для удаления не найдена;");
 
                     if (baseEntity.getMeta().isReference() && refProcessorDao.historyExists(
                             baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId()))
-                        throw new RuntimeException("Справочник с историей не может быть удалена;");
+                        throw new IllegalStateException("Справочник с историей не может быть удалена;");
 
-                    if (baseEntity.getMeta().isReference()) {
+                    if (baseEntity.getMeta().isReference())
                         failIfHasUsages(baseEntityPostPrepared);
-                    }
 
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
