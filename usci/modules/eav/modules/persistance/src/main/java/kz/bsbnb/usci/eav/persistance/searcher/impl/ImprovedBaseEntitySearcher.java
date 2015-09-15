@@ -286,14 +286,17 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         for (IBaseValue val : baseValues) {
                             BaseEntity document = (BaseEntity) val.getValue();
                             BaseEntity docType = (BaseEntity) document.getBaseValue("doc_type").getValue();
+
                             boolean is_identification = (boolean) docType.getBaseValue("is_identification").getValue();
+                            boolean is_person_doc = (boolean) docType.getBaseValue("is_person_doc").getValue();
+                            boolean is_organization_doc = (boolean) docType.getBaseValue("is_organization_doc").getValue();
 
                             if (((BaseEntity) val.getValue()).getId() == 0) {
-                                if (is_identification) identified = true;
+                                if (is_identification || is_person_doc || is_organization_doc) identified = true;
                                 continue;
                             }
 
-                            if (!is_identification) continue;
+                            if (!is_identification && !is_person_doc && !is_organization_doc) continue;
 
                             identified = true;
 
@@ -322,7 +325,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         }
 
                         if (!identified)
-                            throw new IllegalStateException("Нет идентификационных документов;");
+                            throw new IllegalStateException("Нет идентификационных документов(" +
+                                metaClass.getClassName() + ");");
 
                         if (entityValueId > 0) {
                             // TODO: remove repeated code
@@ -361,7 +365,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                         if (childBaseEntityIds.size() == 0)
                             throw new IllegalStateException("Ни один элемент ключевого массива " +
-                                    "не был идентифицирован;");
+                                    "не был идентифицирован(" + metaClass.getClassName() + ");");
 
                         String className = childMetaClass.getClassName();
                         String setValueAlias = "sv_" + className;
