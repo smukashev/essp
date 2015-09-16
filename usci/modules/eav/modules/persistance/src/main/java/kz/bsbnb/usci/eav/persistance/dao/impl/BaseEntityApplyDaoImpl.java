@@ -753,6 +753,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseValueClosed.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
+                // case#3
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
                         throw new RuntimeException("Оперативные данные могут удалятся только за существующий период.");
@@ -801,11 +802,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseEntity baseEntityApplied;
 
                 if (metaAttribute.isImmutable()) {
-                    if (baseEntitySaving.getId() < 1) {
-                        throw new UnsupportedOperationException("Запись класса " +
-                                baseEntitySaving.getMeta().getClassName() + " не найдена;" +
-                                "\n" + baseEntitySaving.toString());
-                    }
+                    if (baseEntitySaving.getId() < 1)
+                        throw new UnsupportedOperationException("Запись класса " + baseEntitySaving.getMeta().
+                                getClassName() + " не найдена;" + "\n" + baseEntitySaving.toString());
 
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
