@@ -424,7 +424,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         baseValueClosed.setBaseContainer(baseEntityApplied);
                         baseValueClosed.setMetaAttribute(metaAttribute);
-                        baseEntityManager.registerAsUpdated(baseValueClosed); // TODO: remove instead update
+                        baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
                 } else if (compare == 1) {
                     if (baseValueLoaded.isLast()) {
@@ -1116,7 +1116,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public void applySimpleSet(long creditorId, IBaseEntity baseEntity, IBaseValue baseValueSaving,
                                IBaseValue baseValueLoaded, IBaseEntityManager baseEntityManager) {
-        IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
+            IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
 
         if (metaAttribute.isFinal())
             throw new UnsupportedOperationException("Не реализовано;");
