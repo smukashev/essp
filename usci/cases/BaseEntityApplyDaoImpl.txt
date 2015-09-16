@@ -1,0 +1,34 @@
+case applyComplexValue, 1
+---------------------------------------------------------
+meta create --name=f_attr
+meta add --name=f_attr --attribute=no --type=string --final
+
+meta create --name=test
+meta add --name=test --attribute=f_attr --type=meta_class --childname=f_attr --final
+meta add --name=test --attribute=code --type=string
+meta key --name=test --attribute=code
+
+quit
+---------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<test>
+    		<code>1</code>
+    		f_attr>
+    			<no>1</no>
+    		</f_attr>
+    	</test>
+    </entities>
+</batch>
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<test>
+    		<code>1</code>
+    		<f_attr />
+    	</test>
+    </entities>
+</batch>
+---------------------------------------------------------
