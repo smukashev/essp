@@ -2023,6 +2023,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
                         return;
+                    //case#8
                     } else {
                         IBaseValue baseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -2038,10 +2039,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseValueClosed.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
+                //case#9
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal()) {
-                        throw new RuntimeException("Instance of BaseValue with incorrect report date and final flag " +
-                                "mistakenly loaded from the database.");
+                        throw new RuntimeException("Отчетная дата оперативных данных " +
+                                "неправильно выгружена из базы.");
                     }
 
                     IBaseValue baseValueClosed = BaseValueFactory.create(
