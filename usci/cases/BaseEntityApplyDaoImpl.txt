@@ -239,3 +239,80 @@ quit
 </batch>
 
 ---------------------------------------------------------
+
+
+applyComplexSet, case#7
+---------------------------------------------------------
+
+#               TEAM
+#               /   \
+#              /   CODE
+#             /
+#    users  [ (user),(user),(user)]
+#                |
+#        quote, relations
+#        /        |
+#     string   (user_id, relation_type_id)
+#
+#
+
+#====================================
+#= RELATION
+#====================================
+meta create --name=relation
+meta add --name=relation --attribute=relation_type_id --type=INTEGER --final
+meta add --name=relation --attribute=user_id --type=INTEGER --final
+
+
+#====================================
+#= USER
+#====================================
+meta create --name=user
+meta add --name=user --attribute=relations --type=meta_class --array --childname=relation --final
+meta add --name=user --attribute=quote --type=string --final
+
+#====================================
+#= TEAM
+#====================================
+meta create --name=team
+meta add --name=team --attribute=users --type=meta_class --array --childname=user --final
+meta add --name=team --attribute=code --type=string
+meta key --name=team --attribute=code
+
+rc
+
+========================================
+
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<team>
+    	    <code>pro_team</code>
+    	    <users>
+    	        <item>
+    	            <quote>think before you do!!!</quote>
+    	            <relations>
+    	                <item>
+    	                    <user_id>1001</user_id>
+    	                    <relation_type_id>100</relation_type_id>
+    	                </item>
+    	            </relations>
+    	        </item>
+    	    </users>
+    	</team>
+    </entities>
+</batch>
+--------------------------------------------------------------------------
+
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<team>
+    	    <code>pro_team</code>
+    	    <users/>
+    	</team>
+    </entities>
+</batch>
+--------------------------------------------------------------------------

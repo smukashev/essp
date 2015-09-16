@@ -1962,11 +1962,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 if (compare == 0) {
+                    //case#7
                     if (metaAttribute.isFinal()) {
                         if (!childMetaClass.isSearchable() && childMetaClass.hasNotFinalAttributes()) {
-                            throw new RuntimeException("Detected situation where one or more attributes " +
-                                    "without final flag contains in attribute with final flag. Class name: " +
-                                    baseEntity.getMeta().getClassName() + ", attribute: " + metaAttribute.getName());
+                            throw new RuntimeException("Оперативные данные " +
+                                    "должны состоять только из оперативных данных. Наименование класса: " +
+                                    baseEntity.getMeta().getClassName() + ", атрибут: " + metaAttribute.getName());
                         }
 
                         IBaseValue baseValueDeleted = ((BaseValue) baseValueLoaded).clone();
