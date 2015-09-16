@@ -15,7 +15,7 @@ quit
     <entities>
     	<test>
     		<code>1</code>
-    		f_attr>
+    		<f_attr>
     			<no>1</no>
     		</f_attr>
     	</test>
@@ -29,6 +29,41 @@ quit
     		<code>1</code>
     		<f_attr />
     	</test>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applyComplexValue, case#2
+---------------------------------------------------------
+meta create --name=c_attr
+meta add --name=c_attr --attribute=no --type=string
+
+meta create --name=test2
+meta add --name=test --attribute=c_attr --type=meta_class --childname=c_attr
+meta add --name=test --attribute=code --type=string
+meta key --name=test --attribute=code
+
+quit
+---------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<test2>
+    		<code>1</code>
+    		<c_attr>
+    			<no>1</no>
+    		</c_attr>
+    	</test2>
+    </entities>
+</batch>
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<test2>
+    		<code>1</code>
+    		<c_attr />
+    	</test2>
     </entities>
 </batch>
 ---------------------------------------------------------
