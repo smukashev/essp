@@ -108,3 +108,134 @@ quit
     </entities>
 </batch>
 ---------------------------------------------------------
+
+applyComplexValue, case#4
+---------------------------------------------------------
+meta create --name=c4_attr
+meta add --name=c4_attr --attribute=no --type=string
+
+meta create --name=test4
+meta add --name=test4 --attribute=c4_attr --type=meta_class --childname=c4_attr
+meta add --name=test4 --attribute=code --type=string
+meta key --name=test4 --attribute=code
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<test4>
+    		<code>1</code>
+    		<c4_attr>
+    			<no>1</no>
+    		</c4_attr>
+    	</test4>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<test4>
+    		<code>1</code>
+    		<c4_attr>
+                <no>1</no>
+            </c4_attr>
+    	</test4>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applyComplexValue, case#5
+---------------------------------------------------------
+meta create --name=c5_attr
+meta add --name=c5_attr --attribute=no --type=string
+meta key --name=c5_attr --attribute=no
+
+meta create --name=test5
+meta add --name=test5 --attribute=c5_attr --type=meta_class --childname=c5_attr
+meta add --name=test5 --attribute=code --type=string
+meta key --name=test5 --attribute=code
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<test5>
+    		<code>1</code>
+    		<c5_attr>
+    			<no>1</no>
+    		</c5_attr>
+    	</test5>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<test5>
+    		<code>1</code>
+    		<c5_attr>
+                <no>2</no>
+            </c5_attr>
+    	</test5>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applyComplexValue, case#6
+---------------------------------------------------------
+meta create --name=c6_attr
+meta add --name=c6_attr --attribute=no --type=string
+meta key --name=c6_attr --attribute=no
+
+meta create --name=test6
+meta add --name=test6 --attribute=c6_attr --type=meta_class --childname=c6_attr
+meta add --name=test6 --attribute=code --type=string
+meta key --name=test6 --attribute=code
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<test6>
+    		<code>1</code>
+    		<c6_attr>
+    			<no>1</no>
+    		</c6_attr>
+    	</test6>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<test6>
+    		<code>1</code>
+    		<c6_attr />
+    	</test6>
+    </entities>
+</batch>
+
+<!-- 01.03.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<test6>
+    		<code>1</code>
+    		<c6_attr>
+    			<no>1</no>
+    		</c6_attr>
+    	</test6>
+    </entities>
+</batch>
+
+---------------------------------------------------------
