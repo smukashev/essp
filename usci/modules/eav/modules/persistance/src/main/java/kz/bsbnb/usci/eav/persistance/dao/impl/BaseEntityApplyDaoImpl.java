@@ -34,9 +34,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager,
                              EntityHolder entityHolder) {
-        IBaseEntity baseEntityLoaded = null;
+        IBaseEntity baseEntityLoaded;
         IBaseEntity baseEntityApplied;
 
+        // Новые сущности или сущности не имеющие ключевые атрибуты
         if (baseEntitySaving.getId() < 1 || !baseEntitySaving.getMeta().isSearchable()) {
             baseEntityApplied = applyBaseEntityBasic(creditorId, baseEntitySaving, baseEntityManager);
         } else {
@@ -45,10 +46,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseEntityReportDateDao baseEntityReportDateDao =
                     persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
+            // Получение максимальной отчетной даты из прошедших периодов
             Date maxReportDate = baseEntityReportDateDao
                     .getMaxReportDate(baseEntitySaving.getId(), reportDateSaving);
 
             if (maxReportDate == null) {
+                // Получение минимальной отчетной даты из будущих периодов
                 Date minReportDate = baseEntityReportDateDao.getMinReportDate(baseEntitySaving.getId(),
                         reportDateSaving);
 
@@ -100,6 +103,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         for (String attribute : baseEntitySaving.getAttributes()) {
             IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attribute);
 
+            // Пропускает закрытые теги на новые сущности <tag/>
             if (baseValueSaving.getValue() == null)
                 continue;
 
@@ -119,18 +123,13 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public void applyBaseValueBasic(long creditorId, IBaseEntity baseEntityApplied, IBaseValue baseValue,
                                     IBaseEntityManager baseEntityManager) {
-        if (baseValue.getValue() == null)
-            throw new IllegalStateException("Значение атрибута не может быть NULL;");
-
-
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
             throw new IllegalStateException("Атрибут должен содержать мета данные;");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer != null && baseContainer.getBaseContainerType() != BaseContainerType.BASE_ENTITY)
-            throw new IllegalStateException("Родитель атрибута(" + baseValue.getMetaAttribute().getName() +
-                    ") должна быть сущность;");
+            throw new IllegalStateException("Родитель атрибута(" + metaAttribute.getName() + ") должна быть сущность;");
 
         IMetaType metaType = metaAttribute.getMetaType();
         if (metaType.isComplex()) {
@@ -147,9 +146,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     if (metaAttribute.isImmutable() && childBaseEntity.getValueCount() != 0 &&
                             childBaseEntity.getId() < 1)
-                        throw new UnsupportedOperationException("Запись класса " +
-                                childBaseEntity.getMeta().getClassName() + " не найдена;" +
-                                "\n" + childBaseEntity.toString());
+                        throw new UnsupportedOperationException("Запись класса " + childBaseEntity.getMeta().
+                                getClassName() + " не найдена;" + "\n" + childBaseEntity.toString());
 
                     IBaseEntity childBaseEntityApplied = apply(creditorId, childBaseEntity, baseEntityManager, null);
 
@@ -361,10 +359,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             baseEntityManager.registerAsInserted(baseEntityReportDate);
         }
 
-        //TODO:Remove unused instances of BaseEntity
-
         baseEntityManager.registerProcessedBaseEntity(baseEntityApplied);
-
         return baseEntityApplied;
     }
 
@@ -672,7 +667,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         IMetaClass metaClass = (IMetaClass) metaType;
 
         if (baseValueLoaded != null) {
-            if (baseValueSaving.getValue() == null) {
+            if (baseValueSaving.getValue() == null) { // case#1
                 Date reportDateSaving = baseValueSaving.getRepDate();
                 Date reportDateLoaded = baseValueLoaded.getRepDate();
 
