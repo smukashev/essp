@@ -667,13 +667,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         IMetaClass metaClass = (IMetaClass) metaType;
 
         if (baseValueLoaded != null) {
-            if (baseValueSaving.getValue() == null) { // case#1
+            if (baseValueSaving.getValue() == null) {
                 Date reportDateSaving = baseValueSaving.getRepDate();
                 Date reportDateLoaded = baseValueLoaded.getRepDate();
 
                 int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 if (compare == 0) {
+                    // case#1
                     if (metaAttribute.isFinal()) {
                         IBaseEntity baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
 
@@ -699,10 +700,13 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
 
+
+                        // Не имеет ключевых атрибутов и изменяемый
                         if (!metaClass.isSearchable() && !metaAttribute.isImmutable()) {
                             IBaseEntity baseEntitySaving = new BaseEntity(baseEntityLoaded,
                                     baseValueSaving.getRepDate());
 
+                            // Собирает атрибуты для удаления
                             for (String attributeName : metaClass.getAttributeNames()) {
                                 IMetaAttribute childMetaAttribute = metaClass.getMetaAttribute(attributeName);
                                 IMetaType childMetaType = childMetaAttribute.getMetaType();
@@ -719,6 +723,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                                 true));
                             }
 
+                            // Запускает удаление атрибутов
                             applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
 
                             IBaseEntityComplexValueDao baseEntityComplexValueDao = persistableDaoPool
@@ -726,11 +731,13 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             boolean singleBaseValue = baseEntityComplexValueDao.isSingleBaseValue(baseValueLoaded);
 
+                            // Удаляет себя, если не используется больше нигде
                             if (singleBaseValue)
                                 baseEntityManager.registerAsDeleted(baseEntityLoaded);
                         }
 
                         return;
+                    // case#2
                     } else {
                         IBaseValue baseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -746,7 +753,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseValueClosed.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
-
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
                         throw new RuntimeException("Оперативные данные могут удалятся только за существующий период.");

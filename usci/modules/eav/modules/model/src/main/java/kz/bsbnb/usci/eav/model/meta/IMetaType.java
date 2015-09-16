@@ -2,19 +2,18 @@ package kz.bsbnb.usci.eav.model.meta;
 
 import java.io.Serializable;
 
-public interface IMetaType extends Serializable
-{
-	public boolean isSet();
+public interface IMetaType extends Serializable {
+    boolean isSet();
 
-	public boolean isComplex();
+    boolean isComplex();
 
-    public boolean isSetOfSets();
+    boolean isSetOfSets();
 
-    public String toString(String prefix);
+    String toString(String prefix);
 
-    public String toJava(String prefix);
+    String toJava(String prefix);
 
-    public boolean isReference();
+    boolean isReference();
 
-    public void setReference(boolean value);
+    void setReference(boolean value);
 }
