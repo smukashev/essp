@@ -1,7 +1,7 @@
 applySimpleValue, case#1
 ---------------------------------------------------------
 meta create --name=s_test1
-meta add --name=s_test1 --attribute=s1_attr --type=string
+meta add --name=s_test1 --attribute=s_attr --type=string
 meta add --name=s_test1 --attribute=code --type=string
 meta key --name=s_test1 --attribute=code
 
@@ -12,8 +12,8 @@ quit
 <batch>
     <entities>
     	<s_test1>
-    		<code>1</code>
-    		<s1_attr>1</s1_attr>
+    		<code>code#1</code>
+    		<s_attr>1</s_attr>
     	</s_test1>
     </entities>
 </batch>
@@ -23,8 +23,8 @@ quit
 <batch>
     <entities>
     	<c_test1>
-    		<code>1</code>
-    		<c1_attr />
+    		<code>code#1</code>
+    		<s_attr />
     	</c_test1>
     </entities>
 </batch>
@@ -33,7 +33,7 @@ quit
 applySimpleValue, case#2
 ---------------------------------------------------------
 meta create --name=s_test2
-meta add --name=s_test2 --attribute=s2_attr --type=string --final
+meta add --name=s_test2 --attribute=s_attr --type=string --final
 meta add --name=s_test2 --attribute=code --type=string
 meta key --name=s_test2 --attribute=code
 
@@ -44,8 +44,8 @@ quit
 <batch>
     <entities>
     	<s_test2>
-    		<code>1</code>
-    		<s2_attr>1</s1_attr>
+    		<code>code#1</code>
+    		<s_attr>1</s_attr>
     	</s_test2>
     </entities>
 </batch>
@@ -55,19 +55,19 @@ quit
 <batch>
     <entities>
     	<c_test2>
-    		<code>1</code>
-    		<c2_attr />
+    		<code>code#1</code>
+    		<s_attr />
     	</c_test2>
     </entities>
 </batch>
 ---------------------------------------------------------
 
-applySimpleValue, case#2
+applySimpleValue, case#3
 ---------------------------------------------------------
-meta create --name=s_test2
-meta add --name=s_test2 --attribute=s2_attr --type=string --final
-meta add --name=s_test2 --attribute=code --type=string
-meta key --name=s_test2 --attribute=code
+meta create --name=s_test3
+meta add --name=s_test3 --attribute=s_attr --type=string
+meta add --name=s_test3 --attribute=code --type=string
+meta key --name=s_test3 --attribute=code
 
 quit
 ---------------------------------------------------------
@@ -75,21 +75,21 @@ quit
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<s_test2>
-    		<code>1</code>
-    		<s2_attr>1</s1_attr>
-    	</s_test2>
+    	<s_test3>
+    		<code>code#1</code>
+    		<s_attr>1</s_attr>
+    	</s_test3>
     </entities>
 </batch>
 
-<!-- 01.01.2015 -->
+<!-- 01.02.2015 -->
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<c_test2>
-    		<code>1</code>
-    		<c2_attr />
-    	</c_test2>
+    	<c_test3>
+    		<code>code#1</code>
+    		<s_attr />
+    	</c_test3>
     </entities>
 </batch>
 ---------------------------------------------------------
