@@ -379,14 +379,6 @@
 		<index name="ebe_IN_ci">
 			<index-column name="class_id"/>
 		</index>
-		<index name="ebe_IN_i_ci">
-			<index-column name="id"/>
-			<index-column name="class_id"/>
-		</index>
-		<index name="ebe_IN_i_d">
-		  <index-column name="id"/>
-		  <index-column name="deleted"/>
-		</index>
 	</table>
 	<table name="eav_be_entity_complex_sets">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
