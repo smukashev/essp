@@ -2084,6 +2084,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 if (metaAttribute.isFinal() && !(compare == 0)) {
                     throw new RuntimeException("Instance of BaseValue with incorrect report date and final flag " +
                             "mistakenly loaded from the database.");
+                //case#10
                 } else if (compare >= 0) {
                     childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
                     IBaseValue baseValueApplied = BaseValueFactory.create(
