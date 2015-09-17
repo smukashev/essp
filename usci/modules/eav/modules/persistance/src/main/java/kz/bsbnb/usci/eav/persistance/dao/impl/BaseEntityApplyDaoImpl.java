@@ -2125,6 +2125,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
             IBaseValue baseValueClosed = null;
+            //case#12
             if (!metaAttribute.isFinal()) {
                 baseValueClosed = baseValueDao.getClosedBaseValue(baseValueSaving); // searches for closed BV at reportDateSaving
 
