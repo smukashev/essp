@@ -378,6 +378,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 if (compare == 0) {
+                    // case #1
                     if (metaAttribute.isFinal()) {
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -406,6 +407,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseEntityManager.registerAsUpdated(baseValuePrevious);
                             }
                         }
+                    // case#2
                     } else {
                         IBaseValue baseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -421,7 +423,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseValueClosed.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsDeleted(baseValueClosed);
                     }
+                // case#3
                 } else if (compare == 1) {
+                    if (metaAttribute.isFinal())
+                        throw new IllegalStateException("Оперативные данные могут быть закрыты только за " +
+                                "существующий отчетный период(" + metaAttribute.getName() + ");");
+
                     if (baseValueLoaded.isLast()) {
                         IBaseValue baseValueLast = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -465,7 +472,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
-                // changing key values
+                // Именение ключевых полей
+                // <tag operation="new" data="new_value">old_value</tag>
+                // case#4
                 Object baseV;
                 if (baseValueSaving.getNewBaseValue() != null) {
                     baseV = baseValueSaving.getNewBaseValue().getValue();
@@ -473,6 +482,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseV = returnCastedValue(metaValue, baseValueLoaded);
                 }
 
+                // case#5
                 if (compare == 0 || compare == 1) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -485,6 +495,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueLoaded.isLast());
 
                     baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
+
+                    // Запуск на изменение ключевого поля
+                    if (baseValueSaving.getNewBaseValue() != null)
+                        baseEntityManager.registerAsUpdated(baseValueApplied);
+                // case#6
                 } else if (compare == -1) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -505,6 +520,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
+                // case#7
                 if (compare == 0) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -518,6 +534,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsUpdated(baseValueApplied);
+                // case#8
                 } else if (compare == 1) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -548,6 +565,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         baseEntityManager.registerAsUpdated(baseValuePrevious);
                     }
+                // case#9
                 } else if (compare == -1) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -577,6 +595,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             if (!metaAttribute.isFinal()) {
                 IBaseValue baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
 
+                // case#10
                 if (baseValueClosed != null) {
                     baseValueClosed.setMetaAttribute(metaAttribute);
                     baseValueClosed.setBaseContainer(baseEntityApplied);
@@ -599,6 +618,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseEntityApplied.put(metaAttribute.getName(), baseValueClosed);
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
+                // case#11
                 } else {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -616,6 +636,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             } else {
                 IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
 
+                // case#12
                 if (baseValueLast == null) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -629,6 +650,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
+                // case#13
                 } else {
                     Date reportDateSaving = baseValueSaving.getRepDate();
                     Date reportDateLast = baseValueLast.getRepDate();
