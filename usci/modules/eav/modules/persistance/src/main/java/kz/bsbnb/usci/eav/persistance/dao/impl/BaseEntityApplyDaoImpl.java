@@ -2212,7 +2212,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         }
                         isNew = false;
                     }
-
+                //case#15
                 } else if (compare == -1) {
                     IBaseValue baseValueNext = baseValueDao.getNextBaseValue(baseValueSaving);
                     if (baseValueNext != null) {
