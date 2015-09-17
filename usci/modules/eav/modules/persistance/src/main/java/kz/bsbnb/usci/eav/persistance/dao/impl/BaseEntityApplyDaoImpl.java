@@ -2182,6 +2182,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 boolean isNew = true;
+                //case#14
                 if (compare == 1) {
                     IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueSaving);
                     if (baseValuePrevious != null) {
