@@ -378,6 +378,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 if (compare == 0) {
+                    // case #1
                     if (metaAttribute.isFinal()) {
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -406,6 +407,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseEntityManager.registerAsUpdated(baseValuePrevious);
                             }
                         }
+                    // case#2
                     } else {
                         IBaseValue baseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -421,7 +423,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseValueClosed.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsDeleted(baseValueClosed);
                     }
+                // case#3
                 } else if (compare == 1) {
+                    if (metaAttribute.isFinal())
+                        throw new IllegalStateException("Оперативные данные могут быть закрыты только за " +
+                                "существующий отчетный период(" + metaAttribute.getName() + ");");
+
                     if (baseValueLoaded.isLast()) {
                         IBaseValue baseValueLast = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
