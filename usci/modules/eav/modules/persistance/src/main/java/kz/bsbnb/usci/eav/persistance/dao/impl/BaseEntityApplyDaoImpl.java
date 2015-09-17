@@ -473,7 +473,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 // Именение ключевых полей
-                // <tag operation="new" data="new_value>old_value</tag>
+                // <tag operation="new" data="new_value">old_value</tag>
                 // case#4
                 Object baseV;
                 if (baseValueSaving.getNewBaseValue() != null) {
@@ -495,6 +495,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueLoaded.isLast());
 
                     baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
+
+                    // Запуск на изменение ключевого поля
+                    if (baseValueSaving.getNewBaseValue() != null)
+                        baseEntityManager.registerAsUpdated(baseValueApplied);
                 // case#6
                 } else if (compare == -1) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
