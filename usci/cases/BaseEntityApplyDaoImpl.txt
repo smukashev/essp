@@ -283,6 +283,37 @@ quit
 </batch>
 ---------------------------------------------------------
 
+applySimpleValue, case#10
+---------------------------------------------------------
+meta create --name=s_test10
+meta add --name=s_test10 --attribute=s_attr --type=string
+meta add --name=s_test10 --attribute=code --type=string
+meta key --name=s_test10 --attribute=code
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test10>
+    		<code>code#1</code>
+    	</s_test10>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test10>
+    	    <s_attr>1</s_attr>
+    	    <code>code#1</code>
+    	</s_test10>
+    </entities>
+</batch>
+---------------------------------------------------------
+
 
 applyComplexValue, case#1
 ---------------------------------------------------------
