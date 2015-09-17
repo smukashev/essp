@@ -1071,7 +1071,6 @@ rc
     	    <users>
     	        <item>
     	            <quote>Think before you do!!!</quote>
-    	            <quote>Think before you do!!!</quote>
     	        </item>
     	    </users>
     	</team>
