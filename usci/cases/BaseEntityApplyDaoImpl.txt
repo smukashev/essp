@@ -470,3 +470,58 @@ rc
 </batch>
 
 ------------------------------------------------------------------
+
+
+applyComplexSet, case#11
+
+#====================================
+#= USER
+#====================================
+meta create --name=user
+meta add --name=user --attribute=quote --type=string
+
+#====================================
+#= TEAM
+#====================================
+meta create --name=team
+meta add --name=team --attribute=users --type=meta_class --array --childname=user
+meta add --name=team --attribute=code --type=string
+meta key --name=team --attribute=code
+
+rc
+
+--------------------------------------------------------------------
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<team>
+    	    <code>pro_team</code>
+    	    <users>
+    	        <item>
+    	            <quote>think before you do!!!</quote>
+    	        </item>
+    	    </users>
+    	</team>
+    </entities>
+</batch>
+
+------------------------------------------------------------------
+
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<team>
+    	    <code>pro_team</code>
+			<users>
+				<item>
+					<quote>Just do it!!!</quote>
+				</item>
+			</users>
+    	</team>
+    </entities>
+</batch>
+
+------------------------------------------------------------------

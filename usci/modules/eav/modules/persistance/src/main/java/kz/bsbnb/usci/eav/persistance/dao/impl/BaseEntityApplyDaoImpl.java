@@ -2097,6 +2097,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueLoaded.isClosed(),
                             baseValueLoaded.isLast());
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                //case#11
                 } else if (compare == -1) {
                     childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
                     IBaseValue baseValueApplied = BaseValueFactory.create(
