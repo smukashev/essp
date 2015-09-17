@@ -123,6 +123,70 @@ quit
 </batch>
 ---------------------------------------------------------
 
+applySimpleValue, case#5
+---------------------------------------------------------
+meta create --name=s_test5
+meta add --name=s_test5 --attribute=s_attr --type=string
+meta add --name=s_test5 --attribute=code --type=string
+meta key --name=s_test5 --attribute=code
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test5>
+    	    <s_attr>1</s_attr>
+    		<code>code#1</code>
+    	</s_test5>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test5>
+    	    <s_attr>1</s_attr>
+    	    <code>code#1</code>
+    	</s_test5>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applySimpleValue, case#6
+---------------------------------------------------------
+meta create --name=s_test6
+meta add --name=s_test6 --attribute=s_attr --type=string
+meta add --name=s_test6 --attribute=code --type=string
+meta key --name=s_test6 --attribute=code
+
+quit
+---------------------------------------------------------
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test6>
+    	    <s_attr>1</s_attr>
+    		<code>code#1</code>
+    	</s_test6>
+    </entities>
+</batch>
+
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test6>
+    	    <s_attr>1</s_attr>
+    	    <code>code#1</code>
+    	</s_test6>
+    </entities>
+</batch>
+---------------------------------------------------------
+
 
 applyComplexValue, case#1
 ---------------------------------------------------------
