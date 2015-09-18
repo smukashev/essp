@@ -16,15 +16,15 @@ import java.util.HashSet;
 public class BACTRepository extends BaseRepository {
     private static HashMap repository;
     private static HashSet columns;
-    //private static String QUERY = "SELECT * FROM ref.ba_ct t" + " where t.open_date <= to_date('" + repDate + "', 'dd.MM.yyyy') \n"+
-   //         "   and (t.close_date > to_date('" + repDate + "', 'dd.MM.yyyy') or t.close_date is null)";
+    //private static String QUERY = "SELECT * FROM ref.ba_ct t" + " where t.open_date <= to_date('repDate', 'dd.MM.yyyy') \n"+
+   //         "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
 
     private static String QUERY = "select t1.id, t1.balance_account_id, t1.credit_type_id, t2.open_date, t2.close_date  from ref.ba_ct t1, ref.balance_account t2 \n" +
             "       where t1.balance_account_id = t2.id        \n" +
-            "       and t1.open_date <= to_date ('"+repDate+"','dd.MM.yyyy')\n" +
-            "       and (t1.close_date > to_date ('"+repDate+"','dd.MM.yyyy') or t1.close_date is null)\n" +
-            "       and t2.open_date <= to_date ('"+repDate+"','dd.MM.yyyy')\n" +
-            "       and (t2.close_date > to_date ('"+repDate+"','dd.MM.yyyy') or t2.close_date is null)\n" +
+            "       and t1.open_date <= to_date ('repDate','dd.MM.yyyy')\n" +
+            "       and (t1.close_date > to_date ('repDate','dd.MM.yyyy') or t1.close_date is null)\n" +
+            "       and t2.open_date <= to_date ('repDate','dd.MM.yyyy')\n" +
+            "       and (t2.close_date > to_date ('repDate','dd.MM.yyyy') or t2.close_date is null)\n" +
             "       and t1.balance_account_id = t2.id\n";
 
 
@@ -38,7 +38,7 @@ public class BACTRepository extends BaseRepository {
 
     public static HashMap construct(){
         try {
-            ResultSet rows = getStatement().executeQuery(QUERY);
+            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
@@ -82,5 +82,9 @@ public class BACTRepository extends BaseRepository {
             e.printStackTrace();
         }*/
         return null;
+    }
+
+    public static void rc(){
+        repository = null;
     }
 }

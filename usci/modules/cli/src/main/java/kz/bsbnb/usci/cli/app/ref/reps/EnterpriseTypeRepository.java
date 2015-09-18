@@ -14,8 +14,8 @@ import java.util.List;
 public class EnterpriseTypeRepository extends BaseRepository {
     private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.ENTERPRISE_TYPE t" + " where t.open_date <= to_date('" + repDate + "', 'dd.MM.yyyy')\n"+
-            "   and (t.close_date > to_date('" + repDate + "', 'dd.MM.yyyy') or t.close_date is null)";
+    private static String QUERY = "SELECT * FROM ref.ENTERPRISE_TYPE t" + " where t.open_date <= to_date('repDate', 'dd.MM.yyyy')\n"+
+            "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='ENTERPRISE_TYPE'";
 
     public static HashMap getRepository() {
@@ -26,7 +26,7 @@ public class EnterpriseTypeRepository extends BaseRepository {
 
     public static HashMap construct(){
         try {
-            ResultSet rows = getStatement().executeQuery(QUERY);
+            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
@@ -77,6 +77,10 @@ public class EnterpriseTypeRepository extends BaseRepository {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void rc(){
+        repository = null;
     }
 }
 

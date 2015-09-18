@@ -15,8 +15,8 @@ import java.util.List;
 public class OffshoreRepository extends BaseRepository {
     private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.OFFSHORE t" + " where t.open_date <= to_date('" + repDate + "', 'dd.MM.yyyy')\n"+
-            "   and (t.close_date > to_date('" + repDate + "', 'dd.MM.yyyy') or t.close_date is null)";
+    private static String QUERY = "SELECT * FROM ref.OFFSHORE t" + " where t.open_date <= to_date('repDate', 'dd.MM.yyyy')\n"+
+            "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='OFFSHORE'";
 
     public static HashMap getRepository() {
@@ -27,7 +27,7 @@ public class OffshoreRepository extends BaseRepository {
 
     public static HashMap construct(){
         try {
-            ResultSet rows = getStatement().executeQuery(QUERY);
+            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
@@ -82,6 +82,10 @@ public class OffshoreRepository extends BaseRepository {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void rc(){
+        repository = null;
     }
 }
 
