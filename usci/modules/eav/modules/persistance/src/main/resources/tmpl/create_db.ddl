@@ -154,6 +154,7 @@
 		<unique name="ebbv_UN_ei_ai_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebbv_IN_ei">
 			<index-column name="entity_id"/>
@@ -204,6 +205,7 @@
 		<unique name="ebcv_UN_ei_ai_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebcv_IN_ai_evi">
 			<index-column name="attribute_id"/>
@@ -251,6 +253,7 @@
 		<unique name="ebdv_ei_ai_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebdv_IN_ei">
 			<index-column name="entity_id"/>
@@ -298,6 +301,7 @@
 		<unique name="ebdv_UN_ei_ai_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebdv_IN_ei">
 			<index-column name="entity_id"/>
@@ -346,6 +350,7 @@
 		<unique name="ebecs_UN_ei_ai_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebecs_IN_ei">
 			<index-column name="entity_id"/>
@@ -397,6 +402,7 @@
 		<unique name="ebess_UN_ei_ai_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
 		</unique>
 	</table>
 	<table name="eav_be_integer_set_values">
@@ -437,6 +443,7 @@
 		<unique name="ebiv_UN_ei_ai_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebiv_IN_ei">
 			<index-column name="entity_id"/>
@@ -484,6 +491,7 @@
 		<unique name="ebsv_UN_ei_ai_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebsv_IN_ei">
 			<index-column name="entity_id"/>
