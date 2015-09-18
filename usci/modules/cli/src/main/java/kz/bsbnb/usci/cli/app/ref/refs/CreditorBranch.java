@@ -41,7 +41,7 @@ public class CreditorBranch extends BaseRef {
             DocType rnn = DocTypeRepository.getByCode("11");
             HashMap d = new HashMap();
             d.put("doc_type", rnn);
-            d.put("NO_", "TEST__" + (100000 + Long.valueOf((String)hm.get("ID"))));
+            d.put("NO_", "000000" + (100000 + Long.valueOf((String)hm.get("ID"))));
             CreditorDoc creditorDoc = new CreditorDoc(d);
             creditorDoc.buildElement(item);
         } else {
