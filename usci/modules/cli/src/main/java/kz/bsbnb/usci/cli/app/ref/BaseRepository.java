@@ -50,7 +50,7 @@ public class BaseRepository implements  Runnable
         boolean oneMore = false;
 
         while(true){
-
+            dropCache();
             BaseRepository.repDate = curDate;
 
             BaseCrawler.fileName = BaseCrawler.prefix + curDate + "/";
@@ -93,6 +93,39 @@ public class BaseRepository implements  Runnable
         }
 
         System.out.println("Done.");
+    }
+
+    public void dropCache(){
+        BACTRepository.rc();
+        BADRTRepository.rc();
+        BalanceAccountRepository.rc();
+        BankRelationRepository.rc();
+        ClassificationRepository.rc();
+        ContactTypeRepository.rc();
+        CountryRepository.rc();
+        CreditObjectRepository.rc();
+        CreditorBranchRepository.rc();
+        CreditorDocRepository.rc();
+        CreditorRepository.rc();
+        CreditPurposeRepository.rc();
+        CreditTypeRepository.rc();
+        CurrencyRepository.rc();
+        DebtorTypeRepository.rc();
+        DocTypeRepository.rc();
+        DRTRepository.rc();
+        EconSectorRepository.rc();
+        EconTradeRepository.rc();
+        EnterpriseTypeRepository.rc();
+        FinanceSourceRepository.rc();
+        LegalFormRepository.rc();
+        MetaRepository.rc();
+        NokbdbRepository.rc();
+        OffshoreRepository.rc();
+        PledgeTypeRepository.rc();
+        PortfolioRepository.rc();
+        RegionRepository.rc();
+        SharedRepository.rc();
+        SubjectTypeRepository.rc();
     }
 
     public void guaranteeNotTooLong(String startDate, String endDate){

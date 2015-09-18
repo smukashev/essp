@@ -24,7 +24,7 @@ public class CreditorDocRepository extends BaseRepository {
 
     public static HashMap construct(){
         try {
-            ResultSet rows = getStatement().executeQuery(QUERY);
+            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
@@ -76,6 +76,10 @@ public class CreditorDocRepository extends BaseRepository {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void rc(){
+        repository = null;
     }
 }
 
