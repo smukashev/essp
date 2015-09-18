@@ -2,9 +2,11 @@
 package kz.bsbnb.usci.cli.app.ref.refs;
 
 import kz.bsbnb.usci.cli.app.ref.BaseRef;
+import kz.bsbnb.usci.cli.app.ref.reps.DocTypeRepository;
 import org.w3c.dom.Element;
 
 import java.util.HashMap;
+import java.util.Random;
 
 
 public class CreditorBranch extends BaseRef {
@@ -32,11 +34,22 @@ public class CreditorBranch extends BaseRef {
 
         root.appendChild(docs);
 
-        for(int i=0;i<cd.length;i++)
-        {
+        //case with no documents dummy docs will be appended
+        if(cd.length == 0) {
             Element item = getDocument().createElement("item");
             docs.appendChild(item);
-            cd[i].buildElement(item);
+            DocType rnn = DocTypeRepository.getByCode("11");
+            HashMap d = new HashMap();
+            d.put("doc_type", rnn);
+            d.put("NO_", "TEST__" + (100000 + Long.valueOf((String)hm.get("ID"))));
+            CreditorDoc creditorDoc = new CreditorDoc(d);
+            creditorDoc.buildElement(item);
+        } else {
+            for (int i = 0; i < cd.length; i++) {
+                Element item = getDocument().createElement("item");
+                docs.appendChild(item);
+                cd[i].buildElement(item);
+            }
         }
 
         Element main_office = getDocument().createElement("main_office");
