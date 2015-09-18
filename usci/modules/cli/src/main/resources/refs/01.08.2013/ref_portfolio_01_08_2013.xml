@@ -272,6 +272,61 @@
       <name_ru>Research and consulting  service</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0805</code>
+      <name_kz>Пулл юр. лиц Обрабатывающие отрасли</name_kz>
+      <name_ru>Пулл юр. лиц Обрабатывающие отрасли</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0662</code>
       <name_kz>Несущественные обесцененные к списанию (КБ, МСБ) УО</name_kz>
       <name_ru>Несущественные обесцененные к списанию (КБ, МСБ) УО</name_ru>
@@ -2898,6 +2953,11 @@
       <name_ru>Товарный кредит Нур</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0800</code>
+      <name_kz>Товарный кредит Нур</name_kz>
+      <name_ru>Товарный кредит Нур</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0695</code>
       <name_kz>Микрокредиты от 1 года до 3х лет, плох обеспечение</name_kz>
       <name_ru>Микрокредиты от 1 года до 3х лет, плох обеспечение</name_ru>
@@ -3083,14 +3143,14 @@
       <name_ru>Сельское хозяйство</name_ru>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0039</code>
-      <name_kz>Под залог автомобиля несущественные обесцененные (РБ)</name_kz>
-      <name_ru>Под залог автомобиля несущественные обесцененные (РБ)</name_ru>
-    </ref_portfolio>
-    <ref_portfolio>
       <code>0618</code>
       <name_kz>Прочее(нарбанк)</name_kz>
       <name_ru>Прочее(нарбанк)</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0039</code>
+      <name_kz>Под залог автомобиля несущественные обесцененные (РБ)</name_kz>
+      <name_ru>Под залог автомобиля несущественные обесцененные (РБ)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
       <code>0036</code>

@@ -2898,6 +2898,11 @@
       <name_ru>Товарный кредит Нур</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0800</code>
+      <name_kz>Товарный кредит Нур</name_kz>
+      <name_ru>Товарный кредит Нур</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0695</code>
       <name_kz>Микрокредиты от 1 года до 3х лет, плох обеспечение</name_kz>
       <name_ru>Микрокредиты от 1 года до 3х лет, плох обеспечение</name_ru>

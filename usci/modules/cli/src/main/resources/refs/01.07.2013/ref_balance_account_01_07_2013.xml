@@ -3001,6 +3001,54 @@
       <sixth_sign>5</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
+      <name_kz>Просроченная задолженность по займам в ДВВ, предоставленным финансовым организациям-нерезидентам</name_kz>
+      <display_no>1424 253</display_no>
+      <name_ru>Просроченная задолженность по займам в ДВВ, предоставленным финансовым организациям-нерезидентам</name_ru>
+      <no_>1424253</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Начисленные доходы по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам в тенге </name_kz>
+      <display_no>1740 251</display_no>
+      <name_ru>Начисленные доходы по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам в тенге </name_ru>
+      <no_>1740251</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Просроченная задолженность по займам в тенге, предоставленным финансовым организациям-нерезидентам</name_kz>
+      <display_no>1424 251</display_no>
+      <name_ru>Просроченная задолженность по займам в тенге, предоставленным финансовым организациям-нерезидентам</name_ru>
+      <no_>1424251</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Просроченная задолженность по займам в СКВ, предоставленным финансовым организациям-нерезидентам</name_kz>
+      <display_no>1424 252</display_no>
+      <name_ru>Просроченная задолженность по займам в СКВ, предоставленным финансовым организациям-нерезидентам</name_ru>
+      <no_>1424252</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Просроченное вознаграждение по займам и финансовому лизингу в тенге, предоставленным финансовым организациям-нерезидентам</name_kz>
+      <display_no>1741 251</display_no>
+      <name_ru>Просроченное вознаграждение по займам и финансовому лизингу в тенге, предоставленным финансовым организациям-нерезидентам</name_ru>
+      <no_>1741251</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Просроченное вознаграждение по займам и финансовому лизингу в СКВ, предоставленным финансовым организациям-нерезидентам</name_kz>
+      <display_no>1741 252</display_no>
+      <name_ru>Просроченное вознаграждение по займам и финансовому лизингу в СКВ, предоставленным финансовым организациям-нерезидентам</name_ru>
+      <no_>1741252</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Начисленные доходы по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам в СКВ</name_kz>
+      <display_no>1740 252</display_no>
+      <name_ru>Начисленные доходы по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам в СКВ</name_ru>
+      <no_>1740252</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Начисленные доходы по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам в ДВВ</name_kz>
+      <display_no>1740 253</display_no>
+      <name_ru>Начисленные доходы по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам в ДВВ</name_ru>
+      <no_>1740253</no_>
+    </ref_balance_account>
+    <ref_balance_account>
       <name_kz>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с некоммерческими организациями-нерезидентами, обслуживающими домашние хозяйства</name_kz>
       <display_no>1463 281</display_no>
       <fifth_sign>2</fifth_sign>
@@ -3010,6 +3058,18 @@
       <no_>1463281</no_>
       <seventh_sign>1</seventh_sign>
       <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Просроченная задолженность по финансовому лизингу в СКВ, предоставленному финансовым организациям-нерезидентам</name_kz>
+      <display_no>1421 252</display_no>
+      <name_ru>Просроченная задолженность по финансовому лизингу в СКВ, предоставленному финансовым организациям-нерезидентам</name_ru>
+      <no_>1421252</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Просроченная задолженность по финансовому лизингу в ДВВ, предоставленному финансовым организациям-нерезидентам</name_kz>
+      <display_no>1421 253</display_no>
+      <name_ru>Просроченная задолженность по финансовому лизингу в ДВВ, предоставленному финансовым организациям-нерезидентам</name_ru>
+      <no_>1421253</no_>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Премия по учтенным векселям в тенге иностранных центральных банков</name_kz>
@@ -3232,6 +3292,12 @@
       <sixth_sign>8</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
+      <name_kz>Краткосрочные займы в СКВ, предоставленные финансовым организациям-нерезидентам</name_kz>
+      <display_no>1411 252</display_no>
+      <name_ru>Краткосрочные займы в СКВ, предоставленные финансовым организациям-нерезидентам</name_ru>
+      <no_>1411252</no_>
+    </ref_balance_account>
+    <ref_balance_account>
       <name_kz>Просроченная задолженность по финансовому лизингу в ДВВ, предоставленному домашним хозяйствам-резидентам</name_kz>
       <display_no>1421 193</display_no>
       <fifth_sign>1</fifth_sign>
@@ -3241,6 +3307,12 @@
       <no_>1421193</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Краткосрочные займы в ДВВ, предоставленные финансовым организациям-нерезидентам</name_kz>
+      <display_no>1411 253</display_no>
+      <name_ru>Краткосрочные займы в ДВВ, предоставленные финансовым организациям-нерезидентам</name_ru>
+      <no_>1411253</no_>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Просроченная задолженность по финансовому лизингу в тенге, предоставленному Правительству иностранного государства</name_kz>
@@ -3265,6 +3337,18 @@
       <sixth_sign>9</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
+      <name_kz>Долгосрочные займы в тенге, предоставленные финансовым организациям-нерезидентам</name_kz>
+      <display_no>1417 251</display_no>
+      <name_ru>Долгосрочные займы в тенге, предоставленные финансовым организациям-нерезидентам</name_ru>
+      <no_>1417251</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Долгосрочные займы в СКВ, предоставленные финансовым организациям-нерезидентам</name_kz>
+      <display_no>1417 252</display_no>
+      <name_ru>Долгосрочные займы в СКВ, предоставленные финансовым организациям-нерезидентам</name_ru>
+      <no_>1417252</no_>
+    </ref_balance_account>
+    <ref_balance_account>
       <name_kz>Просроченная задолженность по финансовому лизингу в СКВ, предоставленному домашним хозяйствам-резидентам</name_kz>
       <display_no>1421 192</display_no>
       <fifth_sign>1</fifth_sign>
@@ -3287,6 +3371,18 @@
       <sixth_sign>2</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
+      <name_kz>Долгосрочные займы в ДВВ, предоставленные финансовым организациям-нерезидентам</name_kz>
+      <display_no>1417 253</display_no>
+      <name_ru>Долгосрочные займы в ДВВ, предоставленные финансовым организациям-нерезидентам</name_ru>
+      <no_>1417253</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Финансовый лизинг в тенге, предоставленный финансовым организациям-нерезидентам</name_kz>
+      <display_no>1420 251</display_no>
+      <name_ru>Финансовый лизинг в тенге, предоставленный финансовым организациям-нерезидентам</name_ru>
+      <no_>1420251</no_>
+    </ref_balance_account>
+    <ref_balance_account>
       <name_kz>Просроченная задолженность по финансовому лизингу в СКВ, предоставленному Правительству иностранного государства</name_kz>
       <display_no>1421 212</display_no>
       <fifth_sign>2</fifth_sign>
@@ -3298,6 +3394,12 @@
       <sixth_sign>1</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
+      <name_kz>Финансовый лизинг в СКВ, предоставленный финансовым организациям-нерезидентам</name_kz>
+      <display_no>1420 252</display_no>
+      <name_ru>Финансовый лизинг в СКВ, предоставленный финансовым организациям-нерезидентам</name_ru>
+      <no_>1420252</no_>
+    </ref_balance_account>
+    <ref_balance_account>
       <name_kz>Просроченная задолженность по финансовому лизингу в ДВВ, предоставленному Правительству иностранного государства</name_kz>
       <display_no>1421 213</display_no>
       <fifth_sign>2</fifth_sign>
@@ -3307,6 +3409,12 @@
       <no_>1421213</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Финансовый лизинг в ДВВ, предоставленный финансовым организациям-нерезидентам</name_kz>
+      <display_no>1420 253</display_no>
+      <name_ru>Финансовый лизинг в ДВВ, предоставленный финансовым организациям-нерезидентам</name_ru>
+      <no_>1420253</no_>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Просроченная задолженность по финансовому лизингу в СКВ, предоставленному некоммерческим организациям-резидентам, обслуживающим домашние хозяйства</name_kz>
@@ -3329,6 +3437,12 @@
       <no_>1421183</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Краткосрочные займы в тенге, предоставленные финансовым организациям-нерезидентам</name_kz>
+      <display_no>1411 251</display_no>
+      <name_ru>Краткосрочные займы в тенге, предоставленные финансовым организациям-нерезидентам</name_ru>
+      <no_>1411251</no_>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Просроченная задолженность по финансовому лизингу в тенге, предоставленному некоммерческим организациям-резидентам, обслуживающим домашние хозяйства</name_kz>
@@ -3384,6 +3498,12 @@
       <no_>1433193</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Просроченная задолженность по финансовому лизингу в тенге, предоставленному финансовым организациям-нерезидентам</name_kz>
+      <display_no>1421 251</display_no>
+      <name_ru>Просроченная задолженность по финансовому лизингу в тенге, предоставленному финансовым организациям-нерезидентам</name_ru>
+      <no_>1421251</no_>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Премия по учтенным векселям в тенге банков-нерезидентов</name_kz>
@@ -3571,6 +3691,12 @@
       <no_>1434123</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Просроченное вознаграждение по займам и финансовому лизингу в ДВВ, предоставленным финансовым организациям-нерезидентам</name_kz>
+      <display_no>1741 253</display_no>
+      <name_ru>Просроченное вознаграждение по займам и финансовому лизингу в ДВВ, предоставленным финансовым организациям-нерезидентам</name_ru>
+      <no_>1741253</no_>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Дисконт по займам в СКВ, предоставленным местным исполнительным органам Республики Казахстан</name_kz>
@@ -6287,17 +6413,6 @@
       <sixth_sign>6</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Займы овердрафт в ДВВ, предоставленные государственным нефинансовым организациям-резидентам</name_kz>
-      <display_no>1401 163</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>1401</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Займы овердрафт в ДВВ, предоставленные государственным нефинансовым организациям-резидентам</name_ru>
-      <no_>1401163</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>6</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Операции «обратное РЕПО» с ценными бумагами в ДВВ с некоммерческими организациями-нерезидентами, обслуживающими домашние хозяйства</name_kz>
       <display_no>1461 283</display_no>
       <fifth_sign>2</fifth_sign>
@@ -6307,6 +6422,17 @@
       <no_>1461283</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Займы овердрафт в ДВВ, предоставленные государственным нефинансовым организациям-резидентам</name_kz>
+      <display_no>1401 163</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>1401</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Займы овердрафт в ДВВ, предоставленные государственным нефинансовым организациям-резидентам</name_ru>
+      <no_>1401163</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>6</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Долгосрочные займы в СКВ, предоставленные государственным нефинансовым организациям иностранного государства</name_kz>
@@ -6683,17 +6809,6 @@
       <sixth_sign>7</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Займы овердрафт в тенге, предоставленные Правительству иностранного государства</name_kz>
-      <display_no>1401 211</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1401</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Займы овердрафт в тенге, предоставленные Правительству иностранного государства</name_ru>
-      <no_>1401211</no_>
-      <seventh_sign>1</seventh_sign>
-      <sixth_sign>1</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Операции «обратное РЕПО» с ценными бумагами в СКВ с финансовыми организациями-нерезидентами</name_kz>
       <display_no>1461 252</display_no>
       <fifth_sign>2</fifth_sign>
@@ -6703,6 +6818,17 @@
       <no_>1461252</no_>
       <seventh_sign>2</seventh_sign>
       <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Займы овердрафт в тенге, предоставленные Правительству иностранного государства</name_kz>
+      <display_no>1401 211</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>1401</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Займы овердрафт в тенге, предоставленные Правительству иностранного государства</name_ru>
+      <no_>1401211</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>1</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Операции «обратное РЕПО» с ценными бумагами в тенге с финансовыми организациями-нерезидентами</name_kz>
@@ -7002,17 +7128,6 @@
       <sixth_sign>2</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Просроченная задолженность по операциям «обратное РЕПО» с ценными бумагами в ДВВ с местными исполнительными органами иностранного государства</name_kz>
-      <display_no>1462 223</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1462</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Просроченная задолженность по операциям «обратное РЕПО» с ценными бумагами в ДВВ с местными исполнительными органами иностранного государства</name_ru>
-      <no_>1462223</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>2</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Займы овердрафт в тенге, предоставленные негосударственным нефинансовым организациям иностранного государства</name_kz>
       <display_no>1401 271</display_no>
       <fifth_sign>2</fifth_sign>
@@ -7022,17 +7137,6 @@
       <no_>1401271</no_>
       <seventh_sign>1</seventh_sign>
       <sixth_sign>7</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Просроченная задолженность по операциям «обратное РЕПО» с ценными бумагами в СКВ с местными исполнительными органами иностранного государства</name_kz>
-      <display_no>1462 222</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1462</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Просроченная задолженность по операциям «обратное РЕПО» с ценными бумагами в СКВ с местными исполнительными органами иностранного государства</name_ru>
-      <no_>1462222</no_>
-      <seventh_sign>2</seventh_sign>
-      <sixth_sign>2</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Займы овердрафт в СКВ, предоставленные негосударственным нефинансовым организациям иностранного государства</name_kz>
@@ -7046,17 +7150,6 @@
       <sixth_sign>7</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Просроченная задолженность по операциям «обратное РЕПО» с ценными бумагами в ДВВ с Правительством иностранного государства</name_kz>
-      <display_no>1462 213</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1462</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Просроченная задолженность по операциям «обратное РЕПО» с ценными бумагами в ДВВ с Правительством иностранного государства</name_ru>
-      <no_>1462213</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>1</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Займы овердрафт в СКВ, предоставленные государственным нефинансовым организациям иностранного государства</name_kz>
       <display_no>1401 262</display_no>
       <fifth_sign>2</fifth_sign>
@@ -7066,17 +7159,6 @@
       <no_>1401262</no_>
       <seventh_sign>2</seventh_sign>
       <sixth_sign>6</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Просроченная задолженность по операциям «обратное РЕПО» с ценными бумагами в СКВ с Правительством иностранного государства</name_kz>
-      <display_no>1462 212</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1462</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Просроченная задолженность по операциям «обратное РЕПО» с ценными бумагами в СКВ с Правительством иностранного государства</name_ru>
-      <no_>1462212</no_>
-      <seventh_sign>2</seventh_sign>
-      <sixth_sign>1</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Займы овердрафт в ДВВ, предоставленные государственным нефинансовым организациям иностранного государства</name_kz>
@@ -7640,6 +7722,12 @@
       <sixth_sign>3</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
+      <name_kz>Краткосрочные займы в ДВВ, предоставленные  государственным нефинансовым организациям-резидентам</name_kz>
+      <display_no>1322 163</display_no>
+      <name_ru>Краткосрочные займы в ДВВ, предоставленные  государственным нефинансовым организациям-резидентам</name_ru>
+      <no_>1322163</no_>
+    </ref_balance_account>
+    <ref_balance_account>
       <name_kz>Финансовый лизинг в СКВ, предоставленный некоммерческим организациям-резидентам, обслуживающим домашние хозяйства</name_kz>
       <display_no>1420 182</display_no>
       <fifth_sign>1</fifth_sign>
@@ -7660,6 +7748,12 @@
       <no_>1319133</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным Национальному Банку Республики Казахстан, в тенге</name_kz>
+      <display_no>1428 131</display_no>
+      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным Национальному Банку Республики Казахстан, в тенге</name_ru>
+      <no_>1428131</no_>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Финансовый лизинг в ДВВ, предоставленный некоммерческим организациям-резидентам, обслуживающим домашние хозяйства</name_kz>
@@ -7684,6 +7778,12 @@
       <sixth_sign>4</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
+      <name_kz>Краткосрочные займы в тенге, предоставленные  государственным нефинансовым организациям-резидентам</name_kz>
+      <display_no>1322 161</display_no>
+      <name_ru>Краткосрочные займы в тенге, предоставленные  государственным нефинансовым организациям-резидентам</name_ru>
+      <no_>1322161</no_>
+    </ref_balance_account>
+    <ref_balance_account>
       <name_kz>Финансовый лизинг в тенге, предоставленный домашним хозяйствам-резидентам</name_kz>
       <display_no>1420 191</display_no>
       <fifth_sign>1</fifth_sign>
@@ -7704,6 +7804,12 @@
       <no_>1319142</no_>
       <seventh_sign>2</seventh_sign>
       <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Краткосрочные займы в СКВ, предоставленные  государственным нефинансовым организациям-резидентам</name_kz>
+      <display_no>1322 162</display_no>
+      <name_ru>Краткосрочные займы в СКВ, предоставленные  государственным нефинансовым организациям-резидентам</name_ru>
+      <no_>1322162</no_>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Финансовый лизинг в СКВ, предоставленный домашним хозяйствам-резидентам</name_kz>
@@ -7728,6 +7834,12 @@
       <sixth_sign>4</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
+      <name_kz>Начисленные доходы по займам и финансовому лизингу в тенге, предоставленным  государственным нефинансовым организациям-резидентам</name_kz>
+      <display_no>1733 161</display_no>
+      <name_ru>Начисленные доходы по займам и финансовому лизингу в тенге, предоставленным  государственным нефинансовым организациям-резидентам</name_ru>
+      <no_>1733161</no_>
+    </ref_balance_account>
+    <ref_balance_account>
       <name_kz>Финансовый лизинг в ДВВ, предоставленный домашним хозяйствам-резидентам</name_kz>
       <display_no>1420 193</display_no>
       <fifth_sign>1</fifth_sign>
@@ -7748,6 +7860,12 @@
       <no_>1313243</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Начисленные доходы по займам и финансовому лизингу в СКВ, предоставленным  государственным нефинансовым организациям-резидентам</name_kz>
+      <display_no>1733 162</display_no>
+      <name_ru>Начисленные доходы по займам и финансовому лизингу в СКВ, предоставленным  государственным нефинансовым организациям-резидентам</name_ru>
+      <no_>1733162</no_>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Финансовый лизинг в тенге, предоставленный Правительству иностранного государства</name_kz>
@@ -7772,6 +7890,12 @@
       <sixth_sign>6</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
+      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным Национальному Банку Республики Казахстан, в СКВ</name_kz>
+      <display_no>1428 132</display_no>
+      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным Национальному Банку Республики Казахстан, в СКВ</name_ru>
+      <no_>1428132</no_>
+    </ref_balance_account>
+    <ref_balance_account>
       <name_kz>Финансовый лизинг в СКВ, предоставленный Правительству иностранного государства</name_kz>
       <display_no>1420 212</display_no>
       <fifth_sign>2</fifth_sign>
@@ -7794,6 +7918,12 @@
       <sixth_sign>6</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
+      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным Национальному Банку Республики Казахстан, в ДВВ</name_kz>
+      <display_no>1428 133</display_no>
+      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным Национальному Банку Республики Казахстан, в ДВВ</name_ru>
+      <no_>1428133</no_>
+    </ref_balance_account>
+    <ref_balance_account>
       <name_kz>Финансовый лизинг в ДВВ, предоставленный Правительству иностранного государства</name_kz>
       <display_no>1420 213</display_no>
       <fifth_sign>2</fifth_sign>
@@ -7803,6 +7933,12 @@
       <no_>1420213</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Начисленные доходы по займам и финансовому лизингу в ДВВ, предоставленным  государственным нефинансовым организациям-резидентам</name_kz>
+      <display_no>1733 163</display_no>
+      <name_ru>Начисленные доходы по займам и финансовому лизингу в ДВВ, предоставленным  государственным нефинансовым организациям-резидентам</name_ru>
+      <no_>1733163</no_>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Займы овердрафт в ДВВ, предоставленные негосударственным нефинансовым организациям иностранного государства</name_kz>
@@ -7915,17 +8051,6 @@
       <sixth_sign>6</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с организациями-резидентами</name_kz>
-      <display_no>1463 102</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>1463</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с организациями-резидентами</name_ru>
-      <no_>1463102</no_>
-      <seventh_sign>2</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации-резиденты) в СКВ</name_kz>
       <display_no>3316 162</display_no>
       <fifth_sign>1</fifth_sign>
@@ -7935,17 +8060,6 @@
       <no_>3316162</no_>
       <seventh_sign>2</seventh_sign>
       <sixth_sign>6</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с организациями-резидентами</name_kz>
-      <display_no>1463 103</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>1463</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с организациями-резидентами</name_ru>
-      <no_>1463103</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>0</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации-резиденты) в ДВВ</name_kz>
@@ -8012,17 +8126,6 @@
       <no_>3316153</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>5</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с организациями-резидентами</name_kz>
-      <display_no>1463 101</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>1463</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с организациями-резидентами</name_ru>
-      <no_>1463101</no_>
-      <seventh_sign>1</seventh_sign>
-      <sixth_sign>0</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Просроченная задолженность по операциям «обратное РЕПО» с ценными бумагами в ДВВ с негосударственными нефинансовыми организациями иностранного государства</name_kz>
@@ -8311,17 +8414,6 @@
       <sixth_sign>5</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с организациями-нерезидентами</name_kz>
-      <display_no>1463 201</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1463</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с организациями-нерезидентами</name_ru>
-      <no_>1463201</no_>
-      <seventh_sign>1</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Счет отрицательной корректировки стоимости займа в ДВВ, предоставленного организациям-резидентам, осуществляющим отдельные виды банковских операций</name_kz>
       <display_no>1325 153</display_no>
       <fifth_sign>1</fifth_sign>
@@ -8474,28 +8566,6 @@
       <no_>1730142</no_>
       <seventh_sign>2</seventh_sign>
       <sixth_sign>4</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с организациями-нерезидентами</name_kz>
-      <display_no>1463 202</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1463</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с организациями-нерезидентами</name_ru>
-      <no_>1463202</no_>
-      <seventh_sign>2</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с организациями-нерезидентами</name_kz>
-      <display_no>1463 203</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1463</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с организациями-нерезидентами</name_ru>
-      <no_>1463203</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>0</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Начисленные доходы по займам и финансовому лизингу, предоставленным иностранным центральным банкам в СКВ</name_kz>
@@ -10434,17 +10504,6 @@
       <sixth_sign>7</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-нерезидентам в тенге</name_kz>
-      <display_no>1319 201</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1319</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-нерезидентам в тенге</name_ru>
-      <no_>1319201</no_>
-      <seventh_sign>1</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации иностранного государства) в тенге</name_kz>
       <display_no>3316 271</display_no>
       <fifth_sign>2</fifth_sign>
@@ -10454,17 +10513,6 @@
       <no_>3316271</no_>
       <seventh_sign>1</seventh_sign>
       <sixth_sign>7</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-резидентам в ДВВ</name_kz>
-      <display_no>1319 103</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>1319</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-резидентам в ДВВ</name_ru>
-      <no_>1319103</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>0</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации иностранного государства) в ДВВ</name_kz>
@@ -10478,17 +10526,6 @@
       <sixth_sign>6</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-резидентам в СКВ</name_kz>
-      <display_no>1319 102</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>1319</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-резидентам в СКВ</name_ru>
-      <no_>1319102</no_>
-      <seventh_sign>2</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации иностранного государства) в СКВ</name_kz>
       <display_no>3316 262</display_no>
       <fifth_sign>2</fifth_sign>
@@ -10498,17 +10535,6 @@
       <no_>3316262</no_>
       <seventh_sign>2</seventh_sign>
       <sixth_sign>6</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-резидентам в тенге</name_kz>
-      <display_no>1319 101</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>1319</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-резидентам в тенге</name_ru>
-      <no_>1319101</no_>
-      <seventh_sign>1</seventh_sign>
-      <sixth_sign>0</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации иностранного государства) в тенге</name_kz>
@@ -10630,28 +10656,6 @@
       <no_>3305181</no_>
       <seventh_sign>1</seventh_sign>
       <sixth_sign>8</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-нерезидентам в СКВ</name_kz>
-      <display_no>1319 202</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1319</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-нерезидентам в СКВ</name_ru>
-      <no_>1319202</no_>
-      <seventh_sign>2</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-нерезидентам в ДВВ</name_kz>
-      <display_no>1319 203</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1319</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным другим банкам-нерезидентам в ДВВ</name_ru>
-      <no_>1319203</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>0</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  государственным нефинансовым организациям иностранного государства, в тенге</name_kz>
@@ -11292,39 +11296,6 @@
       <sixth_sign>0</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций, в ДВВ</name_kz>
-      <display_no>1329 203</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1329</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций, в ДВВ</name_ru>
-      <no_>1329203</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций, в СКВ</name_kz>
-      <display_no>1329 202</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1329</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций, в СКВ</name_ru>
-      <no_>1329202</no_>
-      <seventh_sign>2</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций, в тенге</name_kz>
-      <display_no>1329 201</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1329</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций, в тенге</name_ru>
-      <no_>1329201</no_>
-      <seventh_sign>1</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Счет корректировки по выданным гарантиям (местные исполнительные органы Республики Казахстан) в СКВ</name_kz>
       <display_no>3315 122</display_no>
       <fifth_sign>1</fifth_sign>
@@ -11347,17 +11318,6 @@
       <sixth_sign>5</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций, в ДВВ</name_kz>
-      <display_no>1329 103</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>1329</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций, в ДВВ</name_ru>
-      <no_>1329103</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Счет корректировки по выданным гарантиям (местные исполнительные органы Республики Казахстан) в ДВВ</name_kz>
       <display_no>3315 123</display_no>
       <fifth_sign>1</fifth_sign>
@@ -11367,17 +11327,6 @@
       <no_>3315123</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>2</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций, в СКВ</name_kz>
-      <display_no>1329 102</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>1329</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций, в СКВ</name_ru>
-      <no_>1329102</no_>
-      <seventh_sign>2</seventh_sign>
-      <sixth_sign>0</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций, в тенге</name_kz>
@@ -14300,17 +14249,6 @@
       <sixth_sign>6</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в ДВВ</name_kz>
-      <display_no>1428 103</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>1428</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в ДВВ</name_ru>
-      <no_>1428103</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Дисконт по учтенным векселям в ДВВ государственных нефинансовых организаций иностранного государства</name_kz>
       <display_no>1432 263</display_no>
       <fifth_sign>2</fifth_sign>
@@ -14320,17 +14258,6 @@
       <no_>1432263</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>6</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в тенге</name_kz>
-      <display_no>1428 201</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1428</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в тенге</name_ru>
-      <no_>1428201</no_>
-      <seventh_sign>1</seventh_sign>
-      <sixth_sign>0</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Дисконт по учтенным векселям в тенге негосударственных нефинансовых организаций иностранного государства</name_kz>
@@ -14476,17 +14403,6 @@
       <sixth_sign>2</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в СКВ</name_kz>
-      <display_no>1428 202</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1428</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в СКВ</name_ru>
-      <no_>1428202</no_>
-      <seventh_sign>2</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Премия по учтенным векселям в тенге Национального Банка Республики Казахстан</name_kz>
       <display_no>1433 131</display_no>
       <fifth_sign>1</fifth_sign>
@@ -14498,15 +14414,19 @@
       <sixth_sign>3</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в ДВВ</name_kz>
-      <display_no>1428 203</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>1428</first_fourth_signs>
-      <is_in_balance>1</is_in_balance>
-      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в ДВВ</name_ru>
-      <no_>1428203</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>0</sixth_sign>
+      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам в тенге</name_kz>
+      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам в тенге</name_ru>
+      <no_>1329161</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам в СКВ</name_kz>
+      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам в СКВ</name_ru>
+      <no_>1329162</no_>
+    </ref_balance_account>
+    <ref_balance_account>
+      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам в ДВВ</name_kz>
+      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам в ДВВ</name_ru>
+      <no_>1329163</no_>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Премия по займам в ДВВ, предоставленным негосударственным нефинансовым организациям-резидентам</name_kz>
@@ -15597,50 +15517,6 @@
       <sixth_sign>6</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по условным обязательствам перед нерезидентам в СКВ</name_kz>
-      <display_no>2875 202</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>2875</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по условным обязательствам перед нерезидентам в СКВ</name_ru>
-      <no_>2875202</no_>
-      <seventh_sign>2</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по условным обязательствам перед нерезидентам в ДВВ</name_kz>
-      <display_no>2875 203</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>2875</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по условным обязательствам перед нерезидентам в ДВВ</name_ru>
-      <no_>2875203</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по условным обязательствам перед резидентами в ДВВ</name_kz>
-      <display_no>2875 103</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>2875</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по условным обязательствам перед резидентами в ДВВ</name_ru>
-      <no_>2875103</no_>
-      <seventh_sign>3</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по условным обязательствам перед нерезидентам в тенге</name_kz>
-      <display_no>2875 201</display_no>
-      <fifth_sign>2</fifth_sign>
-      <first_fourth_signs>2875</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по условным обязательствам перед нерезидентам в тенге</name_ru>
-      <no_>2875201</no_>
-      <seventh_sign>1</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Просроченная задолженность по форфейтингу в ДВВ, предоставленному негосударственным нефинансовым организациям иностранного государства</name_kz>
       <display_no>1423 273</display_no>
       <fifth_sign>2</fifth_sign>
@@ -16298,17 +16174,6 @@
       <sixth_sign>5</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по условным обязательствам перед резидентами в СКВ</name_kz>
-      <display_no>2875 102</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>2875</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по условным обязательствам перед резидентами в СКВ</name_ru>
-      <no_>2875102</no_>
-      <seventh_sign>2</seventh_sign>
-      <sixth_sign>0</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
       <name_kz>Просроченная задолженность по займам в ДВВ, предоставленным иным финансовым организациям-резидентам</name_kz>
       <display_no>1424 153</display_no>
       <fifth_sign>1</fifth_sign>
@@ -16318,17 +16183,6 @@
       <no_>1424153</no_>
       <seventh_sign>3</seventh_sign>
       <sixth_sign>5</sixth_sign>
-    </ref_balance_account>
-    <ref_balance_account>
-      <name_kz>Резервы (провизии) на покрытие убытков по условным обязательствам перед резидентами в тенге</name_kz>
-      <display_no>2875 101</display_no>
-      <fifth_sign>1</fifth_sign>
-      <first_fourth_signs>2875</first_fourth_signs>
-      <is_in_balance>0</is_in_balance>
-      <name_ru>Резервы (провизии) на покрытие убытков по условным обязательствам перед резидентами в тенге</name_ru>
-      <no_>2875101</no_>
-      <seventh_sign>1</seventh_sign>
-      <sixth_sign>0</sixth_sign>
     </ref_balance_account>
     <ref_balance_account>
       <name_kz>Опротестованные векселя в СКВ банков-нерезидентов</name_kz>
