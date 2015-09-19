@@ -703,15 +703,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 if (compare == 0) {
                     // case#1
                     if (metaAttribute.isFinal()) {
-                        IBaseEntity baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
-
                         if (metaClass.hasNotFinalAttributes() && !metaClass.isSearchable())
                             throw new IllegalStateException("Оперативные атрибуты могут сожержать только оперативные "
                                     + "данные. Мета: " + baseEntity.getMeta().getClassName()
                                     + ", атрибут: " + metaAttribute.getName());
 
                         IBaseValue baseValueDeleted = ((BaseValue) baseValueLoaded).clone();
-                        baseValueDeleted.setBaseContainer(baseEntity);
                         baseEntityManager.registerAsDeleted(baseValueDeleted);
 
                         if (baseValueLoaded.isLast()) {
@@ -727,84 +724,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
 
-
-                        // Не имеет ключевых атрибутов и изменяемый
-                        if (!metaClass.isSearchable() && !metaAttribute.isImmutable()) {
-                            IBaseEntity baseEntitySaving = new BaseEntity(baseEntityLoaded,
-                                    baseValueSaving.getRepDate());
-
-                            // Собирает атрибуты для удаления
-                            for (String attributeName : metaClass.getAttributeNames()) {
-                                IMetaAttribute childMetaAttribute = metaClass.getMetaAttribute(attributeName);
-                                IMetaType childMetaType = childMetaAttribute.getMetaType();
-
-                                baseEntitySaving.put(attributeName,
-                                        BaseValueFactory.create(
-                                                MetaContainerTypes.META_CLASS,
-                                                childMetaType,
-                                                0,
-                                                creditorId,
-                                                new Date(baseValueSaving.getRepDate().getTime()),
-                                                null,
-                                                false,
-                                                true));
-                            }
-
-                            // Запускает удаление атрибутов
-                            applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
-
-                            IBaseEntityComplexValueDao baseEntityComplexValueDao = persistableDaoPool
-                                    .getPersistableDao(baseValueSaving.getClass(), IBaseEntityComplexValueDao.class);
-
-                            boolean singleBaseValue = baseEntityComplexValueDao.isSingleBaseValue(baseValueLoaded);
-
-                            // Удаляет себя, если не используется больше нигде
-                            if (singleBaseValue) {
-                                baseEntityManager.registerAsDeleted(baseValueLoaded);
-                            } else {
-                                throw new IllegalStateException("Сущность используется в других местах, удаление не " +
-                                        "выполнено;\n" + baseValueLoaded);
-                            }
-                        }
-
                         return;
                     // case#2
                     } else {
-                        IBaseEntity baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
-                        IBaseEntity baseEntitySaving = new BaseEntity(baseEntityLoaded, baseValueSaving.getRepDate());
-
-                        // Собирает атрибуты для удаления
-                        for (String attributeName : metaClass.getAttributeNames()) {
-                            IMetaAttribute childMetaAttribute = metaClass.getMetaAttribute(attributeName);
-                            IMetaType childMetaType = childMetaAttribute.getMetaType();
-
-                            baseEntitySaving.put(attributeName,
-                                    BaseValueFactory.create(
-                                            MetaContainerTypes.META_CLASS,
-                                            childMetaType,
-                                            0,
-                                            creditorId,
-                                            new Date(baseValueSaving.getRepDate().getTime()),
-                                            null,
-                                            false,
-                                            true));
-                        }
-
-                        // Запускает удаление атрибутов
-                        applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
-
-                        IBaseEntityComplexValueDao baseEntityComplexValueDao = persistableDaoPool
-                                .getPersistableDao(baseValueSaving.getClass(), IBaseEntityComplexValueDao.class);
-
-                        boolean singleBaseValue = baseEntityComplexValueDao.isSingleBaseValue(baseValueLoaded);
-
-                        // Удаляет себя, если не используется больше нигде
-                        if (singleBaseValue) {
-                            baseEntityManager.registerAsDeleted(baseValueLoaded);
-                        } else {
-                            throw new IllegalStateException("Сущность используется в других местах, удаление не " +
-                                    "выполнено;\n" + baseValueLoaded);
-                        }
+                        IBaseValue baseValueDeleted = ((BaseValue) baseValueLoaded).clone();
+                        baseEntityManager.registerAsDeleted(baseValueDeleted);
 
                         if (baseValueLoaded.isLast()) {
                             IBaseValueDao valueDao = persistableDaoPool
