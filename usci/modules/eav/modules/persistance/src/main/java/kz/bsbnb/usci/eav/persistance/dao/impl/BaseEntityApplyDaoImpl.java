@@ -604,6 +604,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseEntityManager.registerAsDeleted(baseValueClosed);
 
                         IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueClosed);
+
+                        if (baseValuePrevious == null)
+                            throw new IllegalStateException("Предыдущая запись не найдена(" +
+                                    baseValueClosed.getMetaAttribute().getName() + ");");
+
                         if (baseValueClosed.isLast()) {
                             baseValuePrevious.setLast(true);
                             baseEntityApplied.put(metaAttribute.getName(), baseValuePrevious);
