@@ -2,54 +2,31 @@ package kz.bsbnb.usci.eav.model;
 
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.util.DataUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.DigestUtils;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-/**
- * General information about the batch, such as:
- * date of receipt, start date of processing,
- * end date of processing, status, etc.
- *
- * @author a.motov
- */
-public class Batch extends Persistable
-{
-    Logger logger = LoggerFactory.getLogger(Batch.class);
-    /**
-     * Date and time of receipt of the batch.
-     */
+public class Batch extends Persistable {
     private Date receiptDate;
-
     private Date repDate;
-
     private Long userId;
-
     private String fileName;
     private byte[] content;
     private String hash;
     private String sign;
-
     private String batchType;
     private Long totalCount;
     private Long actualCount;
     private Long reportId;
+    private Long creditorId;
 
-    public Batch() {}
+    public Batch() {
+        super();
+    }
 
-    private  Long creditorId;
-
-    /**
-     * Initializes batch with the default values.
-     */
-    public Batch(Date reportDate, Long userId){
+    public Batch(Date reportDate, Long userId) {
         super();
 
-        Date newReportDate = (Date)reportDate.clone();
+        Date newReportDate = (Date) reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
 
         Date newReceiptDate = new Date();
@@ -60,11 +37,10 @@ public class Batch extends Persistable
         this.userId = userId;
     }
 
-    public Batch(Date reportDate)
-    {
+    public Batch(Date reportDate) {
         super();
 
-        Date newReportDate = (Date)reportDate.clone();
+        Date newReportDate = (Date) reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
 
         Date newReceiptDate = new Date();
@@ -74,38 +50,30 @@ public class Batch extends Persistable
         this.receiptDate = newReceiptDate;
     }
 
-    /**
-     * Initializes batch with a date and time of receipt of the batch.
-     *
-     * @param receiptDate the date and time of receipt of the batch.
-     */
-    public Batch(Date receiptDate, Date reportDate)
-    {
-        Date newReportDate = (Date)reportDate.clone();
+    public Batch(Date receiptDate, Date reportDate) {
+        Date newReportDate = (Date) reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
 
-        Date newReceiptDate = (Date)receiptDate.clone();
+        Date newReceiptDate = (Date) receiptDate.clone();
         DataUtils.toBeginningOfTheSecond(newReceiptDate);
 
         this.repDate = newReportDate;
         this.receiptDate = newReceiptDate;
     }
 
-    public void setReceiptDate(Date receiptDate)
-    {
+    public void setReceiptDate(Date receiptDate) {
         if (receiptDate == null) {
             this.receiptDate = null;
             return;
         }
 
-        Date newReceiptDate = (Date)receiptDate.clone();
+        Date newReceiptDate = (Date) receiptDate.clone();
         DataUtils.toBeginningOfTheSecond(newReceiptDate);
 
         this.receiptDate = newReceiptDate;
     }
 
-    public Date getReceiptDate()
-    {
+    public Date getReceiptDate() {
         return receiptDate;
     }
 
@@ -118,39 +86,34 @@ public class Batch extends Persistable
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Batch)) return false;
         if (!super.equals(o)) return false;
 
         Batch batch = (Batch) o;
 
-        logger.debug("Batch receipt date: " + receiptDate + ", " + batch.receiptDate);
         return receiptDate.equals(batch.receiptDate);
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + receiptDate.hashCode();
         return result;
     }
 
-    public Date getRepDate()
-    {
+    public Date getRepDate() {
         return repDate;
     }
 
-    public void setRepDate(Date reportDate)
-    {
+    public void setRepDate(Date reportDate) {
         if (reportDate == null) {
             this.repDate = null;
             return;
         }
 
-        Date newReportDate = (Date)reportDate.clone();
+        Date newReportDate = (Date) reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
 
         this.repDate = newReportDate;
@@ -226,5 +189,14 @@ public class Batch extends Persistable
 
     public void setCreditorId(Long creditorId) {
         this.creditorId = creditorId;
+    }
+
+    @Override
+    public String toString() {
+        return "Batch{" +
+                "id=" + id +
+                ", fileName='" + fileName + '\'' +
+                ", repDate=" + repDate +
+                ", creditorId=" + creditorId + '}';
     }
 }

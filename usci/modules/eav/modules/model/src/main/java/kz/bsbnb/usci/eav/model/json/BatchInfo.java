@@ -5,22 +5,21 @@ import kz.bsbnb.usci.eav.model.Batch;
 import java.util.Date;
 import java.util.HashMap;
 
-/**
- * @author abukabayev
- */
 public class BatchInfo {
     private String batchType;
     private String batchName;
     private Long size;
     private Long userId;
     private Date repDate;
-    private HashMap<String, String> additionalParams = new HashMap<String, String>();
+    private HashMap<String, String> additionalParams = new HashMap<>();
 
     private long reportId;
     private long totalCount;
     private long actualCount;
 
-    public BatchInfo() {}
+    public BatchInfo() {
+        super();
+    }
 
     public BatchInfo(Batch batch) {
         setReportId(batch.getReportId());
@@ -72,13 +71,11 @@ public class BatchInfo {
         this.repDate = repDate;
     }
 
-    public HashMap<String, String> getAdditionalParams()
-    {
+    public HashMap<String, String> getAdditionalParams() {
         return additionalParams;
     }
 
-    public void setAdditionalParams(HashMap<String, String> additionalParams)
-    {
+    public void setAdditionalParams(HashMap<String, String> additionalParams) {
         this.additionalParams = additionalParams;
     }
 
