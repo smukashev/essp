@@ -565,7 +565,7 @@ quit
     	<c_test4>
     		<code>code#1</code>
     		<c4_attr>
-                <no>no#1</no>
+                <no>no#2</no>
             </c4_attr>
     	</c_test4>
     </entities>

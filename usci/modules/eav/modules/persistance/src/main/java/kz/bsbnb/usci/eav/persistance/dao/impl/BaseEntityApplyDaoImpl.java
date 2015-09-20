@@ -299,6 +299,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         IBaseEntity baseEntityApplied = new BaseEntity(baseEntityLoaded, baseEntitySaving.getReportDate());
 
+        // Устанавливает ID для !metaClass.isSearchable()
         if (baseEntitySaving.getId() < 1 && baseEntityLoaded.getId() > 0)
             baseEntitySaving.setId(baseEntityLoaded.getId());
 
@@ -746,7 +747,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 // case#3
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
-                        throw new RuntimeException("Оперативные данные могут удалятся только за существующий период.");
+                        throw new IllegalStateException("Оперативные данные могут удалятся только за " +
+                                "существующий период(" + metaAttribute.getName() + ").");
 
                     if (baseValueLoaded.isLast()) {
                         IBaseValue baseValueLast = BaseValueFactory.create(

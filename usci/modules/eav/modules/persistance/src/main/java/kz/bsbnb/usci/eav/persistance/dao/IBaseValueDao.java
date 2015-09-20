@@ -14,7 +14,7 @@ public interface IBaseValueDao<T extends IBaseContainer> extends IPersistableDao
 
     IBaseValue getLastBaseValue(IBaseValue baseValue);
 
-    void loadBaseValues(T baseContainer, Date reportDate, boolean isLast);
+    void loadBaseValues(T baseContainer, Date reportDate);
 
     void deleteAll(long baseContainerId);
 }

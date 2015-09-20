@@ -19,9 +19,6 @@ import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BATCH_STATUSES;
 
-/**
- * Created by maksat on 8/3/15.
- */
 @Repository
 public class BatchStatusDaoImpl extends JDBCSupport implements IBatchStatusDao {
 

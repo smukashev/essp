@@ -69,7 +69,7 @@ public class ZipFilesMonitor {
     SenderThread sender;
 
     public static final int ZIP_BUFFER_SIZE = 1024;
-    public static final int MAX_SYNC_QUEUE_SIZE = 512;
+    public static final int MAX_SYNC_QUEUE_SIZE = 1000;
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 

@@ -208,7 +208,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                     .get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            loadBaseValues(baseSet, reportDate, false);
+            loadBaseValues(baseSet, reportDate);
 
             nextBaseValue = BaseValueFactory.create(
                     metaClass.getType(),
@@ -291,7 +291,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                     .get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            loadBaseValues(baseSet, reportDate, false);
+            loadBaseValues(baseSet, reportDate);
 
             previousBaseValue = BaseValueFactory.create(
                     metaClass.getType(),
@@ -348,7 +348,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                     .get(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.getName())).longValue();
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            loadBaseValues(baseSet, baseValue.getRepDate(), false);
+            loadBaseValues(baseSet, baseValue.getRepDate());
 
             closedBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,
@@ -407,7 +407,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                     .get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
 
             IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            loadBaseValues(baseSet, baseValue.getRepDate(), false);
+            loadBaseValues(baseSet, baseValue.getRepDate());
 
             lastBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,
@@ -425,57 +425,41 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate, boolean isLast) {
+    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate) {
         Table tableOfSimpleSets = EAV_M_SIMPLE_SET.as("ss");
         Table tableOfEntitySimpleSets = EAV_BE_ENTITY_SIMPLE_SETS.as("ess");
         Select select = null;
 
-        if (isLast) {
-            select = context
-                    .select(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.NAME),
-                            tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
-                            tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
-                            tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID),
-                            tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
-                            tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
-                    .from(tableOfEntitySimpleSets)
-                    .join(tableOfSimpleSets)
-                    .on(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID)
-                            .eq(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.ID)))
-                    .where(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID).equal(baseEntity.getId()))
-                    .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST).equal(true)
-                            .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED).equal(false)));
-        } else {
-            Table tableNumbering = context
-                    .select(DSL.rank().over()
-                                    .partitionBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID))
-                                    .orderBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE)).as("num_pp"),
-                            tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
-                            tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID),
-                            tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
-                            tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID),
-                            tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
-                            tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
-                    .from(tableOfEntitySimpleSets)
-                    .where(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID).eq(baseEntity.getId()))
-                    .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE)
-                            .lessOrEqual(DataUtils.convert(actualReportDate)))
-                    .asTable("essn");
 
-            select = context
-                    .select(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.NAME),
-                            tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
-                            tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
-                            tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID),
-                            tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
-                            tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
-                    .from(tableNumbering)
-                    .join(tableOfSimpleSets)
-                    .on(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID)
-                            .eq(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.ID)))
-                    .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                    .and(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED).equal(false));
-        }
+        Table tableNumbering = context
+                .select(DSL.rank().over()
+                                .partitionBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID))
+                                .orderBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE)).as("num_pp"),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
+                .from(tableOfEntitySimpleSets)
+                .where(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID).eq(baseEntity.getId()))
+                .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE)
+                        .lessOrEqual(DataUtils.convert(actualReportDate)))
+                .asTable("essn");
+
+        select = context
+                .select(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.NAME),
+                        tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
+                        tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
+                        tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID),
+                        tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
+                        tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
+                .from(tableNumbering)
+                .join(tableOfSimpleSets)
+                .on(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID)
+                        .eq(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.ID)))
+                .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
+                .and(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED).equal(false));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -496,7 +480,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
             IMetaSet metaSet = (MetaSet) metaType;
             IMetaType metaSetMemberType = metaSet.getMemberType();
             IBaseSet baseSet = new BaseSet(setId, metaSetMemberType);
-            loadBaseValues(baseSet, actualReportDate, isLast);
+            loadBaseValues(baseSet, actualReportDate);
 
             baseEntity.put(attribute, BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,
@@ -510,7 +494,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    protected void loadBaseValues(IBaseSet baseSet, Date actualReportDate, boolean lastReportDate) {
+    protected void loadBaseValues(IBaseSet baseSet, Date actualReportDate) {
         IMetaType metaType = baseSet.getMemberType();
         if (metaType.isSet()) {
             throw new UnsupportedOperationException("Не реализовано;");
@@ -521,23 +505,23 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
         switch (dataType) {
             case INTEGER: {
-                baseSetIntegerValueDao.loadBaseValues(baseSet, actualReportDate, lastReportDate);
+                baseSetIntegerValueDao.loadBaseValues(baseSet, actualReportDate);
                 break;
             }
             case DATE: {
-                baseSetDateValueDao.loadBaseValues(baseSet, actualReportDate, lastReportDate);
+                baseSetDateValueDao.loadBaseValues(baseSet, actualReportDate);
                 break;
             }
             case STRING: {
-                baseSetStringValueDao.loadBaseValues(baseSet, actualReportDate, lastReportDate);
+                baseSetStringValueDao.loadBaseValues(baseSet, actualReportDate);
                 break;
             }
             case BOOLEAN: {
-                baseSetBooleanValueDao.loadBaseValues(baseSet, actualReportDate, lastReportDate);
+                baseSetBooleanValueDao.loadBaseValues(baseSet, actualReportDate);
                 break;
             }
             case DOUBLE: {
-                baseSetDoubleValueDao.loadBaseValues(baseSet, actualReportDate, lastReportDate);
+                baseSetDoubleValueDao.loadBaseValues(baseSet, actualReportDate);
                 break;
             }
             default:

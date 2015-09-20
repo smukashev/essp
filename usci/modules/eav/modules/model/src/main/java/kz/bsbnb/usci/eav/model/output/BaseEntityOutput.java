@@ -20,8 +20,8 @@ public class BaseEntityOutput {
     }
 
     public static String toString(BaseEntity entity, String prefix) {
-        String str = entity.getMeta().getClassName() + "(" + entity.getId() + ", " +
-                dateFormat.format(entity.getReportDate()) + ");";
+        String str = entity.getMeta().getClassName() + "(" + entity.getId() + ", ";
+        str += entity.getReportDate() == null ? "-)" : dateFormat.format(entity.getReportDate()) + ");";
 
         MetaClass meta = entity.getMeta();
 
