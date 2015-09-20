@@ -897,22 +897,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         throw new RuntimeException("Оперативные данные(" + metaAttribute.getName() + ")" +
                                 " могут изменятся только за существующие периоды;");
 
-                    if (baseValueLoaded.isClosed()) {
-                        IBaseValue newBaseValueLoaded = BaseValueFactory.create(
-                                MetaContainerTypes.META_CLASS,
-                                metaType,
-                                baseValueLoaded.getId(),
-                                creditorId,
-                                new Date(baseValueLoaded.getRepDate().getTime()),
-                                baseValueSaving.getValue(),
-                                baseValueLoaded.isClosed(),
-                                false);
-
-                        newBaseValueLoaded.setBaseContainer(baseEntity);
-                        newBaseValueLoaded.setMetaAttribute(metaAttribute);
-                        baseEntityManager.registerAsUpdated(newBaseValueLoaded);
-                    }
-
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
                             metaType,
@@ -921,7 +905,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             new Date(baseValueSaving.getRepDate().getTime()),
                             baseEntityApplied,
                             false,
-                            baseValueLoaded.isLast());
+                            false);
 
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
