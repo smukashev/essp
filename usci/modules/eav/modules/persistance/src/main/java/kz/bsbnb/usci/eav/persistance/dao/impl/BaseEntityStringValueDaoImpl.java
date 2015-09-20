@@ -347,7 +347,8 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                 .where(EAV_BE_STRING_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.lessOrEqual(
+                        DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());

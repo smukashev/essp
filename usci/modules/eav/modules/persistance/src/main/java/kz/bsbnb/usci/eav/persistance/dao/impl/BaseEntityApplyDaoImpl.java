@@ -997,6 +997,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 }
             }
 
+            // case#7
             if (metaAttribute.isFinal() || baseValueClosed == null) {
                 IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
                 IBaseEntity baseEntityApplied;

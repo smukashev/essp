@@ -363,7 +363,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.
-                        equal(DataUtils.convert(baseValue.getRepDate())))
+                        lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());

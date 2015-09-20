@@ -277,7 +277,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
                 .from(EAV_BE_STRING_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_STRING_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE.
-                        equal(DataUtils.convert(baseValue.getRepDate())))
+                        lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_STRING_SET_VALUES.as(tableAlias).VALUE.equal((String) baseValue.getValue()))
                 .and(EAV_BE_STRING_SET_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 

@@ -363,7 +363,8 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
                 .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.lessOrEqual(
+                        DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
