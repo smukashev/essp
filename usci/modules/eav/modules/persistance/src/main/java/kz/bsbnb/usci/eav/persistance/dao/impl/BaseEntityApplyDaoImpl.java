@@ -995,23 +995,21 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
                 }
-            }
-
             // case#7
-            if (metaAttribute.isFinal() || baseValueClosed == null) {
+            } else {
                 IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
                 IBaseEntity baseEntityApplied;
 
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1)
-                        throw new UnsupportedOperationException("Запись класса " +
-                                baseEntitySaving.getMeta().getClassName() + " не найдена;" +
-                                "\n" + baseEntitySaving.toString());
+                        throw new UnsupportedOperationException("Запись класса " + baseEntitySaving.getMeta().
+                                getClassName() + " не найдена;" + "\n" + baseEntitySaving.toString());
 
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
                 } else {
                     IBaseValue previousBaseValue = valueDao.getPreviousBaseValue(baseValueSaving);
+
                     if (previousBaseValue != null) {
                         baseEntityApplied = applyBaseEntityAdvanced(creditorId, baseEntitySaving,
                                 (IBaseEntity) previousBaseValue.getValue(), baseEntityManager);
@@ -1021,24 +1019,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 }
 
                 if (baseValueLast == null) {
-                    boolean isClosing = false;
-                    if (baseEntitySaving.getId() > 0) {
-                        Date reportDateSaving = new Date(baseValueSaving.getRepDate().getTime());
-
-                        IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool.
-                                getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
-
-                        Date minReportDate = baseEntityReportDateDao.getMinReportDate(baseEntitySaving.getId());
-
-                        // TODO: Inserting on earlier(nonexisting) date: consider case when only root entity existed before,
-                        // TODO: but all the child entities are new; entity Id could be null?
-
-                        int compare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, minReportDate);
-                        if (compare == -1) {
-                            isClosing = true;
-                        }
-                    }
-
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
                             metaType,
@@ -1047,30 +1027,15 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             new Date(baseValueSaving.getRepDate().getTime()),
                             baseEntityApplied,
                             false,
-                            !isClosing);
+                            true);
 
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
-
-                    if (isClosing) {
-                        IBaseValue baseValueAppliedClosed = BaseValueFactory.create(
-                                MetaContainerTypes.META_CLASS,
-                                metaType,
-                                0,
-                                creditorId,
-                                new Date(baseValueSaving.getRepDate().getTime()),
-                                baseEntityApplied,
-                                true,
-                                true);
-
-                        baseEntity.put(metaAttribute.getName(), baseValueAppliedClosed);
-                        baseEntityManager.registerAsInserted(baseValueAppliedClosed);
-                    }
                 } else {
                     Date reportDateSaving = baseValueSaving.getRepDate();
                     Date reportDateLast = baseValueLast.getRepDate();
-                    int reportDateCompare =
-                            DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLast);
+
+                    int reportDateCompare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLast);
 
                     boolean last = reportDateCompare != -1;
 

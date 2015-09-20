@@ -665,6 +665,47 @@ quit
 ---------------------------------------------------------
 
 
+applyComplexValue, case#7
+---------------------------------------------------------
+meta create --name=c7_attr
+meta add --name=c7_attr --attribute=no --type=string --final
+meta key --name=c7_attr --attribute=no
+
+meta create --name=c_test7
+meta add --name=c_test7 --attribute=c7_attr --type=meta_class --childname=c7_attr --final
+meta add --name=c_test7 --attribute=code --type=string
+meta key --name=c_test7 --attribute=code
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<c_test7>
+    		<code>code#1</code>
+    		<c7_attr>
+    			<no>no#1</no>
+    		</c7_attr>
+    	</c_test7>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<c_test7>
+    		<code>code#1</code>
+    		<c7_attr>
+                <no>no#1</no>
+            </c7_attr>
+    	</c_test7>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+
 applyComplexSet, case#7
 ---------------------------------------------------------
 
