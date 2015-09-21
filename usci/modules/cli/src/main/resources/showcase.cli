@@ -44,6 +44,8 @@ showcase list add finance_source.code finance_source_code
 showcase list add portfolio.portfolio.code portfolio_code
 showcase list add portfolio.portfolio_msfo.code portfolio_msfo_code
 
+showcase addIndex nonunique credit_id
+
 showcase save
 
 #=================================================================================
@@ -66,6 +68,8 @@ showcase list add country.code country_code
 showcase list add offshore.code offshore_code
 
 showcase list addCustom credit creditor creditor_id
+
+showcase addIndex nonunique person_id
 
 showcase save
 
@@ -92,6 +96,8 @@ showcase list add country country
 
 showcase list addCustom credit creditor creditor_id
 
+showcase addIndex nonunique organization_id
+
 showcase save
 
 #=================================================================================
@@ -113,6 +119,8 @@ showcase list add head.names.lastname lastname
 showcase list add head.names.middlename middlename
 showcase list add head.names.lang lang
 
+showcase addIndex nonunique organization_id
+
 showcase save
 
 #=================================================================================
@@ -133,6 +141,8 @@ showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type_id
 showcase list add docs.name doc_name
 
+showcase addIndex nonunique head_id
+
 showcase save
 
 #==================================================================================
@@ -149,6 +159,8 @@ showcase set tableName CORE_DEBTOR_PERSON
 showcase list add persons person_id
 
 showcase list addCustom credit creditor creditor_sender_id
+
+showcase addIndex nonunique credit_id
 
 showcase save
 
@@ -167,6 +179,8 @@ showcase list add organizations org_id
 
 showcase list addCustom credit creditor creditor_sender_id
 
+showcase addIndex nonunique credit_id
+
 showcase save
 
 #==================================================================================
@@ -183,6 +197,8 @@ showcase set tableName CORE_DEBTOR_CREDITOR
 showcase list add creditors creditor_id
 
 showcase list addCustom credit creditor creditor_sender_id
+
+showcase addIndex nonunique credit_id
 
 showcase save
 
@@ -205,6 +221,7 @@ showcase list add addresses.details details
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
+showcase addIndex nonunique person_id
 showcase save
 
 #=================================================================================
@@ -226,6 +243,7 @@ showcase list add addresses.details details
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
+showcase addIndex nonunique organization_id
 showcase save
 
 #=================================================================================
@@ -246,6 +264,8 @@ showcase list add contacts.contact_type contact_type_id
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
 
+showcase addIndex nonunique person_id
+
 showcase save
 
 #=================================================================================
@@ -264,6 +284,8 @@ showcase list add contacts.contact_type contact_type_id
 
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
+
+showcase addIndex nonunique organization_id
 
 showcase save
 
@@ -284,6 +306,8 @@ showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type
 showcase list add docs.name doc_name
 
+showcase addIndex nonunique person_id
+
 showcase save
 
 #==================================================================================
@@ -302,6 +326,8 @@ showcase list add docs doc_id
 showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type
 showcase list add docs.name doc_name
+
+showcase addIndex nonunique organization_id
 
 showcase save
 
@@ -323,6 +349,8 @@ showcase list add names.lastname lastname
 showcase list add names.middlename middlename
 showcase list add names.lang lang
 
+showcase addIndex nonunique person_id
+
 showcase save
 
 #==================================================================================
@@ -341,6 +369,8 @@ showcase list add names name_id
 
 showcase list add names.name name
 showcase list add names.lang lang
+
+showcase addIndex nonunique organization_id
 
 showcase save
 
@@ -369,6 +399,8 @@ showcase list add turnover.issue.interest.amount_currency interest_amount_curren
 
 showcase list addCustom credit root credit_id
 showcase list addCustom credit creditor creditor_id
+
+showcase addIndex nonunique change_id
 
 showcase save
 
@@ -404,6 +436,8 @@ showcase list add credit_flow.provision.provision_msfo_over_balance.value msfo_o
 showcase list addCustom credit root credit_id
 showcase list addCustom credit creditor creditor_id
 
+showcase addIndex nonunique change_id
+
 showcase save
 
 #=================================================================================
@@ -414,7 +448,7 @@ showcase save
 # Pledge
 #==================================================================================
 
-showcase set name CORE_PLEDGE
+    showcase set name CORE_PLEDGE
 showcase set tableName CORE_PLEDGE
 showcase set downPath pledges
 
@@ -424,6 +458,8 @@ showcase list add value value
 
 showcase list addCustom credit root credit_id
 showcase list addCustom credit creditor creditor_id
+
+showcase addIndex nonunique pledge_id
 
 showcase save
 
@@ -491,6 +527,8 @@ showcase list add remains.correction.value_currency corr_cvalue
 showcase list addCustom credit root credit_id
 showcase list addCustom credit creditor creditor_id
 
+showcase addIndex nonunique change_id
+
 showcase save
 
 #=================================================================================
@@ -509,6 +547,8 @@ showcase list add bank_relations person_bank_relation_id
 showcase list add bank_relations.bank_relation ref_bank_relation_id
 showcase list add bank_relations.creditor creditor_id
 
+showcase addIndex nonunique person_id
+
 showcase save
 
 #=================================================================================
@@ -526,6 +566,8 @@ showcase set downPath organizations
 showcase list add bank_relations org_bank_relation_id
 showcase list add bank_relations.bank_relation ref_bank_relation_id
 showcase list add bank_relations.creditor creditor_id
+
+showcase addIndex nonunique organization_id
 
 showcase save
 
@@ -553,6 +595,8 @@ showcase list add details.value value
 showcase list addCustom portfolio_data root portfolio_data_id
 showcase list addCustom portfolio_data creditor portfolio_data_creditor_id
 
+showcase addIndex nonunique portfolio_flow_kfn_id
+
 showcase save
 
 #=================================================================================
@@ -579,6 +623,8 @@ showcase list add discounted_value discounted_value
 
 showcase list addCustom portfolio_data root portfolio_data_id
 showcase list addCustom portfolio_data creditor portfolio_data_creditor_id
+
+showcase addIndex nonunique portfolio_flow_msfo_id
 
 showcase save
 

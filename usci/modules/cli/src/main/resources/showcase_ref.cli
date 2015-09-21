@@ -14,6 +14,8 @@ showcase list add docs.no no
 showcase list add docs.doc_type.code doc_type_code
 showcase list add docs.name name
 
+showcase addIndex nonunique ref_creditor_id
+
 showcase save
 #---------------------------------------------------------------------------------
 
@@ -36,6 +38,8 @@ showcase list add no_ no_
 showcase list add seventh_sign seventh_sign
 showcase list add sixth_sign sixth_sign
 
+showcase addIndex nonunique ref_balance_account_id
+
 showcase save
 #---------------------------------------------------------------------------------
 
@@ -52,7 +56,9 @@ showcase set tableName REF_BANK_RELATION
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
- 
+
+showcase addIndex nonunique ref_bank_relation_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -76,7 +82,9 @@ showcase list add provision_debt provision_debt
 showcase list add provision_portfolio_max provision_portfolio_max
 showcase list add provision_portfolio_min provision_portfolio_min
 showcase list add value_ value_
- 
+
+showcase addIndex nonunique ref_classification_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -84,7 +92,7 @@ showcase save
 #=================================================================================
 #  4.REF_CONTACT_TYPE
 #=================================================================================
- 
+
 showcase set meta ref_contact_type
  
 showcase set name REF_CONTACT_TYPE
@@ -93,6 +101,8 @@ showcase set tableName REF_CONTACT_TYPE
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
+
+showcase addIndex nonunique ref_contact_type_id
 
 showcase save
 #---------------------------------------------------------------------------------
@@ -113,7 +123,8 @@ showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 showcase list add short_name_kz short_name_kz
 showcase list add short_name_ru short_name_ru
- 
+
+showcase addIndex nonunique ref_country_id
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -130,7 +141,9 @@ showcase set tableName REF_CREDIT_OBJECT
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
- 
+
+showcase addIndex nonunique ref_credit_object_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -151,7 +164,9 @@ showcase list add name name
 showcase list add nokbdb_code nokbdb_code
 showcase list add short_name short_name
 showcase list add subject_type.code subject_type_code
- 
+
+showcase addIndex nonunique ref_creditor_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -174,6 +189,8 @@ showcase list add short_name short_name
 showcase list add main_office.code main_office_code
 showcase list add region.code region_code
 
+showcase addIndex nonunique ref_creditor_branch_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -190,7 +207,9 @@ showcase set tableName REF_CREDIT_PURPOSE
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
- 
+
+showcase addIndex nonunique ref_credit_purpose_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -208,7 +227,9 @@ showcase list add code code
 showcase list add kind_id kind_id
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
- 
+
+showcase addIndex nonunique ref_credit_type_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -228,7 +249,7 @@ showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 showcase list add rating rating
 showcase list add short_name short_name
- 
+showcase addIndex nonunique ref_currency_id
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -245,7 +266,9 @@ showcase set tableName REF_DEBTOR_TYPE
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
- 
+
+showcase addIndex nonunique ref_debtor_type_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -269,7 +292,9 @@ showcase list add short_name_kz short_name_kz
 showcase list add short_name_ru short_name_ru
 showcase list add sign_count sign_count
 showcase list add weight weight
- 
+
+showcase addIndex nonunique ref_doc_type_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -286,7 +311,9 @@ showcase set tableName REF_ECON_TRADE
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
- 
+
+showcase addIndex nonunique ref_econ_trade_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -305,7 +332,9 @@ showcase list add is_organization is_organization
 showcase list add is_se is_se
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
- 
+
+showcase addIndex nonunique ref_enterprise_type_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -322,7 +351,9 @@ showcase set tableName REF_FINANCE_SOURCE
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
- 
+
+showcase addIndex nonunique ref_finance_source_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -341,7 +372,9 @@ showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 showcase list add short_name_kz short_name_kz
 showcase list add short_name_ru short_name_ru
- 
+
+showcase addIndex nonunique ref_legal_form_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -362,6 +395,8 @@ showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 showcase list add country.code country_code
 
+showcase addIndex nonunique ref_offshore_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -380,7 +415,9 @@ showcase list add is_liquid_all is_liquid_all
 showcase list add is_liquid_invest is_liquid_invest
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
- 
+
+showcase addIndex nonunique ref_pledge_type_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -401,6 +438,8 @@ showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 showcase list add creditor.code creditor_code
 
+showcase addIndex nonunique ref_portfolio_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -417,7 +456,9 @@ showcase set tableName REF_REGION
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
- 
+
+showcase addIndex nonunique ref_region_id
+
 showcase save
 #---------------------------------------------------------------------------------
  
@@ -436,7 +477,9 @@ showcase list add kind_id kind_id
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 showcase list add report_period_duration_months report_period_duration_months
- 
+
+showcase addIndex nonunique ref_subject_type_id
+
 showcase save
 #---------------------------------------------------------------------------------
 
