@@ -976,7 +976,20 @@
     <ref_creditor_branch>
       <name>Павлодарский областной филиал</name>
       <short_name>Павлодарский областной филиал</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100335</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО "Жилстройсбербанк Казахстана"</name>
         <short_name>АО "ЖССБК"</short_name>
@@ -3864,7 +3877,20 @@
     <ref_creditor_branch>
       <name>филиал АО ДБ Национальный Банк Пакистанав Казахстане в г. Караганда</name>
       <short_name>филиал АО ДБ Национальный Банк Пакистанав Казахстане в г. Караганда</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100405</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО ДБ "Национальный Банк Пакистана" в Казахстане</name>
         <short_name>АО ДБ "NBP" в Казахстане</short_name>
@@ -3986,7 +4012,20 @@
     <ref_creditor_branch>
       <name>филиал АО ДБ Национальный Банк Пакистанав Казахстане</name>
       <short_name>филиал АО ДБ Национальный Банк Пакистанав Казахстане</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100404</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО ДБ "Национальный Банк Пакистана" в Казахстане</name>
         <short_name>АО ДБ "NBP" в Казахстане</short_name>
@@ -6073,7 +6112,20 @@
     <ref_creditor_branch>
       <name>Каскеленский областной филиал</name>
       <short_name>Каскеленский областной филиал</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100177</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО "Казкоммерцбанк"</name>
         <short_name>АО "ККБ"</short_name>
@@ -6286,7 +6338,20 @@
     <ref_creditor_branch>
       <name>Шелекский филиал</name>
       <short_name>Шелекский филиал</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100176</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО "Казкоммерцбанк"</name>
         <short_name>АО "ККБ"</short_name>
@@ -6857,7 +6922,20 @@
     <ref_creditor_branch>
       <name>Кокшетауский филиал</name>
       <short_name>Кокшетауский филиал</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100173</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО "Казкоммерцбанк"</name>
         <short_name>АО "ККБ"</short_name>
@@ -7063,7 +7141,20 @@
     <ref_creditor_branch>
       <name>РКО №1 АО ЖССБК в г. Талдыкорган</name>
       <short_name>РКО №1 АО ЖССБК в г. Талдыкорган</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100412</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО "Жилстройсбербанк Казахстана"</name>
         <short_name>АО "ЖССБК"</short_name>
@@ -8505,7 +8596,20 @@
     <ref_creditor_branch>
       <name>Балхашский филиал</name>
       <short_name>Балхашский филиал</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100187</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО "Казкоммерцбанк"</name>
         <short_name>АО "ККБ"</short_name>
@@ -13004,7 +13108,20 @@
     <ref_creditor_branch>
       <name>Центральный филиал в г. Алматы</name>
       <short_name>Центральный филиал в г. Алматы</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100149</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО "БанкПозитив Казахстан"</name>
         <short_name>АО "БанкПозитив Казахстан"</short_name>
@@ -13704,7 +13821,20 @@
     <ref_creditor_branch>
       <name>Экибастузский филиал</name>
       <short_name>Экибастузский филиал</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100192</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО "Казкоммерцбанк"</name>
         <short_name>АО "ККБ"</short_name>
@@ -20392,7 +20522,20 @@
       <code>050101</code>
       <name>Головной банк АО "Народный сберегательный банк Казахстана"</name>
       <short_name>Головной банк</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000101102</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО "Народный сберегательный банк Казахстана"</name>
         <short_name>АО "Народный банк Казахстана"</short_name>
@@ -23610,6 +23753,79 @@
         <code>35</code>
         <name_kz>Қарағанды облысы</name_kz>
         <name_ru>Карагандинская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Талдыкорганский филиал </name>
+      <short_name>Талдыкорганский филиал</short_name>
+      <docs>
+        <item>
+          <no>000000101262</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>АО "Цеснабанк"</name>
+        <short_name>АО "Цеснабанк"</short_name>
+        <code>998</code>
+        <docs>
+          <item>
+            <no>031400063221</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>920140000084</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>TSESKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>19</code>
+        <name_kz>Алматы облысы</name_kz>
+        <name_ru>Алматинская область</name_ru>
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
@@ -27103,6 +27319,67 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
+      <name>Филиал АО "Банк Kassa Nova" в г.Кокшетау</name>
+      <short_name>Филиал в г.Кокшетау</short_name>
+      <docs>
+        <item>
+          <no>130241031840</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>АО "Банк Kassa Nova"</name>
+        <short_name>АО "Банк Kassa Nova"</short_name>
+        <code>551</code>
+        <docs>
+          <item>
+            <no>KSNVKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>090740019001</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>11</code>
+        <name_kz>Ақмола облысы</name_kz>
+        <name_ru>Акмолинская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
       <code>380107</code>
       <name>Семипалатинский региональный филиал</name>
       <short_name>Семипалатинский региональный филиал</short_name>
@@ -27191,7 +27468,20 @@
     <ref_creditor_branch>
       <name>Головной Офис</name>
       <short_name>Головной офис</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000101040</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО "Kaspi Bank"</name>
         <short_name>АО "Kaspi Bank"</short_name>
@@ -29034,7 +29324,20 @@
     <ref_creditor_branch>
       <name>филиал в г. Актобе</name>
       <short_name>филиал в г. Актобе</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100365</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО ДБ "Банк Китая в Казахстане"</name>
         <short_name>АО ДБ "БАНК КИТАЯ В КАЗАХСТАНЕ"</short_name>
@@ -30773,7 +31076,20 @@
     <ref_creditor_branch>
       <name>филиал АО Ситибанк Казахстан</name>
       <short_name>филиал АО Ситибанк Казахстан</short_name>
-      <docs/>
+      <docs>
+        <item>
+          <no>000000100359</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика</name_ru>
+            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+      </docs>
       <main_office>
         <name>АО "Ситибанк Казахстан"</name>
         <short_name>АО "Ситибанк Казахстан"</short_name>

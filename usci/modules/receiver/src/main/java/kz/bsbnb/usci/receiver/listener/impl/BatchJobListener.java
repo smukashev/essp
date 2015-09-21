@@ -16,9 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 
-/**
- * @author k.tulbassiyev
- */
 @Component
 public class BatchJobListener implements IListener {
 
@@ -28,13 +25,11 @@ public class BatchJobListener implements IListener {
     @Autowired
     private IServiceRepository serviceFactory;
 
-    private final Logger logger = LoggerFactory.getLogger(BatchJobListener.class);
+    private static long lastTime;
 
     @AfterJob
     public void afterJob(JobExecution jobExecution) {
         long batchId = jobExecution.getJobInstance().getJobParameters().getLong("batchId");
-        long userId = jobExecution.getJobInstance().getJobParameters().getLong("userId");
-        System.out.println(" --- AFTER JOB --- batch: " + batchId + ", userId: " + userId);
 
         IBatchService batchService = serviceFactory.getBatchService();
         
@@ -43,13 +38,16 @@ public class BatchJobListener implements IListener {
         properties.put("FILENAME", batch.getFileName());
 //        serviceFactory.getMailMessageBeanCommonBusiness().sendMailMessage("FILE_PROCESSING_COMPLETED", batch.getUserId(), properties);
 
-
         batchService.endBatch(batchId);
         receiverStatusSingleton.batchEnded();
+
+        System.out.println(batch.getFileName() + " finished(" +
+                ((System.currentTimeMillis() - lastTime) / 1000) + " sec" + ")");
     }
 
     @BeforeJob
     public void beforeJob(JobExecution jobExecution) {
         System.out.println(" --- BEFORE JOB ---");
+        lastTime = System.currentTimeMillis();
     }
 }

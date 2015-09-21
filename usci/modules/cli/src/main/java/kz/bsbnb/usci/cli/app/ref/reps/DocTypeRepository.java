@@ -64,6 +64,16 @@ public class DocTypeRepository extends BaseRepository {
          return (DocType) getRepository().get(id);
     }
 
+    public static DocType getByCode(String code) {
+        for(Object d : getRepository().values()) {
+            DocType dt = (DocType) d;
+            if(dt.get("CODE").equals(code))
+                return dt;
+        }
+
+        throw new RuntimeException("docType with code" + code + " not found");
+    }
+
     public static HashSet getColumns() {
         try {
             if(columns ==null){

@@ -311,7 +311,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                 .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE.
-                        equal(DataUtils.convert(baseValue.getRepDate())))
+                        lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID.equal(childBaseEntity.getId()))
                 .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
@@ -410,48 +410,37 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseSet baseSet, Date actualReportDate, boolean lastReportDate) {
+    public void loadBaseValues(IBaseSet baseSet, Date actualReportDate) {
         IMetaType metaType = baseSet.getMemberType();
         IMetaClass metaClass = (IMetaClass) metaType;
 
         Table tableOfValues = EAV_BE_COMPLEX_SET_VALUES.as("csv");
         Select select;
-        if (lastReportDate) {
-            select = context
-                    .select(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ID),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
-                    .from(tableOfValues)
-                    .where(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.SET_ID).equal(baseSet.getId()))
-                    .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST).equal(true)
-                            .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED).equal(false)));
-        } else {
-            Table tableNumbering = context
-                    .select(DSL.rank().over()
-                        .partitionBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID))
-                        .orderBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ID),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
-                            tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
-                    .from(tableOfValues)
-                    .where(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.SET_ID).eq(baseSet.getId()))
-                    .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE)
-                            .lessOrEqual(DataUtils.convert(actualReportDate)))
-                    .asTable("csvn");
 
-            select = context
-                    .select(tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.ID),
-                            tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
-                            tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
-                            tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
-                    .from(tableNumbering)
-                    .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                    .and(tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED).equal(false));
-        }
+        Table tableNumbering = context
+                .select(DSL.rank().over()
+                    .partitionBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID))
+                    .orderBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
+                        tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ID),
+                        tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
+                        tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
+                        tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
+                        tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
+                .from(tableOfValues)
+                .where(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.SET_ID).eq(baseSet.getId()))
+                .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE)
+                        .lessOrEqual(DataUtils.convert(actualReportDate)))
+                .asTable("csvn");
+
+        select = context
+                .select(tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.ID),
+                        tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
+                        tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
+                        tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
+                .from(tableNumbering)
+                .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
+                .and(tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED).equal(false));
+
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

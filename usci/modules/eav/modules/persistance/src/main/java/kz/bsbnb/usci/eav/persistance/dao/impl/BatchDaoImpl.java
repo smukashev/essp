@@ -80,18 +80,17 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 EAV_BATCHES.TOTAL_COUNT,
                 EAV_BATCHES.ACTUAL_COUNT,
                 EAV_BATCHES.REPORT_ID
-        ).from(EAV_BATCHES).join(
-                context.select(
+        ).from(EAV_BATCHES).join(context.select(
                         EAV_BATCH_STATUSES.BATCH_ID,
                         EAV_BATCH_STATUSES.STATUS_ID,
                         DSL.rowNumber().over()
                                 .partitionBy(EAV_BATCH_STATUSES.BATCH_ID)
                                 .orderBy(EAV_BATCH_STATUSES.RECEIPT_DATE.desc(),
-                                        EAV_BATCH_STATUSES.STATUS_ID.desc()).as("num")
-                ).from(EAV_BATCH_STATUSES).asTable("bs")
-        ).on(EAV_BATCHES.ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class)))
+                                        EAV_BATCH_STATUSES.STATUS_ID.desc()).as("num")).
+                        from(EAV_BATCH_STATUSES).asTable("bs")).
+                on(EAV_BATCHES.ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class)))
                 .where(DSL.field("\"bs\".\"num\"").eq(1)).and(DSL.field("\"bs\".STATUS_ID").
-                        ne(statusCompleted.getId()));
+                        ne(statusCompleted.getId())).orderBy(EAV_BATCHES.ID);
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 

@@ -77,6 +77,49 @@
       <name_ru>Автокредитование</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0853</code>
+      <name_kz>Корпоративный Лояльный Просто Кредит МСФО</name_kz>
+      <name_ru>Корпоративный Лояльный Просто Кредит МСФО</name_ru>
+      <creditor>
+        <name>АО "Capital Bank Kazakhstan"</name>
+        <short_name>АО "Capital Bank Kazakhstan"</short_name>
+        <code>781</code>
+        <docs>
+          <item>
+            <no>920140000143</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>TBKBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0079</code>
       <name_kz>Юридические лица</name_kz>
       <name_ru>Юридические лица</name_ru>
@@ -272,6 +315,61 @@
       <name_ru>Research and consulting  service</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0805</code>
+      <name_kz>Пулл юр. лиц Обрабатывающие отрасли</name_kz>
+      <name_ru>Пулл юр. лиц Обрабатывающие отрасли</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0662</code>
       <name_kz>Несущественные обесцененные к списанию (КБ, МСБ) УО</name_kz>
       <name_ru>Несущественные обесцененные к списанию (КБ, МСБ) УО</name_ru>
@@ -280,6 +378,61 @@
       <code>0728</code>
       <name_kz>Other industries</name_kz>
       <name_ru>Other industries</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0804</code>
+      <name_kz>Пулл юр. лиц Прочие отрасли</name_kz>
+      <name_ru>Пулл юр. лиц Прочие отрасли</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0663</code>
@@ -295,6 +448,116 @@
       <code>0660</code>
       <name_kz>Прочее существенные необесцененные (КБ/МСБ) УО</name_kz>
       <name_ru>Прочее существенные необесцененные (КБ/МСБ) УО</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0803</code>
+      <name_kz>Пулл юр. лиц Оптово-розничная торговля отрасли</name_kz>
+      <name_ru>Пулл юр. лиц Оптово-розничная торговля отрасли</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0802</code>
+      <name_kz>Пулл юр. лиц Обрабатывающие отрасли</name_kz>
+      <name_ru>Пулл юр. лиц Обрабатывающие отрасли</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0726</code>
@@ -400,6 +663,49 @@
       <code>0654</code>
       <name_kz>Прочее несущественные необесцененные (КБ/МСБ) УО</name_kz>
       <name_ru>Прочее несущественные необесцененные (КБ/МСБ) УО</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0852</code>
+      <name_kz>Корпоративный Беззалоговый Просто Кредит МСФО</name_kz>
+      <name_ru>Корпоративный Беззалоговый Просто Кредит МСФО</name_ru>
+      <creditor>
+        <name>АО "Capital Bank Kazakhstan"</name>
+        <short_name>АО "Capital Bank Kazakhstan"</short_name>
+        <code>781</code>
+        <docs>
+          <item>
+            <no>920140000143</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>TBKBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0712</code>
@@ -517,6 +823,61 @@
       <name_ru>Прочее несущественные обесцененные (РБ)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0851</code>
+      <name_kz>Кредитные карты Просто Кредит МСФО</name_kz>
+      <name_ru>Кредитные карты Просто Кредит МСФО</name_ru>
+      <creditor>
+        <name>АО "Евразийский банк"</name>
+        <short_name>АО "Евразийский банк"</short_name>
+        <code>948</code>
+        <docs>
+          <item>
+            <no>950240000112</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900063755</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>EURIKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0056</code>
       <name_kz>Прочее несущественные необесцененные (РБ)</name_kz>
       <name_ru>Прочее несущественные необесцененные (РБ)</name_ru>
@@ -607,6 +968,61 @@
       <name_ru>МСБ услуги  реструктурированный</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0850</code>
+      <name_kz>ПУЛЛ ЮР.ЛИЦ УСЛУГИ В ОБЛАСТИ ИСКУССТВА, РАЗВЛЕЧЕНИЙ И ОТДЫХА</name_kz>
+      <name_ru>ПУЛЛ ЮР.ЛИЦ УСЛУГИ В ОБЛАСТИ ИСКУССТВА, РАЗВЛЕЧЕНИЙ И ОТДЫХА</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0846</code>
       <name_kz>ПУЛЛ ЮР.ЛИЦ УСЛУГИ ПРОФЕССИОНАЛЬНЫЕ, НАУЧНЫЕ И ТЕХНИЧЕСКИЕ</name_kz>
       <name_ru>ПУЛЛ ЮР.ЛИЦ УСЛУГИ ПРОФЕССИОНАЛЬНЫЕ, НАУЧНЫЕ И ТЕХНИЧЕСКИЕ</name_ru>
@@ -667,14 +1083,179 @@
       <name_ru>Сотрудники Банка и аффилированных компаний</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0847</code>
+      <name_kz>ПУЛЛ ЮР.ЛИЦ УСЛУГИ В ОБЛАСТИ АДМИНИСТРАТИВНОГО И ВСПОМОГАТЕЛЬНОГО ОБСЛУЖИВАНИЯ</name_kz>
+      <name_ru>ПУЛЛ ЮР.ЛИЦ УСЛУГИ В ОБЛАСТИ АДМИНИСТРАТИВНОГО И ВСПОМОГАТЕЛЬНОГО ОБСЛУЖИВАНИЯ</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0049</code>
       <name_kz>Самрук</name_kz>
       <name_ru>Самрук</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0848</code>
+      <name_kz>ПУЛЛ ЮР.ЛИЦ УСЛУГИ В ОБЛАСТИ ОБРАЗОВАНИЯ</name_kz>
+      <name_ru>ПУЛЛ ЮР.ЛИЦ УСЛУГИ В ОБЛАСТИ ОБРАЗОВАНИЯ</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0048</code>
       <name_kz>Неотложные нужды</name_kz>
       <name_ru>Неотложные нужды</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0849</code>
+      <name_kz>ПУЛЛ ЮР.ЛИЦ УСЛУГИ В ОБЛАСТИ ЗДРАВООХРАНЕНИЯ И СОЦИАЛЬНОГО ОБСЛУЖИВАНИЯ НАСЕЛЕНИЯ</name_kz>
+      <name_ru>ПУЛЛ ЮР.ЛИЦ УСЛУГИ В ОБЛАСТИ ЗДРАВООХРАНЕНИЯ И СОЦИАЛЬНОГО ОБСЛУЖИВАНИЯ НАСЕЛЕНИЯ</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0047</code>
@@ -807,6 +1388,104 @@
       <name_ru>Кредитные карты</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0882</code>
+      <name_kz>Беззалоговый Кредит2 МСФО</name_kz>
+      <name_ru>Беззалоговый Кредит2 МСФО</name_ru>
+      <creditor>
+        <name>АО "Capital Bank Kazakhstan"</name>
+        <short_name>АО "Capital Bank Kazakhstan"</short_name>
+        <code>781</code>
+        <docs>
+          <item>
+            <no>920140000143</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>TBKBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0845</code>
+      <name_kz>ПУЛЛ ЮР.ЛИЦ УСЛУГИ ПО ОПЕРАЦИЯМ С НЕДВИЖИМЫМ ИМУЩЕСТВОМ</name_kz>
+      <name_ru>ПУЛЛ ЮР.ЛИЦ УСЛУГИ ПО ОПЕРАЦИЯМ С НЕДВИЖИМЫМ ИМУЩЕСТВОМ</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0732</code>
       <name_kz>KIK</name_kz>
       <name_ru>KIK</name_ru>
@@ -865,6 +1544,49 @@
       <code>0737</code>
       <name_kz>ипотека КИК</name_kz>
       <name_ru>ипотека КИК</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0857</code>
+      <name_kz>корпоративные займы с рейтингом</name_kz>
+      <name_ru>корпоративные займы с рейтингом</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0738</code>
@@ -1247,6 +1969,49 @@
       <name_ru>Кредитный портфель HUD12-24(&gt;18)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0881</code>
+      <name_kz>Автокредитование Просто Кредит МСФО</name_kz>
+      <name_ru>Автокредитование Просто Кредит МСФО</name_ru>
+      <creditor>
+        <name>АО "Capital Bank Kazakhstan"</name>
+        <short_name>АО "Capital Bank Kazakhstan"</short_name>
+        <code>781</code>
+        <docs>
+          <item>
+            <no>920140000143</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>TBKBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0787</code>
       <name_kz>Кредитный портфель SUK 10-12</name_kz>
       <name_ru>Кредитный портфель SUK 10-12</name_ru>
@@ -1347,6 +2112,104 @@
           <report_period_duration_months>3</report_period_duration_months>
         </subject_type>
         <nokbdb_code>J:Агр КредКорп:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0892</code>
+      <name_kz>Пул "Безнадежные займы"</name_kz>
+      <name_ru>Пул "Безнадежные займы"</name_ru>
+      <creditor>
+        <name>АО "Жилстройсбербанк Казахстана"</name>
+        <short_name>АО "ЖССБК"</short_name>
+        <code>372</code>
+        <docs>
+          <item>
+            <no>030740001404</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HCSKKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700525207</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0858</code>
+      <name_kz>корпоративные займы с рейтингом</name_kz>
+      <name_ru>корпоративные займы с рейтингом</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
@@ -1630,6 +2493,49 @@
       <name_ru>Кредитный портфель SUD 24+</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0880</code>
+      <name_kz>Корпоративные кредиты, обеспеченные недвижимостью</name_kz>
+      <name_ru>Корпоративные кредиты, обеспеченные недвижимостью</name_ru>
+      <creditor>
+        <name>АО "БанкПозитив Казахстан"</name>
+        <short_name>АО "БанкПозитив Казахстан"</short_name>
+        <code>492</code>
+        <docs>
+          <item>
+            <no>920240000177</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>DEMIKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0794</code>
       <name_kz>Кредитный портфель SUD 12-18</name_kz>
       <name_ru>Кредитный портфель SUD 12-18</name_ru>
@@ -1640,9 +2546,95 @@
       <name_ru>Кредитный портфель SUD 19-24</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0878</code>
+      <name_kz>Корпоративные кредиты, обеспеченные движимым имуществом</name_kz>
+      <name_ru>Корпоративные кредиты, обеспеченные движимым имуществом</name_ru>
+      <creditor>
+        <name>АО "БанкПозитив Казахстан"</name>
+        <short_name>АО "БанкПозитив Казахстан"</short_name>
+        <code>492</code>
+        <docs>
+          <item>
+            <no>920240000177</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>DEMIKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0792</code>
       <name_kz>Кредитный портфель HWD18+(19-24)</name_kz>
       <name_ru>Кредитный портфель HWD18+(19-24)</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0879</code>
+      <name_kz>Корпоративные кредиты без  обеспечения</name_kz>
+      <name_ru>Корпоративные кредиты без  обеспечения </name_ru>
+      <creditor>
+        <name>АО "БанкПозитив Казахстан"</name>
+        <short_name>АО "БанкПозитив Казахстан"</short_name>
+        <code>492</code>
+        <docs>
+          <item>
+            <no>920240000177</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>DEMIKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0793</code>
@@ -1650,9 +2642,95 @@
       <name_ru>Кредитный портфель HWD18+(24+)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0876</code>
+      <name_kz>Беззалоговые кредиты</name_kz>
+      <name_ru>Беззалоговые кредиты</name_ru>
+      <creditor>
+        <name>АО "БанкПозитив Казахстан"</name>
+        <short_name>АО "БанкПозитив Казахстан"</short_name>
+        <code>492</code>
+        <docs>
+          <item>
+            <no>920240000177</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>DEMIKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0790</code>
       <name_kz>Кредитный портфель SUK 24+</name_kz>
       <name_ru>Кредитный портфель SUK 24+</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0877</code>
+      <name_kz>Ипотечные кредиты </name_kz>
+      <name_ru>Ипотечные кредиты </name_ru>
+      <creditor>
+        <name>АО "БанкПозитив Казахстан"</name>
+        <short_name>АО "БанкПозитив Казахстан"</short_name>
+        <code>492</code>
+        <docs>
+          <item>
+            <no>920240000177</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>DEMIKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0791</code>
@@ -1660,9 +2738,353 @@
       <name_ru>Кредитный портфель HWD12-18</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0875</code>
+      <name_kz>Автомобильные кредиты</name_kz>
+      <name_ru>Автомобильные кредиты</name_ru>
+      <creditor>
+        <name>АО "БанкПозитив Казахстан"</name>
+        <short_name>АО "БанкПозитив Казахстан"</short_name>
+        <code>492</code>
+        <docs>
+          <item>
+            <no>920240000177</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>DEMIKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0797</code>
       <name_kz>Обесцененные Кредиты</name_kz>
       <name_ru>Обесцененные Кредиты</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0894</code>
+      <name_kz>Кредитные лимиты, установленные на банковские карты</name_kz>
+      <name_ru>Кредитные лимиты, установленные на банковские карты</name_ru>
+      <creditor>
+        <name>АО "Казкоммерцбанк"</name>
+        <short_name>АО "ККБ"</short_name>
+        <code>926</code>
+        <docs>
+          <item>
+            <no>911040000021</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZKOKZKX</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0859</code>
+      <name_kz>Портфель однородных кредитов предоставленных физическим лицам - сотрудникам Банка</name_kz>
+      <name_ru>Портфель однородных кредитов предоставленных физическим лицам - сотрудникам Банка</name_ru>
+      <creditor>
+        <name>АО "Шинхан Банк Казахстан"</name>
+        <short_name>АО "Шинхан Банк Казахстан"</short_name>
+        <code>435</code>
+        <docs>
+          <item>
+            <no>080240019735</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>SHBKKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0854</code>
+      <name_kz>Корпоративный Зарплатный Просто Кредит МСФО</name_kz>
+      <name_ru>Корпоративный Зарплатный Просто Кредит МСФО</name_ru>
+      <creditor>
+        <name>АО "Capital Bank Kazakhstan"</name>
+        <short_name>АО "Capital Bank Kazakhstan"</short_name>
+        <code>781</code>
+        <docs>
+          <item>
+            <no>920140000143</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>TBKBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0871</code>
+      <name_kz>Ипотечные кредиты</name_kz>
+      <name_ru>Ипотечные кредиты</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0872</code>
+      <name_kz>Автокредиты</name_kz>
+      <name_ru>Автокредиты</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0873</code>
+      <name_kz>Потребительские кредиты</name_kz>
+      <name_ru>Потребительские кредиты</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0874</code>
+      <name_kz>Кредитные карточки, дебетные карточки с кредитным лимитом</name_kz>
+      <name_ru>Кредитные карточки, дебетные карточки с кредитным лимитом</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0004</code>
@@ -1863,6 +3285,61 @@
       <code>0085</code>
       <name_kz>3.Кредиты сотрудникам</name_kz>
       <name_ru>3.Кредиты сотрудникам</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0838</code>
+      <name_kz>ПУЛЛ ЮР.ЛИЦ ВОДОСНАБЖЕНИЕ; КАНАЛИЗАЦИОННАЯ СИСТЕМА, УСЛУГИ ПО СБОРУ И УДАЛЕНИЮ ОТХОДОВ</name_kz>
+      <name_ru>ПУЛЛ ЮР.ЛИЦ ВОДОСНАБЖЕНИЕ; КАНАЛИЗАЦИОННАЯ СИСТЕМА, УСЛУГИ ПО СБОРУ И УДАЛЕНИЮ ОТХОДОВ</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0094</code>
@@ -2090,9 +3567,119 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0835</code>
+      <name_kz>ПУЛЛ ЮР.ЛИЦ ПРОДУКЦИЯ ГОРНОДОБЫВАЮЩЕЙ ПРОМЫШЛЕННОСТИ</name_kz>
+      <name_ru>ПУЛЛ ЮР.ЛИЦ ПРОДУКЦИЯ ГОРНОДОБЫВАЮЩЕЙ ПРОМЫШЛЕННОСТИ</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0836</code>
       <name_kz>ПУЛЛ ЮР.ЛИЦ ПРОДУКЦИЯ ОБРАБАТЫВАЮЩЕЙ ПРОМЫШЛЕННОСТИ</name_kz>
       <name_ru>ПУЛЛ ЮР.ЛИЦ ПРОДУКЦИЯ ОБРАБАТЫВАЮЩЕЙ ПРОМЫШЛЕННОСТИ</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0837</code>
+      <name_kz>ПУЛЛ ЮР.ЛИЦ ЭЛЕКТРОЭНЕРГИЯ, ГАЗ, ПАР И ВОЗДУШНОЕ КОНДИЦИОНИРОВАНИЕ</name_kz>
+      <name_ru>ПУЛЛ ЮР.ЛИЦ ЭЛЕКТРОЭНЕРГИЯ, ГАЗ, ПАР И ВОЗДУШНОЕ КОНДИЦИОНИРОВАНИЕ</name_ru>
       <creditor>
         <name>АО "Bank RBK"</name>
         <short_name>АО "Bank RBK"</short_name>
@@ -2210,6 +3797,336 @@
       <name_ru>Автокредитование (новый автотранспорт)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0891</code>
+      <name_kz>Обесцененный пул "промежуточные жилищные займы"</name_kz>
+      <name_ru>Обесцененный пул "промежуточные жилищные займы"</name_ru>
+      <creditor>
+        <name>АО "Жилстройсбербанк Казахстана"</name>
+        <short_name>АО "ЖССБК"</short_name>
+        <code>372</code>
+        <docs>
+          <item>
+            <no>030740001404</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HCSKKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700525207</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0890</code>
+      <name_kz>Обесцененный пул "предварительные жилищные займы"</name_kz>
+      <name_ru>Обесцененный пул "предварительные жилищные займы"</name_ru>
+      <creditor>
+        <name>АО "Жилстройсбербанк Казахстана"</name>
+        <short_name>АО "ЖССБК"</short_name>
+        <code>372</code>
+        <docs>
+          <item>
+            <no>030740001404</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HCSKKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700525207</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0887</code>
+      <name_kz>Необесцененный пул "предварительные жилищные займы"</name_kz>
+      <name_ru>Необесцененный пул "предварительные жилищные займы"</name_ru>
+      <creditor>
+        <name>АО "Жилстройсбербанк Казахстана"</name>
+        <short_name>АО "ЖССБК"</short_name>
+        <code>372</code>
+        <docs>
+          <item>
+            <no>030740001404</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HCSKKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700525207</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0886</code>
+      <name_kz>Необесцененный пул "жилищные займы"</name_kz>
+      <name_ru>Необесцененный пул "жилищные займы"</name_ru>
+      <creditor>
+        <name>АО "Жилстройсбербанк Казахстана"</name>
+        <short_name>АО "ЖССБК"</short_name>
+        <code>372</code>
+        <docs>
+          <item>
+            <no>030740001404</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HCSKKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700525207</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0889</code>
+      <name_kz>Обесцененный пул "жилищные займы"</name_kz>
+      <name_ru>Обесцененный пул "жилищные займы"</name_ru>
+      <creditor>
+        <name>АО "Жилстройсбербанк Казахстана"</name>
+        <short_name>АО "ЖССБК"</short_name>
+        <code>372</code>
+        <docs>
+          <item>
+            <no>030740001404</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HCSKKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700525207</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0888</code>
+      <name_kz>Необесцененный пул "промежуточные жилищные займы"</name_kz>
+      <name_ru>Необесцененный пул "промежуточные жилищные займы"</name_ru>
+      <creditor>
+        <name>АО "Жилстройсбербанк Казахстана"</name>
+        <short_name>АО "ЖССБК"</short_name>
+        <code>372</code>
+        <docs>
+          <item>
+            <no>030740001404</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HCSKKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700525207</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0751</code>
       <name_kz>Условные обязательства ЮЛ</name_kz>
       <name_ru>Условные обязательства ЮЛ</name_ru>
@@ -2218,6 +4135,61 @@
       <code>0752</code>
       <name_kz>Условные обязательства ФЛ</name_kz>
       <name_ru>Условные обязательства ФЛ</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0842</code>
+      <name_kz>ПУЛЛ ЮР.ЛИЦ УСЛУГИ ПО ПРОЖИВАНИЮ И ПИТАНИЮ</name_kz>
+      <name_ru>ПУЛЛ ЮР.ЛИЦ УСЛУГИ ПО ПРОЖИВАНИЮ И ПИТАНИЮ</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0799</code>
@@ -2490,6 +4462,49 @@
       <name_ru>22.МСФО Карточки</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0913</code>
+      <name_kz>Не обесцененные индивидуально значимые займы</name_kz>
+      <name_ru>Не обесцененные индивидуально значимые займы</name_ru>
+      <creditor>
+        <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
+        <short_name>АО "ФФПСХ"</short_name>
+        <docs>
+          <item>
+            <no>980840000675</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>031400130793</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0825</code>
       <name_kz>Кредитование НСХБ</name_kz>
       <name_ru>Кредитование НСХБ</name_ru>
@@ -2608,6 +4623,171 @@
       <name_ru>Однородные кредиты от 1 года  до 5 лет , юридические лица</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0884</code>
+      <name_kz>Портфель Массовых розничных займов за исключением займов на покупку авто</name_kz>
+      <name_ru>Портфель Массовых розничных займов за исключением займов на покупку авто</name_ru>
+      <creditor>
+        <name>АО "Kaspi Bank"</name>
+        <short_name>АО "Kaspi Bank"</short_name>
+        <code>722</code>
+        <docs>
+          <item>
+            <no>CASPKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>971240001315</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700043016</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0883</code>
+      <name_kz>-	Старый портфель займов, выданных юридическим и физическим лицам</name_kz>
+      <name_ru>-	Старый портфель займов, выданных юридическим и физическим лицам</name_ru>
+      <creditor>
+        <name>АО "Kaspi Bank"</name>
+        <short_name>АО "Kaspi Bank"</short_name>
+        <code>722</code>
+        <docs>
+          <item>
+            <no>CASPKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>971240001315</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700043016</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0885</code>
+      <name_kz>Портфель Массовых розничных займов на покупку авто</name_kz>
+      <name_ru>Портфель Массовых розничных займов на покупку авто</name_ru>
+      <creditor>
+        <name>АО "Kaspi Bank"</name>
+        <short_name>АО "Kaspi Bank"</short_name>
+        <code>722</code>
+        <docs>
+          <item>
+            <no>CASPKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>971240001315</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700043016</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0768</code>
       <name_kz>27.РЕФ залоговых займов</name_kz>
       <name_ru>27.РЕФ залоговых займов</name_ru>
@@ -2656,6 +4836,49 @@
       <code>0769</code>
       <name_kz>18.РЕФ беззалоговых займов</name_kz>
       <name_ru>18.РЕФ беззалоговых займов</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0914</code>
+      <name_kz>Не обесцененные индивидуально значимые займы, более 3-х лет</name_kz>
+      <name_ru>Не обесцененные индивидуально значимые займы, более 3-х лет</name_ru>
+      <creditor>
+        <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
+        <short_name>АО "ФФПСХ"</short_name>
+        <docs>
+          <item>
+            <no>980840000675</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>031400130793</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0829</code>
@@ -2898,6 +5121,11 @@
       <name_ru>Товарный кредит Нур</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0800</code>
+      <name_kz>Товарный кредит Нур</name_kz>
+      <name_ru>Товарный кредит Нур</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0695</code>
       <name_kz>Микрокредиты от 1 года до 3х лет, плох обеспечение</name_kz>
       <name_ru>Микрокредиты от 1 года до 3х лет, плох обеспечение</name_ru>
@@ -2988,24 +5216,24 @@
       <name_ru>Операции с недвижимостью существенные необесцененные (КБ/МСБ)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0034</code>
-      <name_kz>Оптовая торговля несущественные необесцененные (КБ/МСБ)</name_kz>
-      <name_ru>Оптовая торговля несущественные необесцененные (КБ/МСБ)</name_ru>
-    </ref_portfolio>
-    <ref_portfolio>
       <code>0613</code>
       <name_kz>Потребительские займы(нарбанк)</name_kz>
       <name_ru>Потребительские займы</name_ru>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0035</code>
-      <name_kz>Оптовая торговля существенные необесцененные (КБ/МСБ)</name_kz>
-      <name_ru>Оптовая торговля существенные необесцененные (КБ/МСБ)</name_ru>
+      <code>0034</code>
+      <name_kz>Оптовая торговля несущественные необесцененные (КБ/МСБ)</name_kz>
+      <name_ru>Оптовая торговля несущественные необесцененные (КБ/МСБ)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
       <code>0614</code>
       <name_kz>Оптовая торговля(нарбанк)</name_kz>
       <name_ru>Оптовая торговля(нарбанк)</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0035</code>
+      <name_kz>Оптовая торговля существенные необесцененные (КБ/МСБ)</name_kz>
+      <name_ru>Оптовая торговля существенные необесцененные (КБ/МСБ)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
       <code>0855</code>
@@ -3073,19 +5301,14 @@
       <name_ru>Строительство</name_ru>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0038</code>
-      <name_kz>Под залог автомобиля несущественные необесцененные (РБ)</name_kz>
-      <name_ru>Под залог автомобиля несущественные необесцененные (РБ)</name_ru>
-    </ref_portfolio>
-    <ref_portfolio>
       <code>0617</code>
       <name_kz>Сельское хозяйство(нарбанк)</name_kz>
       <name_ru>Сельское хозяйство</name_ru>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0039</code>
-      <name_kz>Под залог автомобиля несущественные обесцененные (РБ)</name_kz>
-      <name_ru>Под залог автомобиля несущественные обесцененные (РБ)</name_ru>
+      <code>0038</code>
+      <name_kz>Под залог автомобиля несущественные необесцененные (РБ)</name_kz>
+      <name_ru>Под залог автомобиля несущественные необесцененные (РБ)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
       <code>0618</code>
@@ -3093,14 +5316,19 @@
       <name_ru>Прочее(нарбанк)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0036</code>
-      <name_kz>Пищевая промышленность несущественные необесцененные (КБ/МСБ)</name_kz>
-      <name_ru>Пищевая промышленность несущественные необесцененные (КБ/МСБ)</name_ru>
+      <code>0039</code>
+      <name_kz>Под залог автомобиля несущественные обесцененные (РБ)</name_kz>
+      <name_ru>Под залог автомобиля несущественные обесцененные (РБ)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
       <code>0619</code>
       <name_kz>Предоставление услуг(нарбанк)</name_kz>
       <name_ru>Предоставление услуг</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0036</code>
+      <name_kz>Пищевая промышленность несущественные необесцененные (КБ/МСБ)</name_kz>
+      <name_ru>Пищевая промышленность несущественные необесцененные (КБ/МСБ)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
       <code>0037</code>
@@ -3163,14 +5391,64 @@
       <name_ru>Несущественные обесцененные к списанию (КБ, МСБ)</name_ru>
     </ref_portfolio>
     <ref_portfolio>
+      <code>0860</code>
+      <name_kz>ПУЛ ФИЗ.ЛИЦ Просроченные залоговые</name_kz>
+      <name_ru>ПУЛ ФИЗ.ЛИЦ Просроченные залоговые</name_ru>
+      <creditor>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
+        <docs>
+          <item>
+            <no>920440001102</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KINCKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
       <code>0681</code>
       <name_kz>Ипотека МСФО</name_kz>
       <name_ru>Ипотека МСФО</name_ru>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0680</code>
-      <name_kz>Корпоративный Просто Кредит КФН</name_kz>
-      <name_ru>Корпоративный Просто Кредит КФН</name_ru>
     </ref_portfolio>
     <ref_portfolio>
       <code>0683</code>
@@ -3288,19 +5566,52 @@
       <name_ru>Кредитные лимиты</name_ru>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0674</code>
-      <name_kz>Автокредитование КФН</name_kz>
-      <name_ru>Автокредитование КФН</name_ru>
+      <code>0870</code>
+      <name_kz>Прочие</name_kz>
+      <name_ru>Прочие</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
     <ref_portfolio>
       <code>0757</code>
       <name_kz>МСБ БИЗНЕС КАНИКУЛЫ МСФО</name_kz>
       <name_ru>МСБ БИЗНЕС КАНИКУЛЫ МСФО</name_ru>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0673</code>
-      <name_kz>Ипотечное кредитование КФН</name_kz>
-      <name_ru>Ипотечное кредитование КФН</name_ru>
     </ref_portfolio>
     <ref_portfolio>
       <code>0755</code>
@@ -3323,11 +5634,6 @@
       <name_ru>Финансовые операции существенные необесцененные (КБ/МСБ) УО</name_ru>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0678</code>
-      <name_kz>Автокредитование Просто Кредит КФН</name_kz>
-      <name_ru>Автокредитование Просто Кредит КФН</name_ru>
-    </ref_portfolio>
-    <ref_portfolio>
       <code>0622</code>
       <name_kz>Портфель кредитов частных предпринимателей</name_kz>
       <name_ru>Портфель кредитов частных предпринимателей</name_ru>
@@ -3336,11 +5642,6 @@
       <code>0017</code>
       <name_kz>Займы, выданные физическим лицам на потребительские цели под залог недвижимости</name_kz>
       <name_ru>Займы, выданные физическим лицам на потребительские цели под залог недвижимости</name_ru>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0677</code>
-      <name_kz>Кредитные карты КФН</name_kz>
-      <name_ru>Кредитные карты КФН</name_ru>
     </ref_portfolio>
     <ref_portfolio>
       <code>0621</code>
@@ -3353,11 +5654,6 @@
       <name_ru>Займы, выданные на пополнение оборотных средств под залог недвижимости</name_ru>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0676</code>
-      <name_kz>Беззалоговые кредиты КФН</name_kz>
-      <name_ru>Беззалоговые кредиты КФН</name_ru>
-    </ref_portfolio>
-    <ref_portfolio>
       <code>0620</code>
       <name_kz>Портфель ЕБРР юр.лиц</name_kz>
       <name_ru>Портфель ЕБРР юр.лиц</name_ru>
@@ -3366,11 +5662,6 @@
       <code>0019</code>
       <name_kz>Предоставление кредитного лимита на карту</name_kz>
       <name_ru>Предоставление кредитного лимита на карту</name_ru>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0675</code>
-      <name_kz>Корпоративный кредит КФН</name_kz>
-      <name_ru>Корпоративный кредит КФН</name_ru>
     </ref_portfolio>
     <ref_portfolio>
       <code>0018</code>
@@ -3393,11 +5684,6 @@
       <name_ru>Бланковые займы, выданные физическим лицам-нерезидентам на потребительские цели</name_ru>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0679</code>
-      <name_kz>Беззалоговые Просто Кредит КФН</name_kz>
-      <name_ru>Беззалоговые Просто Кредит КФН</name_ru>
-    </ref_portfolio>
-    <ref_portfolio>
       <code>0014</code>
       <name_kz>Бланковые займы, выданные физическим лицам на потребительские цели</name_kz>
       <name_ru>Бланковые займы, выданные физическим лицам на потребительские цели</name_ru>
@@ -3416,6 +5702,393 @@
       <code>0022</code>
       <name_kz>Физические лица - МБ</name_kz>
       <name_ru>Физические лица - МБ</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0869</code>
+      <name_kz>Логистика</name_kz>
+      <name_ru>Логистика</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0868</code>
+      <name_kz>Сельское хозяйство</name_kz>
+      <name_ru>Сельское хозяйство</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0865</code>
+      <name_kz>Розничная торговля</name_kz>
+      <name_ru>Розничная торговля</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0864</code>
+      <name_kz>Оптовая торговля</name_kz>
+      <name_ru>Оптовая торговля</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0867</code>
+      <name_kz>Пищевая промышленность</name_kz>
+      <name_ru>Пищевая промышленность</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0866</code>
+      <name_kz>Услуги</name_kz>
+      <name_ru>Услуги</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0861</code>
+      <name_kz>Займы   МСБ с рейтингом </name_kz>
+      <name_ru>Займы   МСБ с рейтингом </name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0863</code>
+      <name_kz>Строительство и недвижимость</name_kz>
+      <name_ru>Строительство и недвижимость</name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0862</code>
+      <name_kz>Портфель МСБ без рейтинга  </name_kz>
+      <name_ru>Портфель МСБ без рейтинга  </name_ru>
+      <creditor>
+        <name>АО "АТФБанк"</name>
+        <short_name>АО "АТФБанк"</short_name>
+        <code>826</code>
+        <docs>
+          <item>
+            <no>ALMNKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>951140000151</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
     </ref_portfolio>
   </entities>
 </batch>

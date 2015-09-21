@@ -69,7 +69,7 @@ public class ZipFilesMonitor {
     SenderThread sender;
 
     public static final int ZIP_BUFFER_SIZE = 1024;
-    public static final int MAX_SYNC_QUEUE_SIZE = 512;
+    public static final int MAX_SYNC_QUEUE_SIZE = 1000;
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
@@ -115,13 +115,11 @@ public class ZipFilesMonitor {
 
             System.out.println("-------------------------------------------------------------------------");
 
-            int jobsRestarted = 0;
-
             for (Batch batch : pendingBatchList) {
                 try {
                     sender.addJob(batch.getId(), new BatchInfo(batch));
                     receiverStatusSingleton.batchReceived();
-                    System.out.println("Restarted job #" + ++jobsRestarted);
+                    System.out.println("Restarted job #" + batch.getId() + " - " + batch.getFileName());
                 } catch (Exception e) {
                     System.out.println("Error in pending batches view: " + e.getMessage());
                     System.out.println("Retrying...");
@@ -198,9 +196,15 @@ public class ZipFilesMonitor {
                     try {
                         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
                         jobParametersBuilder.addParameter("batchId", new JobParameter(nextJob.getBatchId()));
-                        jobParametersBuilder.addParameter("userId", new JobParameter(nextJob.getBatchInfo().getUserId()));
-                        jobParametersBuilder.addParameter("reportId", new JobParameter(nextJob.getBatchInfo().getReportId()));
-                        jobParametersBuilder.addParameter("actualCount", new JobParameter(nextJob.getBatchInfo().getActualCount()));
+
+                        jobParametersBuilder.addParameter("userId",
+                                new JobParameter(nextJob.getBatchInfo().getUserId()));
+
+                        jobParametersBuilder.addParameter("reportId",
+                                new JobParameter(nextJob.getBatchInfo().getReportId()));
+
+                        jobParametersBuilder.addParameter("actualCount",
+                                new JobParameter(nextJob.getBatchInfo().getActualCount()));
 
                         Job job = jobs.get(nextJob.getBatchInfo().getBatchType());
 
@@ -210,17 +214,17 @@ public class ZipFilesMonitor {
                             batchService.addBatchStatus(new BatchStatus()
                                             .setBatchId(nextJob.getBatchId())
                                             .setStatus(BatchStatuses.PROCESSING)
-                                            .setReceiptDate(new Date())
-                            );
+                                            .setReceiptDate(new Date()));
                         } else {
                             logger.error("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType() +
                                     " in batch with id: " + nextJob.getBatchId());
+
                             batchService.addBatchStatus(new BatchStatus()
                                             .setBatchId(nextJob.getBatchId())
                                             .setStatus(BatchStatuses.ERROR)
-                                            .setDescription("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType())
-                                            .setReceiptDate(new Date())
-                            );
+                                            .setDescription("Unknown batch file type: " +
+                                                    nextJob.getBatchInfo().getBatchType())
+                                            .setReceiptDate(new Date()));
                         }
 
                         sleep(10000);

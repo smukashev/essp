@@ -149,9 +149,6 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         baseValueCounts.put(BaseEntitySimpleSet.class, baseEntityReportDate.getSimpleSetsCount());
         baseValueCounts.put(BaseEntityComplexSet.class, baseEntityReportDate.getComplexSetsCount());
 
-        Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id);
-        boolean last = DataTypeUtil.compareBeginningOfTheDay(maxReportDate, reportDate) == 0;
-
         int compare = DataTypeUtil.compareBeginningOfTheDay(savingReportDate, reportDate);
 
         for (Class<? extends IBaseValue> baseValueClass : baseValueCounts.keySet()) {
@@ -160,7 +157,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                 IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
                         .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
 
-                baseEntityValueDao.loadBaseValues(baseEntity, compare == -1 ? reportDate : savingReportDate, last);
+                baseEntityValueDao.loadBaseValues(baseEntity, compare == -1 ? reportDate : savingReportDate);
             }
         }
 

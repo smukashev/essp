@@ -22,9 +22,19 @@
       <name_ru>Долевое участие в жилищном строительстве</name_ru>
     </ref_credit_purpose>
     <ref_credit_purpose>
+      <code>10</code>
+      <name_kz>рефинансирование жилищного займа</name_kz>
+      <name_ru>рефинансирование жилищного займа</name_ru>
+    </ref_credit_purpose>
+    <ref_credit_purpose>
       <code>06</code>
       <name_kz>Финансовый лизинг</name_kz>
       <name_ru>Финансовый лизинг</name_ru>
+    </ref_credit_purpose>
+    <ref_credit_purpose>
+      <code>11</code>
+      <name_kz>внесение первоначального взноса для получения ИЖЗ в банках и ОООВБО</name_kz>
+      <name_ru>внесение первоначального взноса для получения ИЖЗ в банках и ОООВБО</name_ru>
     </ref_credit_purpose>
     <ref_credit_purpose>
       <code>05</code>

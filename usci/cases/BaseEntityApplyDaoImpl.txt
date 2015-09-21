@@ -13,7 +13,7 @@ quit
     <entities>
     	<s_test1>
     		<code>code#1</code>
-    		<s_attr>1</s_attr>
+    		<s_attr>s_attr#1</s_attr>
     	</s_test1>
     </entities>
 </batch>
@@ -45,7 +45,7 @@ quit
     <entities>
     	<s_test2>
     		<code>code#1</code>
-    		<s_attr>1</s_attr>
+    		<s_attr>s_attr#1</s_attr>
     	</s_test2>
     </entities>
 </batch>
@@ -77,7 +77,7 @@ quit
     <entities>
     	<s_test3>
     		<code>code#1</code>
-    		<s_attr>1</s_attr>
+    		<s_attr>s_attr#1</s_attr>
     	</s_test3>
     </entities>
 </batch>
@@ -137,7 +137,7 @@ quit
 <batch>
     <entities>
     	<s_test5>
-    	    <s_attr>1</s_attr>
+    	    <s_attr>s_attr#1</s_attr>
     		<code>code#1</code>
     	</s_test5>
     </entities>
@@ -148,7 +148,7 @@ quit
 <batch>
     <entities>
     	<s_test5>
-    	    <s_attr>1</s_attr>
+    	    <s_attr>s_attr#1</s_attr>
     	    <code>code#1</code>
     	</s_test5>
     </entities>
@@ -169,7 +169,7 @@ quit
 <batch>
     <entities>
     	<s_test6>
-    	    <s_attr>1</s_attr>
+    	    <s_attr>s_attr#1</s_attr>
     		<code>code#1</code>
     	</s_test6>
     </entities>
@@ -180,7 +180,7 @@ quit
 <batch>
     <entities>
     	<s_test6>
-    	    <s_attr>1</s_attr>
+    	    <s_attr>s_attr#1</s_attr>
     	    <code>code#1</code>
     	</s_test6>
     </entities>
@@ -201,7 +201,7 @@ quit
 <batch>
     <entities>
     	<s_test7>
-    	    <s_attr>1</s_attr>
+    	    <s_attr>s_attr#1</s_attr>
     		<code>code#1</code>
     	</s_test7>
     </entities>
@@ -212,7 +212,7 @@ quit
 <batch>
     <entities>
     	<s_test7>
-    	    <s_attr>2</s_attr>
+    	    <s_attr>s_attr#2</s_attr>
     	    <code>code#1</code>
     	</s_test7>
     </entities>
@@ -233,7 +233,7 @@ quit
 <batch>
     <entities>
     	<s_test8>
-    	    <s_attr>1</s_attr>
+    	    <s_attr>s_attr#1</s_attr>
     		<code>code#1</code>
     	</s_test8>
     </entities>
@@ -244,7 +244,7 @@ quit
 <batch>
     <entities>
     	<s_test8>
-    	    <s_attr>2</s_attr>
+    	    <s_attr>s_attr#2</s_attr>
     	    <code>code#1</code>
     	</s_test8>
     </entities>
@@ -265,7 +265,7 @@ quit
 <batch>
     <entities>
     	<s_test9>
-    	    <s_attr>1</s_attr>
+    	    <s_attr>s_attr#1</s_attr>
     		<code>code#1</code>
     	</s_test9>
     </entities>
@@ -276,7 +276,7 @@ quit
 <batch>
     <entities>
     	<s_test9>
-    	    <s_attr>2</s_attr>
+    	    <s_attr>s_attr#2</s_attr>
     	    <code>code#1</code>
     	</s_test9>
     </entities>
@@ -297,6 +297,7 @@ quit
 <batch>
     <entities>
     	<s_test10>
+    		<s_attr>s_attr#1</s_attr>
     		<code>code#1</code>
     	</s_test10>
     </entities>
@@ -307,9 +308,115 @@ quit
 <batch>
     <entities>
     	<s_test10>
-    	    <s_attr>1</s_attr>
+    	    <s_attr />
     	    <code>code#1</code>
     	</s_test10>
+    </entities>
+</batch>
+
+<!-- 01.03.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test10>
+    		<s_attr>s_attr#1</s_attr>
+    		<code>code#1</code>
+    	</s_test10>
+    </entities>
+</batch>
+
+---------------------------------------------------------
+
+applySimpleValue, case#11
+---------------------------------------------------------
+meta create --name=s_test11
+meta add --name=s_test11 --attribute=s_attr --type=string
+meta add --name=s_test11 --attribute=code --type=string
+meta key --name=s_test11 --attribute=code
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test11>
+    		<code>code#1</code>
+    	</s_test11>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test11>
+    	    <s_attr>s_attr#1</s_attr>
+    	    <code>code#1</code>
+    	</s_test11>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applySimpleValue, case#12
+---------------------------------------------------------
+meta create --name=s_test12
+meta add --name=s_test12 --attribute=s_attr --type=string --final
+meta add --name=s_test12 --attribute=code --type=string
+meta key --name=s_test12 --attribute=code
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test12>
+    		<code>code#1</code>
+    	</s_test12>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test12>
+    	    <s_attr>s_attr#1</s_attr>
+    	    <code>code#1</code>
+    	</s_test12>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applySimpleValue, case#13
+---------------------------------------------------------
+meta create --name=s_test13
+meta add --name=s_test13 --attribute=s_attr --type=string --final
+meta add --name=s_test13 --attribute=code --type=string
+meta key --name=s_test13 --attribute=code
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test12>
+    	    <s_attr>s_attr#1</s_attr>
+    		<code>code#1</code>
+    	</s_test12>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<s_test12>
+    	    <s_attr>s_attr#2</s_attr>
+    	    <code>code#1</code>
+    	</s_test12>
     </entities>
 </batch>
 ---------------------------------------------------------
@@ -321,7 +428,7 @@ meta create --name=c1_attr
 meta add --name=c1_attr --attribute=no --type=string --final
 
 meta create --name=c_test1
-meta add --name=c_test1 --attribute=c1_attr --type=meta_class --childname=f_attr --final
+meta add --name=c_test1 --attribute=c1_attr --type=meta_class --childname=c1_attr --final
 meta add --name=c_test1 --attribute=code --type=string
 meta key --name=c_test1 --attribute=code
 
@@ -332,9 +439,9 @@ quit
 <batch>
     <entities>
     	<c_test1>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c1_attr>
-    			<no>1</no>
+    			<no>no#1</no>
     		</c1_attr>
     	</c_test1>
     </entities>
@@ -345,7 +452,7 @@ quit
 <batch>
     <entities>
     	<c_test1>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c1_attr />
     	</c_test1>
     </entities>
@@ -369,9 +476,9 @@ quit
 <batch>
     <entities>
     	<c_test2>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c2_attr>
-    			<no>1</no>
+    			<no>no#1</no>
     		</c2_attr>
     	</c_test2>
     </entities>
@@ -382,7 +489,7 @@ quit
 <batch>
     <entities>
     	<c_test2>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c2_attr />
     	</c_test2>
     </entities>
@@ -406,9 +513,9 @@ quit
 <batch>
     <entities>
     	<c_test3>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c3_attr>
-    			<no>1</no>
+    			<no>no#1</no>
     		</c3_attr>
     	</c_test3>
     </entities>
@@ -419,7 +526,7 @@ quit
 <batch>
     <entities>
     	<c_test3>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c3_attr />
     	</c_test3>
     </entities>
@@ -443,9 +550,9 @@ quit
 <batch>
     <entities>
     	<c_test4>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c4_attr>
-    			<no>1</no>
+    			<no>no#1</no>
     		</c4_attr>
     	</c_test4>
     </entities>
@@ -456,9 +563,9 @@ quit
 <batch>
     <entities>
     	<c_test4>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c4_attr>
-                <no>1</no>
+                <no>no#2</no>
             </c4_attr>
     	</c_test4>
     </entities>
@@ -483,9 +590,9 @@ quit
 <batch>
     <entities>
     	<c_test5>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c5_attr>
-    			<no>1</no>
+    			<no>no#1</no>
     		</c5_attr>
     	</c_test5>
     </entities>
@@ -496,9 +603,9 @@ quit
 <batch>
     <entities>
     	<c_test5>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c5_attr>
-                <no>2</no>
+                <no>no#2</no>
             </c5_attr>
     	</c_test5>
     </entities>
@@ -523,9 +630,9 @@ quit
 <batch>
     <entities>
     	<c_test6>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c6_attr>
-    			<no>1</no>
+    			<no>no#1</no>
     		</c6_attr>
     	</c_test6>
     </entities>
@@ -536,7 +643,7 @@ quit
 <batch>
     <entities>
     	<c_test6>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c6_attr />
     	</c_test6>
     </entities>
@@ -547,14 +654,55 @@ quit
 <batch>
     <entities>
     	<c_test6>
-    		<code>1</code>
+    		<code>code#1</code>
     		<c6_attr>
-    			<no>1</no>
+    			<no>no#1</no>
     		</c6_attr>
     	</c_test6>
     </entities>
 </batch>
 
+---------------------------------------------------------
+
+
+applyComplexValue, case#7
+---------------------------------------------------------
+meta create --name=c7_attr
+meta add --name=c7_attr --attribute=no --type=string --final
+meta key --name=c7_attr --attribute=no
+
+meta create --name=c_test7
+meta add --name=c_test7 --attribute=c7_attr --type=meta_class --childname=c7_attr --final
+meta add --name=c_test7 --attribute=code --type=string
+meta key --name=c_test7 --attribute=code
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<c_test7>
+    		<code>code#1</code>
+    		<c7_attr>
+    			<no>no#1</no>
+    		</c7_attr>
+    	</c_test7>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<c_test7>
+    		<code>code#1</code>
+    		<c7_attr>
+                <no>no#1</no>
+            </c7_attr>
+    	</c_test7>
+    </entities>
+</batch>
 ---------------------------------------------------------
 
 
