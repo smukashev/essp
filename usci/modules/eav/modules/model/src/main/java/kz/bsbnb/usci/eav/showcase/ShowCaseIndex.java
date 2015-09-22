@@ -4,6 +4,7 @@ package kz.bsbnb.usci.eav.showcase;
 import kz.bsbnb.ddlutils.model.*;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 ;
 
@@ -14,8 +15,9 @@ public class ShowCaseIndex {
 
     private Index ShowCaseIndex;
     String IndexName;
-/*
-    public static void main(String[] args)
+    Random r = new Random();
+
+   /* public static void main(String[] args)
     {
         String IndexType="nonunique";
         String TableName ="r_core_credit";
@@ -73,6 +75,7 @@ public class ShowCaseIndex {
             }
 
         }
+        IndexName = IndexName+"_"+r.nextInt(100);
         ShowCaseIndex.setName(IndexName);
         for(String columnName: columnNames)
         {
