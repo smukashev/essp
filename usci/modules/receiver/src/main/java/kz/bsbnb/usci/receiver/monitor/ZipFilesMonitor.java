@@ -558,10 +558,8 @@ public class ZipFilesMonitor {
                     }
                 }
 
-                if (extractedBytes == null) {
+                if (extractedBytes == null)
                     throw new IOException("ZIP file does not contain any files.");
-                }
-                //
 
                 if (userId == null)
                     userId = 100500L;
@@ -599,7 +597,9 @@ public class ZipFilesMonitor {
 
                 batchInfo.setRepDate(date);
 
-                String actualCreditCount = document.getElementsByTagName("actual_credit_count").item(0).getTextContent();
+                String actualCreditCount = document.getElementsByTagName("actual_credit_count").item(0).
+                        getTextContent();
+
                 batchInfo.setSize(Long.parseLong(actualCreditCount));
                 batchInfo.setActualCount(Integer.parseInt(actualCreditCount));
                 batchInfo.setTotalCount(0);
@@ -818,7 +818,7 @@ public class ZipFilesMonitor {
                 WatchEvent.Kind kind = event.kind();
                 if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
                     String fileName = event.context().toString();
-                    System.out.println("File Created:" + fileName);
+                    System.out.println("Поступил файл:" + fileName);
 
                     Thread.sleep(1000);
 
