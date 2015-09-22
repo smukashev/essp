@@ -498,6 +498,7 @@
 		<column name="total_count" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="actual_count" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="is_disabled" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="0"/>
 	</table>
 	<table name="eav_global">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
