@@ -705,6 +705,44 @@ quit
 </batch>
 ---------------------------------------------------------
 
+applySimpleSet, case#1
+---------------------------------------------------------
+meta create --name=ss_test1
+meta add --name=ss_test1 --attribute=code --type=string
+meta key --name=ss_test1 --attribute=code
+meta add --name=ss_test1 --attribute=ss_attr1 --type=string --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test1>
+    		<code>code#1</code>
+    		<ss_attr1>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr1>
+    	</ss_test1>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test1>
+    		<code>code#1</code>
+    		<ss_attr1>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr1>
+    	</ss_test1>
+    </entities>
+</batch>
+---------------------------------------------------------
+
 
 applyComplexSet, case#7
 ---------------------------------------------------------

@@ -53,6 +53,6 @@ public class BatchJobListener implements IListener {
         double secs = Math.round((System.currentTimeMillis() - lastTime) / 1000);
         double minutes = Math.round(secs / 60);
 
-        System.out.println("Закончен батч : " + batch.getId() + " (" + minutes + " минут) (" + secs + " секунд" + ");");
+        System.out.println("Закончен батч : " + batch.getId() + " (" + minutes + " минуты) (" + secs + " секунд" + ");");
     }
 }

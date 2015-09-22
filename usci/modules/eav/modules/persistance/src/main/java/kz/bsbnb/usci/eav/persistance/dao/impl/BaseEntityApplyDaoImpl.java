@@ -1087,6 +1087,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         if (baseValueLoaded != null) {
             baseSetLoaded = (IBaseSet) baseValueLoaded.getValue();
 
+            // case#1
             if (baseSetSaving == null || baseSetSaving.getValueCount() == 0) {
                 baseSetApplied = new BaseSet(baseSetLoaded.getId(), memberMetaType);
 
