@@ -190,8 +190,7 @@ public class ZipFilesMonitor {
                 sleepCounter = 0;
 
                 if ((nextJob = getNextJob()) != null) {
-                    logger.debug("Sending file with batchId: " + nextJob.getBatchId());
-                    System.out.println("Sending file with batchId: " + nextJob.getBatchId());
+                    System.out.println("Обработка файла с батч ИД: " + nextJob.getBatchId());
 
                     try {
                         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();

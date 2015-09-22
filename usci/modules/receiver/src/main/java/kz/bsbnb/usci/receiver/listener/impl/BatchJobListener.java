@@ -27,27 +27,31 @@ public class BatchJobListener implements IListener {
 
     private static long lastTime;
 
+    @BeforeJob
+    public void beforeJob(JobExecution jobExecution) {
+        System.out.println(" --- BEFORE JOB ---");
+        lastTime = System.currentTimeMillis();
+    }
+
     @AfterJob
     public void afterJob(JobExecution jobExecution) {
         long batchId = jobExecution.getJobInstance().getJobParameters().getLong("batchId");
 
         IBatchService batchService = serviceFactory.getBatchService();
-        
-        Properties properties = new Properties();
         Batch batch = batchService.getBatch(batchId);
+
+        /*Properties properties = new Properties();
         properties.put("FILENAME", batch.getFileName());
-//        serviceFactory.getMailMessageBeanCommonBusiness().sendMailMessage("FILE_PROCESSING_COMPLETED", batch.getUserId(), properties);
+
+        serviceFactory.getMailMessageBeanCommonBusiness().sendMailMessage("FILE_PROCESSING_COMPLETED",
+            batch.getUserId(), properties);*/
 
         batchService.endBatch(batchId);
         receiverStatusSingleton.batchEnded();
 
-        System.out.println(batch.getFileName() + " finished(" +
-                ((System.currentTimeMillis() - lastTime) / 1000) + " sec" + ")");
-    }
+        double secs = (System.currentTimeMillis() - lastTime) / 1000;
+        double minutes = secs / 60;
 
-    @BeforeJob
-    public void beforeJob(JobExecution jobExecution) {
-        System.out.println(" --- BEFORE JOB ---");
-        lastTime = System.currentTimeMillis();
+        System.out.println(batch.getFileName() + " закончен(" + minutes + " минут) (" + secs + ")секунд" + ");");
     }
 }
