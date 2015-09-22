@@ -109,9 +109,13 @@ public class ZipFilesMonitor {
         if (pendingBatchList.size() > 0) {
             System.out.println("Найдены не законченные батчи: " + pendingBatchList.size());
 
-            for (Batch b : pendingBatchList) {
-                System.out.println(b.getFileName() + ", " + b.getRepDate());
-            }
+            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+
+            System.out.println("-------------------------------------------------------------------------");
+
+            for (Batch b : pendingBatchList)
+                System.out.println(b.getId() + ", " + b.getFileName() + ", " +
+                        sdf.format(b.getRepDate()));
 
             System.out.println("-------------------------------------------------------------------------");
 
@@ -119,7 +123,7 @@ public class ZipFilesMonitor {
                 try {
                     sender.addJob(batch.getId(), new BatchInfo(batch));
                     receiverStatusSingleton.batchReceived();
-                    System.out.println("Restarted job #" + batch.getId() + " - " + batch.getFileName());
+                    System.out.println("Перезагрузка батча : " + batch.getId() + " - " + batch.getFileName());
                 } catch (Exception e) {
                     System.out.println("Error in pending batches view: " + e.getMessage());
                     System.out.println("Retrying...");
@@ -190,7 +194,7 @@ public class ZipFilesMonitor {
                 sleepCounter = 0;
 
                 if ((nextJob = getNextJob()) != null) {
-                    System.out.println("Обработка файла с батч ИД: " + nextJob.getBatchId());
+                    System.out.println("Отправка батча на обработку : " + nextJob.getBatchId());
 
                     try {
                         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
@@ -817,7 +821,7 @@ public class ZipFilesMonitor {
                 WatchEvent.Kind kind = event.kind();
                 if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
                     String fileName = event.context().toString();
-                    System.out.println("Поступил файл:" + fileName);
+                    System.out.println("Поступил батч : " + fileName);
 
                     Thread.sleep(1000);
 

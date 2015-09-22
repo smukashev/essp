@@ -29,7 +29,8 @@ public class BatchJobListener implements IListener {
 
     @BeforeJob
     public void beforeJob(JobExecution jobExecution) {
-        System.out.println(" --- BEFORE JOB ---");
+        long batchId = jobExecution.getJobInstance().getJobParameters().getLong("batchId");
+        System.out.println("Началась обработка батча: " + batchId);
         lastTime = System.currentTimeMillis();
     }
 
@@ -49,9 +50,9 @@ public class BatchJobListener implements IListener {
         batchService.endBatch(batchId);
         receiverStatusSingleton.batchEnded();
 
-        double secs = (System.currentTimeMillis() - lastTime) / 1000;
-        double minutes = secs / 60;
+        double secs = Math.round((System.currentTimeMillis() - lastTime) / 1000);
+        double minutes = Math.round(secs / 60);
 
-        System.out.println(batch.getFileName() + " закончен(" + minutes + " минут) (" + secs + ")секунд" + ");");
+        System.out.println("Закончен батч : " + batch.getId() + " (" + minutes + " минут) (" + secs + " секунд" + ");");
     }
 }
