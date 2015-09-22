@@ -152,6 +152,10 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
+		<index name="ebbv_IN_ai_ei">
+			<index-column name="attribute_id"/>
+			<index-column name="entity_id"/>
+		</index>
 	</table>
 	<table name="eav_be_complex_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -193,6 +197,10 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
+		<index name="ebcv_IN_ai_ei">
+			<index-column name="attribute_id"/>
+			<index-column name="entity_id"/>
+		</index>
 	</table>
 	<table name="eav_be_date_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -230,6 +238,10 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
+		<index name="ebdv_ai_ei">
+			<index-column name="attribute_id"/>
+			<index-column name="entity_id"/>
+		</index>
 	</table>
 	<table name="eav_be_double_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -267,6 +279,10 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
+		<index name="ebdv_IN_ai_ei">
+			<index-column name="attribute_id"/>
+			<index-column name="entity_id"/>
+		</index>
 	</table>
 	<table name="eav_be_entities">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -302,6 +318,10 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
+		<index name="ebecs_IN_ai_ei">
+			<index-column name="attribute_id"/>
+			<index-column name="entity_id"/>
+		</index>
 	</table>
 	<table name="eav_be_entity_report_dates">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -347,6 +367,10 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
+		<index name="ebess_IN_ai_ei">
+			<index-column name="attribute_id"/>
+			<index-column name="entity_id"/>
+		</index>
 	</table>
 	<table name="eav_be_integer_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -384,6 +408,10 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
+		<index name="ebiv_IN_ai_ei">
+			<index-column name="attribute_id"/>
+			<index-column name="entity_id"/>
+		</index>
 	</table>
 	<table name="eav_be_string_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -421,6 +449,10 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
+		<index name="ebsv_IN_ai_ei">
+			<index-column name="attribute_id"/>
+			<index-column name="entity_id"/>
+		</index>
 	</table>
 	<table name="eav_a_user">
     <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
