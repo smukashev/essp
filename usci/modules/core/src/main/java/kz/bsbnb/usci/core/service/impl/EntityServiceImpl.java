@@ -90,7 +90,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
         } catch (Exception e) {
             logger.error("Batch id: " + baseEntity.getBatchId() + ", index: " + (baseEntity.getBatchIndex() - 1) +
-                    ExceptionUtils.getStackTrace(e));
+                    "\n" + ExceptionUtils.getStackTrace(e));
 
             EntityStatus entityStatus = new EntityStatus();
             entityStatus.setBatchId(baseEntity.getBatchId());
