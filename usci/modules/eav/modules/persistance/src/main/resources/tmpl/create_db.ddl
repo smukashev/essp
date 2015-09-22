@@ -600,9 +600,6 @@
 		<index name="ees_IN_bi">
 			<index-column name="batch_id"/>
 		</index>
-		<index name="ebs_IN_ei">
-			<index-column name="entity_id"/>
-		</index>
 	</table>
 	<table name="eav_entity_status_params">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
