@@ -435,6 +435,9 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
             long id = ((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.ID.getName())).longValue();
 
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_STRING_VALUES.CREDITOR_ID.getName())).longValue();
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
@@ -448,7 +451,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                     MetaContainerTypes.META_CLASS,
                     metaType,
                     id,
-                    0,
+                    creditorId,
                     reportDate,
                     value,
                     closed,

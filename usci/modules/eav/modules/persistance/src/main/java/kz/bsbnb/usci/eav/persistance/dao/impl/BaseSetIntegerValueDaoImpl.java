@@ -46,6 +46,7 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
         IBaseValue baseValue = (IBaseValue) persistable;
         long baseValueId = insert(
                 baseValue.getBaseContainer().getId(),
+                baseValue.getCreditorId(),
                 baseValue.getRepDate(),
                 baseValue.getValue(),
                 baseValue.isClosed(),
@@ -55,10 +56,12 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
         return baseValueId;
     }
 
-    protected long insert(long baseSetId, Date reportDate, Object value, boolean closed, boolean last) {
+    protected long insert(long baseSetId, long creditorId, Date reportDate, Object value, boolean closed,
+                          boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_INTEGER_SET_VALUES)
                 .set(EAV_BE_INTEGER_SET_VALUES.SET_ID, baseSetId)
+                .set(EAV_BE_INTEGER_SET_VALUES.CREDITOR_ID, creditorId)
                 .set(EAV_BE_INTEGER_SET_VALUES.REPORT_DATE, DataUtils.convert(reportDate))
                 .set(EAV_BE_INTEGER_SET_VALUES.VALUE, (Integer) value)
                 .set(EAV_BE_INTEGER_SET_VALUES.IS_CLOSED, DataUtils.convert(closed))
@@ -73,17 +76,20 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
         IBaseValue baseValue = (IBaseValue) persistable;
         update(baseValue.getId(),
                 baseValue.getBaseContainer().getId(),
+                baseValue.getCreditorId(),
                 baseValue.getRepDate(),
                 baseValue.getValue(),
                 baseValue.isClosed(),
                 baseValue.isLast());
     }
 
-    protected void update(long id, long baseSetId, Date reportDate, Object value, boolean closed, boolean last) {
+    protected void update(long id, long baseSetId, long creditorId, Date reportDate, Object value, boolean closed,
+                          boolean last) {
         String tableAlias = "isv";
         Update update = context
                 .update(EAV_BE_INTEGER_SET_VALUES.as(tableAlias))
                 .set(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).SET_ID, baseSetId)
+                .set(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).SET_ID, creditorId)
                 .set(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).REPORT_DATE, DataUtils.convert(reportDate))
                 .set(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).VALUE, (Integer) value)
                 .set(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).IS_CLOSED, DataUtils.convert(closed))
@@ -147,6 +153,7 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
                             .partitionBy(tableOfValues.field(EAV_BE_INTEGER_SET_VALUES.VALUE))
                             .orderBy(tableOfValues.field(EAV_BE_INTEGER_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
                         tableOfValues.field(EAV_BE_INTEGER_SET_VALUES.ID),
+                        tableOfValues.field(EAV_BE_INTEGER_SET_VALUES.CREDITOR_ID),
                         tableOfValues.field(EAV_BE_INTEGER_SET_VALUES.VALUE),
                         tableOfValues.field(EAV_BE_INTEGER_SET_VALUES.REPORT_DATE),
                         tableOfValues.field(EAV_BE_INTEGER_SET_VALUES.IS_CLOSED),
@@ -159,6 +166,7 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
 
         select = context
                 .select(tableNumbering.field(EAV_BE_INTEGER_SET_VALUES.ID),
+                        tableNumbering.field(EAV_BE_INTEGER_SET_VALUES.CREDITOR_ID),
                         tableNumbering.field(EAV_BE_INTEGER_SET_VALUES.REPORT_DATE),
                         tableNumbering.field(EAV_BE_INTEGER_SET_VALUES.VALUE),
                         tableNumbering.field(EAV_BE_INTEGER_SET_VALUES.IS_LAST))
@@ -175,6 +183,8 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
 
             long id = ((BigDecimal) row.get(EAV_BE_INTEGER_SET_VALUES.ID.getName())).longValue();
 
+            long creditorId = ((BigDecimal) row.get(EAV_BE_INTEGER_SET_VALUES.CREDITOR_ID.getName())).longValue();
+
             boolean last = ((BigDecimal) row.get(EAV_BE_INTEGER_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
             int value = ((BigDecimal) row.get(EAV_BE_INTEGER_SET_VALUES.VALUE.getName())).intValue();
@@ -186,7 +196,7 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
                     MetaContainerTypes.META_SET,
                     baseSet.getMemberType(),
                     id,
-                    0,
+                    creditorId,
                     reportDate,
                     value,
                     false,
@@ -216,9 +226,10 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-        if (rows.size() > 0) {
+
+        if (rows.size() > 0)
             return DataUtils.convert((Timestamp) rows.get(0).get("next_report_date"));
-        }
+
         return null;
     }
 
@@ -233,9 +244,10 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-        if (rows.size() > 0) {
+
+        if (rows.size() > 0)
             return DataUtils.convert((Timestamp) rows.get(0).get("previous_report_date"));
-        }
+
         return null;
     }
 
