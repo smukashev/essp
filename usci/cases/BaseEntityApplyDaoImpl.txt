@@ -776,6 +776,82 @@ quit
 ---------------------------------------------------------
 
 
+applySimpleSet, case#3
+---------------------------------------------------------
+meta create --name=ss_test3
+meta add --name=ss_test3 --attribute=code --type=string
+meta key --name=ss_test3 --attribute=code
+meta add --name=ss_test3 --attribute=ss_attr3 --type=string --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test3>
+    		<code>code#1</code>
+    		<ss_attr3>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr3>
+    	</ss_test3>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test3>
+    		<code>code#1</code>
+    		<ss_attr3>
+    			<item>item#1</item>
+    			<item>item#3</item>
+    		</ss_attr3>
+    	</ss_test3>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applySimpleSet, case#4
+---------------------------------------------------------
+meta create --name=ss_test4
+meta add --name=ss_test4 --attribute=code --type=string
+meta key --name=ss_test4 --attribute=code
+meta add --name=ss_test4 --attribute=ss_attr4 --type=string --array
+
+quit
+---------------------------------------------------------
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test4>
+    		<code>code#1</code>
+    		<ss_attr4>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr4>
+    	</ss_test4>
+    </entities>
+</batch>
+
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test4>
+    		<code>code#1</code>
+    		<ss_attr4>
+    			<item>item#1</item>
+    			<item>item#3</item>
+    		</ss_attr4>
+    	</ss_test4>
+    </entities>
+</batch>
+---------------------------------------------------------
+
 applyComplexSet, case#7
 ---------------------------------------------------------
 
