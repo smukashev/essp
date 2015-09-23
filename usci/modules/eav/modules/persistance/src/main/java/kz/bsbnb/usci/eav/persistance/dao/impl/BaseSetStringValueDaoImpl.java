@@ -90,7 +90,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         Update update = context
                 .update(EAV_BE_STRING_SET_VALUES.as(tableAlias))
                 .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).SET_ID, baseSetId)
-                .set(EAV_BE_STRING_SET_VALUES.CREDITOR_ID, creditorId)
+                .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).CREDITOR_ID, creditorId)
                 .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE, DataUtils.convert(reportDate))
                 .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).VALUE, (String) value)
                 .set(EAV_BE_STRING_SET_VALUES.as(tableAlias).IS_CLOSED, DataUtils.convert(closed))

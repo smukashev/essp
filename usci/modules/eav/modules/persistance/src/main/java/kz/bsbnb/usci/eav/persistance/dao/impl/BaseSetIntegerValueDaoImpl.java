@@ -89,7 +89,7 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
         Update update = context
                 .update(EAV_BE_INTEGER_SET_VALUES.as(tableAlias))
                 .set(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).SET_ID, baseSetId)
-                .set(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).SET_ID, creditorId)
+                .set(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).CREDITOR_ID, creditorId)
                 .set(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).REPORT_DATE, DataUtils.convert(reportDate))
                 .set(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).VALUE, (Integer) value)
                 .set(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).IS_CLOSED, DataUtils.convert(closed))
