@@ -1097,7 +1097,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 if (compare == 0) {
-                    IBaseValue baseValueClosed = BaseValueFactory.create(
+                    IBaseValue baseValueDeleted = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
                             metaType,
                             baseValueLoaded.getId(),
@@ -1107,9 +1107,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             true,
                             baseValueLoaded.isLast());
 
-                    baseValueClosed.setBaseContainer(baseEntity);
-                    baseValueClosed.setMetaAttribute(metaAttribute);
-                    baseEntityManager.registerAsUpdated(baseValueClosed);
+                    baseValueDeleted.setBaseContainer(baseEntity);
+                    baseValueDeleted.setMetaAttribute(metaAttribute);
+                    baseEntityManager.registerAsDeleted(baseValueDeleted);
                 } else if (compare == 1) {
                     IBaseValue baseValueClosed = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1150,21 +1150,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
-                if (compare == 0) {
-                    baseSetApplied = new BaseSet(baseSetLoaded.getId(), memberMetaType);
-
-                    IBaseValue baseValueApplied = BaseValueFactory.create(
-                            MetaContainerTypes.META_CLASS,
-                            metaType,
-                            baseValueLoaded.getId(),
-                            creditorId,
-                            new Date(baseValueLoaded.getRepDate().getTime()),
-                            baseSetApplied,
-                            baseValueLoaded.isClosed(),
-                            baseValueLoaded.isLast());
-
-                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                } else if (compare == 1) {
+                if (compare == 0 || compare == 1) {
                     baseSetApplied = new BaseSet(baseSetLoaded.getId(), memberMetaType);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
