@@ -199,6 +199,7 @@
 		</unique>
 		<index name="ebcv_IN_ai_ei">
 			<index-column name="attribute_id"/>
+			<index-column name="entity_value_id"/>
 			<index-column name="entity_id"/>
 		</index>
 	</table>
@@ -320,7 +321,7 @@
 		</unique>
 		<index name="ebecs_IN_ai_ei">
 			<index-column name="attribute_id"/>
-			<index-column name="entity_id"/>
+			<index-column name="set_id"/>
 		</index>
 	</table>
 	<table name="eav_be_entity_report_dates">
