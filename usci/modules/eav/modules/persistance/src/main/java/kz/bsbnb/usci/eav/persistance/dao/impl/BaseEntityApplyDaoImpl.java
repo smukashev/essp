@@ -1110,6 +1110,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseValueDeleted.setBaseContainer(baseEntity);
                     baseValueDeleted.setMetaAttribute(metaAttribute);
                     baseEntityManager.registerAsDeleted(baseValueDeleted);
+                // case#2
                 } else if (compare == 1) {
                     IBaseValue baseValueClosed = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,

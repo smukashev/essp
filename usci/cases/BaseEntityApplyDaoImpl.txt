@@ -728,17 +728,49 @@ quit
     </entities>
 </batch>
 
-<!-- 01.02.2015 -->
+<!-- 01.01.2015 -->
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
     	<ss_test1>
     		<code>code#1</code>
-    		<ss_attr1>
+    		<ss_attr1 />
+    	</ss_test1>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applySimpleSet, case#2
+---------------------------------------------------------
+meta create --name=ss_test2
+meta add --name=ss_test2 --attribute=code --type=string
+meta key --name=ss_test2 --attribute=code
+meta add --name=ss_test2 --attribute=ss_attr2 --type=string --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test2>
+    		<code>code#1</code>
+    		<ss_attr2>
     			<item>item#1</item>
     			<item>item#2</item>
-    		</ss_attr1>
-    	</ss_test1>
+    		</ss_attr2>
+    	</ss_test2>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test2>
+    		<code>code#1</code>
+    		<ss_attr2 />
+    	</ss_test2>
     </entities>
 </batch>
 ---------------------------------------------------------
