@@ -18,6 +18,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
@@ -40,6 +41,9 @@ public class KeySearcherForm implements ISearcherForm {
 
     @Autowired
     private IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Autowired
+    private IBaseEntityLoadDao baseEntityLoadDao;
 
     @Autowired
     private IRefProcessorDao refProcessorDao;
@@ -164,14 +168,15 @@ public class KeySearcherForm implements ISearcherForm {
             if(metaType.isSetOfSets())
                 throw new UnsupportedOperationException("Not yet implemented");
 
-            /*Batch b = new Batch(new Date(), 100500L);
-            b.setId(100500L);*/
-
             if(metaType.isSet()) {
                 BaseSet childBaseSet = new BaseSet(metaType);
                 IMetaType itemMeta = ((MetaSet) metaType).getMemberType();
                 BaseEntity childBaseEntity = new BaseEntity((MetaClass) itemMeta, new Date());
-                childBaseEntity.setId(Long.valueOf(parameterValue));
+                long childId = Long.valueOf(parameterValue);
+                if(((MetaClass) itemMeta).getClassName().equals("document"))
+                    childBaseEntity = (BaseEntity) baseEntityLoadDao.load(childId);
+                else
+                    childBaseEntity.setId(Long.valueOf(parameterValue));
 
                 childBaseSet.put(BaseValueFactory.create(
                         BaseContainerType.BASE_SET,
