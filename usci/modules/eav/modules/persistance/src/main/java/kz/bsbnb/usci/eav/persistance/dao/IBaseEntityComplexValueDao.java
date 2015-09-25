@@ -9,11 +9,5 @@ public interface IBaseEntityComplexValueDao extends IBaseEntityValueDao {
 
     Set<Long> getChildBaseEntityIdsWithoutRefs(long parentBaseEntityId);
 
-    IBaseValue getNextBaseValue(IBaseValue baseValue, boolean currentReportDate);
-
-    IBaseValue getPreviousBaseValue(IBaseValue baseValue, boolean currentReportDate);
-
-    IBaseValue getLastBaseValue(IBaseValue baseValue, boolean currentReportDate);
-
     boolean isSingleBaseValue(IBaseValue baseValue);
 }

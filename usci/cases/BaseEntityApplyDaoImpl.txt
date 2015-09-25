@@ -852,6 +852,94 @@ quit
 </batch>
 ---------------------------------------------------------
 
+applySimpleSet, case#5
+---------------------------------------------------------
+meta create --name=ss_test5
+meta add --name=ss_test5 --attribute=code --type=string
+meta key --name=ss_test5 --attribute=code
+meta add --name=ss_test5 --attribute=ss_attr5 --type=string --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test5>
+    		<code>code#1</code>
+    		<ss_attr5>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr5>
+    	</ss_test5>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test5>
+    		<code>code#1</code>
+    		<ss_attr5 />
+    	</ss_test5>
+    </entities>
+</batch>
+
+<!-- 01.03.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test5>
+    		<code>code#1</code>
+    		<ss_attr5>
+    			<item>item#1</item>
+    			<item>item#3</item>
+    		</ss_attr5>
+    	</ss_test5>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applySimpleSet, case#6
+---------------------------------------------------------
+meta create --name=ss_test6
+meta add --name=ss_test6 --attribute=code --type=string
+meta key --name=ss_test6 --attribute=code
+meta add --name=ss_test6 --attribute=ss_attr6 --type=string --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test6>
+    		<code>code#1</code>
+    		<ss_attr6>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr6>
+    	</ss_test6>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test6>
+    		<code>code#1</code>
+    		<ss_attr6>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr6>
+    	</ss_test6>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+
 applyComplexSet, case#7
 ---------------------------------------------------------
 

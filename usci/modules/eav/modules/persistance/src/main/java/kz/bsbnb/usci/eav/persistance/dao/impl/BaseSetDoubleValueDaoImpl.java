@@ -1,9 +1,11 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseSetDoubleValueDao;
@@ -31,7 +33,6 @@ import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_DOUBLE_SET_VALUES
  */
 @Repository
 public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDoubleValueDao {
-
     private final Logger logger = LoggerFactory.getLogger(BaseSetDoubleValueDaoImpl.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -39,11 +40,12 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
     private DSLContext context;
 
     @Autowired
-    private IBatchRepository batchRepository;
+    IBatchRepository batchRepository;
 
     @Override
     public long insert(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
+
         long baseValueId = insert(
                 baseValue.getBaseContainer().getId(),
                 baseValue.getCreditorId(),
@@ -51,6 +53,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                 baseValue.getValue(),
                 baseValue.isClosed(),
                 baseValue.isLast());
+
         baseValue.setId(baseValueId);
 
         return baseValueId;
@@ -68,6 +71,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                 .set(EAV_BE_DOUBLE_SET_VALUES.IS_LAST, DataUtils.convert(last));
 
         logger.debug(insert.toString());
+
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
@@ -86,7 +90,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
 
     protected void update(long id, long baseSetId, long creditorId, Date reportDate, Object value, boolean closed,
                           boolean last) {
-        String tableAlias = "dsv";
+        String tableAlias = "sv";
         Update update = context
                 .update(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
                 .set(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).SET_ID, baseSetId)
@@ -97,12 +101,12 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                 .set(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_LAST, DataUtils.convert(last))
                 .where(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).ID.equal(id));
 
-        logger.debug(update.toString());
-
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException("UPDATE operation should be update only one record.");
+            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_DOUBLE_SET_VALUES);");
+
     }
 
     @Override
@@ -111,48 +115,320 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
     }
 
     protected void delete(long id) {
-        String tableAlias = "dsv";
+        String tableAlias = "sv";
         Delete delete = context
                 .delete(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).ID.equal(id));
 
         logger.debug(delete.toString());
+
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException("DELETE operation should be delete only one record.");
+            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_DOUBLE_SET_VALUES);");
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
-        throw new UnsupportedOperationException("Не реализовано;");
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IBaseSet baseSet = (IBaseSet) baseContainer;
+        IMetaType metaType = baseSet.getMemberType();
+
+        IBaseValue previousBaseValue = null;
+
+        String tableAlias = "bsv";
+        String subqueryAlias = "bsvn";
+        Table subqueryTable = context
+                .select(DSL.rank().over()
+                                .orderBy(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).VALUE.equal((Double) baseValue.getValue()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE.lessThan(
+                        DataUtils.convert(baseValue.getRepDate()))).asTable(subqueryAlias);
+
+        Select select = context
+                .select(subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.ID),
+                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID),
+                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE),
+                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED),
+                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.IS_LAST))
+                .from(subqueryTable)
+                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
+
+        if (rows.size() == 1) {
+            Map<String, Object> row = rows.iterator().next();
+
+            long id = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.ID.getName())).longValue();
+
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE.getName()));
+
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID.getName())).longValue();
+
+            boolean last = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.IS_LAST.getName())).longValue() == 1;
+
+            boolean closed = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
+            previousBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    creditorId,
+                    reportDate,
+                    baseValue.getValue(),
+                    closed,
+                    last);
+        }
+
+        return previousBaseValue;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
-        throw new UnsupportedOperationException("Не реализовано;");
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IBaseSet baseSet = (IBaseSet) baseContainer;
+        IMetaType metaType = baseSet.getMemberType();
+
+        IBaseValue nextBaseValue = null;
+
+        String tableAlias = "bsv";
+        String subqueryAlias = "bsvn";
+        Table subqueryTable = context
+                .select(DSL.rank()
+                                .over().orderBy(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).VALUE.equal((Double) baseValue.getValue()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
+                        DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subqueryAlias);
+
+        Select select = context
+                .select(subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.ID),
+                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID),
+                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE),
+                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED),
+                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.IS_LAST))
+                .from(subqueryTable)
+                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
+
+        if (rows.size() == 1) {
+            Map<String, Object> row = rows.iterator().next();
+
+            long id = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.ID.getName())).longValue();
+
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID.getName())).longValue();
+
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE.getName()));
+
+            boolean last = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.IS_LAST.getName())).longValue() == 1;
+
+            boolean closed = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
+            nextBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    creditorId,
+                    reportDate,
+                    baseValue.getValue(),
+                    closed,
+                    last);
+        }
+
+        return nextBaseValue;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
-        throw new UnsupportedOperationException("Не реализовано;");
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IBaseSet baseSet = (IBaseSet) baseContainer;
+        IMetaType metaType = baseSet.getMemberType();
+
+        IBaseValue closedBaseValue = null;
+
+        String tableAlias = "bsv";
+        Select select = context
+                .select(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_LAST,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID)
+                .from(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE.
+                        lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).VALUE.equal((Double) baseValue.getValue()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
+
+        if (rows.size() == 1) {
+            Map<String, Object> row = rows.iterator().next();
+
+            long id = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.ID.getName())).longValue();
+
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID.getName())).longValue();
+
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE.getName()));
+
+            boolean last = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.IS_LAST.getName())).longValue() == 1;
+
+            closedBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    creditorId,
+                    reportDate,
+                    baseValue.getValue(),
+                    true,
+                    last);
+        }
+
+        return closedBaseValue;
     }
 
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
-        throw new UnsupportedOperationException("Не реализовано;");
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IBaseSet baseSet = (IBaseSet) baseContainer;
+        IMetaType metaType = baseSet.getMemberType();
+
+        IBaseValue lastBaseValue = null;
+
+        String tableAlias = "bsv";
+        Select select = context
+                .select(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_CLOSED)
+                .from(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).VALUE.equal((Double) baseValue.getValue()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_LAST.equal(DataUtils.convert(true)));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
+
+        if (rows.size() == 1) {
+            Map<String, Object> row = rows.iterator().next();
+
+            long id = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.ID.getName())).longValue();
+
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID.getName())).longValue();
+
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE.getName()));
+
+            boolean closed = ((BigDecimal) row
+                    .get(EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
+            lastBaseValue = BaseValueFactory.create(
+                    MetaContainerTypes.META_SET,
+                    metaType,
+                    id,
+                    creditorId,
+                    reportDate,
+                    baseValue.getValue(),
+                    closed,
+                    true);
+        }
+
+        return lastBaseValue;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void loadBaseValues(IBaseSet baseSet, Date actualReportDate) {
-        Table tableOfValues = EAV_BE_DOUBLE_SET_VALUES.as("dsv");
+        Table tableOfValues = EAV_BE_DOUBLE_SET_VALUES.as("ssv");
         Select select;
 
         Table tableNumbering = context
                 .select(DSL.rank().over()
-                            .partitionBy(tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.VALUE))
-                            .orderBy(tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
+                                .partitionBy(tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.VALUE))
+                                .orderBy(tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
                         tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.ID),
                         tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID),
                         tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.VALUE),
@@ -163,7 +439,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                 .where(tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.SET_ID).eq(baseSet.getId()))
                 .and(tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE)
                         .lessOrEqual(DataUtils.convert(actualReportDate)))
-                .asTable("dsvn");
+                .asTable("ssvn");
 
         select = context
                 .select(tableNumbering.field(EAV_BE_DOUBLE_SET_VALUES.ID),
@@ -174,7 +450,6 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                 .from(tableNumbering)
                 .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
                 .and(tableNumbering.field(EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED).equal(false));
-
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -189,7 +464,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
 
             boolean last = ((BigDecimal) row.get(EAV_BE_DOUBLE_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            double value = ((BigDecimal) row.get(EAV_BE_DOUBLE_SET_VALUES.VALUE.getName())).doubleValue();
+            String value = (String) row.get(EAV_BE_DOUBLE_SET_VALUES.VALUE.getName());
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE.getName()));
@@ -208,7 +483,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
 
     @Override
     public void deleteAll(long baseSetId) {
-        String tableAlias = "dsv";
+        String tableAlias = "ssv";
         Delete delete = context
                 .delete(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).SET_ID.equal(baseSetId));
@@ -219,7 +494,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
 
     @Override
     public Date getNextReportDate(long baseSetId, Date reportDate) {
-        String tableAlias = "dsv";
+        String tableAlias = "ssv";
         Select select = context
                 .select(DSL.min(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE).as("next_report_date"))
                 .from(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
@@ -237,7 +512,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
 
     @Override
     public Date getPreviousReportDate(long baseSetId, Date reportDate) {
-        String tableAlias = "dsv";
+        String tableAlias = "ssv";
         Select select = context
                 .select(DSL.max(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE).as("previous_report_date"))
                 .from(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
@@ -252,5 +527,4 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
 
         return null;
     }
-
 }
