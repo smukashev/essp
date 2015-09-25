@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -68,6 +67,8 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
                 .set(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED, DataUtils.convert(closed))
                 .set(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST, DataUtils.convert(last));
 
+        logger.debug(insert.toString());
+
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
@@ -86,8 +87,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
 
     protected void update(long id, long baseSetId, long creditorId, Date reportDate, Object value, boolean closed,
                           boolean last) {
-        String tableAlias = "bsv";
-
+        String tableAlias = "sv";
         Update update = context
                 .update(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .set(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID, baseSetId)
@@ -101,7 +101,9 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("UPDATE operation should be update only one record.");
+            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_BOOLEAN_SET_VALUES);");
+
     }
 
     @Override
@@ -110,23 +112,33 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
     }
 
     protected void delete(long id) {
-        String tableAlias = "bv";
+        String tableAlias = "sv";
         Delete delete = context
                 .delete(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID.equal(id));
 
+        logger.debug(delete.toString());
+
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("DELETE operation should be delete only one record.");
+            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_BOOLEAN_SET_VALUES);");
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        IMetaType metaType = metaAttribute.getMetaType();
+        IBaseSet baseSet = (IBaseSet) baseContainer;
+        IMetaType metaType = baseSet.getMemberType();
 
         IBaseValue previousBaseValue = null;
 
@@ -142,12 +154,11 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
                         EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(
                         DataUtils.convert((Boolean) baseValue.getValue())))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.lessThan(
-                        DataUtils.convert(baseValue.getRepDate())))
-                .asTable(subqueryAlias);
+                        DataUtils.convert(baseValue.getRepDate()))).asTable(subqueryAlias);
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.ID),
@@ -162,15 +173,17 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
-        }
+        if (rows.size() > 1)
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.ID.getName())).longValue();
+
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
 
             long creditorId = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID.getName())).longValue();
@@ -180,9 +193,6 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
 
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
 
             previousBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
@@ -201,29 +211,37 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        IMetaType metaType = metaAttribute.getMetaType();
+        IBaseSet baseSet = (IBaseSet) baseContainer;
+        IMetaType metaType = baseSet.getMemberType();
 
         IBaseValue nextBaseValue = null;
 
         String tableAlias = "bsv";
         String subqueryAlias = "bsvn";
         Table subqueryTable = context
-            .select(DSL.rank()
-                        .over().orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
-                EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
-                EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
-                EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED,
-                EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
-            .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
-            .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
-            .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(
-                    DataUtils.convert((Boolean) baseValue.getValue())))
+                .select(DSL.rank()
+                                .over().orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(
+                        DataUtils.convert((Boolean) baseValue.getValue())))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
-            .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
-                    DataUtils.convert(baseValue.getRepDate())))
-            .asTable(subqueryAlias);
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
+                        DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subqueryAlias);
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.ID),
@@ -238,9 +256,8 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
-        }
+        if (rows.size() > 1)
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -251,14 +268,14 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
             long creditorId = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID.getName())).longValue();
 
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
 
             nextBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
@@ -277,30 +294,38 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        IMetaType metaType = metaAttribute.getMetaType();
+        IBaseSet baseSet = (IBaseSet) baseContainer;
+        IMetaType metaType = baseSet.getMemberType();
 
         IBaseValue closedBaseValue = null;
 
         String tableAlias = "bsv";
         Select select = context
                 .select(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
-                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID)
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.lessOrEqual(
-                        DataUtils.convert(baseValue.getRepDate())))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(
-                        DataUtils.convert((Boolean) baseValue.getValue())))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()));
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.
+                        lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Boolean) baseValue.getValue())))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -311,6 +336,9 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
             long creditorId = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID.getName())).longValue();
 
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
@@ -319,7 +347,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
                     metaType,
                     id,
                     creditorId,
-                    baseValue.getRepDate(),
+                    reportDate,
                     baseValue.getValue(),
                     true,
                     last);
@@ -330,9 +358,16 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
 
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        IMetaType metaType = metaAttribute.getMetaType();
+        IBaseSet baseSet = (IBaseSet) baseContainer;
+        IMetaType metaType = baseSet.getMemberType();
 
         IBaseValue lastBaseValue = null;
 
@@ -344,8 +379,8 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
                         EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED)
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Boolean)
-                        baseValue.getValue())))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(
+                        DataUtils.convert((Boolean) baseValue.getValue())))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST.equal(DataUtils.convert(true)));
 
@@ -353,7 +388,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get last instance of BaseValue return more than one row.");
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -364,11 +399,11 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
             long creditorId = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID.getName())).longValue();
 
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
+
+            boolean closed = ((BigDecimal) row
+                    .get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
             lastBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
@@ -387,13 +422,13 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
     @Override
     @SuppressWarnings("unchecked")
     public void loadBaseValues(IBaseSet baseSet, Date actualReportDate) {
-        Table tableOfValues = EAV_BE_BOOLEAN_SET_VALUES.as("bsv");
+        Table tableOfValues = EAV_BE_BOOLEAN_SET_VALUES.as("ssv");
         Select select;
 
         Table tableNumbering = context
                 .select(DSL.rank().over()
-                            .partitionBy(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.VALUE))
-                            .orderBy(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
+                                .partitionBy(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.VALUE))
+                                .orderBy(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
                         tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.ID),
                         tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID),
                         tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.VALUE),
@@ -404,7 +439,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
                 .where(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.SET_ID).eq(baseSet.getId()))
                 .and(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE)
                         .lessOrEqual(DataUtils.convert(actualReportDate)))
-                .asTable("bsvn");
+                .asTable("ssvn");
 
         select = context
                 .select(tableNumbering.field(EAV_BE_BOOLEAN_SET_VALUES.ID),
@@ -429,7 +464,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
 
             boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            boolean value = DataUtils.convert((Byte) row.get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName()));
+            String value = (String) row.get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName());
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
@@ -448,7 +483,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
 
     @Override
     public void deleteAll(long baseSetId) {
-        String tableAlias = "bsv";
+        String tableAlias = "ssv";
         Delete delete = context
                 .delete(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseSetId));
@@ -459,7 +494,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
 
     @Override
     public Date getNextReportDate(long baseSetId, Date reportDate) {
-        String tableAlias = "bsv";
+        String tableAlias = "ssv";
         Select select = context
                 .select(DSL.min(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE).as("next_report_date"))
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
@@ -477,7 +512,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
 
     @Override
     public Date getPreviousReportDate(long baseSetId, Date reportDate) {
-        String tableAlias = "bsv";
+        String tableAlias = "ssv";
         Select select = context
                 .select(DSL.max(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE).as("previous_report_date"))
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
