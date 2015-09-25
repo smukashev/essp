@@ -108,7 +108,7 @@ public class BatchServiceImpl implements IBatchService {
         }
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         return batchSaveDir + "/" + df.format(batch.getRepDate())
-                + "/" + batch.getCreditorId() + "/" + batch.getHash();
+                + "/" + batch.getCreditorId() + "/" + batch.getHash() + ".zip";
     }
 
     private String getCreditorDirPath(Batch batch) {
