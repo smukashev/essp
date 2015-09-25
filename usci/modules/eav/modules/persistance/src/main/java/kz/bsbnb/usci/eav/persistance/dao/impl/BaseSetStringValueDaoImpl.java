@@ -288,7 +288,8 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         String tableAlias = "bsv";
         Select select = context
                 .select(EAV_BE_STRING_SET_VALUES.as(tableAlias).ID,
-                        EAV_BE_STRING_SET_VALUES.as(tableAlias).IS_LAST)
+                        EAV_BE_STRING_SET_VALUES.as(tableAlias).IS_LAST,
+                        EAV_BE_STRING_SET_VALUES.as(tableAlias).CREDITOR_ID)
                 .from(EAV_BE_STRING_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_STRING_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE.

@@ -1208,23 +1208,49 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
             IBaseValue baseValueClosed = baseValueDao.getClosedBaseValue(baseValueSaving);
+
             // case#5
             if (baseValueClosed != null) {
-                childBaseSetLoaded = (IBaseSet) baseValueClosed.getValue();
-                childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+                baseValueClosed.setBaseContainer(baseValueSaving.getBaseContainer());
+                baseValueClosed.setMetaAttribute(baseValueSaving.getMetaAttribute());
 
-                IBaseValue baseValueApplied = BaseValueFactory.create(
+                IBaseValue baseValueDeleted = BaseValueFactory.create(
                         MetaContainerTypes.META_CLASS,
                         metaType,
                         baseValueClosed.getId(),
                         creditorId,
                         new Date(baseValueClosed.getRepDate().getTime()),
-                        childBaseSetApplied,
-                        false,
+                        null,
+                        baseValueClosed.isClosed(),
                         baseValueClosed.isLast());
 
-                baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                baseEntityManager.registerAsUpdated(baseValueApplied);
+                baseEntityManager.registerAsDeleted(baseValueDeleted);
+
+                IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueClosed);
+
+                if (baseValuePrevious != null) {
+                    baseValuePrevious.setBaseContainer(baseValueSaving.getBaseContainer());
+                    baseValuePrevious.setMetaAttribute(baseValueSaving.getMetaAttribute());
+
+                    childBaseSetLoaded = (IBaseSet) baseValueClosed.getValue();
+                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+
+                    IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValuePrevious.getId(),
+                            creditorId,
+                            new Date(baseValuePrevious.getRepDate().getTime()),
+                            childBaseSetApplied,
+                            false,
+                            true);
+
+                    baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                    baseEntityManager.registerAsUpdated(baseValueApplied);
+                } else {
+                    throw new IllegalStateException("Запись открытия не была найдена(" +
+                            metaAttribute.getName() + ");");
+                }
             // case#6
             } else {
                 IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueSaving);
