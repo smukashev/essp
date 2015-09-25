@@ -532,8 +532,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                                 .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID
                                         .equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
                                 .and(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID.
-                                        notEqual(baseValue.getId()))
-                ));
+                                        notEqual(baseValue.getId()))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
