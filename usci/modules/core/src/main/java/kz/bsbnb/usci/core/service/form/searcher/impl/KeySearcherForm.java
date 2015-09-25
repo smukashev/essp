@@ -146,7 +146,7 @@ public class KeySearcherForm implements ISearcherForm {
     }
 
     @Override
-    public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix) {
+    public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix, long creditorId) {
         BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
         ISearchResult ret = new NonPaginableSearchResult();
         Iterator<String> it = parameters.keySet().iterator();
@@ -164,8 +164,8 @@ public class KeySearcherForm implements ISearcherForm {
             if(metaType.isSetOfSets())
                 throw new UnsupportedOperationException("Not yet implemented");
 
-            Batch b = new Batch(new Date(), 100500L);
-            b.setId(100500L);
+            /*Batch b = new Batch(new Date(), 100500L);
+            b.setId(100500L);*/
 
             if(metaType.isSet()) {
                 BaseSet childBaseSet = new BaseSet(metaType);
@@ -177,7 +177,7 @@ public class KeySearcherForm implements ISearcherForm {
                         BaseContainerType.BASE_SET,
                         itemMeta,
                         0,
-                        /* TODO set creditorId */ 0,
+                        creditorId,
                         new Date(),
                         childBaseEntity,
                         false,
@@ -198,7 +198,7 @@ public class KeySearcherForm implements ISearcherForm {
                     BaseContainerType.BASE_ENTITY,
                     metaAttribute.getMetaType(),
                     0,
-                    /* TODO set creditorId */ 0,
+                    creditorId,
                     new Date(),
                     value,
                     false,
@@ -206,7 +206,7 @@ public class KeySearcherForm implements ISearcherForm {
                 ));
         }
 
-        Long id = searcher.findSingle(baseEntity, /* TODO set creditorId */ 0L);
+        Long id = searcher.findSingle(baseEntity, creditorId);
         baseEntity.setId(id);
         ret.setData(Arrays.asList(new BaseEntity[]{baseEntity}));
         return ret;
