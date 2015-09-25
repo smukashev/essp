@@ -64,6 +64,8 @@ public class MetaClass extends MetaContainer implements IMetaClass
         this.disabled = meta.disabled;
         this.beginDate = meta.beginDate;
         this.complexKeyType = meta.complexKeyType;
+        this.reference = meta.reference;
+        this.parentIsKey = meta.parentIsKey;
 
         members.putAll(meta.members);
     }
