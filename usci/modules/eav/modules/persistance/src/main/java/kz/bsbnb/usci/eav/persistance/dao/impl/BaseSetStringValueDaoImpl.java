@@ -68,6 +68,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
                 .set(EAV_BE_STRING_SET_VALUES.IS_LAST, DataUtils.convert(last));
 
         logger.debug(insert.toString());
+
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
@@ -100,7 +101,8 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException("UPDATE operation should be update only one record.");
+            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_STRING_SET_VALUES);");
 
     }
 
@@ -120,12 +122,20 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException("DELETE operation should be delete only one record.");
+            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_STRING_SET_VALUES);");
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseSet baseSet = (IBaseSet) baseContainer;
         IMetaType metaType = baseSet.getMemberType();
@@ -162,15 +172,17 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
-        }
+        if (rows.size() > 1)
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.ID.getName())).longValue();
+
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
 
             long creditorId = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.CREDITOR_ID.getName())).longValue();
@@ -180,9 +192,6 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
 
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
 
             previousBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
@@ -201,6 +210,13 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseSet baseSet = (IBaseSet) baseContainer;
         IMetaType metaType = baseSet.getMemberType();
@@ -239,7 +255,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -250,14 +266,14 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
             long creditorId = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.CREDITOR_ID.getName())).longValue();
 
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
 
             nextBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
@@ -276,18 +292,23 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseSet baseSet = (IBaseSet) baseContainer;
         IMetaType metaType = baseSet.getMemberType();
-
-        if (baseContainer == null || baseContainer.getId() < 1)
-            throw new RuntimeException("Can not find closed instance of BaseValue without container or container ID.");
 
         IBaseValue closedBaseValue = null;
 
         String tableAlias = "bsv";
         Select select = context
                 .select(EAV_BE_STRING_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_STRING_SET_VALUES.as(tableAlias).IS_LAST,
                         EAV_BE_STRING_SET_VALUES.as(tableAlias).CREDITOR_ID)
                 .from(EAV_BE_STRING_SET_VALUES.as(tableAlias))
@@ -302,7 +323,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -313,6 +334,9 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
             long creditorId = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.CREDITOR_ID.getName())).longValue();
 
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
+                    .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
@@ -321,7 +345,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
                     metaType,
                     id,
                     creditorId,
-                    baseValue.getRepDate(),
+                    reportDate,
                     baseValue.getValue(),
                     true,
                     last);
@@ -332,6 +356,13 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
 
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseSet baseSet = (IBaseSet) baseContainer;
         IMetaType metaType = baseSet.getMemberType();
@@ -354,7 +385,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get last instance of BaseValue return more than one row.");
+            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -365,11 +396,11 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
             long creditorId = ((BigDecimal) row
                     .get(EAV_BE_STRING_SET_VALUES.CREDITOR_ID.getName())).longValue();
 
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_STRING_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
+
+            boolean closed = ((BigDecimal) row
+                    .get(EAV_BE_STRING_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
             lastBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,

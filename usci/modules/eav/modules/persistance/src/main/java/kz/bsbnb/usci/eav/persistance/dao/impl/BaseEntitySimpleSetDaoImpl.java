@@ -150,6 +150,13 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
         IMetaClass metaClass = baseEntity.getMeta();
@@ -232,6 +239,13 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
         IMetaClass metaClass = baseEntity.getMeta();
@@ -314,6 +328,13 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         IMetaType metaType = metaAttribute.getMetaType();
@@ -375,6 +396,13 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         IMetaType metaType = metaAttribute.getMetaType();
@@ -441,8 +469,8 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
         Table tableNumbering = context
             .select(DSL.rank().over()
-                        .partitionBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID))
-                        .orderBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE)).as("num_pp"),
+                            .partitionBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID))
+                            .orderBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE)).as("num_pp"),
                     tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
                     tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID),
                     tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
@@ -483,6 +511,12 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
             long baseValueId = ((BigDecimal) row.get(EAV_BE_ENTITY_SIMPLE_SETS.ID.getName())).longValue();
 
+            boolean closed = ((BigDecimal) row
+                    .get(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED.getName())).longValue() == 1;
+
+            boolean last = ((BigDecimal) row
+                    .get(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST.getName())).longValue() == 1;
+
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
 
@@ -499,16 +533,16 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                     0,
                     reportDate,
                     baseSet,
-                    false,
-                    true));
+                    closed,
+                    last));
         }
     }
 
     protected void loadBaseValues(IBaseSet baseSet, Date actualReportDate) {
         IMetaType metaType = baseSet.getMemberType();
-        if (metaType.isSet()) {
+
+        if (metaType.isSet())
             throw new UnsupportedOperationException("Не реализовано;");
-        }
 
         IMetaValue metaValue = (IMetaValue) metaType;
         DataTypes dataType = metaValue.getTypeCode();

@@ -1253,36 +1253,27 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 }
             // case#6
             } else {
-                IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueSaving);
+                IBaseValue baseValueNext = baseValueDao.getNextBaseValue(baseValueSaving);
 
-                if (baseValuePrevious != null) {
-                    childBaseSetLoaded = (IBaseSet) baseValuePrevious.getValue();
+                if (baseValueNext != null) {
+                    childBaseSetLoaded = (IBaseSet) baseValueNext.getValue();
                     childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
                             metaType,
-                            0,
+                            baseValueNext.getId(),
                             creditorId,
                             new Date(baseValueSaving.getRepDate().getTime()),
                             childBaseSetApplied,
                             false,
-                            baseValuePrevious.isLast());
+                            baseValueNext.isLast());
 
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                    baseEntityManager.registerAsInserted(baseValueApplied);
-
-                    if (baseValuePrevious.isLast()) {
-                        baseValuePrevious.setBaseContainer(baseEntity);
-                        baseValuePrevious.setMetaAttribute(metaAttribute);
-                        baseValuePrevious.setLast(false);
-                        baseEntityManager.registerAsUpdated(baseValuePrevious);
-                    }
+                    baseEntityManager.registerAsUpdated(baseValueApplied);
                 } else {
                     childBaseSetApplied = new BaseSet(childMetaType);
                     baseEntityManager.registerAsInserted(childBaseSetApplied);
-
-                    // TODO: Check next value
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1377,13 +1368,18 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseEntityManager.registerAsDeleted(childBaseValueClosed);
 
                     IBaseValue childBaseValuePrevious = setValueDao.getPreviousBaseValue(childBaseValueClosed);
-                    if (childBaseValueClosed.isLast()) {
-                        childBaseValuePrevious.setLast(true);
+                    if (childBaseValuePrevious != null) {
+                        if (childBaseValueClosed.isLast()) {
+                            childBaseValuePrevious.setLast(true);
 
-                        childBaseSetApplied.put(childBaseValuePrevious);
-                        baseEntityManager.registerAsUpdated(childBaseValuePrevious);
+                            childBaseSetApplied.put(childBaseValuePrevious);
+                            baseEntityManager.registerAsUpdated(childBaseValuePrevious);
+                        } else {
+                            childBaseSetApplied.put(childBaseValuePrevious);
+                        }
                     } else {
-                        childBaseSetApplied.put(childBaseValuePrevious);
+                        throw new IllegalStateException("Запись открытия не была найдена(" +
+                                metaAttribute.getName() + ");");
                     }
 
                     continue;

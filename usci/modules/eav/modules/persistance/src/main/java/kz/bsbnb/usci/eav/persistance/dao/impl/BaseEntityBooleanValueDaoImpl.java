@@ -72,7 +72,6 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 .set(EAV_BE_BOOLEAN_VALUES.IS_CLOSED, DataUtils.convert(closed))
                 .set(EAV_BE_BOOLEAN_VALUES.IS_LAST, DataUtils.convert(last));
 
-        logger.debug(insert.toString());
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
@@ -92,7 +91,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
 
     protected void update(long id, long baseEntityId, long creditorId, long metaAttributeId, Date reportDate,
                           Object value, boolean closed, boolean last) {
-        String tableAlias = "bv";
+        String tableAlias = "sv";
         Update update = context
                 .update(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
                 .set(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID, baseEntityId)
@@ -104,12 +103,11 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 .set(EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_LAST, DataUtils.convert(last))
                 .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ID.equal(id));
 
-        logger.debug(update.toString());
-
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("UPDATE operation should be update only one record.");
+            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_BOOLEAN_VALUES);");
     }
 
     @Override
@@ -118,7 +116,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
     }
 
     protected void delete(long id) {
-        String tableAlias = "bv";
+        String tableAlias = "sv";
         Delete delete = context
                 .delete(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ID.equal(id));
@@ -128,32 +126,32 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException("DELETE operation should be delete only one record.");
+            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_BOOLEAN_VALUES);");
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+
+        if (metaAttribute == null)
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+
+        if (metaAttribute.getId() < 1)
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
+
         if (baseContainer == null)
-            throw new RuntimeException("Can not find next instance of BaseEntityBooleanValue. " +
-                    "Instance of BaseContainer is null.");
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
 
         if (baseContainer.getId() < 1)
-            throw new RuntimeException("Can not find next instance of BaseEntityBooleanValue. " +
-                    "Instance of BaseContainer not contain ID.");
+            return null;
 
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
         IMetaClass metaClass = baseEntity.getMeta();
-
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null)
-            throw new RuntimeException("Can not find next instance of BaseEntityBooleanValue. " +
-                    "Instance of MetaAttribute is null.");
-
-        if (metaAttribute.getId() < 1)
-            throw new RuntimeException("Can not find next instance of BaseEntityBooleanValue. " +
-                    "Instance of MetaAttribute not contain ID.");
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue nextBaseValue = null;
@@ -174,8 +172,8 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.
-                        greaterThan(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
+                        DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subqueryAlias);
 
         Select select = context
@@ -193,28 +191,19 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue();
+            long id = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue();
+            long creditorId = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID.getName())).longValue();
+            boolean closed = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName())).longValue() == 1;
+            boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1;
+            String value = (String) row.get(EAV_BE_BOOLEAN_VALUES.VALUE.getName());
 
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            boolean value = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName()));
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
+                    row.get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName()));
 
             nextBaseValue = BaseValueFactory.create(
                     metaClass.getType(),
@@ -233,26 +222,25 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+
+        if (metaAttribute == null)
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+
+        if (metaAttribute.getId() < 1)
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
+
         if (baseContainer == null)
-            throw new RuntimeException("Can not find previous instance of BaseEntityBooleanValue. " +
-                    "Instance of BaseContainer is null.");
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
 
         if (baseContainer.getId() < 1)
-            throw new RuntimeException("Can not find previous instance of BaseEntityBooleanValue. " +
-                    "Instance of BaseContainer not contain ID.");
+            return null;
 
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
         IMetaClass metaClass = baseEntity.getMeta();
-
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null)
-            throw new RuntimeException("Can not find previous instance of BaseEntityBooleanValue. " +
-                    "Instance of MetaAttribute is null.");
-
-        if (metaAttribute.getId() < 1)
-            throw new RuntimeException("Can not find previous instance of BaseEntityBooleanValue. " +
-                    "Instance of MetaAttribute not contain ID.");
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue previousBaseValue = null;
@@ -271,11 +259,11 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
-                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId())
-                        .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                        .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.
-                                lessThan(DataUtils.convert(baseValue.getRepDate()))))
-                        .asTable(subqueryAlias);
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.lessThan(
+                        DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subqueryAlias);
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_BOOLEAN_VALUES.ID),
@@ -292,7 +280,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Query for get previous instance of BaseValue return more than one row.");
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -309,8 +297,8 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            boolean value = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())).longValue() == 1;
+            String value = (String) row
+                    .get(EAV_BE_BOOLEAN_VALUES.VALUE.getName());
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName()));
@@ -331,23 +319,22 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
-        IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer == null)
-            throw new RuntimeException("Can not find closed instance of BaseEntityBooleanValue. " +
-                    "Instance of BaseContainer is null.");
-
-        if (baseContainer.getId() < 1)
-            throw new RuntimeException("Can not find closed instance of BaseEntityBooleanValue. " +
-                    "Instance of BaseContainer not contain ID.");
-
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+
         if (metaAttribute == null)
-            throw new RuntimeException("Can not find closed instance of BaseEntityBooleanValue. " +
-                    "Instance of MetaAttribute is null.");
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
 
         if (metaAttribute.getId() < 1)
-            throw new RuntimeException("Can not find closed instance of BaseEntityBooleanValue. " +
-                    "Instance of MetaAttribute not contain ID.");
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+
+        if (baseContainer == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if (baseContainer.getId() < 1)
+            return null;
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue closedBaseValue = null;
@@ -360,17 +347,17 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
-                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
-                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.
-                        lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.lessOrEqual(
+                        DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get closed instance of BaseValue return more than one row.");
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -384,8 +371,8 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            boolean value = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())).longValue() == 1;
+            String value = (String) row
+                    .get(EAV_BE_BOOLEAN_VALUES.VALUE.getName());
 
             closedBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,
@@ -403,23 +390,22 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
-        IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer == null)
-            throw new RuntimeException("Can not find last instance of BaseEntityBooleanValue. " +
-                    "Instance of BaseContainer is null.");
-
-        if (baseContainer.getId() < 1)
-            throw new RuntimeException("Can not find last instance of BaseEntityBooleanValue. " +
-                    "Instance of BaseContainer not contain ID.");
-
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+
         if (metaAttribute == null)
-            throw new RuntimeException("Can not find last instance of BaseEntityBooleanValue. " +
-                    "Instance of MetaAttribute is null.");
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
 
         if (metaAttribute.getId() < 1)
-            throw new RuntimeException("Can not find last instance of BaseEntityBooleanValue. " +
-                    "Instance of MetaAttribute not contain ID.");
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+
+        if (baseContainer == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if (baseContainer.getId() < 1)
+            return null;
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue lastBaseValue = null;
@@ -430,19 +416,19 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).VALUE,
-                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_LAST,
-                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_CLOSED)
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
-                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_LAST.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get last instance of BaseValue return more than one row.");
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -451,13 +437,13 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                     .get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue();
 
             long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue();
+                    .get(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID.getName())).longValue();
 
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
-            boolean value = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())).longValue() == 1;
+            String value = (String) row
+                    .get(EAV_BE_BOOLEAN_VALUES.VALUE.getName());
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName()));
@@ -478,11 +464,10 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseEntity baseEntity, Date savingReportDate) {
+    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate) {
         Table tableOfAttributes = EAV_M_SIMPLE_ATTRIBUTES.as("a");
         Table tableOfValues = EAV_BE_BOOLEAN_VALUES.as("v");
-        Select select = null;
-
+        Select select;
 
         Table tableNumbering = context
                 .select(DSL.rank().over()
@@ -499,7 +484,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.ENTITY_ID).eq(baseEntity.getId()))
                 .and(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE)
-                        .lessOrEqual(DataUtils.convert(savingReportDate)))
+                        .lessOrEqual(DataUtils.convert(actualReportDate)))
                 .asTable("vn");
 
         select = context
@@ -517,9 +502,8 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
                 .and((tableNumbering.field(EAV_BE_BOOLEAN_VALUES.IS_CLOSED).equal(false)
                         .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
-                        .or(tableNumbering.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).equal(savingReportDate)
+                        .or(tableNumbering.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).equal(actualReportDate)
                                 .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
-
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -529,10 +513,14 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
             Map<String, Object> row = it.next();
 
             long id = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue();
-            long creditorId = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID.getName())).longValue();
+
+            long creditorId =  ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID.getName())).longValue();
+
             boolean closed = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
             boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1;
-            boolean value = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())).longValue() == 1;
+
+            String value = (String) row.get(EAV_BE_BOOLEAN_VALUES.VALUE.getName());
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName()));
@@ -540,23 +528,22 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
             String attribute = (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
 
             IMetaType metaType = baseEntity.getMemberType(attribute);
-            baseEntity.put(
-                    attribute,
-                    BaseValueFactory.create(
-                            MetaContainerTypes.META_CLASS,
-                            metaType,
-                            id,
-                            creditorId,
-                            reportDate,
-                            value,
-                            closed,
-                            last));
+
+            baseEntity.put(attribute, BaseValueFactory.create(
+                    MetaContainerTypes.META_CLASS,
+                    metaType,
+                    id,
+                    creditorId,
+                    reportDate,
+                    value,
+                    closed,
+                    last));
         }
     }
 
     @Override
     public void deleteAll(long baseEntityId) {
-        String tableAlias = "bv";
+        String tableAlias = "sv";
         Delete delete = context
                 .delete(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntityId));
