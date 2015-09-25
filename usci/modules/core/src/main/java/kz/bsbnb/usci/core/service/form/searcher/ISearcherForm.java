@@ -14,5 +14,5 @@ import java.util.List;
 public interface ISearcherForm {
     List<Pair> getMetaClasses(long userId);
     String getDom(long userId, IMetaClass metaClass, String prefix);
-    ISearchResult search(HashMap<String,String> parameters, MetaClass metaClass, String prefix);
+    ISearchResult search(HashMap<String,String> parameters, MetaClass metaClass, String prefix, long creditorId);
 }

@@ -47,8 +47,8 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
     }
 
     @Override
-    public ISearchResult search(String searchClassName, HashMap<String, String> parameters, MetaClass metaClass,String prefix) {
+    public ISearchResult search(String searchClassName, HashMap<String, String> parameters, MetaClass metaClass,String prefix, long creditorId) {
         ISearcherForm sf = getSearchForm(searchClassName);
-        return sf.search(parameters, metaClass, prefix);
+        return sf.search(parameters, metaClass, prefix, creditorId);
     }
 }
