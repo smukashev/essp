@@ -1003,7 +1003,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseValueDao valueDao = persistableDaoPool
                     .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
-
             // case#6
             if (!metaAttribute.isFinal()) {
                 IBaseValue baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
@@ -1809,6 +1808,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         baseValueLast.setBaseContainer(baseEntity);
                         baseValueLast.setMetaAttribute(metaAttribute);
+
                         baseEntityManager.registerAsUpdated(baseValueLast);
                     }
                 } else if (compare == -1){
@@ -1838,6 +1838,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueLoaded.isClosed(),
                             baseValueLoaded.isLast());
 
+                    baseValueApplied.setBaseContainer(baseEntity);
+                    baseValueApplied.setMetaAttribute(metaAttribute);
+
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                 } else if (compare == -1) {
                     childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
@@ -1851,6 +1854,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             childBaseSetApplied,
                             baseValueLoaded.isClosed(),
                             baseValueLoaded.isLast());
+
+                    baseValueApplied.setBaseContainer(baseEntity);
+                    baseValueApplied.setMetaAttribute(metaAttribute);
 
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsUpdated(baseValueApplied);
@@ -1870,10 +1876,39 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
             IBaseValue baseValueClosed = null;
+            // case#5
             if (!metaAttribute.isFinal()) {
                 baseValueClosed = baseValueDao.getClosedBaseValue(baseValueSaving);
+
                 if (baseValueClosed != null) {
+                    baseValueClosed.setBaseContainer(baseEntity);
+                    baseValueClosed.setMetaAttribute(metaAttribute);
+
+                    IBaseValue baseValueDeleted = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            baseValueClosed.getId(),
+                            baseValueClosed.getCreditorId(),
+                            new Date(baseValueClosed.getRepDate().getTime()),
+                            childBaseSetApplied,
+                            baseValueClosed.isClosed(),
+                            baseValueClosed.isLast());
+
+                    baseValueDeleted.setBaseContainer(baseEntity);
+                    baseValueDeleted.setMetaAttribute(metaAttribute);
+
+                    baseEntityManager.registerAsDeleted(baseValueDeleted);
+
                     reportDateLoaded = baseValueClosed.getRepDate();
+
+                    IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueClosed);
+
+                    if (baseValuePrevious == null)
+                        throw new IllegalStateException("Предыдущая запись не была найдена(" +
+                                metaAttribute.getName() + ");");
+
+                    baseValuePrevious.setBaseContainer(baseEntity);
+                    baseValuePrevious.setMetaAttribute(metaAttribute);
 
                     childBaseSetLoaded = (IBaseSet) baseValueClosed.getValue();
                     childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
@@ -1881,12 +1916,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
                             metaType,
-                            baseValueClosed.getId(),
-                            baseValueClosed.getCreditorId(),
-                            new Date(baseValueClosed.getRepDate().getTime()),
+                            baseValuePrevious.getId(),
+                            baseValuePrevious.getCreditorId(),
+                            new Date(baseValuePrevious.getRepDate().getTime()),
                             childBaseSetApplied,
                             false,
-                            baseValueClosed.isLast());
+                            true);
+
+                    baseValueApplied.setBaseContainer(baseEntity);
+                    baseValueApplied.setMetaAttribute(metaAttribute);
+
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsUpdated(baseValueApplied);
                 }
@@ -1895,6 +1934,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             if (baseValueClosed == null) {
                 IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueSaving);
                 if (baseValuePrevious != null) {
+                    baseValuePrevious.setBaseContainer(baseEntity);
+                    baseValuePrevious.setMetaAttribute(metaAttribute);
+
                     reportDateLoaded = baseValuePrevious.getRepDate();
 
                     childBaseSetLoaded = (IBaseSet) baseValuePrevious.getValue();
@@ -1909,6 +1951,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             childBaseSetApplied,
                             false,
                             baseValuePrevious.isLast());
+
+                    baseValueApplied.setBaseContainer(baseEntity);
+                    baseValueApplied.setMetaAttribute(metaAttribute);
+
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
 
@@ -1992,6 +2038,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
                 }
 
+                /* TODO: Если значение было закрыто и оно не ключевое, элемент массива не будет идентифицирован.
+                *  Элемент будет иметь ID = 0
+                * */
+
                 if (childBaseEntitySaving.getId() > 0) {
                     IBaseSetValueDao setValueDao = persistableDaoPool
                             .getPersistableDao(childBaseValueSaving.getClass(), IBaseSetValueDao.class);
@@ -2006,15 +2056,22 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 childBaseValueSaving.getValue(),
                                 childBaseValueSaving.isClosed(),
                                 childBaseValueSaving.isLast());
+
                         baseValueForSearch.setBaseContainer(childBaseSetApplied);
+                        baseValueForSearch.setMetaAttribute(metaAttribute);
 
                         IBaseValue childBaseValueClosed = setValueDao.getClosedBaseValue(baseValueForSearch);
 
                         if (childBaseValueClosed != null) {
                             childBaseValueClosed.setBaseContainer(childBaseSetApplied);
+                            childBaseValueClosed.setMetaAttribute(metaAttribute);
+
                             baseEntityManager.registerAsDeleted(childBaseValueClosed);
 
                             IBaseValue childBaseValuePrevious = setValueDao.getPreviousBaseValue(childBaseValueClosed);
+
+                            childBaseValuePrevious.setBaseContainer(childBaseSetApplied);
+                            childBaseValuePrevious.setMetaAttribute(metaAttribute);
 
                             if (childBaseValuePrevious != null && childBaseValuePrevious.getValue() != null) {
                                 IBaseEntity childBaseEntityPrevious = (IBaseEntity) childBaseValuePrevious.getValue();
