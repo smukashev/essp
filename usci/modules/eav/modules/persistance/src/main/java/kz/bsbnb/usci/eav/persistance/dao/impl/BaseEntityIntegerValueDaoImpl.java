@@ -197,10 +197,15 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.ID.getName())).longValue();
+
             long creditorId = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.CREDITOR_ID.getName())).longValue();
+
             boolean closed = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
             boolean last = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1;
-            String value = (String) row.get(EAV_BE_INTEGER_VALUES.VALUE.getName());
+
+            int value = ((BigDecimal)row
+                    .get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
@@ -297,8 +302,8 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            String value = (String) row
-                    .get(EAV_BE_INTEGER_VALUES.VALUE.getName());
+            int value = ((BigDecimal)row
+                    .get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
@@ -371,8 +376,8 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            String value = (String) row
-                    .get(EAV_BE_INTEGER_VALUES.VALUE.getName());
+            int value = ((BigDecimal)row
+                    .get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
 
             closedBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,
@@ -442,8 +447,8 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_INTEGER_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
-            String value = (String) row
-                    .get(EAV_BE_INTEGER_VALUES.VALUE.getName());
+            int value = ((BigDecimal)row
+                    .get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
@@ -520,7 +525,7 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
 
             boolean last = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            String value = (String) row.get(EAV_BE_INTEGER_VALUES.VALUE.getName());
+            int value = ((BigDecimal)row.get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));

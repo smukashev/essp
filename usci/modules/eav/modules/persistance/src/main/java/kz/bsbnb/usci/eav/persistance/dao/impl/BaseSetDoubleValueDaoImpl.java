@@ -464,7 +464,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
 
             boolean last = ((BigDecimal) row.get(EAV_BE_DOUBLE_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            String value = (String) row.get(EAV_BE_DOUBLE_SET_VALUES.VALUE.getName());
+            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_SET_VALUES.VALUE.getName())).doubleValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE.getName()));

@@ -228,12 +228,12 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         String subqueryAlias = "bsvn";
         Table subqueryTable = context
                 .select(DSL.rank()
-                                .over().orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
-                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
-                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID,
-                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
-                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED,
-                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
+                        .over().orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                    EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
+                    EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID,
+                    EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
+                    EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED,
+                    EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(
@@ -317,7 +317,8 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.
                         lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Boolean) baseValue.getValue())))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(
+                        DataUtils.convert((Boolean) baseValue.getValue())))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
@@ -464,7 +465,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
 
             boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            String value = (String) row.get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName());
+            boolean value = DataUtils.convert((Byte)row.get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName()));
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));

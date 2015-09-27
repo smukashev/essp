@@ -460,7 +460,7 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
 
             boolean last = ((BigDecimal) row.get(EAV_BE_INTEGER_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            String value = (String) row.get(EAV_BE_INTEGER_SET_VALUES.VALUE.getName());
+            int value = ((BigDecimal)row.get(EAV_BE_INTEGER_SET_VALUES.VALUE.getName())).intValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_INTEGER_SET_VALUES.REPORT_DATE.getName()));

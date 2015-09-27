@@ -462,7 +462,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
 
             boolean last = ((BigDecimal) row.get(EAV_BE_DATE_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            String value = (String) row.get(EAV_BE_DATE_SET_VALUES.VALUE.getName());
+            Date value = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DATE_SET_VALUES.VALUE.getName()));
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_DATE_SET_VALUES.REPORT_DATE.getName()));

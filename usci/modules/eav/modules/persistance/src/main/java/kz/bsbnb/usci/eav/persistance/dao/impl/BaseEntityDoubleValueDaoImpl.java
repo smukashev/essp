@@ -197,10 +197,14 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.ID.getName())).longValue();
+
             long creditorId = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.CREDITOR_ID.getName())).longValue();
+
             boolean closed = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
             boolean last = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.IS_LAST.getName())).longValue() == 1;
-            String value = (String) row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName());
+
+            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_DOUBLE_VALUES.REPORT_DATE.getName()));
@@ -297,8 +301,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_DOUBLE_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            String value = (String) row
-                    .get(EAV_BE_DOUBLE_VALUES.VALUE.getName());
+            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_DOUBLE_VALUES.REPORT_DATE.getName()));
@@ -371,8 +374,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_DOUBLE_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            String value = (String) row
-                    .get(EAV_BE_DOUBLE_VALUES.VALUE.getName());
+            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
 
             closedBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,
@@ -442,8 +444,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_DOUBLE_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
-            String value = (String) row
-                    .get(EAV_BE_DOUBLE_VALUES.VALUE.getName());
+            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_DOUBLE_VALUES.REPORT_DATE.getName()));
@@ -520,7 +521,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
 
             boolean last = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            String value = (String) row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName());
+            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_DOUBLE_VALUES.REPORT_DATE.getName()));
