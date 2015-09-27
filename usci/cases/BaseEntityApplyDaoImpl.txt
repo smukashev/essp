@@ -999,15 +999,57 @@ quit
     <entities>
     	<cs_test2>
     		<code>code#1</code>
-    		<cs_attr2>
+    		<cs_attrs2>
     			<item>
     			    <no>no#1</no>
                 </item>
     			<item>
                     <no>no#2</no>
                 </item>
-    		</cs_attr2>
+    		</cs_attrs2>
     	</cs_test2>
+    </entities>
+</batch>
+
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test2>
+    		<code>code#1</code>
+    		<cs_attrs2 />
+    	</cs_test2>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applyComplexSet, case#3
+---------------------------------------------------------
+meta create --name=cs_attr3
+meta add --name=cs_attr3 --attribute=no --type=string
+
+meta create --name=cs_test3
+meta add --name=cs_test3 --attribute=code --type=string
+meta key --name=cs_test3 --attribute=code
+meta add --name=cs_test3 --attribute=cs_attrs3 --type=meta_class --childname=cs_attr3 --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test3>
+    		<code>code#1</code>
+    		<cs_attrs3>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#2</no>
+                </item>
+    		</cs_attrs3>
+    	</cs_test3>
     </entities>
 </batch>
 
@@ -1015,10 +1057,10 @@ quit
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<cs_test2>
+    	<cs_test3>
     		<code>code#1</code>
-    		<cs_attr2 />
-    	</cs_test2>
+    		<cs_attrs3 />
+    	</cs_test3>
     </entities>
 </batch>
 ---------------------------------------------------------
