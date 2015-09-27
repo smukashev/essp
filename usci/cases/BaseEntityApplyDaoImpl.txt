@@ -1065,5 +1065,51 @@ quit
 </batch>
 ---------------------------------------------------------
 
+applyComplexSet, case#4
+---------------------------------------------------------
+meta create --name=cs_attr4
+meta add --name=cs_attr4 --attribute=no --type=string
 
+meta create --name=cs_test4
+meta add --name=cs_test4 --attribute=code --type=string
+meta key --name=cs_test4 --attribute=code
+meta add --name=cs_test4 --attribute=cs_attrs4 --type=meta_class --childname=cs_attr4 --array
 
+quit
+---------------------------------------------------------
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test4>
+    		<code>code#1</code>
+    		<cs_attrs4>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#2</no>
+                </item>
+    		</cs_attrs4>
+    	</cs_test4>
+    </entities>
+</batch>
+
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test4>
+    		<code>code#1</code>
+    		<cs_attrs4>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#3</no>
+                </item>
+    		</cs_attrs4>
+    	</cs_test4>
+    </entities>
+</batch>
+---------------------------------------------------------
