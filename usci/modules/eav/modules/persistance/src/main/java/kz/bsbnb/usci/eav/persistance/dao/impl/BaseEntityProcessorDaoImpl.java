@@ -200,7 +200,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         baseEntityReportDate.setBaseEntity(baseEntityPostPrepared);
                     } else {
                         baseEntityReportDate = baseEntityPostPrepared.getBaseEntityReportDate();
-                        baseEntityPostPrepared.calculateValueCount();
+                        baseEntityPostPrepared.calculateValueCount(null);
                     }
 
                     baseEntityReportDate.setClosed(true);

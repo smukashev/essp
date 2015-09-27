@@ -1173,3 +1173,62 @@ quit
     </entities>
 </batch>
 ---------------------------------------------------------
+
+applyComplexSet, case#6
+---------------------------------------------------------
+meta create --name=cs_attr6
+meta add --name=cs_attr6 --attribute=no --type=string
+
+meta create --name=cs_test6
+meta add --name=cs_test6 --attribute=code --type=string
+meta key --name=cs_test6 --attribute=code
+meta add --name=cs_test6 --attribute=cs_attrs6 --type=meta_class --childname=cs_attr6 --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test6>
+    		<code>code#1</code>
+    	</cs_test6>
+    </entities>
+</batch>
+
+<!-- 01.03.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test6>
+    		<code>code#1</code>
+    		<cs_attrs6>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#2</no>
+                </item>
+    		</cs_attrs6>
+    	</cs_test6>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test6>
+    		<code>code#1</code>
+    		<cs_attrs6>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#3</no>
+                </item>
+    		</cs_attrs6>
+    	</cs_test6>
+    </entities>
+</batch>
+---------------------------------------------------------
