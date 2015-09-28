@@ -2388,6 +2388,8 @@ public class CLI {
                 commandGetBatch();
             } else if (command.equals("mnt")) {
                 commandMaintenance(line);
+            } else if(command.equals("cp")) {
+                commandCp();
             } else {
                 System.out.println("No such command: " + command);
             }
@@ -2395,6 +2397,49 @@ public class CLI {
             System.err.println("Error: " + e.getMessage());
             lastException = e;
         }
+    }
+
+    private void commandCp() {
+
+        final String usage = "cp sourceFolder [targetFolder]";
+
+        if(args.size() < 1) {
+            System.out.println(usage);
+            return;
+        }
+
+        String sourceFolder = args.get(0);
+        String targetFolder = "C:\\zips";
+
+        if(args.size() > 1)
+            targetFolder = args.get(1);
+
+        String copy = "cp";
+        try {
+            if (System.getProperty("os.name").toLowerCase().contains("windows"))
+                copy = "copy";
+        } catch (Exception e) {
+            System.out.println("using cp as command to copy");
+        }
+
+        int cnt = 0;
+
+        File folder = new File(sourceFolder);
+        for(File file: folder.listFiles()) {
+            if(file.isDirectory())
+                continue;
+            try {
+                Process p = Runtime.getRuntime().exec("cmd /c " + copy + " " + file.getAbsolutePath() + " " + targetFolder);
+                p.waitFor();
+                cnt++;
+                Thread.sleep(1000);
+                System.out.println(file.getName() + " copied");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("Done " + cnt + " files copied.");
     }
 
     private void commandMaintenance(String line) {
