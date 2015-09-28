@@ -345,8 +345,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
+        int compare = DataUtils.compareBeginningOfTheDay(baseEntitySaving.getReportDate(),
+                baseEntityLoaded.getReportDate());
 
-        baseEntityApplied.calculateValueCount(baseEntityLoaded);
+        if (compare == 0 || compare == 1) {
+            baseEntityApplied.calculateValueCount(baseEntityLoaded);
+        } else {
+            baseEntityApplied.calculateValueCount(null);
+        }
 
         IBaseEntityReportDate baseEntityReportDate = baseEntityApplied.getBaseEntityReportDate();
 
