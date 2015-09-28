@@ -443,6 +443,7 @@ public class MainPortlet extends MVCPortlet {
         try {
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
             User currentUser = PortalUtil.getUser(resourceRequest);
+            List<Creditor> creditors;
 
             Gson gson = new Gson();
 
@@ -480,9 +481,19 @@ public class MainPortlet extends MVCPortlet {
                     break;
                 case FIND_ACTION:
                     Enumeration<String> list = resourceRequest.getParameterNames();
+                    creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
 
+                    long creditorId;
+
+                    if(creditors.size() == 0)
+                        throw new RuntimeException("нет доступа к кредиторам");
+                    else
+                    if(creditors.size() > 0) {
+                        logger.warn("доступ к более одному банку");
+                    }
+
+                    creditorId = creditors.get(0).getId();
                     metaName = resourceRequest.getParameter("metaClass");
-
                     MetaClass metaClass = metaFactoryService.getMetaClass(metaName);
                     HashMap<String,String> parameters = new HashMap<>();
                     searchClassName = resourceRequest.getParameter("searchName");
@@ -494,7 +505,7 @@ public class MainPortlet extends MVCPortlet {
                         parameters.put(attribute, resourceRequest.getParameter(attribute));
                     }
 
-                    ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "");
+                    ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "", creditorId);
                     Iterator<BaseEntity> cursor = searchResult.iterator();
 
                     long ret = -1;
@@ -544,7 +555,7 @@ public class MainPortlet extends MVCPortlet {
                     String entityId = resourceRequest.getParameter("entityId");
                     String asRootStr = resourceRequest.getParameter("asRoot");
                     boolean isNb = false;
-                    long creditorId = -1;
+                    creditorId = -1;
 
                     for(Role r : currentUser.getRoles())
                         if("NationalBankEmployee".equals(r.getDescriptiveName()) ||
@@ -553,7 +564,7 @@ public class MainPortlet extends MVCPortlet {
                             break;
                         }
 
-                    List<Creditor> creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
+                    creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
 
                     if(!isNb) {
                         if(creditors.size() > 1)
@@ -601,7 +612,7 @@ public class MainPortlet extends MVCPortlet {
                             parameters.put(attribute, resourceRequest.getParameter(attribute));
                         }
 
-                        searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "");
+                        searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "", creditorId);
                         if(searchResult.getData() == null)
                             throw new IllegalArgumentException("ошибка сериализации");
 

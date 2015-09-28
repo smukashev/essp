@@ -32,10 +32,7 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Repository
 public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseEntityComplexValueDao {
-
     private final Logger logger = LoggerFactory.getLogger(BaseEntityComplexValueDaoImpl.class);
-
-    public static final boolean DEFAULT_CURRENT_REPORT_DATE = true;
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -115,7 +112,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("UPDATE operation should be update only one record.");
+            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_COMPLEX_VALUES);");
     }
 
     @Override
@@ -134,39 +132,31 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("DELETE operation should be delete only one record.");
+            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_COMPLEX_VALUES);");
 
-    }
-
-    @Override
-    public IBaseValue getNextBaseValue(IBaseValue baseValue) {
-        return getNextBaseValue(baseValue, DEFAULT_CURRENT_REPORT_DATE);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public IBaseValue getNextBaseValue(IBaseValue baseValue, boolean currentReportDate) {
+    public IBaseValue getNextBaseValue(IBaseValue baseValue) {
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        if (metaAttribute == null)
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+
+        if (metaAttribute.getId() < 1)
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
-            throw new IllegalStateException("Can not find next instance of BaseEntityComplexValue. " +
-                    "Instance of BaseContainer is null.");
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
 
         if (baseContainer.getId() < 1)
-            throw new IllegalStateException("Can not find next instance of BaseEntityComplexValue. " +
-                    "Instance of BaseContainer not contain ID.");
+            return null;
 
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
         IMetaClass metaClass = baseEntity.getMeta();
-
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null)
-            throw new IllegalStateException("Can not find next instance of BaseEntityComplexValue. " +
-                    "Instance of MetaAttribute is null.");
-
-        if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Can not find next instance of BaseEntityComplexValue. " +
-                    "Instance of MetaAttribute not contain ID.");
-
 
         IBaseEntity parentBaseEntity = (IBaseEntity) baseContainer;
         IMetaType metaType = metaAttribute.getMetaType();
@@ -186,7 +176,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .from(EAV_BE_COMPLEX_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(parentBaseEntity.getId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
+                        DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subqueryAlias);
 
         Select select = context
@@ -202,9 +193,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
-        }
+        if (rows.size() > 1)
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -225,7 +215,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                     .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
 
             IBaseEntity childBaseEntity = baseEntityLoadDao
-                    .loadByMaxReportDate(entityValueId, currentReportDate ? baseValue.getRepDate() : reportDate);
+                    .loadByMaxReportDate(entityValueId, reportDate);
 
             nextBaseValue = BaseValueFactory.create(
                     metaClass.getType(),
@@ -242,35 +232,25 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     }
 
     @Override
-    public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
-        return getPreviousBaseValue(baseValue, DEFAULT_CURRENT_REPORT_DATE);
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
-    public IBaseValue getPreviousBaseValue(IBaseValue baseValue, boolean currentReportDate) {
+    public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        if (metaAttribute == null)
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+
+        if (metaAttribute.getId() < 1)
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer == null) {
-            throw new RuntimeException("Can not find previous instance of BaseEntityComplexValue. " +
-                    "Instance of BaseContainer is null.");
-        }
-        if (baseContainer.getId() < 1) {
-            throw new RuntimeException("Can not find previous instance of BaseEntityComplexValue. " +
-                    "Instance of BaseContainer not contain ID.");
-        }
+        if (baseContainer == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if (baseContainer.getId() < 1)
+            return null;
 
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
         IMetaClass metaClass = baseEntity.getMeta();
-
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null) {
-            throw new RuntimeException("Can not find previous instance of BaseEntityComplexValue. " +
-                    "Instance of MetaAttribute is null.");
-        }
-        if (metaAttribute.getId() < 1) {
-            throw new RuntimeException("Can not find previous instance of BaseEntityComplexValue. " +
-                    "Instance of MetaAttribute not contain ID.");
-        }
 
         IBaseEntity parentBaseEntity = (IBaseEntity) baseContainer;
         IMetaType metaType = metaAttribute.getMetaType();
@@ -290,7 +270,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .from(EAV_BE_COMPLEX_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(parentBaseEntity.getId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.lessThan(
+                        DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subqueryAlias);
 
         Select select = context
@@ -306,9 +287,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
-            throw new RuntimeException("Query for get previous instance of BaseValue return more than one row.");
-        }
+        if (rows.size() > 1)
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -329,7 +309,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                     .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
 
             IBaseEntity childBaseEntity = baseEntityLoadDao
-                    .loadByMaxReportDate(entityValueId, currentReportDate ? baseValue.getRepDate() : reportDate);
+                    .loadByMaxReportDate(entityValueId, reportDate);
 
             previousBaseValue = BaseValueFactory.create(
                     metaClass.getType(),
@@ -347,25 +327,20 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
-        IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer == null) {
-            throw new RuntimeException("Can not find closed instance of BaseEntityComplexValue. " +
-                    "Instance of BaseContainer is null.");
-        }
-        if (baseContainer.getId() < 1) {
-            throw new RuntimeException("Can not find closed instance of BaseEntityComplexValue. " +
-                    "Instance of BaseContainer not contain ID.");
-        }
-
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null) {
-            throw new RuntimeException("Can not find closed instance of BaseEntityComplexValue. " +
-                    "Instance of MetaAttribute is null.");
-        }
-        if (metaAttribute.getId() < 1) {
-            throw new RuntimeException("Can not find closed instance of BaseEntityComplexValue. " +
-                    "Instance of MetaAttribute not contain ID.");
-        }
+        if (metaAttribute == null)
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+
+        if (metaAttribute.getId() < 1)
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        if (baseContainer == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if (baseContainer.getId() < 1)
+            return null;
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue closedBaseValue = null;
@@ -385,9 +360,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
-            throw new RuntimeException("Query for get closed instance of BaseValue return more than one row.");
-        }
+        if (rows.size() > 1)
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -420,30 +394,20 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
-        return getLastBaseValue(baseValue, DEFAULT_CURRENT_REPORT_DATE);
-    }
-
-    @Override
-    public IBaseValue getLastBaseValue(IBaseValue baseValue, boolean currentReportDate) {
-        IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer == null) {
-            throw new RuntimeException("Can not find last instance of BaseEntityComplexValue. " +
-                    "Instance of BaseContainer is null.");
-        }
-        if (baseContainer.getId() < 1) {
-            throw new RuntimeException("Can not find last instance of BaseEntityComplexValue. " +
-                    "Instance of BaseContainer not contain ID.");
-        }
-
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null) {
-            throw new RuntimeException("Can not find last instance of BaseEntityComplexValue. " +
-                    "Instance of MetaAttribute is null.");
-        }
-        if (metaAttribute.getId() < 1) {
-            throw new RuntimeException("Can not find last instance of BaseEntityComplexValue. " +
-                    "Instance of MetaAttribute not contain ID.");
-        }
+        if (metaAttribute == null)
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+
+        if (metaAttribute.getId() < 1)
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        if (baseContainer == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if (baseContainer.getId() < 1)
+            return null;
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue lastBaseValue = null;
@@ -463,9 +427,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
-            throw new RuntimeException("Query for get last instance of BaseValue return more than one row.");
-        }
+        if (rows.size() > 1)
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -483,7 +446,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                     .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
 
             IBaseEntity childBaseEntity = baseEntityLoadDao
-                    .loadByMaxReportDate(entityValueId, currentReportDate ? baseValue.getRepDate() : reportDate);
+                    .loadByMaxReportDate(entityValueId, reportDate);
 
             lastBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,
@@ -545,6 +508,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                                 .and(tableOfAttributes.field(EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL).equal(true))));
 
         logger.debug(select.toString());
+
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         Iterator<Map<String, Object>> it = rows.iterator();
@@ -552,10 +516,16 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             Map<String, Object> row = it.next();
 
             long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
+
             long entityValueId = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
+
             boolean isClosed = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
             boolean isLast = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.IS_LAST.getName())).longValue() == 1;
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
+
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
+                    row.get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
+
             String attribute = (String) row.get(EAV_M_COMPLEX_ATTRIBUTES.NAME.getName());
 
             IMetaType metaType = metaClass.getMemberType(attribute);
@@ -593,7 +563,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     public Set<Long> getChildBaseEntityIds(long parentBaseEntityId) {
-        Set<Long> baseEntityIds = new HashSet<Long>();
+        Set<Long> baseEntityIds = new HashSet<>();
 
         String tableAlias = "bv";
         Select select = context

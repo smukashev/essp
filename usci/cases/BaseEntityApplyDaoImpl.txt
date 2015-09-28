@@ -728,390 +728,74 @@ quit
     </entities>
 </batch>
 
-<!-- 01.02.2015 -->
+<!-- 01.01.2015 -->
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
     	<ss_test1>
     		<code>code#1</code>
-    		<ss_attr1>
-    			<item>item#1</item>
-    			<item>item#2</item>
-    		</ss_attr1>
+    		<ss_attr1 />
     	</ss_test1>
     </entities>
 </batch>
 ---------------------------------------------------------
 
+applySimpleSet, case#2
+---------------------------------------------------------
+meta create --name=ss_test2
+meta add --name=ss_test2 --attribute=code --type=string
+meta key --name=ss_test2 --attribute=code
+meta add --name=ss_test2 --attribute=ss_attr2 --type=string --array
 
-applyComplexSet, case#7
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test2>
+    		<code>code#1</code>
+    		<ss_attr2>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr2>
+    	</ss_test2>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test2>
+    		<code>code#1</code>
+    		<ss_attr2 />
+    	</ss_test2>
+    </entities>
+</batch>
 ---------------------------------------------------------
 
-#               TEAM
-#               /   \
-#              /   CODE
-#             /
-#    users  [ (user),(user),(user)]
-#                |
-#        quote, relations
-#        /        |
-#     string   (user_id, relation_type_id)
-#
-#
 
-#====================================
-#= RELATION
-#====================================
-meta create --name=relation
-meta add --name=relation --attribute=relation_type_id --type=INTEGER --final
-meta add --name=relation --attribute=user_id --type=INTEGER --final
+applySimpleSet, case#3
+---------------------------------------------------------
+meta create --name=ss_test3
+meta add --name=ss_test3 --attribute=code --type=string
+meta key --name=ss_test3 --attribute=code
+meta add --name=ss_test3 --attribute=ss_attr3 --type=string --array
 
-
-#====================================
-#= USER
-#====================================
-meta create --name=user
-meta add --name=user --attribute=relations --type=meta_class --array --childname=relation --final
-meta add --name=user --attribute=quote --type=string --final
-
-#====================================
-#= TEAM
-#====================================
-meta create --name=team
-meta add --name=team --attribute=users --type=meta_class --array --childname=user --final
-meta add --name=team --attribute=code --type=string
-meta key --name=team --attribute=code
-
-rc
-
-========================================
-
+quit
+---------------------------------------------------------
 <!-- 01.01.2015 -->
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>think before you do!!!</quote>
-    	            <relations>
-    	                <item>
-    	                    <user_id>1001</user_id>
-    	                    <relation_type_id>100</relation_type_id>
-    	                </item>
-    	            </relations>
-    	        </item>
-    	    </users>
-    	</team>
-    </entities>
-</batch>
---------------------------------------------------------------------------
-
-<!-- 01.01.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users/>
-    	</team>
-    </entities>
-</batch>
---------------------------------------------------------------------------
-
-applyComplexSet, case#8
---------------------------------------------------------------------------
-
-#====================================
-#= USER
-#====================================
-meta create --name=user
-meta add --name=user --attribute=quote --type=string --final
-
-#====================================
-#= TEAM
-#====================================
-meta create --name=team
-meta add --name=team --attribute=users --type=meta_class --array --childname=user
-meta add --name=team --attribute=code --type=string
-meta key --name=team --attribute=code
-
-rc
-
-<!-- 01.01.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>think before you do!!!</quote>
-    	        </item>
-    	    </users>
-    	</team>
-    </entities>
-</batch>
-
-------------------------------------------------------------------
-
-<!-- 01.01.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users/>
-    	</team>
-    </entities>
-</batch>
-
--------------------------------------------------------------------
-
-applyComplexSet, case#9
---------------------------------------------------------------------------
-
-#====================================
-#= USER
-#====================================
-meta create --name=user
-meta add --name=user --attribute=quote --type=string
-
-#====================================
-#= TEAM
-#====================================
-meta create --name=team
-meta add --name=team --attribute=users --type=meta_class --array --childname=user
-meta add --name=team --attribute=code --type=string
-meta key --name=team --attribute=code
-
-rc
-
---------------------------------------------------------------------
-
-<!-- 01.01.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>think before you do!!!</quote>
-    	        </item>
-    	    </users>
-    	</team>
-    </entities>
-</batch>
-
-------------------------------------------------------------------
-
-<!-- 01.02.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users/>
-    	</team>
-    </entities>
-</batch>
-
-------------------------------------------------------------------
-
-applyComplexSet, case#10
-
-#====================================
-#= USER
-#====================================
-meta create --name=user
-meta add --name=user --attribute=quote --type=string
-
-#====================================
-#= TEAM
-#====================================
-meta create --name=team
-meta add --name=team --attribute=users --type=meta_class --array --childname=user
-meta add --name=team --attribute=code --type=string
-meta key --name=team --attribute=code
-
-rc
-
---------------------------------------------------------------------
-
-<!-- 01.01.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>think before you do!!!</quote>
-    	        </item>
-    	    </users>
-    	</team>
-    </entities>
-</batch>
-
-------------------------------------------------------------------
-
-<!-- 01.02.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-			<users>
-				<item>
-					<quote>Just do it!!!</quote>
-				</item>
-			</users>
-    	</team>
-    </entities>
-</batch>
-
-------------------------------------------------------------------
-
-
-applyComplexSet, case#11
-
-#====================================
-#= USER
-#====================================
-meta create --name=user
-meta add --name=user --attribute=quote --type=string
-
-#====================================
-#= TEAM
-#====================================
-meta create --name=team
-meta add --name=team --attribute=users --type=meta_class --array --childname=user
-meta add --name=team --attribute=code --type=string
-meta key --name=team --attribute=code
-
-rc
-
---------------------------------------------------------------------
-
-<!-- 01.02.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>think before you do!!!</quote>
-    	        </item>
-    	    </users>
-    	</team>
-    </entities>
-</batch>
-
-------------------------------------------------------------------
-
-<!-- 01.01.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-			<users>
-				<item>
-					<quote>Just do it!!!</quote>
-				</item>
-			</users>
-    	</team>
-    </entities>
-</batch>
-
-------------------------------------------------------------------
-
-
-
-applyComplexSet, case#12
-
-#====================================
-#= USER
-#====================================
-meta create --name=user
-meta add --name=user --attribute=quote --type=string
-
-#====================================
-#= TEAM
-#====================================
-meta create --name=team
-meta add --name=team --attribute=users --type=meta_class --array --childname=user
-meta add --name=team --attribute=code --type=string
-meta key --name=team --attribute=code
-
-rc
-
---------------------------------------------------------------------
-
-<!-- 01.01.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users/>
-    	</team>
-    </entities>
-</batch>
-------------------------------------------------------------------
-
-<!-- 01.02.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>Just do it!!!</quote>
-    	        </item>
-    	    </users>
-    	</team>
-    </entities>
-</batch>
-
-------------------------------------------------------------------
-
-applyComplexSet, case#13
-
-#====================================
-#= USER
-#====================================
-meta create --name=user
-meta add --name=user --attribute=quote --type=string
-
-#====================================
-#= TEAM
-#====================================
-meta create --name=team
-meta add --name=team --attribute=users --type=meta_class --array --childname=user
-meta add --name=team --attribute=code --type=string
-meta key --name=team --attribute=code
-
-rc
-
--------------------------------------------------------------
-
-<!-- 01.01.2015 -->
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<batch>
-    <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>Think before you do!</quote>
-    	        </item>
-    	    </users>
-    	</team>
+    	<ss_test3>
+    		<code>code#1</code>
+    		<ss_attr3>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr3>
+    	</ss_test3>
     </entities>
 </batch>
 
@@ -1119,71 +803,86 @@ rc
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users/>
-    	</team>
+    	<ss_test3>
+    		<code>code#1</code>
+    		<ss_attr3>
+    			<item>item#1</item>
+    			<item>item#3</item>
+    		</ss_attr3>
+    	</ss_test3>
     </entities>
 </batch>
+---------------------------------------------------------
 
+applySimpleSet, case#4
+---------------------------------------------------------
+meta create --name=ss_test4
+meta add --name=ss_test4 --attribute=code --type=string
+meta key --name=ss_test4 --attribute=code
+meta add --name=ss_test4 --attribute=ss_attr4 --type=string --array
+
+quit
+---------------------------------------------------------
 <!-- 01.02.2015 -->
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>Just do it!!!</quote>
-    	        </item>
-    	    </users>
-    	</team>
+    	<ss_test4>
+    		<code>code#1</code>
+    		<ss_attr4>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr4>
+    	</ss_test4>
     </entities>
 </batch>
-
-
-applyComplexSet, case#14
-
-#====================================
-#= USER
-#====================================
-meta create --name=user
-meta add --name=user --attribute=quote --type=string
-
-#====================================
-#= TEAM
-#====================================
-meta create --name=team
-meta add --name=team --attribute=users --type=meta_class --array --childname=user
-meta add --name=team --attribute=code --type=string
-meta key --name=team --attribute=code
-
-rc
 
 <!-- 01.01.2015 -->
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>Just do it!!!</quote>
-    	        </item>
-    	    </users>
-    	</team>
+    	<ss_test4>
+    		<code>code#1</code>
+    		<ss_attr4>
+    			<item>item#1</item>
+    			<item>item#3</item>
+    		</ss_attr4>
+    	</ss_test4>
     </entities>
 </batch>
+---------------------------------------------------------
 
+applySimpleSet, case#5
+---------------------------------------------------------
+meta create --name=ss_test5
+meta add --name=ss_test5 --attribute=code --type=string
+meta key --name=ss_test5 --attribute=code
+meta add --name=ss_test5 --attribute=ss_attr5 --type=string --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<ss_test5>
+    		<code>code#1</code>
+    		<ss_attr5>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr5>
+    	</ss_test5>
+    </entities>
+</batch>
 
 <!-- 01.02.2015 -->
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users/>
-    	</team>
+    	<ss_test5>
+    		<code>code#1</code>
+    		<ss_attr5 />
+    	</ss_test5>
     </entities>
 </batch>
 
@@ -1191,60 +890,82 @@ rc
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>Think before you do!!!</quote>
-    	        </item>
-    	    </users>
-    	</team>
+    	<ss_test5>
+    		<code>code#1</code>
+    		<ss_attr5>
+    			<item>item#1</item>
+    			<item>item#3</item>
+    		</ss_attr5>
+    	</ss_test5>
     </entities>
 </batch>
+---------------------------------------------------------
 
+applySimpleSet, case#6
+---------------------------------------------------------
+meta create --name=ss_test6
+meta add --name=ss_test6 --attribute=code --type=string
+meta key --name=ss_test6 --attribute=code
+meta add --name=ss_test6 --attribute=ss_attr6 --type=string --array
 
-applyComplexSet, case#15
-
-#====================================
-#= USER
-#====================================
-meta create --name=user
-meta add --name=user --attribute=quote --type=string
-
-#====================================
-#= TEAM
-#====================================
-meta create --name=team
-meta add --name=team --attribute=users --type=meta_class --array --childname=user
-meta add --name=team --attribute=code --type=string
-meta key --name=team --attribute=code
-
-rc
-
-<!-- 01.03.2015 -->
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>Just do it!!!</quote>
-    	        </item>
-    	    </users>
-    	</team>
+    	<ss_test6>
+    		<code>code#1</code>
+    		<ss_attr6>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr6>
+    	</ss_test6>
     </entities>
 </batch>
-
 
 <!-- 01.02.2015 -->
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users/>
-    	</team>
+    	<ss_test6>
+    		<code>code#1</code>
+    		<ss_attr6>
+    			<item>item#1</item>
+    			<item>item#2</item>
+    		</ss_attr6>
+    	</ss_test6>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applyComplexSet, case#1
+---------------------------------------------------------
+meta create --name=cs_attr1
+meta add --name=cs_attr1 --attribute=no --type=string --final
+
+meta create --name=cs_test1
+meta add --name=cs_test1 --attribute=code --type=string
+meta key --name=cs_test1 --attribute=code
+meta add --name=cs_test1 --attribute=cs_attrs1 --type=meta_class --childname=cs_attr1 --array --final
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test1>
+    		<code>code#1</code>
+    		<cs_attrs1>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#2</no>
+                </item>
+    		</cs_attrs1>
+    	</cs_test1>
     </entities>
 </batch>
 
@@ -1252,14 +973,262 @@ rc
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
     <entities>
-    	<team>
-    	    <code>pro_team</code>
-    	    <users>
-    	        <item>
-    	            <quote>Think before you do!!!</quote>
-    	        </item>
-    	    </users>
-    	</team>
+    	<cs_test1>
+    		<code>code#1</code>
+    		<cs_attrs1 />
+    	</cs_test1>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applyComplexSet, case#2
+---------------------------------------------------------
+meta create --name=cs_attr2
+meta add --name=cs_attr2 --attribute=no --type=string
+
+meta create --name=cs_test2
+meta add --name=cs_test2 --attribute=code --type=string
+meta key --name=cs_test2 --attribute=code
+meta add --name=cs_test2 --attribute=cs_attrs2 --type=meta_class --childname=cs_attr2 --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test2>
+    		<code>code#1</code>
+    		<cs_attrs2>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#2</no>
+                </item>
+    		</cs_attrs2>
+    	</cs_test2>
     </entities>
 </batch>
 
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test2>
+    		<code>code#1</code>
+    		<cs_attrs2 />
+    	</cs_test2>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applyComplexSet, case#3
+---------------------------------------------------------
+meta create --name=cs_attr3
+meta add --name=cs_attr3 --attribute=no --type=string
+
+meta create --name=cs_test3
+meta add --name=cs_test3 --attribute=code --type=string
+meta key --name=cs_test3 --attribute=code
+meta add --name=cs_test3 --attribute=cs_attrs3 --type=meta_class --childname=cs_attr3 --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test3>
+    		<code>code#1</code>
+    		<cs_attrs3>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#2</no>
+                </item>
+    		</cs_attrs3>
+    	</cs_test3>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test3>
+    		<code>code#1</code>
+    		<cs_attrs3 />
+    	</cs_test3>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applyComplexSet, case#4
+---------------------------------------------------------
+meta create --name=cs_attr4
+meta add --name=cs_attr4 --attribute=no --type=string
+
+meta create --name=cs_test4
+meta add --name=cs_test4 --attribute=code --type=string
+meta key --name=cs_test4 --attribute=code
+meta add --name=cs_test4 --attribute=cs_attrs4 --type=meta_class --childname=cs_attr4 --array
+
+quit
+---------------------------------------------------------
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test4>
+    		<code>code#1</code>
+    		<cs_attrs4>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#2</no>
+                </item>
+    		</cs_attrs4>
+    	</cs_test4>
+    </entities>
+</batch>
+
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test4>
+    		<code>code#1</code>
+    		<cs_attrs4>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#3</no>
+                </item>
+    		</cs_attrs4>
+    	</cs_test4>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applyComplexSet, case#5
+---------------------------------------------------------
+meta create --name=cs_attr5
+meta add --name=cs_attr5 --attribute=no --type=string
+
+meta create --name=cs_test5
+meta add --name=cs_test5 --attribute=code --type=string
+meta key --name=cs_test5 --attribute=code
+meta add --name=cs_test5 --attribute=cs_attrs5 --type=meta_class --childname=cs_attr5 --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test5>
+    		<code>code#1</code>
+    		<cs_attrs5>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#2</no>
+                </item>
+    		</cs_attrs5>
+    	</cs_test5>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test5>
+    		<code>code#1</code>
+    		<cs_attrs5 />
+    	</cs_test5>
+    </entities>
+</batch>
+
+<!-- 01.03.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test5>
+    		<code>code#1</code>
+    		<cs_attrs5>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#3</no>
+                </item>
+    		</cs_attrs5>
+    	</cs_test5>
+    </entities>
+</batch>
+---------------------------------------------------------
+
+applyComplexSet, case#6
+---------------------------------------------------------
+meta create --name=cs_attr6
+meta add --name=cs_attr6 --attribute=no --type=string
+
+meta create --name=cs_test6
+meta add --name=cs_test6 --attribute=code --type=string
+meta key --name=cs_test6 --attribute=code
+meta add --name=cs_test6 --attribute=cs_attrs6 --type=meta_class --childname=cs_attr6 --array
+
+quit
+---------------------------------------------------------
+<!-- 01.01.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test6>
+    		<code>code#1</code>
+    	</cs_test6>
+    </entities>
+</batch>
+
+<!-- 01.03.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test6>
+    		<code>code#1</code>
+    		<cs_attrs6>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#2</no>
+                </item>
+    		</cs_attrs6>
+    	</cs_test6>
+    </entities>
+</batch>
+
+<!-- 01.02.2015 -->
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+    	<cs_test6>
+    		<code>code#1</code>
+    		<cs_attrs6>
+    			<item>
+    			    <no>no#1</no>
+                </item>
+    			<item>
+                    <no>no#3</no>
+                </item>
+    		</cs_attrs6>
+    	</cs_test6>
+    </entities>
+</batch>
+---------------------------------------------------------

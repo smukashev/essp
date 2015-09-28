@@ -172,7 +172,9 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
         long id;
         lock.writeLock().lock();
         try {
-            id = metaClassDao.save(meta);
+            id = metaClassDao.save(meta); // TODO: simple array attribute doesn't contain ID
+            // TODO: remove tmp solution
+            meta = metaClassDao.load(id);
             names.put(id, meta.getClassName());
             cache.put(meta.getClassName(), meta);
         } finally {

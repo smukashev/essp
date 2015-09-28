@@ -35,7 +35,7 @@ public interface IBaseEntity extends IBaseContainer {
 
     IBaseValue safeGetValue(String name);
 
-    void calculateValueCount();
+    void calculateValueCount(IBaseEntity baseEntityLoaded);
 
     UUID getUuid();
 

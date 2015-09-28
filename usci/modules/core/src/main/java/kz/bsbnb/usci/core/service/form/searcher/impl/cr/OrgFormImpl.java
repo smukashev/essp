@@ -60,7 +60,7 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
     }
 
     @Override
-    public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix) {
+    public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix, long creditorId) {
         ISearchResult ret;
 
         if(parameters.get("pageNo") != null)

@@ -371,7 +371,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         this.baseEntityReportDate = baseEntityReportDate;
     }
 
-    public void calculateValueCount() {
+    public void calculateValueCount(IBaseEntity baseEntityLoaded) {
         long integerValuesCount = 0;
         long dateValuesCount = 0;
         long stringValuesCount = 0;
@@ -380,6 +380,20 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         long complexValuesCount = 0;
         long simpleSetsCount = 0;
         long complexSetsCount = 0;
+
+        if (baseEntityLoaded != null) {
+            if (baseEntityLoaded.getBaseEntityReportDate() == null)
+                throw new IllegalStateException("Сущность не содержит данные из EAV_BE_ENTITY_REPORT_DATES;");
+
+            integerValuesCount = baseEntityLoaded.getBaseEntityReportDate().getIntegerValuesCount();
+            dateValuesCount = baseEntityLoaded.getBaseEntityReportDate().getDateValuesCount();
+            stringValuesCount = baseEntityLoaded.getBaseEntityReportDate().getStringValuesCount();
+            booleanValuesCount = baseEntityLoaded.getBaseEntityReportDate().getBooleanValuesCount();
+            doubleValuesCount = baseEntityLoaded.getBaseEntityReportDate().getDoubleValuesCount();
+            complexValuesCount = baseEntityLoaded.getBaseEntityReportDate().getComplexValuesCount();
+            simpleSetsCount = baseEntityLoaded.getBaseEntityReportDate().getSimpleSetsCount();
+            complexSetsCount = baseEntityLoaded.getBaseEntityReportDate().getComplexSetsCount();
+        }
 
         for (String attribute : values.keySet()) {
             IMetaType metaType = meta.getMemberType(attribute);

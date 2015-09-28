@@ -106,7 +106,8 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("UPDATE operation should be update only one record.");
+            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_STRING_VALUES);");
     }
 
     @Override
@@ -125,30 +126,32 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException("DELETE operation should be delete only one record.");
+            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + id +
+                    ", EAV_BE_STRING_VALUES);");
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
-        IBaseContainer baseContainer = baseValue.getBaseContainer();
-
-        if (baseContainer == null)
-            throw new RuntimeException("Родитель не можеть быть NULL;");
-
-        if (baseContainer.getId() < 1)
-            throw new RuntimeException("Родитель должен иметь ID больше 0;");
-
-        IBaseEntity baseEntity = (IBaseEntity) baseContainer;
-        IMetaClass metaClass = baseEntity.getMeta();
-
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new RuntimeException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
 
         if (metaAttribute.getId() < 1)
-            throw new RuntimeException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+
+        if (baseContainer == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if (baseContainer.getId() < 1)
+            return null;
+
+        IBaseEntity baseEntity = (IBaseEntity) baseContainer;
+        IMetaClass metaClass = baseEntity.getMeta();
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue nextBaseValue = null;
@@ -188,7 +191,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Количество следующих элементов не может быть больше 1;");
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -219,26 +222,25 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+
+        if (metaAttribute == null)
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+
+        if (metaAttribute.getId() < 1)
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
         IBaseContainer baseContainer = baseValue.getBaseContainer();
+
         if (baseContainer == null)
-            throw new RuntimeException("Can not find previous instance of BaseEntityStringValue. " +
-                    "Instance of BaseContainer is null.");
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
 
         if (baseContainer.getId() < 1)
-            throw new RuntimeException("Can not find previous instance of BaseEntityStringValue. " +
-                    "Instance of BaseContainer not contain ID.");
+            return null;
 
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
         IMetaClass metaClass = baseEntity.getMeta();
-
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        if (metaAttribute == null)
-            throw new RuntimeException("Can not find previous instance of BaseEntityStringValue. " +
-                    "Instance of MetaAttribute is null.");
-
-        if (metaAttribute.getId() < 1)
-            throw new RuntimeException("Can not find previous instance of BaseEntityStringValue. " +
-                    "Instance of MetaAttribute not contain ID.");
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue previousBaseValue = null;
@@ -259,7 +261,8 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                 .where(EAV_BE_STRING_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.lessThan(
+                        DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subqueryAlias);
 
         Select select = context
@@ -277,7 +280,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get previous instance of BaseEntityStringValue return more than one row.");
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -316,23 +319,22 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
 
     @Override
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
-        IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer == null)
-            throw new RuntimeException("Can not find closed instance of BaseEntityStringValue. " +
-                    "Instance of BaseContainer is null.");
-
-        if (baseContainer.getId() < 1)
-            throw new RuntimeException("Can not find closed instance of BaseEntityStringValue. " +
-                    "Instance of BaseContainer not contain ID.");
-
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+
         if (metaAttribute == null)
-            throw new RuntimeException("Can not find closed instance of BaseEntityStringValue. " +
-                    "Instance of MetaAttribute is null.");
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
 
         if (metaAttribute.getId() < 1)
-            throw new RuntimeException("Can not find closed instance of BaseEntityStringValue. " +
-                    "Instance of MetaAttribute not contain ID.");
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+
+        if (baseContainer == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if (baseContainer.getId() < 1)
+            return null;
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue closedBaseValue = null;
@@ -355,7 +357,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get closed instance of BaseEntityStringValue return more than one row.");
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -388,23 +390,22 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
 
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
-        IBaseContainer baseContainer = baseValue.getBaseContainer();
-        if (baseContainer == null)
-            throw new RuntimeException("Can not find last instance of BaseEntityStringValue. " +
-                    "Instance of BaseContainer is null.");
-
-        if (baseContainer.getId() < 1)
-            throw new RuntimeException("Can not find last instance of BaseEntityStringValue. " +
-                    "Instance of BaseContainer not contain ID.");
-
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+
         if (metaAttribute == null)
-            throw new RuntimeException("Can not find last instance of BaseEntityStringValue. " +
-                    "Instance of MetaAttribute is null.");
+            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
 
         if (metaAttribute.getId() < 1)
-            throw new RuntimeException("Can not find last instance of BaseEntityStringValue. " +
-                    "Instance of MetaAttribute not contain ID.");
+            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+
+        if (baseContainer == null)
+            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
+                    ") является NULL;");
+
+        if (baseContainer.getId() < 1)
+            return null;
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue lastBaseValue = null;
@@ -427,13 +428,16 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get last instance of BaseEntityStringValue return more than one row.");
+            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.ID.getName())).longValue();
+
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_STRING_VALUES.CREDITOR_ID.getName())).longValue();
 
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_STRING_VALUES.IS_CLOSED.getName())).longValue() == 1;
@@ -448,7 +452,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                     MetaContainerTypes.META_CLASS,
                     metaType,
                     id,
-                    0,
+                    creditorId,
                     reportDate,
                     value,
                     closed,
@@ -547,5 +551,4 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
     }
-
 }

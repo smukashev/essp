@@ -984,17 +984,20 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 }
 
                 if (newValue instanceof Double) {
-                    if (!Double.valueOf((Double) newValue).equals(Double.valueOf(dbValue.toString()))) {
+                    double value = ((BigDecimal) dbValue).doubleValue();
+                    if (!newValue.equals(value)) {
                         equalityFlag = false;
                         break;
                     }
                 } else if (newValue instanceof Integer) {
-                    if (!Integer.valueOf((Integer) newValue).equals(Integer.valueOf(dbValue.toString()))) {
+                    int value = ((BigDecimal) dbValue).intValue();
+                    if (!newValue.equals(value)) {
                         equalityFlag = false;
                         break;
                     }
                 } else if (newValue instanceof Boolean) {
-                    if (!Boolean.valueOf((Boolean) newValue).equals(Boolean.valueOf(dbValue.toString()))) {
+                    boolean value = ((BigDecimal) dbValue).longValue() == 1;
+                    if (!newValue.equals(value)) {
                         equalityFlag = false;
                         break;
                     }
@@ -1009,7 +1012,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         break;
                     }
                 } else if (newValue instanceof Date) {
-                    if (!newValue.equals(new Date(((Timestamp) dbValue).getTime()))) {
+                    Date value = DataUtils.convertToSQLDate((Timestamp) dbValue);
+                    if (!newValue.equals(value)) {
                         equalityFlag = false;
                         break;
                     }
