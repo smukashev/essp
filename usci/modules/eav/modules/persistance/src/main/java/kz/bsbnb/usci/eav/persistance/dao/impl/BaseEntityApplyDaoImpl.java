@@ -34,7 +34,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager,
                              EntityHolder entityHolder) {
-        IBaseEntity baseEntityLoaded;
+        IBaseEntity baseEntityLoaded = null;
         IBaseEntity baseEntityApplied;
 
         // Новые сущности или сущности не имеющие ключевые атрибуты
@@ -83,7 +83,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         if (entityHolder != null) {
             // entityHolder.setSaving(baseEntitySaving);
-            // entityHolder.setLoaded(baseEntityLoaded);
+            entityHolder.setLoaded(baseEntityLoaded);
             entityHolder.setApplied(baseEntityApplied);
         }
 

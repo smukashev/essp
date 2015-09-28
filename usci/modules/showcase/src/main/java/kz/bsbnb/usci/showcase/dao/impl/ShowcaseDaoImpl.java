@@ -482,14 +482,53 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
     @SuppressWarnings("unchecked")
     @Transactional
-    public void generate(IBaseEntity globalEntity, ShowcaseHolder showcaseHolder) {
-        List<BaseEntity> all;
+    public void generate(IBaseEntity globalEntity, IBaseEntity globalEntityLoaded, ShowcaseHolder showcaseHolder) {
+        List<Long> foundIds = new ArrayList<>();
 
         if (showcaseHolder.getShowCaseMeta().getDownPath() != null) {
-            all = (List<BaseEntity>) globalEntity.getEls("{get}" +
+            List<BaseEntity> all = (List<BaseEntity>) globalEntity.getEls("{get}" +
                     showcaseHolder.getShowCaseMeta().getDownPath());
-            for (BaseEntity baseEntity : all)
-                dbCarteageGenerate(globalEntity, baseEntity, showcaseHolder);
+
+            List<BaseEntity> allLoaded = (List<BaseEntity>) globalEntityLoaded.getEls("{get}" +
+                    showcaseHolder.getShowCaseMeta().getDownPath());
+
+            for (BaseEntity baseEntity : all) {
+                BaseEntity foundEntity = null;
+
+                for (BaseEntity baseEntityLoaded : allLoaded) {
+                    if (baseEntity.getId() == baseEntityLoaded.getId()) {
+                        foundEntity = baseEntityLoaded;
+                        foundIds.add(foundEntity.getId());
+                        break;
+                    }
+                }
+
+                if (foundEntity != null) {
+                    dbCarteageGenerate(globalEntity, baseEntity, showcaseHolder);
+                } else {
+                    dbCarteageGenerate(globalEntity, baseEntity, showcaseHolder);
+                }
+            }
+
+            for (BaseEntity baseEntityLoaded : allLoaded) {
+                if (!foundIds.contains(baseEntityLoaded.getId())) {
+                    HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(baseEntityLoaded,
+                            showcaseHolder);
+
+                    for (Map.Entry entry : savingMap.entrySet()) {
+                        HashMap<ValueElement, Object> entryMap = (HashMap) entry.getValue();
+
+                        KeyData keyData = new KeyData(entryMap);
+
+                        String sql = "DELETE FROM %s WHERE " + keyData.queryKeys + " and open_date = ?";
+                        sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                                COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                        jdbcTemplateSC.update(sql, getObjectArray(false, keyData.vals,
+                                baseEntityLoaded.getReportDate()));
+                    }
+                }
+            }
         } else {
             dbCarteageGenerate(globalEntity, globalEntity, showcaseHolder);
         }

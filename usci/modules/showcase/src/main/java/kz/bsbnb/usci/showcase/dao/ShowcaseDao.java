@@ -14,7 +14,7 @@ public interface ShowcaseDao {
 
     void createTables(ShowcaseHolder showcaseHolder);
 
-    void generate(IBaseEntity entity, ShowcaseHolder showcaseHolder);
+    void generate(IBaseEntity entity, IBaseEntity entityLoaded, ShowcaseHolder showcaseHolder);
 
     ArrayList<ShowcaseHolder> getHolders();
 
