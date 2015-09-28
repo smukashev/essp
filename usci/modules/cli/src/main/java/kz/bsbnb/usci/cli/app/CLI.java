@@ -2182,8 +2182,12 @@ public class CLI {
     public void commandShowCase() {
         // Fast Init
         if (showCase == null) {
-            showCase = new ShowCase();
-            showCase.setMeta(metaClassRepository.getMetaClass("credit"));
+            try {
+                showCase = new ShowCase();
+                showCase.setMeta(metaClassRepository.getMetaClass("credit"));
+            } catch (Exception e) {
+                showCase = new ShowCase();
+            }
         }
 
         if (showcaseServiceFactoryBean == null || showcaseService == null)
