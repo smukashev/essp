@@ -561,10 +561,10 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         generateMap(globalEntityLoaded, showcaseHolder);
 
                 if (appliedMap == null || appliedMap.size() == 0)
-                    throw new IllegalStateException("tmp: appliedMap is null");
+                    return;
 
                 if (loadedMap == null || loadedMap.size() == 0)
-                    throw new IllegalStateException("tmp: loadedMap is null");
+                    dbCarteageGenerate(globalEntityApplied, globalEntityApplied, showcaseHolder);
 
                 for (Map.Entry entryApplied : appliedMap.entrySet()) {
                     HashMap<ValueElement, Object> entryMapApplied = (HashMap) entryApplied.getValue();
