@@ -2428,8 +2428,9 @@ public class CLI {
 
         int cnt = 0;
 
-        File folder = new File(sourceFolder);
-        for(File file: folder.listFiles()) {
+        File[] files = new File(sourceFolder).listFiles();
+        Arrays.sort(files);
+        for(File file: files) {
             if(file.isDirectory())
                 continue;
             try {
