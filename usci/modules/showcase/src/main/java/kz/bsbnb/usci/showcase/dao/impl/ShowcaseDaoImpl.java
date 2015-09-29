@@ -489,44 +489,62 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             List<BaseEntity> all = (List<BaseEntity>) globalEntity.getEls("{get}" +
                     showcaseHolder.getShowCaseMeta().getDownPath());
 
-            List<BaseEntity> allLoaded = (List<BaseEntity>) globalEntityLoaded.getEls("{get}" +
-                    showcaseHolder.getShowCaseMeta().getDownPath());
+            if (globalEntityLoaded != null) {
+                List<BaseEntity> allLoaded = (List<BaseEntity>) globalEntityLoaded.getEls("{get}" +
+                        showcaseHolder.getShowCaseMeta().getDownPath());
 
-            for (BaseEntity baseEntity : all) {
-                BaseEntity foundEntity = null;
+                for (BaseEntity baseEntity : all) {
+                    for (BaseEntity baseEntityLoaded : allLoaded) {
+                        if (baseEntity.getId() == baseEntityLoaded.getId()) {
+                            foundIds.add(baseEntityLoaded.getId());
+                            break;
+                        }
+                    }
+
+                    dbCarteageGenerate(globalEntity, baseEntity, showcaseHolder);
+                }
 
                 for (BaseEntity baseEntityLoaded : allLoaded) {
-                    if (baseEntity.getId() == baseEntityLoaded.getId()) {
-                        foundEntity = baseEntityLoaded;
-                        foundIds.add(foundEntity.getId());
-                        break;
+                    if (!foundIds.contains(baseEntityLoaded.getId())) {
+                        HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(baseEntityLoaded,
+                                showcaseHolder);
+
+                        if (savingMap == null)
+                            throw new IllegalStateException("Карта сохранения витрины является NULL;");
+
+                        for (Map.Entry entry : savingMap.entrySet()) {
+                            HashMap<ValueElement, Object> entryMap = (HashMap) entry.getValue();
+
+                            KeyData keyData = new KeyData(entryMap);
+
+                            int compare = DataUtils.compareBeginningOfTheDay(globalEntity.getReportDate(),
+                                    baseEntityLoaded.getReportDate());
+
+                            String sql;
+
+                            if (compare == 0) {
+                                sql = "DELETE FROM %s WHERE " + keyData.queryKeys + " and open_date = ?";
+                                sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                                jdbcTemplateSC.update(sql, getObjectArray(false, keyData.vals,
+                                        baseEntityLoaded.getReportDate()));
+                            } else if (compare == 1) {
+                                sql = "UPDATE %s SET close_date = ? WHERE " + keyData.queryKeys + " AND open_date = ?";
+                                sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                                        COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                                jdbcTemplateSC.update(sql, getObjectArray(false, getObjectArray(true, keyData.vals,
+                                        globalEntity.getReportDate()), baseEntityLoaded.getReportDate()));
+
+                                moveActualMapToHistory(keyData, baseEntityLoaded, showcaseHolder);
+                            }
+                        }
                     }
                 }
-
-                if (foundEntity != null) {
+            } else {
+                for (BaseEntity baseEntity : all) {
                     dbCarteageGenerate(globalEntity, baseEntity, showcaseHolder);
-                } else {
-                    dbCarteageGenerate(globalEntity, baseEntity, showcaseHolder);
-                }
-            }
-
-            for (BaseEntity baseEntityLoaded : allLoaded) {
-                if (!foundIds.contains(baseEntityLoaded.getId())) {
-                    HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(baseEntityLoaded,
-                            showcaseHolder);
-
-                    for (Map.Entry entry : savingMap.entrySet()) {
-                        HashMap<ValueElement, Object> entryMap = (HashMap) entry.getValue();
-
-                        KeyData keyData = new KeyData(entryMap);
-
-                        String sql = "DELETE FROM %s WHERE " + keyData.queryKeys + " and open_date = ?";
-                        sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
-                                COLUMN_PREFIX, showcaseHolder.getRootClassName());
-
-                        jdbcTemplateSC.update(sql, getObjectArray(false, keyData.vals,
-                                baseEntityLoaded.getReportDate()));
-                    }
                 }
             }
         } else {
