@@ -6,6 +6,8 @@ import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
 import org.jooq.DSLContext;
 import org.jooq.SelectConditionStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,8 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
+
+    private final Logger logger = LoggerFactory.getLogger(DocumentSearcher.class);
 
     @Override
     public String getClassName() {
@@ -83,6 +87,7 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
                         .and(EAV_BE_STRING_VALUES.CREDITOR_ID.equal(creditorId))
                         .and(EAV_BE_STRING_VALUES.VALUE.equal((String) (entity.getBaseValue("no").getValue())));
 
+                logger.debug(select.toString());
                 List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
                         select.getBindValues().toArray());
 

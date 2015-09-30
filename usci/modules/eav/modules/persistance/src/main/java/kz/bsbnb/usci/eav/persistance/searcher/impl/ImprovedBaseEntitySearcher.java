@@ -17,6 +17,8 @@ import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherP
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +33,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
+
+    private final Logger logger = LoggerFactory.getLogger(ImprovedBaseEntitySearcher.class);
 
     @Autowired
     private BasicBaseEntitySearcherPool searcherPool;
@@ -51,6 +55,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         SelectConditionStep select = generateSQL(entity, creditorId, null);
 
         if (select != null) {
+            logger.debug(select.toString());
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
                     select.getBindValues().toArray());
 
