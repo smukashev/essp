@@ -785,6 +785,39 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
 
+                        if (!metaClass.isSearchable() && !metaAttribute.isImmutable()) {
+                            IBaseEntity baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
+
+                            IBaseEntity baseEntitySaving = new BaseEntity(baseEntityLoaded,
+                                    baseValueSaving.getRepDate());
+
+                            for (String attributeName : metaClass.getAttributeNames()) {
+                                IMetaAttribute childMetaAttribute = metaClass.getMetaAttribute(attributeName);
+                                IMetaType childMetaType = childMetaAttribute.getMetaType();
+
+                                baseEntitySaving.put(attributeName,
+                                        BaseValueFactory.create(
+                                                MetaContainerTypes.META_CLASS,
+                                                childMetaType,
+                                                0,
+                                                creditorId,
+                                                new Date(baseValueSaving.getRepDate().getTime()),
+                                                null,
+                                                false,
+                                                true));
+                            }
+                            applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
+
+                            IBaseEntityComplexValueDao baseEntityComplexValueDao = persistableDaoPool
+                                    .getPersistableDao(baseValueSaving.getClass(), IBaseEntityComplexValueDao.class);
+
+                            boolean singleBaseValue = baseEntityComplexValueDao.isSingleBaseValue(baseValueLoaded);
+
+                            if (singleBaseValue) {
+                                baseEntityManager.registerAsDeleted(baseEntityLoaded);
+                            }
+                        }
+
                         return;
                     // case#2
                     } else {
@@ -814,6 +847,39 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseValuePrevious.setMetaAttribute(metaAttribute);
                                 baseValuePrevious.setLast(true);
                                 baseEntityManager.registerAsUpdated(baseValuePrevious);
+                            }
+                        }
+
+                        if (!metaClass.isSearchable() && !metaAttribute.isImmutable()) {
+                            IBaseEntity baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
+
+                            IBaseEntity baseEntitySaving = new BaseEntity(baseEntityLoaded,
+                                    baseValueSaving.getRepDate());
+
+                            for (String attributeName : metaClass.getAttributeNames()) {
+                                IMetaAttribute childMetaAttribute = metaClass.getMetaAttribute(attributeName);
+                                IMetaType childMetaType = childMetaAttribute.getMetaType();
+
+                                baseEntitySaving.put(attributeName,
+                                        BaseValueFactory.create(
+                                                MetaContainerTypes.META_CLASS,
+                                                childMetaType,
+                                                0,
+                                                creditorId,
+                                                new Date(baseValueSaving.getRepDate().getTime()),
+                                                null,
+                                                false,
+                                                true));
+                            }
+                            applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
+
+                            IBaseEntityComplexValueDao baseEntityComplexValueDao = persistableDaoPool
+                                    .getPersistableDao(baseValueSaving.getClass(), IBaseEntityComplexValueDao.class);
+
+                            boolean singleBaseValue = baseEntityComplexValueDao.isSingleBaseValue(baseValueLoaded);
+
+                            if (singleBaseValue) {
+                                baseEntityManager.registerAsDeleted(baseEntityLoaded);
                             }
                         }
                     }
