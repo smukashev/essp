@@ -87,22 +87,13 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             Long entityStatusId = batchService.addEntityStatus(entityStatus);
             batchService.addEntityStatusParams(entityStatusId, params);
-        } catch(IllegalStateException|UnsupportedOperationException e) {
-            EntityStatus entityStatus = new EntityStatus();
-            entityStatus.setBatchId(baseEntity.getBatchId());
-            entityStatus.setEntityId(baseEntity.getId());
-            entityStatus.setStatus(EntityStatuses.ERROR);
-            entityStatus.setDescription(e.getMessage());
-            entityStatus.setIndex(baseEntity.getBatchIndex() - 1);
-            entityStatus.setReceiptDate(new Date());
-
-            Map<String, String> params = StatusProperties.getSpecificParams(baseEntity);
-
-            Long entityStatusId = batchService.addEntityStatus(entityStatus);
-            batchService.addEntityStatusParams(entityStatusId, params);
         } catch (Exception e) {
-            logger.error("Batch id: " + baseEntity.getBatchId() + ", index: " + (baseEntity.getBatchIndex() - 1) +
-                    "\n" + ExceptionUtils.getStackTrace(e));
+            String log = "Batch id: " + baseEntity.getBatchId() + ", Index: " + (baseEntity.getBatchIndex() - 1);
+
+            if (!(e instanceof IllegalStateException || e instanceof UnsupportedOperationException))
+                log += "\n" + ExceptionUtils.getStackTrace(e);
+
+            logger.error(log);
 
             EntityStatus entityStatus = new EntityStatus();
             entityStatus.setBatchId(baseEntity.getBatchId());
