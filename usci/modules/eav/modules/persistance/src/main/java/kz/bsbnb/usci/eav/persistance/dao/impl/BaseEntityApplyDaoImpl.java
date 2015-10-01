@@ -28,6 +28,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
     @Autowired
     IBaseEntityLoadDao baseEntityLoadDao;
+
+    @Autowired
+    IBaseEntityReportDateDao baseEntityReportDateDao;
+
     @Autowired
     IRefRepository refRepositoryDao;
 
@@ -356,12 +360,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         IBaseEntityReportDate baseEntityReportDate = baseEntityApplied.getBaseEntityReportDate();
 
-        Date reportDateSaving = baseEntitySaving.getReportDate();
-        Date reportDateLoaded = baseEntityLoaded.getReportDate();
-
-        int reportDateCompare = DataTypeUtil.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
-
-        if (reportDateCompare == 0) {
+        if (baseEntityReportDateDao.exists(baseEntityApplied.getId(), baseEntityApplied.getReportDate())) {
             baseEntityManager.registerAsUpdated(baseEntityReportDate);
         } else {
             baseEntityManager.registerAsInserted(baseEntityReportDate);
@@ -1112,11 +1111,21 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 } else {
                     IBaseValue previousBaseValue = valueDao.getPreviousBaseValue(baseValueSaving);
 
-                    if (previousBaseValue != null) {
-                        baseEntityApplied = applyBaseEntityAdvanced(creditorId, baseEntitySaving,
-                                (IBaseEntity) previousBaseValue.getValue(), baseEntityManager);
-                    } else {
-                        baseEntityApplied = apply(creditorId, baseEntitySaving, baseEntityManager, null);
+                    baseEntityApplied = apply(creditorId, baseEntitySaving, baseEntityManager, null);
+
+                    if (previousBaseValue != null && previousBaseValue.isLast()) {
+                        IBaseValue baseValueApplied = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                previousBaseValue.getId(),
+                                creditorId,
+                                new Date(previousBaseValue.getRepDate().getTime()),
+                                previousBaseValue.getValue(),
+                                previousBaseValue.isClosed(),
+                                false);
+
+                        baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                        baseEntityManager.registerAsUpdated(baseValueApplied);
                     }
                 }
 
