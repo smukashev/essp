@@ -87,10 +87,18 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             Long entityStatusId = batchService.addEntityStatus(entityStatus);
             batchService.addEntityStatusParams(entityStatusId, params);
-
         } catch (Exception e) {
-            logger.error("Batch id: " + baseEntity.getBatchId() + ", index: " + (baseEntity.getBatchIndex() - 1) +
-                    "\n" + ExceptionUtils.getStackTrace(e));
+            String log = "Batch id: " + baseEntity.getBatchId() + ", Index: " + (baseEntity.getBatchIndex() - 1);
+            log += "\n";
+
+            if (!(e instanceof IllegalStateException || e instanceof UnsupportedOperationException)) {
+                log += e.getMessage();
+                log += "\n" + ExceptionUtils.getStackTrace(e);
+            } else {
+                log += e.getMessage();
+            }
+
+            logger.error(log);
 
             EntityStatus entityStatus = new EntityStatus();
             entityStatus.setBatchId(baseEntity.getBatchId());
