@@ -524,19 +524,18 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                             String sql;
 
                             if (compare == 0) {
-                                sql = "DELETE FROM %s WHERE " + keyDataApplied.queryKeys + " and open_date = ?";
+                                sql = "DELETE FROM %s WHERE " + keyDataApplied.queryKeys;
                                 sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
                                         COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
-                                jdbcTemplateSC.update(sql, getObjectArray(false, keyDataApplied.vals,
-                                        baseEntityLoaded.getReportDate()));
+                                jdbcTemplateSC.update(sql, getObjectArray(false, keyDataApplied.vals));
                             } else if (compare == 1) {
-                                sql = "UPDATE %s SET close_date = ? WHERE " + keyDataApplied.queryKeys + " AND open_date = ?";
+                                sql = "UPDATE %s SET close_date = ? WHERE " + keyDataApplied.queryKeys;
                                 sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
                                         COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
                                 jdbcTemplateSC.update(sql, getObjectArray(false, getObjectArray(true, keyDataApplied.vals,
-                                        globalEntityApplied.getReportDate()), baseEntityLoaded.getReportDate()));
+                                        globalEntityApplied.getReportDate())));
 
                                 moveActualMapToHistory(keyDataApplied, baseEntityLoaded, showcaseHolder);
                             }
@@ -596,19 +595,18 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                     String sql;
 
                     if (compare == 0) {
-                        sql = "DELETE FROM %s WHERE " + keyDataLoaded.queryKeys; // + " and open_date = ?";
+                        sql = "DELETE FROM %s WHERE " + keyDataLoaded.queryKeys;
                         sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
                                 COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
-                        jdbcTemplateSC.update(sql, getObjectArray(false, keyDataLoaded.vals/*,
-                                globalEntityLoaded.getReportDate()*/));
+                        jdbcTemplateSC.update(sql, getObjectArray(false, keyDataLoaded.vals));
                     } else if (compare == 1) {
-                        sql = "UPDATE %s SET close_date = ? WHERE " + keyDataLoaded.queryKeys; // + " AND open_date = ?";
+                        sql = "UPDATE %s SET close_date = ? WHERE " + keyDataLoaded.queryKeys;
                         sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
                                 COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
                         jdbcTemplateSC.update(sql, getObjectArray(false, getObjectArray(true, keyDataLoaded.vals,
-                                globalEntityApplied.getReportDate())/*, globalEntityLoaded.getReportDate()*/));
+                                globalEntityApplied.getReportDate())));
 
                         moveActualMapToHistory(keyDataLoaded, globalEntityLoaded, showcaseHolder);
                     }
