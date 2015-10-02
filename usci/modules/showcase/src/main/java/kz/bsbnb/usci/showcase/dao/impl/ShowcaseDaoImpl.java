@@ -596,19 +596,19 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                     String sql;
 
                     if (compare == 0) {
-                    sql = "DELETE FROM %s WHERE " + keyDataLoaded.queryKeys + " and open_date = ?";
-                    sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
-                            COLUMN_PREFIX, showcaseHolder.getRootClassName());
+                        sql = "DELETE FROM %s WHERE " + keyDataLoaded.queryKeys; // + " and open_date = ?";
+                        sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                                COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
-                    jdbcTemplateSC.update(sql, getObjectArray(false, keyDataLoaded.vals,
-                            globalEntityLoaded.getReportDate()));
+                        jdbcTemplateSC.update(sql, getObjectArray(false, keyDataLoaded.vals/*,
+                                globalEntityLoaded.getReportDate()*/));
                     } else if (compare == 1) {
-                        sql = "UPDATE %s SET close_date = ? WHERE " + keyDataLoaded.queryKeys + " AND open_date = ?";
+                        sql = "UPDATE %s SET close_date = ? WHERE " + keyDataLoaded.queryKeys; // + " AND open_date = ?";
                         sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
                                 COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
                         jdbcTemplateSC.update(sql, getObjectArray(false, getObjectArray(true, keyDataLoaded.vals,
-                                globalEntityApplied.getReportDate()), globalEntityLoaded.getReportDate()));
+                                globalEntityApplied.getReportDate())/*, globalEntityLoaded.getReportDate()*/));
 
                         moveActualMapToHistory(keyDataLoaded, globalEntityLoaded, showcaseHolder);
                     }
