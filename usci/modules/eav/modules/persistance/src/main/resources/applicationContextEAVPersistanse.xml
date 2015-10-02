@@ -7,7 +7,8 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
         http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
     <context:annotation-config/>
@@ -73,15 +74,15 @@
           p:defaultDestination-ref="destination"/>
 
     <!-- datasource to the database -->
-        <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-            <property name="locations">
-                <list>
-                    <value>classpath:properties/oracle.properties</value>
-                    <value>classpath:properties/main.properties</value>
-                    <value>classpath:properties/refs.properties</value>
-                    <value>classpath:properties/jms.properties</value>
-                    <value>classpath:properties/batch.properties</value>
-                </list>
-            </property>
-        </bean>
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:properties/oracle.properties</value>
+                <value>classpath:properties/main.properties</value>
+                <value>classpath:properties/refs.properties</value>
+                <value>classpath:properties/jms.properties</value>
+                <value>classpath:properties/batch.properties</value>
+            </list>
+        </property>
+    </bean>
 </beans>

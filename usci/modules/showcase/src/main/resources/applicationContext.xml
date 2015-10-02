@@ -2,18 +2,26 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:jms="http://www.springframework.org/schema/jms"
        xmlns:amq="http://activemq.apache.org/schema/core"
        xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
 		http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd
-        http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd">
+        http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <context:component-scan base-package="kz.bsbnb.usci.showcase"/>
     <context:component-scan base-package="kz.bsbnb.usci.eav.stats"/>
 
     <context:annotation-config/>
+
+    <aop:aspectj-autoproxy/>
+
+    <!-- Add this tag to enable annotations transactions -->
+    <tx:annotation-driven transaction-manager="txManager"/>
 
     <bean id="dataSourceSC" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${jdbcSC.driver}"/>
@@ -25,6 +33,10 @@
         <!--<property name="validationQuery" value="${jdbcSC.validationQuery}"/>-->
         <property name="testOnBorrow" value="${jdbcSC.testOnBorrow}"/>
         <property name="testOnReturn" value="${jdbcSC.testOnReturn}"/>
+    </bean>
+
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSourceSC"/>
     </bean>
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">

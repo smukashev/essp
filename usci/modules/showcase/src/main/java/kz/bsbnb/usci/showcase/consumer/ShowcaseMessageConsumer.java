@@ -9,6 +9,7 @@ import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -33,6 +34,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
     private ExecutorService exec = Executors.newCachedThreadPool();
 
     @Override
+    @Transactional
     public void onMessage(Message message) {
         if (message instanceof ObjectMessage) {
             ObjectMessage om = (ObjectMessage) message;
