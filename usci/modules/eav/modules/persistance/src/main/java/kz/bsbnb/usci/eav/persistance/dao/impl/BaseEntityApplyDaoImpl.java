@@ -2258,7 +2258,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 for (IPersistable insertedObject : insertedObjects) {
                     persistableDao.insert(insertedObject);
 
-                    if (insertedObjects instanceof IBaseEntity) {
+                    if (insertedObject instanceof IBaseEntity) {
                         IBaseEntity baseEntity = (IBaseEntity) insertedObjects;
                         if (baseEntity.getMeta().isReference()) {
                             if (refRepositoryDao.getRef(baseEntity.getId(), baseEntity.getReportDate()) == null)
