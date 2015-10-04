@@ -21,15 +21,14 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
     IPersistableDaoPool persistableDaoPool;
 
     @Value("${refs.cache.enabled}")
-    private String enabled;
+    private boolean isReferenceCacheEnabled;
 
     @Autowired
     IRefRepository refRepositoryDao;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-
-        if (enabled.equals("true"))
+        if (isReferenceCacheEnabled)
             refRepositoryDao.fillRefRepository();
     }
 
@@ -43,7 +42,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
             throw new RuntimeException("В базе нет данных для сущности(" + id + ") до отчетной даты(включительно): "
                     + savingReportDate + ";");
 
-        if (enabled.equals("false")) {
+        if (isReferenceCacheEnabled) {
             loadedEntity = load(id, maxReportDate, savingReportDate);
         } else {
             loadedEntity = refRepositoryDao.getRef(id, maxReportDate);
@@ -53,9 +52,8 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
                     refRepositoryDao.setRef(id, savingReportDate, loadedEntity);
             }
         }
+
         return loadedEntity;
-
-
     }
 
     @Override

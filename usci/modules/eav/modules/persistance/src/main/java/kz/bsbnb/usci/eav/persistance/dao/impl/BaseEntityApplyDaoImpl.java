@@ -16,6 +16,7 @@ import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
     @Autowired
     IRefRepository refRepositoryDao;
+
+    @Value("${refs.cache.enabled}")
+    private boolean isReferenceCacheEnabled;
 
     @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager,
@@ -2330,15 +2334,15 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             List<IPersistable> insertedObjects = baseEntityManager.getInsertedObjects(objectClass);
             if (insertedObjects != null && insertedObjects.size() != 0) {
                 IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
+
                 for (IPersistable insertedObject : insertedObjects) {
                     persistableDao.insert(insertedObject);
 
-                    if (insertedObject instanceof IBaseEntity) {
-                        IBaseEntity baseEntity = (IBaseEntity) insertedObjects;
-                        if (baseEntity.getMeta().isReference()) {
-                            if (refRepositoryDao.getRef(baseEntity.getId(), baseEntity.getReportDate()) == null)
-                                refRepositoryDao.setRef(baseEntity.getId(), baseEntity.getReportDate(), baseEntity);
-                        }
+                    if (isReferenceCacheEnabled && (insertedObject instanceof IBaseEntity)) {
+                        IBaseEntity baseEntity = (IBaseEntity) insertedObject;
+
+                        if (baseEntity.getMeta().isReference())
+                            refRepositoryDao.setRef(baseEntity.getId(), baseEntity.getReportDate(), baseEntity);
                     }
                 }
             }
@@ -2349,14 +2353,15 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             List<IPersistable> updatedObjects = baseEntityManager.getUpdatedObjects(objectClass);
             if (updatedObjects != null && updatedObjects.size() != 0) {
                 IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
+
                 for (IPersistable updatedObject : updatedObjects) {
                     persistableDao.update(updatedObject);
 
-                    if (updatedObject instanceof IBaseEntity) {
+                    if (isReferenceCacheEnabled && (updatedObject instanceof IBaseEntity)) {
                         IBaseEntity baseEntity = (IBaseEntity) updatedObject;
-                        if (baseEntity.getMeta().isReference()) {
+
+                        if (baseEntity.getMeta().isReference())
                             refRepositoryDao.setRef(baseEntity.getId(), baseEntity.getReportDate(), baseEntity);
-                        }
                     }
                 }
             }
@@ -2367,14 +2372,15 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             List<IPersistable> deletedObjects = baseEntityManager.getDeletedObjects(objectClass);
             if (deletedObjects != null && deletedObjects.size() != 0) {
                 IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
+
                 for (IPersistable deletedObject : deletedObjects) {
                     persistableDao.delete(deletedObject);
 
-                    if (deletedObject instanceof IBaseEntity) {
+                    if (isReferenceCacheEnabled && (deletedObject instanceof IBaseEntity)) {
                         IBaseEntity baseEntity = (IBaseEntity) deletedObject;
-                        if (baseEntity.getMeta().isReference()) {
+
+                        if (baseEntity.getMeta().isReference())
                             refRepositoryDao.delRef(baseEntity.getId(), baseEntity.getReportDate());
-                        }
                     }
                 }
 
@@ -2384,10 +2390,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         for (IBaseEntity unusedBaseEntity : baseEntityManager.getUnusedBaseEntities()) {
             IBaseEntityDao baseEntityDao = persistableDaoPool
                     .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+
             baseEntityDao.deleteRecursive(unusedBaseEntity.getId(), unusedBaseEntity.getMeta());
-            if (unusedBaseEntity.getMeta().isReference()) {
+
+            if (isReferenceCacheEnabled && unusedBaseEntity.getMeta().isReference())
                 refRepositoryDao.delRef(unusedBaseEntity.getId(), unusedBaseEntity.getReportDate());
-            }
         }
     }
 

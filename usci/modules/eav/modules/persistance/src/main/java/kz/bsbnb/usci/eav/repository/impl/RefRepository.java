@@ -22,14 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
-/**
- * Created by Bauyrzhan.Ibraimov on 09.09.2015.
- */
-
 
 @Component
 @Scope(value = "singleton")
-public class RefRepository  extends JDBCSupport implements IRefRepository {
+public class RefRepository extends JDBCSupport implements IRefRepository {
     @Autowired
     IPersistableDaoPool persistableDaoPool;
 
@@ -79,8 +75,7 @@ public class RefRepository  extends JDBCSupport implements IRefRepository {
 
     private HashMap<BaseEntityKey, IBaseEntity> cache = new HashMap<>();
 
-   public void fillRefRepository()
-    {
+    public void fillRefRepository() {
         Select select = context
                 .select(EAV_BE_ENTITIES.ID, EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
                 .from(EAV_BE_ENTITIES, EAV_BE_ENTITY_REPORT_DATES, EAV_M_CLASSES)
@@ -89,9 +84,8 @@ public class RefRepository  extends JDBCSupport implements IRefRepository {
                 .and(EAV_M_CLASSES.IS_REFERENCE.equal(DataUtils.convert(true)));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-        for(Map<String, Object> row: rows)
-        {
-            long id = ((BigDecimal)row.get(EAV_BE_ENTITIES.ID.getName())).longValue();
+        for (Map<String, Object> row : rows) {
+            long id = ((BigDecimal) row.get(EAV_BE_ENTITIES.ID.getName())).longValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
@@ -101,22 +95,19 @@ public class RefRepository  extends JDBCSupport implements IRefRepository {
 
             Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id, reportDate);
 
-            cache.put(new BaseEntityKey(id, reportDate), baseEntityLoadDao.load(id, maxReportDate,reportDate));
-
+            cache.put(new BaseEntityKey(id, reportDate), baseEntityLoadDao.load(id, maxReportDate, reportDate));
         }
     }
 
-    public IBaseEntity getRef(long Id, Date reportDate)
-    {
+    public IBaseEntity getRef(long Id, Date reportDate) {
         return cache.get(new BaseEntityKey(Id, reportDate));
     }
 
-    public void setRef(long Id, Date reportDate, IBaseEntity baseEntity)
-    {
+    public void setRef(long Id, Date reportDate, IBaseEntity baseEntity) {
         cache.put(new BaseEntityKey(Id, reportDate), baseEntity);
     }
-    public  void delRef(long Id, Date reportDate)
-    {
+
+    public void delRef(long Id, Date reportDate) {
         cache.remove(new BaseEntityKey(Id, reportDate));
     }
 }
