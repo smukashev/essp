@@ -659,15 +659,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         baseValuePrevious.setMetaAttribute(metaAttribute);
                         baseValuePrevious.setBaseContainer(baseEntityApplied);
+                        baseValuePrevious.setLast(true);
 
-                        if (baseValueClosed.isLast()) {
-                            baseValuePrevious.setLast(true);
-
-                            baseEntityApplied.put(metaAttribute.getName(), baseValuePrevious);
-                            baseEntityManager.registerAsUpdated(baseValuePrevious);
-                        } else {
-                            baseEntityApplied.put(metaAttribute.getName(), baseValuePrevious);
-                        }
+                        baseEntityApplied.put(metaAttribute.getName(), baseValuePrevious);
+                        baseEntityManager.registerAsUpdated(baseValuePrevious);
                     } else {
                         baseValueClosed.setValue(returnCastedValue(metaValue, baseValueSaving));
                         baseValueClosed.setClosed(false);
@@ -677,18 +672,35 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
                 // case#11
                 } else {
-                    IBaseValue baseValueApplied = BaseValueFactory.create(
-                            MetaContainerTypes.META_CLASS,
-                            metaType,
-                            0,
-                            creditorId,
-                            new Date(baseValueSaving.getRepDate().getTime()),
-                            returnCastedValue(metaValue, baseValueSaving),
-                            false,
-                            true);
+                    IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueSaving);
 
-                    baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
-                    baseEntityManager.registerAsInserted(baseValueApplied);
+                    if (baseValueNext != null) {
+                        IBaseValue baseValueApplied = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                baseValueNext.getId(),
+                                creditorId,
+                                new Date(baseValueSaving.getRepDate().getTime()),
+                                returnCastedValue(metaValue, baseValueSaving),
+                                baseValueNext.isClosed(),
+                                baseValueNext.isLast());
+
+                        baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
+                        baseEntityManager.registerAsUpdated(baseValueApplied);
+                    } else {
+                        IBaseValue baseValueApplied = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                0,
+                                creditorId,
+                                new Date(baseValueSaving.getRepDate().getTime()),
+                                returnCastedValue(metaValue, baseValueSaving),
+                                false,
+                                true);
+
+                        baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
+                        baseEntityManager.registerAsInserted(baseValueApplied);
+                    }
                 }
             } else {
                 IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
