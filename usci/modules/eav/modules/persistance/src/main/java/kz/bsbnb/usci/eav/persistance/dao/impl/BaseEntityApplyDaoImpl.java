@@ -1163,20 +1163,42 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
                 } else {
-                    IBaseEntity baseEntityApplied = apply(creditorId, baseEntitySaving, baseEntityManager, null);
+                    IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueSaving);
 
-                    IBaseValue baseValueApplied = BaseValueFactory.create(
-                            MetaContainerTypes.META_CLASS,
-                            metaType,
-                            0,
-                            creditorId,
-                            new Date(baseValueSaving.getRepDate().getTime()),
-                            baseEntityApplied,
-                            false,
-                            true);
+                    if (metaAttribute.isImmutable())
+                        throw new IllegalStateException("Запись класс " + metaAttribute.getName() + " не найдена;");
 
-                    baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
-                    baseEntityManager.registerAsInserted(baseValueApplied);
+                    if (baseValueNext != null) {
+                        baseValueNext.setBaseContainer(baseEntity);
+                        baseValueNext.setMetaAttribute(metaAttribute);
+
+                        IBaseEntity baseEntityApplied = metaClass.isSearchable() ?
+                                apply(creditorId, baseEntitySaving, baseEntityManager, null) :
+                                applyBaseEntityAdvanced(creditorId, baseEntitySaving, (IBaseEntity)
+                                                baseValueNext.getValue(), baseEntityManager);
+
+                        baseValueNext.setRepDate(baseValueSaving.getRepDate());
+                        baseValueNext.setValue(baseEntityApplied);
+
+                        baseEntity.put(metaAttribute.getName(), baseValueNext);
+                        baseEntityManager.registerAsUpdated(baseValueNext);
+
+                    } else {
+                        IBaseEntity baseEntityApplied = apply(creditorId, baseEntitySaving, baseEntityManager, null);
+
+                        IBaseValue baseValueApplied = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                0,
+                                creditorId,
+                                new Date(baseValueSaving.getRepDate().getTime()),
+                                baseEntityApplied,
+                                false,
+                                true);
+
+                        baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                        baseEntityManager.registerAsInserted(baseValueApplied);
+                    }
                 }
             // case#7
             } else {
