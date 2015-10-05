@@ -45,14 +45,9 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -221,6 +216,17 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                         .equalsIgnoreCase(OperationType.NEW.toString());
     }
 
+    private HashMap<String, MetaClass> metaCache = new HashMap<>();
+
+    private MetaClass getMeta(String metaName) {
+        if(!metaCache.containsKey(metaName)) {
+            MetaClass meta = metaFactoryService.getMetaClass(metaName);
+            metaCache.put(metaName, meta);
+        }
+
+        return metaCache.get(metaName);
+    }
+
     public void startElement(XMLEvent event, StartElement startElement, String localName) {
         if (localName.equals("batch")) {
             logger.debug("batch");
@@ -232,7 +238,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             rootEntityExpected = false;
 
             logger.debug(localName);
-            BaseEntity baseEntity = metaFactoryService.getBaseEntity(localName, batch.getRepDate());
+            //BaseEntity baseEntity = metaFactoryService.getBaseEntity(localName, batch.getRepDate());
+            BaseEntity baseEntity = new BaseEntity(getMeta(localName), batch.getRepDate());
 
             if (hasOperationDelete(startElement))
                 baseEntity.setOperation(OperationType.DELETE);
@@ -249,7 +256,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 stack.push(currentContainer);
                 flagsStack.push(hasMembers);
                 hasMembers = false;
-                currentContainer = metaFactoryService.getBaseSet(((MetaSet) metaType).getMemberType());
+                //currentContainer = metaFactoryService.getBaseSet(((MetaSet) metaType).getMemberType());
+                currentContainer = new BaseSet(((MetaSet) metaType).getMemberType());
                 level++;
             } else if (metaType.isComplex()) {
                 stack.push(currentContainer);
