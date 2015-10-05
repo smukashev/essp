@@ -42,7 +42,9 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
                 DataUtils.convertToTimestamp(entityStatus.getReceiptDate()),
                 entityStatus.getIndex()
         );
-        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        String insert_sql =
+                "insert /*+ APPEND */ into \"C##CORE3\".\"EAV_ENTITY_STATUSES\" (\"BATCH_ID\", \"ENTITY_ID\", \"STATUS_ID\", \"DESCRIPTION\", \"RECEIPT_DATE\", \"INDEX_\") values (?, ?, ?, ?, ?, ?)";
+        return insertWithId(insert_sql, insert.getBindValues().toArray());
     }
 
     @Override
