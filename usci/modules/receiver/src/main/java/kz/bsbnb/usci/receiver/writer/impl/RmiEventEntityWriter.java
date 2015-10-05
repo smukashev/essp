@@ -86,7 +86,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 continue;
             }*/
 
-            {
+           /* {
                 EntityStatus entityStatus = new EntityStatus()
                         .setBatchId(entity.getBatchId())
                         .setEntityId(entity.getId())
@@ -98,7 +98,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
                 Long entityStatusId = batchService.addEntityStatus(entityStatus);
                 batchService.addEntityStatusParams(entityStatusId, params);
-            }
+            }*/
 
             List<String> errors = new LinkedList<>(entity.getValidationErrors());
             String ruleRuntimeException = null;
@@ -153,7 +153,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                     batchService.addEntityStatusParams(entityStatusId, params);
                 }
             } else {
-                EntityStatus entityStatus = new EntityStatus()
+                /*EntityStatus entityStatus = new EntityStatus()
                         .setBatchId(entity.getBatchId())
                         .setEntityId(entity.getId())
                         .setStatus(EntityStatuses.WAITING)
@@ -163,7 +163,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                 Map<String, String> params = StatusProperties.getSpecificParams(entity);
 
                 Long entityStatusId = batchService.addEntityStatus(entityStatus);
-                batchService.addEntityStatusParams(entityStatusId, params);
+                batchService.addEntityStatusParams(entityStatusId, params);*/
 
                 entitiesToSave.add(entity);
             }
