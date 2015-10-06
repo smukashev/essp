@@ -56,8 +56,10 @@ public class SubjectPersonParser extends BatchParser {
             currentBaseEntity.put("country", new BaseEntityComplexValue(0, -1, batch.getRepDate(), country, false, true));
         } else if (localName.equals("offshore")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("offshore", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            BaseEntity ref_offshore = new BaseEntity(metaClassRepository.getMetaClass("ref_offshore"), batch.getRepDate());
+            ref_offshore.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
+            currentBaseEntity.put("offshore", new BaseEntityComplexValue(0, -1, batch.getRepDate(), ref_offshore, false, true));
         } else if (localName.equals("bank_relations")) {
             bankRelations = new BaseSet(metaClassRepository.getMetaClass("bank_relation"));
         } else if (localName.equals("bank_relation")) {
