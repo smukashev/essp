@@ -5,6 +5,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -283,7 +284,11 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         throw new UnsupportedOperationException("Простой массив не может быть ключевым(" +
                                 childMetaClass.getClassName() + ");");
 
-                    if (childMetaClass.getClassName().equals("document")) {
+                    String metaClassName = entity.getMeta().getClassName();
+
+                    if (childMetaClass.getClassName().equals("document") && (metaClassName.equals("person") ||
+                            metaClassName.equals("organization") || metaClassName.equals("head") ||
+                            metaClassName.equals("creditor"))) {
                         List<IBaseValue> baseValues = new ArrayList<>(baseSet.get());
                         Collections.sort(baseValues, new IdentificationDocComparator());
 
@@ -302,15 +307,15 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                             BaseEntity docType = (BaseEntity) document.getBaseValue("doc_type").getValue();
 
                             boolean is_identification = (boolean) docType.getBaseValue("is_identification").getValue();
-                            boolean is_person_doc = (boolean) docType.getBaseValue("is_person_doc").getValue();
-                            boolean is_organization_doc = (boolean) docType.getBaseValue("is_organization_doc").getValue();
+                            // boolean is_person_doc = (boolean) docType.getBaseValue("is_person_doc").getValue();
+                            //boolean is_organization_doc = (boolean) docType.getBaseValue("is_organization_doc").getValue();
 
                             if (((BaseEntity) val.getValue()).getId() == 0) {
-                                if (is_identification || is_person_doc || is_organization_doc) identified = true;
+                                if (is_identification/* || is_person_doc || is_organization_doc*/) identified = true;
                                 continue;
                             }
 
-                            if (!is_identification && !is_person_doc && !is_organization_doc) continue;
+                            if (!is_identification/* && !is_person_doc && !is_organization_doc*/) continue;
 
                             identified = true;
 
@@ -321,13 +326,13 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                     .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
                                     .where(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.eq(((BaseEntity) val.getValue()).getId())
                                     .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.eq(DataUtils.convert(false)))
-                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.eq(DataUtils.convert(true))));
+                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.eq(DataUtils.convert(true))));
 
                             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
                                     select.getBindValues().toArray());
 
                             if (rows.size() > 1)
-                                throw new IllegalStateException("Найдено " + rows.size() + " документов(" +
+                                throw new KnownException("Найдено " + rows.size() + " документов(" +
                                         entity.getMeta().getClassName() + ") (" +
                                         (((BaseEntity) val.getValue()).getId()) +");");
 
@@ -339,8 +344,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         }
 
                         if (!identified)
-                            throw new IllegalStateException("Нет идентификационных документов(" +
-                                metaClass.getClassName() + ");");
+                            throw new KnownException("Нет идентификационных документов(" +
+                                metaClass.getClassName() + ") (" + baseValues + ";");
 
                         if (entityValueId > 0) {
                             // TODO: remove repeated code
@@ -377,9 +382,11 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                             }
                         }
 
-                        if (childBaseEntityIds.size() == 0)
-                            throw new IllegalStateException("Ни один элемент ключевого массива " +
-                                    "не был идентифицирован(" + metaClass.getClassName() + ");");
+                        if (childBaseEntityIds.size() == 0) {
+                            return null;
+                            /*throw new IllegalStateException("Ни один элемент ключевого массива " +
+                                    "не был идентифицирован(" + metaClass.getClassName() + ");");*/
+                        }
 
                         String className = childMetaClass.getClassName();
                         String setValueAlias = "sv_" + className;
