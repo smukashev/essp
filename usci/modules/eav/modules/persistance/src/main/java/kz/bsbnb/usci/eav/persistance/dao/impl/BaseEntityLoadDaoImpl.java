@@ -42,7 +42,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
             throw new RuntimeException("В базе нет данных для сущности(" + id + ") до отчетной даты(включительно): "
                     + savingReportDate + ";");
 
-        if (isReferenceCacheEnabled) {
+        if (!isReferenceCacheEnabled) {
             loadedEntity = load(id, maxReportDate, savingReportDate);
         } else {
             loadedEntity = refRepositoryDao.getRef(id, maxReportDate);
