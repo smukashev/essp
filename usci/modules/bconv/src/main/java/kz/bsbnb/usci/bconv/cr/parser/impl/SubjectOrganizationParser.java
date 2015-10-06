@@ -61,6 +61,9 @@ public class SubjectOrganizationParser extends BatchParser {
         } else if (localName.equals("offshore")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity offshore = new BaseEntity(metaClassRepository.getMetaClass("ref_offshore"), batch.getRepDate());
+
+            offshore.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+
             currentBaseEntity.put("offshore", new BaseEntityComplexValue(0, -1, batch.getRepDate(), offshore, false, true));
         } else if (localName.equals("bank_relations")) {
             bankRelations = new BaseSet(metaClassRepository.getMetaClass("bank_relation"));

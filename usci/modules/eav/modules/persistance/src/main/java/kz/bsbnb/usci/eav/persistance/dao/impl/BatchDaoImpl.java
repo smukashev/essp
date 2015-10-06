@@ -167,8 +167,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         ).values(entityStatusId,
                 key,
                 value);
-
-        long id = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        String insertSql = "insert /*+ APPEND */ into \"C##CORE3\".\"EAV_ENTITY_STATUS_PARAMS\" (\"ENTITY_STATUS_ID\", \"KEY\", \"VALUE\") values (?, ?, ?)";
+        long id = insertWithId(insertSql, insert.getBindValues().toArray());
 
         if (id < 1) {
             logger.error("Can't insert entity status param");
