@@ -5,15 +5,13 @@ import kz.bsbnb.usci.sync.job.impl.ProcessJob;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author k.tulbassiyev
  */
-public abstract class AbstractDataJob extends AbstractJob {
-    protected final List<BaseEntity> entities
-            = Collections.synchronizedList(new ArrayList<BaseEntity>());
+public abstract class AbstractDataJob extends Thread {
+    protected final List<BaseEntity> entities = new ArrayList<>();
 
     protected final List<ProcessJob> processingJobs = new ArrayList<>();
 
@@ -23,7 +21,6 @@ public abstract class AbstractDataJob extends AbstractJob {
     protected final int MAX_THREAD = 42;
     protected final int MIN_THREAD = 16;
     protected final int WATCH_INTERVAL = 1000;
-    protected final int THREAD_INCREMENT_STEP = 1;
     protected final double THRESHOLD = 0.1;
     protected int currentThread = ((MAX_THREAD + MIN_THREAD) / 2);
     protected boolean autoChooseThreshold = false;

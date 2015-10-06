@@ -2,13 +2,12 @@ package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.sync.job.AbstractJob;
 import kz.bsbnb.usci.sync.service.IBatchService;
 
 /**
  * @author k.tulbassiyev
  */
-public class ProcessJob extends AbstractJob {
+public class ProcessJob extends Thread {
     private BaseEntity baseEntity;
     private IEntityService entityService;
     private IBatchService batchService;
