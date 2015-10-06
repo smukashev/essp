@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
+import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.model.json.EntityStatusJModel;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
@@ -91,7 +92,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             String log = "Batch id: " + baseEntity.getBatchId() + ", Index: " + (baseEntity.getBatchIndex() - 1);
             log += "\n";
 
-            if (!(e instanceof IllegalStateException || e instanceof UnsupportedOperationException)) {
+            if (!(e instanceof KnownException)) {
                 log += e.getMessage();
                 log += "\n" + ExceptionUtils.getStackTrace(e);
             } else {
