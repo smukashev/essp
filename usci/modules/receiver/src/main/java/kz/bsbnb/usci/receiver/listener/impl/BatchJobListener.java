@@ -14,6 +14,7 @@ import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Properties;
 
 @Component
@@ -53,6 +54,7 @@ public class BatchJobListener implements IListener {
         double secs = Math.round((System.currentTimeMillis() - lastTime) / 1000);
         double minutes = Math.round(secs / 60);
 
-        System.out.println("Закончен батч : " + batch.getId() + " (" + minutes + " минуты) (" + secs + " секунд" + ");");
+        System.out.println("Закончен батч : " + batch.getId() + " (" + minutes + " минут) (" + secs + " секунд" + ")"
+                + " (" + new Date() + ");");
     }
 }
