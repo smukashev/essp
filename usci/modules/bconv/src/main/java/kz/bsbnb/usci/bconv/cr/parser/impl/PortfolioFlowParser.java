@@ -24,7 +24,7 @@ public class PortfolioFlowParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ct_portfolio_flow_base"),
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_kfn"),
                 batch.getRepDate());
     }
 
@@ -38,9 +38,9 @@ public class PortfolioFlowParser extends BatchParser {
             portfolio.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
             currentBaseEntity.put("portfolio", new BaseEntityComplexValue(0, -1, batch.getRepDate(), portfolio, false, true));
         } else if (localName.equals("details")) {
-            currentDetails = new BaseSet(metaClassRepository.getMetaClass("detail"));
+            currentDetails = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_detail"));
         } else if (localName.equals("detail")) {
-            currentDetail = new BaseEntity(metaClassRepository.getMetaClass("detail"), batch.getRepDate());
+            currentDetail = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_detail"), batch.getRepDate());
         } else if (localName.equals("balance_account")) {
             BaseEntity ba = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"), batch.getRepDate());
             event = (XMLEvent) xmlReader.next();
