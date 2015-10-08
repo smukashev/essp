@@ -201,7 +201,7 @@
 		<index name="ebcv_IN_ai_ei">
 			<index-column name="attribute_id"/>
 			<index-column name="entity_value_id"/>
-			<index-column name="entity_id"/>
+
 		</index>
 	</table>
 	<table name="eav_be_date_set_values">
@@ -415,6 +415,8 @@
 		<index name="ebiv_IN_ai_ei">
 			<index-column name="attribute_id"/>
 			<index-column name="entity_id"/>
+			<index-column name="value"/>
+			<index-column name="creditor_id"/>
 		</index>
 	</table>
 	<table name="eav_be_string_set_values">
@@ -457,6 +459,8 @@
 		<index name="ebsv_IN_ai_ei">
 			<index-column name="attribute_id"/>
 			<index-column name="entity_id"/>
+			<index-column name="value"/>
+			<index-column name="creditor_id"/>
 		</index>
 	</table>
 	<table name="eav_a_user">
