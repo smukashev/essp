@@ -1228,4 +1228,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     public Long getBatchIndex() {
         return index;
     }
+
+    public boolean isInsert(){
+        return operationType == null || operationType.equals(OperationType.INSERT);
+    }
+
+    public boolean isUpdate(){
+        return OperationType.UPDATE.equals(operationType);
+    }
 }

@@ -69,7 +69,7 @@ public class ZipFilesMonitor {
     SenderThread sender;
 
     public static final int ZIP_BUFFER_SIZE = 1024;
-    public static final int MAX_SYNC_QUEUE_SIZE = 1000;
+    public static final int MAX_SYNC_QUEUE_SIZE = 256;
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
@@ -810,7 +810,8 @@ public class ZipFilesMonitor {
 
                 sleepCounter++;
                 if (sleepCounter > WAIT_TIMEOUT) {
-                    throw new IllegalStateException("Sync timeout in reader.");
+                    logger.error("Sync timeout in reader.");
+                    // throw new IllegalStateException("Sync timeout in reader.");
                 }
             }
             sleepCounter = 0;
