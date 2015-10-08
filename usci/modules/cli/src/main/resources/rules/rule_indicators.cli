@@ -234,7 +234,7 @@ rule "legal_form in jur"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
             && getEls("{setString(17,18,19,24)}credit_type.code") == 0
-            && getEl("organizations.legal_form") == null)
+            && getEls("{count}organizations[legal_form=null]") > 0)
 then
   $entity.addValidationError("Организационно-правовая форма должна указываться для данного типа кредита");
 end
