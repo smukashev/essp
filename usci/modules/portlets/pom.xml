@@ -39,7 +39,7 @@
         <module>rules_portlet</module>
         <module>batch_entry_list</module>
         <module>notifications_portlet</module>
-        <module>credit-registry-queue-portlet</module>
+        <module>queue-portlet</module>
     </modules>
 
     <distributionManagement>
