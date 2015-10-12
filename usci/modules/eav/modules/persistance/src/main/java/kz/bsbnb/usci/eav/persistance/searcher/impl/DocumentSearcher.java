@@ -16,9 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_VALUES;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_STRING_VALUES;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
+import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Component
 public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher {
@@ -75,8 +73,8 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
 
             if (docTypeId > 0) {
                 SelectConditionStep select = (SelectConditionStep) context.
-                        select(EAV_BE_ENTITIES.ID.as("inner_id")).
-                        from(EAV_BE_ENTITIES).
+                        select(EAV_BE_ENTITIES.ID.as("inner_id")).hint("/* +PARALLEL(3)*/")
+                        .from(EAV_BE_ENTITIES).
                         join(EAV_BE_COMPLEX_VALUES).
                         on(EAV_BE_ENTITIES.ID.equal(EAV_BE_COMPLEX_VALUES.ENTITY_ID)).
                         and(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.equal(entity.getMetaAttribute("doc_type").getId())).
@@ -85,7 +83,7 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
                         on(EAV_BE_ENTITIES.ID.equal(EAV_BE_STRING_VALUES.ENTITY_ID))
                         .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.equal(entity.getMetaAttribute("no").getId()))
                         .and(EAV_BE_STRING_VALUES.CREDITOR_ID.equal(creditorId))
-                        .and(EAV_BE_STRING_VALUES.VALUE.equal((String) (entity.getBaseValue("no").getValue())));
+                                .and(EAV_BE_STRING_VALUES.VALUE.equal((String) (entity.getBaseValue("no").getValue())));
 
                 logger.debug(select.toString());
                 List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),

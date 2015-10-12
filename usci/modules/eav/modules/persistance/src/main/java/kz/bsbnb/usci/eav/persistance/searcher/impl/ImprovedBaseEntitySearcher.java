@@ -82,8 +82,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         MetaClass metaClass = entity.getMeta();
         String entityAlias = (entityName == null ? "root" : "e_" + entityName);
 
-        SelectJoinStep joins = context.select(EAV_BE_ENTITIES.as(entityAlias).ID.as("inner_id")).
-                from(EAV_BE_ENTITIES.as(entityAlias));
+        SelectJoinStep joins = context.select(EAV_BE_ENTITIES.as(entityAlias).ID.as("inner_id")).hint("/* +PARALLEL(3)*/")
+                .from(EAV_BE_ENTITIES.as(entityAlias));
 
         if (metaClass == null)
             throw new IllegalArgumentException("Метакласс не может быть NULL;");

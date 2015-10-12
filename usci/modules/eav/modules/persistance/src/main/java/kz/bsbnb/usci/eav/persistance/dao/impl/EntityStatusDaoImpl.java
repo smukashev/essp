@@ -43,7 +43,7 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
                 entityStatus.getIndex()
         );
         String insert_sql =
-                "insert /*+ APPEND */ into \"EAV_ENTITY_STATUSES\" (\"BATCH_ID\", \"ENTITY_ID\", \"STATUS_ID\", \"DESCRIPTION\", \"RECEIPT_DATE\", \"INDEX_\") values (?, ?, ?, ?, ?, ?)";
+                "insert /*+ APPEND PARALLEL(EAV_ENTITY_STATUSES, 5) */ into \"EAV_ENTITY_STATUSES\" (\"BATCH_ID\", \"ENTITY_ID\", \"STATUS_ID\", \"DESCRIPTION\", \"RECEIPT_DATE\", \"INDEX_\") values (?, ?, ?, ?, ?, ?)";
         return insertWithId(insert_sql, insert.getBindValues().toArray());
     }
 

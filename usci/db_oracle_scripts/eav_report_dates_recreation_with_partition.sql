@@ -1,6 +1,7 @@
  declare
  l_errors  NUMBER;
- v_trigger varchar2(4000 CHAR);
+ v_trigger_ddl varchar2(4000 CHAR);
+ v_trigger_enable_ddl VARCHAR2(4000 CHAR);
  begin
 
 begin
@@ -15,10 +16,12 @@ end;
 
 DBMS_REDEFINITION.can_redef_table(USER, 'EAV_BE_ENTITY_REPORT_DATES');
 
-select dbms_metadata.get_ddl('TRIGGER', 'TRG_EAV_BE_ENTI_EPORT_DATES_ID', 'C##CORE2')
-into v_trigger
+select dbms_metadata.get_ddl('TRIGGER', 'TRG_EAV_BE_ENTI_EPORT_DATES_ID', 'CORE') --change schema
+into v_trigger_ddl
 from dual;
 execute immediate 'drop trigger TRG_EAV_BE_ENTI_EPORT_DATES_ID';
+v_trigger_enable_ddl:= substr(v_trigger_ddl, instr(v_trigger_ddl, 'ALTER'), length(v_trigger_ddl) - instr(v_trigger_ddl, 'ALTER') + 1);
+v_trigger_ddl := substr(v_trigger_ddl, 1, instr(v_trigger_ddl, 'ALTER') - 1);
 execute immediate 'create table EAV_BE_ENTITY_REPORT_DATES_NEW
 (
   id                   NUMBER(14),
@@ -101,7 +104,8 @@ DBMS_STATS.gather_table_stats(USER, 'EAV_BE_ENTITY_REPORT_DATES_NEW', cascade =>
 
 execute immediate 'DROP TABLE EAV_BE_ENTITY_REPORT_DATES_NEW';
 
-execute immediate v_trigger;
+execute immediate v_trigger_ddl;
+execute immediate v_trigger_enable_ddl;
 
 DBMS_STATS.gather_table_stats(USER, 'EAV_BE_ENTITY_REPORT_DATES', cascade => TRUE);
  end;

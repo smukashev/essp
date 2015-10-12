@@ -10,23 +10,12 @@
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
 		<column name="parent_is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<unique name="emc_UN_n_bd">
-			<unique-column name="name"/>
-			<unique-column name="begin_date"/>
-		</unique>
 		<unique>
 			<unique-column name="id"/>
 		</unique>
-		<index name="emc_IN_bd_n_id">
-			<index-column name="begin_date"/>
-			<index-column name="name"/>
-			<index-column name="is_disabled"/>
-		</index>
 		<index name="emc_IN_bd">
-			<index-column name="begin_date"/>
-		</index>
-		<index name="emc_IN_ir">
 			<index-column name="is_reference"/>
+			<index-column name="id"/>
 		</index>
 	</table>
 	<table name="eav_m_set_key_filter">
@@ -199,9 +188,10 @@
 			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebcv_IN_ai_ei">
+			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="entity_value_id"/>
-			<index-column name="entity_id"/>
+
 		</index>
 	</table>
 	<table name="eav_be_date_set_values">
@@ -242,8 +232,8 @@
 			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebdv_ai_ei">
-			<index-column name="attribute_id"/>
 			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
 		</index>
 	</table>
 	<table name="eav_be_double_set_values">
@@ -415,6 +405,8 @@
 		<index name="ebiv_IN_ai_ei">
 			<index-column name="attribute_id"/>
 			<index-column name="entity_id"/>
+			<index-column name="value"/>
+			<index-column name="creditor_id"/>
 		</index>
 	</table>
 	<table name="eav_be_string_set_values">
@@ -455,8 +447,9 @@
 			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebsv_IN_ai_ei">
+			<index-column name="creditor_id"/>
 			<index-column name="attribute_id"/>
-			<index-column name="entity_id"/>
+			<index-column name="value"/>
 		</index>
 	</table>
 	<table name="eav_a_user">
