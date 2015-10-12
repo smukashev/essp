@@ -3,7 +3,7 @@
 
 <liferay-portlet-app>
     <portlet>
-        <portlet-name>credit-registry-queue-portlet</portlet-name>
+        <portlet-name>queue-portlet</portlet-name>
         <icon>/icon.png</icon>
         <instanceable>true</instanceable>
         <ajaxable>false</ajaxable>

@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bsbnb</groupId>
-    <artifactId>credit-registry-queue-portlet</artifactId>
+    <artifactId>queue-portlet</artifactId>
     <packaging>war</packaging>
-    <name>credit-registry-queue-portlet</name>
+    <name>USCI Portlets: QueuePortlet</name>
     <version>0.1</version>
 
     <properties>
@@ -37,7 +37,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>credit-registry-queue-portlet</finalName>
+        <finalName>queue-portlet</finalName>
     </build>
 
     <dependencies>
