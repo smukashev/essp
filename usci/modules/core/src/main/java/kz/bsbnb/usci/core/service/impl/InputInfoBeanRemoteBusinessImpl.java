@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

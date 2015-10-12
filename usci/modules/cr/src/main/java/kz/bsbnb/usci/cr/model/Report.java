@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.cr.model;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -137,6 +138,8 @@ public class Report implements Serializable {
 
     @Override
     public String toString() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm:ss");
+
         StringBuilder sb = new StringBuilder();
 
         sb.append("{id=");
@@ -154,10 +157,16 @@ public class Report implements Serializable {
         sb.append(getActualCount());
         sb.append(", totalCount=");
         sb.append(getTotalCount());
-        sb.append(", beginingDate=");
-        sb.append(DataTypeUtil.convertDateToString(DataTypeUtil.LONG_DATE_FORMAT, getBeginningDate()));
-        sb.append(", endDate=");
-        sb.append(DataTypeUtil.convertDateToString(DataTypeUtil.LONG_DATE_FORMAT, getEndDate()));
+
+        if (getBeginningDate() != null) {
+            sb.append(", beginingDate=");
+            sb.append(dateFormat.format(getBeginningDate()));
+        }
+
+        if (getEndDate() != null) {
+            sb.append(", endDate=");
+            sb.append(dateFormat.format(getEndDate()));
+        }
         
         if (getStatusId() != null) {
             sb.append(", status={id=");
@@ -166,6 +175,7 @@ public class Report implements Serializable {
         } else {
             sb.append(", status=null");
         }
+
         sb.append("}");
 
         return sb.toString();
