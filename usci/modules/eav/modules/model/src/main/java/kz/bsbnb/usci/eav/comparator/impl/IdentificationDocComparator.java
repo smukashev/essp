@@ -8,12 +8,29 @@ import java.util.Comparator;
 public class IdentificationDocComparator implements Comparator<IBaseValue> {
     @Override
     public int compare(IBaseValue val1, IBaseValue val2) {
-        // TODO: weight check for null
         BaseEntity doc1 = (BaseEntity) val1.getValue();
         BaseEntity doc2 = (BaseEntity) val2.getValue();
 
+        if (doc1 == null)
+            throw new IllegalStateException("Документ является NULL; \n" + val1);
+
+        if (doc2 == null)
+            throw new IllegalStateException("Документ является NULL; \n" + val2);
+
         BaseEntity docType1 = (BaseEntity) doc1.getEl("doc_type");
         BaseEntity docType2 = (BaseEntity) doc2.getEl("doc_type");
+
+        if (docType1 == null)
+            throw new IllegalStateException("Тип документка является NULL; \n" + doc1);
+
+        if (docType2 == null)
+            throw new IllegalStateException("Тип документка является NULL; \n" + doc2);
+
+        if (docType1.getBaseValue("weight") == null || docType1.getBaseValue("weight").getValue() == null)
+            throw new IllegalStateException("Вес документа является NULL; \n" + doc1);
+
+        if (docType2.getBaseValue("weight") == null || docType2.getBaseValue("weight").getValue() == null)
+            throw new IllegalStateException("Вес документа является NULL; \n" + doc2);
 
         Integer weight1 = Integer.parseInt(docType1.getBaseValue("weight").getValue().toString());
         Integer weight2 = Integer.parseInt(docType2.getBaseValue("weight").getValue().toString());
