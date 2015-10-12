@@ -1,12 +1,9 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
 
@@ -16,13 +13,13 @@ import java.util.*;
 /**
  * @author k.tulbassiyev
  */
-public class BaseSet extends BaseContainer implements IBaseSet
-{
+public class BaseSet extends BaseContainer implements IBaseSet {
 
     private UUID uuid = UUID.randomUUID();
 
     /**
      * Holds data about entity structure
+     *
      * @see kz.bsbnb.usci.eav.model.meta.impl.MetaClass
      */
     private IMetaType metaType;
@@ -38,14 +35,12 @@ public class BaseSet extends BaseContainer implements IBaseSet
      *
      * @param metaType MetaClass of the entity..
      */
-    public BaseSet(IMetaType metaType)
-    {
+    public BaseSet(IMetaType metaType) {
         super(BaseContainerType.BASE_SET);
         this.metaType = metaType;
     }
 
-    public BaseSet(long id, IMetaType metaType)
-    {
+    public BaseSet(long id, IMetaType metaType) {
         super(id, BaseContainerType.BASE_SET);
         this.metaType = metaType;
     }
@@ -55,18 +50,15 @@ public class BaseSet extends BaseContainer implements IBaseSet
     }
 
     @Override
-    public IMetaType getMemberType(String name)
-    {
+    public IMetaType getMemberType(String name) {
         return metaType;
     }
 
-    public IMetaType getMemberType()
-    {
+    public IMetaType getMemberType() {
         return metaType;
     }
 
-    public Set<String> getAttributes()
-    {
+    public Set<String> getAttributes() {
         return values.keySet();
     }
 
@@ -91,10 +83,8 @@ public class BaseSet extends BaseContainer implements IBaseSet
     }
 
     @Override
-    public void put(String name, IBaseValue value)
-    {
-        if (name == null)
-        {
+    public void put(String name, IBaseValue value) {
+        if (name == null) {
             UUID uuid = UUID.randomUUID();
             put(uuid.toString(), value);
         }
@@ -103,8 +93,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
         values.put(name, value);
     }
 
-    public BaseSet put(IBaseValue value)
-    {
+    public BaseSet put(IBaseValue value) {
         value.setBaseContainer(this);
 
         UUID uuid = UUID.randomUUID();
@@ -114,29 +103,24 @@ public class BaseSet extends BaseContainer implements IBaseSet
     }
 
     public void remove(String identifier) {
-        fireValueChange(identifier);
         values.remove(identifier);
     }
 
     @Override
-    public Collection<IBaseValue> get()
-    {
+    public Collection<IBaseValue> get() {
         return values.values();
     }
 
-    public IBaseValue getBaseValue(String identifier)
-    {
+    public IBaseValue getBaseValue(String identifier) {
         return values.get(identifier);
     }
 
-    public int getValueCount()
-    {
+    public int getValueCount() {
         return values.size();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         String str = "[";
         boolean first = true;
 
@@ -154,32 +138,26 @@ public class BaseSet extends BaseContainer implements IBaseSet
         return str;
     }
 
-    public Object getElSimple(String filter)
-    {
-        if (metaType.isComplex() || metaType.isSet())
-        {
+    public Object getElSimple(String filter) {
+        if (metaType.isComplex() || metaType.isSet()) {
             throw new IllegalArgumentException("Get simple attribute method called for complex attribute or array");
         }
 
-        for (IBaseValue value : values.values())
-        {
+        for (IBaseValue value : values.values()) {
             Object innerValue = value.getValue();
-            if (innerValue == null)
-            {
+            if (innerValue == null) {
                 continue;
             }
 
-            if (((BaseValue)value).equalsToString(filter, ((MetaValue)metaType).getTypeCode()))
+            if (((BaseValue) value).equalsToString(filter, ((MetaValue) metaType).getTypeCode()))
                 return innerValue;
         }
 
         return null;
     }
 
-    public Object getElComplex(String filter)
-    {
-        if (!metaType.isComplex() || metaType.isSet())
-        {
+    public Object getElComplex(String filter) {
+        if (!metaType.isComplex() || metaType.isSet()) {
             throw new IllegalArgumentException("Get complex attribute method called for simple attribute or array");
         }
 
@@ -188,8 +166,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
         Object valueOut = null;
         HashMap<String, String> params = new HashMap<String, String>();
 
-        while (tokenizer.hasMoreTokens())
-        {
+        while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
 
             StringTokenizer innerTokenizer = new StringTokenizer(token, "=");
@@ -203,23 +180,20 @@ public class BaseSet extends BaseContainer implements IBaseSet
             params.put(fieldName, fieldValue);
         }
 
-        for (IBaseValue value : values.values())
-        {
+        for (IBaseValue value : values.values()) {
             Object innerValue = value.getValue();
-            if (innerValue == null)
-            {
+            if (innerValue == null) {
                 continue;
             }
 
-            if (((BaseEntity)innerValue).equalsToString(params))
+            if (((BaseEntity) innerValue).equalsToString(params))
                 return innerValue;
         }
 
         return valueOut;
     }
 
-    public Object getEl(String filter)
-    {
+    public Object getEl(String filter) {
         if (metaType.isComplex())
             return getElComplex(filter);
         return getElSimple(filter);
@@ -227,18 +201,15 @@ public class BaseSet extends BaseContainer implements IBaseSet
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-        {
+        if (obj == this) {
             return true;
         }
 
-        if (obj == null)
-        {
+        if (obj == null) {
             return false;
         }
 
-        if (!(getClass() == obj.getClass()))
-        {
+        if (!(getClass() == obj.getClass())) {
             return false;
         }
 
@@ -251,38 +222,30 @@ public class BaseSet extends BaseContainer implements IBaseSet
         }
 
         boolean date = false;
-        if (!thisMetaType.isSet() && !thisMetaType.isComplex())
-        {
-            MetaValue metaValue = (MetaValue)thisMetaType;
-            if (metaValue.getTypeCode().equals(DataTypes.DATE))
-            {
+        if (!thisMetaType.isSet() && !thisMetaType.isComplex()) {
+            MetaValue metaValue = (MetaValue) thisMetaType;
+            if (metaValue.getTypeCode().equals(DataTypes.DATE)) {
                 date = true;
             }
         }
 
-        if (this.getValueCount() != that.getValueCount())
-        {
+        if (this.getValueCount() != that.getValueCount()) {
             return false;
         }
 
         Set<UUID> uuids = new HashSet<UUID>();
         Iterator<IBaseValue> thisIt = this.get().iterator();
-        while (thisIt.hasNext())
-        {
+        while (thisIt.hasNext()) {
             IBaseValue thisBaseValue = thisIt.next();
 
             boolean found = false;
 
             Iterator<IBaseValue> thatIt = that.get().iterator();
-            while (thatIt.hasNext())
-            {
+            while (thatIt.hasNext()) {
                 IBaseValue thatBaseValue = thatIt.next();
-                if (uuids.contains(thatBaseValue.getUuid()))
-                {
+                if (uuids.contains(thatBaseValue.getUuid())) {
                     continue;
-                }
-                else
-                {
+                } else {
                     Object thisObject = thisBaseValue.getValue();
                     if (thisObject == null) {
                         throw new RuntimeException("Element of the set can not be equal to null.");
@@ -293,18 +256,13 @@ public class BaseSet extends BaseContainer implements IBaseSet
                         throw new RuntimeException("Element of the set can not be equal to null.");
                     }
 
-                    if (date)
-                    {
-                        if (DataUtils.compareBeginningOfTheDay((Date) thisObject, (Date) thatObject) == 0)
-                        {
+                    if (date) {
+                        if (DataUtils.compareBeginningOfTheDay((Date) thisObject, (Date) thatObject) == 0) {
                             uuids.add(thatBaseValue.getUuid());
                             found = true;
                         }
-                    }
-                    else
-                    {
-                        if (thisObject.equals(thatObject))
-                        {
+                    } else {
+                        if (thisObject.equals(thatObject)) {
                             uuids.add(thatBaseValue.getUuid());
                             found = true;
                         }
@@ -312,8 +270,7 @@ public class BaseSet extends BaseContainer implements IBaseSet
                 }
             }
 
-            if (!found)
-            {
+            if (!found) {
                 return false;
             }
         }
@@ -321,80 +278,36 @@ public class BaseSet extends BaseContainer implements IBaseSet
         return true;
     }
 
-    public void setListeners()
-    {
-        if (metaType.isComplex())
-        {
-            for (String key: values.keySet())
-            {
-                IBaseValue baseValue = values.get(key);
-                IBaseContainer baseContainer = (IBaseContainer)baseValue.getValue();
-                baseContainer.addListener(new ValueChangeListener(this, key) {
-
-                    @Override
-                    public void valueChange(ValueChangeEvent event) {
-                        String identifier = this.getIdentifier();
-
-                        IBaseContainer source = event.getSource();
-                        if (source instanceof IBaseSet)
-                        {
-                            identifier += "." + event.getIdentifier();
-                        }
-
-                        IBaseContainer target = this.getTarget();
-                        if (target instanceof BaseContainer)
-                        {
-                            ((BaseContainer)target).addModifiedIdentifier(identifier);
-                        }
-                        fireValueChange(identifier);
-                    }
-                });
-                baseContainer.setListening(true);
-            }
-        }
-    }
-
-    public void removeListeners()
-    {
-
-    }
-
-    public BaseSet clone()
-    {
+    public BaseSet clone() {
         BaseSet baseSetCloned = null;
-        try
-        {
-            baseSetCloned = (BaseSet)super.clone();
+        try {
+            baseSetCloned = (BaseSet) super.clone();
 
             HashMap<String, IBaseValue> valuesCloned = new HashMap<String, IBaseValue>();
             Iterator<String> items = values.keySet().iterator();
-            while(items.hasNext())
-            {
+            while (items.hasNext()) {
                 String attribute = items.next();
 
                 IBaseValue baseValue = values.get(attribute);
-                IBaseValue baseValueCloned = ((BaseValue)baseValue).clone();
+                IBaseValue baseValueCloned = ((BaseValue) baseValue).clone();
                 baseValueCloned.setBaseContainer(baseSetCloned);
                 valuesCloned.put(attribute, baseValueCloned);
             }
             baseSetCloned.values = valuesCloned;
-        }
-        catch(CloneNotSupportedException ex)
-        {
+        } catch (CloneNotSupportedException ex) {
             throw new RuntimeException("BaseSet class does not implement interface Cloneable.");
         }
         return baseSetCloned;
     }
 
-    public int sizeWithFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException
-    {
+    public int sizeWithFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException {
         if (arrayKeyFilter == null) return values.size();
         if (arrayKeyFilter.size() == 0) return values.size();
 
         int counter = 0;
         if (metaType.isComplex() && !metaType.isSet()) {
             for (String name : values.keySet()) {
-                BaseEntity value = (BaseEntity)values.get(name).getValue();
+                BaseEntity value = (BaseEntity) values.get(name).getValue();
 
                 if (value.applyKeyFilter(arrayKeyFilter)) {
                     counter++;
@@ -409,9 +322,4 @@ public class BaseSet extends BaseContainer implements IBaseSet
     public boolean isSet() {
         return true;
     }
-
-    /*@Override
-    public IMetaContainer getMetaContainer() {
-        return new MetaSet(metaType);
-    }*/
 }
