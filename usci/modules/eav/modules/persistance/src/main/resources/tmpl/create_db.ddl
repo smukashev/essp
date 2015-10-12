@@ -188,6 +188,7 @@
 			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebcv_IN_ai_ei">
+			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="entity_value_id"/>
 
@@ -231,8 +232,8 @@
 			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebdv_ai_ei">
-			<index-column name="attribute_id"/>
 			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
 		</index>
 	</table>
 	<table name="eav_be_double_set_values">
@@ -446,10 +447,9 @@
 			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebsv_IN_ai_ei">
-			<index-column name="attribute_id"/>
-			<index-column name="entity_id"/>
-			<index-column name="value"/>
 			<index-column name="creditor_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="value"/>
 		</index>
 	</table>
 	<table name="eav_a_user">
