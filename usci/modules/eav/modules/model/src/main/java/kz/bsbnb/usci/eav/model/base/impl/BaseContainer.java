@@ -8,7 +8,6 @@ import java.util.Set;
 
 public abstract class BaseContainer extends BaseObject implements IBaseContainer {
     private BaseContainerType baseContainerType;
-    private Set<String> modifiedIdentifiers = new HashSet<String>();
 
     public BaseContainer(BaseContainerType baseContainerType) {
         this.baseContainerType = baseContainerType;
