@@ -1,9 +1,5 @@
 package kz.bsbnb.usci.cr.model;
 
-/**
- *
- * @author alexandr.motov
- */
 public enum MessageType {
     
     CRITICAL_ERROR("CRITICAL_ERROR"),
@@ -13,12 +9,11 @@ public enum MessageType {
     
     private String code;
 
-    private MessageType(String code) {
+    MessageType(String code) {
         this.code = code;
     }
     
     public String getCode() {
         return code;
     }
-    
-}
+ }

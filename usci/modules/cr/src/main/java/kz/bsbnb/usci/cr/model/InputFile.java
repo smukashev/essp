@@ -3,11 +3,9 @@ package kz.bsbnb.usci.cr.model;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-/**
- *
- * @author Aidar.Myrzahanov
- */
 public class InputFile implements Serializable {
+    private static final long serialVersionUID = 2125312865112267120L;
+
     private long id;
     
     private InputInfo inputInfo;
@@ -16,30 +14,18 @@ public class InputFile implements Serializable {
 
     private String md5;
 
-    /**
-     * @return the id
-     */
     public long getId() {
         return id;
     }
 
-    /**
-     * @param id the id to set
-     */
     public void setId(long id) {
         this.id = id;
     }
 
-    /**
-     * @return the filePath
-     */
     public String getFilePath() {
         return filePath;
     }
 
-    /**
-     * @param filePath the filePath to set
-     */
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }

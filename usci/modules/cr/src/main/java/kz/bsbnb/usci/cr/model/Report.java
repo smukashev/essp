@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class Report implements Serializable {
+    private static final long serialVersionUID = 8626348715892412142L;
 
     public final static String INITIAL_REPORT_DATE_STR = "01/04/2013";
 
@@ -36,18 +37,24 @@ public class Report implements Serializable {
     }
 
     private Long id;
-    private Creditor creditor;
-    private Long statusId;
-    private Long totalCount;
-    private Long actualCount;
-    private Date reportDate;
-    private Date beginningDate;
-    private Date endDate;
-    private Date lastManualEditDate;
-    private transient Shared status;
 
-    public Report() {
-    }
+    private Creditor creditor;
+
+    private Long statusId;
+
+    private Long totalCount;
+
+    private Long actualCount;
+
+    private Date reportDate;
+
+    private Date beginningDate;
+
+    private Date endDate;
+
+    private Date lastManualEditDate;
+
+    private transient Shared status;
 
     public Long getId() {
         return id;

@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 public class Creditor implements Serializable {
+    private static final long serialVersionUID = 2115312865111267610L;
+
     private Long id;
 
     private String name;
