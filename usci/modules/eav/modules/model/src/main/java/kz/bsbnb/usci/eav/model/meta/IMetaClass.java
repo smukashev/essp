@@ -2,23 +2,18 @@ package kz.bsbnb.usci.eav.model.meta;
 
 import java.util.Set;
 
-/**
- *
- */
 public interface IMetaClass extends IMetaContainer {
+    String getClassName();
 
-    public String getClassName();
+    IMetaAttribute getMetaAttribute(String name);
 
-    public IMetaAttribute getMetaAttribute(String name);
+    IMetaType getMemberType(String name);
 
-    public IMetaType getMemberType(String name);
+    boolean isReference();
 
-    public boolean isReference();
+    boolean isSearchable();
 
-    public boolean isSearchable();
+    Set<String> getAttributeNames();
 
-    public Set<String> getAttributeNames();
-
-    public boolean hasNotFinalAttributes();
-
+    boolean hasNotFinalAttributes();
 }

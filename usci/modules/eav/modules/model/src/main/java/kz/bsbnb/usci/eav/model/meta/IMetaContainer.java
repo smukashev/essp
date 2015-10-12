@@ -1,13 +1,12 @@
 package kz.bsbnb.usci.eav.model.meta;
 
 public interface IMetaContainer extends IMetaType  {
+    void setMetaAttribute(String name, IMetaAttribute metaAttribute);
 
-    public void setMetaAttribute(String name, IMetaAttribute metaAttribute);
+    long getId();
 
-    public long getId();
+    int getType();
 
-    public int getType();
-
-    public void setType(int type);
+    void setType(int type);
 
 }
