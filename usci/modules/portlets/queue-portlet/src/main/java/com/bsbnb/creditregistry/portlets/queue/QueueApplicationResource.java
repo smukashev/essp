@@ -8,7 +8,7 @@ import com.vaadin.terminal.ExternalResource;
  */
 public class QueueApplicationResource extends ExternalResource {
 
-    private static final String CONTEXT_NAME = "credit-registry-queue-portlet";
+    private static final String CONTEXT_NAME = "queue-portlet";
     public static final QueueApplicationResource EXCEL_ICON = new QueueApplicationResource("excel_table.png");
     public static final QueueApplicationResource DOWNLOAD_ICON = new QueueApplicationResource("download.png");
     public static final QueueApplicationResource REMOVE_ICON = new QueueApplicationResource("remove.png");

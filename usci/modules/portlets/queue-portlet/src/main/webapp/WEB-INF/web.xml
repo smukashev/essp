@@ -6,11 +6,11 @@
         <param-value>true</param-value>
     </context-param>
     <servlet>
-        <servlet-name>credit-registry-queue-portlet</servlet-name>
+        <servlet-name>queue-portlet</servlet-name>
         <servlet-class>com.liferay.portal.kernel.servlet.PortletServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>credit-registry-queue-portlet</servlet-name>
-        <url-pattern>/credit-registry-queue-portlet/*</url-pattern>
+        <servlet-name>queue-portlet</servlet-name>
+        <url-pattern>/queue-portlet/*</url-pattern>
     </servlet-mapping>
 </web-app>
