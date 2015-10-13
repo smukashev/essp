@@ -196,4 +196,7 @@ public class InputInfo implements Serializable {
 		else this.actualCount = (int) actualCount;
 	}
 
+    public void setBatchStatuses(List<Protocol> batchStatuses) {
+        this.batchStatuses = batchStatuses;
+    }
 }
