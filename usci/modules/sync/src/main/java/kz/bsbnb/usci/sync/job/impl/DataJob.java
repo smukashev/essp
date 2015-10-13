@@ -38,6 +38,8 @@ public final class DataJob extends AbstractDataJob {
     @Autowired
     private IBatchService batchService;
 
+    private ActualCountJob actualCountJob;
+
     private final Logger logger = Logger.getLogger(DataJob.class);
 
     protected final List<InProcessTester> entitiesInProcess = new ArrayList<>();
@@ -78,6 +80,8 @@ public final class DataJob extends AbstractDataJob {
     public void run() {
         System.out.println("Data Job Started.");
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
+        actualCountJob = new ActualCountJob(batchService);
+        actualCountJob.start();
 
         while(true) {
             try {
@@ -179,6 +183,7 @@ public final class DataJob extends AbstractDataJob {
             logger.debug("Starting job");
             entitiesInProcess.add(new InProcessTester(entity));
             processingJobs.add(processJob);
+            actualCountJob.insertBatchId(entity.getBatchId());
 
             processJob.start();
             skip_count = 0;

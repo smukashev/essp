@@ -214,6 +214,7 @@ public class ZipFilesMonitor {
                         if (job != null) {
                             jobLauncher.run(job, jobParametersBuilder.toJobParameters());
                             receiverStatusSingleton.batchStarted();
+                            batchService.clearActualCount(nextJob.getBatchId());
                             batchService.addBatchStatus(new BatchStatus()
                                             .setBatchId(nextJob.getBatchId())
                                             .setStatus(BatchStatuses.PROCESSING)
