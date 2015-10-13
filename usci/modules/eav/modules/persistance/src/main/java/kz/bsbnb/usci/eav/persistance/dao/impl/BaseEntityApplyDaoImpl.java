@@ -418,7 +418,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseEntityManager.registerAsUpdated(baseValuePrevious);
                             }
                         }
-                    // case#2
+                        // case#2
                     } else {
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -449,7 +449,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
                     }
-                // case#3
+                    // case#3
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
                         throw new IllegalStateException("Оперативные данные могут быть закрыты только за " +
@@ -530,7 +530,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     // Запуск на изменение ключевого поля
                     if (baseValueSaving.getNewBaseValue() != null)
                         baseEntityManager.registerAsUpdated(baseValueApplied);
-                // case#6
+                    // case#6
                 } else if (compare == -1) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -571,7 +571,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsUpdated(baseValueApplied);
-                // case#8
+                    // case#8
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
                         throw new RuntimeException("Оперативные данные(" + metaAttribute.getName() + ")" +
@@ -609,7 +609,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         baseEntityManager.registerAsUpdated(baseValuePrevious);
                     }
-                // case#9
+                    // case#9
                 } else if (compare == -1) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -669,7 +669,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseEntityApplied.put(metaAttribute.getName(), baseValueClosed);
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
-                // case#11
+                    // case#11
                 } else {
                     IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueSaving);
 
@@ -718,7 +718,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsInserted(baseValueApplied);
-                // case#13
+                    // case#13
                 } else {
                     Date reportDateSaving = baseValueSaving.getRepDate();
                     Date reportDateLast = baseValueLast.getRepDate();
@@ -834,7 +834,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         }
 
                         return;
-                    // case#2
+                        // case#2
                     } else {
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -898,7 +898,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
                     }
-                // case#3
+                    // case#3
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
                         throw new IllegalStateException("Оперативные данные могут быть закрыты только за " +
@@ -1174,7 +1174,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseEntity baseEntityApplied = metaClass.isSearchable() ?
                                 apply(creditorId, baseEntitySaving, baseEntityManager, null) :
                                 applyBaseEntityAdvanced(creditorId, baseEntitySaving, (IBaseEntity)
-                                                baseValueNext.getValue(), baseEntityManager);
+                                        baseValueNext.getValue(), baseEntityManager);
 
                         baseValueNext.setRepDate(baseValueSaving.getRepDate());
                         baseValueNext.setValue(baseEntityApplied);
@@ -1199,7 +1199,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseEntityManager.registerAsInserted(baseValueApplied);
                     }
                 }
-            // case#7
+                // case#7
             } else {
                 IBaseValue baseValueLast = valueDao.getLastBaseValue(baseValueSaving);
                 IBaseEntity baseEntityApplied;
@@ -1292,6 +1292,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         IBaseSet childBaseSetLoaded = null;
         IBaseSet childBaseSetApplied = null;
 
+        boolean isBaseSetDeleted = false;
+
         if (baseValueLoaded != null) {
             childBaseSetLoaded = (IBaseSet) baseValueLoaded.getValue();
 
@@ -1333,7 +1335,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseEntityManager.registerAsUpdated(baseValuePrevious);
                         }
                     }
-                // case#2
+
+                    isBaseSetDeleted = true;
+                    // case#2
                 } else if (compare == 1) {
                     IBaseValue baseValueClosed = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1364,6 +1368,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseValueLast.setMetaAttribute(metaAttribute);
                         baseEntityManager.registerAsUpdated(baseValueLast);
                     }
+                    isBaseSetDeleted = true;
                 } else {
                     throw new IllegalStateException("Дата закрытия атрибута(" + metaAttribute.getName() + ") должна "
                             + "быть больше или равна дате открытия атрибута;");
@@ -1389,7 +1394,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueLoaded.isLast());
 
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                // case#4
+                    // case#4
                 } else if (compare == -1) {
                     childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
 
@@ -1461,7 +1466,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 baseEntity.put(metaAttribute.getName(), baseValueApplied);
                 baseEntityManager.registerAsUpdated(baseValueApplied);
-            // case#6
+                // case#6
             } else {
                 IBaseValue baseValueNext = baseValueDao.getNextBaseValue(baseValueSaving);
 
@@ -1645,7 +1650,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
-        if (childBaseSetLoaded != null) {
+        /* Удаляет элементы массива, если массив не накопительный или массив накопительный и родитель был удалён */
+        if (childBaseSetLoaded != null &&
+                ((metaAttribute.isCumulative() && isBaseSetDeleted) || !metaAttribute.isCumulative())) {
             for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
                 if (processedUuids.contains(childBaseValueLoaded.getUuid()))
                     continue;
@@ -1656,8 +1663,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseSetValueDao setValueDao = persistableDaoPool
                         .getPersistableDao(childBaseValueLoaded.getClass(), IBaseSetValueDao.class);
 
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving,
-                        reportDateLoaded);
+                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 if (compare == -1)
                     continue;
@@ -1804,7 +1810,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     baseEntityManager.registerAsDeleted(childBaseEntityLoaded);
                             }
                         }
-                    // case#2
+                        // case#2
                     } else {
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -1867,7 +1873,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
                     }
-                // case#3
+                    // case#3
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
                         throw new IllegalStateException("Оперативные данные могут быть закрыты только за " +
@@ -1903,11 +1909,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         baseEntityManager.registerAsUpdated(baseValueLast);
                     }
-                } else if (compare == -1){
+                } else if (compare == -1) {
                     throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
                             + "( " + baseValueSaving.getMetaAttribute().getName() + ");");
                 }
-            // case#4
+                // case#4
             } else {
                 reportDateSaving = baseValueSaving.getRepDate();
 
@@ -2249,19 +2255,19 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseEntityManager.registerAsUpdated(childBaseValuePrevious);
                         }
                     }
-                } else if (compare == 1){
+                } else if (compare == 1) {
                     IBaseValue childBaseValueNext = setValueDao.getNextBaseValue(childBaseValueLoaded);
 
                     if (childBaseValueNext == null || !childBaseValueNext.isClosed()) {
                         IBaseValue childBaseValueClosed = BaseValueFactory.create(
-                            MetaContainerTypes.META_SET,
-                            childMetaType,
-                            0,
-                            baseValueSaving.getCreditorId(),
-                            baseValueSaving.getRepDate(),
-                            childBaseValueLoaded.getValue(),
-                            true,
-                            childBaseValueLoaded.isLast());
+                                MetaContainerTypes.META_SET,
+                                childMetaType,
+                                0,
+                                baseValueSaving.getCreditorId(),
+                                baseValueSaving.getRepDate(),
+                                childBaseValueLoaded.getValue(),
+                                true,
+                                childBaseValueLoaded.isLast());
 
                         childBaseValueClosed.setBaseContainer(childBaseSetApplied);
                         baseEntityManager.registerAsInserted(childBaseValueClosed);
