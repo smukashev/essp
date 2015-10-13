@@ -10,11 +10,15 @@ public interface IMetaAttribute extends IPersistable {
 
     boolean isNullable();
 
+    boolean isCumulative();
+
     IMetaType getMetaType();
 
     void setKey(boolean isKey);
 
     void setNullable(boolean isNullable);
+
+    void setCumulative(boolean isCumulative);
 
     void setMetaType(IMetaType metaType);
 

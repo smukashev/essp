@@ -15,7 +15,9 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
 
     private boolean isRequired = false;
 
-    private boolean immutable = false;
+    private boolean isImmutable = false;
+
+    private boolean isCumulative = false;
 
     private String name = "";
 
@@ -74,6 +76,57 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
         this.metaType = metaType;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public boolean isFinal() {
+        return isFinal;
+    }
+
+    public void setFinal(boolean aFinal) {
+        isFinal = aFinal;
+    }
+
+    public boolean isRequired() {
+        return isRequired;
+    }
+
+    public void setRequired(boolean isRequired) {
+        this.isRequired = isRequired;
+    }
+
+    public boolean isImmutable() {
+        return isImmutable;
+    }
+
+    public void setImmutable(boolean isImmutable) {
+        this.isImmutable = isImmutable;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public boolean isCumulative() {
+        return isCumulative;
+    }
+
+    @Override
+    public void setCumulative(boolean isCumulative) {
+        this.isCumulative = isCumulative;
+    }
+
+    @Override
+    public String toString() {
+        return name + ", " + isKey + ", "+ isFinal;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -121,46 +174,5 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
         if (title != null)
             return title;
         return getName();
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public boolean isFinal() {
-        return isFinal;
-    }
-
-    public void setFinal(boolean aFinal) {
-        isFinal = aFinal;
-    }
-
-    public boolean isRequired() {
-        return isRequired;
-    }
-
-    public void setRequired(boolean isRequired) {
-        this.isRequired = isRequired;
-    }
-
-    public boolean isImmutable() {
-        return immutable;
-    }
-
-    public void setImmutable(boolean immutable) {
-        this.immutable = immutable;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return name + ", " + isKey + ", "+ isFinal;
     }
 }
