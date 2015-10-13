@@ -2,23 +2,18 @@ package kz.bsbnb.usci.eav.model.base;
 
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 
-/**
- *
- */
 public interface IBaseSet extends IBaseContainer {
+    IMetaType getMemberType();
 
-    public IMetaType getMemberType();
+    IBaseSet put(IBaseValue value);
 
-    public IBaseSet put(IBaseValue value);
+    void remove(String identifier);
 
-    public void remove(String identifier);
+    long getLevel();
 
-    public long getLevel();
+    void setLevel(long level);
 
-    public void setLevel(long level);
+    boolean isLast();
 
-    public boolean isLast();
-
-    public void setLast(boolean last);
-
+    void setLast(boolean last);
 }

@@ -1,10 +1,12 @@
 package kz.bsbnb.usci.cr.model;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
 public class Report implements Serializable {
+    private static final long serialVersionUID = 8626348715892412142L;
 
     public final static String INITIAL_REPORT_DATE_STR = "01/04/2013";
 
@@ -35,18 +37,24 @@ public class Report implements Serializable {
     }
 
     private Long id;
-    private Creditor creditor;
-    private Long statusId;
-    private Long totalCount;
-    private Long actualCount;
-    private Date reportDate;
-    private Date beginningDate;
-    private Date endDate;
-    private Date lastManualEditDate;
-    private transient Shared status;
 
-    public Report() {
-    }
+    private Creditor creditor;
+
+    private Long statusId;
+
+    private Long totalCount;
+
+    private Long actualCount;
+
+    private Date reportDate;
+
+    private Date beginningDate;
+
+    private Date endDate;
+
+    private Date lastManualEditDate;
+
+    private transient Shared status;
 
     public Long getId() {
         return id;
@@ -137,6 +145,8 @@ public class Report implements Serializable {
 
     @Override
     public String toString() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm:ss");
+
         StringBuilder sb = new StringBuilder();
 
         sb.append("{id=");
@@ -154,10 +164,16 @@ public class Report implements Serializable {
         sb.append(getActualCount());
         sb.append(", totalCount=");
         sb.append(getTotalCount());
-        sb.append(", beginingDate=");
-        sb.append(DataTypeUtil.convertDateToString(DataTypeUtil.LONG_DATE_FORMAT, getBeginningDate()));
-        sb.append(", endDate=");
-        sb.append(DataTypeUtil.convertDateToString(DataTypeUtil.LONG_DATE_FORMAT, getEndDate()));
+
+        if (getBeginningDate() != null) {
+            sb.append(", beginingDate=");
+            sb.append(dateFormat.format(getBeginningDate()));
+        }
+
+        if (getEndDate() != null) {
+            sb.append(", endDate=");
+            sb.append(dateFormat.format(getEndDate()));
+        }
         
         if (getStatusId() != null) {
             sb.append(", status={id=");
@@ -166,6 +182,7 @@ public class Report implements Serializable {
         } else {
             sb.append(", status=null");
         }
+
         sb.append("}");
 
         return sb.toString();

@@ -18,8 +18,7 @@ import org.apache.commons.cli.ParseException;
  */
 public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
 
-    public enum AttributeType
-    {
+    public enum AttributeType {
         DOUBLE(DataTypes.DOUBLE),
         INTEGER(DataTypes.INTEGER),
         STRING(DataTypes.STRING),
@@ -29,11 +28,9 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
 
         private DataTypes dataType;
 
-        AttributeType()
-        { }
+        AttributeType() {}
 
-        AttributeType(DataTypes dataType)
-        {
+        AttributeType(DataTypes dataType) {
             this.dataType = dataType;
         }
 
@@ -42,14 +39,12 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
         }
     }
 
-    public enum AttributeKeyType
-    {
+    public enum AttributeKeyType {
         ALL(ComplexKeyTypes.ALL), ANY(ComplexKeyTypes.ANY);
 
         private ComplexKeyTypes complexKeyType;
 
-        AttributeKeyType(ComplexKeyTypes complexKeyType)
-        {
+        AttributeKeyType(ComplexKeyTypes complexKeyType) {
             this.complexKeyType = complexKeyType;
         }
 
@@ -73,6 +68,9 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
     public static final String OPTION_ARRAY = "ar";
     public static final String LONG_OPTION_ARRAY = "array";
 
+    public static final String OPTION_CUMULATIVE = "cm";
+    public static final String LONG_OPTION_CUMULATIVE = "cumulative";
+
     public static final String OPTION_CHILD_NAME = "cn";
     public static final String LONG_OPTION_CHILD_NAME = "childname";
 
@@ -92,14 +90,14 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
     public static final String DEFAULT_CHILD_NAME = null;
     public static final boolean DEFAULT_ARRAY = false;
     public static final boolean DEFAULT_IMMUTABLE = false;
+    public static final boolean DEFAULT_CUMULATIVE = false;
     public static final boolean DEFAULT_FINAL = false;
     public static final boolean DEFAULT_REQUIRED = false;
 
     private IMetaClassRepository metaClassRepository;
     private Options options = new Options();
 
-    public MetaAddCommand()
-    {
+    public MetaAddCommand() {
         Option nameOption = new Option(OPTION_NAME, LONG_OPTION_NAME, true,
                 "Class name to find instance of MetaClass.");
         nameOption.setRequired(true);
@@ -151,6 +149,12 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
         arrayOption.setRequired(false);
         options.addOption(arrayOption);
 
+        Option cumulativeOption = new Option(OPTION_CUMULATIVE, LONG_OPTION_CUMULATIVE, false,
+                "Cumulative flag for new instance of MetaAttribute.");
+        arrayOption.setArgs(0);
+        arrayOption.setRequired(false);
+        options.addOption(cumulativeOption);
+
         Option immutableOption = new Option(OPTION_IMMUTABLE, LONG_OPTION_IMMUTABLE, false,
                 "Immutable flag for new instance of MetaAttribute.");
         immutableOption.setArgs(0);
@@ -183,80 +187,80 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
         boolean isImmutable = DEFAULT_IMMUTABLE;
         boolean isFinal = DEFAULT_FINAL;
         boolean isRequired = DEFAULT_REQUIRED;
+        boolean isCumulative = DEFAULT_CUMULATIVE;
 
         try {
             CommandLine commandLine = commandLineParser.parse(options, args);
 
-            if(commandLine.hasOption(OPTION_NAME)) {
+            if (commandLine.hasOption(OPTION_NAME)) {
                 o = getParsedOption(commandLine, OPTION_NAME);
                 if (o != null) {
                     name = (String) o;
                 }
             }
 
-            if(commandLine.hasOption(OPTION_ATTRIBUTE)) {
+            if (commandLine.hasOption(OPTION_ATTRIBUTE)) {
                 o = getParsedOption(commandLine, OPTION_ATTRIBUTE);
                 if (o != null) {
                     attribute = (String) o;
                 }
             }
 
-            if(commandLine.hasOption(OPTION_TYPE)) {
+            if (commandLine.hasOption(OPTION_TYPE)) {
                 o = getParsedOption(commandLine, OPTION_TYPE);
                 if (o != null) {
-                    type = AttributeType.valueOf(((String)o).toUpperCase());
+                    type = AttributeType.valueOf(((String) o).toUpperCase());
                 }
             }
 
-            if(commandLine.hasOption(OPTION_KEY_TYPE)) {
+            if (commandLine.hasOption(OPTION_KEY_TYPE)) {
                 o = getParsedOption(commandLine, OPTION_KEY_TYPE);
                 if (o != null) {
-                    keyType = AttributeKeyType.valueOf(((String)o).toUpperCase());
+                    keyType = AttributeKeyType.valueOf(((String) o).toUpperCase());
                 }
             }
 
-            if(commandLine.hasOption(OPTION_CHILD_NAME)) {
+            if (commandLine.hasOption(OPTION_CHILD_NAME)) {
                 o = getParsedOption(commandLine, OPTION_CHILD_NAME);
                 if (o != null) {
                     childName = (String) o;
                 }
             }
 
-            if(commandLine.hasOption(OPTION_ARRAY)) {
+            if (commandLine.hasOption(OPTION_ARRAY)) {
                 isArray = true;
             }
 
-            if(commandLine.hasOption(OPTION_IMMUTABLE)) {
+            if (commandLine.hasOption(OPTION_CUMULATIVE)) {
+                isCumulative = true;
+            }
+
+            if (commandLine.hasOption(OPTION_IMMUTABLE)) {
                 isImmutable = true;
             }
 
-            if(commandLine.hasOption(OPTION_FINAL)) {
+            if (commandLine.hasOption(OPTION_FINAL)) {
                 isFinal = true;
             }
 
             if (commandLine.hasOption(OPTION_REQUIRED)) {
                 isRequired = true;
             }
-        }
-        catch(ParseException e) {
+        } catch (ParseException e) {
             System.err.println(e.getMessage());
             helpFormatter.printHelp(getCustomUsageString("meta add", options), options);
 
             return;
         }
 
-        if (metaClassRepository == null)
-        {
+        if (metaClassRepository == null) {
             throw new RuntimeException("Instance of IMetaClassRepository can not be null.");
         }
 
         MetaClass metaClass = null;
-        if (name != null)
-        {
+        if (name != null) {
             metaClass = metaClassRepository.getMetaClass(name);
-        }
-        else
-        {
+        } else {
             System.out.println("Имя не должно быть NULL;");
             return;
         }
@@ -273,12 +277,14 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
                 metaAttribute.setImmutable(isImmutable);
                 metaAttribute.setFinal(isFinal);
                 metaAttribute.setRequired(isRequired);
+                metaAttribute.setCumulative(isCumulative);
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             } else {
                 MetaAttribute metaAttribute = new MetaAttribute(false, false, childMetaClass);
                 metaAttribute.setImmutable(isImmutable);
                 metaAttribute.setFinal(isFinal);
                 metaAttribute.setRequired(isRequired);
+                metaAttribute.setCumulative(isCumulative);
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             }
         } else {
@@ -293,12 +299,14 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
                 metaAttribute.setImmutable(isImmutable);
                 metaAttribute.setFinal(isFinal);
                 metaAttribute.setRequired(isRequired);
+                metaAttribute.setCumulative(isCumulative);
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             } else {
                 MetaAttribute metaAttribute = new MetaAttribute(false, false, metaValue);
                 metaAttribute.setImmutable(isImmutable);
                 metaAttribute.setFinal(isFinal);
                 metaAttribute.setRequired(isRequired);
+                metaAttribute.setCumulative(isCumulative);
 
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             }

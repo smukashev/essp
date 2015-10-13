@@ -76,7 +76,6 @@ public class DataUtils {
     }
 
     public static boolean convert(Byte value) {
-        return value == null ? null : value == Byte.valueOf("1") ? true : false;
+        return value.equals(Byte.valueOf("1"));
     }
-
 }

@@ -5,39 +5,38 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 /**
  * @author k.tulbassiyev
  */
-public interface IMetaAttribute extends IPersistable
-{
-    /**
-     *
-     * @return <code>true</code>, when attribute is a key attribute
-     */
-    public boolean isKey();
+public interface IMetaAttribute extends IPersistable {
+    boolean isKey();
 
-    /**
-     *
-     * @return <code>true</code>, when attribute can have null value
-     */
-    public boolean isNullable();
+    boolean isNullable();
 
-    public IMetaType getMetaType();
+    boolean isCumulative();
 
-    public void setKey(boolean isKey);
-    public void setNullable(boolean isNullable);
-    public void setMetaType(IMetaType metaType);
+    IMetaType getMetaType();
 
-    public String getTitle();
+    void setKey(boolean isKey);
 
-    public boolean isFinal();
-    public void setFinal(boolean isFinal);
+    void setNullable(boolean isNullable);
 
-    public boolean isRequired();
-    public void setRequired(boolean isRequired);
+    void setCumulative(boolean isCumulative);
 
-    public boolean isImmutable();
+    void setMetaType(IMetaType metaType);
 
-    public void setImmutable(boolean immutable);
+    String getTitle();
 
-    public String getName();
+    boolean isFinal();
 
-    public void setName(String name);
+    void setFinal(boolean isFinal);
+
+    boolean isRequired();
+
+    void setRequired(boolean isRequired);
+
+    boolean isImmutable();
+
+    void setImmutable(boolean immutable);
+
+    String getName();
+
+    void setName(String name);
 }

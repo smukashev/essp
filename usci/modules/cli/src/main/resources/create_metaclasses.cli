@@ -103,7 +103,7 @@ meta add --name=ref_creditor --attribute=name --type=string --required
 meta add --name=ref_creditor --attribute=nokbdb_code --type=string
 meta add --name=ref_creditor --attribute=short_name --type=string --required
 meta add --name=ref_creditor --attribute=subject_type --type=meta_class --childname=ref_subject_type --keytype=any --immutable
-meta add --name=ref_creditor --attribute=docs --type=meta_class --childname=document --array --keytype=any
+meta add --name=ref_creditor --attribute=docs --type=meta_class --childname=document --array --keytype=any --cumulative
 meta key --name=ref_creditor --attribute=docs
 
 #====================================
@@ -139,7 +139,7 @@ meta add --name=provision --attribute=balance_account --type=meta_class --childn
 #====================================
 
 meta create --name=head
-meta add --name=head --attribute=docs --type=meta_class --childname=document --array
+meta add --name=head --attribute=docs --type=meta_class --childname=document --array  --cumulative
 meta add --name=head --attribute=names --type=meta_class --childname=person_name --array
 
 #====================================
@@ -399,7 +399,7 @@ meta add --name=bank_relation --attribute=creditor --type=meta_class --childname
 #====================================
 
 meta create --name=organization
-meta add --name=organization --attribute=docs --type=meta_class --array --childname=document
+meta add --name=organization --attribute=docs --type=meta_class --array --childname=document --cumulative
 meta key --name=organization --attribute=docs
 meta add --name=organization --attribute=is_se --type=boolean
 meta add --name=organization --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
@@ -418,7 +418,7 @@ meta add --name=organization --attribute=names --type=meta_class --array --child
 #====================================
 
 meta create --name=person
-meta add --name=person --attribute=docs --type=meta_class --array --childname=document
+meta add --name=person --attribute=docs --type=meta_class --array --childname=document --cumulative
 meta key --name=person --attribute=docs
 meta add --name=person --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
 meta add --name=person --attribute=offshore --type=meta_class --childname=ref_offshore --keytype=any --immutable
@@ -433,7 +433,7 @@ meta add --name=person --attribute=names --type=meta_class --array --childname=p
 
 meta create --name=creditor
 meta add --name=creditor --attribute=code --type=string
-meta add --name=creditor --attribute=docs --type=meta_class --childname=document --array
+meta add --name=creditor --attribute=docs --type=meta_class --childname=document --array --cumulative
 
 #====================================
 #= REMAINS
@@ -496,7 +496,7 @@ meta add --name=ref_creditor_branch --attribute=name --type=string --required
 meta add --name=ref_creditor_branch --attribute=short_name --type=string --required
 meta add --name=ref_creditor_branch --attribute=main_office --type=meta_class --childname=ref_creditor --keytype=any --immutable --required
 meta add --name=ref_creditor_branch --attribute=region --type=meta_class --childname=ref_region --keytype=any --immutable
-meta add --name=ref_creditor_branch --attribute=docs --type=meta_class --childname=document --array --keytype=any
+meta add --name=ref_creditor_branch --attribute=docs --type=meta_class --childname=document --array --keytype=any --cumulative
 meta key --name=ref_creditor_branch --attribute=docs
 
 #====================================

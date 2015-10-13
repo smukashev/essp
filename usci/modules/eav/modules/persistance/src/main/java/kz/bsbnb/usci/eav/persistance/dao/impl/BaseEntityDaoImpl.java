@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.cr.model.DataTypeUtil;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -149,7 +148,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         baseValueCounts.put(BaseEntitySimpleSet.class, baseEntityReportDate.getSimpleSetsCount());
         baseValueCounts.put(BaseEntityComplexSet.class, baseEntityReportDate.getComplexSetsCount());
 
-        int compare = DataTypeUtil.compareBeginningOfTheDay(savingReportDate, reportDate);
+        int compare = DataUtils.compareBeginningOfTheDay(savingReportDate, reportDate);
 
         for (Class<? extends IBaseValue> baseValueClass : baseValueCounts.keySet()) {
             long baseValuesCount = baseValueCounts.get(baseValueClass);

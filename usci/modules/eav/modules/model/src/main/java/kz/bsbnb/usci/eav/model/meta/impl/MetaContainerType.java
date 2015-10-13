@@ -4,7 +4,6 @@ package kz.bsbnb.usci.eav.model.meta.impl;
  * @author alexandr.motov
  */
 public enum MetaContainerType {
-
     META_CLASS(MetaContainerTypes.META_CLASS),
     META_SET(MetaContainerTypes.META_SET);
 

@@ -1,18 +1,23 @@
 package kz.bsbnb.usci.cr.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-/**
- * Created by n.seitkozhayev on 2/18/15.
- */
-public class CrossCheck {
+public class CrossCheck implements Serializable {
+    private static final long serialVersionUID = 2115312865112267120L;
 
     private Long id;
+
     private Shared status;
+
     private String username;
+
     private Creditor creditor;
+
     private Date dateBegin;
+
     private Date dateEnd;
+
     private Date reportDate;
 
     public Long getId() {

@@ -2,21 +2,16 @@ package kz.bsbnb.usci.cr.model;
 
 import java.io.Serializable;
 
-/**
- * Created by n.seitkozhayev on 2/18/15.
- */
 public class ReportMessageAttachment implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 8626348715892462142L;
 
     private Long id;
+
     private ReportMessage reportMessage;
+
     private String filename;
+
     private byte[] content;
-
-    public ReportMessageAttachment() {
-
-    }
 
     public Long getId() {
         return id;

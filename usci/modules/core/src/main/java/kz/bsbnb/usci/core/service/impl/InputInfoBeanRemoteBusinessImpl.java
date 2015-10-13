@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,7 +80,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             ii.setReceiverType(s);
             ii.setStatus(s);
 
-            if (reportDate == null || DataTypeUtil.compareBeginningOfTheDay(ii.getReportDate(), reportDate) == 0) {
+            if (reportDate == null || DataUtils.compareBeginningOfTheDay(ii.getReportDate(), reportDate) == 0) {
                 list.add(ii);
             }
         }

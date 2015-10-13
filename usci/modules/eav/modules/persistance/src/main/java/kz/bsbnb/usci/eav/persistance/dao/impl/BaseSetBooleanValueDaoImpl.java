@@ -429,7 +429,8 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         Table tableNumbering = context
                 .select(DSL.rank().over()
                                 .partitionBy(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.VALUE))
-                                .orderBy(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
+                                .orderBy(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE).
+                                        desc()).as("num_pp"),
                         tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.ID),
                         tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID),
                         tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.VALUE),
@@ -465,7 +466,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
 
             boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            boolean value = DataUtils.convert((Byte)row.get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName()));
+            boolean value = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName())).longValue() == 1;
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));

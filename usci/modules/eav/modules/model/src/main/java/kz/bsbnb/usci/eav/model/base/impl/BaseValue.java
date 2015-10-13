@@ -335,6 +335,9 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
 
     @Override
     public String toString() {
+        if (getValue() == null)
+            return null;
+
         return getValue().toString();
     }
 }

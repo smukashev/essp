@@ -226,32 +226,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         baseValue.setBaseContainer(this);
         baseValue.setMetaAttribute(metaAttribute);
 
-        boolean listening = isListening();
-        if (listening) {
-            if (values.containsKey(attribute)) {
-                IBaseValue existingBaseValue = values.get(attribute);
-                if (existingBaseValue.getValue() == null) {
-                    removeListeners(attribute);
-                }
-
-                values.put(attribute, baseValue);
-
-                if (baseValue.getValue() != null) {
-                    setListeners(attribute);
-                }
-                fireValueChange(attribute);
-            } else {
-                values.put(attribute, baseValue);
-                fireValueChange(attribute);
-            }
-        } else {
-            values.put(attribute, baseValue);
-        }
+        values.put(attribute, baseValue);
     }
 
     public void remove(String name) {
-        fireValueChange(name);
-
         IBaseValue baseValue = values.remove(name);
         baseValue.setBaseContainer(null);
         baseValue.setMetaAttribute(null);
@@ -963,111 +941,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     public Set<String> getValidationErrors() {
         return validationErrors;
-    }
-
-    @Override
-    protected void setListeners() {
-        this.addListener(new IValueChangeListener() {
-            @Override
-            public void valueChange(ValueChangeEvent event) {
-                addModifiedIdentifier(event.getIdentifier());
-            }
-        });
-
-        for (String attribute : values.keySet()) {
-            setListeners(attribute);
-        }
-    }
-
-    private void setListeners(String attribute) {
-        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
-        if (metaAttribute.isImmutable()) {
-            return;
-        }
-
-        IMetaType metaType = metaAttribute.getMetaType();
-        if (metaType.isComplex()) {
-            IBaseValue baseValue = values.get(attribute);
-            if (baseValue.getValue() != null) {
-                if (metaType.isSet()) {
-                    BaseSet baseSet = (BaseSet) baseValue.getValue();
-                    baseSet.addListener(new ValueChangeListener(this, attribute) {
-
-                        @Override
-                        public void valueChange(ValueChangeEvent event) {
-                            String identifier = this.getIdentifier();
-
-                            IBaseContainer target = this.getTarget();
-                            if (target instanceof BaseContainer) {
-                                ((BaseContainer) target).addModifiedIdentifier(identifier);
-                            }
-
-                            fireValueChange(identifier);
-                        }
-                    });
-                    baseSet.setListening(true);
-                } else {
-
-                    BaseEntity baseEntity = (BaseEntity) baseValue.getValue();
-                    baseEntity.addListener(new ValueChangeListener(this, attribute) {
-
-                        @Override
-                        public void valueChange(ValueChangeEvent event) {
-                            String childIdentifier = event.getIdentifier();
-                            String parentIdentifier = this.getIdentifier();
-                            String identifier = parentIdentifier + "." + childIdentifier;
-
-                            IBaseContainer target = this.getTarget();
-                            if (target instanceof BaseContainer) {
-                                ((BaseContainer) target).addModifiedIdentifier(identifier);
-                            }
-
-                            fireValueChange(identifier);
-                        }
-                    });
-
-                    baseEntity.setListening(true);
-                }
-            }
-        }
-    }
-
-    public void removeListeners() {
-        List<IValueChangeListener> parentListeners =
-                (List<IValueChangeListener>) this.getListeners(ValueChangeEvent.class);
-        final Iterator<IValueChangeListener> parentIt = parentListeners.iterator();
-        while (parentIt.hasNext()) {
-            final IValueChangeListener listener = parentIt.next();
-            this.removeListener(listener);
-        }
-
-        for (String attribute : values.keySet()) {
-            removeListeners(attribute);
-        }
-    }
-
-    public void removeListeners(String attribute) {
-
-        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
-        if (metaAttribute.isImmutable()) {
-            return;
-        }
-
-        IMetaType metaType = metaAttribute.getMetaType();
-        if (!metaType.isSet() && metaType.isComplex()) {
-            IBaseValue baseValue = values.get(attribute);
-            BaseEntity baseEntity = (BaseEntity) baseValue.getValue();
-
-            if (baseEntity != null) {
-                List<IValueChangeListener> childListeners =
-                        (List<IValueChangeListener>) baseEntity.getListeners(ValueChangeEvent.class);
-                final Iterator<IValueChangeListener> childIt = childListeners.iterator();
-                while (childIt.hasNext()) {
-                    final IValueChangeListener listener = childIt.next();
-                    baseEntity.removeListener(listener);
-                }
-            }
-        }
     }
 
     @Override

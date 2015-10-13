@@ -9,7 +9,6 @@ import org.apache.commons.lang.NotImplementedException;
 import java.util.Date;
 
 public class BaseEntityReportDate extends Persistable implements IBaseEntityReportDate {
-
     private IBaseEntity baseEntity;
     private Date reportDate;
     private boolean isClosed;
@@ -222,15 +221,4 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
 
         return result;
     }
-
-    @Override
-    public void addListener(Listener listener) {
-        throw new NotImplementedException("Не реализовано");
-    }
-
-    @Override
-    public void removeListener(Listener listener) {
-        throw new NotImplementedException("Не реализовано");
-    }
-
 }
