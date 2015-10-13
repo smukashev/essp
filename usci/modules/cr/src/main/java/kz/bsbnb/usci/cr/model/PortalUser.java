@@ -28,6 +28,10 @@ public class PortalUser implements Serializable {
 
     private List<Creditor> creditorList;
 
+    public PortalUser() {
+        super();
+    }
+
     public PortalUser(Long userId, String emailAddress, Date modifiedDate) {
         this.userId = userId;
         this.emailAddress = emailAddress;
