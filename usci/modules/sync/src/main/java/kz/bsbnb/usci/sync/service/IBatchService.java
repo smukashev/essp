@@ -41,4 +41,7 @@ public interface IBatchService {
 
     void addEntityStatusParams(long entityStatusId, Map<String, String> params);
 
+    boolean incrementActualCounts(Map<Long, Long> batchesToUpdate);
+
+    boolean clearActualCount(long batchId);
 }

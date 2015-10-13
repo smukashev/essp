@@ -23,4 +23,7 @@ public interface IBatchDao {
 
     void addEntityStatusParam(long entityStatusId, String key, String value);
 
+    void incrementActualCount(long batchId, long count);
+
+    void clearActualCount(long batchId);
 }

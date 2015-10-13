@@ -277,4 +277,21 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         return o == null ? null : ((BigDecimal) o).longValue();
     }
 
+    @Override
+    public void incrementActualCount(long batchId, long count) {
+        Update update = context.update(EAV_BATCHES)
+                .set(EAV_BATCHES.ACTUAL_COUNT, EAV_BATCHES.ACTUAL_COUNT.plus(count))
+                .where(EAV_BATCHES.ID.eq(batchId));
+
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
+
+    @Override
+    public void clearActualCount(long batchId){
+        Update update = context.update(EAV_BATCHES)
+                .set(EAV_BATCHES.ACTUAL_COUNT, 0L)
+                .where(EAV_BATCHES.ID.eq(batchId));
+
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
 }

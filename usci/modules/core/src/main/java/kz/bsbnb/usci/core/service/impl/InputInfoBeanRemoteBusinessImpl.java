@@ -154,6 +154,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
                 inputInfo.setUserId(batch.getUserId());
                 inputInfo.setReceiverDate(batch.getReceiptDate());
+                inputInfo.setActualCount(batch.getActualCount());
 
                 list.add(inputInfo);
             }

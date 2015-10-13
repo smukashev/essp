@@ -86,12 +86,13 @@ public class BeanDataProvider implements DataProvider {
 
         List<QueueFileInfo> queue = new ArrayList<>();
 
+        int i=0;
         for (InputInfo ii : queueList) {
             QueueFileInfo file = new QueueFileInfo();
-            file.setRownum(0);
+            file.setRownum(++i);
             file.setInputInfoId(ii.getId().intValue());
             file.setUserId(ii.getUserId().intValue());
-            file.setProtocolCount(0);
+            file.setProtocolCount(ii.getActualCount());
             file.setCreditorId(ii.getCreditor().getId().intValue());
             file.setCreditorName(ii.getCreditor().getName());
             // file.setStatusCode("AAAAA");

@@ -11,16 +11,17 @@ import kz.bsbnb.usci.eav.persistance.dao.IBatchStatusDao;
 import kz.bsbnb.usci.eav.persistance.dao.IEntityStatusDao;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,6 +53,8 @@ public class BatchServiceImpl implements IBatchService {
     public long save(Batch batch) {
         return batchDao.save(batch);
     }
+
+    Logger logger = LoggerFactory.getLogger(BatchServiceImpl.class);
 
     @Override
     public Batch getBatch(long batchId) {
@@ -238,4 +241,29 @@ public class BatchServiceImpl implements IBatchService {
         batch.setHash(hash);
     }
 
+    @Override
+    @Transactional
+    public boolean incrementActualCounts(Map<Long, Long> batchesToUpdate) {
+        try {
+            for (Long batchId : batchesToUpdate.keySet()) {
+                batchDao.incrementActualCount(batchId, batchesToUpdate.get(batchId));
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean clearActualCount(long batchId){
+        try {
+            batchDao.clearActualCount(batchId);
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return false;
+        }
+    }
 }
