@@ -307,15 +307,13 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                             BaseEntity docType = (BaseEntity) document.getBaseValue("doc_type").getValue();
 
                             boolean is_identification = (boolean) docType.getBaseValue("is_identification").getValue();
-                            // boolean is_person_doc = (boolean) docType.getBaseValue("is_person_doc").getValue();
-                            //boolean is_organization_doc = (boolean) docType.getBaseValue("is_organization_doc").getValue();
 
                             if (((BaseEntity) val.getValue()).getId() == 0) {
-                                if (is_identification/* || is_person_doc || is_organization_doc*/) identified = true;
+                                if (is_identification) identified = true;
                                 continue;
                             }
 
-                            if (!is_identification/* && !is_person_doc && !is_organization_doc*/) continue;
+                            if (!is_identification) continue;
 
                             identified = true;
 
@@ -382,11 +380,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                             }
                         }
 
-                        if (childBaseEntityIds.size() == 0) {
+                        /* Ни один элемент ключевого массива не был идентифицирован */
+                        if (childBaseEntityIds.size() == 0)
                             return null;
-                            /*throw new IllegalStateException("Ни один элемент ключевого массива " +
-                                    "не был идентифицирован(" + metaClass.getClassName() + ");");*/
-                        }
 
                         String className = childMetaClass.getClassName();
                         String setValueAlias = "sv_" + className;
