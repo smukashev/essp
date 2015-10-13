@@ -1732,6 +1732,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         Date reportDateSaving = null;
         Date reportDateLoaded = null;
 
+        boolean isBaseSetDeleted = false;
+
         if (baseValueLoaded != null) {
             reportDateLoaded = baseValueLoaded.getRepDate();
             childBaseSetLoaded = (IBaseSet) baseValueLoaded.getValue();
@@ -1810,6 +1812,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     baseEntityManager.registerAsDeleted(childBaseEntityLoaded);
                             }
                         }
+
+                        isBaseSetDeleted = true;
                         // case#2
                     } else {
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
@@ -1872,6 +1876,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     baseEntityManager.registerAsDeleted(childBaseEntityLoaded);
                             }
                         }
+
+                        isBaseSetDeleted = true;
                     }
                     // case#3
                 } else if (compare == 1) {
@@ -1909,6 +1915,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         baseEntityManager.registerAsUpdated(baseValueLast);
                     }
+
+                    isBaseSetDeleted = true;
                 } else if (compare == -1) {
                     throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
                             + "( " + baseValueSaving.getMetaAttribute().getName() + ");");
@@ -2210,7 +2218,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
-        if (childBaseSetLoaded != null) {
+        /* Удаляет элементы массива, если массив не накопительный или массив накопительный и родитель был удалён */
+        if (childBaseSetLoaded != null &&
+                ((metaAttribute.isCumulative() && isBaseSetDeleted) || !metaAttribute.isCumulative())) {
             for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
                 if (processedUuids.contains(childBaseValueLoaded.getUuid()))
                     continue;
