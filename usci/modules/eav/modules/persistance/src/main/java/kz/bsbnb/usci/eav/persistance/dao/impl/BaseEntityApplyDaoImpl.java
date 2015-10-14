@@ -1733,6 +1733,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         Date reportDateLoaded = null;
 
         boolean isBaseSetDeleted = false;
+        List<IBaseValue> savedDocTypes = new ArrayList<>();
 
         if (baseValueLoaded != null) {
             reportDateLoaded = baseValueLoaded.getRepDate();
@@ -2215,6 +2216,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 childBaseSetApplied.put(childBaseValueApplied);
                 baseEntityManager.registerAsInserted(childBaseValueApplied);
+
+                if (childBaseEntitySaving.getMeta().getClassName().equals("document"))
+                    savedDocTypes.add(childBaseValueSaving);
             }
         }
 
@@ -2300,6 +2304,64 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         childBaseValueNext.setRepDate(baseValueSaving.getRepDate());
 
                         baseEntityManager.registerAsUpdated(childBaseValueNext);
+                    }
+                }
+            }
+        }
+
+        if(savedDocTypes.size() > 0 && childBaseSetLoaded != null) {
+            for (IBaseValue savedValue : savedDocTypes) {
+                for (IBaseValue loadedValue : childBaseSetLoaded.get()) {
+                    BaseEntity savedDocument = (BaseEntity) savedValue.getValue();
+                    BaseEntity loadedDocument = (BaseEntity) loadedValue.getValue();
+
+                    BaseEntity savedDocType = (BaseEntity) savedDocument.getBaseValue("doc_type").getValue();
+                    BaseEntity loadedDocType = (BaseEntity) loadedDocument.getBaseValue("doc_type").getValue();
+
+                    if (savedDocType.equals(loadedDocType)) {
+                        int compare = DataUtils.compareBeginningOfTheDay(savedValue.getRepDate(),
+                                loadedValue.getRepDate());
+
+                        if (compare == 0) {
+                            IBaseValue deletedDocument = BaseValueFactory.create(
+                                    MetaContainerTypes.META_SET,
+                                    loadedDocument.getMeta(),
+                                    loadedValue.getId(),
+                                    creditorId,
+                                    loadedValue.getRepDate(),
+                                    loadedDocument,
+                                    loadedValue.isClosed(),
+                                    loadedValue.isLast());
+
+                            deletedDocument.setBaseContainer(loadedValue.getBaseContainer());
+                            baseEntityManager.registerAsDeleted(deletedDocument);
+                        } else if (compare == 1) {
+                            IBaseValue closedDocument = BaseValueFactory.create(
+                                    MetaContainerTypes.META_SET,
+                                    loadedDocument.getMeta(),
+                                    0,
+                                    creditorId,
+                                    savedValue.getRepDate(),
+                                    loadedDocument,
+                                    true,
+                                    true);
+
+                            closedDocument.setBaseContainer(loadedValue.getBaseContainer());
+                            baseEntityManager.registerAsInserted(closedDocument);
+                        } else if (compare == -1) {
+                            IBaseValue closedDocument = BaseValueFactory.create(
+                                    MetaContainerTypes.META_SET,
+                                    savedDocument.getMeta(),
+                                    0,
+                                    creditorId,
+                                    loadedValue.getRepDate(),
+                                    savedDocument,
+                                    true,
+                                    true);
+
+                            closedDocument.setBaseContainer(loadedValue.getBaseContainer());
+                            baseEntityManager.registerAsInserted(closedDocument);
+                        }
                     }
                 }
             }
