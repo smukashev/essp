@@ -31,4 +31,17 @@ global add --type=BATCH_STATUS --code=PROCESSING --value=PROCESSING --desc=PROCE
 global add --type=BATCH_STATUS --code=ERROR --value=ERROR --desc=ERROR
 global add --type=BATCH_STATUS --code=COMPLETED --value=COMPLETED --desc=COMPLETED
 
+#
+# NOTIFICATION
+#
+global add --type=NOTIFICATION --code=IS_MAIL_HANDLING_ON --value=1 --desc=признак отправки уведомлений
+
+#
+# QUEUE
+#
+
+global add --type=QUEUE_ALGO --code=CHRONOLOGICAL --value=CHRONOLOGICAL --desc=Хроногический
+global add --type=QUEUE_ALGO --code=CREDITOR_CYCLE --value=CREDITOR_CYCLE --desc=Циклический
+global add --type=QUEUE_ALGO --code=MINIMUM_WEIGHT --value=MINIMUM_WEIGHT --desc=Минимальный вес
+
 quit

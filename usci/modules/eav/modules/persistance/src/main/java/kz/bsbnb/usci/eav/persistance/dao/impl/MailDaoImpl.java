@@ -25,6 +25,9 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
 
     private final Logger logger = LoggerFactory.getLogger(BaseEntityDaoImpl.class);
 
+    private final String NOTIFICATION = "NOTIFICATION";
+    private final String IS_MAIL_HANDLING_ON = "IS_MAIL_HANDLING_ON";
+
     @Override
     public List<UserMailTemplate> getUserMailTemplates(long userId) {
 
@@ -328,9 +331,10 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
     @Override
     public boolean isMailHandlingOn() {
         Select select = context.select(DSL.count())
-                .from(EAV_A_SYSCONFIG)
-                .where(EAV_A_SYSCONFIG.KEY_.eq("IS_MAIL_HANDLING_ON"))
-                .and(EAV_A_SYSCONFIG.VALUE_.eq("1"));
+                .from(EAV_GLOBAL)
+                .where(EAV_GLOBAL.TYPE.eq(NOTIFICATION))
+                .and(EAV_GLOBAL.CODE.eq(IS_MAIL_HANDLING_ON))
+                .and(EAV_GLOBAL.VALUE.eq("1"));
 
         int ans = jdbcTemplate.queryForInt(select.getSQL(),select.getBindValues().toArray());
 

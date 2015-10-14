@@ -745,9 +745,4 @@
 	  <column name="enabled" required="true" type="NUMERIC" size="1" default="0"/>
 	</table>
   <!--END: tables for notifications portlet -->
-  <table name="eav_a_sysconfig">
-  	<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
-  	<column name="key_"  type="VARCHAR" size="100"  />
-  	<column name="value_" type="VARCHAR" size="100" />
-  </table>
 </database>
