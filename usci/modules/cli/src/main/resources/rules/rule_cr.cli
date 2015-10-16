@@ -568,7 +568,7 @@ rule "проверка документов по признаку IS_PERSON_DOC/
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
                  && (getEls("{setString(07,10,15,16)}persons.docs.doc_type.code") > 0
-                  || getEls("{setString(01,02,03,04,05,06,08,09,12,13)}organizations.docs.doc_type.code") > 0
+                  || getEls("{setString(01,02,03,04,05,08,09,12,13)}organizations.docs.doc_type.code") > 0
                   ))
 then
  $entity.addValidationError("Документ субъекта сформирован неправильно");
