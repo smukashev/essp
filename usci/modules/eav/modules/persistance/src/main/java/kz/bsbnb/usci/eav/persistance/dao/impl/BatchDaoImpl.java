@@ -274,7 +274,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
 
     private Long getNullSafeLong(Map<String, Object> row, Field field) {
         Object o = row.get(field.getName());
-        return o == null ? null : ((BigDecimal) o).longValue();
+        return o == null ? 0 : ((BigDecimal) o).longValue();
     }
 
     @Override
