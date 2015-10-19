@@ -73,7 +73,7 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
 
             if (docTypeId > 0) {
                 SelectConditionStep select = (SelectConditionStep) context.
-                        select(EAV_BE_ENTITIES.ID.as("inner_id")).hint("/* +PARALLEL(3)*/")
+                        select(EAV_BE_ENTITIES.ID.as("inner_id"))
                         .from(EAV_BE_ENTITIES).
                         join(EAV_BE_COMPLEX_VALUES).
                         on(EAV_BE_ENTITIES.ID.equal(EAV_BE_COMPLEX_VALUES.ENTITY_ID)).
