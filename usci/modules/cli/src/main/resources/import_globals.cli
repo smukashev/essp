@@ -34,14 +34,16 @@ global add --type=BATCH_STATUS --code=COMPLETED --value=COMPLETED --desc=COMPLET
 #
 # NOTIFICATION
 #
-global add --type=NOTIFICATION --code=IS_MAIL_HANDLING_ON --value=1 --desc=признак отправки уведомлений
+global add --type=NOTIFICATION --code=IS_MAIL_HANDLING_ON --value=1 --desc=признак_отправки_уведомлений
 
 #
 # QUEUE
 #
 
-global add --type=QUEUE_ALGO --code=CHRONOLOGICAL --value=CHRONOLOGICAL --desc=Хроногический
-global add --type=QUEUE_ALGO --code=CREDITOR_CYCLE --value=CREDITOR_CYCLE --desc=Циклический
-global add --type=QUEUE_ALGO --code=MINIMUM_WEIGHT --value=MINIMUM_WEIGHT --desc=Минимальный вес
+global add --type=QUEUE_ALGO_OPTION --code=CHRONOLOGICAL --value=CHRONOLOGICAL --desc=Хронологический
+global add --type=QUEUE_ALGO_OPTION --code=CREDITOR_CYCLE --value=CREDITOR_CYCLE --desc=Циклический
+global add --type=QUEUE_ALGO_OPTION --code=MINIMUM_WEIGHT --value=MINIMUM_WEIGHT --desc=Минимальный_вес
+
+global add --type=QUEUE_SETTING -code=QUEUE_ALGO --value=CHRONOLOGICAL --desc=Алгоритм_очереди
 
 quit
