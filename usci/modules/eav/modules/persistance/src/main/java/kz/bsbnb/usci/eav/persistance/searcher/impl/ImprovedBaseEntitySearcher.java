@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -286,21 +287,18 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                     String metaClassName = entity.getMeta().getClassName();
 
+                    /* Обработка документов */
                     if (childMetaClass.getClassName().equals("document") && (metaClassName.equals("person") ||
                             metaClassName.equals("organization") || metaClassName.equals("head") ||
                             metaClassName.equals("creditor"))) {
                         List<IBaseValue> baseValues = new ArrayList<>(baseSet.get());
-                        Collections.sort(baseValues, new IdentificationDocComparator());
+                        List<Long> identificationValues = new ArrayList<>();
 
                         String className = childMetaClass.getClassName();
                         String setValueAlias = "sv_" + className;
                         String entitySetAlias = "es_" + className;
 
-                        Long entityValueId = 0L;
-
                         Select select;
-
-                        boolean identified = false;
 
                         for (IBaseValue val : baseValues) {
                             BaseEntity document = (BaseEntity) val.getValue();
@@ -308,61 +306,33 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                             boolean is_identification = (boolean) docType.getBaseValue("is_identification").getValue();
 
-                            if (((BaseEntity) val.getValue()).getId() == 0) {
-                                if (is_identification) identified = true;
-                                continue;
-                            }
+                            if (is_identification && document.getId() == 0)
+                                return null;
 
-                            if (!is_identification) continue;
-
-                            identified = true;
-
-                            select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
-                                    .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
-                                    .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                    .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
-                                    .where(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.eq(((BaseEntity) val.getValue()).getId())
-                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.eq(DataUtils.convert(false)))
-                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.eq(DataUtils.convert(true))));
-
-                            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
-                                    select.getBindValues().toArray());
-
-                            if (rows.size() > 1)
-                                throw new KnownException("Найдено " + rows.size() + " документов(" +
-                                        entity.getMeta().getClassName() + ") (" +
-                                        (((BaseEntity) val.getValue()).getId()) +");");
-
-                            if (rows.size() == 1) {
-                                entityValueId = ((BigDecimal) rows.get(0).get(EAV_BE_COMPLEX_SET_VALUES.
-                                        as(setValueAlias).ENTITY_VALUE_ID.getName())).longValue();
-                                break;
-                            }
+                            if (is_identification)
+                                identificationValues.add(document.getId());
                         }
 
-                        if (!identified)
-                            throw new KnownException("Нет идентификационных документов(" +
-                                metaClass.getClassName() + ") (" + baseValues + ";");
+                        Collections.sort(identificationValues);
 
-                        if (entityValueId > 0) {
-                            // TODO: remove repeated code
-                            select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
-                                    .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
-                                    .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                    .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.
-                                            equal(metaAttribute.getId()))
-                                    .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.
-                                            equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
-                                    .where(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.eq(entityValueId)
-                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
-                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.equal(DataUtils.convert(true)))
-                                            .and(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID)));
+                        String identificationCondition = StringUtils.arrayToDelimitedString(identificationValues.toArray(), ",");
 
-                            condition = condition == null ? DSL.exists(select) :
-                                    metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
-                                            condition.and(DSL.exists(select)) : condition.or(DSL.exists(select));
-                        }
+                        select = context.select(
+                                DSL.field("listagg(\"" + setValueAlias + "\".\"ENTITY_VALUE_ID\", ',') " +
+                                        "within group (order by \"" + setValueAlias + "\".\"ENTITY_VALUE_ID\" asc)")
+                        ).from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                                .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
+                                .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.eq(metaAttribute.getId()))
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID)
+                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
+                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.equal(DataUtils.convert(true))));
+
+                        Condition setCondition = select.asField().eq(identificationCondition);
+
+                        condition = condition == null ? setCondition :
+                                metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
+                                        condition.and(setCondition) : condition.or(setCondition);
                     } else {
                         List<Long> childBaseEntityIds = new ArrayList<>();
 
@@ -405,20 +375,24 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                             condition.and(DSL.exists(select)) : condition.or(DSL.exists(select));
                         } else {
                             Collections.sort(childBaseEntityIds);
+                            String sChildBaseEntityIds = StringUtils.arrayToDelimitedString(childBaseEntityIds.toArray(), ", ");
 
-                            select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID
+                            select = context.select(
+                                    DSL.field("listagg(\"" + setValueAlias + "\".\"ENTITY_VALUE_ID\", ', ') " +
+                                            "within group (order by \"" + setValueAlias + "\".\"ENTITY_VALUE_ID\" asc)")
                             ).from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                     .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
                                     .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.eq(metaAttribute.getId()))
                                     .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
                                     .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds))
-                                            .and(EAV_BE_BOOLEAN_VALUES.as(setValueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
-                                            .and(EAV_BE_BOOLEAN_VALUES.as(setValueAlias).IS_LAST.equal(DataUtils.convert(true))));
+                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
+                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.equal(DataUtils.convert(true))));
 
-                            condition = condition == null ? DSL.exists(select) :
+                            Condition setCondition = select.asField().eq(sChildBaseEntityIds);
+
+                            condition = condition == null ? setCondition :
                                     metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
-                                            condition.and(DSL.exists(select)) : condition.or(DSL.exists(select));
+                                            condition.and(setCondition) : condition.or(setCondition);
                         }
                     }
                 }
