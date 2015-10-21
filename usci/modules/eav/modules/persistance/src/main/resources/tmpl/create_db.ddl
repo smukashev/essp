@@ -10,12 +10,20 @@
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
 		<column name="parent_is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<unique>
-			<unique-column name="id"/>
+		<unique name ="emc_UN_n_bd">
+			<unique-column name="name"/>
+			<unique-column name="begin_date"/>
 		</unique>
+		<index name="emc_IN_bd_n_id">
+			<index-column name="begin_date"/>
+			<index-column name="name"/>
+			<index-column name="is_disabled"/>
+		</index>
 		<index name="emc_IN_bd">
+			<index-column name="begin_date"/>
+		</index>
+		<index name="emc_IN_ir">
 			<index-column name="is_reference"/>
-			<index-column name="id"/>
 		</index>
 	</table>
 	<table name="eav_m_set_key_filter">
@@ -82,6 +90,9 @@
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>
 		</index>
+		<index name="emsa_IN_if">
+			<index-column name="is_final"/>
+		</index>
 	</table>
 	<table name="eav_m_simple_set">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -120,15 +131,21 @@
 		</foreign-key>-->
 		<index name="ebbsv_IN_si_rd_ic">
 			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
+		</index>
+		<index name="ebbsv_IN_si_il">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_boolean_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="value" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_closed" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
@@ -139,14 +156,32 @@
 		<!--<foreign-key foreignTable="eav_m_simple_attributes" name="eav_fk_003_02">
 			<reference local="attribute_id" foreign="id"/>
 		</foreign-key>-->
-		<unique name="ebbv_UN_ei_ai_rd">
+		<unique name="ebbv_UN_ei_ai_ci_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
+			<unique-column name="creditor_id"/>
 			<unique-column name="report_date"/>
 		</unique>
-		<index name="ebbv_IN_ai_ei">
-			<index-column name="attribute_id"/>
+		<index name="ebbv_IN_ei_ai_ci_rd_ic">
 			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
+		<index name="ebbv_IN_ei_ai_ci_il">
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="is_last"/>
+		</index>
+		<index name="ebbv_IN_ei">
+			<index-column name="entity_id"/>
+		</index>
+		<index name="ebbv_IN_ai_ci_v">
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="value"/>
 		</index>
 	</table>
 	<table name="eav_be_complex_set_values">
@@ -162,8 +197,14 @@
 		<!--<foreign-key foreignTable="eav_be_entities" name="eav_fk_004_02">
 			<reference local="entity_value_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="ebcsv_IN_si">
+		<index name="ebcsv_IN_si_rd_ic">
 			<index-column name="set_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
+		<index name="ebcsv_IN_si_il">
+			<index-column name="set_id"/>
+			<index-column name="is_last"/>
 		</index>
 		<index name="ebcsv_IN_evi_si">
 			<index-column name="entity_value_id"/>
@@ -189,11 +230,28 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
-		<index name="ebcv_IN_ai_ei">
+		<index name="ebcv_IN_ei_ai_rd_ic">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
+		<index name="ebcv_IN_ei_ai_il">
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="is_last"/>
+		</index>
+		<index name="ebcv_IN_ai_evi">
+			<index-column name="attribute_id"/>
 			<index-column name="entity_value_id"/>
-
+		</index>
+		<index name="ebcv_IN_ei">
+			<index-column name="entity_id"/>
+		</index>
+		<index name="ebcv_ai_evi_ei">
+			<index-column name="attribute_id"/>
+			<index-column name="entity_value_id"/>
+			<index-column name="entity_id"/>
 		</index>
 	</table>
 	<table name="eav_be_date_set_values">
@@ -211,6 +269,10 @@
 			<index-column name="set_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
+		</index>
+		<index name="ebdsv_IN_si_il">
+			<index-column name="set_id"/>
+			<index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_date_values">
@@ -233,9 +295,26 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
-		<index name="ebdv_ai_ei">
+		<index name="ebdv_IN_ei_ai_ci_rd_ic">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
+		<index name="ebdv_IN_ei_ai_ci_il">
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="is_last"/>
+		</index>
+		<index name="ebdv_IN_ei">
+			<index-column name="entity_id"/>
+		</index>
+		<index name="ebdv_IN_ai_ci_v">
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="value"/>
 		</index>
 	</table>
 	<table name="eav_be_double_set_values">
@@ -249,10 +328,16 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_008_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="ebdsv_IN_si_rd_ic">
+		<index name="ebdsv_IN_si_ci_rd_ic">
 			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
+		</index>
+		<index name="ebdsv_IN_si_ci_il">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_double_values">
@@ -270,14 +355,31 @@
 		<!--<foreign-key foreignTable="eav_m_simple_attributes" name="eav_fk_009_02">
 			<reference local="attribute_id" foreign="id"/>
 		</foreign-key>-->
-		<unique name="ebdv_UN_ei_ai_rd">
+		<unique name="ebdov_UN_ei_ai_rd">
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
-		<index name="ebdv_IN_ai_ei">
-			<index-column name="attribute_id"/>
+		<index name="ebdov_IN_ei_ai_ci_rd_ic">
 			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
+		<index name="ebdov_IN_ei_ai_ci_il">
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="is_last"/>
+		</index>
+		<index name="ebdov_IN_ei">
+			<index-column name="entity_id"/>
+		</index>
+		<index name="ebdov_IN_ai_ci_v">
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="value"/>
 		</index>
 	</table>
 	<table name="eav_be_entities">
@@ -287,9 +389,15 @@
 		<!--<foreign-key foreignTable="eav_m_classes" name="eav_fk_010_00">
 			<reference local="class_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="ebe_IN_ci_i">
+		<index name="ebe_IN_ci">
 			<index-column name="class_id"/>
+		</index>
+		<index name="ebe_IN_i_ci">
 			<index-column name="id"/>
+			<index-column name="class_id"/>
+		</index>
+		<index name="ebe_IN_d">
+			<index-column name="deleted"/>
 		</index>
 	</table>
 	<table name="eav_be_entity_complex_sets">
@@ -314,9 +422,30 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
-		<index name="ebecs_IN_ai_ei">
+		<index name="ebecs_IN_ei_ai_si_rd_ic">
+			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="set_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
+		<index name="ebecs_IN_ei_ai_si_il">
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="set_id"/>
+			<index-column name="is_last"/>
+		</index>
+		<index name="ebecs_IN_ei">
+			<index-column name="entity_id"/>
+		</index>
+		<index name="ebecs_IN_ai_si">
+			<index-column name="attribute_id"/>
+			<index-column name="set_id"/>
+		</index>
+		<index name="ebecs_IN_ai_si_ei">
+			<index-column name="attribute_id"/>
+			<index-column name="set_id"/>
+			<index-column name="entity_id"/>
 		</index>
 	</table>
 	<table name="eav_be_entity_report_dates">
@@ -362,9 +491,18 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
-		<index name="ebess_IN_ai_ei">
-			<index-column name="attribute_id"/>
+		<index name="ebess_IN_ei_ai_si_rd_ic">
 			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="set_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
+		<index name="ebess_IN_ei_ai_si_il">
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="set_id"/>
+			<index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_integer_set_values">
@@ -378,10 +516,16 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_015_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="ebisv_IN_si_rd_ic">
+		<index name="ebisv_IN_si_ci_rd_ic">
 			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
+		</index>
+		<index name="ebisv_IN_si_ci_il">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_integer_values">
@@ -404,11 +548,26 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
-		<index name="ebiv_IN_ai_ei">
-			<index-column name="attribute_id"/>
+		<index name="ebiv_IN_ei_ai_ci_rd_ic">
 			<index-column name="entity_id"/>
-			<index-column name="value"/>
+			<index-column name="attribute_id"/>
 			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
+		<index name="ebiv_IN_ei_ai_ci_il">
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="is_last"/>
+		</index>
+		<index name="ebiv_IN_ei">
+			<index-column name="entity_id"/>
+		</index>
+		<index name="ebiv_IN_ai_ci_v">
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="value"/>
 		</index>
 	</table>
 	<table name="eav_be_string_set_values">
@@ -422,10 +581,16 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_020_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
-		<index name="ebssv_IN_si_rd_ic">
+		<index name="ebssv_IN_si_ci_rd_ic">
 			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
+		</index>
+		<index name="ebssv_IN_si_ci_il">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_string_values">
@@ -448,9 +613,31 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
-		<index name="ebsv_IN_ai_ei">
-			<index-column name="creditor_id"/>
+		<index name="ebsv_IN_ei_ai_ci_rd_ic">
+			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
+		<index name="ebsv_IN_ei_ai_ci_il">
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="is_last"/>
+		</index>
+		<index name="ebsv_IN_ei">
+			<index-column name="entity_id"/>
+		</index>
+		<index name="ebsv_IN_ai_ci_v">
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="value"/>
+		</index>
+		<index name="ebsv_IN_ei_ai_ci_v">
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
 			<index-column name="value"/>
 		</index>
 	</table>
