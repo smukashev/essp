@@ -28,7 +28,8 @@ public class MainPortlet extends MVCPortlet {
 
     private IBatchProcessService batchProcessService;
 
-    private final static String TMP_FILE_DIR = "C:/zips";
+    //должен быть отличен от C:/zips (т.е папки receiver-а)
+    private final static String TMP_FILE_DIR = "C:\\batch_entry_list_temp_folder";
 
     private IBatchEntryService batchEntryService;
 

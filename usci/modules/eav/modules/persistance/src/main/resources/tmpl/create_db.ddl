@@ -90,6 +90,9 @@
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>
 		</index>
+		<index name="emsa_IN_if">
+			<index-column name="is_final"/>
+		</index>
 	</table>
 	<table name="eav_m_simple_set">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
