@@ -2335,6 +2335,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             deletedDocument.setBaseContainer(loadedValue.getBaseContainer());
                             baseEntityManager.registerAsDeleted(deletedDocument);
+
+                            /* Для удаления из витрин */
+                            loadedDocument.setOperation(OperationType.DELETE);
+                            childBaseSetApplied.put(deletedDocument);
                         } else if (compare == 1) {
                             IBaseValue closedDocument = BaseValueFactory.create(
                                     MetaContainerTypes.META_SET,
@@ -2348,6 +2352,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             closedDocument.setBaseContainer(loadedValue.getBaseContainer());
                             baseEntityManager.registerAsInserted(closedDocument);
+
+                            /* Для закрытия записи в витринах*/
+                            loadedDocument.setOperation(OperationType.CLOSE);
+                            childBaseSetApplied.put(closedDocument);
                         } else if (compare == -1) {
                             IBaseValue closedDocument = BaseValueFactory.create(
                                     MetaContainerTypes.META_SET,
@@ -2361,6 +2369,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             closedDocument.setBaseContainer(loadedValue.getBaseContainer());
                             baseEntityManager.registerAsInserted(closedDocument);
+
+                            savedDocument.setOperation(OperationType.CLOSE);
                         }
                     }
                 }

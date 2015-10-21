@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -648,6 +649,34 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
                 KeyData keyData = new KeyData(entryMap);
 
+                ValueElement keyValueElement = new ValueElement("_operation", -1L, false, false);
+
+                if (entryMap.containsKey(keyValueElement)) {
+                    OperationType ot = (OperationType) entryMap.get(keyValueElement);
+                    switch(ot) {
+                        case DELETE:
+                            sql = "DELETE FROM %s WHERE " + keyData.queryKeys;
+                            sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                                    COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                            jdbcTemplateSC.update(sql, getObjectArray(false, keyData.vals));
+                            break;
+                        case CLOSE:
+                            sql = "UPDATE %s SET close_date = ? WHERE " + keyData.queryKeys;
+                            sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                                    COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                            jdbcTemplateSC.update(sql, getObjectArray(false, getObjectArray(true, keyData.vals,
+                                    entity.getReportDate())));
+
+                            moveActualMapToHistory(keyData, entity, showcaseHolder);
+                            break;
+                        default:
+                            throw new IllegalStateException("Операция не поддерживается(" + ot + ")!;");
+                    }
+                    continue;
+                }
+
                 if (!showcaseHolder.getShowCaseMeta().isFinal()) {
                     try {
                         sql = "SELECT MAX(open_date) AS open_date FROM %s WHERE " + keyData.queryKeys;
@@ -845,6 +874,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         HashSet<PathElement> attributes = paths.get(curPath);
 
         HashMap<ValueElement, Object> map = new HashMap<>();
+
+        if (entity.getOperation() != null)
+            map.put(new ValueElement("_operation", -1L, false, false), entity.getOperation());
 
         if (attributes != null) {
             for (PathElement attribute : attributes) {
@@ -1556,6 +1588,31 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         @Override
         public String toString() {
             return columnName + ", " + elementId + ", " + isKey + ", " + isArray;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            ValueElement that = (ValueElement) o;
+
+            if (isKey != that.isKey) return false;
+            if (isArray != that.isArray) return false;
+            if (isSimple != that.isSimple) return false;
+            if (!columnName.equals(that.columnName)) return false;
+            return elementId.equals(that.elementId);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = columnName.hashCode();
+            result = 31 * result + elementId.hashCode();
+            result = 31 * result + (isKey ? 1 : 0);
+            result = 31 * result + (isArray ? 1 : 0);
+            result = 31 * result + (isSimple ? 1 : 0);
+            return result;
         }
     }
 

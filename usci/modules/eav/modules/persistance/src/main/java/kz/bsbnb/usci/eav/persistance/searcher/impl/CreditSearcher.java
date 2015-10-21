@@ -68,7 +68,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
 
             if (primaryContractId != null && creditorId != null && primaryContractId > 0 && creditorId > 0) {
                 SelectConditionStep select = (SelectConditionStep) context
-                        .select(EAV_BE_ENTITIES.as("en").ID.as("inner_id")).hint("/* +PARALLEL(3)*/")
+                        .select(EAV_BE_ENTITIES.as("en").ID.as("inner_id"))
                         .from(EAV_BE_ENTITIES.as("en"))
                         .join(EAV_BE_COMPLEX_VALUES.as("co"))
                         .on(EAV_BE_ENTITIES.as("en").ID.equal(EAV_BE_COMPLEX_VALUES.as("co").ENTITY_ID))
