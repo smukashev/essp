@@ -40,22 +40,15 @@ public class SubjectsParser extends BatchParser {
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if(localName.equals("subjects")) {
         } else if(localName.equals("subject")) {
-            //currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("subject"), batch.getRepDate());
         } else if(localName.equals("person")) {
             subjectPersonParser.parse(xmlReader, batch, index);
             currentBaseEntity = subjectPersonParser.getCurrentBaseEntity();
-            /*currentBaseEntity.put("person",
-                    new BaseEntityComplexValue(-1, batch, index, subjectPersonParser.getCurrentBaseEntity()));*/
         } else if(localName.equals("organization")) {
             subjectOrganizationParser.parse(xmlReader, batch, index);
             currentBaseEntity = subjectOrganizationParser.getCurrentBaseEntity();
-            /*currentBaseEntity.put("organization",
-                    new BaseEntityComplexValue(-1, batch, index, subjectOrganizationParser.getCurrentBaseEntity()));*/
         } else if(localName.equals("creditor")) {
             subjectCreditorParser.parse(xmlReader, batch, index);
             currentBaseEntity = subjectCreditorParser.getCurrentBaseEntity();
-            /*currentBaseEntity.put("creditor",
-                    new BaseEntityComplexValue(-1, batch, index, subjectCreditorParser.getCurrentBaseEntity()));*/
         } else {
             throw new UnknownTagException(localName);
         }

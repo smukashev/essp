@@ -4,10 +4,7 @@ import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
-import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
-import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
-import kz.bsbnb.usci.eav.model.base.impl.value.BaseSetComplexValue;
+import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -26,9 +23,12 @@ public class SubjectCreditorParser extends BatchParser {
     private BaseSet docs;
     private BaseEntity currentDoc;
 
+    private BaseEntity creditorInfo;
+
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("creditor"), batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("subject"), batch.getRepDate());
+        creditorInfo = new BaseEntity(metaClassRepository.getMetaClass("creditor_info"), batch.getRepDate());
     }
 
     @Override
@@ -36,7 +36,7 @@ public class SubjectCreditorParser extends BatchParser {
         if (localName.equals("creditor")) {
         } else if (localName.equals("code")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            creditorInfo.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
         } else if (localName.equals("docs")) {
             docs = new BaseSet(metaClassRepository.getMetaClass("document"));
         } else if (localName.equals("doc")) {
@@ -61,6 +61,10 @@ public class SubjectCreditorParser extends BatchParser {
     @Override
     public boolean endElement(String localName) throws SAXException {
         if (localName.equals("creditor")) {
+            currentBaseEntity.put("creditor_info", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditorInfo, false, true));
+            currentBaseEntity.put("is_person", new BaseEntityBooleanValue(0, -1, batch.getRepDate(), false, true, false));
+            currentBaseEntity.put("is_organization", new BaseEntityBooleanValue(0, -1, batch.getRepDate(), false, true, false));
+            currentBaseEntity.put("is_creditor", new BaseEntityBooleanValue(0, -1, batch.getRepDate(), true, true, false));
             return true;
         } else if (localName.equals("code")) {
         } else if (localName.equals("docs")) {
