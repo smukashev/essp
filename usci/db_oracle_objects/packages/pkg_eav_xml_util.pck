@@ -24,7 +24,7 @@ create or replace package PKG_EAV_XML_UTIL is
 
   c_tt_issue_debt constant number := 18;
   c_tt_issue_interest constant number := 19;
-  
+
   c_log_level_info constant VARCHAR2(200 CHAR) := 'INFO';
   c_log_level_error constant VARCHAR2(200 CHAR) := 'ERROR';
 
@@ -40,14 +40,14 @@ create or replace package PKG_EAV_XML_UTIL is
     p_log_level IN VARCHAR2,
     p_procedure_call IN VARCHAR2
   );
-  
+
   PROCEDURE generate_credit_rd
   (
     p_credit_id    in varchar2,
     p_report_date  in date,
     p_version IN NUMBER DEFAULT 2
   );
-  
+
   PROCEDURE xml_file_upd
   (
     p_id           IN NUMBER,
@@ -140,7 +140,7 @@ create or replace package PKG_EAV_XML_UTIL is
   (
     p_xml_file_id IN NUMBER
   );
-  
+
   FUNCTION nillable_xml
   (
     p_xml_tag in varchar2,
@@ -299,27 +299,27 @@ create or replace package PKG_EAV_XML_UTIL is
     p_credit_id IN NUMBER,
     p_report_date IN DATE
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_persons_xml
   (
     p_credit_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'person'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_organizations_xml
   (
     p_credit_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'organization'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_creditors_xml
   (
     p_credit_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'creditors'
-  ) RETURN XMLTYPE;  
+  ) RETURN XMLTYPE;
 
   FUNCTION get_organization_xml
   (
@@ -389,30 +389,38 @@ create or replace package PKG_EAV_XML_UTIL is
     p_tag_name IN VARCHAR2 DEFAULT 'pledges'
   ) RETURN XMLTYPE;
   
+  
+  FUNCTION get_subject
+  (
+    p_credit_id NUMBER,
+    p_report_date DATE
+  ) RETURN XMLType;
+
+
   FUNCTION get_persons
   (
     p_credit_id NUMBER,
     p_report_date DATE
   ) RETURN XMLType;
-  
+
   FUNCTION get_organizations
   (
     p_credit_id NUMBER,
     p_report_date DATE
   ) RETURN XMLType;
-  
+
   FUNCTION get_creditors
   (
     p_credit_id NUMBER,
     p_report_date DATE
   ) RETURN XMLType;
-  
+
   FUNCTION get_portfolio_flows_kfn
   (
     p_creditor_id IN NUMBER,
     p_report_date IN DATE
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_portfolio_flows_msfo
   (
     p_creditor_id IN NUMBER,
@@ -535,9 +543,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                'P_EXTRACT_CREDIT => ' || p_extract_credit || ', ' ||
                'P_EXTRACT_PORTFOLIO => ' || p_extract_portfolio || ')';
   BEGIN
-    write_log(p_log_date => sysdate, 
-              p_log_text => 'Procedure started.', 
-              p_log_level => c_log_level_info, 
+    write_log(p_log_date => sysdate,
+              p_log_text => 'Procedure started.',
+              p_log_level => c_log_level_info,
               p_procedure_call => v_procedure_call);
     LOOP
       SELECT to_number(xc.value)
@@ -546,9 +554,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        WHERE xc.code = 'XML_GENERATION_STATUS';
 
       IF (v_status = 0) THEN
-        write_log(p_log_date => sysdate, 
-                  p_log_text => 'Procedure execution terminated.', 
-                  p_log_level => c_log_level_info, 
+        write_log(p_log_date => sysdate,
+                  p_log_text => 'Procedure execution terminated.',
+                  p_log_level => c_log_level_info,
                   p_procedure_call => v_procedure_call);
         RETURN;
       END IF;
@@ -561,18 +569,18 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
       v_report_date_no := v_report_date_no + 1;
 
       IF (v_report_date_no >= p_report_date_count) THEN
-        write_log(p_log_date => sysdate, 
-                p_log_text => 'Procedure completed successfully.', 
-                p_log_level => c_log_level_info, 
+        write_log(p_log_date => sysdate,
+                p_log_text => 'Procedure completed successfully.',
+                p_log_level => c_log_level_info,
                 p_procedure_call => v_procedure_call);
         RETURN;
       END IF;
     END LOOP;
   EXCEPTION
     WHEN OTHERS THEN
-      write_log(p_log_date => sysdate, 
-                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.', 
-                p_log_level => c_log_level_error, 
+      write_log(p_log_date => sysdate,
+                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.',
+                p_log_level => c_log_level_error,
                 p_procedure_call => v_procedure_call);
   END;
 
@@ -607,7 +615,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                               enabled         => TRUE,
                               auto_drop       => TRUE);
   END;
-  
+
   PROCEDURE generate_credit_rd
   (
     p_credit_id    in varchar2,
@@ -621,22 +629,22 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_job_action VARCHAR2(1000 CHAR);
 
   BEGIN
-    SELECT vhs.creditor_id 
+    SELECT vhs.creditor_id
       INTO v_creditor_id
       FROM v_credit_his vhs
      WHERE vhs.id = p_credit_id
        AND ROWNUM = 1;
-       
+
     SELECT seq_xml_file.nextval
       INTO v_xml_file_id
       FROM dual;
-      
+
     INSERT INTO xml_file (id, creditor_id, report_date, begin_date, end_date, file_name, status, sent)
       VALUES (v_xml_file_id, v_creditor_id, p_report_date, sysdate, sysdate, 'XML_DATA_BY_CID_' || v_creditor_id || '_RD_' || to_char(p_report_date, 'yyyyMMdd') || '_' || ltrim(to_char(v_xml_file_id, '00000')), NULL, 0);
 
     INSERT INTO xml_credit_id (id, xml_file_id, credit_id )
       VALUES (seq_xml_credit_id.nextval, v_xml_file_id, p_credit_id);
-      
+
     commit;
 
     dbms_scheduler.create_job(job_name        => 'XML_GEN' || dbms_random.string('X', 10),
@@ -648,7 +656,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                               repeat_interval => NULL,
                               enabled         => TRUE,
                               auto_drop       => TRUE);
-                                          
+
   END;
 
   PROCEDURE generate_by_rd
@@ -670,9 +678,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                      'P_EXTRACT_CREDIT => ' || p_extract_credit || ', ' ||
                      'P_EXTRACT_PORTFOLIO => ' || p_extract_portfolio || ')';
   BEGIN
-    write_log(p_log_date => sysdate, 
-              p_log_text => 'Procedure started.', 
-              p_log_level => c_log_level_info, 
+    write_log(p_log_date => sysdate,
+              p_log_text => 'Procedure started.',
+              p_log_level => c_log_level_info,
               p_procedure_call => v_procedure_call);
 
     FOR rec_creditor IN (SELECT r.creditor_id as id
@@ -698,15 +706,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                          p_extract_portfolio => p_extract_portfolio);
     END LOOP;
 
-    write_log(p_log_date => sysdate, 
-              p_log_text => 'Procedure completed successfully.', 
-              p_log_level => c_log_level_info, 
+    write_log(p_log_date => sysdate,
+              p_log_text => 'Procedure completed successfully.',
+              p_log_level => c_log_level_info,
               p_procedure_call => v_procedure_call);
   EXCEPTION
     WHEN OTHERS THEN
-      write_log(p_log_date => sysdate, 
-                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.', 
-                p_log_level => c_log_level_error, 
+      write_log(p_log_date => sysdate,
+                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.',
+                p_log_level => c_log_level_error,
                 p_procedure_call => v_procedure_call);
   END;
 
@@ -775,9 +783,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                          'P_EXTRACT_CREDIT => ' || p_extract_credit || ', ' ||
                          'P_EXTRACT_PORTFOLIO => ' || p_extract_portfolio || ')';
   BEGIN
-    write_log(p_log_date => sysdate, 
-              p_log_text => 'Procedure started.', 
-              p_log_level => c_log_level_info, 
+    write_log(p_log_date => sysdate,
+              p_log_text => 'Procedure started.',
+              p_log_level => c_log_level_info,
               p_procedure_call => v_procedure_call);
 
     BEGIN
@@ -791,14 +799,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
          AND (vch.close_date > p_report_date OR vch.close_date IS NULL);
     EXCEPTION
       WHEN OTHERS THEN
-        write_log(p_log_date => sysdate, 
-                  p_log_text => 'Error occurred while retrieving previous report date.', 
-                  p_log_level => c_log_level_error, 
+        write_log(p_log_date => sysdate,
+                  p_log_text => 'Error occurred while retrieving previous report date.',
+                  p_log_level => c_log_level_error,
                   p_procedure_call => v_procedure_call);
-        write_log(p_log_date => sysdate, 
-                  p_log_text => 'Procedure execution terminated.', 
-                  p_log_level => c_log_level_info, 
-                  p_procedure_call => v_procedure_call);        
+        write_log(p_log_date => sysdate,
+                  p_log_text => 'Procedure execution terminated.',
+                  p_log_level => c_log_level_info,
+                  p_procedure_call => v_procedure_call);
         RETURN;
     END;
 
@@ -922,9 +930,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
              WHERE xc.code = 'XML_GENERATION_STATUS';
 
             IF (v_status = 0) THEN
-              write_log(p_log_date => sysdate, 
-                        p_log_text => 'Procedure execution terminated.', 
-                        p_log_level => c_log_level_info, 
+              write_log(p_log_date => sysdate,
+                        p_log_text => 'Procedure execution terminated.',
+                        p_log_level => c_log_level_info,
                         p_procedure_call => v_procedure_call);
               RETURN;
             END IF;
@@ -1037,15 +1045,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
           END IF;
       END IF;
     END IF;
-    write_log(p_log_date => sysdate, 
-              p_log_text => 'Procedure completed successfully.', 
-              p_log_level => c_log_level_info, 
+    write_log(p_log_date => sysdate,
+              p_log_text => 'Procedure completed successfully.',
+              p_log_level => c_log_level_info,
               p_procedure_call => v_procedure_call);
   EXCEPTION
     WHEN OTHERS THEN
-      write_log(p_log_date => sysdate, 
-                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.', 
-                p_log_level => c_log_level_error, 
+      write_log(p_log_date => sysdate,
+                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.',
+                p_log_level => c_log_level_error,
                 p_procedure_call => v_procedure_call);
   END;
 
@@ -1080,8 +1088,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    decode(vch.actual_issue_date, null, null, xmlelement("actual_issue_date", to_char(vch.actual_issue_date, c_date_format))),
                    -- AMOUNT
                    decode(vch.amount, null, null, xmlelement("amount", vch.amount)),
-                   
-                   xmlelement("data_creditor", 
+
+                   xmlelement("data_creditor",
                      -- CHANGE
                      (SELECT xmlelement("change",
                                -- REMAINS
@@ -1462,9 +1470,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                           OR EXISTS (SELECT t.* FROM core.credit_flow t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date)
                           OR EXISTS (SELECT t.* FROM core.turnover t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.amount IS NOT NULL AND t.amount <> 0)),
                      -- PERSONS
-                     get_persons_xml(vch.id, v_report_date, 'persons'),                         
+                     get_persons_xml(vch.id, v_report_date, 'persons'),
                      -- ORGANIZATIONS
-                     get_organizations_xml(vch.id, v_report_date, 'organizations'),              
+                     get_organizations_xml(vch.id, v_report_date, 'organizations'),
                      -- CREDITORS
                      get_creditors_xml(vch.id, v_report_date, 'creditors'),
 
@@ -2084,7 +2092,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                            decode(vph.type_id, null, null, xmlelement("pledge_type",
                                              xmlelement("code", ref_p_pt.code)
                                            )),
-    
+
                                            -- VALUE
                                            decode(vph.value_, null, null, xmlelement("value", ltrim(to_char(vph.value_, c_number_format, c_nls_numeric_characters))))
                                          )
@@ -2302,9 +2310,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_zip_comment  VARCHAR2(4000 CHAR);
     v_procedure_call VARCHAR2(4000 CHAR) := 'GENERATE_XML_V2(P_XML_FILE_ID => ' || p_xml_file_id || ')';
   BEGIN
-    write_log(p_log_date => sysdate, 
-              p_log_text => 'Procedure started.', 
-              p_log_level => c_log_level_info, 
+    write_log(p_log_date => sysdate,
+              p_log_text => 'Procedure started.',
+              p_log_level => c_log_level_info,
               p_procedure_call => v_procedure_call);
 
     SELECT xf.creditor_id, xf.report_date
@@ -2319,7 +2327,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
     SELECT xmlroot(xmlelement("entities", xmlattributes('http://www.w3.org/2001/XMLSchema-instance' AS "xmlns:xsi"),
              xmlagg(
-              xmlelement("credit",                 
+              xmlelement("credit",
                  -- ACTUAL_ISSUE_DATE
                  nillable_xml('actual_issue_date', to_char(vch.actual_issue_date, c_date_format)),
                  -- AMOUNT
@@ -2333,6 +2341,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  ),
                  -- CONTRACT_MATURITY_DATE
                  nillable_xml('contract_maturity_date', to_char(vch.contract_maturity_date, c_date_format)),
+                 -- MATURITY_DATE
+                 nillable_xml('maturity_date', to_char(vch.maturity_date, c_date_format)),
                  -- CREDIT_OBJECT
                  get_ref_credit_object_xml(vch.credit_object_id, v_report_date),
                  -- CREDIT_PURPOSE
@@ -2347,6 +2357,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  nillable_xml('has_currency_earn', decode(vch.has_currency_earn, 1, 'true', 'false')),
                  -- INTEREST_RATE_YEARLY
                  nillable_xml('interest_rate_yearly', ltrim(to_char(vch.interest_rate_yearly, c_number_format, c_nls_numeric_characters))),
+                 -- PROLONGATION_DATE
+                 nillable_xml('prolongation_date', to_char(vch.prolongation_date, c_date_format)),
                  -- PORTFOLIO
                  xmlelement("portfolio",
                    -- PORTFOLIO
@@ -2398,9 +2410,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                      )
                    )
                  ),
-                 get_persons(vch.id, v_report_date),
-                 get_organizations(vch.id, v_report_date),
-                 get_creditors(vch.id, v_report_date),
+                 get_subject(vch.id, v_report_date),
                  --PLEDGES
                  get_pledges_xml(vch.id, v_report_date),
                  -- CREDITOR
@@ -2489,22 +2499,22 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
      WHERE xf.id = p_xml_file_id;
     COMMIT;
 
-    write_log(p_log_date => sysdate, 
-              p_log_text => 'Procedure completed successfully.', 
-              p_log_level => c_log_level_info, 
+    write_log(p_log_date => sysdate,
+              p_log_text => 'Procedure completed successfully.',
+              p_log_level => c_log_level_info,
               p_procedure_call => v_procedure_call);
   EXCEPTION
     WHEN OTHERS THEN
       ROLLBACK;
-      xml_file_upd(p_id => p_xml_file_id, 
+      xml_file_upd(p_id => p_xml_file_id,
                    p_end_date => sysdate,
                    p_status => 'FAILED');
-      write_log(p_log_date => sysdate, 
-                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.', 
-                p_log_level => c_log_level_error, 
+      write_log(p_log_date => sysdate,
+                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.',
+                p_log_level => c_log_level_error,
                 p_procedure_call => v_procedure_call);
   END;
-  
+
   FUNCTION nillable_xml
   (
     p_xml_tag in varchar2,
@@ -2618,14 +2628,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
      WHERE xf.id = p_xml_file_id;
 
     COMMIT;
-    
+
   EXCEPTION
     WHEN OTHERS then
-      write_log(p_log_date => sysdate, 
-                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.', 
-                p_log_level => c_log_level_error, 
+      write_log(p_log_date => sysdate,
+                p_log_text => 'Unexpected error occurred: ' || SQLERRM || '.',
+                p_log_level => c_log_level_error,
                 p_procedure_call => 'to do');
-    
+
   END;
 
   FUNCTION get_ref_balance_account_xml
@@ -3093,7 +3103,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         FROM dual;
     ELSE
       SELECT xmlelement(evalname(p_tag_name),
-               nillable_xml('code', vch.code),               
+               nillable_xml('code', vch.code),
                xmlelement("docs",
                  (SELECT xmlagg(
                            -- ITEM
@@ -3257,7 +3267,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
           passing v_xml as "doc"
           returning content)
     into v_elem_cnt from dual;
-    
+
     IF v_elem_cnt.getstringval = '0' THEN
       SELECT xmlelement("koiwna", xmlattributes('ok' as "true"), NULL)
         INTO v_xml
@@ -3351,7 +3361,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
     RETURN v_xml;
   END;
-  
+
 
   FUNCTION get_persons_xml
   (
@@ -3364,8 +3374,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_control int;
   BEGIN
 
-   SELECT xmlelement("persons_dev", 
-              xmlagg(                                     
+   SELECT xmlelement("persons_dev",
+              xmlagg(
                 (SELECT xmlelement("item",
                            -- ADDRESSES
                            (SELECT (SELECT xmlelement("addresses",
@@ -3548,7 +3558,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                            -- OFFSHORE
                            decode(s_vph.offshore_id, null, null, xmlelement("offshore",
                              nillable_xml('code', ref_p_o.code)
-                           ))                          
+                           ))
                 )
                    FROM v_person_his s_vph,
                          (SELECT t.parent_id AS id,
@@ -3576,14 +3586,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        AND (vdh.person_id IS NOT NULL)
        AND vdh.open_date <= p_report_date
        AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
-               
+
     if v_control = 1 then
       return v_xml;
     end if;
-    
+
     return null;
-  END;  
-  
+  END;
+
   FUNCTION get_creditors_xml
   (
     p_credit_id IN NUMBER,
@@ -3594,9 +3604,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
     v_control int;
   BEGIN
-     SELECT xmlelement("creditors_dev", 
+     SELECT xmlelement("creditors_dev",
                 xmlagg(
-                  (SELECT xmlelement("item", 
+                  (SELECT xmlelement("item",
                              -- CODE
                              decode(s_vch.code, null, null, xmlelement("code", s_vch.code)),
                              -- DOCS
@@ -3621,10 +3631,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                          AND (t.close_date > p_report_date OR t.close_date IS NULL)) ref_dt
                                WHERE ref_vcdh.creditor_id = s_vch.id
                                  AND ref_vcdh.type_id = ref_dt.id (+)))
-                      FROM ref.v_creditor_his s_vch                      
+                      FROM ref.v_creditor_his s_vch
                      WHERE s_vch.id = vdh.creditor_id
                        AND s_vch.open_date <= p_report_date
-                       AND (s_vch.close_date > p_report_date OR s_vch.close_date is null)                                  
+                       AND (s_vch.close_date > p_report_date OR s_vch.close_date is null)
                   )
                 )
               ), 1 as control
@@ -3636,15 +3646,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
          AND vdh.open_date <= p_report_date
          AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
 
-         
+
     if v_control = 1 then
       return v_xml;
     end if;
-    
-    return null;        
+
+    return null;
   END;
-  
-  
+
+
   FUNCTION get_organizations_xml
   (
     p_credit_id IN NUMBER,
@@ -3655,8 +3665,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
     v_control int;
   BEGIN
-  
-       SELECT xmlelement("organizations_dev", 
+
+       SELECT xmlelement("organizations_dev",
                   xmlagg(
                     (SELECT xmlelement("item",
                                -- ADDRESSES
@@ -3920,7 +3930,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                -- OFFSHORE
                                decode(s_voh.offshore_id, null, null, xmlelement("offshore",
                                  nillable_xml('code', ref_o_o.code)
-                               ))                                          
+                               ))
                             )
                         FROM v_organization_his s_voh,
                              (SELECT t.parent_id AS id,
@@ -3955,25 +3965,25 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                          AND s_voh.legal_form_id = ref_o_lf.id (+)
                          AND s_voh.enterprise_type_id = ref_o_t.id (+)
                          AND s_voh.open_date <= p_report_date
-                         AND (s_voh.close_date > p_report_date OR s_voh.close_date is null)   
+                         AND (s_voh.close_date > p_report_date OR s_voh.close_date is null)
                      )
                   )
-               ), 1 as control 
-          INTO v_xml,v_control 
-          FROM v_debtor_his vdh           
+               ), 1 as control
+          INTO v_xml,v_control
+          FROM v_debtor_his vdh
          WHERE vdh.credit_id = p_credit_id
            AND vdh.type_id in (1, 7)
            AND (vdh.org_id IS NOT NULL)
            AND vdh.open_date <= p_report_date
            AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
-        
+
     if(v_control = 1) then
       return v_xml;
     end if;
-      
+
     return null;
-  END;  
-  
+  END;
+
   FUNCTION get_organization_xml
   (
     p_organization_id IN NUMBER,
@@ -3995,7 +4005,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- COUNTRY
                  get_ref_country_xml(voh.country_id, p_report_date),
                  -- DOCUMENTS
-                 get_documents_xml(null, voh.id, p_report_date),
+                 --get_documents_xml(null, voh.id, p_report_date),
                  -- ECON_TRADE
                  get_ref_econ_trade_xml(voh.econ_trade_id, p_report_date),
                  -- ENTERPRISE_TYPE
@@ -4054,7 +4064,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    -- COUNTRY
                    get_ref_country_xml(vph.country_id, p_report_date),
                    -- DOCUMENTS
-                   get_documents_xml(vph.id, null, p_report_date),
+                   --get_documents_xml(vph.id, null, p_report_date),
                    -- NAMES
                    get_person_names_xml(vph.id, p_report_date),
                    -- OFFSHORE
@@ -4392,6 +4402,83 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     RETURN v_xml;
   END;
   
+  FUNCTION get_subject
+  (
+    p_credit_id NUMBER,
+    p_report_date DATE
+  ) RETURN XMLType
+  IS
+    v_xml XMLTYPE;
+    v_person_id NUMBER;
+    v_org_id NUMBER;
+    v_doc_xml XMLTYPE;
+  BEGIN
+     BEGIN
+      SELECT vdh.person_id
+        INTO v_person_id
+        FROM v_debtor_his vdh
+       WHERE vdh.credit_id = p_credit_id
+         AND vdh.type_id in (1,7)
+         AND vdh.person_id IS NOT NULL
+         AND vdh.open_date <= p_report_date
+         AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
+       EXCEPTION
+         WHEN no_data_found THEN
+            v_person_id := null;
+     END;    
+       
+     BEGIN
+      SELECT vdh.org_id
+        INTO v_org_id
+        FROM v_debtor_his vdh
+       WHERE vdh.credit_id = p_credit_id
+         AND vdh.type_id in (1,7)
+         AND vdh.org_id IS NOT NULL
+         AND vdh.open_date <= p_report_date
+         AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
+       EXCEPTION
+         WHEN no_data_found THEN
+            v_org_id := null;
+     END;    
+       
+    IF(v_person_id IS NOT NULL AND v_org_id IS NOT NULL) THEN
+      write_log(SYSDATE, 'Найдены два субъекта у кредита: ' || p_credit_id, 'ERROR', '');
+    END IF;
+    
+    IF(v_person_id IS NULL AND v_org_id IS NULL) THEN
+      write_log(SYSDATE, 'Не найден субъект у кредита: ' || p_credit_id, 'ERROR', '');
+    END IF;
+
+    
+    IF v_person_id IS NOT NULL THEN
+      SELECT get_documents_xml(v_person_id, NULL, p_report_date) 
+        INTO v_doc_xml
+        FROM dual;
+    ELSE
+      SELECT get_documents_xml(NULL, v_org_id, p_report_date) 
+        INTO v_doc_xml
+        FROM dual;
+    END IF;
+    
+    SELECT xmlelement("subject",
+                  v_doc_xml,
+                  get_person_xml(v_person_id, p_report_date, 'person_info' ),
+                  get_organization_xml(v_org_id, p_report_date, 'organization_info'),
+                  nillable_xml('creditor_info', NULL),                  
+                  nillable_xml('is_creditor', 0),
+                  nillable_xml('is_person', decode(v_person_id, NULL, 0, 1)),
+                  nillable_xml('is_organization', decode(v_org_id, NULL, 0, 1))                  
+              )
+      INTO v_xml
+      FROM dual;
+      
+   RETURN v_xml;
+      
+   EXCEPTION
+     WHEN OTHERS THEN
+        write_log(p_log_date => SYSDATE,p_log_text => SQLERRM,p_log_level => c_log_level_error,p_procedure_call => '');
+  END;
+
   FUNCTION get_persons
   (
     p_credit_id NUMBER,
@@ -4409,7 +4496,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        AND vdh.person_id IS NOT NULL
        AND vdh.open_date <= p_report_date
        AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
-                   
+
     if(v_elem_cnt is null) then
       select xmlelement("persons", xmlattributes('true' as "xsi:nil"), NULL)
         into v_xml
@@ -4417,12 +4504,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     else
       select xmlelement("persons", v_elem_cnt)
         into v_xml
-        from dual;    
+        from dual;
     end if;
-      
+
     return v_xml;
   END;
-  
+
   FUNCTION get_organizations
   (
     p_credit_id NUMBER,
@@ -4433,7 +4520,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_elem_cnt XMLTYPE;
     v_cnt number;
   BEGIN
-  
+
     SELECT xmlagg(get_organization_xml(vdh.org_id, p_report_date, 'item'))
       INTO v_elem_cnt
       FROM v_debtor_his vdh
@@ -4442,7 +4529,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        AND vdh.org_id IS NOT NULL
        AND vdh.open_date <= p_report_date
        AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
-                   
+
     if(v_elem_cnt is null) then
       select xmlelement("organizations", xmlattributes('true' as "xsi:nil"), NULL)
         into v_xml
@@ -4450,12 +4537,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     else
       select xmlelement("organizations", v_elem_cnt)
         into v_xml
-        from dual;    
+        from dual;
     end if;
-      
+
     return v_xml;
   END;
-  
+
   FUNCTION get_creditors
   (
     p_credit_id NUMBER,
@@ -4466,7 +4553,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_elem_cnt XMLTYPE;
     v_cnt number;
   BEGIN
-  
+
     SELECT xmlagg(get_ref_creditor_xml(vdh.creditor_id, p_report_date, 'item'))
       INTO v_elem_cnt
       FROM v_debtor_his vdh
@@ -4475,7 +4562,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        AND vdh.creditor_id IS NOT NULL
        AND vdh.open_date <= p_report_date
        AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
-                   
+
     if(v_elem_cnt is null) then
       select xmlelement("creditors", xmlattributes('true' as "xsi:nil"), NULL)
         into v_xml
@@ -4483,12 +4570,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     else
       select xmlelement("creditors", v_elem_cnt)
         into v_xml
-        from dual;    
+        from dual;
     end if;
-      
+
     return v_xml;
   END;
-  
+
   FUNCTION get_portfolio_flows_kfn
   (
     p_creditor_id IN NUMBER,
@@ -4518,7 +4605,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
             from (select pf.creditor_id, pf.portfolio_id, pf.rep_date from portfolio_flow pf group by pf.creditor_id, pf.portfolio_id, pf.rep_date) pfg
            where pfg.creditor_id = p_creditor_id
              and pfg.rep_date = p_report_date;
-             
+
     IF(v_xml IS NULL) THEN
       SELECT xmlelement("portfolio_flows_kfn", xmlattributes('true' as "xsi:nil"))
         INTO v_xml
@@ -4528,19 +4615,19 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         INTO v_xml
         FROM dual;
     END IF;
-    
-    RETURN v_xml;    
-    
+
+    RETURN v_xml;
+
   EXCEPTION
     WHEN OTHERS THEN
       write_log(p_log_date => sysdate,
                 p_log_text => 'Unexpected error occured: ' || SQLERRM || '.',
                 p_log_level => c_log_level_error,
                 p_procedure_call => 'to do');
-    
+
 
   END;
-  
+
   FUNCTION get_portfolio_flows_msfo
   (
     p_creditor_id IN NUMBER,
@@ -4550,7 +4637,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml XMLTYPE;
     v_procedure_call varchar2(4000 CHAR) :=
       'PORTFOLIO_FLOWS_MSFO(P_CREDITOR_ID => ' || p_creditor_id || ',' ||
-                           'P_REPORT_DATE = > ' || p_report_date || ')';  
+                           'P_REPORT_DATE = > ' || p_report_date || ')';
   BEGIN
        SELECT xmlagg(
                  xmlelement("item",
@@ -4571,13 +4658,13 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                        and pfmv.discounted_value = pfmg.discounted_value)
                  )
                )
-                         
+
         INTO v_xml
         FROM (select pfm.creditor_id, pfm.portfolio_id, pfm.rep_date, pfm.discounted_value from portfolio_flow_msfo_old pfm group by pfm.creditor_id, pfm.portfolio_id, pfm.rep_date, pfm.discounted_value) pfmg
        WHERE pfmg.creditor_id = p_creditor_id
          AND pfmg.rep_date = p_report_date;
-                     
-                     
+
+
     IF v_xml IS NULL THEN
       SELECT xmlelement("portfolio_flows_msfo", xmlattributes('true' as "xsi:nil"))
         INTO v_xml
@@ -4587,16 +4674,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         INTO v_xml
         FROM dual;
     END IF;
-    
-    RETURN v_xml;    
-    
+
+    RETURN v_xml;
+
   EXCEPTION
   WHEN OTHERS THEN
     write_log(p_log_date => sysdate,
               p_log_text => 'Unexpected error occured: ' || SQLERRM || '.',
               p_log_level => c_log_level_error,
               p_procedure_call => v_procedure_call);
-              
+
 
 
   END;
