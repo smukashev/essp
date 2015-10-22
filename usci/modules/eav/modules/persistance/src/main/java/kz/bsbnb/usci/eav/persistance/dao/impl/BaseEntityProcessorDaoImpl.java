@@ -21,6 +21,7 @@ import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.slf4j.Logger;
@@ -155,7 +156,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             creditorId = creditor.getId();
 
             if (creditorId < 1)
-                throw new IllegalStateException("Кредитор не найден;");
+                throw new IllegalStateException("Кредитор не найден; \n" + creditor);
         }
 
         baseEntityPostPrepared = prepare(((BaseEntity) baseEntity).clone(), creditorId);
@@ -164,11 +165,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             switch (baseEntityPostPrepared.getOperation()) {
                 case DELETE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new IllegalStateException("Сущность для удаления не найдена;");
+                        throw new KnownException("Сущность для удаления не найдена; \n" + baseEntityPostPrepared);
 
                     if (baseEntity.getMeta().isReference() && refProcessorDao.historyExists(
                             baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId()))
-                        throw new IllegalStateException("Справочник с историей не может быть удалена;");
+                        throw new KnownException("Справочник с историей не может быть удалена; \n " + baseEntity);
 
                     if (baseEntity.getMeta().isReference())
                         failIfHasUsages(baseEntityPostPrepared);
@@ -179,14 +180,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case CLOSE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new UnsupportedOperationException("Сущность для закрытия не найдена;");
+                        throw new KnownException("Сущность для закрытия не найдена; \n" + baseEntityPostPrepared);
 
                     IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool.getPersistableDao(
                             BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
                     if (baseEntityReportDateDao.getMinReportDate(baseEntityPostPrepared.getId()).equals(
                             baseEntityPostPrepared.getReportDate()))
-                        throw new IllegalStateException("Дата закрытия не может быть одинаковой с датой открытия;");
+                        throw new IllegalStateException("Дата закрытия не может быть одинаковой с датой открытия; \n"
+                            + baseEntityPostPrepared);
 
 
                     boolean reportDateExists = baseEntityReportDateDao.exists(baseEntityPostPrepared.getId(),
@@ -276,8 +278,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
 
             if (rows.size() > 0) {
-                throw new RuntimeException("Deleting baseEntity " + metaClassOfDeleting.getClassName()
-                        + "(id: " + baseEntity.getId() + ") has usages in classes: " + sbUsages.toString());
+                throw new IllegalStateException("Невозможно удалить сущность " + metaClassOfDeleting.getClassName()
+                        + "(id: " + baseEntity.getId() + ") используется в классах: " + sbUsages.toString());
             }
         }
 
@@ -286,11 +288,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 Select select = context.select().from(EAV_A_CREDITOR_USER)
                         .where(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(baseEntity.getId())).limit(1);
 
-                List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+                List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
+                        select.getBindValues().toArray());
 
                 if (rows.size() > 0) {
-                    throw new RuntimeException("Deleting ref_creditor "
-                            + "(id: " + baseEntity.getId() + ") has binded users");
+                    throw new RuntimeException("Невозмозжно удалить кредитор у которго есть связки с пользователями "
+                            + "(id: " + baseEntity.getId() + ")");
                 }
             }
         }
@@ -302,7 +305,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         Select select = context
                 .select(EAV_BE_ENTITIES.ID)
                 .from(EAV_BE_ENTITIES)
-                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId));
+                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId).
+                        and(EAV_BE_ENTITIES.DELETED.eq(DataUtils.convert(false))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
