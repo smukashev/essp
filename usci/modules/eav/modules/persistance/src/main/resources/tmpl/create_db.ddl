@@ -46,6 +46,7 @@
 		<column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+		<column name="is_disabled" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="class_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<index name="emca_IN_ci">
 			<index-column name="class_id"/>
@@ -69,6 +70,7 @@
 		<column name="is_cumulative" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+		<column name="is_disabled" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<index name="emcs_IN_ci_ct">
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>
@@ -85,6 +87,7 @@
 		<column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+		<column name="is_disabled" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="type_code" primaryKey="false" required="false" type="VARCHAR" size="16" autoIncrement="false"/>
 		<index name="emsa_IN_ci_ct">
 			<index-column name="containing_id"/>
@@ -108,6 +111,7 @@
 		<column name="is_cumulative" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_final" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+		<column name="is_disabled" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<index name="emss_IN_ci_ct">
 			<index-column name="containing_id"/>
 			<index-column name="container_type"/>

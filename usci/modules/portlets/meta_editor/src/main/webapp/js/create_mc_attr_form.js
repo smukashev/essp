@@ -5,6 +5,11 @@ Ext.require([
 
 function createMCAttrForm(classId, parentPath, attrPath, callback)
 {
+    var isDisabled = [
+        ['false', 'Активный'],
+        ['true', 'Не активный'],
+    ];
+
     var buttonSave = Ext.create('Ext.button.Button', {
         id: "createMCAttrFormOK",
         text: 'Сохранить',
@@ -35,6 +40,7 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                             is_Required = Ext.getCmp('is_Required');
                             is_Nullable = Ext.getCmp('is_Nullable');
                             is_Final = Ext.getCmp('is_Final');
+                            is_Deleted = Ext.getCmp('is_Deleted');
                             if(attrTypeField.getValue() == 1 || attrTypeField.getValue() == 3) {
                                 callback(attrPathPart.getValue() + attrPathCode.getValue(),
                                     attrTitle.getValue(), true);
@@ -294,6 +300,31 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                 valueField:'Id',
                 displayField:'Text',
                 queryMode:'local'
+            },
+            {
+                fieldLabel: 'Признак активности',
+                id: 'is_Disabled',
+                name: 'is_Disabled',
+                xtype: 'combobox',
+                store: new Ext.data.SimpleStore({
+                    id:0,
+                    fields:
+                        [
+                            'Id',
+                            'Text'
+                        ],
+                    data: isDisabled
+
+                }),
+                valueField:'Id',
+                displayField:'Text',
+                queryMode:'local',
+                listeners:{
+                    scope: this,
+                    afterRender: function(me){
+                        me.setValue(isDisabled.toString());
+                    }
+                }
             }
         ],
 
@@ -338,14 +369,22 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                     is_Key.setValue(data.data.is_key);
                     is_Required = Ext.getCmp('is_Required');
                     is_Required.setValue(data.data.is_required);
-                    is_Required = Ext.getCmp('is_Final');
-                    is_Required.setValue(data.data.is_final);
-                    if(data.data.is_key=='true')
+                    is_Final = Ext.getCmp('is_Final');
+                    is_Final.setValue(data.data.is_final);
+                    is_Disabled = Ext.getCmp('is_Disabled');
+                    is_Disabled.setValue(data.data.is_disabled);
+                    if(data.data.is_key=='false')
                     {
                         is_Nullable = Ext.getCmp('is_Nullable');
                         is_Nullable.setValue(data.data.is_nullable);
+                        is_Nullable.setDisabled(false);
+                    }
+                    else
+                    {
+                        is_Nullable.setValue(false);
                         is_Nullable.setDisabled(true);
                     }
+
                 }
             },
             failure: function(response, opts) {

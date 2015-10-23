@@ -55,9 +55,6 @@ function createMetaClassTree(classId, className) {
     var metaTreeMenu = new Ext.menu.Menu({
         items: [
             {
-                id: 'mtm-del',
-                text: label_DEL
-            },{
                 id: 'mtm-edit',
                 text: label_EDIT
             },
@@ -151,12 +148,12 @@ function createMetaClassTree(classId, className) {
                 var selectedNode = tree.getSelectionModel().getLastSelected();
                 if(selectedNode.data.id==currentClassId)
                 {
-                    metaTreeMenu.getComponent('mtm-del').disable(true);
+                    //metaTreeMenu.getComponent('mtm-del').disable(true);
                     metaTreeMenu.getComponent('mtm-edit').disable(true);
                 }
                 else
                 {
-                    metaTreeMenu.getComponent('mtm-del').enable(true);
+                    //metaTreeMenu.getComponent('mtm-del').enable(true);
                     metaTreeMenu.getComponent('mtm-edit').enable(true);
                 }
                 metaTreeMenu.showAt(event.getXY());
@@ -228,7 +225,7 @@ function createMetaClassesListView() {
                     }}
                 ]
             },
-            {
+            /*{
                 header: '',
                 xtype: 'actioncolumn',
                 width: 26,
@@ -256,7 +253,7 @@ function createMetaClassesListView() {
                         });
                     }}
                 ]
-            },
+            },*/
             {
                 text     : label_TITLE,
                 dataIndex: 'className',
