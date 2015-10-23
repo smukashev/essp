@@ -162,7 +162,7 @@ rule "head juridical"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
             && getEls("{setString(17,18,19,24)}credit_type.code") == 0
-            && getEls("{count}organizations[head=null]") > 0)
+            && getEls("{count}subject[is_organization=true]organization_info[head=null]") > 0)
 then
   $entity.addValidationError("Руководитель юридического лица должен указываться для данного типа кредита");
 end
@@ -190,7 +190,7 @@ rule "jur econ_trade"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
             && getEls("{setString(17,18)}credit_type.code") == 0
-            && getEls("{count}organizations[econ_trade.code=null]") > 0)
+            && getEls("{count}subject[is_organization=true]organization_info[econ_trade.code=null]") > 0)
 then
   $entity.addValidationError("Вид экономической деятельности должен указываться для данного типа кредита");
 end
@@ -204,9 +204,9 @@ rule "credit subject"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
             && getEls("{setString(17,18)}credit_type.code") == 0
-            && getEls("{count}organizations") == 0
-            && getEls("{count}persons") == 0
-            && getEls("{count}creditors") == 0)
+            && getEls("{count}subject[is_organization=true]organization_info") == 0
+            && getEls("{count}subject[is_person=true]person_info") == 0
+            && getEls("{count}subject[is_creditor=true]organization_info") == 0)
 then
   $entity.addValidationError("Субъект кредитной истории должен указываться для данного типа кредита");
 end
@@ -234,7 +234,7 @@ rule "legal_form in jur"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
             && getEls("{setString(17,18,19,24)}credit_type.code") == 0
-            && getEls("{count}organizations[legal_form=null]") > 0)
+            && getEls("{count}subject[is_organization=true]organization_info[legal_form=null]") > 0)
 then
   $entity.addValidationError("Организационно-правовая форма должна указываться для данного типа кредита");
 end
@@ -304,7 +304,7 @@ title: Вид экономической деятельности для КЗ
 rule "econ trade KZ"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
-            && getEls("{count}organizations[country.code_numeric=398][econ_trade.code=null]") > 0)
+            && getEls("{count}subject[is_organization=true]organization_info[country.code_numeric=398][econ_trade.code=null]") > 0)
 then
   $entity.addValidationError("Вид экономической деятельности должен указываться для юр лица Казахстана");
 end
