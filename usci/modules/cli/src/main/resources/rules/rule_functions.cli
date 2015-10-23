@@ -31,15 +31,6 @@ function List getNot12DigitStrings(List docs){
     return ret;
 }
 
-function boolean identificationDocCheckSuccess(List subjects) {
-            for(Object o : subjects) {
-                BaseEntity subject = (BaseEntity) o;
-                if( (Integer)subject.getEls("{setString(06,07,11)}docs.doc_type.code") == 0 )
-                    return false;
-            }
-        return true;
-}
-
 function List get12ZeroStrings(List docs){
     List ret = new ArrayList();
         for(Object doc: docs) {
