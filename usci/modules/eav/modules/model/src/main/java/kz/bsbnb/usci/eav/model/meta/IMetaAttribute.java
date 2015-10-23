@@ -36,6 +36,11 @@ public interface IMetaAttribute extends IPersistable {
 
     void setImmutable(boolean immutable);
 
+    boolean isDisabled();
+
+    void setDisabled(boolean immutable);
+
+
     String getName();
 
     void setName(String name);

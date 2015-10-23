@@ -23,6 +23,8 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
 
     private boolean isNullable = true;
 
+    private boolean isDisabled = true;
+
     private String title;
 
     public MetaAttribute(boolean isKey, boolean isNullable) {
@@ -174,5 +176,13 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
         if (title != null)
             return title;
         return getName();
+    }
+
+    public boolean isDisabled() {
+        return isDisabled;
+    }
+
+    public void setDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
     }
 }
