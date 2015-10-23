@@ -3,7 +3,7 @@ title: иин физ лицо
 rule "иин физ лицо"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getInvalidIINs((List)getEls("{get}persons.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getInvalidIINs((List)getEls("{get}subject[is_person=true]docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("обнаружен некорректный иин: " + $r);
 end
@@ -16,7 +16,7 @@ title: иин юр. лицо
 rule "иин юр. лицо"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getInvalidIINs((List)getEls("{get}organizations.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getInvalidIINs((List)getEls("{get}subject[is_organization=true]docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("обнаружен некорректный иин: " + $r);
 end
@@ -68,7 +68,7 @@ title: иин кредтиора физ лица с особыми отноше�
 rule "иин кредтиора физ лица с особыми отношениями"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getInvalidIINs((List)getEls("{get}persons.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getInvalidIINs((List)getEls("{get}subject[is_person=true]person_info.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("обнаружен некорректный иин: " + $r);
 end
@@ -81,7 +81,7 @@ title: иин руководитель организации
 rule "иин руководитель организации"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getInvalidIINs((List)getEls("{get}organizations.head.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getInvalidIINs((List)getEls("{get}subject[is_organization=true]organization_info.head.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("обнаружен некорректный иин: " + $r);
 end
@@ -94,7 +94,7 @@ title: иин кредтиора юр лица с особыми отношен�
 rule "иин кредтиора юр лица с особыми отношениями"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getInvalidIINs((List)getEls("{get}organizations.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getInvalidIINs((List)getEls("{get}subject[is_organization=true]organization_info.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("обнаружен некорректный иин: " + $r);
 end
@@ -133,7 +133,7 @@ title: иин субъект кредитора
 rule "иин субъект кредитора"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getInvalidIINs((List)getEls("{get}creditors.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getInvalidIINs((List)getEls("{get}subject[is_creditor=true]docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("обнаружен некорректный иин: " + $r);
 end
