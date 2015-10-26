@@ -177,6 +177,13 @@ public class MetaClassRepositoryImpl implements IMetaClassRepository, Initializi
             meta = metaClassDao.load(id);
             names.put(id, meta.getClassName());
             cache.put(meta.getClassName(), meta);
+            List<Long> classIds= metaClassDao.loadContaining(id);
+            for(long classId: classIds)
+            {
+                meta = metaClassDao.load(classId);
+                names.put(meta.getId(), meta.getClassName());
+                cache.put(meta.getClassName(), meta);
+            }
         } finally {
             lock.writeLock().unlock();
         }

@@ -247,7 +247,22 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
             }),
             valueField:'Id',
             displayField:'Text',
-            queryMode:'local'
+            queryMode:'local',
+            listeners: {
+                change: function (field, newValue, oldValue) {
+                    attrIsNullable = Ext.getCmp('is_Nullable');
+                    if(newValue == 'false') {
+                        attrIsNullable.setDisabled(false);
+                        attrIsNullable.allowBlank=false;
+
+                    } else {
+                        attrIsNullable.setDisabled(true);
+                        attrIsNullable.allowBlank=true;
+
+                    }
+                }
+            }
+
         },{
             fieldLabel: 'Обязательный аттрибут',
             id: 'is_Required',
@@ -266,7 +281,7 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
             displayField:'Text',
             queryMode:'local'
         },{
-            fieldLabel: 'IS NULLABLE',
+            fieldLabel: 'Обнуляемый',
             id: 'is_Nullable',
             name: 'is_Nullable',
             xtype: 'combobox',
@@ -284,7 +299,7 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
             queryMode:'local'
         },
             {
-                fieldLabel: 'IS FINAL',
+                fieldLabel: 'Финальная запись',
                 id: 'is_Final',
                 name: 'is_Final',
                 xtype: 'combobox',
@@ -381,7 +396,6 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                     }
                     else
                     {
-                        is_Nullable.setValue(false);
                         is_Nullable.setDisabled(true);
                     }
 

@@ -961,6 +961,40 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         return meta;
     }
 
+    @Override
+    public List<Long> loadContaining(long id)
+    {
+        List<Long> l= new ArrayList<>();
+        if(id<1)
+            return null;
+
+        Select selectComplexSetIds = context.select(
+                EAV_M_COMPLEX_SET.CONTAINING_ID).from(EAV_M_COMPLEX_SET).
+                where(EAV_M_COMPLEX_SET.CLASS_ID.eq(id));
+
+        List<Map<String, Object>> complexSetIds = jdbcTemplate.queryForList(selectComplexSetIds.getSQL(),
+                selectComplexSetIds.getBindValues().toArray());
+
+
+        Select selectComplexIds = context.select(
+                EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID).from(EAV_M_COMPLEX_ATTRIBUTES).
+                where(EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID.eq(id));
+
+        List<Map<String, Object>> complexIds = jdbcTemplate.queryForList(selectComplexIds.getSQL(),
+                selectComplexIds.getBindValues().toArray());
+
+        for(Map<String, Object> complexSetId : complexSetIds)
+        {
+            l.add(Long.parseLong(complexSetId.get("CONTAINING_ID").toString()));
+        }
+        for(Map<String, Object> complexId : complexIds)
+        {
+            l.add(Long.parseLong(complexId.get("CONTAINING_ID").toString()));
+        }
+
+        return l;
+    }
+
     private void removeAllAttributes(long id, int type) {
         DeleteConditionStep delete = context.delete(EAV_M_SIMPLE_ATTRIBUTES
         ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(id)

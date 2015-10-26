@@ -21,5 +21,7 @@ public interface IMetaClassDao extends IDao<MetaClass> {
 
     List<MetaClassName> getRefNames();
 
+    List<Long> loadContaining(long id);
+
     void remove(MetaClass metaClass);
 }
