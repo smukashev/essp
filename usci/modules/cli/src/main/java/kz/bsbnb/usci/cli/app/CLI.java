@@ -1731,6 +1731,7 @@ public class CLI {
         } else {
             System.out.println("Argument needed: <core_url>");
             System.out.println("Example: sqlstat rmi://127.0.0.1:1099/entityService");
+            System.out.println("Example: sqlstat rmi://127.0.0.1:1097/batchProcessService");
         }
     }
 
