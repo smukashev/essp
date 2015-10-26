@@ -185,17 +185,17 @@ public class SubjectOrganizationParser extends BatchParser {
         } else if (localName.equals("country")) {
         } else if (localName.equals("offshore")) {
         } else if (localName.equals("bank_relations")) {
-            currentBaseEntity.put("bank_relations", new BaseEntityComplexSet(0, -1, batch.getRepDate(), bankRelations, false, true));
+            organizationInfo.put("bank_relations", new BaseEntityComplexSet(0, -1, batch.getRepDate(), bankRelations, false, true));
         } else if (localName.equals("bank_relation")) {
         } else if (localName.equals("addresses")) {
-            currentBaseEntity.put("addresses", new BaseEntityComplexSet(0, -1, batch.getRepDate(), addresses, false, true));
+            organizationInfo.put("addresses", new BaseEntityComplexSet(0, -1, batch.getRepDate(), addresses, false, true));
         } else if (localName.equals("address")) {
             addresses.put(new BaseSetComplexValue(0, -1, batch.getRepDate(), currentAddress, false, true));
         } else if (localName.equals("region")) {
         } else if (localName.equals("details")) {
         } else if (localName.equals("contacts")) {
         } else if (localName.equals("contact")) {
-            currentBaseEntity.put("contacts", new BaseEntityComplexSet(0, -1, batch.getRepDate(), contacts, false, true));
+            organizationInfo.put("contacts", new BaseEntityComplexSet(0, -1, batch.getRepDate(), contacts, false, true));
         } else if (localName.equals("names")) {
         } else if (localName.equals("head")) {
         } else if (localName.equals("legal_form")) {
