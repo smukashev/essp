@@ -468,6 +468,7 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"is_nullable\": \"" + meta.getElAttribute(attrName).isNullable() + "\", ");
                                 writer.write("\"is_final\": \"" + meta.getElAttribute(attrName).isFinal() + "\", ");
                                 writer.write("\"is_disabled\": \"" + meta.getElAttribute(attrName).isDisabled() + "\"");
+                                writer.write("}}");
                             } else {
                                 MetaValue value = (MetaValue)attribute;
 
