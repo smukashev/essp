@@ -650,7 +650,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 // Операций с кастомными полями
                 for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
                     if (sf.getAttributePath().equals("root")) {
-                        entryMap.put(new ValueElement(sf.getColumnName(), globalEntity.getId(), true), entity.getId());
+                        entryMap.put(new ValueElement(sf.getColumnName(), globalEntity.getId(), true), globalEntity.getId());
                         continue;
                     }
 
