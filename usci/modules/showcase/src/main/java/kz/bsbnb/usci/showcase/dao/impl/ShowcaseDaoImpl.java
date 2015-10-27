@@ -280,9 +280,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         Object[] vals;
 
         if (!showCaseHolder.getShowCaseMeta().isFinal()) {
-            vals = new Object[map.size() + 2 + showCaseHolder.getShowCaseMeta().getCustomFieldsList().size()];
+            vals = new Object[map.size() + 2 /*+ showCaseHolder.getShowCaseMeta().getCustomFieldsList().size()*/];
         } else {
-            vals = new Object[map.size() + 1 + showCaseHolder.getShowCaseMeta().getCustomFieldsList().size()];
+            vals = new Object[map.size() + 1 /*+ showCaseHolder.getShowCaseMeta().getCustomFieldsList().size()*/];
         }
 
         int i = 0;
@@ -293,7 +293,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             vals[i++] = entry.getValue();
         }
 
-        for (ShowCaseField sf : showCaseHolder.getShowCaseMeta().getCustomFieldsList()) {
+        /*for (ShowCaseField sf : showCaseHolder.getShowCaseMeta().getCustomFieldsList()) {
             if (sf.getAttributePath().equals("root")) {
                 sql.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
                 vals[i++] = entity.getId();
@@ -318,7 +318,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
         if (!showCaseHolder.getShowCaseMeta().isFinal()) {
             sql.append("cdc, open_date, close_date");
@@ -647,6 +647,35 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             for (Map.Entry entry : savingMap.entrySet()) {
                 HashMap<ValueElement, Object> entryMap = (HashMap) entry.getValue();
 
+                // Операций с кастомными полями
+                for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
+                    if (sf.getAttributePath().equals("root")) {
+                        entryMap.put(new ValueElement(sf.getColumnName(), globalEntity.getId(), true), entity.getId());
+                        continue;
+                    }
+
+                    Object customObject = null;
+
+                    try {
+                        customObject = globalEntity.getEl(sf.getAttributePath());
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        if (customObject instanceof BaseEntity) {
+                            entryMap.put(new ValueElement(sf.getColumnName(), ((BaseEntity) customObject).getId(), true),
+                                    ((BaseEntity) customObject).getId());
+                        } else if (customObject instanceof BaseSet) {
+                            throw new UnsupportedOperationException("CustomSet is not supported!");
+                        } else {
+                            entryMap.put(new ValueElement(sf.getColumnName(), 0L, false), customObject);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 KeyData keyData = new KeyData(entryMap);
 
                 ValueElement keyValueElement = new ValueElement("_operation", -1L, false, false);
@@ -676,6 +705,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                     }
                     continue;
                 }
+
+
 
                 if (!showcaseHolder.getShowCaseMeta().isFinal()) {
                     try {
