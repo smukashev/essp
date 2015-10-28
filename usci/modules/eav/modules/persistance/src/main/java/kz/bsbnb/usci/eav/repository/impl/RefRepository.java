@@ -1,16 +1,14 @@
 package kz.bsbnb.usci.eav.repository.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityReportDateDao;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
-import kz.bsbnb.usci.eav.util.DataUtils;
-import org.jooq.DSLContext;
-import org.jooq.Select;
-import org.springframework.beans.factory.annotation.Autowired;
+import kz.bsbnb.usci.eav.util.DataUtils; import org.jooq.DSLContext; import org.jooq.Select; import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -75,6 +73,54 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
 
     private HashMap<BaseEntityKey, IBaseEntity> cache = new HashMap<>();
 
+    class EntityCacheKey {
+        private int cache;
+        private Date reportDate;
+
+        public EntityCacheKey(int cache, Date reportDate) {
+            this.cache = cache;
+            this.reportDate = reportDate;
+        }
+
+        public int getCache() {
+            return cache;
+        }
+
+        public void setCache(int cache) {
+            this.cache = cache;
+        }
+
+        public Date getReportDate() {
+            return reportDate;
+        }
+
+        public void setReportDate(Date reportDate) {
+            this.reportDate = reportDate;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            EntityCacheKey that = (EntityCacheKey) o;
+
+            if (cache != that.cache) return false;
+            if (!reportDate.equals(that.reportDate)) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = (int) (cache ^ (cache >>> 32));
+            result = 31 * result + reportDate.hashCode();
+            return result;
+        }
+    }
+
+    private HashMap<EntityCacheKey, IBaseEntity> entityCache = new HashMap<>();
+
     public void fillRefRepository() {
         Select select = context
                 .select(EAV_BE_ENTITIES.ID, EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
@@ -95,7 +141,9 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
 
             Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id, reportDate);
 
-            cache.put(new BaseEntityKey(id, reportDate), baseEntityLoadDao.load(id, maxReportDate, reportDate));
+            IBaseEntity en = baseEntityLoadDao.load(id, maxReportDate, reportDate);
+            cache.put(new BaseEntityKey(id, reportDate), en);
+            entityCache.put(new EntityCacheKey(((BaseEntity) en).hashCode2(), maxReportDate), en);
         }
     }
 
@@ -103,11 +151,25 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
         return cache.get(new BaseEntityKey(Id, reportDate));
     }
 
+    public IBaseEntity getRef(IBaseEntity baseEntity)
+    {
+        return entityCache.get(new EntityCacheKey(((BaseEntity)baseEntity).hashCode2(), baseEntity.getReportDate()));
+    }
+
+    public void setRef(IBaseEntity baseEntity)
+    {
+        entityCache.put(new EntityCacheKey(((BaseEntity) baseEntity).hashCode2(), baseEntity.getReportDate()), baseEntity);
+    }
     public void setRef(long Id, Date reportDate, IBaseEntity baseEntity) {
         cache.put(new BaseEntityKey(Id, reportDate), baseEntity);
     }
 
     public void delRef(long Id, Date reportDate) {
         cache.remove(new BaseEntityKey(Id, reportDate));
+    }
+
+    public void delRef(IBaseEntity baseEntity)
+    {
+        entityCache.remove(new EntityCacheKey(((BaseEntity)baseEntity).hashCode2(), baseEntity.getReportDate()));
     }
 }

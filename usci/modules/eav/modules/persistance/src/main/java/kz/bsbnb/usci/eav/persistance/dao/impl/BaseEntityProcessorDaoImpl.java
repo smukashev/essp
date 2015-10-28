@@ -21,12 +21,14 @@ import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,6 +73,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         this.applyListener = applyListener;
     }
 
+    @Autowired
+    IRefRepository refRepositoryDao;
+
+    @Value("${refs.cache.enabled}")
+    private boolean isReferenceCacheEnabled;
+
     @Override
     public long search(IBaseEntity baseEntity, long creditorId) {
         IMetaClass metaClass = baseEntity.getMeta();
@@ -85,6 +93,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public IBaseEntity prepare(IBaseEntity baseEntity, long creditorId) {
         MetaClass metaClass = baseEntity.getMeta();
 
+        if(isReferenceCacheEnabled) {
+            if (metaClass.isReference()) {
+                IBaseEntity refBaseEntity = refRepositoryDao.getRef(baseEntity);
+                if (refBaseEntity != null) {
+                    return refBaseEntity;
+                }
+            }
+        }
         creditorId = metaClass.isReference() ? 0 : creditorId;
 
         for (String attribute : baseEntity.getAttributes()) {
@@ -135,7 +151,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 logger.error(e.getMessage());
             }
         }
-
+        if(isReferenceCacheEnabled) {
+            if (metaClass.isReference()) {
+                refRepositoryDao.setRef(baseEntity);
+            }
+        }
         return baseEntity;
     }
 
