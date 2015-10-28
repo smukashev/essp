@@ -136,7 +136,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
             } else if (errors != null && errors.size() > 0) {
                 for (String errorMsg : errors) {
-                    System.out.println(errorMsg);
+                    //System.out.println(errorMsg);
                     //TODO: check for error with Index
 
                     EntityStatus entityStatus = new EntityStatus()
