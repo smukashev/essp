@@ -2388,7 +2388,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
 
                 for (IPersistable insertedObject : insertedObjects) {
-                    persistableDao.insert(insertedObject);
+                    try {
+                        persistableDao.insert(insertedObject);
+                    } catch (Exception e) {
+                        throw new IllegalStateException("Ошибка при вставке: " + e.getMessage() +
+                                "\n" + insertedObject);
+                    }
 
                     if (isReferenceCacheEnabled && (insertedObject instanceof IBaseEntity)) {
                         IBaseEntity baseEntity = (IBaseEntity) insertedObject;
@@ -2407,7 +2412,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
 
                 for (IPersistable updatedObject : updatedObjects) {
-                    persistableDao.update(updatedObject);
+                    try {
+                        persistableDao.update(updatedObject);
+                    } catch (Exception e) {
+                        throw new IllegalStateException("Ошибка при обновлений: " + e.getMessage() +
+                                "\n" + updatedObject);
+                    }
 
                     if (isReferenceCacheEnabled && (updatedObject instanceof IBaseEntity)) {
                         IBaseEntity baseEntity = (IBaseEntity) updatedObject;
@@ -2426,7 +2436,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
 
                 for (IPersistable deletedObject : deletedObjects) {
-                    persistableDao.delete(deletedObject);
+                    try {
+                        persistableDao.delete(deletedObject);
+                    } catch (Exception e) {
+                        throw new IllegalStateException("Ошибка при удалений: " + e.getMessage() +
+                                "\n" + deletedObject);
+                    }
 
                     if (isReferenceCacheEnabled && (deletedObject instanceof IBaseEntity)) {
                         IBaseEntity baseEntity = (IBaseEntity) deletedObject;
@@ -2435,7 +2450,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             refRepositoryDao.delRef(baseEntity.getId(), baseEntity.getReportDate());
                     }
                 }
-
             }
         }
 

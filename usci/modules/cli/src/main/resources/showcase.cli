@@ -68,9 +68,11 @@ showcase list add country.code country_code
 showcase list add offshore.code offshore_code
 
 showcase list addCustom credit creditor creditor_id
+showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
 showcase addIndex nonunique subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id
 
 showcase save
 
@@ -96,9 +98,11 @@ showcase list add enterprise_type enterprise_type
 showcase list add country country
 
 showcase list addCustom credit creditor creditor_id
+showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
 showcase addIndex nonunique subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id
 
 showcase save
 
@@ -145,7 +149,9 @@ showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type_id
 showcase list add docs.name doc_name
 
-showcase addIndex nonunique head_id
+showcase list addCustom credit subject subject_id
+
+showcase addIndex nonunique subject_id
 
 showcase save
 
@@ -170,6 +176,7 @@ showcase list addCustom credit creditor creditor_sender_id
 
 showcase addIndex nonunique credit_id
 showcase addIndex nonunique subject_id
+showcase addIndex nonunique creditor_sender_id credit_id subject_id
 
 showcase save
 
@@ -192,9 +199,12 @@ showcase list add addresses.details details
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
+showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
+showcase addIndex nonunique credit_id subject_id person_info_id
 showcase addIndex nonunique subject_id
+
 showcase save
 
 #=================================================================================
@@ -216,9 +226,12 @@ showcase list add addresses.details details
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
+showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
+showcase addIndex nonunique credit_id subject_id organization_info_id
 showcase addIndex nonunique subject_id
+
 showcase save
 
 #=================================================================================
@@ -239,8 +252,10 @@ showcase list add contacts.contact_type contact_type_id
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
 
+showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
+showcase addIndex nonunique credit_id subject_id person_info_id
 showcase addIndex nonunique subject_id
 
 showcase save
@@ -262,9 +277,10 @@ showcase list add contacts.contact_type contact_type_id
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
 
+showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique subject_id
+showcase addIndex nonunique credit_id subject_id organization_info_id
 
 showcase save
 
@@ -285,7 +301,9 @@ showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type
 showcase list add docs.name doc_name
 
-showcase addIndex nonunique subject_id
+showcase list addCustom credit root credit_id
+
+showcase addIndex nonunique credit_id subject_id doc_id
 
 showcase save
 
@@ -306,7 +324,9 @@ showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type
 showcase list add docs.name doc_name
 
-showcase addIndex nonunique subject_id
+showcase list addCustom credit root credit_id
+
+showcase addIndex nonunique credit_id subject_id doc_id
 
 showcase save
 
@@ -328,9 +348,11 @@ showcase list add names.lastname lastname
 showcase list add names.middlename middlename
 showcase list add names.lang lang
 
+showcase list addCustom credit creditor creditor_id
+showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id person_info_id name_id
 
 showcase save
 
@@ -351,9 +373,11 @@ showcase list add names name_id
 showcase list add names.name name
 showcase list add names.lang lang
 
+showcase list addCustom credit creditor creditor_id
+showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id organization_info_id name_id
 
 showcase save
 
@@ -530,9 +554,11 @@ showcase list add bank_relations person_bank_relation_id
 showcase list add bank_relations.bank_relation ref_bank_relation_id
 showcase list add bank_relations.creditor creditor_id
 
+showcase list addCustom credit creditor creditor_sender_id
+showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id person_info_id person_bank_relation_id
 
 showcase save
 
@@ -552,9 +578,11 @@ showcase list add bank_relations org_bank_relation_id
 showcase list add bank_relations.bank_relation ref_bank_relation_id
 showcase list add bank_relations.creditor creditor_id
 
+showcase list addCustom credit creditor creditor_sender_id
+showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id organization_info_id org_bank_relation_id
 
 showcase save
 

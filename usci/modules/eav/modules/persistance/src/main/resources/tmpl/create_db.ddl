@@ -711,7 +711,7 @@
 		<column name="batch_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<column name="description" primaryKey="false" required="false" type="VARCHAR" size="2048" autoIncrement="false"/>
+		<column name="description" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<!--<foreign-key foreignTable="eav_a_user" name="ebs_FK_eau_id">
 			<reference local="user_id" foreign="id"/>
 		</foreign-key>-->
@@ -732,7 +732,7 @@
 		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="description" primaryKey="false" required="false" type="VARCHAR" size="2048" autoIncrement="false"/>
+		<column name="description" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<!--<foreign-key foreignTable="eav_global" name="ees_FK_eg_id">
 			<reference local="status_id" foreign="id"/>
 		</foreign-key>-->
@@ -749,8 +749,8 @@
 	<table name="eav_entity_status_params">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="key" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
-		<column name="value" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="key" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
+		<column name="value" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<index name="eesp_esi">
 			<index-column name="entity_status_id"/>
 		</index>
