@@ -12,8 +12,13 @@ public interface IRefRepository {
     public void fillRefRepository();
     public IBaseEntity getRef(long Id, Date reportDate);
 
+    public IBaseEntity getRef(IBaseEntity baseEntity);
+
     public void setRef(long Id, Date reportDate, IBaseEntity baseEntity);
 
+    public void setRef(IBaseEntity baseEntity);
 
     public void delRef(long Id, Date reportDate);
+
+    public void delRef(IBaseEntity baseEntity);
 }
