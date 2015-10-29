@@ -39,7 +39,7 @@ public class BatchStatus extends Persistable {
             if (description.getBytes(java.nio.charset.StandardCharsets.UTF_8).length < 512) {
                 this.description = description;
             } else {
-                this.description = description.substring(0, 384);
+                this.description = description.substring(0, 256);
             }
         }
 
