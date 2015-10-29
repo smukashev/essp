@@ -47,10 +47,12 @@ public class EntityStatus extends Persistable {
     }
 
     public EntityStatus setDescription(String description) {
-        if (description.getBytes(java.nio.charset.StandardCharsets.UTF_8).length < 512) {
-            this.description = description;
-        } else {
-            this.description = description.substring(0, 384);
+        if (description != null) {
+            if (description.getBytes(java.nio.charset.StandardCharsets.UTF_8).length < 512) {
+                this.description = description;
+            } else {
+                this.description = description.substring(0, 256);
+            }
         }
         return this;
     }
