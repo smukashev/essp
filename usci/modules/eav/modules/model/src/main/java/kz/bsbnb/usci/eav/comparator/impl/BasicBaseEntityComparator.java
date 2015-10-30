@@ -31,26 +31,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
                     (BaseEntity) value2.getValue());
         }
 
-        if (res)
-            logger.debug("Same: " + value1.getValue() + ", " + value2.getValue());
-        else
-            logger.debug("Different: " + value1.getValue() + ", " + value2.getValue());
-
         return res;
-    }
-
-    private boolean filterPass(BaseEntity entity, MetaSet parentMeta) {
-        HashMap<String, ArrayList<String>> arrayKeyFilter = parentMeta.getArrayKeyFilter();
-
-        if (arrayKeyFilter == null || arrayKeyFilter.size() < 1) {
-            return true;
-        }
-
-        try {
-            return entity.applyKeyFilter(arrayKeyFilter);
-        } catch (ParseException e) {
-            return false;
-        }
     }
 
     private boolean compareSet(IMetaType type, IBaseValue value1, IBaseValue value2) {
@@ -66,13 +47,11 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
         if (set2 == null)
             return false;
 
-
         Collection<IBaseValue> ar1 = set1.get();
         Collection<IBaseValue> ar2 = set2.get();
 
         if (ar1.size() != ar2.size())
             return false;
-
 
         boolean res = (((MetaSet) type).getArrayKeyType() == ComplexKeyTypes.ALL);
 
@@ -85,7 +64,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
             } else {
                 boolean found = false;
 
-                if (v1.getValue() != null && filterPass((BaseEntity) v1.getValue(), (MetaSet) type)) {
+                if (v1.getValue() != null) {
                     for (IBaseValue v2 : ar2) {
                         if (compare((BaseEntity) v1.getValue(), (BaseEntity) v2.getValue())) {
                             found = true;
@@ -102,28 +81,19 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
             }
         }
 
-        if (res)
-            logger.debug("Same: " + value1.getValue() + ", " + value2.getValue());
-        else
-            logger.debug("Different: " + value1.getValue() + ", " + value2.getValue());
-
         return res;
     }
 
     @Override
     public boolean compare(BaseEntity c1, BaseEntity c2) throws IllegalStateException {
-        if (!c1.getMeta().equals(c2.getMeta())) {
-            logger.debug("Classes are different: " + c1.getMeta().getClassName() + ", " + c2.getMeta().getClassName());
+        if (!c1.getMeta().equals(c2.getMeta()))
             return false;
-        }
 
-        if (!c1.getMeta().isSearchable() || !c2.getMeta().isSearchable()) {
+        if (!c1.getMeta().isSearchable() || !c2.getMeta().isSearchable())
             return false;
-        }
 
-        if (c1.getId() > 0 && c2.getId() > 0 && c1.getId() == c2.getId()) {
+        if (c1.getId() > 0 && c2.getId() > 0 && c1.getId() == c2.getId())
             return true;
-        }
 
         MetaClass meta = c1.getMeta();
 
@@ -135,21 +105,14 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
             IMetaAttribute attribute = meta.getMetaAttribute(name);
             IMetaType type = meta.getMemberType(name);
 
-            logger.debug("Testing attribute: " + name);
-            if (!attribute.isKey()) {
-                logger.debug("It's not a key! So skipped.");
+            if (!attribute.isKey())
                 continue;
-            }
-
-            logger.debug("It's a key!");
 
             IBaseValue value1 = c1.safeGetValue(name);
             IBaseValue value2 = c2.safeGetValue(name);
 
-            if (value1 == null || value2 == null) {
-                //check this row
-                throw new IllegalArgumentException("Key attribute " + name + " couldn't be null");
-            }
+            if (value1 == null || value2 == null)
+                throw new IllegalArgumentException("Ключевой атрибут (" + name + ") не может быть пустым;");
 
             if (meta.getComplexKeyType() == ComplexKeyTypes.ALL) {
                 if (!type.isSet())
@@ -164,13 +127,11 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
             }
         }
 
-        logger.debug("Result is: " + result);
-
         return result;
     }
 
     public List<String> findBaseEntity(BaseEntity entity1, BaseEntity c2, MetaClass type) {
-        ArrayList<String> paths = new ArrayList<String>();
+        ArrayList<String> paths = new ArrayList<>();
 
         List<String> subClasses = c2.getMeta().getAllPaths(type);
 
@@ -238,7 +199,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
     }
 
     public List<String> intersect(BaseEntity c1, BaseEntity c2) throws IllegalStateException {
-        ArrayList<String> paths = new ArrayList<String>();
+        ArrayList<String> paths = new ArrayList<>();
 
         if (c1 == null)
             return paths;

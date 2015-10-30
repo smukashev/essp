@@ -26,15 +26,6 @@
 			<index-column name="is_reference"/>
 		</index>
 	</table>
-	<table name="eav_m_set_key_filter">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="attr_name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="value" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<index name="emskf_IN_si">
-			<index-column name="set_id"/>
-		</index>
-	</table>
 	<table name="eav_m_complex_attributes">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="containing_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
