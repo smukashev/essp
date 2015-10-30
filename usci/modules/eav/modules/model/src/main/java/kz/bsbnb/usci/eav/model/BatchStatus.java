@@ -41,6 +41,8 @@ public class BatchStatus extends Persistable {
             } else {
                 this.description = description.substring(0, 256);
             }
+        } else {
+            this.description = null;
         }
 
         return this;
