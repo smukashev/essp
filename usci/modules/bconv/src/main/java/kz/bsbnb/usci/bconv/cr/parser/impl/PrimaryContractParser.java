@@ -32,12 +32,14 @@ public class PrimaryContractParser extends BatchParser {
         if (localName.equals("primary_contract")) {
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            currentBaseEntity.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else if (localName.equals("date")) {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                currentBaseEntity.put("date", new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw), false, true));
+                currentBaseEntity.put("date", new BaseEntityDateValue(0, -1, batch.getRepDate(),
+                        dateFormat.parse(dateRaw), false, true));
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
             }

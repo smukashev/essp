@@ -29,6 +29,10 @@ public class ChangeCreditFlowParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit_flow"), batch.getRepDate());
+        currentProvisionGroup = null;
+        currentProvisionKfn = null;
+        currentProvisionMsfo = null;
+        currentProvisionMsfoOverB = null;
     }
 
     @Override

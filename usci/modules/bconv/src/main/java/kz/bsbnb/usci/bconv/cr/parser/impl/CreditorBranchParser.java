@@ -19,14 +19,15 @@ import javax.xml.stream.events.XMLEvent;
 @Component
 @Scope("prototype")
 public class CreditorBranchParser extends BatchParser {
-
-    BaseEntity currentDoc = null;
-    BaseSet currentDocSet = null;
+    private BaseEntity currentDoc = null;
+    private BaseSet currentDocSet = null;
 
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor_branch"),
                 batch.getRepDate());
+        currentDoc = null;
+        currentDocSet = null;
     }
 
     @Override

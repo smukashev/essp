@@ -34,14 +34,16 @@ public class SubjectOrganizationHeadDocsParser extends BatchParser {
             docType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
 
-            currentBaseEntity.put("doc_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), docType, false, true));
+            currentBaseEntity.put("doc_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), docType,
+                    false, true));
         } else if (localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
             currentBaseEntity.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            currentBaseEntity.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else {
             throw new UnknownTagException(localName);
         }

@@ -36,15 +36,21 @@ public class SubjectOrganizationParser extends BatchParser {
     private BaseSet bankRelations;
     private BaseSet addresses;
     private BaseSet contacts;
+
     private BaseEntity currentContact;
-
     private BaseEntity currentAddress;
-
     private BaseEntity organizationInfo;
+
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("subject"), batch.getRepDate());
         organizationInfo = new BaseEntity(metaClassRepository.getMetaClass("organization_info"), batch.getRepDate());
+
+        bankRelations = null;
+        addresses = null;
+        contacts = null;
+        currentContact = null;
+        currentAddress = null;
     }
 
     @Override

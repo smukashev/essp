@@ -32,6 +32,9 @@ public class ChangeRemainsDebtParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_debt"), batch.getRepDate());
+        fieldCurrent = null;
+        fieldPastDue = null;
+        fieldWriteOf = null;
     }
 
     @Override

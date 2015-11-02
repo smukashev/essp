@@ -29,6 +29,8 @@ public class SubjectCreditorParser extends BatchParser {
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("subject"), batch.getRepDate());
         creditorInfo = new BaseEntity(metaClassRepository.getMetaClass("creditor_info"), batch.getRepDate());
+        docs = null;
+        currentDoc = null;
     }
 
     @Override
@@ -36,7 +38,8 @@ public class SubjectCreditorParser extends BatchParser {
         if (localName.equals("creditor")) {
         } else if (localName.equals("code")) {
             event = (XMLEvent) xmlReader.next();
-            creditorInfo.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            creditorInfo.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else if (localName.equals("docs")) {
             docs = new BaseSet(metaClassRepository.getMetaClass("document"));
         } else if (localName.equals("doc")) {
@@ -47,10 +50,12 @@ public class SubjectCreditorParser extends BatchParser {
             currentDoc.put("doc_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), docType, false, true));
         } else if (localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            currentDoc.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            currentDoc.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -61,10 +66,14 @@ public class SubjectCreditorParser extends BatchParser {
     @Override
     public boolean endElement(String localName) throws SAXException {
         if (localName.equals("creditor")) {
-            currentBaseEntity.put("creditor_info", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditorInfo, false, true));
-            currentBaseEntity.put("is_person", new BaseEntityBooleanValue(0, -1, batch.getRepDate(), false, true, false));
-            currentBaseEntity.put("is_organization", new BaseEntityBooleanValue(0, -1, batch.getRepDate(), false, true, false));
-            currentBaseEntity.put("is_creditor", new BaseEntityBooleanValue(0, -1, batch.getRepDate(), true, true, false));
+            currentBaseEntity.put("creditor_info", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    creditorInfo, false, true));
+            currentBaseEntity.put("is_person", new BaseEntityBooleanValue(0, -1, batch.getRepDate(),
+                    false, true, false));
+            currentBaseEntity.put("is_organization", new BaseEntityBooleanValue(0, -1, batch.getRepDate(),
+                    false, true, false));
+            currentBaseEntity.put("is_creditor", new BaseEntityBooleanValue(0, -1, batch.getRepDate(),
+                    true, true, false));
             return true;
         } else if (localName.equals("code")) {
         } else if (localName.equals("docs")) {

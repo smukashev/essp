@@ -28,7 +28,8 @@ public class SubjectOrganizationNamesParser extends BatchParser {
             currentBaseEntity.put("lang", new BaseEntityStringValue(0, -1, batch.getRepDate(),
                     event.asStartElement().getAttributeByName(new QName("lang")).getValue(), false, true));
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            currentBaseEntity.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else {
             throw new UnknownTagException(localName);
         }

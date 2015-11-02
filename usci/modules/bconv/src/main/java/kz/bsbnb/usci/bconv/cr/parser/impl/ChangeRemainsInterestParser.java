@@ -32,6 +32,9 @@ public class ChangeRemainsInterestParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_interest"), batch.getRepDate());
+        fieldCurrent = null;
+        fieldPastDue = null;
+        fieldWriteOf = null;
     }
 
     @Override
