@@ -1,13 +1,16 @@
 package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.IBatchService;
+import kz.bsbnb.usci.core.service.IGlobalService;
 import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
+import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.model.json.*;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.QueueOrderType;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +26,12 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     @Autowired
     private IBatchService batchService;
 
+    @Autowired
+    private IGlobalService globalService;
+
     private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED);
+
+    private Map<Long, EavGlobal> globalMap = new HashMap<>();
 
     @Override
     public List<InputInfo> getAllInputInfos(List<Creditor> creditorsList, Date reportDate) {
@@ -148,9 +156,20 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 inputInfo.setCreditor(creditor);
 
                 Shared s = new Shared();
+
+                EavGlobal g;
+                if(globalMap.containsKey(batch.getStatusId())) {
+                    g = globalMap.get(batch.getStatusId());
+                } else {
+                    g = globalService.getGlobal(batch.getStatusId());
+                    if(g!= null)
+                        globalMap.put(g.getId(), g);
+                }
                 s.setCode("S");
-                s.setNameRu("В обработке");
-                s.setNameKz("В обработке");
+                if(g != null) {
+                    s.setNameRu(g.getDescription());
+                    s.setNameKz(g.getDescription());
+                }
                 inputInfo.setStatus(s);
 
                 inputInfo.setUserId(batch.getUserId());
@@ -180,5 +199,4 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         return batchFullJModel;
     }
-
 }

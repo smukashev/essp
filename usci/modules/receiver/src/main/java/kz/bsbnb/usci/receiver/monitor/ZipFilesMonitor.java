@@ -10,6 +10,8 @@ import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.ReportStatus;
+import kz.bsbnb.usci.receiver.queue.JobInfo;
+import kz.bsbnb.usci.receiver.queue.JobLauncherQueue;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IEntityService;
@@ -60,6 +62,9 @@ public class ZipFilesMonitor {
     @Autowired
     private ReceiverStatusSingleton receiverStatusSingleton;
 
+    @Autowired
+    private JobLauncherQueue jobLauncherQueue;
+
     private IBatchService batchService;
 
     private Map<String, Job> jobs;
@@ -75,8 +80,6 @@ public class ZipFilesMonitor {
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
-        sender = new SenderThread();
-        sender.start();
     }
 
     public boolean restartBatch(long batchId) {
@@ -84,7 +87,8 @@ public class ZipFilesMonitor {
             Batch batch = batchService.getBatch(batchId);
             BatchInfo batchInfo = new BatchInfo(batch);
             System.out.println(batchId + " - restarted");
-            sender.addJob(batchId, batchInfo);
+            //sender.addJob(batchId, batchInfo);
+            jobLauncherQueue.addJob(batchId, batchInfo);
             receiverStatusSingleton.batchReceived();
             return true;
         } catch (Exception e) {
@@ -97,7 +101,8 @@ public class ZipFilesMonitor {
     @PostConstruct
     public void init() {
         batchService = serviceFactory.getBatchService();
-
+        sender = new SenderThread();
+        sender.start();
         sender.setReceiverStatusSingleton(receiverStatusSingleton);
         creditors = serviceFactory.getRemoteCreditorBusiness().findMainOfficeCreditors();
         System.out.println("Найдено " + creditors.size() + " кредиторов;");
@@ -121,7 +126,8 @@ public class ZipFilesMonitor {
 
             for (Batch batch : pendingBatchList) {
                 try {
-                    sender.addJob(batch.getId(), new BatchInfo(batch));
+                    //sender.addJob(batch.getId(), new BatchInfo(batch));
+                    jobLauncherQueue.addJob(batch.getId(), new BatchInfo(batch));
                     receiverStatusSingleton.batchReceived();
                     System.out.println("Перезагрузка батча : " + batch.getId() + " - " + batch.getFileName());
                 } catch (Exception e) {
@@ -141,36 +147,6 @@ public class ZipFilesMonitor {
 
         public void setReceiverStatusSingleton(ReceiverStatusSingleton receiverStatusSingleton) {
             this.receiverStatusSingleton = receiverStatusSingleton;
-        }
-
-        private class JobInfo {
-            long batchId;
-            BatchInfo batchInfo;
-
-            private JobInfo(long batchId, BatchInfo batchInfo) {
-                this.batchId = batchId;
-                this.batchInfo = batchInfo;
-            }
-
-            public long getBatchId() {
-                return batchId;
-            }
-
-            public BatchInfo getBatchInfo() {
-                return batchInfo;
-            }
-        }
-
-        private ConcurrentLinkedQueue<JobInfo> ids = new ConcurrentLinkedQueue<JobInfo>();
-
-        private synchronized void addJob(long id, BatchInfo batchInfo) {
-            ids.add(new JobInfo(id, batchInfo));
-        }
-
-        private synchronized JobInfo getNextJob() {
-            if (ids.size() > 0)
-                return ids.poll();
-            return null;
         }
 
         public void run() {
@@ -193,7 +169,7 @@ public class ZipFilesMonitor {
                 }
                 sleepCounter = 0;
 
-                if ((nextJob = getNextJob()) != null) {
+                if ((nextJob = jobLauncherQueue.getNextJob()) != null) {
                     System.out.println("Отправка батча на обработку : " + nextJob.getBatchId());
 
                     try {
@@ -395,7 +371,11 @@ public class ZipFilesMonitor {
                             .setStatus(BatchStatuses.WAITING)
                             .setReceiptDate(new Date()));
 
-            sender.addJob(batchId, batchInfo);
+            batchInfo.setContentSize(batch.getContent().length);
+            batchInfo.setCreditorId(batch.getCreditorId());
+            batchInfo.setReceiptDate(batch.getReceiptDate());
+            //sender.addJob(batchId, batchInfo);
+            jobLauncherQueue.addJob(batchId, batchInfo);
         }
     }
 
@@ -569,7 +549,7 @@ public class ZipFilesMonitor {
                     userId = 100500L;
 
                 batchInfo.setBatchType("2");
-                batchInfo.setBatchName(batchName);
+                batchInfo.setBatchName(parseFileNameFromPath(filename));
                 batchInfo.setUserId(userId);
 
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -659,8 +639,9 @@ public class ZipFilesMonitor {
                 batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent().
                         replaceAll("\\s+", ""));
 
-                batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent().
-                        replaceAll("\\s+", ""));
+                /*batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent().
+                        replaceAll("\\s+", ""));*/
+                batchInfo.setBatchName(parseFileNameFromPath(filename));
 
                 batchInfo.setUserId(userId == null ?
                         Long.parseLong(document.getElementsByTagName("userid").item(0).getTextContent().
@@ -751,8 +732,9 @@ public class ZipFilesMonitor {
             batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent()
                     .replaceAll("\\s+", ""));
 
-            batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent()
-                    .replaceAll("\\s+", ""));
+            /*batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent()
+                    .replaceAll("\\s+", ""));*/
+            batchInfo.setBatchName(parseFileNameFromPath(filename));
 
             batchInfo.setUserId(100500L);
             NodeList nlist = document.getElementsByTagName("property");
@@ -834,5 +816,14 @@ public class ZipFilesMonitor {
 
         } while (valid);
 
+    }
+
+    private String parseFileNameFromPath(String fileName){
+        return fileName.substring(fileName.lastIndexOf('/') + 1);
+
+    }
+
+    public JobLauncherQueue getJobLauncherQueue() {
+        return jobLauncherQueue;
     }
 }

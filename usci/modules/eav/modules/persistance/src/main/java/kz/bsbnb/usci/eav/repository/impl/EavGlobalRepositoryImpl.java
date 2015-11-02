@@ -4,6 +4,8 @@ import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IEavGlobalDao;
 import kz.bsbnb.usci.eav.repository.IEavGlobalRepository;
 import kz.bsbnb.usci.eav.util.IGlobal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -15,6 +17,8 @@ import java.util.List;
 public class EavGlobalRepositoryImpl implements IEavGlobalRepository, InitializingBean {
 
     private HashMap<String, EavGlobal> cache = new HashMap<>();
+
+    Logger logger = LoggerFactory.getLogger(EavGlobalRepositoryImpl.class);
 
     @Autowired
     private IEavGlobalDao eavGlobalDao;
@@ -51,4 +55,19 @@ public class EavGlobalRepositoryImpl implements IEavGlobalRepository, Initializi
         return eavGlobalDao.get(id);
     }
 
+    @Override
+    public void update(String type, String code, String value){
+        eavGlobalDao.update(type, code, value);
+        cache.remove(type + "___" + code);
+    }
+
+    @Override
+    public String getValue(String type, String code){
+        try {
+            return getGlobal(type, code).getValue();
+        } catch (Exception e) {
+            logger.warn("global ("+type + "," + code + ") not found: " + e.getMessage() );
+            return null;
+        }
+    }
 }

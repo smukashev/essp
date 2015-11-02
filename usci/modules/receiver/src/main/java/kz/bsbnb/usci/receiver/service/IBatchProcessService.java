@@ -1,6 +1,12 @@
 package kz.bsbnb.usci.receiver.service;
 
+import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.cr.model.InputInfo;
+import kz.bsbnb.usci.eav.util.QueueOrderType;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author k.tulbassiyev
@@ -11,4 +17,7 @@ public interface IBatchProcessService {
     public void processBatchWithoutUser(String fileName);
     public ReceiverStatus getStatus();
     public boolean restartBatch(long id);
+    public String getJobLauncherStatus();
+    public void reloadJobLauncherConfig();
+    public List<InputInfo> getQueueListPreview(List<Creditor> creditors, Set<Long> priorityCreditors, QueueOrderType queueOrderType);
 }

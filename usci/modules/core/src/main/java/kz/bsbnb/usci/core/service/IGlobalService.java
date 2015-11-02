@@ -12,4 +12,9 @@ public interface IGlobalService {
 
     EavGlobal getGlobal(Long id);
 
+    void update(String type, String code, String value);
+
+    void updateValue(EavGlobal global);
+
+    String getValue(String type, String code);
 }
