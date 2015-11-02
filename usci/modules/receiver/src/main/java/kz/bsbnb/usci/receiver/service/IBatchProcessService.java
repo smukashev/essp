@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
+import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 
 import java.util.HashMap;
