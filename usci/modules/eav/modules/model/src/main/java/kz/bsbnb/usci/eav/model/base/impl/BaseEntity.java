@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -514,6 +513,21 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         result = 31 * result + values.hashCode();
         return result;
     }
+    public int hashCode2() {
+        int result = 0;
+        result = 31 * result + meta.hashCode();
+
+        for(String name : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(name);
+            if (metaAttribute.isKey()) {
+                result += values.get(name).getValue().hashCode();
+            }
+
+        }
+
+        return result;
+    }
+
 
     private Queue queue;
     public List lastRuleErrors;

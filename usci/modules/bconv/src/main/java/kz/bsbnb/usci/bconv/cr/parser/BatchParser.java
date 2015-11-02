@@ -47,12 +47,6 @@ public abstract class BatchParser {
         dateFormat.setLenient(false);
     }
 
-    public Calendar convertDateToCalendar(Date date) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        return c;
-    }
-
     public void parse(XMLEventReader xmlReader, Batch batch, long index) throws SAXException {
         this.batch = batch;
         init();

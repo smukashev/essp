@@ -288,9 +288,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     String metaClassName = entity.getMeta().getClassName();
 
                     /* Обработка документов */
-                    if (childMetaClass.getClassName().equals("document") && (metaClassName.equals("person") ||
-                            metaClassName.equals("organization") || metaClassName.equals("head") ||
-                            metaClassName.equals("creditor"))) {
+                    if (childMetaClass.getClassName().equals("document") && (metaClassName.equals("subject"))) {
                         List<IBaseValue> baseValues = new ArrayList<>(baseSet.get());
                         List<Long> identificationValues = new ArrayList<>();
 

@@ -3,7 +3,7 @@ title: документ  физ лица должен содержать 12 си
 rule "документ  физ лица должен содержать 12 символов ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}persons.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_person=true]docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -16,7 +16,7 @@ title: документ  юр. лица должен содержать 12 си�
 rule "документ  юр. лица должен содержать 12 символов ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}organizations.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_organization=true]docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -68,7 +68,7 @@ title: документ  кредтиора физ лица с особыми о
 rule "документ  кредтиора физ лица с особыми отношениями должен содержать 12 символов ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}persons.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_person=true]person_info.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -81,7 +81,7 @@ title: документ  руководитель организации дол�
 rule "документ  руководитель организации должен содержать 12 символов ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}organizations.head.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_organization=true]organization_info.head.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -94,7 +94,7 @@ title: документ  кредтиора юр лица с особыми от
 rule "документ  кредтиора юр лица с особыми отношениями должен содержать 12 символов ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}organizations.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_organization=true]organization_info.bank_relations.creditor.docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -133,7 +133,7 @@ title: документ  субъект кредитора  должен сод�
 rule "документ  субъект кредитора  должен содержать 12 символов ИИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}creditors.docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_creditor=true]docs[doc_type.code=06]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -146,7 +146,7 @@ title: документ  физ лица должен содержать 12 си
 rule "документ  физ лица должен содержать 12 символов БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}persons.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_person=true]docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -159,7 +159,7 @@ title: документ  юр. лица должен содержать 12 си�
 rule "документ  юр. лица должен содержать 12 символов БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}organizations.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_organization=true]docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -211,7 +211,7 @@ title: документ  кредтиора физ лица с особыми о
 rule "документ  кредтиора физ лица с особыми отношениями должен содержать 12 символов БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}persons.bank_relations.creditor.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_person=true]person_info.bank_relations.creditor.docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -224,7 +224,7 @@ title: документ  руководитель организации дол�
 rule "документ  руководитель организации должен содержать 12 символов БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}organizations.head.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_organization=true]organization_info.head.docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -237,7 +237,7 @@ title: документ  кредтиора юр лица с особыми от
 rule "документ  кредтиора юр лица с особыми отношениями должен содержать 12 символов БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}organizations.bank_relations.creditor.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_organization=true]organization_info.bank_relations.creditor.docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -276,7 +276,7 @@ title: документ  субъект кредитора  должен сод�
 rule "документ  субъект кредитора  должен содержать 12 символов БИН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}creditors.docs[doc_type.code=07]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_creditor=true]docs[doc_type.code=07]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -289,7 +289,7 @@ title: документ  физ лица должен содержать 12 си
 rule "документ  физ лица должен содержать 12 символов РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}persons.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_person=true]docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -302,7 +302,7 @@ title: документ  юр. лица должен содержать 12 си�
 rule "документ  юр. лица должен содержать 12 символов РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}organizations.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_organization=true]docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -354,7 +354,7 @@ title: документ  кредтиора физ лица с особыми о
 rule "документ  кредтиора физ лица с особыми отношениями должен содержать 12 символов РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}persons.bank_relations.creditor.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_person=true]person_info.bank_relations.creditor.docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -367,7 +367,7 @@ title: документ  руководитель организации дол�
 rule "документ  руководитель организации должен содержать 12 символов РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}organizations.head.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_organization=true]organization_info.head.docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -380,7 +380,7 @@ title: документ  кредтиора юр лица с особыми от
 rule "документ  кредтиора юр лица с особыми отношениями должен содержать 12 символов РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}organizations.bank_relations.creditor.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_organization=true]organization_info.bank_relations.creditor.docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end
@@ -419,7 +419,7 @@ title: документ  субъект кредитора  должен сод�
 rule "документ  субъект кредитора  должен содержать 12 символов РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getNot12DigitStrings((List)getEls("{get}creditors.docs[doc_type.code=11]no")) && $r.size() > 0))
+			&& ( $r : getNot12DigitStrings((List)getEls("{get}subject[is_creditor=true]docs[doc_type.code=11]no")) && $r.size() > 0))
 then
 	$entity.addValidationError("документ должен содержать 12 цифр: " + $r);
 end

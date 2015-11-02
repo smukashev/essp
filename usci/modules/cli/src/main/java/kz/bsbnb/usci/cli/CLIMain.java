@@ -10,18 +10,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.ConnectException;
-import java.rmi.RMISecurityManager;
 
-/**
- * clear
- * init
- * xsd convert path_to_file ct_package
- * meta show name person | ct_package
- * crbatch path_to_xml count
- */
-
-public class CLIMain
-{
+public class CLIMain {
     public static void main(String args[]) {
         ApplicationContext ctx = null;
         try {
@@ -44,13 +34,11 @@ public class CLIMain
         if (args.length > 0) {
             File f = new File(args[0]);
 
-            try
-            {
+            try {
                 InputStream inputStream = new FileInputStream(f);
                 app.setInputStream(inputStream);
                 System.out.println("Using file: " + args[0]);
-            } catch (FileNotFoundException e)
-            {
+            } catch (FileNotFoundException e) {
                 System.out.println("Error file: " + args[0] + " does not exist.");
                 System.out.println(f.getAbsoluteFile());
             }

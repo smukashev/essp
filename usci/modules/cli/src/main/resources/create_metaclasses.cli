@@ -395,45 +395,55 @@ meta add --name=bank_relation --attribute=bank_relation --type=meta_class --chil
 meta add --name=bank_relation --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
 
 #====================================
-#= ORGANIZATION
+#= ORGANIZATION_INFO
 #====================================
 
-meta create --name=organization
-meta add --name=organization --attribute=docs --type=meta_class --array --childname=document --cumulative
-meta key --name=organization --attribute=docs
-meta add --name=organization --attribute=is_se --type=boolean
-meta add --name=organization --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
-meta add --name=organization --attribute=econ_trade --type=meta_class --childname=ref_econ_trade --keytype=any --immutable
-meta add --name=organization --attribute=enterprise_type --type=meta_class --childname=ref_enterprise_type --keytype=any --immutable
-meta add --name=organization --attribute=head --type=meta_class --childname=head
-meta add --name=organization --attribute=legal_form --type=meta_class --childname=ref_legal_form --keytype=any --immutable
-meta add --name=organization --attribute=offshore --type=meta_class --childname=ref_offshore --keytype=any --immutable
-meta add --name=organization --attribute=addresses --type=meta_class --array --childname=address
-meta add --name=organization --attribute=bank_relations --type=meta_class --childname=bank_relation --array --keytype=any
-meta add --name=organization --attribute=contacts --type=meta_class --array --childname=contact
-meta add --name=organization --attribute=names --type=meta_class --array --childname=organization_name
+meta create --name=organization_info
+meta add --name=organization_info --attribute=is_se --type=boolean
+meta add --name=organization_info --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
+meta add --name=organization_info --attribute=econ_trade --type=meta_class --childname=ref_econ_trade --keytype=any --immutable
+meta add --name=organization_info --attribute=enterprise_type --type=meta_class --childname=ref_enterprise_type --keytype=any --immutable
+meta add --name=organization_info --attribute=head --type=meta_class --childname=head
+meta add --name=organization_info --attribute=legal_form --type=meta_class --childname=ref_legal_form --keytype=any --immutable
+meta add --name=organization_info --attribute=offshore --type=meta_class --childname=ref_offshore --keytype=any --immutable
+meta add --name=organization_info --attribute=addresses --type=meta_class --array --childname=address
+meta add --name=organization_info --attribute=bank_relations --type=meta_class --childname=bank_relation --array --keytype=any
+meta add --name=organization_info --attribute=contacts --type=meta_class --array --childname=contact
+meta add --name=organization_info --attribute=names --type=meta_class --array --childname=organization_name
 
 #====================================
-#= PERSON
+#= PERSON_INFO
 #====================================
 
-meta create --name=person
-meta add --name=person --attribute=docs --type=meta_class --array --childname=document --cumulative
-meta key --name=person --attribute=docs
-meta add --name=person --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
-meta add --name=person --attribute=offshore --type=meta_class --childname=ref_offshore --keytype=any --immutable
-meta add --name=person --attribute=addresses --type=meta_class --array --childname=address
-meta add --name=person --attribute=bank_relations --type=meta_class --childname=bank_relation --array --keytype=any
-meta add --name=person --attribute=contacts --type=meta_class --array --childname=contact
-meta add --name=person --attribute=names --type=meta_class --array --childname=person_name
+meta create --name=person_info
+meta add --name=person_info --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
+meta add --name=person_info --attribute=offshore --type=meta_class --childname=ref_offshore --keytype=any --immutable
+meta add --name=person_info --attribute=addresses --type=meta_class --array --childname=address
+meta add --name=person_info --attribute=bank_relations --type=meta_class --childname=bank_relation --array --keytype=any
+meta add --name=person_info --attribute=contacts --type=meta_class --array --childname=contact
+meta add --name=person_info --attribute=names --type=meta_class --array --childname=person_name
 
 #====================================
-#= CREDITOR
+#= CREDITOR_INFO
 #====================================
 
-meta create --name=creditor
-meta add --name=creditor --attribute=code --type=string
-meta add --name=creditor --attribute=docs --type=meta_class --childname=document --array --cumulative
+meta create --name=creditor_info
+meta add --name=creditor_info --attribute=code --type=string
+
+#====================================
+#= SUBJECT
+#====================================
+
+meta create --name=subject
+meta add --name=subject --attribute=docs --type=meta_class --array --childname=document --cumulative
+meta key --name=subject --attribute=docs
+meta add --name=subject --attribute=person_info --type=meta_class --childname=person_info
+meta add --name=subject --attribute=organization_info --type=meta_class --childname=organization_info
+meta add --name=subject --attribute=creditor_info --type=meta_class --childname=creditor_info
+meta add --name=subject --attribute=is_person --type=boolean
+meta add --name=subject --attribute=is_organization --type=boolean
+meta add --name=subject --attribute=is_creditor --type=boolean
+
 
 #====================================
 #= REMAINS
@@ -598,6 +608,11 @@ meta key --name=primary_contract --attribute=no
 #====================================
 
 meta create --name=credit
+meta add --name=credit --attribute=primary_contract --type=meta_class --childname=primary_contract
+meta key --name=credit --attribute=primary_contract
+meta add --name=credit --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
+meta key --name=credit --attribute=creditor
+meta add --name=credit --attribute=subject --type=meta_class --childname=subject
 meta add --name=credit --attribute=actual_issue_date --type=date
 meta add --name=credit --attribute=amount --type=double
 meta add --name=credit --attribute=contract_maturity_date --type=date
@@ -612,14 +627,7 @@ meta add --name=credit --attribute=currency --type=meta_class --childname=ref_cu
 meta add --name=credit --attribute=finance_source --type=meta_class --childname=ref_finance_source --keytype=any --immutable
 meta add --name=credit --attribute=portfolio --type=meta_class --childname=portfolio
 meta add --name=credit --attribute=change --type=meta_class --childname=change --final
-meta add --name=credit --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
-meta key --name=credit --attribute=creditor
-meta add --name=credit --attribute=organizations --type=meta_class --array --childname=organization
-meta add --name=credit --attribute=persons --type=meta_class --array --childname=person
-meta add --name=credit --attribute=creditors --type=meta_class --array --childname=creditor
 meta add --name=credit --attribute=pledges --type=meta_class --array --childname=pledge
-meta add --name=credit --attribute=primary_contract --type=meta_class --childname=primary_contract
-meta key --name=credit --attribute=primary_contract
 meta add --name=credit --attribute=maturity_date --type=date
 meta add --name=credit --attribute=prolongation_date --type=date
 

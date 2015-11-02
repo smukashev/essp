@@ -5,16 +5,11 @@ import kz.bsbnb.usci.eav.util.BatchStatuses;
 
 import java.util.Date;
 
-/**
- * Created by maksat on 8/3/15.
- */
 public class BatchStatus extends Persistable {
-
     private long batchId;
     private long statusId;
     private String description;
     private Date receiptDate;
-
     private BatchStatuses status;
 
     public long getBatchId() {
@@ -40,7 +35,16 @@ public class BatchStatus extends Persistable {
     }
 
     public BatchStatus setDescription(String description) {
-        this.description = description;
+        if (description != null) {
+            if (description.getBytes(java.nio.charset.StandardCharsets.UTF_8).length < 512) {
+                this.description = description;
+            } else {
+                this.description = description.substring(0, 256);
+            }
+        } else {
+            this.description = null;
+        }
+
         return this;
     }
 

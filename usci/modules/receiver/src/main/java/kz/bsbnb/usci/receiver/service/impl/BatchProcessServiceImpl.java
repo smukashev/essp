@@ -79,6 +79,16 @@ public class BatchProcessServiceImpl implements IBatchProcessService {
     }
 
     @Override
+    public HashMap<String, QueryEntry> getSQLStats() {
+        return sqlStats.getStats();
+    }
+
+    @Override
+    public void clearSQLStats() {
+        sqlStats.clear();
+    }
+
+    @Override
     public boolean restartBatch(long id) {
         return zipFilesMonitor.restartBatch(id);
     }

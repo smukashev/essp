@@ -487,6 +487,7 @@ public class ZipFilesMonitor {
         }
 
         buffer.flush();
+        in.close();
 
         return buffer.toByteArray();
     }
@@ -635,6 +636,7 @@ public class ZipFilesMonitor {
                 } catch (SAXException e) {
                     e.printStackTrace();
                 }
+
 
                 batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent().
                         replaceAll("\\s+", ""));

@@ -1238,6 +1238,9 @@ public class CLI {
                     System.out.println("Argument needed: <fkey> <id, name> <id or name> <attributeName> " +
                             "<subAttributeName> <filterValue>");
                 }
+            } else if (args.get(0).equals("tojava")) {
+                MetaClass metaClass = metaClassRepository.getMetaClass(args.get(1));
+                System.out.println(metaClass.toJava(""));
             } else {
                 System.out.println("No such operation: " + args.get(0));
             }
@@ -1731,6 +1734,7 @@ public class CLI {
         } else {
             System.out.println("Argument needed: <core_url>");
             System.out.println("Example: sqlstat rmi://127.0.0.1:1099/entityService");
+            System.out.println("Example: sqlstat rmi://127.0.0.1:1097/batchProcessService");
         }
     }
 

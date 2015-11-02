@@ -5,9 +5,6 @@ import kz.bsbnb.usci.eav.util.EntityStatuses;
 
 import java.util.Date;
 
-/**
- * Created by maksat on 8/3/15.
- */
 public class EntityStatus extends Persistable {
     private long batchId;
     private long entityId;
@@ -50,7 +47,15 @@ public class EntityStatus extends Persistable {
     }
 
     public EntityStatus setDescription(String description) {
-        this.description = description;
+        if (description != null) {
+            if (description.getBytes(java.nio.charset.StandardCharsets.UTF_8).length < 512) {
+                this.description = description;
+            } else {
+                this.description = description.substring(0, 256);
+            }
+        } else {
+            this.description = null;
+        }
         return this;
     }
 
