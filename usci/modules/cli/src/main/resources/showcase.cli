@@ -199,10 +199,11 @@ showcase list add addresses.details details
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
+showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique credit_id subject_id person_info_id
+showcase addIndex nonunique creditor_id credit_id subject_id person_info_id
 showcase addIndex nonunique subject_id
 
 showcase save
@@ -226,10 +227,11 @@ showcase list add addresses.details details
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
+showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique credit_id subject_id organization_info_id
+showcase addIndex nonunique creditor_id credit_id subject_id organization_info_id
 showcase addIndex nonunique subject_id
 
 showcase save
@@ -252,10 +254,11 @@ showcase list add contacts.contact_type contact_type_id
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
 
+showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique credit_id subject_id person_info_id
+showcase addIndex nonunique creditor_id credit_id subject_id person_info_id
 showcase addIndex nonunique subject_id
 
 showcase save
@@ -277,10 +280,11 @@ showcase list add contacts.contact_type contact_type_id
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
 
+showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique credit_id subject_id organization_info_id
+showcase addIndex nonunique creditor_id credit_id subject_id organization_info_id
 
 showcase save
 
@@ -301,9 +305,10 @@ showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type
 showcase list add docs.name doc_name
 
+showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
-showcase addIndex nonunique credit_id subject_id doc_id
+showcase addIndex nonunique creditor_id credit_id subject_id doc_id
 
 showcase save
 
@@ -324,9 +329,10 @@ showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type
 showcase list add docs.name doc_name
 
+showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
-showcase addIndex nonunique credit_id subject_id doc_id
+showcase addIndex nonunique creditor_id credit_id subject_id doc_id
 
 showcase save
 
@@ -404,10 +410,10 @@ showcase list add turnover.issue.debt.amount_currency debt_amount_currency
 showcase list add turnover.issue.interest.amount interest_amount
 showcase list add turnover.issue.interest.amount_currency interest_amount_currency
 
-showcase list addCustom credit root credit_id
 showcase list addCustom credit creditor creditor_id
+showcase list addCustom credit root credit_id
 
-showcase addIndex nonunique change_id
+showcase addIndex nonunique creditor_id credit_id change_id
 
 showcase save
 
@@ -440,10 +446,10 @@ showcase list add credit_flow.provision.provision_msfo.value msfo_value
 showcase list add credit_flow.provision.provision_msfo_over_balance.balance_account msfo_ob_balance_account_id
 showcase list add credit_flow.provision.provision_msfo_over_balance.value msfo_ob_value
 
-showcase list addCustom credit root credit_id
 showcase list addCustom credit creditor creditor_id
+showcase list addCustom credit root credit_id
 
-showcase addIndex nonunique change_id
+showcase addIndex nonunique creditor_id credit_id change_id
 
 showcase save
 
@@ -463,10 +469,10 @@ showcase list add pledge_type pledge_type
 showcase list add contract contract
 showcase list add value value
 
-showcase list addCustom credit root credit_id
 showcase list addCustom credit creditor creditor_id
+showcase list addCustom credit root credit_id
 
-showcase addIndex nonunique pledge_id
+showcase addIndex nonunique creditor_id credit_id pledge_id
 
 showcase save
 
@@ -531,10 +537,10 @@ showcase list add remains.discounted_value.value discounted_value
 showcase list add remains.correction.value corr_value
 showcase list add remains.correction.value_currency corr_cvalue
 
-showcase list addCustom credit root credit_id
 showcase list addCustom credit creditor creditor_id
+showcase list addCustom credit root credit_id
 
-showcase addIndex nonunique change_id
+showcase addIndex nonunique creditor_id credit_id change_id
 
 showcase save
 
