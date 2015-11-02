@@ -125,6 +125,8 @@ showcase list add head.names.lastname lastname
 showcase list add head.names.middlename middlename
 showcase list add head.names.lang lang
 
+
+showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit subject subject_id
 
 showcase addIndex nonunique subject_id
@@ -149,6 +151,7 @@ showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type_id
 showcase list add docs.name doc_name
 
+showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit subject subject_id
 
 showcase addIndex nonunique subject_id
