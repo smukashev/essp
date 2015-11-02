@@ -50,7 +50,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @Autowired
     protected Global global;
 
-    private Set<String> metaRules = new HashSet<String>();
+    private Set<String> metaRules = new HashSet<>();
 
     @PostConstruct
     public void init() {
@@ -69,36 +69,13 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
     @Override
     public void write(List items) throws Exception {
         logger.info("Writer write: " + items.size());
-        //System.out.println("Writer write: " + items.size());
 
-        Iterator<Object> iter = items.iterator();
+        Iterator<BaseEntity> iterator = items.iterator();
 
-        ArrayList<BaseEntity> entitiesToSave = new ArrayList<BaseEntity>(items.size());
+        ArrayList<BaseEntity> entitiesToSave = new ArrayList<>(items.size());
 
-        while(iter.hasNext()) {
-            BaseEntity entity = (BaseEntity)iter.next();
-            //System.out.println(entity.toString());
-
-            //TODO: UNCOMMENT
-            /*if (statusSingleton.isEntityCompleted(entity.getBatchId(), entity.getBatchIndex() - 1)) {
-                //System.out.println("Contract no " + contractNo + " with date " + contractDate + " skipped because it " +
-                        //"has status \"" + EntityStatuses.COMPLETED + "\"");
-                continue;
-            }*/
-
-           /* {
-                EntityStatus entityStatus = new EntityStatus()
-                        .setBatchId(entity.getBatchId())
-                        .setEntityId(entity.getId())
-                        .setStatus(EntityStatuses.CHECK_IN_PARSER)
-                        .setReceiptDate(new Date())
-                        .setIndex(entity.getBatchIndex() - 1);
-
-                Map<String, String> params = StatusProperties.getSpecificParams(entity);
-
-                Long entityStatusId = batchService.addEntityStatus(entityStatus);
-                batchService.addEntityStatusParams(entityStatusId, params);
-            }*/
+        while(iterator.hasNext()) {
+            BaseEntity entity = iterator.next();
 
             List<String> errors = new LinkedList<>(entity.getValidationErrors());
             String ruleRuntimeException = null;
@@ -113,7 +90,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
                     sqlStats.put(entity.getMeta().getClassName() + "_parser", System.currentTimeMillis() - t1);
                 } catch (Exception e) {
-                    logger.error("Can't run rules: " + e.getMessage());
+                    logger.error("Не могу применить бизнес правила: " + e.getMessage());
                     ruleRuntimeException = e.getMessage();
                 }
             }
@@ -136,9 +113,6 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
             } else if (errors != null && errors.size() > 0) {
                 for (String errorMsg : errors) {
-                    //System.out.println(errorMsg);
-                    //TODO: check for error with Index
-
                     EntityStatus entityStatus = new EntityStatus()
                             .setBatchId(entity.getBatchId())
                             .setEntityId(entity.getId())
@@ -153,18 +127,6 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                     batchService.addEntityStatusParams(entityStatusId, params);
                 }
             } else {
-                /*EntityStatus entityStatus = new EntityStatus()
-                        .setBatchId(entity.getBatchId())
-                        .setEntityId(entity.getId())
-                        .setStatus(EntityStatuses.WAITING)
-                        .setReceiptDate(new Date())
-                        .setIndex(entity.getBatchIndex() - 1);
-
-                Map<String, String> params = StatusProperties.getSpecificParams(entity);
-
-                Long entityStatusId = batchService.addEntityStatus(entityStatus);
-                batchService.addEntityStatusParams(entityStatusId, params);*/
-
                 entitiesToSave.add(entity);
             }
         }

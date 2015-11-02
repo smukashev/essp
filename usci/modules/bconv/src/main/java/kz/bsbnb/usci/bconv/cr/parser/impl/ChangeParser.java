@@ -36,6 +36,8 @@ public class ChangeParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("change"), batch.getRepDate());
+        maturityDate = null;
+        prolongationDate = null;
     }
 
     @Override

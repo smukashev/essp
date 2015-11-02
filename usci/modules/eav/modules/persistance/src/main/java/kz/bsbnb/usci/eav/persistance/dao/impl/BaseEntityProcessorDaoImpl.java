@@ -93,13 +93,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public IBaseEntity prepare(IBaseEntity baseEntity, long creditorId) {
         MetaClass metaClass = baseEntity.getMeta();
 
-        if(isReferenceCacheEnabled) {
-            if (metaClass.isReference()) {
-                IBaseEntity refBaseEntity = refRepositoryDao.getRef(baseEntity);
-                if (refBaseEntity != null) {
-                    return refBaseEntity;
-                }
-            }
+        if(isReferenceCacheEnabled && metaClass.isReference()) {
+            IBaseEntity refBaseEntity = refRepositoryDao.getRef(baseEntity);
+
+            if (refBaseEntity != null)
+                return refBaseEntity;
         }
         creditorId = metaClass.isReference() ? 0 : creditorId;
 

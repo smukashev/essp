@@ -46,7 +46,9 @@ public class MainParser extends BatchParser {
         if (packageParser.hasMore()) {
             currentBaseEntity = packageParser.getCurrentBaseEntity();
             BaseEntity creditor = infoParser.getCurrentBaseEntity();
-            currentBaseEntity.put("creditor", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditor, false, true));
+
+            currentBaseEntity.put("creditor", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditor,
+                    false, true));
 
             for (String s : creditor.getValidationErrors()) {
                 currentBaseEntity.addValidationError(s);

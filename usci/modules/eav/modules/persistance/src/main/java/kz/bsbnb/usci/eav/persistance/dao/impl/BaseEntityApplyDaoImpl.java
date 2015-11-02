@@ -2167,10 +2167,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             IBaseValue childBaseValuePrevious = setValueDao.getPreviousBaseValue(childBaseValueClosed);
 
-                            childBaseValuePrevious.setBaseContainer(childBaseSetApplied);
-                            childBaseValuePrevious.setMetaAttribute(metaAttribute);
-
                             if (childBaseValuePrevious != null && childBaseValuePrevious.getValue() != null) {
+                                childBaseValuePrevious.setBaseContainer(childBaseSetApplied);
+                                childBaseValuePrevious.setMetaAttribute(metaAttribute);
+
                                 IBaseEntity childBaseEntityPrevious = (IBaseEntity) childBaseValuePrevious.getValue();
 
                                 childBaseValuePrevious.setValue(applyBaseEntityAdvanced(creditorId,
@@ -2217,6 +2217,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 childBaseSetApplied.put(childBaseValueApplied);
                 baseEntityManager.registerAsInserted(childBaseValueApplied);
 
+                /* Сохранение документов по типу для последующей обработки */
                 if (childBaseEntitySaving.getMeta().getClassName().equals("document"))
                     savedDocTypes.add(childBaseValueSaving);
             }
@@ -2309,6 +2310,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
+        /* Обработка документов по типу*/
         if(savedDocTypes.size() > 0 && childBaseSetLoaded != null) {
             for (IBaseValue savedValue : savedDocTypes) {
                 for (IBaseValue loadedValue : childBaseSetLoaded.get()) {
