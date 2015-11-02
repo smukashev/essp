@@ -292,11 +292,11 @@ showcase save
 
 
 #==================================================================================
-# Person doc
+# Subject doc
 #==================================================================================
 
-showcase set name CORE_PERSON_DOC
-showcase set tableName CORE_PERSON_DOC
+showcase set name CORE_SUBJECT_DOC
+showcase set tableName CORE_SUBJECT_DOC
 showcase set downPath subject
 
 showcase list add docs doc_id
@@ -304,6 +304,10 @@ showcase list add docs doc_id
 showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type
 showcase list add docs.name doc_name
+
+showcase list add is_person is_person
+showcase list add is_organization is_organization
+showcase list add is_creditor is_creditor
 
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
@@ -314,29 +318,6 @@ showcase save
 
 #==================================================================================
 
-
-#==================================================================================
-# Organization doc
-#==================================================================================
-
-showcase set name CORE_ORG_DOC
-showcase set tableName CORE_ORG_DOC
-showcase set downPath subject
-
-showcase list add docs doc_id
-
-showcase list add docs.no doc_no
-showcase list add docs.doc_type doc_type
-showcase list add docs.name doc_name
-
-showcase list addCustom credit creditor creditor_id
-showcase list addCustom credit root credit_id
-
-showcase addIndex nonunique creditor_id credit_id subject_id doc_id
-
-showcase save
-
-#==================================================================================
 
 
 #==================================================================================
