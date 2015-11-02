@@ -50,8 +50,6 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
         reloadConfig();
     }
 
-    int nextCall = 0;
-
     @Override
     public JobInfo getNextJob() {
         if(activeJobCount < concurrencyLimit) {
@@ -70,10 +68,13 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
     @Override
     public String getStatus() {
         StringBuilder sb = new StringBuilder();
+        sb.append("JobLauncherStatus:\n");
         sb.append("queue size = " + queue.size() + ", order(Impl):" + order.getClass().getName() + ", " +
-                "activeJobCount = " + activeJobCount + ", nextCall = " + nextCall);
+                "activeJobCount = " + activeJobCount);
 
         sb.append("queue state:\n");
+        if(queue.size() == 0) sb.append("(empty)");
+
         for(JobInfo jobInfo : queue) {
             sb.append("batchId = " + jobInfo.getBatchId());
             sb.append(", batchName = " + jobInfo.getBatchInfo().getBatchName());
@@ -104,7 +105,6 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
     }
 
     public JobInfo next(List<JobInfo> queue, Set<Long> creditorsWithPriority, QueueOrder order) {
-        nextCall ++;
         //Сначала определяем первые файлы по каждому кредитору
         /*List<JobInfo> firstFilesByEachCreditor = new ArrayList<JobInfo>();
         Set<Long> creditorIds = new HashSet<>();*/

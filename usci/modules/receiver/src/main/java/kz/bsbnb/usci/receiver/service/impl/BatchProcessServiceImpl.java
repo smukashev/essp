@@ -73,6 +73,8 @@ public class BatchProcessServiceImpl implements IBatchProcessService {
             rs.setRulesEvaluationTimeAvg(time / count);
         }
 
+        rs.setJobLauncherStatus(zipFilesMonitor.getJobLauncherQueue().getStatus());
+
         return rs;
     }
 
