@@ -77,7 +77,8 @@ public class PackageParser extends BatchParser {
             creditType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
                     event.asStartElement().getAttributeByName(new QName("credit_type")).getValue(), false, true));
 
-            credit.put("credit_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditType, false, true));
+            credit.put("credit_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditType,
+                    false, true));
         } else if (localName.equals("subjects")) {
             while (true) {
                 subjectsParser.parse(xmlReader, batch, index);
@@ -100,7 +101,8 @@ public class PackageParser extends BatchParser {
                             pledgesParser.getCurrentBaseEntity(), false, true));
                 } else break;
             }
-            currentBaseEntity.put("pledges", new BaseEntityComplexSet(0, -1, batch.getRepDate(), pledges, false, true));
+            currentBaseEntity.put("pledges", new BaseEntityComplexSet(0, -1, batch.getRepDate(), pledges,
+                    false, true));
 
         } else if (localName.equals("change")) {
             changeParser.parse(xmlReader, batch, index);

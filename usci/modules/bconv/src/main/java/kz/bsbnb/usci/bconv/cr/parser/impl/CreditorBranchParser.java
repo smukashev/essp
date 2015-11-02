@@ -35,7 +35,8 @@ public class CreditorBranchParser extends BatchParser {
         if (localName.equals("creditor_branch")) {
         } else if (localName.equals("code")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            currentBaseEntity.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else if (localName.equals("docs")) {
             currentDocSet = new BaseSet(metaClassRepository.getMetaClass("document"));
         } else if (localName.equals("doc")) {
@@ -50,10 +51,12 @@ public class CreditorBranchParser extends BatchParser {
                     docType, false, true));
         } else if (localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            currentDoc.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(),
+                    false, true));
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            currentDoc.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(),
+                    false, true));
         } else {
             throw new UnknownTagException(localName);
         }
@@ -67,7 +70,8 @@ public class CreditorBranchParser extends BatchParser {
             return true;
         } else if (localName.equals("code")) {
         } else if (localName.equals("docs")) {
-            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, -1, batch.getRepDate(), currentDocSet, false, true));
+            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, -1, batch.getRepDate(), currentDocSet,
+                    false, true));
         } else if (localName.equals("doc")) {
             currentDocSet.put(new BaseSetComplexValue(0, -1, batch.getRepDate(), currentDoc, false, true));
         } else if (localName.equals("name")) {

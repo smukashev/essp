@@ -60,7 +60,7 @@ public class InfoParser extends BatchParser {
                         BaseEntity docLoaded = (BaseEntity) bv.getValue();
                         BaseEntity doc = new BaseEntity(metaClassRepository.getMetaClass("document"),
                                 batch.getRepDate());
-                        doc.put("no", new BaseValue(0, -1, batch.getRepDate(), docLoaded.getEl("no")));
+                        doc.put("no", new BaseValue<>(0, -1, batch.getRepDate(), docLoaded.getEl("no")));
 
                         BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
                                 batch.getRepDate());
@@ -68,7 +68,7 @@ public class InfoParser extends BatchParser {
                                 (String) docLoaded.getEl("doc_type.code"), false, true));
                         doc.put("doc_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), docType,
                                 false, true));
-                        creditorDocs.put(new BaseValue(0, -1, batch.getRepDate(), doc));
+                        creditorDocs.put(new BaseValue<>(0, -1, batch.getRepDate(), doc));
                     }
                     currentBaseEntity.put("docs", new BaseEntityComplexSet(0, -1, batch.getRepDate(),
                             creditorDocs, false, true));

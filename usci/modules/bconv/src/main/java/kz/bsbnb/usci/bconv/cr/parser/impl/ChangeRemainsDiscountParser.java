@@ -41,8 +41,10 @@ public class ChangeRemainsDiscountParser extends BatchParser {
             BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
                     batch.getRepDate());
 
-            balanceAccount.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
-            currentBaseEntity.put("balance_account", new BaseEntityComplexValue(0, -1, batch.getRepDate(), balanceAccount, false, true));
+            balanceAccount.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
+            currentBaseEntity.put("balance_account", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    balanceAccount, false, true));
         } else {
             throw new UnknownTagException(localName);
         }

@@ -45,8 +45,10 @@ public class ChangeCreditFlowParser extends BatchParser {
                     batch.getRepDate()
             );
             event = (XMLEvent) xmlReader.next();
-            classification.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
-            currentBaseEntity.put("classification", new BaseEntityComplexValue(0, -1, batch.getRepDate(), classification, false, true));
+            classification.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
+            currentBaseEntity.put("classification", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    classification, false, true));
         } else if (localName.equals("provision")) {
             currentProvisionGroup = new BaseEntity(metaClassRepository.getMetaClass("provision_group"),
                     batch.getRepDate());
@@ -57,34 +59,41 @@ public class ChangeCreditFlowParser extends BatchParser {
         } else if (localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
             getCurrentProvisionKfn().put("value",
-                    new BaseEntityDoubleValue(0, -1, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                    new BaseEntityDoubleValue(0, -1, batch.getRepDate(), new Double(event.asCharacters().getData()),
+                            false, true));
         } else if (localName.equals("balance_account")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
                     batch.getRepDate());
 
-            balanceAccount.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            balanceAccount.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
             getCurrentProvisionKfn().put("balance_account", new BaseEntityComplexValue(0, -1,
                     batch.getRepDate(), balanceAccount, false, true));
         } else if (localName.equals("value_msfo")) {
             event = (XMLEvent) xmlReader.next();
             getCurrentProvisionMsfo().put("value",
-                    new BaseEntityDoubleValue(0, -1, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                    new BaseEntityDoubleValue(0, -1, batch.getRepDate(), new Double(event.asCharacters().getData()),
+                            false, true));
         } else if (localName.equals("balance_account_msfo")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
                     batch.getRepDate());
-            balanceAccount.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
-            getCurrentProvisionMsfo().put("balance_account", new BaseEntityComplexValue(0, -1, batch.getRepDate(), balanceAccount, false, true));
+            balanceAccount.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
+            getCurrentProvisionMsfo().put("balance_account", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    balanceAccount, false, true));
         } else if (localName.equals("value_msfo_over_balance")) {
             event = (XMLEvent) xmlReader.next();
             getCurrentProvisionMsfoOverB().put("value",
-                    new BaseEntityDoubleValue(0, -1, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                    new BaseEntityDoubleValue(0, -1, batch.getRepDate(), new Double(event.asCharacters().getData()),
+                            false, true));
         } else if (localName.equals("balance_account_msfo_over_balance")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
                     batch.getRepDate());
-            balanceAccount.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            balanceAccount.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
             getCurrentProvisionMsfoOverB().put("balance_account", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
                     balanceAccount, false, true));
         } else {
@@ -109,10 +118,11 @@ public class ChangeCreditFlowParser extends BatchParser {
                         currentProvisionMsfo, false, true));
 
             if (currentProvisionMsfoOverB != null)
-                currentProvisionGroup.put("provision_msfo_over_balance", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
-                        currentProvisionMsfoOverB, false, true));
+                currentProvisionGroup.put("provision_msfo_over_balance", new BaseEntityComplexValue(0, -1,
+                        batch.getRepDate(), currentProvisionMsfoOverB, false, true));
 
-            currentBaseEntity.put("provision", new BaseEntityComplexValue(0, -1, batch.getRepDate(), currentProvisionGroup, false, true));
+            currentBaseEntity.put("provision", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    currentProvisionGroup, false, true));
 
         } else if (localName.equals("balance_account")) {
         } else if (localName.equals("balance_account_msfo")) {
