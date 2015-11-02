@@ -351,29 +351,6 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         id = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
         metaSet.setId(id);
 
-        if (metaSet.isComplex()) {
-            HashMap<String, ArrayList<String>> keyFilter = metaSet.getArrayKeyFilter();
-
-            DeleteConditionStep deleteFilter =
-                    context.delete(EAV_M_SET_KEY_FILTER).where(EAV_M_SET_KEY_FILTER.SET_ID.eq(id));
-
-            jdbcTemplate.update(deleteFilter.getSQL(), deleteFilter.getBindValues().toArray());
-
-            for (String attrName : keyFilter.keySet()) {
-
-                for (String val : keyFilter.get(attrName)) {
-                    InsertOnDuplicateStep insertFilter = context.
-                            insertInto(EAV_M_SET_KEY_FILTER,
-                                    EAV_M_SET_KEY_FILTER.SET_ID,
-                                    EAV_M_SET_KEY_FILTER.ATTR_NAME,
-                                    EAV_M_SET_KEY_FILTER.VALUE).
-                            values(id, attrName, val);
-
-                    insertWithId(insertFilter.getSQL(), insertFilter.getBindValues().toArray());
-                }
-            }
-        }
-
         return id;
     }
 
@@ -475,49 +452,6 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(dbMeta.getId())
                     ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
                     ).and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
-
-                    MetaSet metaSet = (MetaSet) meta.getMemberType(typeName);
-                    long id = ((MetaSet) dbMeta.getMemberType(typeName)).getId();
-
-                    HashMap<String, ArrayList<String>> keyFilter = metaSet.getArrayKeyFilter();
-
-                    DeleteConditionStep deleteFilter =
-                            context.delete(EAV_M_SET_KEY_FILTER).where(EAV_M_SET_KEY_FILTER.SET_ID.eq(id));
-
-                    long t = 0;
-                    if (sqlStats != null) {
-                        t = System.nanoTime();
-                    }
-
-                    jdbcTemplate.update(deleteFilter.getSQL(), deleteFilter.getBindValues().toArray());
-
-                    if (sqlStats != null) {
-                        sqlStats.put(deleteFilter.getSQL(), (System.nanoTime() - t) / 1000000);
-                    }
-
-                    for (String attrName : keyFilter.keySet()) {
-                        for (String val : keyFilter.get(attrName)) {
-                            InsertOnDuplicateStep insertFilter = context.
-                                    insertInto(EAV_M_SET_KEY_FILTER,
-                                            EAV_M_SET_KEY_FILTER.SET_ID,
-                                            EAV_M_SET_KEY_FILTER.ATTR_NAME,
-                                            EAV_M_SET_KEY_FILTER.VALUE).values(
-                                    id,
-                                    attrName,
-                                    val);
-
-                            t = 0;
-                            if (sqlStats != null) {
-                                t = System.nanoTime();
-                            }
-
-                            insertWithId(insertFilter.getSQL(), insertFilter.getBindValues().toArray());
-
-                            if (sqlStats != null) {
-                                sqlStats.put(insertFilter.getSQL(), (System.nanoTime() - t) / 1000000);
-                            }
-                        }
-                    }
                 } else {
                     update = context.update(EAV_M_SIMPLE_SET
                     ).set(EAV_M_SIMPLE_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey())
@@ -827,27 +761,6 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
             metaSet.setId(((BigDecimal) row.get("id")).longValue());
             metaSet.setArrayKeyType(ComplexKeyTypes.valueOf((String) row.get("array_key_type")));
             metaSet.setReference(((BigDecimal) row.get("is_reference")).longValue() == 1);
-
-            SelectForUpdateStep selectFilters = context.select(
-                    EAV_M_SET_KEY_FILTER.ATTR_NAME,
-                    EAV_M_SET_KEY_FILTER.VALUE).from(EAV_M_SET_KEY_FILTER).
-                    where(EAV_M_SET_KEY_FILTER.SET_ID.eq(metaSet.getId()));
-
-            if (sqlStats != null) {
-                t = System.nanoTime();
-            }
-            List<Map<String, Object>> filterRows = jdbcTemplate.queryForList(selectFilters.getSQL(),
-                    selectFilters.getBindValues().toArray());
-            if (sqlStats != null) {
-                sqlStats.put(selectFilters.getSQL(), (System.nanoTime() - t) / 1000000);
-            }
-
-            for (Map<String, Object> filterRow : filterRows) {
-                if (filterRow.get("attr_name") != null) {
-                    metaSet.addArrayKeyFilter((String) filterRow.get("attr_name"),
-                            (String) filterRow.get("value"));
-                }
-            }
 
             metaAttribute.setMetaType(metaSet);
             metaAttribute.setTitle((String) row.get("title"));
