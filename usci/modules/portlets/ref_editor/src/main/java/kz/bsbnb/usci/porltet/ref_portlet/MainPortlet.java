@@ -86,7 +86,6 @@ public class MainPortlet extends MVCPortlet {
     @Override
     public void init() throws PortletException {
         connectToServices();
-
         super.init();
     }
 
@@ -620,7 +619,17 @@ public class MainPortlet extends MVCPortlet {
 
                 if (value != null) {
                     if (value instanceof Number) {
-                        jxl.write.Number number = new jxl.write.Number(columnIndex, rowCounter, Integer.parseInt(value.toString()), dataFormat);
+                        jxl.write.Number number;
+                        try {
+                            number = new jxl.write.Number(columnIndex, rowCounter, Integer.parseInt(value.toString()), dataFormat);
+                        } catch (NumberFormatException nfe) {
+                            try {
+                                number = new jxl.write.Number(columnIndex, rowCounter, ((Number) value).doubleValue(), dataFormat);
+                            } catch (Exception e) {
+                                System.out.println("Excel export failed: number format not correct");
+                                number = new jxl.write.Number(columnIndex, rowCounter, 0, dataFormat);
+                            }
+                        }
                         sheet.addCell(number);
                     } else if (value instanceof Date) {
                         sheet.addCell(new jxl.write.DateTime(columnIndex, rowCounter, (Date) value, dateFormat));
