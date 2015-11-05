@@ -41,8 +41,11 @@ public class ChangeRemainsCorrectionParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
                     batch.getRepDate());
-            baseEntity.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
-            currentBaseEntity.put("balance_account", new BaseEntityComplexValue(0, -1, batch.getRepDate(), baseEntity, false, true));
+            baseEntity.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(),
+                    false, true));
+
+            currentBaseEntity.put("balance_account", new BaseEntityComplexValue(0, -1, batch.getRepDate(), baseEntity,
+                    false, true));
         } else {
             throw new UnknownTagException(localName);
         }

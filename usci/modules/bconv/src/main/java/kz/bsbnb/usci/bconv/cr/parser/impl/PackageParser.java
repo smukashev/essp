@@ -61,7 +61,8 @@ public class PackageParser extends BatchParser {
         } else if (localName.equals("primary_contract")) {
             primaryContractParser.parse(xmlReader, batch, index);
             BaseEntity primaryContract = primaryContractParser.getCurrentBaseEntity();
-            currentBaseEntity.put("primary_contract", new BaseEntityComplexValue(0, -1, batch.getRepDate(), primaryContract, false, true));
+            currentBaseEntity.put("primary_contract", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    primaryContract, false, true));
             for (String e : primaryContractParser.getCurrentBaseEntity().getValidationErrors()) {
                 getCurrentBaseEntity().addValidationError(e);
             }
@@ -76,14 +77,16 @@ public class PackageParser extends BatchParser {
             creditType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
                     event.asStartElement().getAttributeByName(new QName("credit_type")).getValue(), false, true));
 
-            credit.put("credit_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditType, false, true));
+            credit.put("credit_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditType,
+                    false, true));
         } else if (localName.equals("subjects")) {
             while (true) {
                 subjectsParser.parse(xmlReader, batch, index);
                 if (subjectsParser.hasMore()) {
                     BaseEntity subject = subjectsParser.getCurrentBaseEntity();
                     if (subject != null) {
-                        currentBaseEntity.put("subject", new BaseEntityComplexValue(0, -1, batch.getRepDate(), subject, false, true));
+                        currentBaseEntity.put("subject", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                                subject, false, true));
                     }
                 } else {
                     break;
@@ -94,14 +97,17 @@ public class PackageParser extends BatchParser {
             while (true) {
                 pledgesParser.parse(xmlReader, batch, index);
                 if (pledgesParser.hasMore()) {
-                    pledges.put(new BaseSetComplexValue(0, -1, batch.getRepDate(), pledgesParser.getCurrentBaseEntity(), false, true));
+                    pledges.put(new BaseSetComplexValue(0, -1, batch.getRepDate(),
+                            pledgesParser.getCurrentBaseEntity(), false, true));
                 } else break;
             }
-            currentBaseEntity.put("pledges", new BaseEntityComplexSet(0, -1, batch.getRepDate(), pledges, false, true));
+            currentBaseEntity.put("pledges", new BaseEntityComplexSet(0, -1, batch.getRepDate(), pledges,
+                    false, true));
 
         } else if (localName.equals("change")) {
             changeParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("change", new BaseEntityComplexValue(0, -1, batch.getRepDate(), changeParser.getCurrentBaseEntity(), false, true));
+            currentBaseEntity.put("change", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    changeParser.getCurrentBaseEntity(), false, true));
 
             for (String e : changeParser.getCurrentBaseEntity().getValidationErrors()) {
                 getCurrentBaseEntity().addValidationError(e);

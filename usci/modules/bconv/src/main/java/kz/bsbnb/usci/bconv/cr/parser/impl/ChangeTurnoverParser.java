@@ -30,6 +30,11 @@ public class ChangeTurnoverParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("turnover"), batch.getRepDate());
+        currentIssue = null;
+        currentInterest = null;
+        interestFlag = false;
+        currentDebt = null;
+        debtFlag = false;
     }
 
     @Override
@@ -77,13 +82,15 @@ public class ChangeTurnoverParser extends BatchParser {
         if (localName.equals("turnover")) {
             return true;
         } else if (localName.equals("issue")) {
-            currentBaseEntity.put("issue", new BaseEntityComplexValue(0, -1, batch.getRepDate(), currentIssue, false, true));
+            currentBaseEntity.put("issue", new BaseEntityComplexValue(0, -1, batch.getRepDate(), currentIssue,
+                    false, true));
         } else if (localName.equals("debt")) {
             debtFlag = false;
             currentIssue.put("debt", new BaseEntityComplexValue(0, -1, batch.getRepDate(), currentDebt, false, true));
         } else if (localName.equals("interest")) {
             interestFlag = false;
-            currentIssue.put("interest", new BaseEntityComplexValue(0, -1, batch.getRepDate(), currentInterest, false, true));
+            currentIssue.put("interest", new BaseEntityComplexValue(0, -1, batch.getRepDate(), currentInterest,
+                    false, true));
         } else if (localName.equals("amount")) {
         } else if (localName.equals("amount_currency")) {
         } else {

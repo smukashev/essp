@@ -29,15 +29,19 @@ public class PledgesParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             BaseEntity pledgeType = new BaseEntity(metaClassRepository.getMetaClass("ref_pledge_type"),
                     batch.getRepDate());
-            pledgeType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),event.asCharacters().getData(), false, true));
-            currentBaseEntity.put("pledge_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(),pledgeType, false, true));
+            pledgeType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
+            currentBaseEntity.put("pledge_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(),pledgeType,
+                    false, true));
         } else if (localName.equals("contract")) {
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("contract", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(), false, true));
+            currentBaseEntity.put("contract", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    event.asCharacters().getData(), false, true));
         } else if (localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, -1, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+                    new Double(event.asCharacters().getData()), false, true));
         } else {
             throw new UnknownTagException(localName);
         }
