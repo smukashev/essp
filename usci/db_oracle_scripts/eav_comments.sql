@@ -26,6 +26,9 @@ update eav_m_classes set title = 	'Физическое лицо'	WHERE NAME = '
 update eav_m_classes set title = 	'Юридическое лицо'	WHERE NAME = 'organization';
 update eav_m_classes set title = 	'Договор'	WHERE NAME = 'primary_contract';
 update eav_m_classes set title = 	'Исключительный документ'	WHERE NAME = 'ref_exclusive_doc';
+update eav_m_classes set title = 	'соответсвтие балансовый счет - тип креидита' WHERE NAME = 'ref_ba_ct';
+update eav_m_classes set title = 	'соответсвтие балансовый счет - тип остатка' WHERE NAME = 'ref_ba_drt';
+update eav_m_classes set title = 	'виды остатков' WHERE NAME = 'ref_debt_remains_type';
 
 update eav_m_simple_attributes set title = 'номер' where name='no';
 update eav_m_simple_attributes set title = 'дата' where name='date';
