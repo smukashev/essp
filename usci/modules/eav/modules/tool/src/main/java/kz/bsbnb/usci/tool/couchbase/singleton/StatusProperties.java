@@ -44,8 +44,8 @@ public class StatusProperties
         return null;
     }
 
-    public static Map<String, String> getSpecificParams(BaseEntity entity) {
-        Map<String, String> params = new HashMap<>();
+    public static String getSpecificParams(BaseEntity entity) {
+        String result = "";
 
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 
@@ -54,18 +54,14 @@ public class StatusProperties
             String sContractDate = df.format(contractDate);
             String contractNo = (String)entity.getEl("primary_contract.no");
 
-            params.put(CONTRACT_DATE, sContractDate);
-            params.put(CONTRACT_NO, contractNo);
-
+            result = contractNo + " | " + sContractDate;
         } else if (entity.getMeta().getClassName().equals("portfolio_data")) {
-            // TODO decide what to fill about portfolio_data
-
+            result = "Портфель " + entity.getId();
         } else if (entity.getMeta().isReference()) {
-            String refName = getEntityNameAttrValue(entity);
-            params.put(REF_NAME, refName);
+            result = getEntityNameAttrValue(entity);
         }
 
-        return params;
+        return result;
     }
 
 }

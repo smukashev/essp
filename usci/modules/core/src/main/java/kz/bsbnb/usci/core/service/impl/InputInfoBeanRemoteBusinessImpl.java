@@ -26,7 +26,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED);
 
     @Override
-    public List<InputInfo> getAllInputInfos(List<Creditor> creditorsList, Date reportDate) {
+    public List<InputInfo>  getAllInputInfos(List<Creditor> creditorsList, Date reportDate) {
         ArrayList<InputInfo> list = new ArrayList<>();
 
         HashMap<Long, Creditor> inputCreditors = new HashMap<>();
@@ -71,6 +71,12 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
             ii.setCreditor(currentCreditor);
             ii.setFileName(batch.getFileName());
+
+            if (lastStatus.equals("COMPLETED")) {
+                lastStatus = "Завершён";
+            } else if (lastStatus.equals("ERROR")) {
+                lastStatus = "Ошибка";
+            }
 
             Shared s = new Shared();
             s.setCode("S");

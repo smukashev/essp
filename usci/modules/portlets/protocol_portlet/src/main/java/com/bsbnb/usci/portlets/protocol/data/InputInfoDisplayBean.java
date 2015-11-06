@@ -15,12 +15,7 @@ import com.vaadin.ui.themes.BaseTheme;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 
-/**
- *
- * @author Aidar.Myrzahanov
- */
 public class InputInfoDisplayBean implements Button.ClickListener {
-
     private InputInfo inputInfo;
     private DataProvider provider;
 
@@ -29,16 +24,10 @@ public class InputInfoDisplayBean implements Button.ClickListener {
         this.provider = provider;
     }
 
-    /**
-     * @return the inputInfo
-     */
     public InputInfo getInputInfo() {
         return inputInfo;
     }
 
-    /**
-     * @return the creditorName
-     */
     public String getCreditorName() {
         if (inputInfo != null && inputInfo.getCreditor() != null) {
             return inputInfo.getCreditor().getName();
@@ -46,9 +35,6 @@ public class InputInfoDisplayBean implements Button.ClickListener {
         return "---";
     }
 
-    /**
-     * @return the fileName
-     */
     public String getFileName() {
         return inputInfo == null ? "" : new File(inputInfo.getFileName()).getName();
     }
@@ -60,35 +46,23 @@ public class InputInfoDisplayBean implements Button.ClickListener {
         return result;
     }
 
-    /**
-     * @return the receiverDate
-     */
     public Date getReceiverDate() {
         return inputInfo == null ? null : inputInfo.getReceiverDate();
     }
 
-    /**
-     * @return the receiverType
-     */
     public String getReceiverType() {
-        if (inputInfo == null || inputInfo.getReceiverType() == null) {
+        if (inputInfo == null || inputInfo.getReceiverType() == null)
             return "";
-        }
+
         return PortletEnvironmentFacade.get().isLanguageKazakh()
                 ? inputInfo.getReceiverType().getNameKz()
                 : inputInfo.getReceiverType().getNameRu();
     }
 
-    /**
-     * @return the completionDate
-     */
     public Date getCompletionDate() {
         return inputInfo == null ? null : inputInfo.getCompletionDate();
     }
 
-    /**
-     * @return the reportDate
-     */
     public Date getReportDate() {
         return inputInfo == null ? null : inputInfo.getReportDate();
     }
@@ -97,13 +71,10 @@ public class InputInfoDisplayBean implements Button.ClickListener {
         return inputInfo == null ? null : inputInfo.getStartedDate();
     }
 
-    /**
-     * @return the statusName
-     */
     public String getStatusName() {
-        if (inputInfo == null || inputInfo.getStatus() == null) {
+        if (inputInfo == null || inputInfo.getStatus() == null)
             return "";
-        }
+
         return PortletEnvironmentFacade.get().isLanguageKazakh()
                 ? inputInfo.getStatus().getNameKz()
                 : inputInfo.getStatus().getNameRu();

@@ -11,7 +11,6 @@ import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Link;
 import kz.bsbnb.usci.core.service.*;
 import kz.bsbnb.usci.cr.model.Creditor;
-import kz.bsbnb.usci.cr.model.InputFile;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
@@ -25,10 +24,6 @@ import java.util.Map;
  * @author Aidar.Myrzahanov
  */
 public class BeanDataProvider implements DataProvider {
-    private RmiProxyFactoryBean protocolBeanRemoteBusinessFactoryBean;
-    private RmiProxyFactoryBean inputInfoBeanRemoteBusinessFactoryBean;
-    private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
-    private RmiProxyFactoryBean inputFileBeanRemoteBusinessFactoryBean;
 
     private ProtocolBeanRemoteBusiness protocolBusiness;
     private InputInfoBeanRemoteBusiness inputInfoBusiness;
@@ -42,38 +37,28 @@ public class BeanDataProvider implements DataProvider {
     }
 
     private void initializeBeans() {
-        protocolBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        RmiProxyFactoryBean protocolBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
         protocolBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/protocolBeanRemoteBusiness");
         protocolBeanRemoteBusinessFactoryBean.setServiceInterface(ProtocolBeanRemoteBusiness.class);
 
         protocolBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         protocolBusiness = (ProtocolBeanRemoteBusiness) protocolBeanRemoteBusinessFactoryBean.getObject();
 
-        //////////////////////////////
-
-        inputInfoBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        RmiProxyFactoryBean inputInfoBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
         inputInfoBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/inputInfoBeanRemoteBusiness");
         inputInfoBeanRemoteBusinessFactoryBean.setServiceInterface(InputInfoBeanRemoteBusiness.class);
 
         inputInfoBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         inputInfoBusiness = (InputInfoBeanRemoteBusiness) inputInfoBeanRemoteBusinessFactoryBean.getObject();
-        if (inputInfoBusiness == null)
-        {
-            System.out.println("InputInfoBusiness is null!");
-        }
 
-        //////////////////////////////
-
-        portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
         portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
         portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
 
         portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
-        //////////////////////////////
-
-        inputFileBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        RmiProxyFactoryBean inputFileBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
         inputFileBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/inputFileBeanRemoteBusiness");
         inputFileBeanRemoteBusinessFactoryBean.setServiceInterface(InputFileBeanRemoteBusiness.class);
 
@@ -87,8 +72,7 @@ public class BeanDataProvider implements DataProvider {
 
     public List<ProtocolDisplayBean> getProtocolsByInputInfo(InputInfoDisplayBean inputInfo) {
         List<Protocol> protocols = protocolBusiness.getProtocolsBy_InputInfo(inputInfo.getInputInfo());
-        System.out.println("Protocols count: " + protocols.size());
-        List<ProtocolDisplayBean> result = new ArrayList<ProtocolDisplayBean>();
+        List<ProtocolDisplayBean> result = new ArrayList<>();
 
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         String sRepDate = df.format(inputInfo.getInputInfo().getReportDate());
@@ -115,9 +99,10 @@ public class BeanDataProvider implements DataProvider {
         return result;
     }
 
-    public Map<SharedDisplayBean, Map<String, List<ProtocolDisplayBean>>> getProtocolsByInputInfoGrouped(InputInfoDisplayBean inputInfo) {
+    public Map<SharedDisplayBean, Map<String, List<ProtocolDisplayBean>>> getProtocolsByInputInfoGrouped(
+            InputInfoDisplayBean inputInfo) {
         List<ProtocolDisplayBean> list = getProtocolsByInputInfo(inputInfo);
-        Map<SharedDisplayBean, Map<String, List<ProtocolDisplayBean>>> result = new LinkedHashMap<SharedDisplayBean, Map<String, List<ProtocolDisplayBean>>>(list.size());
+        Map<SharedDisplayBean, Map<String, List<ProtocolDisplayBean>>> result = new LinkedHashMap<>(list.size());
         for (ProtocolDisplayBean protocol : list) {
             Map<String, List<ProtocolDisplayBean>> innerMap;
             SharedDisplayBean shared = new SharedDisplayBean(protocol.getType());
@@ -137,10 +122,6 @@ public class BeanDataProvider implements DataProvider {
             innerList.add(protocol);
         }
         return result;
-    }
-
-    public InputFile getFileByInputInfo(InputInfoDisplayBean inputInfo) {
-        return inputFileBusiness.getInputFileByInputInfo(inputInfo.getInputInfo());
     }
 
     public BatchFullJModel getBatchFullModel(BigInteger batchId) {

@@ -626,7 +626,8 @@ public class MainPortlet extends MVCPortlet {
                         parameters.put(attribute, resourceRequest.getParameter(attribute));
                     }
 
-                    ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, prefix);
+                    ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass,
+                            prefix, 0);
 
                     if(searchResult.getData() == null)
                         throw new RuntimeException("ошибка сериализации");

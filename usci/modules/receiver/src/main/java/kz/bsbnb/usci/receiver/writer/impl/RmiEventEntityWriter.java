@@ -102,29 +102,25 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                         .setBatchId(entity.getBatchId())
                         .setEntityId(entity.getId())
                         .setStatus(EntityStatuses.ERROR)
-                        .setDescription(ruleRuntimeException)
+                        .setDescription(StatusProperties.getSpecificParams(entity) + " (" +
+                                ruleRuntimeException + ")")
                         .setReceiptDate(new Date())
                         .setIndex(entity.getBatchIndex() - 1);
 
-                Map<String, String> params = StatusProperties.getSpecificParams(entity);
 
-                Long entityStatusId = batchService.addEntityStatus(entityStatus);
-                batchService.addEntityStatusParams(entityStatusId, params);
-
+                batchService.addEntityStatus(entityStatus);
             } else if (errors != null && errors.size() > 0) {
                 for (String errorMsg : errors) {
                     EntityStatus entityStatus = new EntityStatus()
                             .setBatchId(entity.getBatchId())
                             .setEntityId(entity.getId())
                             .setStatus(EntityStatuses.ERROR)
-                            .setDescription(errorMsg)
+                            .setDescription(StatusProperties.getSpecificParams(entity) + " (" +
+                                    errorMsg + ")")
                             .setReceiptDate(new Date())
                             .setIndex(entity.getBatchIndex() - 1);
 
-                    Map<String, String> params = StatusProperties.getSpecificParams(entity);
-
-                    Long entityStatusId = batchService.addEntityStatus(entityStatus);
-                    batchService.addEntityStatusParams(entityStatusId, params);
+                    batchService.addEntityStatus(entityStatus);
                 }
             } else {
                 entitiesToSave.add(entity);

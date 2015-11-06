@@ -90,17 +90,7 @@ public class BatchServiceImpl implements IBatchService {
         return remoteBatchService.getAll(repDate);
     }
 
-    @Override
-    public Map<String, String> getEntityStatusParams(long entityStatusId) {
-        return remoteBatchService.getEntityStatusParams(entityStatusId);
-    }
-
-    @Override
-    public void addEntityStatusParams(long entityStatusId, Map<String, String> params) {
-        remoteBatchService.addEntityStatusParams(entityStatusId, params);
-    }
-
-    @Override
+   @Override
     public boolean incrementActualCounts(Map<Long, Long> batchesToUpdate) {
         return remoteBatchService.incrementActualCounts(batchesToUpdate);
     }

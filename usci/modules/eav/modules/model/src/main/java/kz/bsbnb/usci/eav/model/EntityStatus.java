@@ -81,6 +81,28 @@ public class EntityStatus extends Persistable {
         return status;
     }
 
+    public String getStatusDescription() {
+        if (status == EntityStatuses.COMPLETED) {
+            return "Завершён";
+        } else if (status == EntityStatuses.CHECK_IN_CORE) {
+            return "Прверка";
+        } else if (status == EntityStatuses.CHECK_IN_PARSER) {
+            return "Провекра";
+        } else if (status == EntityStatuses.ERROR) {
+            return "Ошибка";
+        } else if (status == EntityStatuses.PARSING) {
+            return "Парсинг";
+        } else if (status == EntityStatuses.PROCESSING) {
+            return "В обработке";
+        } else if (status == EntityStatuses.TOTAL_COUNT) {
+            return "Общее количество";
+        } else if (status == EntityStatuses.ACTUAL_COUNT) {
+            return "Заявленоое количество";
+        } else {
+            return "Неизвестный тип";
+        }
+    }
+
     public EntityStatus setStatus(EntityStatuses status) {
         this.status = status;
         return this;

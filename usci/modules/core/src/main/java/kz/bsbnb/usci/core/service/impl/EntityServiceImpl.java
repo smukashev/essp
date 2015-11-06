@@ -80,14 +80,11 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             entityStatus.setBatchId(entity.getBatchId());
             entityStatus.setEntityId(entity.getId());
             entityStatus.setStatus(EntityStatuses.COMPLETED);
-            entityStatus.setDescription("" + entity.getId());
+            entityStatus.setDescription(StatusProperties.getSpecificParams(baseEntity));
             entityStatus.setIndex(entity.getBatchIndex());
             entityStatus.setReceiptDate(new Date());
 
-            Map<String, String> params = StatusProperties.getSpecificParams(baseEntity);
-
-            Long entityStatusId = batchService.addEntityStatus(entityStatus);
-            batchService.addEntityStatusParams(entityStatusId, params);
+            batchService.addEntityStatus(entityStatus);
         } catch (Exception e) {
             if (!(e instanceof KnownException))
                 logger.error("Batch id: " + baseEntity.getBatchId() + ", Index: " + (baseEntity.getBatchIndex() - 1)
@@ -97,14 +94,11 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             entityStatus.setBatchId(baseEntity.getBatchId());
             entityStatus.setEntityId(baseEntity.getId());
             entityStatus.setStatus(EntityStatuses.ERROR);
-            entityStatus.setDescription(e.getMessage());
+            entityStatus.setDescription(StatusProperties.getSpecificParams(baseEntity) + " (" + e.getMessage() + ")");
             entityStatus.setIndex(baseEntity.getBatchIndex() - 1);
             entityStatus.setReceiptDate(new Date());
 
-            Map<String, String> params = StatusProperties.getSpecificParams(baseEntity);
-
-            Long entityStatusId = batchService.addEntityStatus(entityStatus);
-            batchService.addEntityStatusParams(entityStatusId, params);
+            batchService.addEntityStatus(entityStatus);
         }
     }
 
