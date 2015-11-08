@@ -5,8 +5,8 @@ Ext.onReady(function() {
         extend: 'Ext.data.Model',
         fields: [
             {name: 'title',     type: 'string'},
-            {name: 'тип',     type: 'string'},
-            {name: 'значение',     type: 'string'},
+            {name: 'code',     type: 'string'},
+            {name: 'value',     type: 'string'},
             {name: 'simple',     type: 'boolean'},
             {name: 'array',     type: 'boolean'},
             {name: 'ref',     type: 'boolean'},
@@ -53,7 +53,7 @@ Ext.onReady(function() {
         panel.bodyPadding = 0;
         panel.add(
             Ext.create('Ext.tree.Panel',{
-                id: 's_person_doc_view',
+                id: 's_person_doc_tree',
                 preventHeader: true,
                 useArrows: true,
                 rootVisible: false,
@@ -98,12 +98,12 @@ Ext.onReady(function() {
                 tbar: [{
                     text: 'добавить документ поиска',
                     handler: function(){
-                        var tree = Ext.getCmp('s_person_doc_view');
+                        var tree = Ext.getCmp('s_person_doc_tree');
                         var selectedNode = tree.getSelectionModel().getLastSelected();
-                        var arrayElForm= Ext.getCmp('ArrayElFormPanel');
-                        arrayElForm.removeAll();
-                        loadAttributes(arrayElForm, selectedNode, true);
-                        arrayElWindow.show();
+                        var form = Ext.getCmp('modalDocSearchForm');
+                        form.removeAll();
+                        loadAttributes(form, selectedNode, true);
+                        Ext.getCmp('modalDocSearchWindow').show();
                     }
                 }]
             }));

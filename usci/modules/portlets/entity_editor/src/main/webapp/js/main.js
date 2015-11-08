@@ -1117,7 +1117,7 @@ Ext.onReady(function() {
                         }
                     },
                     format: 'd.m.Y',
-                    value : '12.12.2012'
+                    value : '01.11.2015'
                 }]
             },{
                 region: 'center',
