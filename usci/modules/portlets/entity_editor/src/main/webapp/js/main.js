@@ -661,12 +661,22 @@ Ext.onReady(function() {
     });
 
     var types = Ext.create('Ext.data.Store', {
-        fields: ['id', 'name'],
-        data : [
+        fields: ['searchName', 'title'],
+        /*data : [
             {"id":"s_credit_pc", "name":"Договор по номеру и дате договора"},
             {"id":"s_person_doc", "name":"Физ лицо по документу"},
             {"id":"s_org_doc", "name":"Юр лицо по документу"}
-        ]
+        ]*/
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op : 'LIST_CLASSES'},
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        }
     });
 
     var creditors = Ext.create('Ext.data.Store',{
@@ -1094,10 +1104,10 @@ Ext.onReady(function() {
                 items: [{
                     id: 'edSearch',
                     xtype: 'combobox',
-                    displayField:'name',
+                    displayField:'title',
                     store: types,
                     labelWidth: 70,
-                    valueField:'id',
+                    valueField:'searchName',
                     fieldLabel: 'Вид поиска',
                     editable: false,
                     listeners : {
