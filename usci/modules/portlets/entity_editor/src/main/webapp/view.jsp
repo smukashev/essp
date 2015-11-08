@@ -59,6 +59,7 @@
 <script src="<%=request.getContextPath()%>/js/st_format.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/s_person_doc.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/w_search_doc.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/s_credit_pc.js" type="text/javascript"></script>
 
 <script src="<%=request.getContextPath()%>/js/lang/default.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/lang/<%= ((ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY)).getLocale() %>.js" type="text/javascript"></script>

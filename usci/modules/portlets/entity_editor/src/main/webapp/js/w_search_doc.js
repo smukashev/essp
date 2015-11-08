@@ -23,7 +23,8 @@ Ext.onReady(function(){
                 var form = Ext.getCmp('modalDocSearchForm');
                 if (form.isValid()) {
                     var tree = Ext.getCmp('s_person_doc_tree');
-                    var selectedNode = tree.getSelectionModel().getLastSelected();
+                    //var selectedNode = tree.getSelectionModel().getLastSelected();
+                    var selectedNode = tree.getRootNode().getChildAt(0);
                     var arrayIndex = selectedNode.childNodes.length;
                     var element = {
                         leaf: false,

@@ -99,11 +99,16 @@ Ext.onReady(function() {
                     text: 'добавить документ поиска',
                     handler: function(){
                         var tree = Ext.getCmp('s_person_doc_tree');
-                        var selectedNode = tree.getSelectionModel().getLastSelected();
+                        var docNode = tree.getRootNode().getChildAt(0);
                         var form = Ext.getCmp('modalDocSearchForm');
                         form.removeAll();
-                        loadAttributes(form, selectedNode, true);
+                        loadAttributes(form, docNode, true);
                         Ext.getCmp('modalDocSearchWindow').show();
+                    }
+                }, {
+                    text: 'Очистить',
+                    handler: function(){
+                        Ext.getCmp('s_person_doc_tree').getRootNode().getChildAt(0).removeAll();
                     }
                 }]
             }));
