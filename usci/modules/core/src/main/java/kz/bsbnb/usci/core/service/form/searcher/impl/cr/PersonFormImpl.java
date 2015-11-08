@@ -71,7 +71,7 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
         ret.setData(entities);
 
         MetaClass personNameClass = metaClassRepository.getMetaClass("person_name");
-        MetaClass personClass = metaClassRepository.getMetaClass("person");
+        MetaClass personClass = metaClassRepository.getMetaClass("person_info");
 
         IMetaAttribute firstNameAttribute = personNameClass.getMetaAttribute("firstname");
         IMetaAttribute lastNameAttribute = personNameClass.getMetaAttribute("lastname");
@@ -154,7 +154,7 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
 
     @Override
     public List<Pair> getMetaClasses(long userId) {
-        MetaClass person = metaClassRepository.getMetaClass("person");
+        MetaClass person = metaClassRepository.getMetaClass("person_info");
         List<Pair> ret = new LinkedList<>();
         ret.add(new Pair(person.getId(), person.getClassName(), "физ лицо (по ФИО)"));
         return ret;

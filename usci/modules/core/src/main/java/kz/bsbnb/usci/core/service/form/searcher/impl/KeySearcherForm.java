@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Component
+//@Component
 public class KeySearcherForm implements ISearcherForm {
 
     private static final ThreadLocal<Long> inputId = new ThreadLocal<Long>() {
