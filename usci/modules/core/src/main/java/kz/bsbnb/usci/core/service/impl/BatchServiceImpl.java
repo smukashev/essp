@@ -224,18 +224,6 @@ public class BatchServiceImpl implements IBatchService {
         return batchDao.getAll(repDate);
     }
 
-    @Override
-    public Map<String, String> getEntityStatusParams(long entityStatusId) {
-        return batchDao.getEntityStatusParams(entityStatusId);
-    }
-
-    @Override
-    public void addEntityStatusParams(long entityStatusId, Map<String, String> params) {
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            batchDao.addEntityStatusParam(entityStatusId, entry.getKey(), entry.getValue());
-        }
-    }
-
     public void setHash(Batch batch) {
         String hash = DigestUtils.md5DigestAsHex(batch.getContent());
         batch.setHash(hash);

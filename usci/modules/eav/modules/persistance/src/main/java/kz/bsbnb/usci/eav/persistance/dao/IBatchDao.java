@@ -19,10 +19,6 @@ public interface IBatchDao {
 
     List<Batch> getAll(Date repDate);
 
-    Map<String,String> getEntityStatusParams(long entityStatusId);
-
-    void addEntityStatusParam(long entityStatusId, String key, String value);
-
     void incrementActualCount(long batchId, long count);
 
     void clearActualCount(long batchId);

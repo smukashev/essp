@@ -107,5 +107,5 @@ update eav_m_complex_set set title = 'Субьекты' where name = 'subjects';
 update eav_m_simple_attributes set title = 'Значение' where name = 'value';
 update eav_m_simple_attributes set title = 'Значение' where name = 'value_';
 update eav_m_simple_attributes set title = 'Валюта' where name = 'value_currency';
---update eav_m_simple_attributes set title = '' where name = 'weight';
---update eav_m_simple_attributes set title = '' where name = 'write_off';
+update eav_m_simple_attributes set title = '' where name = 'weight';
+update eav_m_simple_attributes set title = '' where name = 'write_off';

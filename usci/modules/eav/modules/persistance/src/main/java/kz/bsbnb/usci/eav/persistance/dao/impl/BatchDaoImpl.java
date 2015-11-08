@@ -139,42 +139,6 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         return batchList;
     }
 
-    @Override
-    public Map<String, String> getEntityStatusParams(long entityStatusId) {
-        Select select = context.selectFrom(EAV_ENTITY_STATUS_PARAMS)
-                .where(EAV_ENTITY_STATUS_PARAMS.ENTITY_STATUS_ID.eq(entityStatusId));
-
-        Map<String, String> params = new HashMap<>();
-
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        for (Map<String, Object> row : rows) {
-            params.put(
-                    (String) row.get(EAV_ENTITY_STATUS_PARAMS.KEY.getName()),
-                    (String) row.get(EAV_ENTITY_STATUS_PARAMS.VALUE.getName())
-            );
-        }
-
-        return params;
-    }
-
-    @Override
-    public void addEntityStatusParam(long entityStatusId, String key, String value) {
-        Insert insert = context.insertInto(EAV_ENTITY_STATUS_PARAMS,
-                EAV_ENTITY_STATUS_PARAMS.ENTITY_STATUS_ID,
-                EAV_ENTITY_STATUS_PARAMS.KEY,
-                EAV_ENTITY_STATUS_PARAMS.VALUE
-        ).values(entityStatusId,
-                key,
-                value);
-        String insertSql = "insert /*+ APPEND */ into \"EAV_ENTITY_STATUS_PARAMS\" (\"ENTITY_STATUS_ID\", \"KEY\", \"VALUE\") values (?, ?, ?)";
-        long id = insertWithId(insertSql, insert.getBindValues().toArray());
-
-        if (id < 1) {
-            logger.error("Can't insert entity status param");
-        }
-    }
-
     private long insertBatch(Batch batch) {
         Insert insert = context.insertInto(EAV_BATCHES,
                 EAV_BATCHES.USER_ID,

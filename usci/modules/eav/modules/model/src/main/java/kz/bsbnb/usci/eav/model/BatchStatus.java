@@ -61,6 +61,20 @@ public class BatchStatus extends Persistable {
         return status;
     }
 
+    public String getStatusDescription() {
+        if (status == BatchStatuses.COMPLETED) {
+            return "Завершён";
+        } else if (status == BatchStatuses.ERROR) {
+            return "Ошибка";
+        } else if (status == BatchStatuses.PROCESSING) {
+            return "В обработке";
+        } else if (status == BatchStatuses.WAITING) {
+            return "В ожиданий";
+        } else {
+            return "Неизвестный тип";
+        }
+    }
+
     public BatchStatus setStatus(BatchStatuses status) {
         this.status = status;
         return this;
