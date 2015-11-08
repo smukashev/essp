@@ -153,7 +153,8 @@ public class MainPortlet extends MVCPortlet {
         FIND_ACTION,
         GET_FORM,
         LIST_ATTRIBUTES,
-        LIST_BY_CLASS_SHORT
+        LIST_BY_CLASS_SHORT,
+        LIST_CREDITORS
     }
 
     private String testNull(String str) {
@@ -550,6 +551,10 @@ public class MainPortlet extends MVCPortlet {
                         out.write(sJson.getBytes());
                     }
 
+                    break;
+                case LIST_CREDITORS:
+                    creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
+                    out.write(JsonMaker.getJson(creditors).getBytes());
                     break;
                 case LIST_ENTITY:
                     String entityId = resourceRequest.getParameter("entityId");

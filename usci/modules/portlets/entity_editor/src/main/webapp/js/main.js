@@ -671,9 +671,16 @@ Ext.onReady(function() {
 
     var creditors = Ext.create('Ext.data.Store',{
         fields: ['id','name'],
-        data : [
-            {id:1, "name" : 'Test Bank'}
-        ]
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op : 'LIST_CREDITORS'},
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        },
     });
 
 
@@ -716,6 +723,8 @@ Ext.onReady(function() {
         text: label_VIEW,
         handler : function (){
             //entityId = Ext.getCmp("entityId");
+            Ext.getCmp('form-area').doSearch();
+            return;
             var keySearchComponent = document.getElementById('inp-1-' + currentMeta + '-null');
 
             if(keySearchComponent != null) {
