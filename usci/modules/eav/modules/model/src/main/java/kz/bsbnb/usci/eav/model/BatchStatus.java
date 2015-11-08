@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.util.BatchStatuses;
 import java.util.Date;
 
 public class BatchStatus extends Persistable {
+    private static final long serialVersionUID = 1L;
     private long batchId;
     private long statusId;
     private String description;
