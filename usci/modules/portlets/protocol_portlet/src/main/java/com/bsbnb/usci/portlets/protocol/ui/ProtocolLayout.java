@@ -91,10 +91,10 @@ public class ProtocolLayout extends VerticalLayout {
         "statusIcon", "message", "note", "link"};
 
     private static final String[] EXTENDED_PROTOCOL_TABLE_COLUMNS = new String[] {
-        "statusIcon", "typeName", "description", "primaryContractDate", "message", "note", "link" };
+        "statusIcon", "typeName", "description", "message", "note", "link" };
 
     private static final String[] EXPORT_PROTOCOL_TABLE_COLUMNS = new String[] {
-        "description", "primaryContractDate", "typeName", "messageType", "message", "note"};
+        "description", "typeName", "messageType", "message", "note"};
 
     public ProtocolLayout(DataProvider provider) {
         this.provider = provider;
@@ -110,7 +110,7 @@ public class ProtocolLayout extends VerticalLayout {
             return;
         }
 
-        creditorSelector = new FilterableSelect<Creditor>(creditorList, new Selector<Creditor>() {
+        creditorSelector = new FilterableSelect<>(creditorList, new Selector<Creditor>() {
             public String getCaption(Creditor item) {
                 return item.getName();
             }
@@ -400,7 +400,7 @@ public class ProtocolLayout extends VerticalLayout {
         groupsOfProtocolTree.removeAllItems();
         protocolsContainer.removeAllItems();
         typesOfProtocolLayout.removeAllComponents();
-        groupsMapProtocol = new HashMap<Object, List<ProtocolDisplayBean>>();
+        groupsMapProtocol = new HashMap<>();
         if (isProtocolGrouped) {
             showGroupedProtocol(ii);
         } else {

@@ -28,20 +28,9 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
     private final List<EntityStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, TOTAL_COUNT, ACTUAL_COUNT);
 
-    private Date parseContractDate(String sDate) {
-        synchronized (contractDateFormat) {
-            try {
-                return contractDateFormat.parse(sDate);
-            } catch (Exception e) {
-//                e.printStackTrace();
-                return null;
-            }
-        }
-    }
-
     @Override
     public List<Protocol> getProtocolsBy_InputInfo(InputInfo inputInfoId) {
-        ArrayList<Protocol> list = new ArrayList<Protocol>();
+        ArrayList<Protocol> list = new ArrayList<>();
 
         long batchId = inputInfoId.getId().longValue();
 
@@ -69,8 +58,8 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
         Shared type = new Shared();
         type.setCode(entityStatus.getStatus().code());
-        type.setNameRu(entityStatus.getStatus().code());
-        type.setNameKz(entityStatus.getStatus().code());
+        type.setNameRu(entityStatus.getStatusDescription());
+        type.setNameKz(entityStatus.getStatusDescription());
 
         protocol.setMessage(message);
         protocol.setMessageType(type);
@@ -91,26 +80,10 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
                 protocol.setNote(entityStatus.getEntityId() + "");
             }
 
-            Map<String, String> entityStatusParams = batchService.getEntityStatusParams(entityStatus.getId());
-
-            fillTypeDescription(entityStatusParams, protocol);
-
-            protocol.setPrimaryContractDate(
-                    parseContractDate(
-                            entityStatusParams.get(StatusProperties.CONTRACT_DATE)
-                    )
-            );
+            protocol.setTypeDescription(entityStatus.getDescription());
         }
 
         list.add(protocol);
-    }
-
-    private void fillTypeDescription(Map<String, String> entityStatusParams, Protocol protocol) {
-        if (entityStatusParams.get(StatusProperties.CONTRACT_NO) != null) {
-            protocol.setTypeDescription(entityStatusParams.get(StatusProperties.CONTRACT_NO));
-        } else if (entityStatusParams.get(StatusProperties.REF_NAME) != null) {
-            protocol.setTypeDescription("Наименование: " + entityStatusParams.get(StatusProperties.REF_NAME));
-        }
     }
 }
 

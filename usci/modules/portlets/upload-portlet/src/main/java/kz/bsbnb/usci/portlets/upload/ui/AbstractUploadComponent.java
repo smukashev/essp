@@ -133,7 +133,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
         StringBuilder normalFileNameBuilder = new StringBuilder(fileName.length());
         for (int i = 0; i < fileName.length(); i++) {
             char ch = fileName.charAt(i);
-            if (Character.isLetterOrDigit(ch) || ch == '.') {
+            if (Character.isLetterOrDigit(ch) || ch == '.' || ch == '_' || ch == '-') {
                 normalFileNameBuilder.append(fileName.charAt(i));
             }
         }

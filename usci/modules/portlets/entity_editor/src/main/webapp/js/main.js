@@ -25,6 +25,8 @@ var ADDITION_META_NAME = "credit";
 var modalWindow;
 var arrayElWindow;
 
+var forms = [];
+
 function getForm(){
     currentSearch = Ext.getCmp('edSearch').value;
     currentMeta = Ext.getCmp('edSearch').displayTplData[0].metaName;
@@ -201,7 +203,7 @@ function addArrayElementButton(form) {
                 newArrayElements.push(element);
                 addField(form, element, "_edit", selectedNode);
             } else {
-                var arrayElForm= Ext.getCmp('ArrayElFormPannel');
+                var arrayElForm= Ext.getCmp('ArrayElFormPanel');
                 arrayElForm.removeAll();
                 loadAttributes(arrayElForm, selectedNode, true);
                 arrayElWindow.show();
@@ -658,6 +660,40 @@ Ext.onReady(function() {
         ]
     });
 
+    var types = Ext.create('Ext.data.Store', {
+        fields: ['searchName', 'title'],
+        /*data : [
+            {"id":"s_credit_pc", "name":"Договор по номеру и дате договора"},
+            {"id":"s_person_doc", "name":"Физ лицо по документу"},
+            {"id":"s_org_doc", "name":"Юр лицо по документу"}
+        ]*/
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op : 'LIST_CLASSES'},
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        }
+    });
+
+    var creditors = Ext.create('Ext.data.Store',{
+        fields: ['id','name'],
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op : 'LIST_CREDITORS'},
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        },
+    });
+
+
     entityStore = Ext.create('Ext.data.TreeStore', {
         model: 'entityModel',
         storeId: 'entityStore',
@@ -697,6 +733,8 @@ Ext.onReady(function() {
         text: label_VIEW,
         handler : function (){
             //entityId = Ext.getCmp("entityId");
+            Ext.getCmp('form-area').doSearch();
+            return;
             var keySearchComponent = document.getElementById('inp-1-' + currentMeta + '-null');
 
             if(keySearchComponent != null) {
@@ -914,7 +952,7 @@ Ext.onReady(function() {
         closeAction: 'hide',
         items : [
             {
-                id: "ArrayElFormPannel",
+                id: "ArrayElFormPanel",
                 xtype: 'form',
                 bodyPadding: '5 5 0',
                 width: "100%",
@@ -926,7 +964,7 @@ Ext.onReady(function() {
         tbar : [{
             text : 'Сохранить новую запись' ,
             handler :function() {
-                var form = Ext.getCmp('ArrayElFormPannel');
+                var form = Ext.getCmp('ArrayElFormPanel');
                 if (form.isValid()) {
                     saveFormValues(FORM_ADD_ARRAY_EL);
                 }
@@ -1067,28 +1105,42 @@ Ext.onReady(function() {
                     id: 'edSearch',
                     xtype: 'combobox',
                     displayField:'title',
-                    store: classesStore,
+                    store: types,
                     labelWidth: 70,
                     valueField:'searchName',
-                    fieldLabel: label_CLASS,
+                    fieldLabel: 'Вид поиска',
+                    editable: false,
+                    listeners : {
+                        change: function(a,key,prev){
+                            for(p in forms)
+                                if(p == key)
+                                    forms[p](Ext.getCmp('form-area'));
+                        }
+                    }
+                }, {
+                    id: 'edCreditor',
+                    xtype: 'combobox',
+                    displayField: 'name',
+                    store: creditors,
+                    labelWidth: 70,
+                    valueField:'id',
+                    fieldLabel: 'Кредитор',
                     editable: false
                 }, {
-                    xtype: 'component',
-                    html: "<a href='#' onclick='getForm();'>" +LABEL_UPDATE+ "</a>"
-                },{
                     xtype: 'datefield',
                     id: 'edDate',
-                    fieldLabel: label_date,
+                    fieldLabel: 'label_date',
                     listeners: {
                         change: function(){
                             console.log('datefield changed');
                         }
                     },
                     format: 'd.m.Y',
-                    value : today
+                    value : '01.11.2015'
                 }]
             },{
                 region: 'center',
+                id: 'form-area',
                 height: '80%',
                 split: true,
                 html: '<div id="entity-editor-form"></div>',

@@ -11,6 +11,9 @@ import kz.bsbnb.usci.eav.util.DataUtils;
 import java.util.*;
 
 public class MetaClass extends MetaContainer implements IMetaClass {
+
+    private static final long serialVersionUID = 1L;
+
     private String className;
 
     private String classTitle;

@@ -153,7 +153,8 @@ public class MainPortlet extends MVCPortlet {
         FIND_ACTION,
         GET_FORM,
         LIST_ATTRIBUTES,
-        LIST_BY_CLASS_SHORT
+        LIST_BY_CLASS_SHORT,
+        LIST_CREDITORS
     }
 
     private String testNull(String str) {
@@ -551,6 +552,10 @@ public class MainPortlet extends MVCPortlet {
                     }
 
                     break;
+                case LIST_CREDITORS:
+                    creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
+                    out.write(JsonMaker.getJson(creditors).getBytes());
+                    break;
                 case LIST_ENTITY:
                     String entityId = resourceRequest.getParameter("entityId");
                     String asRootStr = resourceRequest.getParameter("asRoot");
@@ -596,6 +601,41 @@ public class MainPortlet extends MVCPortlet {
 
                         out.write(sJson.getBytes());
                     } else {
+                        searchClassName = resourceRequest.getParameter("searchName");
+                        metaName = resourceRequest.getParameter("metaClass");
+                        metaClass = metaFactoryService.getMetaClass(metaName);
+                        creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
+
+                        list = resourceRequest.getParameterNames();
+                        parameters = new HashMap<>();
+                        while(list.hasMoreElements()) {
+                            String attribute = list.nextElement();
+                            if(attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
+                                continue;
+                            parameters.put(attribute, resourceRequest.getParameter(attribute));
+                        }
+
+
+                        searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "", creditorId);
+
+                        StringBuilder sb = new StringBuilder("{\"text\":\".\",\"children\": [\n");
+                        Iterator<BaseEntity> it = searchResult.iterator();
+                        do {
+                            if(!it.hasNext())
+                                break;
+                            BaseEntity currentEntity = it.next();
+                            sb.append(entityToJson(currentEntity, currentEntity.getMeta().getClassTitle(),
+                                    currentEntity.getMeta().getClassName(), null, true, isNb, creditorId));
+
+                            if(it.hasNext()) sb.append(",");
+                        } while(true);
+
+                        sb.append("]}");
+                        out.write(sb.toString().getBytes());
+
+                        if(1==1)
+                            return;
+
                         //search by parameters
 
                         list = resourceRequest.getParameterNames();
@@ -615,7 +655,7 @@ public class MainPortlet extends MVCPortlet {
                         searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "", creditorId);
                         if(searchResult.getData() == null)
                             throw new IllegalArgumentException("ошибка сериализации");
-
+                        /*
                         StringBuilder sb = new StringBuilder("{\"text\":\".\",\"children\": [\n");
                         Iterator<BaseEntity> it = searchResult.iterator();
                         do {
@@ -626,7 +666,7 @@ public class MainPortlet extends MVCPortlet {
                                     currentEntity.getMeta().getClassName(), null, true, isNb, creditorId));
 
                             if(it.hasNext()) sb.append(",");
-                        } while(true);
+                        } while(true);*/
 
                         sb.append("]}");
                         out.write(sb.toString().getBytes());

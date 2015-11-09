@@ -34,10 +34,6 @@ public interface IBatchService {
 
     List<Batch> getAll(Date repDate);
 
-    Map<String, String> getEntityStatusParams(long entityStatusId);
-
-    void addEntityStatusParams(long entityStatusId, Map<String, String> params);
-
     boolean incrementActualCounts(Map<Long, Long> batchesToUpdate);
 
     boolean clearActualCount(long batchId);

@@ -47,9 +47,9 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
     @Override
     public List<Pair> getMetaClasses(long userId) {
-        MetaClass person = metaClassRepository.getMetaClass("organization");
+        MetaClass organization = metaClassRepository.getMetaClass("organization_info");
         List<Pair> ret = new LinkedList<>();
-        ret.add(new Pair(person.getId(), person.getClassName(), "организация (по наименованию)"));
+        ret.add(new Pair(organization.getId(), organization.getClassName(), "организация (по наименованию)"));
         return ret;
     }
 
@@ -80,7 +80,7 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
 
         MetaClass orgNameMeta = metaClassRepository.getMetaClass("organization_name");
-        MetaClass orgMeta = metaClassRepository.getMetaClass("organization");
+        MetaClass orgMeta = metaClassRepository.getMetaClass("organization_info");
 
         IMetaAttribute attribute = orgNameMeta.getMetaAttribute("name");
         IMetaAttribute namesAttribute = orgMeta.getMetaAttribute("names");

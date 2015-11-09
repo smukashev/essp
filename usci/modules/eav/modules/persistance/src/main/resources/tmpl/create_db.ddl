@@ -737,15 +737,6 @@
 			<index-column name="batch_id"/>
 		</index>
 	</table>
-	<table name="eav_entity_status_params">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="entity_status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="key" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
-		<column name="value" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
-		<index name="eesp_esi">
-			<index-column name="entity_status_id"/>
-		</index>
-	</table>
 	<table name="batch_entries">
     <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
     <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
