@@ -2,7 +2,9 @@ package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.sync.job.AbstractDataJob;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.SyncStatusSingleton;
@@ -11,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,9 +25,6 @@ public final class DataJob extends AbstractDataJob {
     @Autowired
     @Qualifier(value = "remoteEntityService")
     private RmiProxyFactoryBean rmiProxyFactoryBean;
-
-    @Autowired
-    private BasicBaseEntityComparator comparator;
 
     @Autowired
     private SyncStatusSingleton syncStatusSingleton;
@@ -44,8 +40,8 @@ public final class DataJob extends AbstractDataJob {
 
     protected final List<InProcessTester> entitiesInProcess = new ArrayList<>();
 
-    BaseEntity currentEntity;
-    boolean currentIntersection;
+    private volatile BaseEntity currentEntity;
+    private volatile boolean currentIntersection;
 
     ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -63,8 +59,12 @@ public final class DataJob extends AbstractDataJob {
         }
 
         public Boolean call() {
-            if(hasCrossLine(currentEntity, myEntity)) {
+            Map<MetaClass, List<IBaseEntity>> currentEntityMetaMaps = currentEntity.getMetaMaps();
+
+            if(myEntity.containsComplexKey() && myEntity.compareMetaMaps(currentEntityMetaMaps)) {
                 currentIntersection = true;
+                return true;
+            } else if(myEntity.equalsByKey(currentEntity)) {
                 return true;
             }
 
@@ -91,7 +91,7 @@ public final class DataJob extends AbstractDataJob {
                 if(processingJobs.size() > 0)
                     removeDeadJobs();
 
-                if(entities.size() == 0 && entitiesInProcess.size() == 0) {
+                /*if(entities.size() == 0 && entitiesInProcess.size() == 0) {
                     skip_count++;
                     Thread.sleep(SLEEP_TIME_NORMAL);
                 }
@@ -99,7 +99,7 @@ public final class DataJob extends AbstractDataJob {
                 if(skip_count > SKIP_TIME_MAX) {
                     Thread.sleep(SLEEP_TIME_LONG);
                     skip_count = 0;
-                }
+                }*/
 
                 syncStatusSingleton.put(entities.size(), entitiesInProcess.size(), currentThread, avgTimeCur);
 
@@ -222,9 +222,5 @@ public final class DataJob extends AbstractDataJob {
         }
 
         return currentIntersection;
-    }
-
-    private boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2) {
-        return entity1.compareMetaMaps(entity2.getMetaMaps(false), false);
     }
 }

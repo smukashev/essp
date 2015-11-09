@@ -45,8 +45,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     private Long index;
 
-    private Map<MetaClass, List<IBaseEntity>> metaMap;
-
     @Override
     public OperationType getOperation() {
         return operationType;
@@ -419,6 +417,64 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         baseEntityReportDate.setComplexValuesCount(complexValuesCount);
         baseEntityReportDate.setSimpleSetsCount(simpleSetsCount);
         baseEntityReportDate.setComplexSetsCount(complexSetsCount);
+    }
+
+    @Override
+    public boolean equalsByKey(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (!(getClass() == obj.getClass())) {
+            return false;
+        }
+
+        BaseEntity that = (BaseEntity) obj;
+
+        for (String name : this.meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = this.meta.getMetaAttribute(name);
+            IMetaType metaType = metaAttribute.getMetaType();
+
+            if (metaAttribute.isImmutable())
+                continue;
+
+            IBaseValue thisValue = values.get(name);
+            IBaseValue thatValue = that.getBaseValue(name);
+
+            if (metaAttribute.isKey()) {
+                if (!metaType.isSet()) {
+                    if (metaType.isComplex()) {
+                        if (((BaseEntity) thisValue.getValue()).equalsByKey(thatValue.getValue()))
+                            return true;
+                    } else {
+                        if (thisValue.getValue().equals(thatValue.getValue()))
+                            return true;
+                    }
+                } else {
+                    BaseSet thisChildSet = (BaseSet) thisValue.getValue();
+                    BaseSet thatChildSet = (BaseSet) thatValue.getValue();
+
+                    for (IBaseValue thisChildBaseValue : thisChildSet.get()) {
+                        for (IBaseValue thatChildBaseValue : thatChildSet.get()) {
+                            if (metaType.isComplex()) {
+                                if (((BaseEntity) thisChildBaseValue.getValue()).equalsByKey(
+                                        thatChildBaseValue.getValue()))
+                                    return true;
+                            } else {
+                                if (thisChildBaseValue.getValue().equals(thatChildBaseValue.getValue()))
+                                    return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -911,11 +967,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return valueOut;
     }
 
-    public Map<MetaClass, List<IBaseEntity>> getMetaMaps(boolean override) {
-        if (!override && metaMap != null)
-            return metaMap;
-
-        metaMap = new HashMap<>();
+    public Map<MetaClass, List<IBaseEntity>> getMetaMaps() {
+        Map<MetaClass, List<IBaseEntity>> metaMap = new HashMap<>();
 
         for (String attributeName : meta.getAttributeNames()) {
             IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeName);
@@ -925,6 +978,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 continue;
 
             IBaseValue baseValue = getBaseValue(attributeName);
+
+            if (baseValue.getValue() == null)
+                continue;
 
             if (!metaType.isSet()) {
                 BaseEntity baseEntity = (BaseEntity) baseValue.getValue();
@@ -939,7 +995,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     }
                 }
 
-                for (Map.Entry<MetaClass, List<IBaseEntity>> entry : baseEntity.getMetaMaps(override).entrySet()) {
+                for (Map.Entry<MetaClass, List<IBaseEntity>> entry : baseEntity.getMetaMaps().entrySet()) {
                     if (metaMap.containsKey(entry.getKey())) {
                         metaMap.get(entry.getKey()).addAll(entry.getValue());
                     } else {
@@ -963,7 +1019,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     }
 
                     for (Map.Entry<MetaClass, List<IBaseEntity>> entry :
-                            childBaseEntity.getMetaMaps(override).entrySet()) {
+                            childBaseEntity.getMetaMaps().entrySet()) {
                         if (metaMap.containsKey(entry.getKey())) {
                             metaMap.get(entry.getKey()).addAll(entry.getValue());
                         } else {
@@ -978,14 +1034,14 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return metaMap;
     }
 
-    public boolean compareMetaMaps(Map<MetaClass, List<IBaseEntity>> metaMap, boolean override) {
-        Map<MetaClass, List<IBaseEntity>> thisMetaMap = getMetaMaps(override);
+    public boolean compareMetaMaps(Map<MetaClass, List<IBaseEntity>> metaMap) {
+        Map<MetaClass, List<IBaseEntity>> thisMetaMap = getMetaMaps();
 
         for (Map.Entry<MetaClass, List<IBaseEntity>> entry : thisMetaMap.entrySet()) {
             if (metaMap.containsKey(entry.getKey())) {
                 for (IBaseEntity entity : entry.getValue()) {
                     for (IBaseEntity entity2 : metaMap.get(entry.getKey())) {
-                        if (entity.equals(entity2))
+                        if (entity.equalsByKey(entity2))
                             return true;
                     }
                 }
@@ -1124,6 +1180,19 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     @Override
     public boolean isSet() {
+        return false;
+    }
+
+    @Override
+    public boolean containsComplexKey() {
+        for (String name : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(name);
+            IMetaType metaType = metaAttribute.getMetaType();
+
+            if (metaType.isComplex() && metaAttribute.isKey() && !metaAttribute.isImmutable())
+                return true;
+        }
+
         return false;
     }
 

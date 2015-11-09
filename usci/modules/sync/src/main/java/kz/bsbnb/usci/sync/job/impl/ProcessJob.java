@@ -21,18 +21,6 @@ public class ProcessJob extends Thread {
 
     @Override
     public void run() {
-       /* EntityStatus entityStatus = new EntityStatus()
-                .setBatchId(baseEntity.getBatchId())
-                .setEntityId(baseEntity.getId())
-                .setStatus(EntityStatuses.PROCESSING)
-                .setReceiptDate(new Date())
-                .setIndex(baseEntity.getBatchIndex() - 1);
-
-        Map<String, String> params = StatusProperties.getSpecificParams(baseEntity);
-
-        Long entityStatusId = batchService.addEntityStatus(entityStatus);
-        batchService.addEntityStatusParams(entityStatusId, params);*/
-
         long t1 = System.currentTimeMillis();
         entityService.process(baseEntity);
         timeSpent = System.currentTimeMillis() - t1;

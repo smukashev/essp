@@ -46,4 +46,8 @@ public interface IBaseEntity extends IBaseContainer {
     Long getBatchId();
 
     Long getBatchIndex();
+
+    boolean equalsByKey(Object obj);
+
+    boolean containsComplexKey();
 }
