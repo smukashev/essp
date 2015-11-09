@@ -225,6 +225,8 @@ public final class DataJob extends AbstractDataJob {
     }
 
     private boolean hasCrossLine(BaseEntity entity1, BaseEntity entity2) {
-        return comparator.hasIntersect(entity1, entity2);
+        System.out.println(entity1.compareMetaMaps(entity2.getMetaMaps(false), false));
+        return entity1.compareMetaMaps(entity2.getMetaMaps(false), false);
+        // return comparator.hasIntersect(entity1, entity2);
     }
 }
