@@ -47,6 +47,7 @@ public class MainPortlet extends MVCPortlet {
     private PortalUserBeanRemoteBusiness portalUserBeanRemoteBusiness;
     private ISearcherFormService searcherFormService;
 
+
     void connectToServices() {
         try {
             RmiProxyFactoryBean metaFactoryServiceFactoryBean = new RmiProxyFactoryBean();
@@ -83,7 +84,7 @@ public class MainPortlet extends MVCPortlet {
 
             portalUserBean = new RmiProxyFactoryBean();
             portalUserBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
-            portalUserBean.setServiceInterface(IMetaFactoryService.class);
+            portalUserBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
             portalUserBean.setRefreshStubOnConnectFailure(true);
             portalUserBean.afterPropertiesSet();
 
@@ -626,8 +627,7 @@ public class MainPortlet extends MVCPortlet {
                         parameters.put(attribute, resourceRequest.getParameter(attribute));
                     }
 
-                    ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass,
-                            prefix, 0);
+                    ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, prefix, creditorId);
 
                     if(searchResult.getData() == null)
                         throw new RuntimeException("ошибка сериализации");
@@ -673,6 +673,7 @@ public class MainPortlet extends MVCPortlet {
                     String leftReportDate = resourceRequest.getParameter("leftReportDate");
                     String rightEntityId = resourceRequest.getParameter("rightEntityId");
                     String rightReportDate = resourceRequest.getParameter("rightReportDate");
+                    String CreditorId = resourceRequest.getParameter("creditorId");
 
                     System.out.println("\n THE LEFT ENTITY ID: " + leftEntityId);
                     System.out.println("\n THE RIGHT ENTITY ID: " + rightEntityId);
@@ -695,6 +696,23 @@ public class MainPortlet extends MVCPortlet {
                                         entityLeft.getMeta().getClassName()) +
                                 "]}");
                     }
+                    break;
+                }
+                case LIST_CREDITOR:
+                {
+                    Map m = new HashMap();
+                    List<Map> l = new LinkedList<>();
+                    List<Creditor> creditors =
+                            portalUserBeanRemoteBusiness.getPortalUserCreditorList(currentUser.getUserId());
+                    for(Creditor creditor: creditors) {
+                        Map creditorMap = new HashMap();
+                        creditorMap.put("id", creditor.getId());
+                        creditorMap.put("title", creditor.getName());
+                        l.add(creditorMap);
+                    }
+                    m.put("data", l);
+                    JsonMaker.getJson(m);
+                    writer.write(JsonMaker.getJson(m));
                     break;
                 }
                 default:
@@ -725,6 +743,7 @@ public class MainPortlet extends MVCPortlet {
     enum OperationTypes {
         LIST_CLASSES,
         LIST_ENTITY,
+        LIST_CREDITOR,
         SAVE_JSON,
         GET_FORM,
         FIND_ACTION,
