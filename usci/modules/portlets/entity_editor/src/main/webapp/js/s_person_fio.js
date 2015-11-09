@@ -43,9 +43,9 @@ Ext.onReady(function() {
                 params: params,
                 callback: function (records, operation, success) {
                     if (!success) {
-                    var error = '';
-                    if(operation.error != undefined)
-                        error = operation.error;
+                        var error = '';
+                        if(operation.error != undefined)
+                            error = operation.error;
                     else
                         error = operation.request.proxy.reader.rawData.errorMessage;
                         Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(error));

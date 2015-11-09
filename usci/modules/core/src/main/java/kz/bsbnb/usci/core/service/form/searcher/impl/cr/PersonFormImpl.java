@@ -151,14 +151,14 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
 
         logger.debug(subjectSelect.toString());
 
-        List<Long> personIds = jdbcTemplate.queryForList(subjectSelect.getSQL(), subjectSelect.getBindValues().toArray(), Long.class);
+        List<Long> subjectIds = jdbcTemplate.queryForList(subjectSelect.getSQL(), subjectSelect.getBindValues().toArray(), Long.class);
 
         if(reportDate != null) {
-            for (Long id : personIds) {
+            for (Long id : subjectIds) {
                 entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
             }
         } else {
-            for(Long id : personIds)
+            for(Long id : subjectIds)
                 entities.add((BaseEntity) baseEntityLoadDao.load(id));
         }
 
