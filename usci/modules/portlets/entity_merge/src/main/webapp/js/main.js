@@ -432,6 +432,7 @@ function find(control){
 function filterLeaf(control, queryObject, first){
     for(var i =0 ;i<control.childNodes.length;i++) {
         var childControl = control.childNodes[i];
+        var form = document.getElementById((first ? 'f1_' : 'f2_') +'entity-editor-form'+ (first ? '' : '2'));
         if(childControl.tagName == 'INPUT' || childControl.tagName=='SELECT') {
             var info =  childControl.id.match(regex);
             var id = info[1];
@@ -441,6 +442,16 @@ function filterLeaf(control, queryObject, first){
             }
 
             queryObject[info[3]] = childControl.value;
+        }
+        else if(childControl.className=='usci-date'){
+            //var all = control.getElementsByClassName("usci-date");
+            var info =  childControl.id.match(regex);
+            var value = Ext.getCmp((first ? 'f1_inp-' : 'f2_inp-')+info[1]+(first ? '-1' : '-2')).getRawValue();
+            if(value.length==0)
+            {
+                errors.push(document.getElementById( (first ? 'f1_' : 'f2_') + 'err-' + id));
+            }
+            queryObject[info[3]] = value;
         }
     }
 }
@@ -464,6 +475,18 @@ function getLeftEntityId() {
     } else {
         return document.getElementsByClassName('inp-1')[0].value;
     }
+}
+
+function getCreditorId()
+{
+    var currentTab = tabs.getActiveTab();
+    var currentTabIndex = tabs.items.indexOf(currentTab);
+
+    if (currentTabIndex == 0) {
+        return Ext.getCmp("creditor").getValue();
+    } /*else {
+        return document.getElementsByClassName('inp-1')[0].value;
+    }*/
 }
 
 function getRightEntityId() {
@@ -551,6 +574,32 @@ Ext.onReady(function() {
         ]
     });
 
+
+    var CreditorStore = Ext.create('Ext.data.Store',
+        {
+            model: 'refStoreModel',
+            proxy: {
+                type: 'ajax',
+                url: dataUrl,
+                extraParams: {op : 'LIST_CREDITOR'},
+                actionMethods: {
+                    read: 'POST'
+                },
+                reader: {
+                    type: 'json',
+                    root: 'data'
+                }/*,
+                listeners: {
+                    load: function (obj, records) {
+                        Ext.each(records, function (rec) {
+                            console.log(rec.get('title'));
+                        });
+                    }
+                }*/
+            },
+            autoLoad: true,
+            remoteSort: true
+    });
     var entityStore = Ext.create('Ext.data.TreeStore', {
         model: 'entityModel',
         proxy: {
@@ -574,7 +623,8 @@ Ext.onReady(function() {
                     leftEntityId: getLeftEntityId(),
                     leftReportDate: getLeftReportDate(),
                     rightEntityId: getRightEntityId(),
-                    rightReportDate : getRightReportDate()
+                    rightReportDate : getRightReportDate(),
+                    creditorId: getCreditorId()
                 },
                 callback: function(records, operation, success) {
                     if (!success) {
@@ -761,6 +811,23 @@ Ext.onReady(function() {
         },
         dockedItems: [
             {
+              xtype: 'panel',
+              layout: 'hbox',
+              border: 0,
+              items: [
+                  {
+                      fieldLabel : 'Кредитор',
+                      id: 'creditor',
+                      name: 'creditor',
+                      xtype: 'combobox',
+                      valueField: 'id',
+                      displayField: 'title',
+                      store: CreditorStore,
+                      margin: '10 10 10 10'
+                  }
+              ]
+            },
+            {
                 xtype: 'panel',
                 layout: 'hbox',
                 border: 0,
@@ -803,7 +870,7 @@ Ext.onReady(function() {
                         xtype: 'datefield',
                         format: 'd.m.Y',
                         margin: '10 10 10 10'
-                    },
+                    }
                 ]
             }
         ]

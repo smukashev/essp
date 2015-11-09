@@ -24,12 +24,12 @@ public class MergeManagerKey<T> {
 
     @Override
     public int hashCode() {
-        StringBuilder keyHash = new StringBuilder();
+        /*StringBuilder keyHash = new StringBuilder();
 
         for (T key : keyStore)
-            keyHash.append(key.toString());
+            keyHash.append(key);*/
 
-        return keyHash.hashCode();
+        return keyStore.hashCode();
     }
 
     @Override
@@ -47,12 +47,13 @@ public class MergeManagerKey<T> {
         if (key.getKeyStore().size() != this.keyStore.size()) {
             return false;
         }
-
-        for (int i = 0; i < key.getKeyStore().size(); i++) {
+        if(!keyStore.equals(key.getKeyStore()))
+            return false;
+       /* for (int i = 0; i < key.getKeyStore().size(); i++) {
             if (!keyStore.get(i).equals(key.getKeyStore().get(i))) {
                 return false;
             }
-        }
+        }*/
 
         return true;
     }

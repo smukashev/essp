@@ -45,6 +45,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     private Long index;
 
+    private Map<MetaClass, List<IBaseEntity>> metaMap;
+
     @Override
     public OperationType getOperation() {
         return operationType;
@@ -907,6 +909,90 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         }
 
         return valueOut;
+    }
+
+    public Map<MetaClass, List<IBaseEntity>> getMetaMaps(boolean override) {
+        if (!override && metaMap != null)
+            return metaMap;
+
+        metaMap = new HashMap<>();
+
+        for (String attributeName : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeName);
+            IMetaType metaType = metaAttribute.getMetaType();
+
+            if (metaAttribute.isImmutable() || !metaType.isComplex())
+                continue;
+
+            IBaseValue baseValue = getBaseValue(attributeName);
+
+            if (!metaType.isSet()) {
+                BaseEntity baseEntity = (BaseEntity) baseValue.getValue();
+
+                if (baseEntity.getMeta().isSearchable()) {
+                    if (metaMap.get(baseEntity.getMeta()) != null) {
+                        metaMap.get(baseEntity.getMeta()).add(baseEntity);
+                    } else {
+                        List<IBaseEntity> tmpList = new ArrayList<>();
+                        tmpList.add(baseEntity);
+                        metaMap.put(baseEntity.getMeta(), tmpList);
+                    }
+                }
+
+                for (Map.Entry<MetaClass, List<IBaseEntity>> entry : baseEntity.getMetaMaps(override).entrySet()) {
+                    if (metaMap.containsKey(entry.getKey())) {
+                        metaMap.get(entry.getKey()).addAll(entry.getValue());
+                    } else {
+                        metaMap.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            } else {
+                BaseSet baseSet = (BaseSet) baseValue.getValue();
+
+                for (IBaseValue childBaseValue : baseSet.get()) {
+                    BaseEntity childBaseEntity = (BaseEntity) childBaseValue.getValue();
+
+                    if (childBaseEntity.getMeta().isSearchable()) {
+                        if (metaMap.get(childBaseEntity.getMeta()) != null) {
+                            metaMap.get(childBaseEntity.getMeta()).add(childBaseEntity);
+                        } else {
+                            List<IBaseEntity> tmpList = new ArrayList<>();
+                            tmpList.add(childBaseEntity);
+                            metaMap.put(childBaseEntity.getMeta(), tmpList);
+                        }
+                    }
+
+                    for (Map.Entry<MetaClass, List<IBaseEntity>> entry :
+                            childBaseEntity.getMetaMaps(override).entrySet()) {
+                        if (metaMap.containsKey(entry.getKey())) {
+                            metaMap.get(entry.getKey()).addAll(entry.getValue());
+                        } else {
+                            metaMap.put(entry.getKey(), entry.getValue());
+                        }
+                    }
+                }
+            }
+
+        }
+
+        return metaMap;
+    }
+
+    public boolean compareMetaMaps(Map<MetaClass, List<IBaseEntity>> metaMap, boolean override) {
+        Map<MetaClass, List<IBaseEntity>> thisMetaMap = getMetaMaps(override);
+
+        for (Map.Entry<MetaClass, List<IBaseEntity>> entry : thisMetaMap.entrySet()) {
+            if (metaMap.containsKey(entry.getKey())) {
+                for (IBaseEntity entity : entry.getValue()) {
+                    for (IBaseEntity entity2 : metaMap.get(entry.getKey())) {
+                        if (entity.equals(entity2))
+                            return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     public boolean equalsToString(HashMap<String, String> params) {
