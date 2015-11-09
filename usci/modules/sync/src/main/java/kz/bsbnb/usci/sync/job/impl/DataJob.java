@@ -61,8 +61,10 @@ public final class DataJob extends AbstractDataJob {
         public Boolean call() {
             Map<MetaClass, List<IBaseEntity>> currentEntityMetaMaps = currentEntity.getMetaMaps();
 
-            if(myEntity.compareMetaMaps(currentEntityMetaMaps)) {
+            if(myEntity.containsComplexKey() && myEntity.compareMetaMaps(currentEntityMetaMaps)) {
                 currentIntersection = true;
+                return true;
+            } else if(myEntity.equalsByKey(currentEntity)) {
                 return true;
             }
 

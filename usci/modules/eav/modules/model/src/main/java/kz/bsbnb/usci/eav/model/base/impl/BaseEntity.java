@@ -1183,6 +1183,19 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return false;
     }
 
+    @Override
+    public boolean containsComplexKey() {
+        for (String name : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(name);
+            IMetaType metaType = metaAttribute.getMetaType();
+
+            if (metaType.isComplex() && metaAttribute.isKey() && !metaAttribute.isImmutable())
+                return true;
+        }
+
+        return false;
+    }
+
     public int getSearchableChildrenCount() {
         int count = 0;
 

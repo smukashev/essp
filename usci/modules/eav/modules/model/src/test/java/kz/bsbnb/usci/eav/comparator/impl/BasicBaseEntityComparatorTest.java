@@ -36,6 +36,10 @@ public class BasicBaseEntityComparatorTest {
         document2.put("doc_type", new BaseValue<>(refDocType));
         document2.put("no", new BaseValue<>("no#2"));
 
+        BaseEntity document3 = new BaseEntity(metaDocument, new Date());
+        document3.put("doc_type", new BaseValue<>(refDocType));
+        document3.put("no", new BaseValue<>("no#2"));
+
         BaseSet docs1 = new BaseSet(metaDocs);
         BaseSet docs2 = new BaseSet(metaDocs);
 
@@ -58,6 +62,14 @@ public class BasicBaseEntityComparatorTest {
 
         Assert.assertTrue(subject2.compareMetaMaps(subject1.getMetaMaps()));
         Assert.assertTrue(subject1.equalsByKey(subject2));
+
+        Assert.assertFalse(document1.compareMetaMaps(document2.getMetaMaps()));
+
+        if (document2.containsComplexKey()) {
+            Assert.assertTrue(document2.compareMetaMaps(document3.getMetaMaps()));
+        } else {
+            Assert.assertTrue(document2.equalsByKey(document3));
+        }
     }
 
     @Test
