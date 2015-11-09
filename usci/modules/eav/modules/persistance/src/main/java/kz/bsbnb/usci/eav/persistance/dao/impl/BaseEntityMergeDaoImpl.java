@@ -21,6 +21,7 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityApplyDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityMergeDao;
+import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,12 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
     @Autowired
     IBaseEntityApplyDao baseEntityApplyDao;
 
+    IDaoListener applyListener;
+
+    @Autowired
+    public void setApplyListener(IDaoListener applyListener) {
+        this.applyListener = applyListener;
+    }
     /**
      * Given two entities, merge manager. and merge result choice, perform merge
      * operation and return resulting base entity. The choice of the resulting entity
@@ -58,6 +65,9 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                 mergeManager, baseEntityManager, choice, deleteUnused);
 
         baseEntityApplyDao.applyToDb(baseEntityManager);
+
+        applyListener.applyToDBEnded(null, baseEntityRight, resultingBaseEntity, baseEntityManager);
+
 
         return resultingBaseEntity;
     }
@@ -83,6 +93,8 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
         long creditorId = 0;
         if (baseEntityLeft.getMeta().getClassName().equals("credit")) {
+
+            //long creditorIdLeft = ((BaseEntity) baseEntityLeft.getEl("creditor")).getId();
             long creditorIdLeft = ((BaseEntity) baseEntityLeft.getEl("creditor")).getId();
             long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("creditor")).getId();
 
@@ -111,7 +123,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
         for (String attribute : metaClass.getAttributeNames()) {
             IBaseValue baseValueLeft = baseEntityLeft.getBaseValue(attribute);
             IBaseValue baseValueRight = baseEntityRight.getBaseValue(attribute);
-            MergeManagerKey attrKey = new MergeManagerKey(attribute);
+            MergeManagerKey<String> attrKey = new MergeManagerKey<String>(attribute);
 
             if (baseValueLeft != null && baseValueRight != null) {
                 IMetaAttribute metaAttribute = baseValueLeft.getMetaAttribute();

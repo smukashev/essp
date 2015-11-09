@@ -37,6 +37,11 @@ public class CrRefLoadedListener implements IRefLoadedListener {
                     list.add(refItem);
                 }
             }
+            else if (creditors.size() == 0)
+            {
+                list.clear();
+            }
         }
+
     }
 }
