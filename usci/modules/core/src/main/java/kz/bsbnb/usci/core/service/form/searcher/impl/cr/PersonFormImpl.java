@@ -14,6 +14,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -72,6 +73,7 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
 
         MetaClass personNameClass = metaClassRepository.getMetaClass("person_name");
         MetaClass personClass = metaClassRepository.getMetaClass("person_info");
+        MetaClass subjectClass = metaClassRepository.getMetaClass("subject");
 
         IMetaAttribute firstNameAttribute = personNameClass.getMetaAttribute("firstname");
         IMetaAttribute lastNameAttribute = personNameClass.getMetaAttribute("lastname");
@@ -124,21 +126,32 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
                         fioSelect
                 ));
 
-        Select entitySelect = context.select(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID)
+        Select personInfoSelect = context.select(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID)
                 .from(EAV_BE_ENTITY_COMPLEX_SETS)
                 .where(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.in(setSelect))
                 .and(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.eq(namesAttribute.getId()));
 
+        IMetaAttribute personInfoAttribute = subjectClass.getElAttribute("person_info");
+
+        SelectConditionStep subjectSelectWhere = context.select(EAV_BE_COMPLEX_VALUES.ENTITY_ID)
+                .from(EAV_BE_COMPLEX_VALUES)
+                .where(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.in(personInfoSelect))
+                .and(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.eq(personInfoAttribute.getId()));
+
+        Select subjectSelect = subjectSelectWhere;
+        if(reportDate != null)
+            subjectSelect = subjectSelectWhere.and(EAV_BE_COMPLEX_VALUES.REPORT_DATE.lessOrEqual(DataUtils.convert(reportDate)));
+
         if(parameters.get("pageNo") != null) {
-            Select countSelect = context.select(DSL.count()).from(entitySelect);
+            Select countSelect = context.select(DSL.count()).from(personInfoSelect);
             int cnt = jdbcTemplate.queryForInt(countSelect.getSQL(), countSelect.getBindValues().toArray());
             SearchPagination pagination = new SearchPagination(cnt);
             ret.setPagination(pagination);
         }
 
-        logger.debug(entitySelect.toString());
+        logger.debug(subjectSelect.toString());
 
-        List<Long> personIds = jdbcTemplate.queryForList(entitySelect.getSQL(), entitySelect.getBindValues().toArray(), Long.class);
+        List<Long> personIds = jdbcTemplate.queryForList(subjectSelect.getSQL(), subjectSelect.getBindValues().toArray(), Long.class);
 
         if(reportDate != null) {
             for (Long id : personIds) {
