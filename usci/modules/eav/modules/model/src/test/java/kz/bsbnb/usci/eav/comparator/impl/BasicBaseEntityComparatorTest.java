@@ -85,6 +85,6 @@ public class BasicBaseEntityComparatorTest {
         document2.put("doc_type", new BaseValue<>(refDocType));
         document2.put("no", new BaseValue<>("no#1"));
 
-        System.out.println(document1.equalsByKey(document2));
+        Assert.assertTrue(document1.equalsByKey(document2));
     }
 }
