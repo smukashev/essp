@@ -8,6 +8,7 @@ var label_ERROR = 'Ошибка';
 var label_ERROR_NO_DATA = 'Не возможно получить данные';
 var label_VIEW = 'Просмотр';
 var label_ERROR_NO_DATA_FOR = 'Не возможно получить данные: {0} ';
+var label_INFO = 'Информация';
 var label_SAVE = 'Сохранить';
 var label_CANCEL = 'Отмена';
 var label_VALUE = 'Значение';
