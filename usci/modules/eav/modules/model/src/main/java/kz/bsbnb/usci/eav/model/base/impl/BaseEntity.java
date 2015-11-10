@@ -979,7 +979,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
             IBaseValue baseValue = getBaseValue(attributeName);
 
-            if (baseValue.getValue() == null)
+            if (baseValue == null || baseValue.getValue() == null)
                 continue;
 
             if (!metaType.isSet()) {
@@ -1180,6 +1180,19 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     @Override
     public boolean isSet() {
+        return false;
+    }
+
+    @Override
+    public boolean containsComplexKey() {
+        for (String name : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(name);
+            IMetaType metaType = metaAttribute.getMetaType();
+
+            if (metaType.isComplex() && metaAttribute.isKey() && !metaAttribute.isImmutable())
+                return true;
+        }
+
         return false;
     }
 

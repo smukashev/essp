@@ -29,6 +29,8 @@ update eav_m_classes set title = 	'Исключительный документ
 update eav_m_classes set title = 	'соответсвтие балансовый счет - тип креидита' WHERE NAME = 'ref_ba_ct';
 update eav_m_classes set title = 	'соответсвтие балансовый счет - тип остатка' WHERE NAME = 'ref_ba_drt';
 update eav_m_classes set title = 	'виды остатков' WHERE NAME = 'ref_debt_remains_type';
+update eav_m_classes set title = 	'субъект кредитной истории' WHERE NAME = 'subject';
+update eav_m_classes set title = 	'физ лицо' WHERE NAME = 'person_info';
 
 update eav_m_simple_attributes set title = 'номер' where name='no';
 update eav_m_simple_attributes set title = 'дата' where name='date';

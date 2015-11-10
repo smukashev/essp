@@ -988,31 +988,36 @@ Ext.onReady(function() {
             sortable: true,
             dataIndex: 'title'
         },{
-            text: label_CODE,
-            flex: 1,
-            dataIndex: 'code',
-            sortable: true
-        },{
             text: label_VALUE,
             flex: 4,
             dataIndex: 'value',
             sortable: true
-        },{
-            text: label_SIMPLE,
-            flex: 1,
-            dataIndex: 'simple',
-            sortable: true
-        },{
-            text: label_ARRAY,
-            flex: 1,
-            dataIndex: 'array',
-            sortable: true
-        },{
-            text: label_TYPE,
-            flex: 1,
-            dataIndex: 'type',
-            sortable: true
-        }],
+        }/*,{
+         text: label_CODE,
+         flex: 1,
+         dataIndex: 'code',
+         sortable: true
+         },{
+         text: label_VALUE,
+         flex: 4,
+         dataIndex: 'value',
+         sortable: true
+         },{
+         text: label_SIMPLE,
+         flex: 1,
+         dataIndex: 'simple',
+         sortable: true
+         },{
+         text: label_ARRAY,
+         flex: 1,
+         dataIndex: 'array',
+         sortable: true
+         },{
+         text: label_TYPE,
+         flex: 1,
+         dataIndex: 'type',
+         sortable: true
+         }*/],
         listeners : {
             itemclick: function(view, record, item, index, e, eOpts) {
                 nextArrayIndex = 0;

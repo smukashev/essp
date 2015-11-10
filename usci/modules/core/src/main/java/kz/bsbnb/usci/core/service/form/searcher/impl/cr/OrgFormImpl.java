@@ -13,9 +13,11 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.jooq.DSLContext;
 import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +83,7 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
         MetaClass orgNameMeta = metaClassRepository.getMetaClass("organization_name");
         MetaClass orgMeta = metaClassRepository.getMetaClass("organization_info");
+        MetaClass subjectClass = metaClassRepository.getMetaClass("subject");
 
         IMetaAttribute attribute = orgNameMeta.getMetaAttribute("name");
         IMetaAttribute namesAttribute = orgMeta.getMetaAttribute("names");
@@ -100,18 +103,30 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
                 .where(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.in(setSelect))
                 .and(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.eq(namesAttribute.getId()));
 
+        IMetaAttribute personInfoAttribute = subjectClass.getElAttribute("organization_info");
 
-        logger.debug(orgSelect.toString());
+        SelectConditionStep subjectSelectWhere = context.select(EAV_BE_COMPLEX_VALUES.ENTITY_ID)
+                .from(EAV_BE_COMPLEX_VALUES)
+                .where(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.in(orgSelect))
+                .and(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID.eq(personInfoAttribute.getId()));
 
 
-        List<Long> orgIds = jdbcTemplate.queryForList(orgSelect.getSQL(), orgSelect.getBindValues().toArray(), Long.class);
+        Select subjectSelect = subjectSelectWhere;
+        if(reportDate != null)
+            subjectSelect = subjectSelectWhere.and(EAV_BE_COMPLEX_VALUES.REPORT_DATE.lessOrEqual(DataUtils.convert(reportDate)));
+
+
+        logger.debug(subjectSelect.toString());
+
+
+        List<Long> subjectIds = jdbcTemplate.queryForList(subjectSelect.getSQL(), subjectSelect.getBindValues().toArray(), Long.class);
 
         if(reportDate != null) {
-            for (Long id : orgIds) {
+            for (Long id : subjectIds) {
                 entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
             }
         } else {
-            for(Long id : orgIds)
+            for(Long id : subjectIds)
                 entities.add((BaseEntity) baseEntityLoadDao.load(id));
         }
 

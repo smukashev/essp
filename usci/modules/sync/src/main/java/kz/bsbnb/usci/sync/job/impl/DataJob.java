@@ -59,11 +59,18 @@ public final class DataJob extends AbstractDataJob {
         }
 
         public Boolean call() {
-            Map<MetaClass, List<IBaseEntity>> currentEntityMetaMaps = currentEntity.getMetaMaps();
+            try {
+                Map<MetaClass, List<IBaseEntity>> currentEntityMetaMaps = currentEntity.getMetaMaps();
 
-            if(myEntity.compareMetaMaps(currentEntityMetaMaps)) {
-                currentIntersection = true;
-                return true;
+                if (myEntity.containsComplexKey() && myEntity.compareMetaMaps(currentEntityMetaMaps)) {
+                    currentIntersection = true;
+                    return true;
+                } else if (myEntity.equalsByKey(currentEntity)) {
+                    currentIntersection = true;
+                    return true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             return false;
@@ -76,7 +83,6 @@ public final class DataJob extends AbstractDataJob {
 
     @Override
     public void run() {
-        System.out.println("Data Job Started.");
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
         actualCountJob = new ActualCountJob(batchService);
         actualCountJob.start();
@@ -89,7 +95,7 @@ public final class DataJob extends AbstractDataJob {
                 if(processingJobs.size() > 0)
                     removeDeadJobs();
 
-                /*if(entities.size() == 0 && entitiesInProcess.size() == 0) {
+                if(entities.size() == 0 && entitiesInProcess.size() == 0) {
                     skip_count++;
                     Thread.sleep(SLEEP_TIME_NORMAL);
                 }
@@ -97,7 +103,7 @@ public final class DataJob extends AbstractDataJob {
                 if(skip_count > SKIP_TIME_MAX) {
                     Thread.sleep(SLEEP_TIME_LONG);
                     skip_count = 0;
-                }*/
+                }
 
                 syncStatusSingleton.put(entities.size(), entitiesInProcess.size(), currentThread, avgTimeCur);
 
@@ -199,8 +205,6 @@ public final class DataJob extends AbstractDataJob {
             if(!isInProcessWithThreads(entity)) {
                 iterator.remove();
                 return entity;
-            } else {
-                logger.debug("Entity in process.");
             }
 
             clearJobsIndex++;
