@@ -979,7 +979,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
             IBaseValue baseValue = getBaseValue(attributeName);
 
-            if (baseValue.getValue() == null)
+            if (baseValue == null || baseValue.getValue() == null)
                 continue;
 
             if (!metaType.isSet()) {
