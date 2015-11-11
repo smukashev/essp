@@ -578,7 +578,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         for(String name : meta.getAttributeNames()) {
             IMetaAttribute metaAttribute = meta.getMetaAttribute(name);
             if (metaAttribute.isKey()) {
-                result += values.get(name).getValue().hashCode();
+                result += values.get(name).getValue().toString().hashCode();
             }
 
         }
@@ -979,7 +979,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
             IBaseValue baseValue = getBaseValue(attributeName);
 
-            if (baseValue.getValue() == null)
+            if (baseValue == null || baseValue.getValue() == null)
                 continue;
 
             if (!metaType.isSet()) {
