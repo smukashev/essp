@@ -149,11 +149,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 logger.error(e.getMessage());
             }
         }
-        if(isReferenceCacheEnabled) {
-            if (metaClass.isReference()) {
-                refRepositoryDao.setRef(baseEntity);
-            }
-        }
         return baseEntity;
     }
 
@@ -235,6 +230,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     baseEntityApplyDao.applyToDb(baseEntityManager);
 
+                    if(isReferenceCacheEnabled) {
+                        if(baseEntityApplied.getMeta().isReference()){
+                            if(refRepositoryDao.getRef(baseEntityApplied)!=null) {
+                                refRepositoryDao.delRef(baseEntityApplied);
+                            }
+                        }
+                    }
                     entityHolder.setApplied(baseEntityApplied);
                     break;
                 case INSERT:
@@ -246,6 +248,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             entityHolder);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
+
+                    if(isReferenceCacheEnabled) {
+                        if(baseEntityApplied.getMeta().isReference()){
+                            if(refRepositoryDao.getRef(baseEntityApplied)==null) {
+                                refRepositoryDao.setRef(baseEntityApplied);
+                            }
+                        }
+                    }
                     break;
                 case UPDATE:
                     if (baseEntityPostPrepared.getId() <= 0)
@@ -256,6 +266,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             entityHolder);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
+
+                    if(isReferenceCacheEnabled) {
+                        if(baseEntityApplied.getMeta().isReference()){
+                            if(refRepositoryDao.getRef(baseEntityApplied)==null) {
+                                refRepositoryDao.setRef(baseEntityApplied);
+                            }
+                        }
+                    }
                     break;
                 default:
                     throw new UnsupportedOperationException("Операция не поддерживается: "
@@ -266,6 +284,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     entityHolder);
 
             baseEntityApplyDao.applyToDb(baseEntityManager);
+
+            if(isReferenceCacheEnabled) {
+                if(baseEntityApplied.getMeta().isReference()){
+                    if(refRepositoryDao.getRef(baseEntityApplied)==null){
+                        refRepositoryDao.setRef(baseEntityApplied);
+                    }
+                }
+            }
         }
 
         if (applyListener != null)
