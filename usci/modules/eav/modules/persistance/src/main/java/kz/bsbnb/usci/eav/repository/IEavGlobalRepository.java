@@ -14,4 +14,7 @@ public interface IEavGlobalRepository {
 
     EavGlobal getGlobal(Long id);
 
+    void update(String type, String code, String value);
+
+    String getValue(String type, String code);
 }

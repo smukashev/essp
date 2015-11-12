@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IEavGlobalDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
+import kz.bsbnb.usci.eav.util.IGlobal;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,5 +134,32 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
         }
 
         return eavGlobals;
+    }
+
+
+    @Override
+    public void update(String type, String code, String value){
+        Update update = context.update(EAV_GLOBAL)
+                .set(EAV_GLOBAL.VALUE, value)
+                .where(EAV_GLOBAL.TYPE.eq(type))
+                .and(EAV_GLOBAL.CODE.eq(code));
+
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
+
+    @Override
+    public String getValue(String type, String code){
+        Select select = context.select(EAV_GLOBAL.VALUE)
+                .from(EAV_GLOBAL)
+                .where(EAV_GLOBAL.TYPE.eq(type))
+                .and(EAV_GLOBAL.CODE.eq(code));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        for (Map<String, Object> row : rows) {
+            return (String)row.get("VALUE");
+        }
+
+        throw new RuntimeException("value not found");
     }
 }

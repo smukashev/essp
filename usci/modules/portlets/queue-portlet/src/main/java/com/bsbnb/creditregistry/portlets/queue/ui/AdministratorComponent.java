@@ -4,6 +4,11 @@ import com.bsbnb.creditregistry.portlets.queue.PortalEnvironmentFacade;
 import static com.bsbnb.creditregistry.portlets.queue.QueueApplication.log;
 import com.bsbnb.creditregistry.portlets.queue.data.DataProvider;
 import com.bsbnb.creditregistry.portlets.queue.data.QueueFileInfo;
+import com.bsbnb.creditregistry.portlets.queue.thread.ConfigurationException;
+import com.bsbnb.creditregistry.portlets.queue.thread.DatabaseQueueConfiguration;
+import com.bsbnb.creditregistry.portlets.queue.thread.QueueConfiguration;
+//import com.bsbnb.creditregistry.portlets.queue.thread.QueueHandler;
+//import com.bsbnb.creditregistry.portlets.queue.thread.logic.QueueOrderType;
 import com.bsbnb.vaadin.messagebox.MessageBox;
 import com.vaadin.data.util.AbstractBeanContainer;
 import com.vaadin.data.util.BeanContainer;
@@ -15,6 +20,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.eav.util.QueueOrderType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,6 +54,7 @@ public class AdministratorComponent extends VerticalLayout {
         removeAllComponents();
         log.log(Level.INFO, "Loading admin interface");
         try {
+            DatabaseQueueConfiguration config = new DatabaseQueueConfiguration(dataProvider);
             Button manageButton = new Button(environment.getString(Localization.START_QUEUE_PROCESSING), new Button.ClickListener() {
                 public void buttonClick(ClickEvent event) {
 
@@ -56,15 +63,16 @@ public class AdministratorComponent extends VerticalLayout {
             manageButton.setImmediate(true);
 
             orderBox = new ComboBox(environment.getString(Localization.ORDER_COMBOBOX_CAPTION));
-           /* QueueOrderType[] orders = QueueOrderType.values();
-            for (QueueOrderType order : orders) {
+            //QueueOrderType[] orders = QueueOrderType.values();
+            kz.bsbnb.usci.eav.util.QueueOrderType[] orders = kz.bsbnb.usci.eav.util.QueueOrderType.values();
+            for (kz.bsbnb.usci.eav.util.QueueOrderType order : orders) {
                 orderBox.addItem(order);
                 orderBox.setItemCaption(order, environment.getString(order.getDescription()));
-            }*/
+            }
             orderBox.setImmediate(true);
             orderBox.setNullSelectionAllowed(false);
             orderBox.setWidth("400px");
-            // orderBox.setValue(config.getOrderType());
+            orderBox.setValue(config.getOrderType());
 
             List<Creditor> creditors = dataProvider.getCreditors(environment.getUserId(), environment.isUserAdmin());
             log.log(Level.INFO, "Creditors number: {0}", creditors.size());
@@ -73,9 +81,9 @@ public class AdministratorComponent extends VerticalLayout {
                 creditorsById.put(creditor.getId(), creditor);
             }
             List<Integer> selectedCreditorIds = new ArrayList<>();
-            /* for (int priorityCreditorId : config.getPriorityCreditorIds()) {
+             for (int priorityCreditorId : config.getPriorityCreditorIds()) {
                 selectedCreditorIds.add(priorityCreditorId);
-            } */
+            }
             BeanContainer<Integer, Creditor> creditorsContainer = new BeanContainer<>(Creditor.class);
 
            creditorsContainer.setBeanIdResolver(new AbstractBeanContainer.BeanIdResolver<Integer, Creditor>() {
@@ -95,10 +103,10 @@ public class AdministratorComponent extends VerticalLayout {
 
             Button saveButton = new Button(environment.getString(Localization.SAVE), new Button.ClickListener() {
                 public void buttonClick(ClickEvent event) {
-                    /*DatabaseQueueConfiguration config = new DatabaseQueueConfiguration(dataProvider);
+                    DatabaseQueueConfiguration config = new DatabaseQueueConfiguration(dataProvider);
                     config.setOrderType(getSelectedOrder());
                     config.setPriorityCreditorIds(getSelectedCreditorIds());
-                    MessageBox.Show(environment.getString(Localization.SETTINGS_SAVED_MESSAGE), getApplication().getMainWindow());*/
+                    MessageBox.Show(environment.getString(Localization.SETTINGS_SAVED_MESSAGE), getApplication().getMainWindow());
                 }
             });
 
@@ -132,18 +140,14 @@ public class AdministratorComponent extends VerticalLayout {
     }
 
     private void showPreview() {
-        /*log.log(Level.INFO, "Showing queue preview");
+        log.log(Level.INFO, "Showing queue preview");
         previewLayout.removeAllComponents();
         QueueConfiguration selectedConfiguration = new QueueConfiguration() {
-            @Override
-            public int getFilesInProcessing() throws ConfigurationException {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-
+            /*
             @Override
             public long getLastLaunchMillis() throws ConfigurationException {
                 throw new UnsupportedOperationException("Not supported yet.");
-            }
+            }*/
 
             @Override
             public QueueOrderType getOrderType() {
@@ -151,24 +155,15 @@ public class AdministratorComponent extends VerticalLayout {
             }
 
             @Override
-            public int getParallelLimit() throws ConfigurationException {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-
-            @Override
             public List<Integer> getPriorityCreditorIds() {
                 return getSelectedCreditorIds();
             }
 
-            @Override
-            public String getWsdlLocation() throws ConfigurationException {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-
+            /*
             @Override
             public void setLastLaunchMillis(long millis) throws ConfigurationException {
                 throw new UnsupportedOperationException("Not supported yet.");
-            }
+            }*/
 
             @Override
             public void setOrderType(QueueOrderType orderType) {
@@ -180,13 +175,16 @@ public class AdministratorComponent extends VerticalLayout {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        List<QueueFileInfo> files = dataProvider.getQueue(dataProvider.getCreditors(environment.getUserId(), environment.isUserAdmin()));
+        List<Creditor> creditors = dataProvider.getCreditors(environment.getUserId(), environment.isUserAdmin());
+        List<QueueFileInfo> files = dataProvider.getPreviewQueue(creditors, getSelectedCreditorIds(), getSelectedOrder());
+        /*List<QueueFileInfo> files = dataProvider.getQueue(dataProvider.getCreditors(environment.getUserId(), environment.isUserAdmin()));
         QueueHandler handler = new QueueHandler(dataProvider, selectedConfiguration);
-        List<QueueFileInfo> orderedFiles = handler.getOrderedFiles(files);
+        List<QueueFileInfo> orderedFiles = handler.getOrderedFiles(files);*/
+
         QueueTable previewTable = new QueueTable(environment);
-        previewTable.load(orderedFiles);
+        previewTable.load(files);
         previewLayout.addComponent(previewTable);
-        log.log(Level.INFO, "Queue preview showed");*/
+        log.log(Level.INFO, "Queue preview showed active");
     }
 
     private List<Integer> getSelectedCreditorIds() {
@@ -202,4 +200,10 @@ public class AdministratorComponent extends VerticalLayout {
         }
         return priorityCreditorIds;
     }
+
+    private QueueOrderType getSelectedOrder() {
+        QueueOrderType selectedOrder = (QueueOrderType) orderBox.getValue();
+        return selectedOrder;
+    }
+
 }

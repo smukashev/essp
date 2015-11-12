@@ -26,4 +26,18 @@ public class GlobalServiceImpl implements IGlobalService {
         return eavGlobalRepository.getGlobal(id);
     }
 
+    @Override
+    public void update(String type, String code, String value){
+        eavGlobalRepository.update(type, code, value);
+    }
+
+    @Override
+    public void updateValue(EavGlobal global) {
+        eavGlobalRepository.update(global.getType(), global.getCode(), global.getValue());
+    }
+
+    @Override
+    public String getValue(String type, String code){
+        return eavGlobalRepository.getValue(type, code);
+    }
 }

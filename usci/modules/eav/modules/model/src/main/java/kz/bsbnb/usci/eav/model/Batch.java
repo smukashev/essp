@@ -18,6 +18,7 @@ public class Batch extends Persistable {
     private Long actualCount;
     private Long reportId;
     private Long creditorId;
+    private Long statusId;
 
     public Batch() {
         super();
@@ -189,6 +190,14 @@ public class Batch extends Persistable {
 
     public void setCreditorId(Long creditorId) {
         this.creditorId = creditorId;
+    }
+
+    public Long getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(Long statusId) {
+        this.statusId = statusId;
     }
 
     @Override

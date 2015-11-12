@@ -12,6 +12,9 @@ public class BatchInfo {
     private Long userId;
     private Date repDate;
     private HashMap<String, String> additionalParams = new HashMap<>();
+    private Date receiptDate;
+    private int contentSize;
+    private Long creditorId;
 
     private long reportId;
     private long totalCount;
@@ -29,6 +32,9 @@ public class BatchInfo {
         setTotalCount(batch.getTotalCount() != null ? batch.getTotalCount() : 0);
         setActualCount(batch.getActualCount() != null ? batch.getActualCount() : 0);
         setUserId(batch.getUserId());
+        setCreditorId(batch.getCreditorId());
+        setContentSize(batch.getContent().length);
+        setReceiptDate(batch.getReceiptDate());
     }
 
     public String getBatchName() {
@@ -106,5 +112,29 @@ public class BatchInfo {
 
     public void setActualCount(long actualCount) {
         this.actualCount = actualCount;
+    }
+
+    public Date getReceiptDate() {
+        return receiptDate;
+    }
+
+    public void setReceiptDate(Date receiptDate) {
+        this.receiptDate = receiptDate;
+    }
+
+    public int getContentSize() {
+        return contentSize;
+    }
+
+    public void setContentSize(int contentSize) {
+        this.contentSize = contentSize;
+    }
+
+    public Long getCreditorId() {
+        return creditorId;
+    }
+
+    public void setCreditorId(Long creditorId) {
+        this.creditorId = creditorId;
     }
 }

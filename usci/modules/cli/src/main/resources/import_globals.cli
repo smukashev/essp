@@ -26,8 +26,8 @@ global add --type=ENTITY_STATUS --code=ACTUAL_COUNT --value=ACTUAL_COUNT --desc=
 #
 # BATCH_STATUS
 #
-global add --type=BATCH_STATUS --code=WAITING --value=WAITING --desc=WAITING
-global add --type=BATCH_STATUS --code=PROCESSING --value=PROCESSING --desc=PROCESSING
+global add --type=BATCH_STATUS --code=WAITING --value=WAITING --desc=В_очереди
+global add --type=BATCH_STATUS --code=PROCESSING --value=PROCESSING --desc=В_обработке
 global add --type=BATCH_STATUS --code=ERROR --value=ERROR --desc=ERROR
 global add --type=BATCH_STATUS --code=COMPLETED --value=COMPLETED --desc=COMPLETED
 
