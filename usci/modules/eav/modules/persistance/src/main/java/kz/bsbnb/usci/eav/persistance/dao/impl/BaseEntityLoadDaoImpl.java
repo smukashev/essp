@@ -33,6 +33,9 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
     }
 
     public IBaseEntity loadByMaxReportDate(long id, Date savingReportDate) {
+        if (id == 0L || savingReportDate == null)
+            throw new IllegalStateException("Необходимо предоставить ID записи и отчётную дату");
+
         IBaseEntity loadedEntity;
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
