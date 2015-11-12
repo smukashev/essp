@@ -45,5 +45,6 @@ global add --type=QUEUE_ALGO_OPTION --code=CREDITOR_CYCLE --value=CREDITOR_CYCLE
 global add --type=QUEUE_ALGO_OPTION --code=MINIMUM_WEIGHT --value=MINIMUM_WEIGHT --desc=Минимальный_вес
 
 global add --type=QUEUE_SETTING --code=QUEUE_ALGO --value=CHRONOLOGICAL --desc=Алгоритм_очереди
+global add --type=QUEUE_SETTING --code=PRIORITY_CREDITOR_IDS --value=-1 --desc=Список_приоритетных_организаций
 
 quit
