@@ -27,8 +27,6 @@ rule import usci/modules/cli/src/main/resources/rules/ba/rule_bact.cli
 rule import usci/modules/cli/src/main/resources/rules/ba/rule_badrt.cli
 rule import usci/modules/cli/src/main/resources/rules/ba/rule_noba.cli
 
-quit
-
 #===========================================================================================
 # ref_creditor
 #===========================================================================================

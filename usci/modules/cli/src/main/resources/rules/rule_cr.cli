@@ -66,7 +66,7 @@ rule "DEBT_REMAINS_DEBT_PASTDUE_VALUE_NULL_WHEN_CLOSE_DATE_IS_NOT_SET"
 when
   $entity: BaseEntity( getMeta().getClassName() == "credit"
                         && (getEl("change.remains.debt.pastdue.value") == null
-                            || getEl("change.remains.debt.pastdue.value") ==0 )
+                            || getEl("change.remains.debt.pastdue.value") == 0.0 )
                         &&    getEl("change.remains.debt.pastdue.close_date") == null
                         &&    getEl("change.remains.debt.pastdue.open_date") != null)
 then
@@ -84,7 +84,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && getEl("change.remains.debt.pastdue.open_date") == null
                 && getEl("change.remains.debt.pastdue.value")!=null
-                && getEl("change.remains.debt.pastdue.value")!=0 )
+                && getEl("change.remains.debt.pastdue.value")!= 0.0 )
 then
    $entity.addValidationError("При наличии непустого и неравного нулю значения остатка просроченной задолженности по основному долгу дата вынесения на счет просроченной задолженности по основному долгу не может быть пустой.")
 end
@@ -160,7 +160,7 @@ rule "DEBT_REMAINS_INTEREST_PASTDUE_VALUE_NULL_WHEN_CLOSE_DATE_IS_NOT_SET"
 when
   $entity: BaseEntity( getMeta().getClassName() == "credit"
                         && (getEl("change.remains.interest.pastdue.value") == null
-                          || getEl("change.remains.interest.pastdue.value") == 0 )
+                          || getEl("change.remains.interest.pastdue.value") == 0.0 )
                         &&    getEl("change.remains.interest.pastdue.close_date") == null
                         &&    getEl("change.remains.interest.pastdue.open_date") != null)
 then
@@ -178,7 +178,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && getEl("change.remains.interest.pastdue.open_date") == null
                 && getEl("change.remains.interest.pastdue.value")!=null
-                && getEl("change.remains.interest.pastdue.value")!=0 )
+                && getEl("change.remains.interest.pastdue.value")!= 0.0 )
 then
    $entity.addValidationError("При наличии непустого и неравного нулю значения остатка просроченной задолженности по начисленному вознаграждению дата вынесения на счет просроченной задолженности по начисленному вознаграждению не может быть пустой.")
 end
@@ -548,7 +548,7 @@ title: идентификацонный документ для КЗ
 rule "идентификацонный документ для КЗ"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                 &&   getEls("{setString(06,07,11,17)}subject.docs.doc_type.code") == 0
+                 &&   getEls("{setString(06,07,11,17,99)}subject.docs.doc_type.code") == 0
                  && ( getEls("{count}subject[is_person=true]person_info[country.code_numeric=398]") > 0
                   || getEls("{count}subject[is_organization=true]organization_info[country.code_numeric=398]") > 0)
                   )
