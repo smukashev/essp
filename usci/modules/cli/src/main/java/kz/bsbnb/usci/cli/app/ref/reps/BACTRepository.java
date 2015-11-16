@@ -31,7 +31,7 @@ public class BACTRepository extends BaseRepository {
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BA_CT'";
 
     public static HashMap getRepository() {
-        if(repository ==null)
+        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
             repository = construct();
         return repository;
     }

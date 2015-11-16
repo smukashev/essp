@@ -22,17 +22,17 @@ public class DebtorTypeRepository extends BaseRepository{
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='DEBTOR_TYPE'";
 
     public static HashMap getRepository() {
-        if(repository ==null)
+        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
             repository = construct();
         return repository;
     }
 
     public static HashMap construct(){
         try {
+            HashSet hs = getColumns();
             ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
-            HashSet hs = getColumns();
 
             while(rows.next()){
                 HashMap tmp = new HashMap();

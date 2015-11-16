@@ -18,7 +18,7 @@ public class MetaRepository extends BaseRepository {
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'CORE' AND TABLE_NAME='EAV_M_CLASSES'";
 
     public static HashMap getRepository() {
-        if(repository ==null)
+        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
             repository = construct();
         return repository;
     }

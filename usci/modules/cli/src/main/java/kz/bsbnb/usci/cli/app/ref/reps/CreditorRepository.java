@@ -15,28 +15,39 @@ public class CreditorRepository extends BaseRepository {
     private static HashSet columns;
     //private static String QUERY = "SELECT t.* FROM ref.CREDITOR_HIS WHERE main_office_id IS NULL";
     private static String QUERY = "SELECT c.* FROM ref.v_Creditor_His t, ref.creditor c WHERE c.id = t.id and t.main_office_id IS NULL\n" +
-            " and t.open_date <= to_date('repDate', 'dd.MM.yyyy')\n" +
-            " and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
+            " and t.open_date = to_date('repDate', 'dd.MM.yyyy')\n" +
+            " and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)" +
+            " and exists (select 1 from ref.subject_type st where st.id = t.subject_type_id and st.open_date <= to_date('repDate', 'dd.MM.yyyy'))";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDITOR'";
 
     public static HashMap getRepository() {
-        if(repository ==null)
+        //if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;
+        if(repository==null)
             repository = construct();
         return repository;
     }
 
     public static HashMap construct(){
         try {
+            HashSet hs = getColumns();
+
+            CreditorDocRepository.getRepository();
+            SubjectTypeRepository.getRepository();
+            NokbdbRepository.getRepository();
+
             ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
-                HashSet hs = getColumns();
                 HashMap tmp = new HashMap();
                 //System.out.println(rows.getString("NAME_RU"));
                 for(Object s: hs){
                     //System.out.println(s);
-                    tmp.put((String)s,rows.getString((String)s));
+                    try {
+                        tmp.put(s, rows.getString((String) s));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 tmp.put("docs",CreditorDocRepository.getByProperty("CREDITOR_ID",(String)tmp.get("ID")));
                 tmp.put("subject_type",SubjectTypeRepository.getById((String)tmp.get("SUBJECT_TYPE")));

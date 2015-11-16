@@ -4,6 +4,7 @@ import kz.bsbnb.usci.cli.app.ref.craw.*;
 import kz.bsbnb.usci.cli.app.ref.refs.CreditorDoc;
 import kz.bsbnb.usci.cli.app.ref.refs.DocType;
 import kz.bsbnb.usci.cli.app.ref.reps.*;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -18,10 +19,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * My BaseRepository
@@ -29,12 +27,15 @@ import java.util.List;
  */
 public class BaseRepository implements  Runnable
 {
-     private final String startDate = "01.12.2014";
-     private final String endDate = "01.12.2014";
+     private final String startDate = "01.01.2012";
+     private final String endDate = "01.01.2012";
 
      private static Connection connection;
      private static Statement statement;
      protected static String repDate;
+    public static boolean closeMode;
+    public static String QUERY;
+    public static String targetClass;
 
     @Override
     public void run() {
@@ -42,13 +43,7 @@ public class BaseRepository implements  Runnable
         guaranteeNotTooLong(startDate, endDate);
 
         String exclusiveEndDate = getNextRepDate(endDate);
-
-        int mo = (startDate.charAt(3) - '0' )* 10 + (startDate.charAt(4) - '0');
-        int year = 2000 + (startDate.charAt(8) - '0') * 10 + (startDate.charAt(9) - '0');
         String curDate = startDate;
-
-        boolean oneMore = false;
-
         while(true){
             dropCache();
             BaseRepository.repDate = curDate;
@@ -70,7 +65,7 @@ public class BaseRepository implements  Runnable
             (new RegionCrawler()).work();
             //(new CreditorDocCrawler()).work(); //obsolete
             (new CreditorCrawler()).work();
-            (new CreditorBranchCrawler()).work();
+            /*(new CreditorBranchCrawler()).work();
             (new CurrencyCrawler()).work();
             (new EconTradeCrawler()).work();
             (new EnterpriseTypeCrawler()).work();
@@ -83,9 +78,13 @@ public class BaseRepository implements  Runnable
             //(new SharedCrawler()).work(); //not used
             //(new NokbdbCrawler()).work(); //not used
             //(new EconSectorCrawler()).work(); //not used
-            new BACTCrawler().work();
+            /*new BACTCrawler().work();
             new DRTCrawler().work();
-            new BADRTCrawler().work();
+            new BADRTCrawler().work();*/
+
+            if(f.list().length == 0) {
+                f.delete();
+            }
 
             curDate = getNextRepDate(curDate);
             if(curDate.equals(exclusiveEndDate))
@@ -138,7 +137,8 @@ public class BaseRepository implements  Runnable
             throw new RuntimeException("end format not correct");
 
         int mo = (startDate.charAt(3) - '0' )* 10 + (startDate.charAt(4) - '0');
-        int year = 2000 + (startDate.charAt(8) - '0') * 10 + (startDate.charAt(9) - '0');
+        int year = (startDate.charAt(6) - '0') * 1000 + (startDate.charAt(7) - '0') * 100
+                + (startDate.charAt(8) - '0') * 10 + (startDate.charAt(9) - '0');
 
         int cnt = 0;
 
@@ -160,7 +160,8 @@ public class BaseRepository implements  Runnable
 
     public String getNextRepDate(String date){
         int mo = (date.charAt(3) - '0' )* 10 + (date.charAt(4) - '0');
-        int year = 2000 + (date.charAt(8) - '0') * 10 + (date.charAt(9) - '0');
+        int year =   (date.charAt(6) - '0') * 1000 + (date.charAt(7) - '0') * 100
+                + (date.charAt(8) - '0') * 10 + (date.charAt(9) - '0');
         mo = mo + 1 < 13 ? mo + 1 : 1;
         if(mo == 1) year ++;
 
@@ -175,15 +176,73 @@ public class BaseRepository implements  Runnable
     public static Statement getStatement(){
         try {
             if(connection == null){
-                    connection = DriverManager.getConnection("jdbc:oracle:thin:@170.7.15.97:1521:CREDITS", "core","core_aug_2015");
+                    connection = DriverManager.getConnection("jdbc:oracle:thin:@10.10.20.44:1521:CREDITS", "core","core_sep_2014");
                     return statement = connection.createStatement();
             }
 
-            return statement = connection.createStatement();
+           if(statement == null)
+             statement = connection.createStatement();
+
+           return statement;
         } catch (SQLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
         return null;
+    }
+
+    public static String resolveTable(BaseCrawler crawler){
+        switch (crawler.getClassName()) {
+            case "ref_creditor":
+                return "ref.v_creditor_his";
+            default:
+                return crawler.getClassName().replaceAll("ref_", "ref.");
+        }
+    }
+
+    public static String resolveWhereForClosedDate(BaseCrawler crawler){
+        switch (crawler.getClassName()) {
+            case "ref_creditor":
+                return " where close_date is not null and main_office_id is null";
+            default:
+                return " where close_date is not null and is_last = 1";
+        }
+
+    }
+
+    public static String[] getDatesAsStringArray(BaseCrawler crawler) throws SQLException {
+        ResultSet rows = getStatement()
+                .executeQuery("select distinct(to_char(open_date,'dd.MM.yyyy')) as open_date from "
+                        + resolveTable(crawler));
+        List<String> ret = new LinkedList<>();
+
+        while(rows.next()){
+            ret.add(rows.getString("open_date"));
+        }
+
+        return ret.toArray(new String[0]);
+    }
+
+    public static String[] getCloseDatesAsStringArray(BaseCrawler crawler) throws SQLException {
+        ResultSet rows = getStatement()
+                .executeQuery("select distinct(to_char(close_date,'dd.MM.yyyy')) as close_date from "
+                        + resolveTable(crawler) + resolveWhereForClosedDate(crawler));
+        List<String> ret = new LinkedList<String>();
+
+        while(rows.next()){
+            if(rows.getString("close_date") != null)
+                ret.add(rows.getString("close_date"));
+        }
+
+        return ret.toArray(new String[0]);
+    }
+
+    public static void enterClosedMode(BaseCrawler crawler){
+        closeMode = true;
+        QUERY = "select * from " + resolveTable(crawler) + resolveWhereForClosedDate(crawler);
+    }
+
+    public static void exitClosedMode(){
+        closeMode = false;
     }
 }
