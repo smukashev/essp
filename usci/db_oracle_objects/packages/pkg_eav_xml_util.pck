@@ -2430,6 +2430,11 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    )
                  ),
                  get_subject(vch.id, v_report_date),
+                 /*
+                 get_persons(vch.id, v_report_date),
+                 get_organizations(vch.id, v_report_date),
+                 get_creditors(vch.id, v_report_date),
+                 */
                  --PLEDGES
                  get_pledges_xml(vch.id, v_report_date),
                  -- CREDITOR
@@ -4195,25 +4200,43 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
   ) RETURN XMLTYPE
   IS
     v_xml xmltype;
+    v_iden_cnt NUMBER;
   BEGIN
+    
+  SELECT count(1) INTO v_iden_cnt
+    FROM core.v_debtor_doc_his vddh
+   WHERE ((vddh.person_id = p_person_id AND vddh.org_id IS NULL)
+      OR (vddh.org_id = p_organization_id AND vddh.person_id IS NULL))
+     AND vddh.open_date <= p_report_date
+     AND (vddh.close_date > p_report_date OR vddh.close_date is null)
+     AND vddh.type_id in (SELECT id from ref.doc_type where is_identification = 1);
+
+  
     BEGIN
       SELECT xmlelement(evalname(p_tag_name),
                xmlagg(
                  -- ITEM
                  xmlelement("item",
                    -- DOC_TYPE
-                   get_ref_doc_type_xml(vddh.type_id, p_report_date),
+                   decode(t.type_id, 99, xmlelement("doc_type", xmlelement("code",99)), get_ref_doc_type_xml(t.type_id, p_report_date)),
                    -- NO
-                   nillable_xml('no', vddh.no_)
+                   nillable_xml('no', t.no_)
                  )
                )
              )
         INTO v_xml
-        FROM core.v_debtor_doc_his vddh
-       WHERE ((vddh.person_id = p_person_id AND vddh.org_id IS NULL)
-          OR (vddh.org_id = p_organization_id AND vddh.person_id IS NULL))
-         AND vddh.open_date <= p_report_date
-         AND (vddh.close_date > p_report_date OR vddh.close_date is null);
+        FROM (SELECT vddh.type_id, vddh.no_
+                FROM core.v_debtor_doc_his vddh
+               WHERE ((vddh.person_id = p_person_id AND vddh.org_id IS NULL)
+                  OR (vddh.org_id = p_organization_id AND vddh.person_id IS NULL))
+                 AND vddh.open_date <= p_report_date
+                 AND (vddh.close_date > p_report_date OR vddh.close_date is null)
+           UNION ALL
+              SELECT 99 as type_id, to_char(decode(p_person_id, null, p_organization_id, p_person_id)) as no_
+                 FROM DUAL
+                WHERE v_iden_cnt = 0
+          ) t;
+         
     EXCEPTION
       WHEN no_data_found THEN
         v_xml := null;
