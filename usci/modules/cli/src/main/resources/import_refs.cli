@@ -23,4 +23,7 @@ entity read  usci/modules/cli/src/main/resources/refs/01.12.2014/ref_portfolio_0
 #entity read  usci/modules/cli/src/main/resources/refs/01.12.2014/ref_debt_remains_type_01_12_2014.xml 01.12.2014
 #entity read  usci/modules/cli/src/main/resources/refs/01.12.2014/ref_ba_drt_01_12_2014.xml 01.12.2014
 
+#custom doc_type
+entity read  usci/modules/cli/src/main/resources/refs/usci_ref_doc_type.xml 01.04.2013
+
 quit
