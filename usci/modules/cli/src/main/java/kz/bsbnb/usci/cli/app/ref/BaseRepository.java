@@ -56,7 +56,7 @@ public class BaseRepository implements  Runnable
             File f = new File(BaseCrawler.fileName);
             f.mkdir();
 
-            (new SubjectTypeCrawler()).work();
+            /*(new SubjectTypeCrawler()).work();
             (new DocTypeCrawler()).work();
             (new BalanceAccountCrawler()).work();
             (new BankRelationCrawler()).work();
@@ -69,15 +69,16 @@ public class BaseRepository implements  Runnable
             (new RegionCrawler()).work();
             //(new CreditorDocCrawler()).work(); //obsolete
             (new CreditorCrawler()).work();
-            (new CreditorBranchCrawler()).work();
-            /*(new CurrencyCrawler()).work();
-            (new EconTradeCrawler()).work();
-            (new EnterpriseTypeCrawler()).work();
-            (new FinanceSourceCrawler()).work();
-            (new LegalFormCrawler()).work();
-            (new OffshoreCrawler()).work();
-            (new PledgeTypeCrawler()).work();*/
-            //(new PortfolioCrawler()).work();
+            (new CreditorBranchCrawler()).work();*/
+
+            //(new CurrencyCrawler()).work();
+            //(new EconTradeCrawler()).work();
+            //(new EnterpriseTypeCrawler()).work();
+            //(new FinanceSourceCrawler()).work();
+            //(new LegalFormCrawler()).work();
+            //(new OffshoreCrawler()).work();
+            //(new PledgeTypeCrawler()).work();
+            (new PortfolioCrawler()).work();
 
             //(new SharedCrawler()).work(); //not used
             //(new NokbdbCrawler()).work(); //not used

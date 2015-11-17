@@ -14,22 +14,30 @@ import java.util.HashSet;
 import java.util.List;
 
 public class OffshoreRepository extends BaseRepository {
-    private static HashMap repository;
+    /*private static HashMap repository;
     private static HashSet columns;
     private static String QUERY = "SELECT * FROM ref.OFFSHORE t" + " where t.open_date = to_date('repDate', 'dd.MM.yyyy')\n"+
             "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
-    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='OFFSHORE'";
+    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='OFFSHORE'";*/
 
-    public HashMap construct(){
+    public OffshoreRepository() {
+        QUERY_ALL = "SELECT * FROM ref.offshore";
+        QUERY_OPEN = "SELECT * FROM ref.offshore where open_date = to_date('repDate', 'dd.MM.yyyy') " +
+                " and (close_date > to_date('repDate','dd.MM.yyyy') or close_date is null)";
+        QUERY_CLOSE = "SELECT * FROM ref.offshore where close_date = to_date('repDate', 'dd.MM.yyyy') and is_last = 1";
+        COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='OFFSHORE'";
+        countryCrawler = new CountryCrawler();
+        countryCrawler.constructAll();
+    }
+
+    CountryCrawler countryCrawler;
+
+    @Override
+    public HashMap construct(String query){
         try {
             HashSet hs = getColumns();
-
-            CountryCrawler countryCrawler = new CountryCrawler();
-            countryCrawler.constructAll();
             CountryRepository countryRepository = (CountryRepository) countryCrawler.getRepositoryInstance();
-
-
-            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
+            ResultSet rows = getStatement().executeQuery(query.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
