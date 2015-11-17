@@ -3,6 +3,7 @@ package kz.bsbnb.usci.cli.app.ref.reps;
 
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.cli.app.ref.refs.CreditType;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,22 +13,25 @@ import java.util.HashSet;
 import java.util.List;
 
 public class CreditTypeRepository extends BaseRepository {
-    private static HashMap repository;
+    /*private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.CREDIT_TYPE t" + " where t.open_date = to_date('repDate', 'dd.MM.yyyy')\n"+
+    private static String QUERY = "SELECT * FROM ref.CREDIT_TYPE t" + " where t.open_date <= to_date('repDate', 'dd.MM.yyyy')\n"+
             "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
-    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDIT_TYPE'";
+    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDIT_TYPE'";*/
 
-    public static HashMap getRepository() {
-        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
-            repository = construct();
-        return repository;
+    public CreditTypeRepository() {
+        QUERY_ALL = "SELECT * FROM ref.credit_type";
+        QUERY_OPEN = "SELECT * FROM ref.credit_type where open_date = to_date('repDate', 'dd.MM.yyyy') " +
+                " and (close_date > to_date('repDate','dd.MM.yyyy') or close_date is null)";
+        QUERY_CLOSE = "SELECT * FROM ref.%s where close_date = to_date('repDate', 'dd.MM.yyyy') and is_last = 1";
+        COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDIT_TYPE'";
     }
 
-    public static HashMap construct(){
+    @Autowired
+    public HashMap construct(String query){
         try {
             HashSet hs = getColumns();
-            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
+            ResultSet rows = getStatement().executeQuery(query.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
@@ -48,7 +52,7 @@ public class CreditTypeRepository extends BaseRepository {
         return null;
     }
 
-    public static CreditType[] getByProperty(String key,String value){
+    public CreditType[] getByProperty(String key,String value){
         CreditType [] ret = new CreditType[0];
         List<CreditType> list = new ArrayList<CreditType>();
         for(Object v: getRepository().values()){
@@ -58,28 +62,11 @@ public class CreditTypeRepository extends BaseRepository {
         return list.toArray(ret);
     }
 
-    public static CreditType getById(String id){
+    public CreditType getById(String id){
         return (CreditType) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return columns = hs;
-            }
-            return columns;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

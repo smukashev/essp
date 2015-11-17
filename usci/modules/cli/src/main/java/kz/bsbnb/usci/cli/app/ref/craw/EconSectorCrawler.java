@@ -16,11 +16,15 @@ public class EconSectorCrawler extends BaseCrawler {
 
     @Override
     public HashMap getRepository() {
-        return EconSectorRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return super.getRef();
+    }
+
+    public EconSectorCrawler() {
+       repositoryInstance = new EconSectorRepository();
     }
 }

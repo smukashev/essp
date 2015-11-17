@@ -21,11 +21,15 @@ public class ClassificationCrawler extends BaseCrawler {
 
     @Override
     public HashMap getRepository() {
-        return ClassificationRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return Classification.class;
+    }
+
+    public ClassificationCrawler() {
+       repositoryInstance = new ClassificationRepository();
     }
 }

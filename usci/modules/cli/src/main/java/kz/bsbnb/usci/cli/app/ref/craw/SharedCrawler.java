@@ -21,11 +21,15 @@ public class SharedCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return SharedRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return Shared.class;
+    }
+
+    public SharedCrawler() {
+       repositoryInstance = new SharedRepository();
     }
 }

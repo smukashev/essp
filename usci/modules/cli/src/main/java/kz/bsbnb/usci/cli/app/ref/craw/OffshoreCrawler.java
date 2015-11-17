@@ -22,11 +22,15 @@ public class OffshoreCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return OffshoreRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return Offshore.class;
+    }
+
+    public OffshoreCrawler() {
+       repositoryInstance = new OffshoreRepository();
     }
 }

@@ -21,11 +21,15 @@ public class EnterpriseTypeCrawler extends BaseCrawler {
 
     @Override
     public HashMap getRepository() {
-        return EnterpriseTypeRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return EnterpriseType.class;
+    }
+
+    public EnterpriseTypeCrawler() {
+       repositoryInstance = new EnterpriseTypeRepository();
     }
 }

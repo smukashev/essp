@@ -5,6 +5,7 @@ import kz.bsbnb.usci.cli.app.ref.refs.CreditorDoc;
 import kz.bsbnb.usci.cli.app.ref.refs.DocType;
 import kz.bsbnb.usci.cli.app.ref.reps.*;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -33,9 +34,13 @@ public class BaseRepository implements  Runnable
      private static Connection connection;
      private static Statement statement;
      protected static String repDate;
-    public static boolean closeMode;
-    public static String QUERY;
-    public static String targetClass;
+    //public static boolean closeMode;
+
+    protected HashMap repository;
+    protected HashSet columns;
+
+    //public static String QUERY;
+    //public static String targetClass;
 
     @Override
     public void run() {
@@ -45,7 +50,6 @@ public class BaseRepository implements  Runnable
         String exclusiveEndDate = getNextRepDate(endDate);
         String curDate = startDate;
         while(true){
-            dropCache();
             BaseRepository.repDate = curDate;
 
             BaseCrawler.fileName = BaseCrawler.prefix + curDate + "/";
@@ -65,21 +69,21 @@ public class BaseRepository implements  Runnable
             (new RegionCrawler()).work();
             //(new CreditorDocCrawler()).work(); //obsolete
             (new CreditorCrawler()).work();
-            /*(new CreditorBranchCrawler()).work();
-            (new CurrencyCrawler()).work();
+            (new CreditorBranchCrawler()).work();
+            /*(new CurrencyCrawler()).work();
             (new EconTradeCrawler()).work();
             (new EnterpriseTypeCrawler()).work();
             (new FinanceSourceCrawler()).work();
             (new LegalFormCrawler()).work();
             (new OffshoreCrawler()).work();
-            (new PledgeTypeCrawler()).work();
-            (new PortfolioCrawler()).work();
+            (new PledgeTypeCrawler()).work();*/
+            //(new PortfolioCrawler()).work();
 
             //(new SharedCrawler()).work(); //not used
             //(new NokbdbCrawler()).work(); //not used
             //(new EconSectorCrawler()).work(); //not used
-            /*new BACTCrawler().work();
-            new DRTCrawler().work();
+            //new BACTCrawler().work();
+            /*new DRTCrawler().work();
             new BADRTCrawler().work();*/
 
             if(f.list().length == 0) {
@@ -92,39 +96,6 @@ public class BaseRepository implements  Runnable
         }
 
         System.out.println("Done.");
-    }
-
-    public void dropCache(){
-        BACTRepository.rc();
-        BADRTRepository.rc();
-        BalanceAccountRepository.rc();
-        BankRelationRepository.rc();
-        ClassificationRepository.rc();
-        ContactTypeRepository.rc();
-        CountryRepository.rc();
-        CreditObjectRepository.rc();
-        CreditorBranchRepository.rc();
-        CreditorDocRepository.rc();
-        CreditorRepository.rc();
-        CreditPurposeRepository.rc();
-        CreditTypeRepository.rc();
-        CurrencyRepository.rc();
-        DebtorTypeRepository.rc();
-        DocTypeRepository.rc();
-        DRTRepository.rc();
-        EconSectorRepository.rc();
-        EconTradeRepository.rc();
-        EnterpriseTypeRepository.rc();
-        FinanceSourceRepository.rc();
-        LegalFormRepository.rc();
-        MetaRepository.rc();
-        NokbdbRepository.rc();
-        OffshoreRepository.rc();
-        PledgeTypeRepository.rc();
-        PortfolioRepository.rc();
-        RegionRepository.rc();
-        SharedRepository.rc();
-        SubjectTypeRepository.rc();
     }
 
     public void guaranteeNotTooLong(String startDate, String endDate){
@@ -195,8 +166,19 @@ public class BaseRepository implements  Runnable
         switch (crawler.getClassName()) {
             case "ref_creditor":
                 return "ref.v_creditor_his";
+            case "ref_creditor_branch":
+                return "ref.v_creditor_his";
             default:
                 return crawler.getClassName().replaceAll("ref_", "ref.");
+        }
+    }
+
+    public static String resolveWhereForOpenDate(BaseCrawler crawler){
+        switch (crawler.getClassName()) {
+            case "ref_creditor":
+                return " where main_office_id is null and open_date is not null";
+            default:
+                return " where open_date is not null";
         }
     }
 
@@ -204,23 +186,31 @@ public class BaseRepository implements  Runnable
         switch (crawler.getClassName()) {
             case "ref_creditor":
                 return " where close_date is not null and main_office_id is null";
+            case "ref_creditor_branch":
+                return " where close_date is not null and main_office_id is not null";
+            case "ref_ba_ct":
+                return " where close_date is not null";
             default:
                 return " where close_date is not null and is_last = 1";
         }
-
     }
 
     public static String[] getDatesAsStringArray(BaseCrawler crawler) throws SQLException {
-        ResultSet rows = getStatement()
-                .executeQuery("select distinct(to_char(open_date,'dd.MM.yyyy')) as open_date from "
-                        + resolveTable(crawler));
-        List<String> ret = new LinkedList<>();
+        try {
+            ResultSet rows = getStatement()
+                    .executeQuery("select distinct(to_char(open_date,'dd.MM.yyyy')) as open_date from "
+                            + resolveTable(crawler) + resolveWhereForOpenDate(crawler));
+            List<String> ret = new LinkedList<>();
 
-        while(rows.next()){
-            ret.add(rows.getString("open_date"));
+            while (rows.next()) {
+                ret.add(rows.getString("open_date"));
+            }
+
+            return ret.toArray(new String[0]);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
-
-        return ret.toArray(new String[0]);
     }
 
     public static String[] getCloseDatesAsStringArray(BaseCrawler crawler) throws SQLException {
@@ -237,12 +227,59 @@ public class BaseRepository implements  Runnable
         return ret.toArray(new String[0]);
     }
 
-    public static void enterClosedMode(BaseCrawler crawler){
+    protected String QUERY_ALL;
+    protected String QUERY_CLOSE;
+    protected String QUERY_OPEN;
+    protected String COLUMNS_QUERY;
+
+    public void constructByCloseDate(){
+        repository = construct(QUERY_CLOSE);
+    }
+
+    public void constructByOpenDate(){
+        repository = construct(QUERY_OPEN);
+    }
+
+    public void constructAll(){
+        repository = construct(QUERY_ALL);
+    }
+
+    public HashMap construct(String query){
+        throw new NotImplementedException();
+    }
+
+    public HashMap getRepository(){
+        return repository;
+    }
+
+    protected HashSet getColumns() {
+        try {
+            if(columns ==null){
+                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
+                HashSet hs = new HashSet();
+                while(rows.next()){
+                    hs.add(rows.getString("column_name"));
+                }
+                return columns = hs;
+            }
+            return columns;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /*
+    protected BaseRepository getRepositoryInstance(){
+        return repositoryInstance;
+    }*/
+
+    /*public static void enterClosedMode(BaseCrawler crawler){
         closeMode = true;
-        QUERY = "select * from " + resolveTable(crawler) + resolveWhereForClosedDate(crawler);
+        QUERY = "select * from " + resolveTable(crawler) + " where close_date = to_date"
     }
 
     public static void exitClosedMode(){
         closeMode = false;
-    }
+    }*/
 }

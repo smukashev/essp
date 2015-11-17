@@ -23,11 +23,10 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class BaseCrawler {
-
-
     public static Document document;
     public static String fileName;
     public static String prefix = "C:\\refs\\";
+    protected BaseRepository repositoryInstance;
 
     public static Document getDocument(){
 
@@ -53,13 +52,13 @@ public class BaseCrawler {
 
             String[] dates = BaseRepository.getDatesAsStringArray(this);
             String[] closeDates = BaseRepository.getCloseDatesAsStringArray(this);
-            BaseRepository.targetClass = this.getClassName();
+            //BaseRepository.targetClass = this.getClassName();
 
             for(String date: dates) {
 
                 BaseRepository.repDate = date;
-                new BaseRepository().dropCache();
                 BaseCrawler.fileName = BaseCrawler.prefix + date + "/";
+                constructByOpenDate();
 
                 if (getRepository().size() < 1)
                     continue;
@@ -98,15 +97,19 @@ public class BaseCrawler {
                     f.delete();
             }
 
-            if("ref_creditor".equals(this.getClassName()))
+            //if("ref_creditor".equals(this.getClassName()))
+            //    return;
+
+            //if("ref_creditor_branch".equals(this.getClassName()))
+            //    return;
+
+            if("ref_portfolio".equals(this.getClassName()))
                 return;
-            //generation of closed refs
-            BaseRepository.enterClosedMode(this);
 
             for(String date: closeDates) {
                 BaseRepository.repDate = date;
-                new BaseRepository().dropCache();
                 BaseCrawler.fileName = BaseCrawler.prefix + date + "/";
+                constructByCloseDate();
                 if (getRepository().size() < 1)
                     continue;
 
@@ -142,8 +145,6 @@ public class BaseCrawler {
                 if(f.listFiles().length < 1)
                     f.delete();
             }
-
-            BaseRepository.exitClosedMode();
         } catch (TransformerConfigurationException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (TransformerException e) {
@@ -217,10 +218,28 @@ public class BaseCrawler {
     }
 
     public HashMap getRepository(){
-        throw new NotImplementedException();
+        return getRepositoryInstance().getRepository();
+    }
+
+    public void constructByOpenDate(){
+        repositoryInstance.constructByOpenDate();
+    }
+
+    public void constructByCloseDate(){
+        repositoryInstance.constructByCloseDate();
+    }
+
+    public void constructAll(){
+        repositoryInstance.constructAll();
+    }
+
+    public BaseRepository getRepositoryInstance(){
+        return repositoryInstance;
     }
 
     public Class  getRef(){
         throw new NotImplementedException();
     }
+
+
 }

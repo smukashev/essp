@@ -31,13 +31,7 @@ public class BADRTRepository extends BaseRepository {
 
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BA_CT'";
 
-    public static HashMap getRepository() {
-        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
-            repository = construct();
-        return repository;
-    }
-
-    public static HashMap construct(){
+    public HashMap construct(){
         try {
             ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
 
@@ -63,11 +57,11 @@ public class BADRTRepository extends BaseRepository {
         return null;
     }
 
-    public static BADRT getById(String id){
+    public BADRT getById(String id){
         throw new RuntimeException("badrt not searchable!!!");
     }
 
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

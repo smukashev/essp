@@ -27,6 +27,10 @@ public class CreditorDocCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return CreditorDocRepository.getRepository();
+        return getRepositoryInstance().getRepository();
+    }
+
+    public CreditorDocCrawler() {
+       repositoryInstance = new CreditorDocRepository();
     }
 }

@@ -22,11 +22,15 @@ public class PortfolioCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return PortfolioRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return Portfolio.class;
+    }
+
+    public PortfolioCrawler() {
+       repositoryInstance = new PortfolioRepository();
     }
 }

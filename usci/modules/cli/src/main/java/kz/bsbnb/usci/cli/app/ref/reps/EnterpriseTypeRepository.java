@@ -18,13 +18,7 @@ public class EnterpriseTypeRepository extends BaseRepository {
             "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='ENTERPRISE_TYPE'";
 
-    public static HashMap getRepository() {
-        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
-            repository = construct();
-        return repository;
-    }
-
-    public static HashMap construct(){
+    public HashMap construct(){
         try {
             HashSet hs = getColumns();
             ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
@@ -48,7 +42,7 @@ public class EnterpriseTypeRepository extends BaseRepository {
         return null;
     }
 
-    public static EnterpriseType[] getByProperty(String key,String value){
+    public EnterpriseType[] getByProperty(String key,String value){
         EnterpriseType [] ret = new EnterpriseType[0];
         List<EnterpriseType> list = new ArrayList<EnterpriseType>();
         for(Object v: getRepository().values()){
@@ -58,28 +52,11 @@ public class EnterpriseTypeRepository extends BaseRepository {
         return list.toArray(ret);
     }
 
-    public static EnterpriseType getById(String id){
+    public EnterpriseType getById(String id){
         return (EnterpriseType) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return columns = hs;
-            }
-            return columns;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

@@ -13,19 +13,19 @@ import java.util.HashMap;
  * Time: 15:46
  * To change this template use File | Settings | File Templates.
  */
-public class BalanceAccountCrawler extends BaseCrawler{
+public class BalanceAccountCrawler extends BaseCrawler {
+
     @Override
     public String getClassName() {
         return "ref_balance_account";
     }
 
     @Override
-    public HashMap getRepository() {
-        return BalanceAccountRepository.getRepository();
-    }
-
-    @Override
     public Class getRef() {
         return BalanceAccount.class;
+    }
+
+    public BalanceAccountCrawler() {
+       repositoryInstance = new BalanceAccountRepository();
     }
 }

@@ -22,11 +22,15 @@ public class CurrencyCrawler extends BaseCrawler {
 
     @Override
     public HashMap getRepository() {
-        return CurrencyRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return Currency.class;
+    }
+
+    public CurrencyCrawler() {
+       repositoryInstance = new CurrencyRepository();
     }
 }

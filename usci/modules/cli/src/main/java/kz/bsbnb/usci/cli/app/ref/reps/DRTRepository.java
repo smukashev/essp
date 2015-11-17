@@ -24,13 +24,7 @@ public class DRTRepository extends BaseRepository {
 
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BA_CT'";
 
-    public static HashMap getRepository() {
-        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
-            repository = construct();
-        return repository;
-    }
-
-    public static HashMap construct(){
+    public HashMap construct(){
         try {
             ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
 
@@ -54,15 +48,15 @@ public class DRTRepository extends BaseRepository {
         return null;
     }
 
-    public static BACT getById(String id){
+    public BACT getById(String id){
         return (BACT) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
+    public HashSet getColumns() {
         return null;
     }
 
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

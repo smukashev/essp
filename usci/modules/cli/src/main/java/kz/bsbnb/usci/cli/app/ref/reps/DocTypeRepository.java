@@ -19,19 +19,21 @@ public class DocTypeRepository extends BaseRepository {
 
     private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.doc_type";
-    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='DOC_TYPE'";
+    //private static String QUERY = "SELECT * FROM ref.doc_type";
+    //private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='DOC_TYPE'";
 
-    public static HashMap getRepository() {
-        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
-            repository = construct();
-        return repository;
+    public DocTypeRepository() {
+        QUERY_CLOSE = "SELECT * FROM ref.doc_type";
+        QUERY_OPEN = "SELECT * FROM ref.doc_type where open_date = to_date('repDate','dd.MM.yyyy')";
+        QUERY_ALL = "SELECT * FROM ref.doc_type";
+        COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='DOC_TYPE'";
     }
 
-    public static HashMap construct(){
+    @Override
+    public HashMap construct(String query){
         try {
             HashSet hs = getColumns();
-            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
+            ResultSet rows = getStatement().executeQuery(query.replaceAll("repDate",repDate));
 //            rows.next();
 //            HashMap hm = new HashMap();
 //            HashSet hs = getColumns();
@@ -60,11 +62,11 @@ public class DocTypeRepository extends BaseRepository {
         return null;
     }
 
-    public static DocType getById(String id){
+    public DocType getById(String id){
          return (DocType) getRepository().get(id);
     }
 
-    public static DocType getByCode(String code) {
+    public DocType getByCode(String code) {
         for(Object d : getRepository().values()) {
             DocType dt = (DocType) d;
             if(dt.get("CODE").equals(code))
@@ -74,23 +76,7 @@ public class DocTypeRepository extends BaseRepository {
         throw new RuntimeException("docType with code" + code + " not found");
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return hs;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

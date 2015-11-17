@@ -21,11 +21,15 @@ public class CreditTypeCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return CreditTypeRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return CreditType.class;
+    }
+
+    public CreditTypeCrawler() {
+       repositoryInstance = new CreditTypeRepository();
     }
 }

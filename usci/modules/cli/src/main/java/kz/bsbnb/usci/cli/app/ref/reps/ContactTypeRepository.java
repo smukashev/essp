@@ -12,22 +12,26 @@ import java.util.HashSet;
 import java.util.List;
 
 public class ContactTypeRepository extends BaseRepository {
-    private static HashMap repository;
+    /*private static HashMap repository;
     private static HashSet columns;
     private static String QUERY = "SELECT * FROM ref.CONTACT_TYPE t" + " where t.open_date = to_date('repDate', 'dd.MM.yyyy')\n"+
             "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
-    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CONTACT_TYPE'";
+    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CONTACT_TYPE'";*/
 
-    public static HashMap getRepository() {
-        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
-            repository = construct();
-        return repository;
+    public ContactTypeRepository() {
+        QUERY_ALL = "SELECT * FROM ref.contact_type";
+        QUERY_OPEN = "SELECT * FROM ref.contact_type where open_date = to_date('repDate', 'dd.MM.yyyy') " +
+                " and (close_date > to_date('repDate','dd.MM.yyyy') or close_date is null)";
+        QUERY_CLOSE = "SELECT * FROM ref.%s where close_date = to_date('repDate', 'dd.MM.yyyy') and is_last = 1";
+        COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CONTACT_TYPE'";
     }
 
-    public static HashMap construct(){
+
+    @Override
+    public HashMap construct(String query){
         try {
             HashSet hs = getColumns();
-            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
+            ResultSet rows = getStatement().executeQuery(query.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
@@ -48,7 +52,7 @@ public class ContactTypeRepository extends BaseRepository {
         return null;
     }
 
-    public static ContactType[] getByProperty(String key,String value){
+    public ContactType[] getByProperty(String key,String value){
         ContactType [] ret = new ContactType[0];
         List<ContactType> list = new ArrayList<ContactType>();
         for(Object v: getRepository().values()){
@@ -58,28 +62,11 @@ public class ContactTypeRepository extends BaseRepository {
         return list.toArray(ret);
     }
 
-    public static ContactType getById(String id){
+    public ContactType getById(String id){
         return (ContactType) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return columns = hs;
-            }
-            return columns;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

@@ -21,11 +21,15 @@ public class EconTradeCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return EconTradeRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return EconTrade.class;
+    }
+
+    public EconTradeCrawler() {
+       repositoryInstance = new EconTradeRepository();
     }
 }

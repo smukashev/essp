@@ -12,22 +12,25 @@ import java.util.HashSet;
 import java.util.List;
 
 public class CreditObjectRepository extends BaseRepository {
-    private static HashMap repository;
+    /*private static HashMap repository;
     private static HashSet columns;
     private static String QUERY = "SELECT * FROM ref.CREDIT_OBJECT t" + " where t.open_date = to_date('repDate', 'dd.MM.yyyy')\n"+
             "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
-    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDIT_OBJECT'";
+    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDIT_OBJECT'";*/
 
-    public static HashMap getRepository() {
-        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
-            repository = construct();
-        return repository;
+    public CreditObjectRepository() {
+        QUERY_ALL = "SELECT * FROM ref.credit_object";
+        QUERY_OPEN = "SELECT * FROM ref.credit_object where open_date = to_date('repDate', 'dd.MM.yyyy') " +
+                " and (close_date > to_date('repDate','dd.MM.yyyy') or close_date is null)";
+        QUERY_CLOSE = "SELECT * FROM ref.%s where close_date = to_date('repDate', 'dd.MM.yyyy') and is_last = 1";
+        COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDIT_OBJECT'";
     }
 
-    public static HashMap construct(){
+    @Override
+    public HashMap construct(String query){
         try {
             HashSet hs = getColumns();
-            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
+            ResultSet rows = getStatement().executeQuery(query.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
@@ -48,7 +51,7 @@ public class CreditObjectRepository extends BaseRepository {
         return null;
     }
 
-    public static CreditObject[] getByProperty(String key,String value){
+    public CreditObject[] getByProperty(String key,String value){
         CreditObject [] ret = new CreditObject[0];
         List<CreditObject> list = new ArrayList<CreditObject>();
         for(Object v: getRepository().values()){
@@ -58,28 +61,11 @@ public class CreditObjectRepository extends BaseRepository {
         return list.toArray(ret);
     }
 
-    public static CreditObject getById(String id){
+    public CreditObject getById(String id){
         return (CreditObject) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return columns = hs;
-            }
-            return columns;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

@@ -2,6 +2,7 @@
 package kz.bsbnb.usci.cli.app.ref.reps;
 
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
+import kz.bsbnb.usci.cli.app.ref.craw.CountryCrawler;
 import kz.bsbnb.usci.cli.app.ref.refs.Country;
 import kz.bsbnb.usci.cli.app.ref.refs.Offshore;
 
@@ -19,15 +20,15 @@ public class OffshoreRepository extends BaseRepository {
             "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='OFFSHORE'";
 
-    public static HashMap getRepository() {
-        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
-            repository = construct();
-        return repository;
-    }
-
-    public static HashMap construct(){
+    public HashMap construct(){
         try {
             HashSet hs = getColumns();
+
+            CountryCrawler countryCrawler = new CountryCrawler();
+            countryCrawler.constructAll();
+            CountryRepository countryRepository = (CountryRepository) countryCrawler.getRepositoryInstance();
+
+
             ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
@@ -39,7 +40,7 @@ public class OffshoreRepository extends BaseRepository {
                     tmp.put((String)s,rows.getString((String)s));
                 }
 
-                Country country = CountryRepository.getById((String)tmp.get("COUNTRY_ID"));
+                Country country = countryRepository.getById((String)tmp.get("COUNTRY_ID"));
                 tmp.put("country",country);
 
                 Offshore dt = new Offshore(tmp);
@@ -53,7 +54,7 @@ public class OffshoreRepository extends BaseRepository {
         return null;
     }
 
-    public static Offshore[] getByProperty(String key,String value){
+    public Offshore[] getByProperty(String key,String value){
         Offshore [] ret = new Offshore[0];
         List<Offshore> list = new ArrayList<Offshore>();
         for(Object v: getRepository().values()){
@@ -63,28 +64,11 @@ public class OffshoreRepository extends BaseRepository {
         return list.toArray(ret);
     }
 
-    public static Offshore getById(String id){
+    public Offshore getById(String id){
         return (Offshore) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return columns = hs;
-            }
-            return columns;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

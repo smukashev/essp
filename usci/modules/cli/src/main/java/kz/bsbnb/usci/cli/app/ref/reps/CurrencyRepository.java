@@ -18,13 +18,8 @@ public class CurrencyRepository extends BaseRepository {
             "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CURRENCY'";
 
-    public static HashMap getRepository() {
-        if(BaseRepository.closeMode) QUERY = BaseRepository.QUERY;if(repository==null)
-            repository = construct();
-        return repository;
-    }
 
-    public static HashMap construct(){
+    public HashMap construct(){
         try {
             HashSet hs = getColumns();
             ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
@@ -48,7 +43,7 @@ public class CurrencyRepository extends BaseRepository {
         return null;
     }
 
-    public static Currency[] getByProperty(String key,String value){
+    public Currency[] getByProperty(String key,String value){
         Currency [] ret = new Currency[0];
         List<Currency> list = new ArrayList<Currency>();
         for(Object v: getRepository().values()){
@@ -58,28 +53,11 @@ public class CurrencyRepository extends BaseRepository {
         return list.toArray(ret);
     }
 
-    public static Currency getById(String id){
+    public Currency getById(String id){
         return (Currency) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return columns = hs;
-            }
-            return columns;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }
