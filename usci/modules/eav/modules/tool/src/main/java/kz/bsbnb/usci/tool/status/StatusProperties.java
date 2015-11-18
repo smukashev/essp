@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.tool.couchbase.singleton;
+package kz.bsbnb.usci.tool.status;
 
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 

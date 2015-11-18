@@ -399,37 +399,7 @@ public class ZipFilesMonitor {
                 return false;
             }
         } else {
-//            Date lastApprovedDate = reportBeanRemoteBusiness.getLastApprovedDate(creditorId);
-//
-//            try {
-//                Date expectedDate = lastApprovedDate != null
-//                        ? DataTypeUtil.plus(lastApprovedDate, Calendar.MONTH, 1)
-//                        : new SimpleDateFormat("dd/MM/yyyy").parse(Report.INITIAL_REPORT_DATE_STR);
-//
-//                if (!batchInfo.getRepDate().equals(expectedDate)) {
-//                    String errMsg = "Отчеты должны отправляться последовательно по месяцам";
-//                    logger.error(errMsg);
-//
-//                    statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-//                            BatchStatuses.ERROR,
-//                            errMsg,
-//                            new Date(),
-//                            batchInfo.getUserId()
-//                    ));
-//                    return false;
-//                }
-//
-//            } catch (ParseException e) {
-//                String errMsg = "Ошибка при парсинге даты";
-//                logger.error(errMsg, e);
-//                statusSingleton.addBatchStatus(batchId, new BatchStatusJModel(
-//                        BatchStatuses.ERROR,
-//                        errMsg,
-//                        new Date(),
-//                        batchInfo.getUserId()
-//                ));
-//                return false;
-//            }
+            // FIXME: 18.11.15
         }
 
 

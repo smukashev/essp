@@ -14,7 +14,6 @@
         <liferay.auto.deploy.dir>/soft/glassfish3/deploy</liferay.auto.deploy.dir>
         <liferay.app.server.deploy.dir>/soft/glassfish3/deploy</liferay.app.server.deploy.dir>
         <liferay.app.server.portal.dir>/soft/glassfish3/deploy</liferay.app.server.portal.dir>
-        <couchbase.client.version>1.1.4</couchbase.client.version>
     </properties>
 
     <build>
