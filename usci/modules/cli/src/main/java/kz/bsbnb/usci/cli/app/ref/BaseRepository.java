@@ -56,7 +56,7 @@ public class BaseRepository implements  Runnable
             File f = new File(BaseCrawler.fileName);
             f.mkdir();
 
-            /*(new SubjectTypeCrawler()).work();
+            (new SubjectTypeCrawler()).work();
             (new DocTypeCrawler()).work();
             (new BalanceAccountCrawler()).work();
             (new BankRelationCrawler()).work();
@@ -69,23 +69,23 @@ public class BaseRepository implements  Runnable
             (new RegionCrawler()).work();
             //(new CreditorDocCrawler()).work(); //obsolete
             (new CreditorCrawler()).work();
-            (new CreditorBranchCrawler()).work();*/
+            (new CreditorBranchCrawler()).work();
 
-            //(new CurrencyCrawler()).work();
-            //(new EconTradeCrawler()).work();
-            //(new EnterpriseTypeCrawler()).work();
-            //(new FinanceSourceCrawler()).work();
-            //(new LegalFormCrawler()).work();
-            //(new OffshoreCrawler()).work();
-            //(new PledgeTypeCrawler()).work();
+            (new CurrencyCrawler()).work();
+            (new EconTradeCrawler()).work();
+            (new EnterpriseTypeCrawler()).work();
+            (new FinanceSourceCrawler()).work();
+            (new LegalFormCrawler()).work();
+            (new OffshoreCrawler()).work();
+            (new PledgeTypeCrawler()).work();
             (new PortfolioCrawler()).work();
 
             //(new SharedCrawler()).work(); //not used
             //(new NokbdbCrawler()).work(); //not used
             //(new EconSectorCrawler()).work(); //not used
-            //new BACTCrawler().work();
-            /*new DRTCrawler().work();
-            new BADRTCrawler().work();*/
+            new BACTCrawler().work();
+            new DRTCrawler().work();
+            new BADRTCrawler().work();
 
             if(f.list().length == 0) {
                 f.delete();
@@ -169,6 +169,8 @@ public class BaseRepository implements  Runnable
                 return "ref.v_creditor_his";
             case "ref_creditor_branch":
                 return "ref.v_creditor_his";
+            case "ref_debt_remains_type":
+                return "dual";
             default:
                 return crawler.getClassName().replaceAll("ref_", "ref.");
         }
@@ -197,6 +199,10 @@ public class BaseRepository implements  Runnable
     }
 
     public static String[] getDatesAsStringArray(BaseCrawler crawler) throws SQLException {
+
+        if(crawler instanceof DRTCrawler)
+            return new String[] {"01.01.1990"};
+
         try {
             ResultSet rows = getStatement()
                     .executeQuery("select distinct(to_char(open_date,'dd.MM.yyyy')) as open_date from "
@@ -215,6 +221,13 @@ public class BaseRepository implements  Runnable
     }
 
     public static String[] getCloseDatesAsStringArray(BaseCrawler crawler) throws SQLException {
+
+        if(crawler instanceof  DRTCrawler)
+            return new String[] {};
+
+        if(crawler instanceof BADRTCrawler)
+            return new String[] {};
+
         ResultSet rows = getStatement()
                 .executeQuery("select distinct(to_char(close_date,'dd.MM.yyyy')) as close_date from "
                         + resolveTable(crawler) + resolveWhereForClosedDate(crawler));

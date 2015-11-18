@@ -16,7 +16,7 @@ import java.util.HashSet;
  * Created by Bauyrzhan.Makhambeto on 12/06/2015.
  */
 public class BACTRepository extends BaseRepository {
-    private static HashMap repository;
+    /*private static HashMap repository;
     private static HashSet columns;
     //private static String QUERY = "SELECT * FROM ref.ba_ct t" + " where t.open_date <= to_date('repDate', 'dd.MM.yyyy') \n"+
    //         "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
@@ -30,20 +30,30 @@ public class BACTRepository extends BaseRepository {
             "       and t1.balance_account_id = t2.id\n";
 
 
-    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BA_CT'";
+    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BA_CT'";*/
 
-    public HashMap construct(){
+    public BACTRepository() {
+        QUERY_ALL = "SELECT * FROM ref.ba_ct";
+        QUERY_OPEN = "SELECT * FROM ref.ba_ct t where t.open_date = to_date('repDate', 'dd.MM.yyyy') " +
+                " and (t.close_date > to_date('repDate','dd.MM.yyyy') or t.close_date is null)" +
+                " and exists(select 1 from ref.balance_account where id = t.balance_account_id)";
+        QUERY_CLOSE = "SELECT * FROM ref.ba_ct where close_date = to_date('repDate', 'dd.MM.yyyy')";
+        COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BA_CT'";
+
+        balanceAccountCrawler = new BalanceAccountCrawler();
+        balanceAccountCrawler.constructAll();
+        creditTypeCrawler = new CreditTypeCrawler();
+        creditTypeCrawler.constructAll();
+    }
+
+    BalanceAccountCrawler balanceAccountCrawler;
+    CreditTypeCrawler creditTypeCrawler;
+
+
+    @Override
+    public HashMap construct(String query){
         try {
-            BalanceAccountCrawler balanceAccountCrawler = new BalanceAccountCrawler();
-            balanceAccountCrawler.constructAll();
-
-            CreditTypeCrawler creditTypeCrawler = new CreditTypeCrawler();
-            creditTypeCrawler.constructAll();
-
-            //BalanceAccountRepository.getRepository();
-            //CreditTypeRepository.getRepository();
-
-            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
+            ResultSet rows = getStatement().executeQuery(query.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
@@ -76,7 +86,7 @@ public class BACTRepository extends BaseRepository {
         return (BACT) getRepository().get(id);
     }
 
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }
