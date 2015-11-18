@@ -22,7 +22,7 @@ public class BalanceAccountRepository extends BaseRepository {
 
     public BalanceAccountRepository(){
         QUERY_ALL = "SELECT * FROM ref.balance_account";
-        QUERY_CLOSE = "SELECT * FROM ref.balance_account where close_date = to_date('repDate', 'dd.MM.yyyy') and is_last = 1";
+        QUERY_CLOSE = "SELECT * FROM ref.balance_account where close_date = to_date('repDate', 'dd.MM.yyyy') and is_last = 1 and open_date < close_date";
         QUERY_OPEN = "SELECT * FROM ref.balance_account where open_date = to_date('repDate', 'dd.MM.yyyy') " +
                 " and (close_date > to_date('repDate','dd.MM.yyyy') or close_date is null)";
         COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BALANCE_ACCOUNT'";

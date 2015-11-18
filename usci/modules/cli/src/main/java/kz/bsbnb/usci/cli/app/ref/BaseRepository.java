@@ -200,13 +200,14 @@ public class BaseRepository implements  Runnable
 
     public static String[] getDatesAsStringArray(BaseCrawler crawler) throws SQLException {
 
+        //because it is from table shared
         if(crawler instanceof DRTCrawler)
             return new String[] {"01.01.1990"};
 
         try {
             ResultSet rows = getStatement()
-                    .executeQuery("select distinct(to_char(open_date,'dd.MM.yyyy')) as open_date from "
-                            + resolveTable(crawler) + resolveWhereForOpenDate(crawler));
+                    .executeQuery("select to_char(open_date,'dd.MM.yyyy') as open_date from (select distinct open_date from "
+                            + resolveTable(crawler) + resolveWhereForOpenDate(crawler) + " order by open_date)");
             List<String> ret = new LinkedList<>();
 
             while (rows.next()) {
