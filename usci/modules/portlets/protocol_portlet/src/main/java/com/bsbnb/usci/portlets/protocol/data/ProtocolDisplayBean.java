@@ -6,10 +6,8 @@ import com.vaadin.terminal.Resource;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Link;
 import kz.bsbnb.usci.cr.model.Message;
-import kz.bsbnb.usci.cr.model.MessageType;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.Shared;
-import kz.bsbnb.usci.tool.couchbase.EntityStatuses;
 
 import java.util.Date;
 import java.util.HashMap;

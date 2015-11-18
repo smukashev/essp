@@ -8,7 +8,7 @@ import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
-import kz.bsbnb.usci.tool.couchbase.singleton.StatusProperties;
+import kz.bsbnb.usci.tool.status.StatusProperties;
 import kz.bsbnb.usci.receiver.writer.IWriter;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.apache.log4j.Logger;

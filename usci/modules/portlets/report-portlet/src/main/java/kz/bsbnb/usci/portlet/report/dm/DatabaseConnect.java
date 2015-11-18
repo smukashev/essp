@@ -168,27 +168,8 @@ public class DatabaseConnect {
         return null;
     }
 
-   /* public CustomDataSource getDataFromCouchBase(List<Object> parameterList)
-    {
-        int parametersCount = parameterList.size();
-        Date dateParameter=null;
-        Long parameterValue=null;
-        for (int parameterIndex = 0; parameterIndex < parametersCount; parameterIndex++)
-        {
-            Object parameter = parameterList.get(parameterIndex);
-            if (parameter instanceof Date) {
-                dateParameter = (Date) parameter;
-            }
-            else
-            {
-                parameterValue = Long.parseLong(parameter.toString());
-            }
-        }
-
-        return new CustomDataSource(new ProtocolsTableReportExporter(parameterValue, dateParameter).getData());
-    }*/
-
-    public CustomDataSource getDataSourceFromStoredProcedure(String procedureName, List<Object> parameterList) throws SQLException {
+    public CustomDataSource getDataSourceFromStoredProcedure(String procedureName, List<Object> parameterList)
+            throws SQLException {
         Connection connection = getConnection();
         CallableStatement statement = null;
         OracleCallableStatement ocs = null;

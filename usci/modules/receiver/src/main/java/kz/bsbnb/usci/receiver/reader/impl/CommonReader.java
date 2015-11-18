@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
 import kz.bsbnb.usci.receiver.common.Global;
-import kz.bsbnb.usci.tool.couchbase.factory.ICouchbaseClientFactory;
 import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
 import kz.bsbnb.usci.receiver.helper.impl.ParserHelper;
 import kz.bsbnb.usci.receiver.reader.IReader;
@@ -20,9 +19,6 @@ import java.text.SimpleDateFormat;
  * @author k.tulbassiyev
  */
 public abstract class CommonReader<T> implements IReader<T> {
-    @Autowired
-    protected ICouchbaseClientFactory couchbaseClientFactory;
-
     @Autowired
     protected IServiceRepository serviceRepository;
 
