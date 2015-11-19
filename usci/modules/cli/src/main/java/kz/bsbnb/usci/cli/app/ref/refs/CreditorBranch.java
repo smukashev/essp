@@ -14,10 +14,6 @@ public class CreditorBranch extends BaseRef {
 
     public CreditorBranch(HashMap hm){
         super(hm);
-        if(docTypeCrawler == null) {
-            docTypeCrawler = new DocTypeCrawler();
-            docTypeCrawler.constructAll();
-        }
     }
 
     public String get(String s){
@@ -30,8 +26,6 @@ public class CreditorBranch extends BaseRef {
 
     public static DocTypeCrawler docTypeCrawler;
 
-
-
     @Override
     public void buildElement(Element root) {
         appendToElement(root,"code",hm.get("CODE"));
@@ -42,6 +36,11 @@ public class CreditorBranch extends BaseRef {
         Element docs = getDocument().createElement("docs");
 
         root.appendChild(docs);
+
+        if(docTypeCrawler == null) {
+            docTypeCrawler = new DocTypeCrawler();
+            docTypeCrawler.constructAll();
+        }
 
         DocTypeRepository docTypeRepository = (DocTypeRepository) docTypeCrawler.getRepositoryInstance();
 
