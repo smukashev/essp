@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
@@ -38,6 +39,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
     @Autowired
     private BasicBaseEntitySearcherPool searcherPool;
+
+    @Autowired
+    IBaseEntityLoadDao baseEntityLoadDao;
 
     @Override
     public String getClassName() {
@@ -298,7 +302,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                         for (IBaseValue val : baseValues) {
                             BaseEntity document = (BaseEntity) val.getValue();
-                            BaseEntity docType = (BaseEntity) document.getBaseValue("doc_type").getValue();
+                            long docTypeId = ((BaseEntity) document.getBaseValue("doc_type").getValue()).getId();
+
+                            IBaseEntity docType = baseEntityLoadDao.load(docTypeId);
 
                             boolean is_identification = (boolean) docType.getBaseValue("is_identification").getValue();
 
@@ -309,9 +315,12 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                 identificationValues.add(document.getId());
                         }
 
+                        MetaClass metaDocType = (MetaClass) childMetaClass.getMemberType("doc_type");
+
                         Collections.sort(identificationValues);
 
-                        String identificationCondition = StringUtils.arrayToDelimitedString(identificationValues.toArray(), ",");
+                        String identificationCondition = StringUtils.
+                                arrayToDelimitedString(identificationValues.toArray(), ",");
 
                         String entitiesAlias = "sebe";
                         String complexValuesAlias = "sebcv";
@@ -322,13 +331,16 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                 .join(EAV_BE_COMPLEX_VALUES.as(complexValuesAlias)).
                                         on(EAV_BE_COMPLEX_VALUES.as(complexValuesAlias).ENTITY_ID.eq(
                                                 EAV_BE_ENTITIES.as(entitiesAlias).ID)
-                                                .and(EAV_BE_COMPLEX_VALUES.as(complexValuesAlias).ATTRIBUTE_ID.eq(1L))) // doc_type
+                                                .and(EAV_BE_COMPLEX_VALUES.as(complexValuesAlias).ATTRIBUTE_ID.eq(
+                                                        childMetaClass.getMetaAttribute("doc_type").getId())))
                                 .join(EAV_BE_BOOLEAN_VALUES.as(booleanValuesAlias)).
                                         on(EAV_BE_BOOLEAN_VALUES.as(booleanValuesAlias).ENTITY_ID.eq(
                                                 EAV_BE_COMPLEX_VALUES.as(complexValuesAlias).ENTITY_VALUE_ID)
-                                                .and(EAV_BE_BOOLEAN_VALUES.as(booleanValuesAlias).ATTRIBUTE_ID.eq(5L) // is_identification
-                                                        .and(EAV_BE_BOOLEAN_VALUES.as(booleanValuesAlias).VALUE.eq(DataUtils.convert(true)))))
-                                .where(EAV_BE_ENTITIES.as(entitiesAlias).CLASS_ID.eq(3L)); // document
+                                                .and(EAV_BE_BOOLEAN_VALUES.as(booleanValuesAlias).ATTRIBUTE_ID.eq(
+                                                        metaDocType.getMetaAttribute("is_identification").getId())
+                                                        .and(EAV_BE_BOOLEAN_VALUES.as(booleanValuesAlias).VALUE.eq(
+                                                                DataUtils.convert(true)))))
+                                .where(EAV_BE_ENTITIES.as(entitiesAlias).CLASS_ID.eq(childMetaClass.getId()));
 
                         select = context.select(
                                 DSL.field("listagg(\"" + setValueAlias + "\".\"ENTITY_VALUE_ID\", ',') " +

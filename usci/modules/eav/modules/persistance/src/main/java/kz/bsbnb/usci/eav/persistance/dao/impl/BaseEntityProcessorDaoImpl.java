@@ -115,17 +115,16 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
                             for (IBaseValue childBaseValue : childBaseSet.get()) {
                                 IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
-                                if (childBaseEntity.getValueCount() != 0) {
+
+                                if (childBaseEntity.getValueCount() != 0)
                                     prepare((IBaseEntity) childBaseValue.getValue(), creditorId);
-                                }
                             }
                         }
                     } else {
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
-                        if (childBaseEntity.getValueCount() != 0) {
-                            IBaseEntity tmpEntity = prepare((IBaseEntity) baseValue.getValue(), creditorId);
-                            baseValue.setValue(tmpEntity); // TODO: fix
-                        }
+
+                        if (childBaseEntity.getValueCount() != 0)
+                            prepare((IBaseEntity) baseValue.getValue(), creditorId);
                     }
                 }
             } else {
@@ -141,14 +140,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 baseEntity.setId(baseEntityId);
         }
 
-        // TODO: fix
-        if (metaClass.getClassName().equals("ref_doc_type")) {
-            try {
-                baseEntity = baseEntityLoadDao.load(baseEntity.getId());
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
-        }
         return baseEntity;
     }
 
