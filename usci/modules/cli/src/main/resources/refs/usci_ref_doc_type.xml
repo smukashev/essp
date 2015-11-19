@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+        <ref_doc_type>
+            <name_ru>Присвоенный документ</name_ru>
+            <name_kz>Присвоенный документ</name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>26</weight>
+            <code>99</code>
+        </ref_doc_type>
+    </entities>
+</batch>
