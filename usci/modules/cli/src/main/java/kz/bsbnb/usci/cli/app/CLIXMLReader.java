@@ -240,7 +240,6 @@ public class CLIXMLReader {
                 if (endElement(localName)) return (BaseEntity) currentContainer;
             } else if (event.isEndDocument()) {
                 logger.info("end document");
-                //couchbaseClient.set("batch:" + batchId, 0, gson.toJson(batchFullJModel));
             } else {
                 logger.info(event);
             }

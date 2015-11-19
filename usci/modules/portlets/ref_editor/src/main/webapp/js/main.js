@@ -737,7 +737,7 @@ Ext.onReady(function() {
                 method: 'POST',
                 params: {
                     xml_data: xmlStr,
-                    date: selected.data.open_date,
+                    date: Ext.getCmp('edDate').value,
                     op: 'SAVE_XML'
                 },
                 success: function(response) {
@@ -764,7 +764,8 @@ Ext.onReady(function() {
                 method: 'POST',
                 params: {
                     xml_data: xmlStr,
-                    date: selected.data.open_date,
+                    /*date: selected.data.open_date,*/
+                    date: Ext.getCmp('edDate').value,
                     op: 'SAVE_XML'
                 },
                 success: function(response) {

@@ -17,11 +17,15 @@ public class BADRTCrawler extends BaseCrawler {
 
     @Override
     public HashMap getRepository() {
-        return BADRTRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return BADRT.class;
+    }
+
+    public BADRTCrawler() {
+       repositoryInstance = new BADRTRepository();
     }
 }

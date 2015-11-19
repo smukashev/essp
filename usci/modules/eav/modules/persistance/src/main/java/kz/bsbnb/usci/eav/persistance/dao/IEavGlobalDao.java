@@ -16,4 +16,8 @@ public interface IEavGlobalDao {
     EavGlobal get(Long id);
 
     List<EavGlobal> getAll();
+
+    void update(String type, String code, String value);
+
+    String getValue(String type, String code);
 }

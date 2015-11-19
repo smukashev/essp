@@ -8,6 +8,7 @@ public class ReceiverStatus implements Serializable
     private long batchesInProgress;
     private long batchesCompleted;
     private long rulesEvaluationTimeAvg;
+    private String jobLauncherStatus;
 
     public long getQueueSize()
     {
@@ -47,6 +48,10 @@ public class ReceiverStatus implements Serializable
         this.rulesEvaluationTimeAvg = rulesEvaluationTimeAvg;
     }
 
+    public void setJobLauncherStatus(String jobLauncherStatus) {
+        this.jobLauncherStatus = jobLauncherStatus;
+    }
+
     @Override
     public String toString() {
         return "ReceiverStatus{" +
@@ -54,6 +59,6 @@ public class ReceiverStatus implements Serializable
                 ", batchesInProgress=" + batchesInProgress +
                 ", batchesCompleted=" + batchesCompleted +
                 ", rulesEvaluationTimeAvg=" + rulesEvaluationTimeAvg +
-                '}';
+                "} \n" + jobLauncherStatus;
     }
 }

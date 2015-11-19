@@ -21,11 +21,15 @@ public class PledgeTypeCrawler extends BaseCrawler {
 
     @Override
     public HashMap getRepository() {
-        return PledgeTypeRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return PledgeType.class;
+    }
+
+    public PledgeTypeCrawler() {
+       repositoryInstance = new PledgeTypeRepository();
     }
 }

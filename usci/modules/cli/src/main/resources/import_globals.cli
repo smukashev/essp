@@ -26,8 +26,8 @@ global add --type=ENTITY_STATUS --code=ACTUAL_COUNT --value=ACTUAL_COUNT --desc=
 #
 # BATCH_STATUS
 #
-global add --type=BATCH_STATUS --code=WAITING --value=WAITING --desc=WAITING
-global add --type=BATCH_STATUS --code=PROCESSING --value=PROCESSING --desc=PROCESSING
+global add --type=BATCH_STATUS --code=WAITING --value=WAITING --desc=В_очереди
+global add --type=BATCH_STATUS --code=PROCESSING --value=PROCESSING --desc=В_обработке
 global add --type=BATCH_STATUS --code=ERROR --value=ERROR --desc=ERROR
 global add --type=BATCH_STATUS --code=COMPLETED --value=COMPLETED --desc=COMPLETED
 
@@ -45,5 +45,6 @@ global add --type=QUEUE_ALGO_OPTION --code=CREDITOR_CYCLE --value=CREDITOR_CYCLE
 global add --type=QUEUE_ALGO_OPTION --code=MINIMUM_WEIGHT --value=MINIMUM_WEIGHT --desc=Минимальный_вес
 
 global add --type=QUEUE_SETTING --code=QUEUE_ALGO --value=CHRONOLOGICAL --desc=Алгоритм_очереди
+global add --type=QUEUE_SETTING --code=PRIORITY_CREDITOR_IDS --value=-1 --desc=Список_приоритетных_организаций
 
 quit

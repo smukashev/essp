@@ -3,6 +3,7 @@ package kz.bsbnb.usci.receiver.listener.impl;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.exceptions.BatchNotFoundException;
 import kz.bsbnb.usci.receiver.listener.IListener;
+import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
@@ -25,6 +26,9 @@ public class BatchJobListener implements IListener {
 
     @Autowired
     private IServiceRepository serviceFactory;
+
+    @Autowired
+    private ZipFilesMonitor zipFilesMonitor;
 
     private static long lastTime;
 
@@ -50,6 +54,7 @@ public class BatchJobListener implements IListener {
 
         batchService.endBatch(batchId);
         receiverStatusSingleton.batchEnded();
+        zipFilesMonitor.getJobLauncherQueue().jobFinished();
 
         double secs = Math.round((System.currentTimeMillis() - lastTime) / 1000);
         double minutes = Math.round(secs / 60);

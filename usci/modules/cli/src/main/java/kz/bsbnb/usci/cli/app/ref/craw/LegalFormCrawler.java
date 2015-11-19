@@ -22,11 +22,15 @@ public class LegalFormCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return LegalFormRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return LegalForm.class;
+    }
+
+    public LegalFormCrawler() {
+       repositoryInstance = new LegalFormRepository();
     }
 }

@@ -12,25 +12,29 @@ import java.util.HashSet;
 import java.util.List;
 
 public class CreditPurposeRepository extends BaseRepository {
-    private static HashMap repository;
+    /*private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.CREDIT_PURPOSE t" + " where t.open_date <= to_date('repDate', 'dd.MM.yyyy')\n"+
+    private static String QUERY = "SELECT * FROM ref.CREDIT_PURPOSE t" + " where t.open_date = to_date('repDate', 'dd.MM.yyyy')\n"+
             "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
-    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDIT_PURPOSE'";
+    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDIT_PURPOSE'";*/
 
-    public static HashMap getRepository() {
-        if(repository ==null)
-            repository = construct();
-        return repository;
+
+    public CreditPurposeRepository() {
+        QUERY_ALL = "SELECT * FROM ref.credit_purpose";
+        QUERY_OPEN = "SELECT * FROM ref.credit_purpose where open_date = to_date('repDate', 'dd.MM.yyyy') " +
+                " and (close_date > to_date('repDate','dd.MM.yyyy') or close_date is null)";
+        QUERY_CLOSE = "SELECT * FROM ref.%s where close_date = to_date('repDate', 'dd.MM.yyyy') and is_last = 1";
+        COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDIT_PURPOSE'";
     }
 
-    public static HashMap construct(){
+    @Override
+    public HashMap construct(String query){
         try {
-            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
+            HashSet hs = getColumns();
+            ResultSet rows = getStatement().executeQuery(query.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
-                HashSet hs = getColumns();
                 HashMap tmp = new HashMap();
                 //System.out.println(rows.getString("NAME_RU"));
                 for(Object s: hs){
@@ -48,7 +52,7 @@ public class CreditPurposeRepository extends BaseRepository {
         return null;
     }
 
-    public static CreditPurpose[] getByProperty(String key,String value){
+    public CreditPurpose[] getByProperty(String key,String value){
         CreditPurpose [] ret = new CreditPurpose[0];
         List<CreditPurpose> list = new ArrayList<CreditPurpose>();
         for(Object v: getRepository().values()){
@@ -58,28 +62,11 @@ public class CreditPurposeRepository extends BaseRepository {
         return list.toArray(ret);
     }
 
-    public static CreditPurpose getById(String id){
+    public CreditPurpose getById(String id){
         return (CreditPurpose) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return columns = hs;
-            }
-            return columns;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

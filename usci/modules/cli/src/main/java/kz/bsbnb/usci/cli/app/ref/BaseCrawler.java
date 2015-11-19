@@ -12,6 +12,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 /**
@@ -22,11 +23,10 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class BaseCrawler {
-
-
     public static Document document;
     public static String fileName;
     public static String prefix = "C:\\refs\\";
+    protected BaseRepository repositoryInstance;
 
     public static Document getDocument(){
 
@@ -49,38 +49,108 @@ public class BaseCrawler {
     public void work(){
 
         try {
-            rootElement = getDocument().createElement("batch");
-            getDocument().appendChild(rootElement);
+
+            String[] dates = BaseRepository.getDatesAsStringArray(this);
+            String[] closeDates = BaseRepository.getCloseDatesAsStringArray(this);
+            //BaseRepository.targetClass = this.getClassName();
+
+            for(String date: dates) {
+
+                BaseRepository.repDate = date;
+                BaseCrawler.fileName = BaseCrawler.prefix + date + "/";
+                constructByOpenDate();
+
+                if (getRepository().size() < 1)
+                    continue;
+
+                File f = new File(BaseCrawler.fileName);
+                f.mkdir();
+
+                rootElement = getDocument().createElement("batch");
+                getDocument().appendChild(rootElement);
 
 
-            Element entities = getDocument().createElement("entities");
-            rootElement.appendChild(entities);
+                Element entities = getDocument().createElement("entities");
+                rootElement.appendChild(entities);
 
-            buildElement(entities);
+                buildElement(entities);
 
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(getDocument());
-            StreamResult result = new StreamResult(new File(fileName + getClassName() +
-                    "_" + BaseRepository.repDate.replaceAll("\\.", "_") + ".xml"));
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(getDocument());
+                StreamResult result = new StreamResult(new File(fileName + getClassName() +
+                        "_" + BaseRepository.repDate.replaceAll("\\.", "_") + ".xml"));
 
-            System.out.println("entity read  " + fileName + getClassName() +
-                    "_" + BaseRepository.repDate.replaceAll("\\.", "_") + ".xml " + BaseRepository.repDate);
+                System.out.println("entity read  " + fileName + getClassName() +
+                        "_" + BaseRepository.repDate.replaceAll("\\.", "_") + ".xml " + BaseRepository.repDate);
 
-            //Output to console for testing
-            //StreamResult result = new StreamResult(System.out);
+                //Output to console for testing
+                //StreamResult result = new StreamResult(System.out);
 
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-            transformer.transform(source, result);
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+                transformer.transform(source, result);
 
-            document = null;
+                document = null;
 
+                if(f.list().length < 1)
+                    f.delete();
+            }
 
+            //if("ref_creditor".equals(this.getClassName()))
+            //    return;
+
+            //if("ref_creditor_branch".equals(this.getClassName()))
+            //    return;
+
+            if("ref_portfolio".equals(this.getClassName()))
+                return;
+
+            for(String date: closeDates) {
+                BaseRepository.repDate = date;
+                BaseCrawler.fileName = BaseCrawler.prefix + date + "/";
+                constructByCloseDate();
+                if (getRepository().size() < 1)
+                    continue;
+
+                File f = new File(BaseCrawler.fileName);
+                f.mkdir();
+
+                rootElement = getDocument().createElement("batch");
+                getDocument().appendChild(rootElement);
+
+                Element entities = getDocument().createElement("entities");
+                rootElement.appendChild(entities);
+
+                buildElementForClose(entities);
+
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(getDocument());
+                StreamResult result = new StreamResult(new File(fileName + getClassName() +
+                        "_c_" + BaseRepository.repDate.replaceAll("\\.", "_") + ".xml"));
+
+                System.out.println("entity read  " + fileName + getClassName() +
+                        "_c_" + BaseRepository.repDate.replaceAll("\\.", "_") + ".xml " + BaseRepository.repDate);
+
+                //Output to console for testing
+                //StreamResult result = new StreamResult(System.out);
+
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+                transformer.transform(source, result);
+
+                document = null;
+
+                if(f.listFiles().length < 1)
+                    f.delete();
+            }
         } catch (TransformerConfigurationException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         } catch (TransformerException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
     }
@@ -107,6 +177,29 @@ public class BaseCrawler {
 
     }
 
+    public void buildElementForClose(Element root){
+
+        //int i = 0;
+        for( Object o: getRepository().values()){
+
+            //if(i>5) break;
+            //BaseRef creditor = (BaseRef) getRef().cast(o);
+            BaseRef creditor = (BaseRef) o;
+
+            Element entityClass = getDocument().createElement(getClassName());
+            entityClass.setAttribute("operation","CLOSE");
+
+            root.appendChild(entityClass);
+
+            creditor.buildElement(entityClass);
+
+             /*appendToElement(entity,"name",creditor.get("NAME"));
+             appendToElement(entity,"short_name",creditor.get("SHORT_NAME"));*/
+
+            //i++;
+        }
+    }
+
     /**
      * Simply adds new tag to ther parent tag
      *
@@ -125,10 +218,28 @@ public class BaseCrawler {
     }
 
     public HashMap getRepository(){
-        throw new NotImplementedException();
+        return getRepositoryInstance().getRepository();
+    }
+
+    public void constructByOpenDate(){
+        repositoryInstance.constructByOpenDate();
+    }
+
+    public void constructByCloseDate(){
+        repositoryInstance.constructByCloseDate();
+    }
+
+    public void constructAll(){
+        repositoryInstance.constructAll();
+    }
+
+    public BaseRepository getRepositoryInstance(){
+        return repositoryInstance;
     }
 
     public Class  getRef(){
         throw new NotImplementedException();
     }
+
+
 }

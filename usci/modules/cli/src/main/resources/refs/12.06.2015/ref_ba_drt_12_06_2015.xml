@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_ba_drt>
+      <balance_account>
+        <no_>8713</no_>
+      </balance_account>
+      <debt_remains_type>
+        <code>1</code>
+      </debt_remains_type>
+    </ref_ba_drt>
+    <ref_ba_drt>
+      <balance_account>
+        <no_>8714</no_>
+      </balance_account>
+      <debt_remains_type>
+        <code>4</code>
+      </debt_remains_type>
+    </ref_ba_drt>
+    <ref_ba_drt>
+      <balance_account>
+        <no_>8709</no_>
+      </balance_account>
+      <debt_remains_type>
+        <code>12</code>
+      </debt_remains_type>
+    </ref_ba_drt>
+    <ref_ba_drt>
+      <balance_account>
+        <no_>8708</no_>
+      </balance_account>
+      <debt_remains_type>
+        <code>12</code>
+      </debt_remains_type>
+    </ref_ba_drt>
+  </entities>
+</batch>

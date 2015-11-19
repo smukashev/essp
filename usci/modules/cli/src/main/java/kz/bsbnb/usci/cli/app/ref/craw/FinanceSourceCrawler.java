@@ -22,11 +22,15 @@ public class FinanceSourceCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return FinanceSourceRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return FinanceSource.class;
+    }
+
+    public FinanceSourceCrawler() {
+       repositoryInstance = new FinanceSourceRepository();
     }
 }

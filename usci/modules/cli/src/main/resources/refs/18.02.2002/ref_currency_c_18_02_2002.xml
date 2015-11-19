@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_currency operation="CLOSE">
+      <code>999</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Валюта МВФ</name_ru>
+      <short_name>XDR</short_name>
+    </ref_currency>
+    <ref_currency operation="CLOSE">
+      <code>057</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Ливанские фунты</name_ru>
+      <short_name>LBP</short_name>
+    </ref_currency>
+    <ref_currency operation="CLOSE">
+      <code>308</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Ливийские динары</name_ru>
+      <short_name>LYD</short_name>
+    </ref_currency>
+    <ref_currency operation="CLOSE">
+      <code>425</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Эквадорские сукре</name_ru>
+      <short_name>ECS</short_name>
+    </ref_currency>
+    <ref_currency operation="CLOSE">
+      <code>045</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Европейская валютная единица</name_ru>
+      <short_name>ECU</short_name>
+    </ref_currency>
+    <ref_currency operation="CLOSE">
+      <code>404</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Либерийские доллары</name_ru>
+      <short_name>LRD</short_name>
+    </ref_currency>
+  </entities>
+</batch>

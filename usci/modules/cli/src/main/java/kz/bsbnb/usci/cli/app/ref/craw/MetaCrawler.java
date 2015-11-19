@@ -14,11 +14,15 @@ public class MetaCrawler extends BaseCrawler {
 
     @Override
     public HashMap getRepository() {
-        return MetaRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return Meta.class;
+    }
+
+    public MetaCrawler() {
+       repositoryInstance = new MetaRepository();
     }
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_doc_type>
+      <name_ru>Справка о государственной регистрации (перерегистрации) юридического лица</name_ru>
+      <name_kz>Справка о государственной регистрации (перерегистрации) юридического лица</name_kz>
+      <is_identification>0</is_identification>
+      <is_organization_doc>1</is_organization_doc>
+      <is_person_doc>0</is_person_doc>
+      <weight>0</weight>
+      <code>18</code>
+    </ref_doc_type>
+    <ref_doc_type>
+      <name_ru>Регистрационный номер налогоплательщика </name_ru>
+      <name_kz>Регистрационный номер налогоплательщика </name_kz>
+      <is_identification>1</is_identification>
+      <is_organization_doc>1</is_organization_doc>
+      <is_person_doc>1</is_person_doc>
+      <weight>25</weight>
+      <code>11</code>
+    </ref_doc_type>
+  </entities>
+</batch>

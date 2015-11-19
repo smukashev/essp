@@ -79,7 +79,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 EAV_BATCHES.BATCH_TYPE,
                 EAV_BATCHES.TOTAL_COUNT,
                 EAV_BATCHES.ACTUAL_COUNT,
-                EAV_BATCHES.REPORT_ID
+                EAV_BATCHES.REPORT_ID,
+                DSL.field("\"bs\".STATUS_ID")
         ).from(EAV_BATCHES).join(context.select(
                         EAV_BATCH_STATUSES.BATCH_ID,
                         EAV_BATCH_STATUSES.STATUS_ID,
@@ -226,6 +227,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         batch.setCreditorId(getNullSafeLong(row, EAV_BATCHES.CREDITOR_ID));
         batch.setFileName((String) row.get(EAV_BATCHES.FILE_NAME.getName()));
         batch.setHash((String) row.get(EAV_BATCHES.HASH.getName()));
+        batch.setStatusId(getNullSafeLong(row, EAV_BATCH_STATUSES.STATUS_ID));
         batch.setSign((String) row.get(EAV_BATCHES.SIGN.getName()));
         batch.setRepDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.REP_DATE.getName())));
         batch.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.RECEIPT_DATE.getName())));

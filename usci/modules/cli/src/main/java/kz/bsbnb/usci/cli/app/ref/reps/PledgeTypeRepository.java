@@ -12,25 +12,28 @@ import java.util.HashSet;
 import java.util.List;
 
 public class PledgeTypeRepository extends BaseRepository {
-    private static HashMap repository;
+    /*private static HashMap repository;
     private static HashSet columns;
-    private static String QUERY = "SELECT * FROM ref.PLEDGE_TYPE t" + " where t.open_date <= to_date('repDate', 'dd.MM.yyyy')\n"+
+    private static String QUERY = "SELECT * FROM ref.PLEDGE_TYPE t" + " where t.open_date = to_date('repDate', 'dd.MM.yyyy')\n"+
             "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
-    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='PLEDGE_TYPE'";
+    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='PLEDGE_TYPE'";*/
 
-    public static HashMap getRepository() {
-        if(repository ==null)
-            repository = construct();
-        return repository;
+    public PledgeTypeRepository() {
+        QUERY_ALL = "SELECT * FROM ref.pledge_type";
+        QUERY_OPEN = "SELECT * FROM ref.pledge_type where open_date = to_date('repDate', 'dd.MM.yyyy') " +
+                " and (close_date > to_date('repDate','dd.MM.yyyy') or close_date is null)";
+        QUERY_CLOSE = "SELECT * FROM ref.pledge_type where close_date = to_date('repDate', 'dd.MM.yyyy') and is_last = 1";
+        COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='PLEDGE_TYPE'";
     }
 
-    public static HashMap construct(){
+    @Override
+    public HashMap construct(String query){
         try {
-            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
+            HashSet hs = getColumns();
+            ResultSet rows = getStatement().executeQuery(query.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
-                HashSet hs = getColumns();
                 HashMap tmp = new HashMap();
                 //System.out.println(rows.getString("NAME_RU"));
                 for(Object s: hs){
@@ -48,7 +51,7 @@ public class PledgeTypeRepository extends BaseRepository {
         return null;
     }
 
-    public static PledgeType[] getByProperty(String key,String value){
+    public PledgeType[] getByProperty(String key,String value){
         PledgeType [] ret = new PledgeType[0];
         List<PledgeType> list = new ArrayList<PledgeType>();
         for(Object v: getRepository().values()){
@@ -58,28 +61,11 @@ public class PledgeTypeRepository extends BaseRepository {
         return list.toArray(ret);
     }
 
-    public static PledgeType getById(String id){
+    public PledgeType getById(String id){
         return (PledgeType) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return columns = hs;
-            }
-            return columns;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

@@ -21,11 +21,15 @@ public class RegionCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return RegionRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return Region.class;
+    }
+
+    public RegionCrawler() {
+       repositoryInstance = new RegionRepository();
     }
 }

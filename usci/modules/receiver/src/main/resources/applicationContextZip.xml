@@ -23,7 +23,6 @@
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.bconv" />
     <context:component-scan base-package="kz.bsbnb.usci.receiver" />
-    <context:component-scan base-package="kz.bsbnb.usci.tool.couchbase" />
     <context:component-scan base-package="kz.bsbnb.usci.tool.status" />
 
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
@@ -70,7 +69,7 @@
         <property name="jobRepository" ref="jobRepository" />
         <property name="taskExecutor">
             <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor">
-                <property name="concurrencyLimit" value="1" />
+                <property name="concurrencyLimit" value="${concurrencyLimit}" />
             </bean>
         </property>
     </bean>

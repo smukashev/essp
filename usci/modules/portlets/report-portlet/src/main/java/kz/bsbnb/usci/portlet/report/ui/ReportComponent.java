@@ -65,7 +65,6 @@ public class ReportComponent extends VerticalLayout {
         return getConnect().getDataSourceFromStoredProcedure(report.getProcedureName(), parameterValues);
         else
         {
-            //return getConnect().getDataFromCouchBase(parameterValues);
             return new CustomDataSource(new ProtocolsTableReportExporter(parameterValues,report.getName()).getData());
         }
     }

@@ -22,11 +22,15 @@ public class DocTypeCrawler extends BaseCrawler {
 
     @Override
     public HashMap getRepository() {
-        return DocTypeRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return DocType.class;
+    }
+
+    public DocTypeCrawler() {
+       repositoryInstance = new DocTypeRepository();
     }
 }

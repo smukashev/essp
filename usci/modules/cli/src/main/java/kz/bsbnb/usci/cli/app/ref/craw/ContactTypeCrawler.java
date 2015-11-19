@@ -22,11 +22,15 @@ public class ContactTypeCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return ContactTypeRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return ContactType.class;
+    }
+
+    public ContactTypeCrawler() {
+       repositoryInstance = new ContactTypeRepository();
     }
 }

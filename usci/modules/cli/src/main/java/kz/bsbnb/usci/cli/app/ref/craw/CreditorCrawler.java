@@ -18,12 +18,6 @@ import java.util.HashMap;
  */
 public class CreditorCrawler extends BaseCrawler{
 
-
-    @Override
-    public HashMap getRepository() {
-        return CreditorRepository.getRepository();
-    }
-
     @Override
     public Class getRef() {
         return Creditor.class;
@@ -69,4 +63,8 @@ public class CreditorCrawler extends BaseCrawler{
 //
 //
 //    }
+
+    public CreditorCrawler() {
+       repositoryInstance = new CreditorRepository();
+    }
 }

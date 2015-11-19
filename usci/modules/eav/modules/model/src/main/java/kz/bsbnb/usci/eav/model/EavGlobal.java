@@ -3,6 +3,9 @@ package kz.bsbnb.usci.eav.model;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 
 public class EavGlobal extends Persistable {
+
+    private static final long serialVersionUID = 1L;
+
     private String type;
     private String code;
     private String value;
@@ -16,6 +19,12 @@ public class EavGlobal extends Persistable {
         this.code = code;
         this.value = value;
         this.description = description;
+    }
+
+    public EavGlobal(String type, String code, String value){
+        this.type = type;
+        this.code = code;
+        this.value = value;
     }
 
     public String getType() {

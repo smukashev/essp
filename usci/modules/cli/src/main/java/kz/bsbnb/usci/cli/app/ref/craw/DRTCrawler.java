@@ -17,11 +17,15 @@ public class DRTCrawler extends BaseCrawler {
 
     @Override
     public HashMap getRepository() {
-        return DRTRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return EconSector.class;
+    }
+
+    public DRTCrawler() {
+       repositoryInstance = new DRTRepository();
     }
 }

@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.cli.app.ref.craw;
 
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
+import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.cli.app.ref.refs.SubjectType;
 import kz.bsbnb.usci.cli.app.ref.reps.SubjectTypeRepository;
 
@@ -14,10 +15,10 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class SubjectTypeCrawler extends BaseCrawler {
-    @Override
+    /*@Override
     public HashMap getRepository() {
-        return SubjectTypeRepository.getRepository();
-    }
+        return getRepositoryInstance().getRepository();
+    }*/
 
     @Override
     public String getClassName() {
@@ -27,5 +28,9 @@ public class SubjectTypeCrawler extends BaseCrawler {
     @Override
     public Class getRef() {
         return SubjectType.class;
+    }
+
+    public SubjectTypeCrawler() {
+       repositoryInstance = new SubjectTypeRepository();
     }
 }

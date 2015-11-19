@@ -22,11 +22,15 @@ public class CountryCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return CountryRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return Country.class;
+    }
+
+    public CountryCrawler() {
+       repositoryInstance = new CountryRepository();
     }
 }

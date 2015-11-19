@@ -203,6 +203,7 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
                                 .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
                                 .and(entityId != null ? EAV_BE_ENTITIES.ID.eq(entityId) : DSL.trueCondition())
                                 .and(EAV_BE_ENTITIES.DELETED.ne(DataUtils.convert(true)))
+                                .and(EAV_BE_ENTITY_REPORT_DATES.IS_CLOSED.ne(DataUtils.convert(true)))
                                 .asTable("dat")
                 )
         ).groupBy(groupByFields).orderBy(DSL.field("id"), DSL.min(DSL.field("report_date")));
@@ -246,6 +247,7 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
                                 .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
                                 .and(dt != null ? EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.le(dt) : DSL.trueCondition())
                                 .and(EAV_BE_ENTITIES.DELETED.ne(DataUtils.convert(true)))
+                                .and(EAV_BE_ENTITY_REPORT_DATES.IS_CLOSED.ne(DataUtils.convert(true)))
                                 .asTable("sub")
                 ).where(DSL.field("\"sub\".\"p\"").eq(1)).asTable("enr")
         );

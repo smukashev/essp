@@ -22,11 +22,15 @@ public class BankRelationCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return BankRelationRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return BankRelation.class;
+    }
+
+    public BankRelationCrawler() {
+       repositoryInstance = new BankRelationRepository();
     }
 }

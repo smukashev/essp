@@ -17,13 +17,7 @@ public class MetaRepository extends BaseRepository {
     private static String QUERY = "SELECT * FROM eav_m_classes";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'CORE' AND TABLE_NAME='EAV_M_CLASSES'";
 
-    public static HashMap getRepository() {
-        if(repository ==null)
-            repository = construct();
-        return repository;
-    }
-
-    public static HashMap construct(){
+    public HashMap construct(){
         try {
             ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
 
@@ -47,28 +41,11 @@ public class MetaRepository extends BaseRepository {
         return null;
     }
 
-    public static Meta getById(String id){
+    public Meta getById(String id){
         return (Meta) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return columns = hs;
-            }
-            return columns;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

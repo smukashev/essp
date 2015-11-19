@@ -17,11 +17,15 @@ public class BACTCrawler extends BaseCrawler {
 
     @Override
     public HashMap getRepository() {
-        return BACTRepository.getRepository();
+        return getRepositoryInstance().getRepository();
     }
 
     @Override
     public Class getRef() {
         return BACT.class;
+    }
+
+    public BACTCrawler() {
+       repositoryInstance = new BACTRepository();
     }
 }

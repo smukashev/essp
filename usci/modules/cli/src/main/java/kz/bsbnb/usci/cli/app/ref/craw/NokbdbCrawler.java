@@ -27,6 +27,10 @@ public class NokbdbCrawler extends BaseCrawler{
 
     @Override
     public HashMap getRepository() {
-        return NokbdbRepository.getRepository();    //To change body of overridden methods use File | Settings | File Templates.
+        return getRepositoryInstance().getRepository();    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    public NokbdbCrawler() {
+       repositoryInstance = new NokbdbRepository();
     }
 }

@@ -1,0 +1,2264 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (домашние хозяйства-резиденты) в СКВ</name_kz>
+      <display_no>3315 192</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (домашние хозяйства-резиденты) в СКВ</name_ru>
+      <no_>3315192</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-резидентам, в ДВВ</name_kz>
+      <display_no>3303 143</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-резидентам, в ДВВ</name_ru>
+      <no_>3303143</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (некоммерческие организации-резиденты,  обслуживающие домашние хозяйства) в ДВВ</name_kz>
+      <display_no>3315 183</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (некоммерческие организации-резиденты,  обслуживающие домашние хозяйства) в ДВВ</name_ru>
+      <no_>3315183</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (домашние хозяйства-резиденты) в тенге</name_kz>
+      <display_no>3315 191</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (домашние хозяйства-резиденты) в тенге</name_ru>
+      <no_>3315191</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (некоммерческие организации-резиденты,  обслуживающие домашние хозяйства) в тенге</name_kz>
+      <display_no>3315 181</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (некоммерческие организации-резиденты,  обслуживающие домашние хозяйства) в тенге</name_ru>
+      <no_>3315181</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (некоммерческие организации-резиденты,  обслуживающие домашние хозяйства) в СКВ</name_kz>
+      <display_no>3315 182</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (некоммерческие организации-резиденты,  обслуживающие домашние хозяйства) в СКВ</name_ru>
+      <no_>3315182</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации-резиденты) в СКВ</name_kz>
+      <display_no>3315 172</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации-резиденты) в СКВ</name_ru>
+      <no_>3315172</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации-резиденты) в ДВВ</name_kz>
+      <display_no>3315 173</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации-резиденты) в ДВВ</name_ru>
+      <no_>3315173</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-нерезиденты) в СКВ</name_kz>
+      <display_no>3316 242</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-нерезиденты) в СКВ</name_ru>
+      <no_>3316242</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-нерезиденты) в ДВВ</name_kz>
+      <display_no>3316 243</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-нерезиденты) в ДВВ</name_ru>
+      <no_>3316243</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы иностранного государства) в ДВВ</name_kz>
+      <display_no>3316 223</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы иностранного государства) в ДВВ</name_ru>
+      <no_>3316223</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-нерезиденты) в тенге</name_kz>
+      <display_no>3316 241</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-нерезиденты) в тенге</name_ru>
+      <no_>3316241</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным другим банкам</name_kz>
+      <display_no>3303</display_no>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным другим банкам</name_ru>
+      <no_>3303</no_>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  государственным нефинансовым организациям иностранного государства, в ДВВ</name_kz>
+      <display_no>3305 263</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  государственным нефинансовым организациям иностранного государства, в ДВВ</name_ru>
+      <no_>3305263</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным негосударственным нефинансовым организациям иностранного государства, в тенге</name_kz>
+      <display_no>3305 271</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным негосударственным нефинансовым организациям иностранного государства, в тенге</name_ru>
+      <no_>3305271</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным клиентам</name_kz>
+      <display_no>3305</display_no>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным клиентам</name_ru>
+      <no_>3305</no_>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным местным исполнительным органам иностранного государства, в СКВ</name_kz>
+      <display_no>3305 222</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным местным исполнительным органам иностранного государства, в СКВ</name_ru>
+      <no_>3305222</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным акционерному обществу «Казпочта», в тенге</name_kz>
+      <display_no>3303 161</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным акционерному обществу «Казпочта», в тенге</name_ru>
+      <no_>3303161</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям, осуществляющим отдельные виды банковских операций</name_kz>
+      <display_no>3304</display_no>
+      <first_fourth_signs>3304</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям, осуществляющим отдельные виды банковских операций</name_ru>
+      <no_>3304</no_>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным местным исполнительным органам иностранного государства, в ДВВ</name_kz>
+      <display_no>3305 223</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным местным исполнительным органам иностранного государства, в ДВВ</name_ru>
+      <no_>3305223</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-нерезиденты, обслуживающие домашние хозяйства) в тенге</name_kz>
+      <display_no>3316 281</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-нерезиденты, обслуживающие домашние хозяйства) в тенге</name_ru>
+      <no_>3316281</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации иностранного государства) в ДВВ</name_kz>
+      <display_no>3316 273</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации иностранного государства) в ДВВ</name_ru>
+      <no_>3316273</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным негосударственным нефинансовым организациям иностранного государства, в СКВ</name_kz>
+      <display_no>3305 272</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным негосударственным нефинансовым организациям иностранного государства, в СКВ</name_ru>
+      <no_>3305272</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным акционерному обществу «Казпочта», в ДВВ</name_kz>
+      <display_no>3303 163</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным акционерному обществу «Казпочта», в ДВВ</name_ru>
+      <no_>3303163</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным акционерному обществу «Казпочта», в СКВ</name_kz>
+      <display_no>3303 162</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным акционерному обществу «Казпочта», в СКВ</name_ru>
+      <no_>3303162</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство иностранного государства) в ДВВ</name_kz>
+      <display_no>3316 213</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство иностранного государства) в ДВВ</name_ru>
+      <no_>3316213</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (финансовые организации-резиденты) в тенге</name_kz>
+      <display_no>3315 151</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (финансовые организации-резиденты) в тенге</name_ru>
+      <no_>3315151</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (финансовые организации-резиденты) в СКВ</name_kz>
+      <display_no>3315 152</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (финансовые организации-резиденты) в СКВ</name_ru>
+      <no_>3315152</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (финансовые организации-резиденты) в ДВВ</name_kz>
+      <display_no>3315 153</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (финансовые организации-резиденты) в ДВВ</name_ru>
+      <no_>3315153</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (государственные нефинансовые организации-резиденты) в тенге</name_kz>
+      <display_no>3315 161</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (государственные нефинансовые организации-резиденты) в тенге</name_ru>
+      <no_>3315161</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-нерезидентам, обслуживающим домашние хозяйства, в тенге</name_kz>
+      <display_no>3305 281</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-нерезидентам, обслуживающим домашние хозяйства, в тенге</name_ru>
+      <no_>3305281</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-нерезидентам, обслуживающим домашние хозяйства, в СКВ</name_kz>
+      <display_no>3305 282</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-нерезидентам, обслуживающим домашние хозяйства, в СКВ</name_ru>
+      <no_>3305282</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-нерезидентам, обслуживающим домашние хозяйства, в ДВВ</name_kz>
+      <display_no>3305 283</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-нерезидентам, обслуживающим домашние хозяйства, в ДВВ</name_ru>
+      <no_>3305283</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-нерезидентам, в тенге</name_kz>
+      <display_no>3305 291</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-нерезидентам, в тенге</name_ru>
+      <no_>3305291</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-резиденты) в ДВВ</name_kz>
+      <display_no>3316 193</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-резиденты) в ДВВ</name_ru>
+      <no_>3316193</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство иностранного государства) в тенге</name_kz>
+      <display_no>3316 211</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство иностранного государства) в тенге</name_ru>
+      <no_>3316211</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-резидентам, в ДВВ</name_kz>
+      <display_no>3305 193</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-резидентам, в ДВВ</name_ru>
+      <no_>3305193</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным Правительству иностранного государства, в тенге</name_kz>
+      <display_no>3305 211</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным Правительству иностранного государства, в тенге</name_ru>
+      <no_>3305211</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным Правительству иностранного государства, в СКВ</name_kz>
+      <display_no>3305 212</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным Правительству иностранного государства, в СКВ</name_ru>
+      <no_>3305212</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (государственные нефинансовые организации-резиденты) в СКВ</name_kz>
+      <display_no>3315 162</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (государственные нефинансовые организации-резиденты) в СКВ</name_ru>
+      <no_>3315162</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  Правительству иностранного государства, в ДВВ</name_kz>
+      <display_no>3305 213</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  Правительству иностранного государства, в ДВВ</name_ru>
+      <no_>3305213</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (государственные нефинансовые организации-резиденты) в ДВВ</name_kz>
+      <display_no>3315 163</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (государственные нефинансовые организации-резиденты) в ДВВ</name_ru>
+      <no_>3315163</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным местным исполнительным органам иностранного государства, в тенге</name_kz>
+      <display_no>3305 221</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным местным исполнительным органам иностранного государства, в тенге</name_ru>
+      <no_>3305221</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство иностранного государства) в СКВ</name_kz>
+      <display_no>3316 212</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство иностранного государства) в СКВ</name_ru>
+      <no_>3316212</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы иностранного государства) в СКВ</name_kz>
+      <display_no>3316 222</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы иностранного государства) в СКВ</name_ru>
+      <no_>3316222</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы иностранного государства) в тенге</name_kz>
+      <display_no>3316 221</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы иностранного государства) в тенге</name_ru>
+      <no_>3316221</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации-резиденты) в тенге</name_kz>
+      <display_no>3315 171</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации-резиденты) в тенге</name_ru>
+      <no_>3315171</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (банки-нерезиденты) в ДВВ</name_kz>
+      <display_no>3315 243</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (банки-нерезиденты) в ДВВ</name_ru>
+      <no_>3315243</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (финансовые организации-нерезиденты) в тенге</name_kz>
+      <display_no>3315 251</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (финансовые организации-нерезиденты) в тенге</name_ru>
+      <no_>3315251</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (банки-нерезиденты) в тенге</name_kz>
+      <display_no>3315 241</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (банки-нерезиденты) в тенге</name_ru>
+      <no_>3315241</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (банки-нерезиденты) в СКВ</name_kz>
+      <display_no>3315 242</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (банки-нерезиденты) в СКВ</name_ru>
+      <no_>3315242</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (государственные нефинансовые организации иностранного государства) в тенге</name_kz>
+      <display_no>3315 261</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (государственные нефинансовые организации иностранного государства) в тенге</name_ru>
+      <no_>3315261</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-резиденты, обслуживающие домашние хозяйства) в ДВВ</name_kz>
+      <display_no>3316 183</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-резиденты, обслуживающие домашние хозяйства) в ДВВ</name_ru>
+      <no_>3316183</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (финансовые организации-нерезиденты) в СКВ</name_kz>
+      <display_no>3315 252</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (финансовые организации-нерезиденты) в СКВ</name_ru>
+      <no_>3315252</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-резиденты) в тенге</name_kz>
+      <display_no>3316 191</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-резиденты) в тенге</name_ru>
+      <no_>3316191</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (финансовые организации-нерезиденты) в ДВВ</name_kz>
+      <display_no>3315 253</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (финансовые организации-нерезиденты) в ДВВ</name_ru>
+      <no_>3315253</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-резиденты, обслуживающие домашние хозяйства) в тенге</name_kz>
+      <display_no>3316 181</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-резиденты, обслуживающие домашние хозяйства) в тенге</name_ru>
+      <no_>3316181</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-резиденты, обслуживающие домашние хозяйства) в СКВ</name_kz>
+      <display_no>3316 182</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-резиденты, обслуживающие домашние хозяйства) в СКВ</name_ru>
+      <no_>3316182</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам, в СКВ</name_kz>
+      <display_no>3305 162</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам, в СКВ</name_ru>
+      <no_>3305162</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-резиденты) в СКВ</name_kz>
+      <display_no>3316 192</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-резиденты) в СКВ</name_ru>
+      <no_>3316192</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным Правительству Республики Казахстан, в ДВВ</name_kz>
+      <display_no>3305 113</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным Правительству Республики Казахстан, в ДВВ</name_ru>
+      <no_>3305113</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным Правительству Республики Казахстан, в СКВ</name_kz>
+      <display_no>3305 112</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным Правительству Республики Казахстан, в СКВ</name_ru>
+      <no_>3305112</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным Правительству Республики Казахстан, в тенге</name_kz>
+      <display_no>3305 111</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным Правительству Республики Казахстан, в тенге</name_ru>
+      <no_>3305111</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-нерезидентам, в СКВ</name_kz>
+      <display_no>3303 242</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-нерезидентам, в СКВ</name_ru>
+      <no_>3303242</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным иностранным центральным банкам в тенге</name_kz>
+      <display_no>3303 231</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным иностранным центральным банкам в тенге</name_ru>
+      <no_>3303231</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным иностранным центральным банкам, в СКВ</name_kz>
+      <display_no>3303 232</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным иностранным центральным банкам, в СКВ</name_ru>
+      <no_>3303232</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным иностранным центральным банкам в ДВВ</name_kz>
+      <display_no>3303 233</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным иностранным центральным банкам в ДВВ</name_ru>
+      <no_>3303233</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-нерезидентам, в тенге</name_kz>
+      <display_no>3303 241</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-нерезидентам, в тенге</name_ru>
+      <no_>3303241</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (домашние хозяйства-резиденты) в ДВВ</name_kz>
+      <display_no>3315 193</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (домашние хозяйства-резиденты) в ДВВ</name_ru>
+      <no_>3315193</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (Правительство иностранного государства) в тенге</name_kz>
+      <display_no>3315 211</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (Правительство иностранного государства) в тенге</name_ru>
+      <no_>3315211</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (Правительство иностранного государства) в СКВ</name_kz>
+      <display_no>3315 212</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (Правительство иностранного государства) в СКВ</name_ru>
+      <no_>3315212</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (Правительство иностранного государства) в ДВВ</name_kz>
+      <display_no>3315 213</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (Правительство иностранного государства) в ДВВ</name_ru>
+      <no_>3315213</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (местные исполнительные органы иностранного государства) в тенге</name_kz>
+      <display_no>3315 221</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (местные исполнительные органы иностранного государства) в тенге</name_ru>
+      <no_>3315221</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (местные исполнительные органы иностранного государства) в ДВВ</name_kz>
+      <display_no>3315 223</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (местные исполнительные органы иностранного государства) в ДВВ</name_ru>
+      <no_>3315223</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (местные исполнительные органы иностранного государства) в СКВ</name_kz>
+      <display_no>3315 222</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (местные исполнительные органы иностранного государства) в СКВ</name_ru>
+      <no_>3315222</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с  государственными нефинансовыми организациями-резидентами</name_kz>
+      <display_no>3307 161</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с  государственными нефинансовыми организациями-резидентами</name_ru>
+      <no_>3307161</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с финансовыми организациями-резидентами</name_kz>
+      <display_no>3307 153</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с финансовыми организациями-резидентами</name_ru>
+      <no_>3307153</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с финансовыми организациями-резидентами</name_kz>
+      <display_no>3307 152</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с финансовыми организациями-резидентами</name_ru>
+      <no_>3307152</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с финансовыми организациями-резидентами</name_kz>
+      <display_no>3307 151</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с финансовыми организациями-резидентами</name_ru>
+      <no_>3307151</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций в СКВ</name_kz>
+      <display_no>3304 252</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3304</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций в СКВ</name_ru>
+      <no_>3304252</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций в тенге</name_kz>
+      <display_no>3304 251</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3304</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций в тенге</name_ru>
+      <no_>3304251</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций в ДВВ</name_kz>
+      <display_no>3304 153</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3304</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций в ДВВ</name_ru>
+      <no_>3304153</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций в СКВ</name_kz>
+      <display_no>3304 152</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3304</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций в СКВ</name_ru>
+      <no_>3304152</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций в тенге</name_kz>
+      <display_no>3304 151</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3304</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций в тенге</name_ru>
+      <no_>3304151</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации иностранного государства) в ДВВ</name_kz>
+      <display_no>3315 273</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации иностранного государства) в ДВВ</name_ru>
+      <no_>3315273</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (некоммерческие организации-нерезиденты,  обслуживающие домашние хозяйства) в тенге</name_kz>
+      <display_no>3315 281</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (некоммерческие организации-нерезиденты,  обслуживающие домашние хозяйства) в тенге</name_ru>
+      <no_>3315281</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации иностранного государства) в тенге</name_kz>
+      <display_no>3315 271</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации иностранного государства) в тенге</name_ru>
+      <no_>3315271</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации иностранного государства) в СКВ</name_kz>
+      <display_no>3315 272</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (негосударственные нефинансовые организации иностранного государства) в СКВ</name_ru>
+      <no_>3315272</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (государственные нефинансовые организации иностранного государства) в СКВ</name_kz>
+      <display_no>3315 262</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (государственные нефинансовые организации иностранного государства) в СКВ</name_ru>
+      <no_>3315262</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (государственные нефинансовые организации иностранного государства) в ДВВ</name_kz>
+      <display_no>3315 263</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (государственные нефинансовые организации иностранного государства) в ДВВ</name_ru>
+      <no_>3315263</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с государственными нефинансовыми организациями-резидентами</name_kz>
+      <display_no>3307 163</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с государственными нефинансовыми организациями-резидентами</name_ru>
+      <no_>3307163</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с негосударственными нефинансовыми организациями-резидентами</name_kz>
+      <display_no>3307 171</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с негосударственными нефинансовыми организациями-резидентами</name_ru>
+      <no_>3307171</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с государственными нефинансовыми организациями-резидентами</name_kz>
+      <display_no>3307 162</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с государственными нефинансовыми организациями-резидентами</name_ru>
+      <no_>3307162</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с государственными нефинансовыми организациями иностранного государства</name_kz>
+      <display_no>3307 263</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с государственными нефинансовыми организациями иностранного государства</name_ru>
+      <no_>3307263</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с негосударственными нефинансовыми организациями иностранного государства</name_kz>
+      <display_no>3307 271</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с негосударственными нефинансовыми организациями иностранного государства</name_ru>
+      <no_>3307271</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с государственными нефинансовыми организациями иностранного государства</name_kz>
+      <display_no>3307 261</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с государственными нефинансовыми организациями иностранного государства</name_ru>
+      <no_>3307261</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с государственными нефинансовыми организациями иностранного государства</name_kz>
+      <display_no>3307 262</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с государственными нефинансовыми организациями иностранного государства</name_ru>
+      <no_>3307262</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-резидентам, в СКВ</name_kz>
+      <display_no>3305 192</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-резидентам, в СКВ</name_ru>
+      <no_>3305192</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-резидентам, в тенге</name_kz>
+      <display_no>3305 191</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-резидентам, в тенге</name_ru>
+      <no_>3305191</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-нерезидентам, в СКВ</name_kz>
+      <display_no>3305 292</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-нерезидентам, в СКВ</name_ru>
+      <no_>3305292</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации-резиденты) в ДВВ</name_kz>
+      <display_no>3316 173</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации-резиденты) в ДВВ</name_ru>
+      <no_>3316173</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-нерезидентам, в ДВВ</name_kz>
+      <display_no>3305 293</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным домашним хозяйствам-нерезидентам, в ДВВ</name_ru>
+      <no_>3305293</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы Республики Казахстан) в СКВ</name_kz>
+      <display_no>3316 122</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы Республики Казахстан) в СКВ</name_ru>
+      <no_>3316122</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы Республики Казахстан) в тенге</name_kz>
+      <display_no>3316 121</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы Республики Казахстан) в тенге</name_ru>
+      <no_>3316121</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  местными исполнительными органами Республики Казахстан, в СКВ</name_kz>
+      <display_no>3305 122</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  местными исполнительными органами Республики Казахстан, в СКВ</name_ru>
+      <no_>3305122</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  местным исполнительным органам Республики Казахстан, в тенге</name_kz>
+      <display_no>3305 121</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  местным исполнительным органам Республики Казахстан, в тенге</name_ru>
+      <no_>3305121</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство Республики Казахстан) в ДВВ</name_kz>
+      <display_no>3316 113</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство Республики Казахстан) в ДВВ</name_ru>
+      <no_>3316113</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство Республики Казахстан) в СКВ</name_kz>
+      <display_no>3316 112</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство Республики Казахстан) в СКВ</name_ru>
+      <no_>3316112</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-резиденты) в тенге</name_kz>
+      <display_no>3316 141</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-резиденты) в тенге</name_ru>
+      <no_>3316141</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-резиденты) в СКВ</name_kz>
+      <display_no>3316 142</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-резиденты) в СКВ</name_ru>
+      <no_>3316142</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-резиденты) в ДВВ</name_kz>
+      <display_no>3316 143</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (банки-резиденты) в ДВВ</name_ru>
+      <no_>3316143</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-нерезидентам, в ДВВ</name_kz>
+      <display_no>3303 243</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-нерезидентам, в ДВВ</name_ru>
+      <no_>3303243</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы Республики Казахстан) в ДВВ</name_kz>
+      <display_no>3316 123</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (местные исполнительные органы Республики Казахстан) в ДВВ</name_ru>
+      <no_>3316123</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с Национальным Банком Республики Казахстан</name_kz>
+      <display_no>3307 131</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с Национальным Банком Республики Казахстан</name_ru>
+      <no_>3307131</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с Национальным Банком Республики Казахстан</name_kz>
+      <display_no>3307 132</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с Национальным Банком Республики Казахстан</name_ru>
+      <no_>3307132</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с Национальным Банком Республики Казахстан</name_kz>
+      <display_no>3307 133</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с Национальным Банком Республики Казахстан</name_ru>
+      <no_>3307133</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с банками-резидентами</name_kz>
+      <display_no>3307 141</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с банками-резидентами</name_ru>
+      <no_>3307141</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с банками-резидентами</name_kz>
+      <display_no>3307 142</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с банками-резидентами</name_ru>
+      <no_>3307142</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с банками-резидентами</name_kz>
+      <display_no>3307 143</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с банками-резидентами</name_ru>
+      <no_>3307143</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации иностранного государства) в СКВ</name_kz>
+      <display_no>3316 272</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации иностранного государства) в СКВ</name_ru>
+      <no_>3316272</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации иностранного государства) в тенге</name_kz>
+      <display_no>3316 271</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации иностранного государства) в тенге</name_ru>
+      <no_>3316271</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации иностранного государства) в ДВВ</name_kz>
+      <display_no>3316 263</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации иностранного государства) в ДВВ</name_ru>
+      <no_>3316263</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации иностранного государства) в СКВ</name_kz>
+      <display_no>3316 262</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации иностранного государства) в СКВ</name_ru>
+      <no_>3316262</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации иностранного государства) в тенге</name_kz>
+      <display_no>3316 261</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации иностранного государства) в тенге</name_ru>
+      <no_>3316261</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-нерезиденты) в ДВВ</name_kz>
+      <display_no>3316 253</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-нерезиденты) в ДВВ</name_ru>
+      <no_>3316253</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  Национальному Банку Республики Казахстан, в ДВВ</name_kz>
+      <display_no>3303 133</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  Национальному Банку Республики Казахстан, в ДВВ</name_ru>
+      <no_>3303133</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  Национальному Банку Республики Казахстан, в СКВ</name_kz>
+      <display_no>3303 132</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  Национальному Банку Республики Казахстан, в СКВ</name_ru>
+      <no_>3303132</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  Национальному Банку Республики Казахстан, в тенге</name_kz>
+      <display_no>3303 131</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  Национальному Банку Республики Казахстан, в тенге</name_ru>
+      <no_>3303131</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-резидентам, обслуживающим домашние хозяйства, в СКВ</name_kz>
+      <display_no>3305 182</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-резидентам, обслуживающим домашние хозяйства, в СКВ</name_ru>
+      <no_>3305182</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-резидентам, обслуживающим домашние хозяйства, в ДВВ</name_kz>
+      <display_no>3305 183</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-резидентам, обслуживающим домашние хозяйства, в ДВВ</name_ru>
+      <no_>3305183</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  государственным нефинансовым организациям иностранного государства, в СКВ</name_kz>
+      <display_no>3305 262</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  государственным нефинансовым организациям иностранного государства, в СКВ</name_ru>
+      <no_>3305262</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-резидентам, обслуживающим домашние хозяйства, в тенге</name_kz>
+      <display_no>3305 181</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным некоммерческим организациям-резидентам, обслуживающим домашние хозяйства, в тенге</name_ru>
+      <no_>3305181</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  государственным нефинансовым организациям иностранного государства, в тенге</name_kz>
+      <display_no>3305 261</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  государственным нефинансовым организациям иностранного государства, в тенге</name_ru>
+      <no_>3305261</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-резидентам, в ДВВ</name_kz>
+      <display_no>3305 153</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-резидентам, в ДВВ</name_ru>
+      <no_>3305153</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам, в тенге</name_kz>
+      <display_no>3305 161</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам, в тенге</name_ru>
+      <no_>3305161</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным негосударственным нефинансовым организациям иностранного государства, в ДВВ</name_kz>
+      <display_no>3305 273</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным негосударственным нефинансовым организациям иностранного государства, в ДВВ</name_ru>
+      <no_>3305273</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-нерезиденты) в ДВВ</name_kz>
+      <display_no>3316 293</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-нерезиденты) в ДВВ</name_ru>
+      <no_>3316293</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-резидентам, в СКВ</name_kz>
+      <display_no>3305 152</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-резидентам, в СКВ</name_ru>
+      <no_>3305152</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-резидентам, в тенге</name_kz>
+      <display_no>3305 151</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-резидентам, в тенге</name_ru>
+      <no_>3305151</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам, в тенге</name_kz>
+      <display_no>3305 251</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам, в тенге</name_ru>
+      <no_>3305251</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-нерезиденты, обслуживающие домашние хозяйства) в ДВВ</name_kz>
+      <display_no>3316 283</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-нерезиденты, обслуживающие домашние хозяйства) в ДВВ</name_ru>
+      <no_>3316283</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-нерезиденты, обслуживающие домашние хозяйства) в СКВ</name_kz>
+      <display_no>3316 282</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (некоммерческие организации-нерезиденты, обслуживающие домашние хозяйства) в СКВ</name_ru>
+      <no_>3316282</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-нерезиденты) в СКВ</name_kz>
+      <display_no>3316 292</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-нерезиденты) в СКВ</name_ru>
+      <no_>3316292</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-нерезиденты) в тенге</name_kz>
+      <display_no>3316 291</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (домашние хозяйства-нерезиденты) в тенге</name_ru>
+      <no_>3316291</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (некоммерческие организации-нерезиденты,  обслуживающие домашние хозяйства) в ДВВ</name_kz>
+      <display_no>3315 283</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (некоммерческие организации-нерезиденты,  обслуживающие домашние хозяйства) в ДВВ</name_ru>
+      <no_>3315283</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (некоммерческие организации-нерезиденты,  обслуживающие домашние хозяйства) в СКВ</name_kz>
+      <display_no>3315 282</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (некоммерческие организации-нерезиденты,  обслуживающие домашние хозяйства) в СКВ</name_ru>
+      <no_>3315282</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (домашние хозяйства-нерезиденты) в СКВ</name_kz>
+      <display_no>3315 292</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (домашние хозяйства-нерезиденты) в СКВ</name_ru>
+      <no_>3315292</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (домашние хозяйства-нерезиденты) в тенге</name_kz>
+      <display_no>3315 291</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (домашние хозяйства-нерезиденты) в тенге</name_ru>
+      <no_>3315291</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (домашние хозяйства-нерезиденты) в ДВВ</name_kz>
+      <display_no>3315 293</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (домашние хозяйства-нерезиденты) в ДВВ</name_ru>
+      <no_>3315293</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство Республики Казахстан) в тенге</name_kz>
+      <display_no>3316 111</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (Правительство Республики Казахстан) в тенге</name_ru>
+      <no_>3316111</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций в ДВВ</name_kz>
+      <display_no>3304 253</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3304</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным организациям-нерезидентам, осуществляющим отдельные виды банковских операций в ДВВ</name_ru>
+      <no_>3304253</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  местными исполнительными органами Республики Казахстан, в ДВВ</name_kz>
+      <display_no>3305 123</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  местными исполнительными органами Республики Казахстан, в ДВВ</name_ru>
+      <no_>3305123</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (банки-резиденты) в ДВВ</name_kz>
+      <display_no>3315 143</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (банки-резиденты) в ДВВ</name_ru>
+      <no_>3315143</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам, в СКВ</name_kz>
+      <display_no>3305 252</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам, в СКВ</name_ru>
+      <no_>3305252</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам, в ДВВ</name_kz>
+      <display_no>3305 253</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным финансовым организациям-нерезидентам, в ДВВ</name_ru>
+      <no_>3305253</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-нерезиденты) в тенге</name_kz>
+      <display_no>3316 251</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-нерезиденты) в тенге</name_ru>
+      <no_>3316251</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-нерезиденты) в СКВ</name_kz>
+      <display_no>3316 252</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-нерезиденты) в СКВ</name_ru>
+      <no_>3316252</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам</name_kz>
+      <display_no>3316</display_no>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам</name_ru>
+      <no_>3316</no_>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-резиденты) в СКВ</name_kz>
+      <display_no>3316 152</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-резиденты) в СКВ</name_ru>
+      <no_>3316152</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-резиденты) в тенге</name_kz>
+      <display_no>3316 151</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-резиденты) в тенге</name_ru>
+      <no_>3316151</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами</name_kz>
+      <display_no>3307</display_no>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами</name_ru>
+      <no_>3307</no_>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям</name_kz>
+      <display_no>3315</display_no>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям</name_ru>
+      <no_>3315</no_>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации-резиденты) в СКВ</name_kz>
+      <display_no>3316 172</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации-резиденты) в СКВ</name_ru>
+      <no_>3316172</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации-резиденты) в тенге</name_kz>
+      <display_no>3316 161</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации-резиденты) в тенге</name_ru>
+      <no_>3316161</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации-резиденты) в СКВ</name_kz>
+      <display_no>3316 162</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации-резиденты) в СКВ</name_ru>
+      <no_>3316162</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации-резиденты) в ДВВ</name_kz>
+      <display_no>3316 163</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (государственные нефинансовые организации-резиденты) в ДВВ</name_ru>
+      <no_>3316163</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации-резиденты) в тенге</name_kz>
+      <display_no>3316 171</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (негосударственные нефинансовые организации-резиденты) в тенге</name_ru>
+      <no_>3316171</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-резиденты) в ДВВ</name_kz>
+      <display_no>3316 153</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3316</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по условным обязательствам (финансовые организации-резиденты) в ДВВ</name_ru>
+      <no_>3316153</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (местные исполнительные органы Республики Казахстан) в СКВ</name_kz>
+      <display_no>3315 122</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (местные исполнительные органы Республики Казахстан) в СКВ</name_ru>
+      <no_>3315122</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (местные исполнительные органы Республики Казахстан) в ДВВ</name_kz>
+      <display_no>3315 123</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (местные исполнительные органы Республики Казахстан) в ДВВ</name_ru>
+      <no_>3315123</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (местные исполнительные органы Республики Казахстан) в тенге</name_kz>
+      <display_no>3315 121</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (местные исполнительные органы Республики Казахстан) в тенге</name_ru>
+      <no_>3315121</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>2</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (Правительство Республики Казахстан) в ДВВ</name_kz>
+      <display_no>3315 113</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (Правительство Республики Казахстан) в ДВВ</name_ru>
+      <no_>3315113</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (Правительство Республики Казахстан) в СКВ</name_kz>
+      <display_no>3315 112</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (Правительство Республики Казахстан) в СКВ</name_ru>
+      <no_>3315112</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (Правительство Республики Казахстан) в тенге</name_kz>
+      <display_no>3315 111</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (Правительство Республики Казахстан) в тенге</name_ru>
+      <no_>3315111</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>1</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с домашними хозяйствами-нерезидентами</name_kz>
+      <display_no>3307 293</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с домашними хозяйствами-нерезидентами</name_ru>
+      <no_>3307293</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с домашними хозяйствами-нерезидентами</name_kz>
+      <display_no>3307 292</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с домашними хозяйствами-нерезидентами</name_ru>
+      <no_>3307292</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с домашними хозяйствами-нерезидентами</name_kz>
+      <display_no>3307 291</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с домашними хозяйствами-нерезидентами</name_ru>
+      <no_>3307291</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с некоммерческими организациями-нерезидентами, обслуживающими домашние хозяйства</name_kz>
+      <display_no>3307 283</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с некоммерческими организациями-нерезидентами, обслуживающими домашние хозяйства</name_ru>
+      <no_>3307283</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным негосударственным нефинансовым организациям-резидентам, в СКВ</name_kz>
+      <display_no>3305 172</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным негосударственным нефинансовым организациям-резидентам, в СКВ</name_ru>
+      <no_>3305172</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным негосударственным нефинансовым организациям-резидентам, в ДВВ</name_kz>
+      <display_no>3305 173</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным негосударственным нефинансовым организациям-резидентам, в ДВВ</name_ru>
+      <no_>3305173</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам, в ДВВ</name_kz>
+      <display_no>3305 163</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным государственным нефинансовым организациям-резидентам, в ДВВ</name_ru>
+      <no_>3305163</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>6</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  негосударственным нефинансовым организациям-резидентам, в тенге</name_kz>
+      <display_no>3305 171</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3305</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным  негосударственным нефинансовым организациям-резидентам, в тенге</name_ru>
+      <no_>3305171</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с некоммерческими организациями-нерезидентами, обслуживающими домашние хозяйства</name_kz>
+      <display_no>3307 282</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с некоммерческими организациями-нерезидентами, обслуживающими домашние хозяйства</name_ru>
+      <no_>3307282</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с негосударственными нефинансовыми организациями иностранного государства</name_kz>
+      <display_no>3307 272</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с негосударственными нефинансовыми организациями иностранного государства</name_ru>
+      <no_>3307272</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с негосударственными нефинансовыми организациями иностранного государства</name_kz>
+      <display_no>3307 273</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с негосударственными нефинансовыми организациями иностранного государства</name_ru>
+      <no_>3307273</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с некоммерческими организациями-резидентами, обслуживающими домашние хозяйства</name_kz>
+      <display_no>3307 183</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с некоммерческими организациями-резидентами, обслуживающими домашние хозяйства</name_ru>
+      <no_>3307183</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с некоммерческими организациями-резидентами, обслуживающими домашние хозяйства</name_kz>
+      <display_no>3307 181</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с некоммерческими организациями-резидентами, обслуживающими домашние хозяйства</name_ru>
+      <no_>3307181</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с негосударственными нефинансовыми организациями-резидентами</name_kz>
+      <display_no>3307 173</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с негосударственными нефинансовыми организациями-резидентами</name_ru>
+      <no_>3307173</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с негосударственными нефинансовыми организациями-резидентами</name_kz>
+      <display_no>3307 172</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с негосударственными нефинансовыми организациями-резидентами</name_ru>
+      <no_>3307172</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>7</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (банки-резиденты) в СКВ</name_kz>
+      <display_no>3315 142</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (банки-резиденты) в СКВ</name_ru>
+      <no_>3315142</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки по выданным гарантиям (банки-резиденты) в тенге</name_kz>
+      <display_no>3315 141</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3315</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки по выданным гарантиям (банки-резиденты) в тенге</name_ru>
+      <no_>3315141</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-резидентам, в тенге</name_kz>
+      <display_no>3303 141</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-резидентам, в тенге</name_ru>
+      <no_>3303141</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с иностранными центральными банками</name_kz>
+      <display_no>3307 231</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с иностранными центральными банками</name_ru>
+      <no_>3307231</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с домашними хозяйствами-резидентами</name_kz>
+      <display_no>3307 193</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с домашними хозяйствами-резидентами</name_ru>
+      <no_>3307193</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с домашними хозяйствами-резидентами</name_kz>
+      <display_no>3307 192</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с домашними хозяйствами-резидентами</name_ru>
+      <no_>3307192</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-резидентам, в СКВ</name_kz>
+      <display_no>3303 142</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3303</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) по займам и финансовому лизингу, предоставленным банкам-резидентам, в СКВ</name_ru>
+      <no_>3303142</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с домашними хозяйствами-резидентами</name_kz>
+      <display_no>3307 191</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с домашними хозяйствами-резидентами</name_ru>
+      <no_>3307191</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>9</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с финансовыми организациями-нерезидентами</name_kz>
+      <display_no>3307 251</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с финансовыми организациями-нерезидентами</name_ru>
+      <no_>3307251</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с банками-нерезидентами</name_kz>
+      <display_no>3307 243</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с банками-нерезидентами</name_ru>
+      <no_>3307243</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с банками-нерезидентами</name_kz>
+      <display_no>3307 242</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с банками-нерезидентами</name_ru>
+      <no_>3307242</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с некоммерческими организациями-резидентами, обслуживающими домашние хозяйства</name_kz>
+      <display_no>3307 182</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с некоммерческими организациями-резидентами, обслуживающими домашние хозяйства</name_ru>
+      <no_>3307182</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с иностранными центральными банками</name_kz>
+      <display_no>3307 232</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с иностранными центральными банками</name_ru>
+      <no_>3307232</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с банками-нерезидентами</name_kz>
+      <display_no>3307 241</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с банками-нерезидентами</name_ru>
+      <no_>3307241</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>4</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с иностранными центральными банками</name_kz>
+      <display_no>3307 233</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с иностранными центральными банками</name_ru>
+      <no_>3307233</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>3</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с финансовыми организациями-нерезидентами</name_kz>
+      <display_no>3307 252</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в СКВ с финансовыми организациями-нерезидентами</name_ru>
+      <no_>3307252</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с некоммерческими организациями-нерезидентами, обслуживающими домашние хозяйства</name_kz>
+      <display_no>3307 281</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в тенге с некоммерческими организациями-нерезидентами, обслуживающими домашние хозяйства</name_ru>
+      <no_>3307281</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>8</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с финансовыми организациями-нерезидентами</name_kz>
+      <display_no>3307 253</display_no>
+      <fifth_sign>2</fifth_sign>
+      <first_fourth_signs>3307</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Счет корректировки резервов (провизий) на покрытие убытков по операциям «обратное РЕПО» с ценными бумагами в ДВВ с финансовыми организациями-нерезидентами</name_ru>
+      <no_>3307253</no_>
+      <seventh_sign>3</seventh_sign>
+      <sixth_sign>5</sixth_sign>
+    </ref_balance_account>
+  </entities>
+</batch>

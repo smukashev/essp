@@ -12,21 +12,11 @@
     <properties>
         <spring.batch.version>2.1.8.RELEASE</spring.batch.version>
         <com.google.gson.version>2.2.2</com.google.gson.version>
-        <couchbase.client.version>1.1.4</couchbase.client.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
 
     <repositories>
-        <repository>
-            <id>couchbase</id>
-            <name>Couchbase Maven Repository</name>
-            <layout>default</layout>
-            <url>http://files.couchbase.com/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
         <repository>
             <id>java.net</id>
             <url>http://download.java.net/maven/2</url>
@@ -67,11 +57,6 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${com.google.gson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>couchbase</groupId>
-            <artifactId>couchbase-client</artifactId>
-            <version>${couchbase.client.version}</version>
         </dependency>
         <dependency>
             <groupId>kz.bsbnb.usci.eav</groupId>

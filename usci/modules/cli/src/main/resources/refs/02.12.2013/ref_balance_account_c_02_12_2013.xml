@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Долги, списанные в убыток</name_kz>
+      <display_no>7130</display_no>
+      <first_fourth_signs>7130</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Долги, списанные в убыток</name_ru>
+      <no_>7130</no_>
+    </ref_balance_account>
+  </entities>
+</batch>

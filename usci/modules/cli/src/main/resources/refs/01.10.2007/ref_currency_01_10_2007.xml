@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_currency>
+      <code>000</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>По иностранным валютам стран,имеющих суверенный рейтинг не ниже &lt;&lt;A&gt;&gt;</name_ru>
+      <short_name>A</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>000</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>По иностранным валютам стран,имеющих суверенный рейтинг  ниже &lt;&lt;A&gt;&gt;</name_ru>
+      <short_name>B</short_name>
+    </ref_currency>
+  </entities>
+</batch>

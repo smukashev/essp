@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_creditor>
+      <name>Национальный Банк Республики Казахстан</name>
+      <short_name>НБРК</short_name>
+      <docs>
+        <item>
+          <no>NBRKKZKX</no>
+          <doc_type>
+            <name_ru>Банковский идентификационный код </name_ru>
+            <name_kz>Банковский идентификационный код </name_kz>
+            <is_identification>0</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>30</weight>
+            <code>15</code>
+          </doc_type>
+        </item>
+      </docs>
+      <subject_type>
+        <kind_id>31</kind_id>
+        <name_kz>Банк первого уровня</name_kz>
+        <name_ru>Банк первого уровня</name_ru>
+        <code>0009</code>
+      </subject_type>
+    </ref_creditor>
+  </entities>
+</batch>

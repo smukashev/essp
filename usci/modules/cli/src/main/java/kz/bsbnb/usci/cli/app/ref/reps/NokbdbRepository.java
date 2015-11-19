@@ -17,24 +17,28 @@ import java.util.HashSet;
  * To change this template use File | Settings | File Templates.
  */
 public class NokbdbRepository extends BaseRepository{
-    private static HashMap repository;
+    /*private static HashMap repository;
     private static HashSet columns;
     private static String QUERY = "SELECT * FROM ref.CREDITOR_NOKBDB";
-    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDITOR_NOKBDB'";
+    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDITOR_NOKBDB'";*/
 
-    public static HashMap getRepository() {
-        if(repository ==null)
-            repository = construct();
-        return repository;
+    public NokbdbRepository() {
+        QUERY_ALL = "SELECT * FROM ref.CREDITOR_NOKBDB";
+        QUERY_OPEN = "SELECT * FROM ref.CREDITOR_NOKBDB";
+        QUERY_CLOSE = "SELECT * FROM ref.nokbdb where close_date = to_date('repDate', 'dd.MM.yyyy') and is_last = 1";
+        COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='CREDITOR_NOKBDB'";
     }
 
-    public static HashMap construct(){
+
+
+    @Override
+    public HashMap construct(String query){
         try {
-            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
+            HashSet hs = getColumns();
+            ResultSet rows = getStatement().executeQuery(query.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             while(rows.next()){
-                HashSet hs = getColumns();
                 HashMap tmp = new HashMap();
                 //System.out.println(rows.getString("NAME_RU"));
                 for(Object s: hs){
@@ -52,28 +56,11 @@ public class NokbdbRepository extends BaseRepository{
         return null;
     }
 
-    public static Nokbdb getById(String id){
+    public Nokbdb getById(String id){
         return (Nokbdb) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return columns = hs;
-            }
-            return columns;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

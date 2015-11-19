@@ -15,24 +15,26 @@ import java.util.HashSet;
  * Created by Bauyrzhan.Makhambeto on 13/06/2015.
  */
 public class DRTRepository extends BaseRepository {
-    private static HashMap repository;
+    /*private static HashMap repository;
     private static HashSet columns;
     //private static String QUERY = "SELECT * FROM ref.ba_ct t" + " where t.open_date <= to_date('repDate', 'dd.MM.yyyy') \n"+
     //         "   and (t.close_date > to_date('repDate', 'dd.MM.yyyy') or t.close_date is null)";
 
     private static String QUERY = "select * from ref.shared where type_ = 'debt_remains_type'";
 
-    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BA_CT'";
+    private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BA_CT'";*/
 
-    public static HashMap getRepository() {
-        if(repository ==null)
-            repository = construct();
-        return repository;
+    public DRTRepository() {
+        QUERY_ALL = "select * from ref.shared where type_ = 'debt_remains_type'";
+        QUERY_OPEN = "select * from ref.shared where type_ = 'debt_remains_type'";
+        QUERY_CLOSE = "select * from ref.shared where type_ = 'debt_remains_type' where 1 = 2";
+        COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BA_CT'";
     }
 
-    public static HashMap construct(){
+    @Override
+    public HashMap construct(String query){
         try {
-            ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
+            ResultSet rows = getStatement().executeQuery(query.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
             int i = 0;
@@ -54,15 +56,15 @@ public class DRTRepository extends BaseRepository {
         return null;
     }
 
-    public static BACT getById(String id){
+    public BACT getById(String id){
         return (BACT) getRepository().get(id);
     }
 
-    public static HashSet getColumns() {
+    public HashSet getColumns() {
         return null;
     }
 
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }

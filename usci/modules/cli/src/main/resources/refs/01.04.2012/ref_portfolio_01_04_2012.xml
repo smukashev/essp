@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_portfolio>
+      <code>0798</code>
+      <name_kz>Карточки КСБУ</name_kz>
+      <name_ru>Карточки КСБУ</name_ru>
+    </ref_portfolio>
+  </entities>
+</batch>

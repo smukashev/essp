@@ -21,18 +21,18 @@ public class DebtorTypeRepository extends BaseRepository{
     private static String QUERY = "SELECT * FROM ref.debtor_type";
     private static String COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='DEBTOR_TYPE'";
 
-    public static HashMap getRepository() {
-        if(repository ==null)
+    public HashMap getRepository() {
+        if(repository==null)
             repository = construct();
         return repository;
     }
 
-    public static HashMap construct(){
+    public HashMap construct(){
         try {
+            HashSet hs = getColumns();
             ResultSet rows = getStatement().executeQuery(QUERY.replaceAll("repDate",repDate));
 
             HashMap hm = new HashMap();
-            HashSet hs = getColumns();
 
             while(rows.next()){
                 HashMap tmp = new HashMap();
@@ -53,7 +53,7 @@ public class DebtorTypeRepository extends BaseRepository{
         return null;
     }
 
-    public static DebtorType getByCode(String code){
+    public DebtorType getByCode(String code){
         for(Object v : getRepository().values()){
             if( ( (DebtorType) v ).get("CODE").equals(code) )
                 return (DebtorType) v;
@@ -61,24 +61,7 @@ public class DebtorTypeRepository extends BaseRepository{
     return null;
     }
 
-    public static HashSet getColumns() {
-        try {
-            if(columns ==null){
-                ResultSet rows = getStatement().executeQuery(COLUMNS_QUERY);
-                HashSet hs = new HashSet();
-                while(rows.next()){
-                    hs.add(rows.getString("column_name"));
-                }
-                return columns = hs;
-            }
-            return columns;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void rc(){
+    public void rc(){
         repository = null;
     }
 }
