@@ -1,23 +1,22 @@
 package com.bsbnb.usci.portlets.protocol.data;
 
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Link;
-import kz.bsbnb.usci.core.service.*;
+import kz.bsbnb.usci.core.service.InputFileBeanRemoteBusiness;
+import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
+import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
+import kz.bsbnb.usci.core.service.ProtocolBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
-import java.util.List;
-import java.util.Map;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  *
@@ -79,7 +78,7 @@ public class BeanDataProvider implements DataProvider {
 
         for (Protocol protocol : protocols) {
             ProtocolDisplayBean pr = new ProtocolDisplayBean(protocol);
-            if (protocol.getMessageType().getNameRu().equals("COMPLETED"))
+            if (protocol.getMessageType().getCode().equals("COMPLETED"))
                 pr.setLink(new Link("Просмотр",
                         new ExternalResource(ENTITY_EDITOR_PAGE + "?entityId=" +
                         protocol.getNote() + "&repDate=" + sRepDate)));
