@@ -1,0 +1,859 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Уральск</name>
+      <short_name>Филиал в г. Уральск</short_name>
+      <docs>
+        <item>
+          <no>130241018358</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>27</code>
+        <name_kz>Батыс Қазақстан облысы</name_kz>
+        <name_ru>Западно-Казахстанская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Кокшетау</name>
+      <short_name>Филиал в г. Кокшетау</short_name>
+      <docs>
+        <item>
+          <no>130241005524</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>11</code>
+        <name_kz>Ақмола облысы</name_kz>
+        <name_ru>Акмолинская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Петропавловск</name>
+      <short_name>Филиал в г. Петропавловск</short_name>
+      <docs>
+        <item>
+          <no>130241010580</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>59</code>
+        <name_kz>Солтүстік Қазақстан облысы</name_kz>
+        <name_ru>Северо-Казахстанская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Усть-Каменогорск</name>
+      <short_name>Филиал в г. Усть-Каменогорск</short_name>
+      <docs>
+        <item>
+          <no>130941025178</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>63</code>
+        <name_kz>Шығыс Қазақстан облысы</name_kz>
+        <name_ru>Восточно-Казахстанская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Павлодар</name>
+      <short_name>Филиал в г. Павлодар</short_name>
+      <docs>
+        <item>
+          <no>130141022838</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>55</code>
+        <name_kz>Павлодар облысы</name_kz>
+        <name_ru>Павлодарская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Актау</name>
+      <short_name>Филиал в г. Актау</short_name>
+      <docs>
+        <item>
+          <no>130241008073</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>47</code>
+        <name_kz>Маңғыстау облысы</name_kz>
+        <name_ru>Мангистауская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Жезказган</name>
+      <short_name>Филиал в г. Жезказган</short_name>
+      <docs>
+        <item>
+          <no>131041002842</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>35</code>
+        <name_kz>Қарағанды облысы</name_kz>
+        <name_ru>Карагандинская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Кызылорда</name>
+      <short_name>Филиал в г. Кызылорда</short_name>
+      <docs>
+        <item>
+          <no>130941001894</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>43</code>
+        <name_kz>Қызылорда облысы</name_kz>
+        <name_ru>Кызылординская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Караганды</name>
+      <short_name>Филиал в г. Караганды</short_name>
+      <docs>
+        <item>
+          <no>130941013134</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>35</code>
+        <name_kz>Қарағанды облысы</name_kz>
+        <name_ru>Карагандинская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Актобе</name>
+      <short_name>Филиал в г. Актобе</short_name>
+      <docs>
+        <item>
+          <no>130841021131</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>15</code>
+        <name_kz>Ақтөбе облысы</name_kz>
+        <name_ru>Актюбинская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Талдыкорган</name>
+      <short_name>Филиал в г. Талдыкорган</short_name>
+      <docs>
+        <item>
+          <no>130741006223</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>19</code>
+        <name_kz>Алматы облысы</name_kz>
+        <name_ru>Алматинская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Семей</name>
+      <short_name>Филиал в г. Семей</short_name>
+      <docs>
+        <item>
+          <no>130741002845</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>63</code>
+        <name_kz>Шығыс Қазақстан облысы</name_kz>
+        <name_ru>Восточно-Казахстанская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Костанай</name>
+      <short_name>Филиал в г. Костанай</short_name>
+      <docs>
+        <item>
+          <no>130541006543</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>39</code>
+        <name_kz>Қостанай облысы</name_kz>
+        <name_ru>Костанайская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+    <ref_creditor_branch>
+      <name>Филиал ДБ АО «Хоум Кредит энд  Финанс Банк» в г. Атырау</name>
+      <short_name>Филиал в г. Атырау</short_name>
+      <docs>
+        <item>
+          <no>130541004379</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+      </docs>
+      <main_office>
+        <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
+        <short_name>ДБ АО "Хоум Кредит энд Финанс Банк"</short_name>
+        <code>886</code>
+        <docs>
+          <item>
+            <no>930540000147</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>INLMKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </main_office>
+      <region>
+        <code>23</code>
+        <name_kz>Атырау облысы</name_kz>
+        <name_ru>Атырауская область</name_ru>
+      </region>
+    </ref_creditor_branch>
+  </entities>
+</batch>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_legal_form>
+      <code>60</code>
+      <name_kz>Иные организационно-правовые формы некоммерческой организации</name_kz>
+      <name_ru>Иные организационно-правовые формы некоммерческой организации</name_ru>
+    </ref_legal_form>
+  </entities>
+</batch>

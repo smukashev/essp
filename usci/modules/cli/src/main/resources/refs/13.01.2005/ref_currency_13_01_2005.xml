@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_currency>
+      <code>971</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Афгани</name_ru>
+      <short_name>AFN</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>654</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Фунт Святой Елены</name_ru>
+      <short_name>SHP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>960</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>СДР</name_ru>
+      <short_name>XDR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>969</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Ариари</name_ru>
+      <short_name>MGA</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>222</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Сальвадорский колон</name_ru>
+      <short_name>SVC</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>970</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Единица реальной стоимости</name_ru>
+      <short_name>COU</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>643</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Российский рубль</name_ru>
+      <rating>B+</rating>
+      <short_name>RUB</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>136</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Доллар Островов Кайман</name_ru>
+      <short_name>KYD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>891</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Сербский динар</name_ru>
+      <short_name>CSD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>174</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Франк Комор</name_ru>
+      <short_name>KMF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>238</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Фунт Фолклендских островов</name_ru>
+      <short_name>FKP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>498</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Молдавский лей</name_ru>
+      <short_name>MDL</short_name>
+    </ref_currency>
+  </entities>
+</batch>

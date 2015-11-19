@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_balance_account>
+      <name_kz>Долги, списанные на внесистемный учет</name_kz>
+      <display_no>8923</display_no>
+      <name_ru>Долги, списанные на внесистемный учет</name_ru>
+      <no_>8923</no_>
+    </ref_balance_account>
+  </entities>
+</batch>

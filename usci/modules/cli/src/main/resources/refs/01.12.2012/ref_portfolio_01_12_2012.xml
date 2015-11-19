@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_portfolio>
+      <code>0758</code>
+      <name_kz>17.Корпоративный</name_kz>
+      <name_ru>17.Корпоративный</name_ru>
+    </ref_portfolio>
+  </entities>
+</batch>

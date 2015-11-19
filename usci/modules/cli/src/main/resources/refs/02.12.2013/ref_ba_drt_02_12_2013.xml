@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_ba_drt>
+      <balance_account>
+        <no_>8923</no_>
+      </balance_account>
+      <debt_remains_type>
+        <code>3</code>
+      </debt_remains_type>
+    </ref_ba_drt>
+    <ref_ba_drt>
+      <balance_account>
+        <no_>8923</no_>
+      </balance_account>
+      <debt_remains_type>
+        <code>6</code>
+      </debt_remains_type>
+    </ref_ba_drt>
+  </entities>
+</batch>

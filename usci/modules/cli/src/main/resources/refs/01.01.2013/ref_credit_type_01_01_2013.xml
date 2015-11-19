@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_credit_type>
+      <code>26</code>
+      <kind_id>15</kind_id>
+      <name_kz>Возможные обязательства по векселям</name_kz>
+      <name_ru>Возможные обязательства по векселям</name_ru>
+    </ref_credit_type>
+  </entities>
+</batch>

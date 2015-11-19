@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_portfolio>
+      <code>0778</code>
+      <name_kz>Кредитный портфель HWK18+ (24+)</name_kz>
+      <name_ru>Кредитный портфель HWK18+ (24+)</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0777</code>
+      <name_kz>Кредитный портфель HWK18+ (19-24)</name_kz>
+      <name_ru>Кредитный портфель HWK18+ (19-24)</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0776</code>
+      <name_kz>Кредитный портфель HWK12-18</name_kz>
+      <name_ru>Кредитный портфель HWK12-18</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0796</code>
+      <name_kz>Кредитный портфель SUD 24+</name_kz>
+      <name_ru>Кредитный портфель SUD 24+</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0771</code>
+      <name_kz>Кредитный портфель HUK</name_kz>
+      <name_ru>Кредитный портфель HUK</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0794</code>
+      <name_kz>Кредитный портфель SUD 12-18</name_kz>
+      <name_ru>Кредитный портфель SUD 12-18</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0795</code>
+      <name_kz>Кредитный портфель SUD 19-24</name_kz>
+      <name_ru>Кредитный портфель SUD 19-24</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0792</code>
+      <name_kz>Кредитный портфель HWD18+(19-24)</name_kz>
+      <name_ru>Кредитный портфель HWD18+(19-24)</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0774</code>
+      <name_kz>Кредитный портфель HUD24+</name_kz>
+      <name_ru>Кредитный портфель HUD24+</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0793</code>
+      <name_kz>Кредитный портфель HWD18+(24+)</name_kz>
+      <name_ru>Кредитный портфель HWD18+(24+)</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0775</code>
+      <name_kz>Кредитный портфель HWK</name_kz>
+      <name_ru>Кредитный портфель HWK</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0790</code>
+      <name_kz>Кредитный портфель SUK 24+</name_kz>
+      <name_ru>Кредитный портфель SUK 24+</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0772</code>
+      <name_kz>Кредитный портфель HUD12-24(&lt;18)</name_kz>
+      <name_ru>Кредитный портфель HUD12-24(&lt;18)</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0791</code>
+      <name_kz>Кредитный портфель HWD12-18</name_kz>
+      <name_ru>Кредитный портфель HWD12-18</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0773</code>
+      <name_kz>Кредитный портфель HUD12-24(&gt;18)</name_kz>
+      <name_ru>Кредитный портфель HUD12-24(&gt;18)</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0787</code>
+      <name_kz>Кредитный портфель SUK 10-12</name_kz>
+      <name_ru>Кредитный портфель SUK 10-12</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0789</code>
+      <name_kz>Кредитный портфель SUK 19-24</name_kz>
+      <name_ru>Кредитный портфель SUK 19-24</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0788</code>
+      <name_kz>Кредитный портфель SUK 12-18</name_kz>
+      <name_ru>Кредитный портфель SUK 12-18</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0768</code>
+      <name_kz>27.РЕФ залоговых займов</name_kz>
+      <name_ru>27.РЕФ залоговых займов</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0767</code>
+      <name_kz>26.РЕФ беззалоговых займов</name_kz>
+      <name_ru>26.РЕФ беззалоговых займов</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0770</code>
+      <name_kz>19.РЕФ залоговых займов</name_kz>
+      <name_ru>19.РЕФ залоговых займов</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0769</code>
+      <name_kz>18.РЕФ беззалоговых займов</name_kz>
+      <name_ru>18.РЕФ беззалоговых займов</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0779</code>
+      <name_kz>Кредитный портфель HXK+HYK</name_kz>
+      <name_ru>Кредитный портфель HXK+HYK</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0780</code>
+      <name_kz>Кредитный портфель HXK+HYK 12-18</name_kz>
+      <name_ru>Кредитный портфель HXK+HYK 12-18</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0781</code>
+      <name_kz>Кредитный портфель HXK+HYK 19-24</name_kz>
+      <name_ru>Кредитный портфель HXK+HYK 19-24</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0782</code>
+      <name_kz>Кредитный портфель HXK+HYK 24+</name_kz>
+      <name_ru>Кредитный портфель HXK+HYK 24+</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0783</code>
+      <name_kz>Кредитный портфель RU</name_kz>
+      <name_ru>Кредитный портфель RU</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0784</code>
+      <name_kz>Кредитный портфель RX</name_kz>
+      <name_ru>Кредитный портфель RX</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0785</code>
+      <name_kz>Кредитный портфель SUK 3-6</name_kz>
+      <name_ru>Кредитный портфель SUK 3-6</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0786</code>
+      <name_kz>Кредитный портфель SUK 7-9</name_kz>
+      <name_ru>Кредитный портфель SUK 7-9</name_ru>
+    </ref_portfolio>
+  </entities>
+</batch>

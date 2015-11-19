@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в тенге</name_kz>
+      <display_no>1428 101</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>1428</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в тенге</name_ru>
+      <no_>1428101</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в СКВ</name_kz>
+      <display_no>1428 102</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>1428</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным клиентам в СКВ</name_ru>
+      <no_>1428102</no_>
+      <seventh_sign>2</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций, в тенге</name_kz>
+      <display_no>1329 101</display_no>
+      <fifth_sign>1</fifth_sign>
+      <first_fourth_signs>1329</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Резервы (провизии) по займам и финансовому лизингу, предоставленным организациям-резидентам, осуществляющим отдельные виды банковских операций, в тенге</name_ru>
+      <no_>1329101</no_>
+      <seventh_sign>1</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+  </entities>
+</batch>

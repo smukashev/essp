@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_balance_account>
+      <name_kz>Просроченная задолженность по займам в тенге, предоставленным финансовым организациям-нерезидентам</name_kz>
+      <display_no>1424 251</display_no>
+      <name_ru>Просроченная задолженность по займам в тенге, предоставленным финансовым организациям-нерезидентам</name_ru>
+      <no_>1424251</no_>
+    </ref_balance_account>
+  </entities>
+</batch>

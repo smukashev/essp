@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Дисконт по займам, предоставленным клиентам</name_kz>
+      <display_no>1434</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1434</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Дисконт по займам, предоставленным клиентам</name_ru>
+      <no_>1434000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Премия по займам, предоставленным клиентам</name_kz>
+      <display_no>1435</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1435</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Премия по займам, предоставленным клиентам</name_ru>
+      <no_>1435000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Дисконт по учтенным векселям</name_kz>
+      <display_no>1432</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1432</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Дисконт по учтенным векселям</name_ru>
+      <no_>1432000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Премия по учтенным векселям</name_kz>
+      <display_no>1433</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1433</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Премия по учтенным векселям</name_ru>
+      <no_>1433000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет положительной корректировки стоимости займа, предоставленного клиентам</name_kz>
+      <display_no>1430</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1430</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Счет положительной корректировки стоимости займа, предоставленного клиентам</name_ru>
+      <no_>1430000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет отрицательной корректировки стоимости займа, предоставленного клиентам</name_kz>
+      <display_no>1431</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1431</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Счет отрицательной корректировки стоимости займа, предоставленного клиентам</name_ru>
+      <no_>1431000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Премия по займам, предоставленным другим банкам</name_kz>
+      <display_no>1313</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1313</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Премия по займам, предоставленным другим банкам</name_ru>
+      <no_>1313000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Премия по займам, предоставленным организациям, осуществляющим отдельные виды банковских операций</name_kz>
+      <display_no>1331</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1331</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Премия по займам, предоставленным организациям, осуществляющим отдельные виды банковских операций</name_ru>
+      <no_>1331000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Дисконт по займам, предоставленным организациям, осуществляющим отдельные виды банковских операций</name_kz>
+      <display_no>1330</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1330</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Дисконт по займам, предоставленным организациям, осуществляющим отдельные виды банковских операций</name_ru>
+      <no_>1330000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет положительной корректировки стоимости займа, предоставленного другим банкам</name_kz>
+      <display_no>1310</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1310</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Счет положительной корректировки стоимости займа, предоставленного другим банкам</name_ru>
+      <no_>1310000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет положительной корректировки стоимости займа, предоставленного организациям, осуществляющим отдельные виды банковских операций</name_kz>
+      <display_no>1324</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1324</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Счет положительной корректировки стоимости займа, предоставленного организациям, осуществляющим отдельные виды банковских операций</name_ru>
+      <no_>1324000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет отрицательной корректировки стоимости займа, предоставленного другим банкам</name_kz>
+      <display_no>1311</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1311</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Счет отрицательной корректировки стоимости займа, предоставленного другим банкам</name_ru>
+      <no_>1311000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Счет отрицательной корректировки стоимости займа, предоставленного организациям, осуществляющим отдельные виды банковских операций</name_kz>
+      <display_no>1325</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1325</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Счет отрицательной корректировки стоимости займа, предоставленного организациям, осуществляющим отдельные виды банковских операций</name_ru>
+      <no_>1325000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Дисконт по займам, предоставленным другим банкам</name_kz>
+      <display_no>1312</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>1312</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Дисконт по займам, предоставленным другим банкам</name_ru>
+      <no_>1312000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+  </entities>
+</batch>

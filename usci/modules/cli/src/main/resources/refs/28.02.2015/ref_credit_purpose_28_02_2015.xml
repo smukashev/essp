@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_credit_purpose>
+      <code>10</code>
+      <name_kz>рефинансирование жилищного займа</name_kz>
+      <name_ru>рефинансирование жилищного займа</name_ru>
+    </ref_credit_purpose>
+    <ref_credit_purpose>
+      <code>11</code>
+      <name_kz>внесение первоначального взноса для получения ИЖЗ в банках и ОООВБО</name_kz>
+      <name_ru>внесение первоначального взноса для получения ИЖЗ в банках и ОООВБО</name_ru>
+    </ref_credit_purpose>
+  </entities>
+</batch>

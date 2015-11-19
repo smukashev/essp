@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_portfolio>
+      <code>0755</code>
+      <name_kz>Горнодобывающая промышленность</name_kz>
+      <name_ru>Горнодобывающая промышленность</name_ru>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0756</code>
+      <name_kz>Обрабатывающая промышленность</name_kz>
+      <name_ru>Обрабатывающая промышленность</name_ru>
+    </ref_portfolio>
+  </entities>
+</batch>

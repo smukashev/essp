@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_legal_form>
+      <code>15</code>
+      <name_kz>Государственные товарищества с ограниченной ответственностью</name_kz>
+      <name_ru>Государственные товарищества с ограниченной ответственностью</name_ru>
+      <short_name_kz>ЖШС</short_name_kz>
+      <short_name_ru>ТОО</short_name_ru>
+    </ref_legal_form>
+  </entities>
+</batch>

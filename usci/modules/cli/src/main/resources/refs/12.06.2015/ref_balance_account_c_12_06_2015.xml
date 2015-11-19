@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Резервы (провизии) на покрытие убытков по выданным гарантиям</name_kz>
+      <display_no>8917</display_no>
+      <first_fourth_signs>8917</first_fourth_signs>
+      <is_in_balance>1</is_in_balance>
+      <name_ru>Резервы (провизии) на покрытие убытков по выданным гарантиям</name_ru>
+      <no_>8917</no_>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Сумма основного долга по операциям финансирования торговой деятельности</name_kz>
+      <display_no>8911</display_no>
+      <first_fourth_signs>8911</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Сумма основного долга по операциям финансирования торговой деятельности</name_ru>
+      <no_>8911</no_>
+    </ref_balance_account>
+    <ref_balance_account operation="CLOSE">
+      <name_kz>Сумма наценки по операциям финансирования торговой деятельности</name_kz>
+      <display_no>8912</display_no>
+      <first_fourth_signs>8912</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Сумма наценки по операциям финансирования торговой деятельности</name_ru>
+      <no_>8912</no_>
+    </ref_balance_account>
+  </entities>
+</batch>

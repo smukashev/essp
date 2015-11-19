@@ -1,0 +1,972 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_currency>
+      <code>224</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Бангладешские таки</name_ru>
+      <short_name>BDT</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>435</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Парагвайские гуарани</name_ru>
+      <short_name>PYG</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>533</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Китайские ренминби (юани)</name_ru>
+      <short_name>CNY</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>052</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Кувейтские динары</name_ru>
+      <short_name>KWD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>043</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Молдавский лей</name_ru>
+      <short_name>MDL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>400</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Ангольские кванзы</name_ru>
+      <short_name>AON</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>037</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Таджикский рубль</name_ru>
+      <short_name>TJR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>999</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Валюта МВФ</name_ru>
+      <short_name>XDR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>057</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Ливанские фунты</name_ru>
+      <short_name>LBP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>056</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Пакистанские рупии</name_ru>
+      <short_name>PKR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>042</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Азербайджанский манат</name_ru>
+      <short_name>AZM</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>044</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Армянский драм</name_ru>
+      <short_name>AMD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>351</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Тунисские динары</name_ru>
+      <short_name>TND</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>358</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Малазийские ринггиты</name_ru>
+      <short_name>MYR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>363</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Кенийские шиллинги</name_ru>
+      <short_name>KES</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>377</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Джибутийские франки</name_ru>
+      <short_name>DJF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>307</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Шри-Ланка рупии</name_ru>
+      <short_name>LKR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>331</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Ганские седи</name_ru>
+      <short_name>GHC</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>422</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Белизские доллары</name_ru>
+      <short_name>BZD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>424</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Доминиканские песо</name_ru>
+      <short_name>DOP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>403</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Гвинея-Бисау песо</name_ru>
+      <short_name>GWP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>425</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Эквадорские сукре</name_ru>
+      <short_name>ECS</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>426</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Гватемальские кетcали</name_ru>
+      <short_name>GTQ</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>427</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Гайанские доллары</name_ru>
+      <short_name>GYD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>381</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Фолклендские фунты</name_ru>
+      <short_name>FKP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>049</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Грузинский лари</name_ru>
+      <short_name>GEK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>486</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Лилангени Свазиленда</name_ru>
+      <short_name>SZL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>384</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Сомалийские шиллинги</name_ru>
+      <short_name>SOS</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>737</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Югославские динары</name_ru>
+      <short_name>YUN</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>423</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Костариканские колоны</name_ru>
+      <short_name>CRC</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>393</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Перуанские соли</name_ru>
+      <short_name>PEN</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>493</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Израильские шекели</name_ru>
+      <short_name>ILS</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>414</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Бахрейнские динары</name_ru>
+      <short_name>BHD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>402</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Гамбийские даласи</name_ru>
+      <short_name>GMD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>022</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Канадские доллары</name_ru>
+      <short_name>CAD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>058</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Российские рубли</name_ru>
+      <short_name>RUR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>491</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Патака (Макао)</name_ru>
+      <short_name>MOP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>429</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Гаитянские гурды</name_ru>
+      <short_name>HTG</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>477</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Барбадосские доллары</name_ru>
+      <short_name>BBD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>489</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Нгултрумы (рупии Бутана)</name_ru>
+      <short_name>BTN</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>343</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Мексиканские песо</name_ru>
+      <short_name>MXN</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>019</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Люксенбургские франки</name_ru>
+      <short_name>LUF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>023</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Иракские динары</name_ru>
+      <short_name>IQD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>214</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Турецкие лиры</name_ru>
+      <short_name>TRL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>365</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Гонконгские доллары</name_ru>
+      <short_name>HKD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>053</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Латвийские латы</name_ru>
+      <short_name>LVL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>024</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Японские йены</name_ru>
+      <short_name>JPY</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>440</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Мавританские угвии</name_ru>
+      <short_name>MRO</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>248</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Непальские рупии</name_ru>
+      <short_name>NPR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>405</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Малагасийские франки</name_ru>
+      <short_name>MGF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>419</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Мальдивские руфии</name_ru>
+      <short_name>MVR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>413</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Сейшельские рупии</name_ru>
+      <short_name>SCR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>415</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Оманские риалы</name_ru>
+      <short_name>OMR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>411</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Сан-Томе и Принсипи добры</name_ru>
+      <short_name>STD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>274</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Кипрские фунты</name_ru>
+      <short_name>CYP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>412</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Гвинейские франки</name_ru>
+      <short_name>GNF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>033</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Украинские гривны</name_ru>
+      <short_name>UAN</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>409</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Заирские заиры</name_ru>
+      <short_name>ZRN</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>410</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Зимбабвейские доллары</name_ru>
+      <short_name>ZWD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>404</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Либерийские доллары</name_ru>
+      <short_name>LRD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>406</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Нигерийские найры</name_ru>
+      <short_name>NGN</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>421</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Восточнокарибские доллары</name_ru>
+      <short_name>XCD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>061</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Исландские кроны</name_ru>
+      <short_name>ISK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>420</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Острова Фиджи доллары</name_ru>
+      <short_name>FJD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>378</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Панамские бальбоа</name_ru>
+      <short_name>PAB</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>490</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Паанги (Тонганские доллары)</name_ru>
+      <short_name>TOP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>304</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>КФА франки</name_ru>
+      <short_name>XAF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>017</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Норвежские кроны</name_ru>
+      <short_name>NOK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>416</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Филиппинские песо</name_ru>
+      <short_name>PHP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>007</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Шведские кроны</name_ru>
+      <short_name>SEK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>353</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Таиландские баты</name_ru>
+      <short_name>THB</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>216</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Финляндские марки</name_ru>
+      <short_name>FIM</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>051</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Испанские песеты</name_ru>
+      <short_name>ESP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>041</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Австралийские доллары</name_ru>
+      <short_name>AUD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>045</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Европейская валютная единица</name_ru>
+      <short_name>ECU</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>040</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Белгийские франки</name_ru>
+      <short_name>BEF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>027</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Австрийские шиллинги</name_ru>
+      <short_name>ATS</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>005</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Голландские гульдены</name_ru>
+      <short_name>NLG</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>009</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Французские франки</name_ru>
+      <short_name>FRF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>006</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Швейцарские франки</name_ru>
+      <short_name>CHF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>003</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Английские фунты стерлингов</name_ru>
+      <short_name>GBP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>035</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Казахстанские тенге</name_ru>
+      <short_name>KZT</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>001</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Доллары США</name_ru>
+      <short_name>USD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>229</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Йеменские риалы</name_ru>
+      <short_name>YER</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>583</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Албанские леки</name_ru>
+      <short_name>ALL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>541</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Польские злотые</name_ru>
+      <short_name>PLZ</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>531</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Вьетнамские донги</name_ru>
+      <short_name>VND</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>525</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Монгольские тугрики</name_ru>
+      <short_name>MNT</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>519</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Румынские леи</name_ru>
+      <short_name>ROL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>401</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Бурундийские франки</name_ru>
+      <short_name>BIF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>488</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Лоти (Лесото)</name_ru>
+      <short_name>LSL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>492</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Тала (доллары Западного Самоа)</name_ru>
+      <short_name>WST</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>213</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Греческие драхмы</name_ru>
+      <short_name>GRD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>281</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Португальские эскудо</name_ru>
+      <short_name>PTE</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>436</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Сальвадорские колоны</name_ru>
+      <short_name>SVC</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>054</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Литовские литы</name_ru>
+      <short_name>LTL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>434</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Никарагуанские кордобы</name_ru>
+      <short_name>NIO</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>055</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Эстонские кроны</name_ru>
+      <short_name>EEK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>433</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Антильские гульдены</name_ru>
+      <short_name>ANG</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>039</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Кыргизские сомы</name_ru>
+      <short_name>KGS</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>008</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Итальянские лиры</name_ru>
+      <short_name>ITL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>018</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Датские кроны</name_ru>
+      <short_name>DKK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>510</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Чешские кроны</name_ru>
+      <short_name>CZK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>487</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Малавийские квачи</name_ru>
+      <short_name>MWK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>484</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Катарские риалы</name_ru>
+      <short_name>QAR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>529</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Болгарские левы</name_ru>
+      <short_name>BGL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>504</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Венгерские форинты</name_ru>
+      <short_name>HUF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>476</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Багамские доллары</name_ru>
+      <short_name>BSD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>355</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Новозеландские доллары</name_ru>
+      <rating>AA+</rating>
+      <short_name>NZD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>481</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Дирхамы ОАЭ</name_ru>
+      <short_name>AED</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>062</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Сингапурские доллары</name_ru>
+      <short_name>SGD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>478</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Брунейские доллары</name_ru>
+      <short_name>BND</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>573</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Кубинские песо</name_ru>
+      <short_name>CUP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>593</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Лаотянские кипы (лаоские)</name_ru>
+      <short_name>LAK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>454</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Эфиопские быры</name_ru>
+      <short_name>ETB</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>479</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Вату Республики Вануату</name_ru>
+      <short_name>VUV</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>437</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Суринамские гульдены</name_ru>
+      <short_name>SRG</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>450</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Угандийские шиллинги</name_ru>
+      <short_name>UGS</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>483</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Соломоновых островов доллары</name_ru>
+      <short_name>SBD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>485</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Коморские франки</name_ru>
+      <short_name>KMF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>480</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Воны Южной Кореи (корейские)</name_ru>
+      <short_name>KRW</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>482</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Каймановых островов доллары</name_ru>
+      <short_name>KYD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>239</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Египетские фунты</name_ru>
+      <short_name>EGP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>048</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Немецкие марки</name_ru>
+      <short_name>DEM</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>034</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Белорусский рубль</name_ru>
+      <short_name>BXB</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>245</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Индийские рупии</name_ru>
+      <short_name>INR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>242</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Бразильские реалы</name_ru>
+      <short_name>BRL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>201</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Суданские динары</name_ru>
+      <short_name>SDD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>219</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Ирландские фунты</name_ru>
+      <short_name>IEP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>221</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Саудовские риалы</name_ru>
+      <short_name>SAR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>228</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Аргентинское песо</name_ru>
+      <short_name>ARS</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>244</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Иранские реалы</name_ru>
+      <short_name>IRR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>200</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Иорданские динары</name_ru>
+      <short_name>JOD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>252</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Афганские афгани</name_ru>
+      <short_name>AFA</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>253</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Кина Папуа - Hовая Гвинея</name_ru>
+      <short_name>PGK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>260</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Индонезийские рупии</name_ru>
+      <short_name>IDR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>261</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Ботсванские пулы</name_ru>
+      <short_name>BWP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>269</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Южноафриканские рэнды</name_ru>
+      <short_name>ZAR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>430</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Гондурасские лемпиры</name_ru>
+      <short_name>HNL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>364</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Леоне Сьерра-Леоне</name_ru>
+      <short_name>SLL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>361</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Мальтийские лиры</name_ru>
+      <short_name>MTL</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>359</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Бермудские доллары</name_ru>
+      <short_name>BMD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>357</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Марокканские дирхамы</name_ru>
+      <short_name>MAD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>347</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Сирийские фунты</name_ru>
+      <short_name>SYP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>391</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Венесуэльские боливары</name_ru>
+      <short_name>VEB</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>392</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Замбийские квачи</name_ru>
+      <short_name>ZMK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>382</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Маврикийские рупии</name_ru>
+      <short_name>MUR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>383</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Колумбийские песо</name_ru>
+      <short_name>COP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>373</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Мозамбикские метикалы</name_ru>
+      <short_name>MZM</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>380</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Танзанийские шиллинги</name_ru>
+      <short_name>TZS</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>287</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Тайваньские доллары</name_ru>
+      <short_name>TWD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>279</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Гибралтарские фунты</name_ru>
+      <short_name>GIP</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>036</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Узбекские сумы</name_ru>
+      <short_name>UZS</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>511</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Словацкая крона</name_ru>
+      <short_name>SKK</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>002</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Евро</name_ru>
+      <short_name>EUR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>038</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Туркменские манаты</name_ru>
+      <short_name>TMM</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>303</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Алжирские динары</name_ru>
+      <short_name>DZD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>308</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Ливийские динары</name_ru>
+      <short_name>LYD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>321</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Руандийские франки</name_ru>
+      <short_name>RWF</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>333</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Уругвайские песо</name_ru>
+      <short_name>UYU</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>296</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Чилийские песо</name_ru>
+      <short_name>CLP</short_name>
+    </ref_currency>
+  </entities>
+</batch>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>23</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>22</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>13</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>12</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>11</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>01</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>03</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>02</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>24</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>16</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>07</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>17</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>08</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>14</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>09</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>15</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>10</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>20</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>21</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>04</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>18</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>05</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>19</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct operation="CLOSE">
+      <balance_account>
+        <no_>7130</no_>
+      </balance_account>
+      <credit_type>
+        <code>06</code>
+      </credit_type>
+    </ref_ba_ct>
+  </entities>
+</batch>

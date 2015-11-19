@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_currency operation="CLOSE">
+      <code>954</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Европейская валютная единица</name_ru>
+      <short_name>XEU</short_name>
+    </ref_currency>
+  </entities>
+</batch>
