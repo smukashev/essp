@@ -23,12 +23,10 @@ entity read  usci/modules/cli/src/main/resources/refs/01.01.2012/ref_credit_purp
 entity read  usci/modules/cli/src/main/resources/refs/28.02.2015/ref_credit_purpose_28_02_2015.xml 28.02.2015
 entity read  usci/modules/cli/src/main/resources/refs/01.01.2012/ref_credit_type_01_01_2012.xml 01.01.2012
 entity read  usci/modules/cli/src/main/resources/refs/01.01.2013/ref_credit_type_01_01_2013.xml 01.01.2013
-entity read  usci/modules/cli/src/main/resources/refs/01.02.2012/ref_region_01_02_2012.xml 01.02.2012
-entity read  usci/modules/cli/src/main/resources/refs/01.09.2010/ref_creditor_01_09_2010.xml 01.09.2010
+entity read  usci/modules/cli/src/main/resources/refs/01.01.2012/ref_region_01_01_2012.xml 01.01.2012
 entity read  usci/modules/cli/src/main/resources/refs/01.01.2012/ref_creditor_01_01_2012.xml 01.01.2012
 entity read  usci/modules/cli/src/main/resources/refs/16.01.2013/ref_creditor_16_01_2013.xml 16.01.2013
 entity read  usci/modules/cli/src/main/resources/refs/19.05.2014/ref_creditor_19_05_2014.xml 19.05.2014
-entity read  usci/modules/cli/src/main/resources/refs/01.01.2012/ref_creditor_c_01_01_2012.xml 01.01.2012
 entity read  usci/modules/cli/src/main/resources/refs/01.01.2012/ref_creditor_branch_01_01_2012.xml 01.01.2012
 entity read  usci/modules/cli/src/main/resources/refs/25.04.2012/ref_creditor_branch_25_04_2012.xml 25.04.2012
 entity read  usci/modules/cli/src/main/resources/refs/03.05.2012/ref_creditor_branch_03_05_2012.xml 03.05.2012

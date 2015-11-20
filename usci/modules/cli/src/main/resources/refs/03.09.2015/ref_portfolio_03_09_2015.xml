@@ -6,9 +6,8 @@
       <name_kz>test</name_kz>
       <name_ru>test</name_ru>
       <creditor>
-        <name>234</name>
-        <short_name>234</short_name>
-        <code>234</code>
+        <name>Тестовая организация</name>
+        <short_name>Тестовая организация</short_name>
         <docs>
           <item>
             <no>sdfsdfasdfsadf</no>
@@ -37,9 +36,10 @@
         </docs>
         <subject_type>
           <kind_id>31</kind_id>
-          <name_kz>Микрокредитная организация</name_kz>
-          <name_ru>Микрокредитная организация</name_ru>
-          <code>0004</code>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
         </subject_type>
       </creditor>
     </ref_portfolio>
