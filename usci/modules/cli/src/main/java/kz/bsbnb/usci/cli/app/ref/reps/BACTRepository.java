@@ -37,7 +37,7 @@ public class BACTRepository extends BaseRepository {
         QUERY_OPEN = "SELECT * FROM ref.ba_ct t where t.open_date = to_date('repDate', 'dd.MM.yyyy') " +
                 " and (t.close_date > to_date('repDate','dd.MM.yyyy') or t.close_date is null)" +
                 " and exists(select 1 from ref.balance_account where id = t.balance_account_id)";
-        QUERY_CLOSE = "SELECT * FROM ref.ba_ct where close_date = to_date('repDate', 'dd.MM.yyyy')";
+        QUERY_CLOSE = "SELECT * FROM ref.ba_ct where close_date = to_date('repDate', 'dd.MM.yyyy') and open_date < close_date";
         COLUMNS_QUERY = "SELECT * FROM all_tab_cols WHERE owner = 'REF' AND TABLE_NAME='BA_CT'";
 
         balanceAccountCrawler = new BalanceAccountCrawler();
