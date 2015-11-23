@@ -307,6 +307,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         IBaseEntity baseEntityApplied = new BaseEntity(baseEntityLoaded, baseEntitySaving.getReportDate());
 
+        if (baseEntitySaving.equals(baseEntityLoaded))
+            return baseEntityLoaded;
+
         // Устанавливает ID для !metaClass.isSearchable()
         if (baseEntitySaving.getId() < 1 && baseEntityLoaded.getId() > 0)
             baseEntitySaving.setId(baseEntityLoaded.getId());
@@ -948,7 +951,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseEntity baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
 
             // case#4
-            if (baseValueSaving.equalsByValue(baseValueLoaded) || !metaClass.isSearchable()) {
+            if (baseEntitySaving.getId() == baseEntityLoaded.getId() || !metaClass.isSearchable()) {
                 IBaseEntity baseEntityApplied;
 
                 if (metaAttribute.isImmutable()) {
