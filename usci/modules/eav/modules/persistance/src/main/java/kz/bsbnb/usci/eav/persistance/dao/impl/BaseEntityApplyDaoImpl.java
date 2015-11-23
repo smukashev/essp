@@ -40,53 +40,53 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     private boolean isReferenceCacheEnabled;
 
     @Override
-    public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager,
-                             EntityHolder entityHolder) {
-        IBaseEntity baseEntityLoaded = null;
+    public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded,
+                             IBaseEntityManager baseEntityManager, EntityHolder entityHolder) {
         IBaseEntity baseEntityApplied;
 
         // Новые сущности или сущности не имеющие ключевые атрибуты
         if (baseEntitySaving.getId() < 1 || !baseEntitySaving.getMeta().isSearchable()) {
             baseEntityApplied = applyBaseEntityBasic(creditorId, baseEntitySaving, baseEntityManager);
         } else {
-            Date reportDateSaving = baseEntitySaving.getReportDate();
+            if (baseEntityLoaded == null) {
+                Date reportDateSaving = baseEntitySaving.getReportDate();
 
-            IBaseEntityReportDateDao baseEntityReportDateDao =
-                    persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+                IBaseEntityReportDateDao baseEntityReportDateDao =
+                        persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
-            // Получение максимальной отчетной даты из прошедших периодов
-            Date maxReportDate = baseEntityReportDateDao
-                    .getMaxReportDate(baseEntitySaving.getId(), reportDateSaving);
+                // Получение максимальной отчетной даты из прошедших периодов
+                Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(baseEntitySaving.getId(), reportDateSaving);
 
-            if (maxReportDate == null) {
-                // Получение минимальной отчетной даты из будущих периодов
-                Date minReportDate = baseEntityReportDateDao.getMinReportDate(baseEntitySaving.getId(),
-                        reportDateSaving);
+                if (maxReportDate == null) {
+                    // Получение минимальной отчетной даты из будущих периодов
+                    Date minReportDate = baseEntityReportDateDao.getMinReportDate(baseEntitySaving.getId(),
+                            reportDateSaving);
 
-                if (minReportDate == null)
-                    throw new UnsupportedOperationException("Найденный объект (" + baseEntitySaving.getId()
-                            + ") не имеет отчетный даты;");
+                    if (minReportDate == null)
+                        throw new UnsupportedOperationException("Найденный объект (" + baseEntitySaving.getId()
+                                + ") не имеет отчетный даты;");
 
-                baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), minReportDate, reportDateSaving);
+                    baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), minReportDate,
+                                reportDateSaving);
 
-                if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
-                    throw new UnsupportedOperationException("Запись с ID(" + baseEntityLoaded.getId() +
-                            ") является закрытой с даты " + baseEntityLoaded.getBaseEntityReportDate().getReportDate()
-                            + ". Обновление после закрытия сущностей не является возможным;");
+                    if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
+                        throw new UnsupportedOperationException("Запись с ID(" + baseEntityLoaded.getId() +
+                                ") является закрытой с даты " + baseEntityLoaded.getBaseEntityReportDate().getReportDate()
+                                + ". Обновление после закрытия сущностей не является возможным;");
 
-                baseEntityApplied = applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded,
-                        baseEntityManager);
-            } else {
-                baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), maxReportDate, reportDateSaving);
+                } else {
+                    baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), maxReportDate, reportDateSaving);
 
-                if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
-                    throw new UnsupportedOperationException("Запись с ID(" + baseEntityLoaded.getId() +
-                            ") является закрытой с даты " + baseEntityLoaded.getBaseEntityReportDate().getReportDate()
-                            + ". Обновление после закрытия сущностей не является возможным;");
+                    if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
+                        throw new UnsupportedOperationException("Запись с ID(" + baseEntityLoaded.getId() +
+                                ") является закрытой с даты " + baseEntityLoaded.getBaseEntityReportDate().getReportDate()
+                                + ". Обновление после закрытия сущностей не является возможным;");
 
-                baseEntityApplied = applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded,
-                        baseEntityManager);
+                }
             }
+
+            baseEntityApplied = applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded,
+                    baseEntityManager);
         }
 
         if (entityHolder != null) {
@@ -157,7 +157,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         throw new KnownException("Запись класса " + childBaseEntity.getMeta().
                                 getClassName() + " не найдена;" + "\n" + childBaseEntity.toString());
 
-                    IBaseEntity childBaseEntityApplied = apply(creditorId, childBaseEntity, baseEntityManager, null);
+                    IBaseEntity childBaseEntityApplied = apply(creditorId, childBaseEntity, null,
+                            baseEntityManager, null);
 
                     IBaseValue childBaseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_SET,
@@ -222,7 +223,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
                 } else {
                     IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
-                    IBaseEntity childBaseEntityApplied = apply(creditorId, childBaseEntity, baseEntityManager, null);
+                    IBaseEntity childBaseEntityApplied = apply(creditorId, childBaseEntity, null,
+                            baseEntityManager, null);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -963,7 +965,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseEntitySaving.getReportDate());
                 } else {
                     baseEntityApplied = metaClass.isSearchable() ?
-                            apply(creditorId, baseEntitySaving, baseEntityManager, null) :
+                            apply(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager, null) :
                             applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
                 }
 
@@ -1001,7 +1003,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
                 } else {
-                    baseEntityApplied = apply(creditorId, baseEntitySaving, baseEntityManager, null);
+                    baseEntityApplied = apply(creditorId, baseEntitySaving, null, baseEntityManager, null);
                 }
 
                 Date reportDateSaving = baseValueSaving.getRepDate();
@@ -1127,7 +1129,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     baseEntitySaving.getReportDate());
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
-                                    apply(creditorId, baseEntitySaving, baseEntityManager, null) :
+                                    apply(creditorId, baseEntitySaving, null, baseEntityManager, null) :
                                     applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityClosed,
                                             baseEntityManager);
                         }
@@ -1154,7 +1156,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     baseEntitySaving.getReportDate());
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
-                                    apply(creditorId, baseEntitySaving, baseEntityManager, null) :
+                                    apply(creditorId, baseEntitySaving, baseEntityClosed, baseEntityManager, null) :
                                     applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityClosed,
                                             baseEntityManager);
                         }
@@ -1176,7 +1178,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseValueNext.setMetaAttribute(metaAttribute);
 
                         IBaseEntity baseEntityApplied = metaClass.isSearchable() ?
-                                apply(creditorId, baseEntitySaving, baseEntityManager, null) :
+                                apply(creditorId, baseEntitySaving, (IBaseEntity)
+                                        baseValueNext.getValue(), baseEntityManager, null) :
                                 applyBaseEntityAdvanced(creditorId, baseEntitySaving, (IBaseEntity)
                                         baseValueNext.getValue(), baseEntityManager);
 
@@ -1187,7 +1190,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseEntityManager.registerAsUpdated(baseValueNext);
 
                     } else {
-                        IBaseEntity baseEntityApplied = apply(creditorId, baseEntitySaving, baseEntityManager, null);
+                        IBaseEntity baseEntityApplied = apply(creditorId, baseEntitySaving, null, baseEntityManager, null);
 
                         IBaseValue baseValueApplied = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -1218,7 +1221,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 } else {
                     IBaseValue previousBaseValue = valueDao.getPreviousBaseValue(baseValueSaving);
 
-                    baseEntityApplied = apply(creditorId, baseEntitySaving, baseEntityManager, null);
+                    baseEntityApplied = apply(creditorId, baseEntitySaving, null, baseEntityManager, null);
 
                     if (previousBaseValue != null && previousBaseValue.isLast()) {
                         IBaseValue baseValueApplied = BaseValueFactory.create(
@@ -2214,7 +2217,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         0,
                         creditorId,
                         childBaseValueSaving.getRepDate(),
-                        apply(creditorId, childBaseEntitySaving, baseEntityManager, null),
+                        apply(creditorId, childBaseEntitySaving, null, baseEntityManager, null),
                         false,
                         true);
 

@@ -235,8 +235,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         throw new KnownException("Запись была найдена в базе(" +
                                 baseEntityPostPrepared.getId() + "). Вставка не произведена;");
 
-                    baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, baseEntityManager,
-                            entityHolder);
+                    baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
+                            baseEntityManager, entityHolder);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
 
@@ -253,8 +253,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         throw new KnownException("Запись не была найдена в базе. " +
                                 "Обновление не выполнено;");
 
-                    baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, baseEntityManager,
-                            entityHolder);
+                    baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
+                            baseEntityManager, entityHolder);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
 
@@ -271,8 +271,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             + baseEntityPostPrepared.getOperation() + ";");
             }
         } else {
-            baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, baseEntityManager,
-                    entityHolder);
+            baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
+                    baseEntityManager, entityHolder);
 
             baseEntityApplyDao.applyToDb(baseEntityManager);
 
