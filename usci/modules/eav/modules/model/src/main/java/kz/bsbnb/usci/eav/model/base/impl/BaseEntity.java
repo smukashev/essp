@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -477,68 +478,96 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return false;
     }
 
+    /* Проверяет на соответсвие атрибутов */
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) {
+        if (obj == this)
             return true;
-        }
 
-        if (obj == null) {
+        if (obj == null)
             return false;
-        }
 
-        if (!(getClass() == obj.getClass())) {
+        if (!(getClass() == obj.getClass()))
             return false;
-        }
 
         BaseEntity that = (BaseEntity) obj;
-
-        if (meta.isSearchable()) {
-            if (this.getId() > 0 && that.getId() > 0 && this.getId() == that.getId()) {
-                return true;
-            }
-            return false;
-        }
 
         int thisValueCount = this.getValueCount();
         int thatValueCount = that.getValueCount();
 
-        if (thisValueCount != thatValueCount) {
+        if (thisValueCount != thatValueCount)
             return false;
-        }
 
-        for (String attribute : values.keySet()) {
-            Object thisObject = null;
-            if (this.safeGetValue(attribute) != null) {
-                thisObject = this.safeGetValue(attribute).getValue();
-            }
+        if (meta.isReference())
+            return this.getId() == that.getId();
 
-            Object thatObject = null;
-            if (that.safeGetValue(attribute) != null) {
-                thatObject = that.safeGetValue(attribute).getValue();
-            }
+        for (String attributeName : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeName);
+            IMetaType metaType = metaAttribute.getMetaType();
 
-            if (thisObject == null && thatObject == null) {
+            IBaseValue thisBaseValue = this.getBaseValue(attributeName);
+            IBaseValue thatBaseValue = that.getBaseValue(attributeName);
+
+            if (thisBaseValue == null && thatBaseValue == null)
                 continue;
-            }
 
-            if (thisObject == null || thatObject == null) {
+            if (thisBaseValue == null || thatBaseValue == null)
                 return false;
-            }
 
-            IMetaType metaType = this.getMemberType(attribute);
-            if (!metaType.isSet() && !metaType.isComplex()) {
-                MetaValue metaValue = (MetaValue) metaType;
-                if (metaValue.getTypeCode().equals(DataTypes.DATE)) {
-                    if (DataUtils.compareBeginningOfTheDay((Date) thisObject, (Date) thatObject) != 0) {
-                        return false;
+            if (metaType.isSet()) {
+                IBaseSet thisBaseSet = (BaseSet) thisBaseValue.getValue();
+                IBaseSet thatBaseSet = (BaseSet) thatBaseValue.getValue();
+
+                if (thisBaseSet == null && thatBaseSet == null)
+                    continue;
+
+                if (thisBaseSet == null || thatBaseSet == null)
+                    return false;
+
+                if (thisBaseSet.get().size() != thatBaseSet.get().size())
+                    return false;
+
+                for (IBaseValue thisChildBaseValue : thisBaseSet.get()) {
+                    Object thisChildValue = thisChildBaseValue.getValue();
+
+                    boolean childValueFound = false;
+
+                    for (IBaseValue thatChildBaseValue : thatBaseSet.get()) {
+                        Object thatChildValue = thatChildBaseValue.getValue();
+
+                        if (metaType.isComplex() && metaAttribute.isImmutable()) {
+                            if (!(((IBaseEntity) thisChildValue).getId() == ((IBaseEntity) thatChildValue).getId()))
+                                return false;
+
+                            continue;
+                        }
+
+                        if (thisChildValue.equals(thatChildValue))
+                            childValueFound = true;
                     }
+
+                    if (!childValueFound)
+                        return false;
+                }
+            } else {
+                Object thisValue = thisBaseValue.getValue();
+                Object thatValue = thatBaseValue.getValue();
+
+                if (thisValue == null && thatValue == null)
+                    continue;
+
+                if (thisValue == null || thatValue == null)
+                    return false;
+
+                if (metaType.isComplex() && metaAttribute.isImmutable()) {
+                    if (!(((IBaseEntity) thisValue).getId() == ((IBaseEntity) thatValue).getId()))
+                        return false;
+
+                    continue;
                 }
 
-            }
-
-            if (!thisObject.equals(thatObject)) {
-                return false;
+                if (!thisValue.equals(thatValue))
+                    return false;
             }
         }
 

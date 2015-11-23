@@ -76,15 +76,15 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
             logger.debug(update.toString());
             int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-            if (count > 1) {
-                throw new IllegalStateException("DELETE operation should update only one record. ID: " +
-                        baseEntity.getId());
-            }
-            if (count < 1) {
-                logger.warn("DELETE operation should update a record. ID: " + baseEntity.getId());
-            }
-        } else
+
+            if (count > 1)
+                throw new IllegalStateException("Попытка удалений более 1 записи (ID: " + baseEntity.getId() + ");");
+
+            if (count < 1)
+                throw new IllegalStateException("Удаление не произошло (ID: " + baseEntity.getId() + ");");
+        } else {
             delete(persistable.getId());
+        }
     }
 
     protected void delete(long id) {
@@ -95,12 +95,12 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
         logger.debug(delete.toString());
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-        if (count > 1) {
-            throw new RuntimeException("DELETE operation should be delete only one record. ID: " + id);
-        }
-        if (count < 1) {
-            logger.warn("DELETE operation should delete a record. ID: " + id);
-        }
+
+        if (count > 1)
+            throw new IllegalStateException("Попытка удалений более 1 записи (ID: " + id + ");");
+
+        if (count < 1)
+            throw new IllegalStateException("Удаление не произошло (ID: " + id + ");");
     }
 
     @Override
@@ -122,11 +122,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Override
     public IBaseEntity load(long id, Date reportDate, Date savingReportDate) {
         if (id < 1)
-            throw new IllegalArgumentException("Does not have id. Can't load.");
+            throw new IllegalArgumentException("Запись должна иметь идентификатор;");
 
         if (reportDate == null)
-            throw new IllegalArgumentException("To load instance of BaseEntity must always " +
-                    "be specified report date.");
+            throw new IllegalArgumentException("Запись должна иметь отчётную дату;");
 
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
@@ -174,23 +173,16 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() > 1) {
-            throw new IllegalArgumentException("More then one instance of BaseEntity found.");
-        }
+        if (rows.size() > 1)
+            throw new IllegalArgumentException("Найдено более одной записи (ID: " + baseEntityId + ";");
 
-        if (rows.size() < 1) {
-            throw new IllegalStateException("Instance of BaseEntity was not found.");
-        }
+        if (rows.size() < 1)
+            throw new IllegalStateException("Запись не была найдена (ID: " + baseEntityId + ");");
 
         Map<String, Object> row = rows.get(0);
-        if (row != null) {
-            long classId = ((BigDecimal) row.get(EAV_BE_ENTITIES.as(tableAlias).CLASS_ID.getName())).longValue();
-            return metaClassRepository.getMetaClass(classId);
 
-        } else {
-            logger.error("Can't load instance of BaseEntity, empty data set.");
-        }
-        return null;
+        long classId = ((BigDecimal) row.get(EAV_BE_ENTITIES.as(tableAlias).CLASS_ID.getName())).longValue();
+        return metaClassRepository.getMetaClass(classId);
     }
 
     @Override
@@ -204,20 +196,19 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                 .select(DSL.val(1L).as("ex_flag"))
                 .from("dual")
                 .where(DSL.exists(context.select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
-                    .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                    .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
-                    .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.notEqual(exceptContainingId))
-                    )
+                                .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
+                                .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
+                                .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.notEqual(exceptContainingId))
+                        )
                 ).or(DSL.exists(context.select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
-                    .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias)
-                        .join(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias)).on(
-                        EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).SET_ID
-                            .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).SET_ID)
-                            )
-                    ).where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.
-                                        equal(baseEntityId))
-                    .and(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).ENTITY_ID.
-                            notEqual(exceptContainingId))));
+                        .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias)
+                                .join(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias)).on(
+                                        EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).SET_ID
+                                                .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).SET_ID))
+                        ).where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.
+                                equal(baseEntityId))
+                        .and(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).ENTITY_ID.
+                                notEqual(exceptContainingId))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -232,16 +223,16 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
         //TODO: refactor, remove dual, make selectOne()
         Select select = context
-            .select(DSL.val(1L).as("ex_flag"))
-            .from("dual")
-            .where(DSL.exists(context
-                .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
-                .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))))
-            .or(DSL.exists(context
-                .select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
-                .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias))
-                .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))));
+                .select(DSL.val(1L).as("ex_flag"))
+                .from("dual")
+                .where(DSL.exists(context
+                        .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
+                        .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
+                        .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))))
+                .or(DSL.exists(context
+                        .select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
+                        .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias))
+                        .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
