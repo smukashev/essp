@@ -33,7 +33,7 @@ public class MainPortlet extends MVCPortlet {
     public void connectToServices() {
         try {
             RmiProxyFactoryBean batchEntryServiceFactoryBean = new RmiProxyFactoryBean();
-            batchEntryServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+            batchEntryServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                     + ":1099/batchEntryService");
             batchEntryServiceFactoryBean.setServiceInterface(IBatchEntryService.class);
             batchEntryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -42,7 +42,7 @@ public class MainPortlet extends MVCPortlet {
             batchEntryService = (IBatchEntryService) batchEntryServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-            batchProcessServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+            batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                     + ":1097/batchProcessService");
             batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
             batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);

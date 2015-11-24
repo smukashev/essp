@@ -43,7 +43,7 @@ public class BeanDataProvider implements DataProvider {
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         RmiProxyFactoryBean remoteCreditorBusinessFactoryBean = new RmiProxyFactoryBean();
-        remoteCreditorBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+        remoteCreditorBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                 + ":1099/remoteCreditorBusiness");
         remoteCreditorBusinessFactoryBean.setServiceInterface(RemoteCreditorBusiness.class);
 
@@ -51,14 +51,14 @@ public class BeanDataProvider implements DataProvider {
         creditorBusiness = (RemoteCreditorBusiness) remoteCreditorBusinessFactoryBean.getObject();
 
         RmiProxyFactoryBean protocolBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        protocolBeanRemoteBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+        protocolBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                 + ":1099/protocolBeanRemoteBusiness");
         protocolBeanRemoteBusinessFactoryBean.setServiceInterface(ProtocolBeanRemoteBusiness.class);
 
         protocolBeanRemoteBusinessFactoryBean.afterPropertiesSet();
 
         RmiProxyFactoryBean inputInfoBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        inputInfoBeanRemoteBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+        inputInfoBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                 + ":1099/inputInfoBeanRemoteBusiness");
         inputInfoBeanRemoteBusinessFactoryBean.setServiceInterface(InputInfoBeanRemoteBusiness.class);
 
@@ -66,7 +66,7 @@ public class BeanDataProvider implements DataProvider {
         inputInfoBusiness = (InputInfoBeanRemoteBusiness) inputInfoBeanRemoteBusinessFactoryBean.getObject();
 
         portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                 + ":1099/portalUserBeanRemoteBusiness");
         portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
 
@@ -74,21 +74,21 @@ public class BeanDataProvider implements DataProvider {
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         RmiProxyFactoryBean inputFileBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        inputFileBeanRemoteBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+        inputFileBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                 + ":1099/inputFileBeanRemoteBusiness");
         inputFileBeanRemoteBusinessFactoryBean.setServiceInterface(InputFileBeanRemoteBusiness.class);
 
         inputFileBeanRemoteBusinessFactoryBean.afterPropertiesSet();
 
         RmiProxyFactoryBean globalServiceFactoryBean = new RmiProxyFactoryBean();
-        globalServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1099/globalService");
+        globalServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/globalService");
         globalServiceFactoryBean.setServiceInterface(IGlobalService.class);
 
         globalServiceFactoryBean.afterPropertiesSet();
         globalService = (IGlobalService) globalServiceFactoryBean.getObject();
 
         RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-        batchProcessServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1097/batchProcessService");
+        batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchProcessService");
         batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
 
         batchProcessServiceFactoryBean.afterPropertiesSet();

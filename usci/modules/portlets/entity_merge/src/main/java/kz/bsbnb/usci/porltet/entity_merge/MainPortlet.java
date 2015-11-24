@@ -44,7 +44,7 @@ public class MainPortlet extends MVCPortlet {
     void connectToServices() {
         try {
             RmiProxyFactoryBean metaFactoryServiceFactoryBean = new RmiProxyFactoryBean();
-            metaFactoryServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+            metaFactoryServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                     + ":1098/metaFactoryService");
             metaFactoryServiceFactoryBean.setServiceInterface(IMetaFactoryService.class);
             metaFactoryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -53,7 +53,7 @@ public class MainPortlet extends MVCPortlet {
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
-            entityServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+            entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                     + ":1098/entityService");
             entityServiceFactoryBean.setServiceInterface(IEntityService.class);
             entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -62,7 +62,7 @@ public class MainPortlet extends MVCPortlet {
             entityService = (IEntityService) entityServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean entityMergeServiceFactoryBean = new RmiProxyFactoryBean();
-            entityMergeServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+            entityMergeServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                     + ":1099/entityMergeService");
             entityMergeServiceFactoryBean.setServiceInterface(IBaseEntityMergeService.class);
             entityMergeServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -71,7 +71,7 @@ public class MainPortlet extends MVCPortlet {
             entityMergeService = (IBaseEntityMergeService) entityMergeServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean searcherFormEntryServiceFactoryBean = new RmiProxyFactoryBean();
-            searcherFormEntryServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+            searcherFormEntryServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                     + ":1098/searcherFormService");
             searcherFormEntryServiceFactoryBean.setServiceInterface(ISearcherFormService.class);
             searcherFormEntryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -80,7 +80,7 @@ public class MainPortlet extends MVCPortlet {
             searcherFormService = (ISearcherFormService) searcherFormEntryServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean portalUserBean = new RmiProxyFactoryBean();
-            portalUserBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+            portalUserBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                     + ":1099/portalUserBeanRemoteBusiness");
             portalUserBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
             portalUserBean.setRefreshStubOnConnectFailure(true);

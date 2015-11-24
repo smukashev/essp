@@ -36,7 +36,7 @@ public class MainPortlet extends MVCPortlet {
     public void connectToServices() {
         try {
             RmiProxyFactoryBean metaFactoryServiceFactoryBean = new RmiProxyFactoryBean();
-            metaFactoryServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+            metaFactoryServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                     + ":1098/metaFactoryService");
             metaFactoryServiceFactoryBean.setServiceInterface(IMetaFactoryService.class);
             metaFactoryServiceFactoryBean.setRefreshStubOnConnectFailure(true);

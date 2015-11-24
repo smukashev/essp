@@ -31,7 +31,7 @@ public class BeanDataProvider implements DataProvider {
 
     private void initializeBeans() {
         RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                 + ":1099/portalUserBeanRemoteBusiness");
         portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
 
@@ -39,7 +39,7 @@ public class BeanDataProvider implements DataProvider {
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         RmiProxyFactoryBean remoteCreditorBusinessFactoryBean = new RmiProxyFactoryBean();
-        remoteCreditorBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+        remoteCreditorBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                 + ":1099/remoteCreditorBusiness");
         remoteCreditorBusinessFactoryBean.setServiceInterface(RemoteCreditorBusiness.class);
 

@@ -36,7 +36,7 @@ public class RulesPortlet extends MVCPortlet{
         ApplicationContext context = new ClassPathXmlApplicationContext("applicationContextPortlet.xml");
 
         RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
-        entityServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1098/entityService");
+        entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1098/entityService");
         entityServiceFactoryBean.setServiceInterface(IEntityService.class);
         entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
@@ -45,14 +45,14 @@ public class RulesPortlet extends MVCPortlet{
 
 
         RmiProxyFactoryBean ruleServiceFactoryBean = new RmiProxyFactoryBean();
-        ruleServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1097/ruleService");
+        ruleServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/ruleService");
         ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
 
         ruleServiceFactoryBean.afterPropertiesSet();
         ruleService = (IRuleService) ruleServiceFactoryBean.getObject();
 
         RmiProxyFactoryBean batchServiceFactoryBean = new RmiProxyFactoryBean();
-        batchServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1097/batchService");
+        batchServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchService");
         batchServiceFactoryBean.setServiceInterface(IBatchService.class);
 
         batchServiceFactoryBean.afterPropertiesSet();

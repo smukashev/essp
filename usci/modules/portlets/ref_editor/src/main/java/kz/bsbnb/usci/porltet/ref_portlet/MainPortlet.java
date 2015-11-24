@@ -53,7 +53,7 @@ public class MainPortlet extends MVCPortlet {
     public void connectToServices() {
         try {
             RmiProxyFactoryBean metaFactoryServiceFactoryBean = new RmiProxyFactoryBean();
-            metaFactoryServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+            metaFactoryServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
                     + ":1098/metaFactoryService");
             metaFactoryServiceFactoryBean.setServiceInterface(IMetaFactoryService.class);
             metaFactoryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -62,7 +62,7 @@ public class MainPortlet extends MVCPortlet {
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
-            entityServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1098/entityService");
+            entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1098/entityService");
             entityServiceFactoryBean.setServiceInterface(IEntityService.class);
             entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
@@ -70,7 +70,7 @@ public class MainPortlet extends MVCPortlet {
             entityService = (IEntityService) entityServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean batchEntryServiceFactoryBean = new RmiProxyFactoryBean();
-            batchEntryServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1099/batchEntryService");
+            batchEntryServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/batchEntryService");
             batchEntryServiceFactoryBean.setServiceInterface(IBatchEntryService.class);
             batchEntryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
