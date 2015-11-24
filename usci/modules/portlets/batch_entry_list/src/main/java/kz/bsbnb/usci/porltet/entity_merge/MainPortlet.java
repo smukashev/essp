@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.porltet.entity_merge;
 
-import com.google.gson.Gson;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Role;
@@ -8,8 +7,8 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchEntry;
-import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
@@ -18,33 +17,33 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class MainPortlet extends MVCPortlet {
-    private RmiProxyFactoryBean batchEntryServiceFactoryBean;
-    private RmiProxyFactoryBean batchProcessServiceFactoryBean;
-
     private IBatchProcessService batchProcessService;
 
     //должен быть отличен от C:/zips (т.е папки receiver-а)
-    private final static String TMP_FILE_DIR = "C:\\batch_entry_list_temp_folder";
+    private final static String TMP_FILE_DIR = "\\\\" + StaticRouter.getAsIP() + "\\batch_entry_list_temp_folder";
 
     private IBatchEntryService batchEntryService;
 
     public void connectToServices() {
         try {
-            batchEntryServiceFactoryBean = new RmiProxyFactoryBean();
-            batchEntryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+            RmiProxyFactoryBean batchEntryServiceFactoryBean = new RmiProxyFactoryBean();
+            batchEntryServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+                    + ":1099/batchEntryService");
             batchEntryServiceFactoryBean.setServiceInterface(IBatchEntryService.class);
             batchEntryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
             batchEntryServiceFactoryBean.afterPropertiesSet();
             batchEntryService = (IBatchEntryService) batchEntryServiceFactoryBean.getObject();
 
-            batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-            batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchProcessService");
+            RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+            batchProcessServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+                    + ":1097/batchProcessService");
             batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
             batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 

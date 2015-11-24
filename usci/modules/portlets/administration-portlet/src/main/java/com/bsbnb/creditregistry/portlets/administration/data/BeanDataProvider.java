@@ -7,6 +7,7 @@ import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.RemoteCreditorBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
+import kz.bsbnb.usci.eav.StaticRouter;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.ArrayList;
@@ -20,9 +21,6 @@ import static com.bsbnb.creditregistry.portlets.administration.AdministrationApp
  * @author Aidar.Myrzahanov
  */
 public class BeanDataProvider implements DataProvider {
-    private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
-    private RmiProxyFactoryBean remoteCreditorBusinessFactoryBean;
-
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private RemoteCreditorBusiness creditorBusiness;
 
@@ -32,15 +30,17 @@ public class BeanDataProvider implements DataProvider {
     }
 
     private void initializeBeans() {
-        portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
+        RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+                + ":1099/portalUserBeanRemoteBusiness");
         portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
 
         portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
-        remoteCreditorBusinessFactoryBean = new RmiProxyFactoryBean();
-        remoteCreditorBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/remoteCreditorBusiness");
+        RmiProxyFactoryBean remoteCreditorBusinessFactoryBean = new RmiProxyFactoryBean();
+        remoteCreditorBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+                + ":1099/remoteCreditorBusiness");
         remoteCreditorBusinessFactoryBean.setServiceInterface(RemoteCreditorBusiness.class);
 
         remoteCreditorBusinessFactoryBean.afterPropertiesSet();

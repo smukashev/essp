@@ -9,6 +9,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
@@ -29,14 +30,14 @@ import java.io.PrintWriter;
 import java.util.List;
 
 public class MainPortlet extends MVCPortlet {
-    private RmiProxyFactoryBean metaFactoryServiceFactoryBean;
     private XSDGenerator xsdGenerator = new XSDGenerator();
     private IMetaFactoryService metaFactoryService;
 
     public void connectToServices() {
         try {
-            metaFactoryServiceFactoryBean = new RmiProxyFactoryBean();
-            metaFactoryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/metaFactoryService");
+            RmiProxyFactoryBean metaFactoryServiceFactoryBean = new RmiProxyFactoryBean();
+            metaFactoryServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+                    + ":1098/metaFactoryService");
             metaFactoryServiceFactoryBean.setServiceInterface(IMetaFactoryService.class);
             metaFactoryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 

@@ -9,6 +9,7 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.porltet.entity_merge.model.json.JsonMaker;
@@ -25,10 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class RulesPortlet extends MVCPortlet{
-    private RmiProxyFactoryBean ruleServiceFactoryBean;
-    private RmiProxyFactoryBean batchServiceFactoryBean;
-    private RmiProxyFactoryBean entityServiceFactoryBean;
-
     private IRuleService ruleService;
     private IBatchService batchService;
     private IEntityService entityService;
@@ -36,11 +33,10 @@ public class RulesPortlet extends MVCPortlet{
 
     @Override
     public void init() throws PortletException {
-
         ApplicationContext context = new ClassPathXmlApplicationContext("applicationContextPortlet.xml");
 
-        entityServiceFactoryBean = new RmiProxyFactoryBean();
-        entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
+        RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
+        entityServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1098/entityService");
         entityServiceFactoryBean.setServiceInterface(IEntityService.class);
         entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
@@ -48,21 +44,21 @@ public class RulesPortlet extends MVCPortlet{
         entityService = (IEntityService) entityServiceFactoryBean.getObject();
 
 
-        ruleServiceFactoryBean = new RmiProxyFactoryBean();
-        ruleServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/ruleService");
+        RmiProxyFactoryBean ruleServiceFactoryBean = new RmiProxyFactoryBean();
+        ruleServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1097/ruleService");
         ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
 
         ruleServiceFactoryBean.afterPropertiesSet();
         ruleService = (IRuleService) ruleServiceFactoryBean.getObject();
 
-        batchServiceFactoryBean = new RmiProxyFactoryBean();
-        batchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
+        RmiProxyFactoryBean batchServiceFactoryBean = new RmiProxyFactoryBean();
+        batchServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1097/batchService");
         batchServiceFactoryBean.setServiceInterface(IBatchService.class);
 
         batchServiceFactoryBean.afterPropertiesSet();
 
         batchService = (IBatchService) batchServiceFactoryBean.getObject();
-        super.init();    //To change body of overridden methods use File | Settings | File Templates.
+        super.init();
     }
 
     @Override

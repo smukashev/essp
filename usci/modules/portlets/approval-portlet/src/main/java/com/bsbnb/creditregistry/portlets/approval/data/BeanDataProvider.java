@@ -5,6 +5,7 @@ import kz.bsbnb.usci.core.service.MailMessageBeanCommonBusiness;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.util.ReportStatus;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -21,11 +22,6 @@ import java.util.Properties;
  * @author Aidar.Myrzahanov
  */
 public class BeanDataProvider implements DataProvider {
-    private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
-    private RmiProxyFactoryBean reportBusinessFactoryBean;
-    private RmiProxyFactoryBean mailBusinessFactoryBean;
-    private RmiProxyFactoryBean globalServiceFactoryBean;
-
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
@@ -36,27 +32,29 @@ public class BeanDataProvider implements DataProvider {
 
     public BeanDataProvider() {
         // portalUserBeanRemoteBusiness
-        portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://localhost:1099/portalUserBeanRemoteBusiness");
+        RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+                + ":1099/portalUserBeanRemoteBusiness");
         portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
         portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         // reportBeanRemoteBusiness
-        reportBusinessFactoryBean = new RmiProxyFactoryBean();
-        reportBusinessFactoryBean.setServiceUrl("rmi://localhost:1099/reportBeanRemoteBusiness");
+        RmiProxyFactoryBean reportBusinessFactoryBean = new RmiProxyFactoryBean();
+        reportBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+                + ":1099/reportBeanRemoteBusiness");
         reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
         reportBusinessFactoryBean.afterPropertiesSet();
         reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
 
-        mailBusinessFactoryBean = new RmiProxyFactoryBean();
-        mailBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/mailRemoteBusiness");
+        RmiProxyFactoryBean mailBusinessFactoryBean = new RmiProxyFactoryBean();
+        mailBusinessFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1099/mailRemoteBusiness");
         mailBusinessFactoryBean.setServiceInterface(MailMessageBeanCommonBusiness.class);
         mailBusinessFactoryBean.afterPropertiesSet();
         mailMessageBusiness = (MailMessageBeanCommonBusiness) mailBusinessFactoryBean.getObject();
 
-        globalServiceFactoryBean = new RmiProxyFactoryBean();
-        globalServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/globalService");
+        RmiProxyFactoryBean globalServiceFactoryBean = new RmiProxyFactoryBean();
+        globalServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1099/globalService");
         globalServiceFactoryBean.setServiceInterface(IGlobalService.class);
         globalServiceFactoryBean.afterPropertiesSet();
         globalService = (IGlobalService) globalServiceFactoryBean.getObject();
@@ -142,7 +140,8 @@ public class BeanDataProvider implements DataProvider {
     }
 
     @Override
-    public void sendApprovalNotifications(Creditor creditor, Report report, String username, Date sendDate, String text) {
+    public void sendApprovalNotifications(Creditor creditor, Report report, String username, Date sendDate,
+                                          String text) {
         List<PortalUser> notificationRecipients = portalUserBusiness.getPortalUsersHavingAccessToCreditor(creditor);
         Properties mailMessageParameters = new Properties();
         mailMessageParameters.setProperty("CREDITOR", creditor.getName());
@@ -160,14 +159,6 @@ public class BeanDataProvider implements DataProvider {
     public Date getLastReportDate(Creditor creditor) {
         return reportBusiness.getLastReportDate(creditor.getId());
     }
-
-//    private MailMessageParameter getMailMessageParameter(MailMessage mailMessage, MailTemplateParameter templateParameter, String value) {
-//        MailMessageParameter mailMessageParameter = new MailMessageParameter();
-//        mailMessageParameter.setMailMessage(mailMessage);
-//        mailMessageParameter.setMailTemplateParameter(templateParameter);
-//        mailMessageParameter.setValue(value);
-//        return mailMessageParameter;
-//    }
 
     @Override
     public void updateLastManualEditDate(Report report) {

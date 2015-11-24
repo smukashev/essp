@@ -13,6 +13,7 @@ import jxl.format.Border;
 import jxl.format.BorderLineStyle;
 import jxl.write.*;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListResponse;
@@ -45,34 +46,31 @@ import java.util.*;
 import java.util.logging.Level;
 
 public class MainPortlet extends MVCPortlet {
-    private RmiProxyFactoryBean metaFactoryServiceFactoryBean;
-    private RmiProxyFactoryBean entityServiceFactoryBean;
-    private RmiProxyFactoryBean batchEntryServiceFactoryBean;
-
     private IMetaFactoryService metaFactoryService;
     private IEntityService entityService;
     private IBatchEntryService batchEntryService;
 
     public void connectToServices() {
         try {
-            metaFactoryServiceFactoryBean = new RmiProxyFactoryBean();
-            metaFactoryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/metaFactoryService");
+            RmiProxyFactoryBean metaFactoryServiceFactoryBean = new RmiProxyFactoryBean();
+            metaFactoryServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP()
+                    + ":1098/metaFactoryService");
             metaFactoryServiceFactoryBean.setServiceInterface(IMetaFactoryService.class);
             metaFactoryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
             metaFactoryServiceFactoryBean.afterPropertiesSet();
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
 
-            entityServiceFactoryBean = new RmiProxyFactoryBean();
-            entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
+            RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
+            entityServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1098/entityService");
             entityServiceFactoryBean.setServiceInterface(IEntityService.class);
             entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
             entityServiceFactoryBean.afterPropertiesSet();
             entityService = (IEntityService) entityServiceFactoryBean.getObject();
 
-            batchEntryServiceFactoryBean = new RmiProxyFactoryBean();
-            batchEntryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/batchEntryService");
+            RmiProxyFactoryBean batchEntryServiceFactoryBean = new RmiProxyFactoryBean();
+            batchEntryServiceFactoryBean.setServiceUrl("rmi:// " + StaticRouter.getAsIP() + ":1099/batchEntryService");
             batchEntryServiceFactoryBean.setServiceInterface(IBatchEntryService.class);
             batchEntryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
@@ -110,9 +108,7 @@ public class MainPortlet extends MVCPortlet {
                         hasRights = true;
                 }
             }
-        } catch (PortalException e) {
-            e.printStackTrace();
-        } catch (SystemException e) {
+        } catch (PortalException | SystemException e) {
             e.printStackTrace();
         }
 

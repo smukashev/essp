@@ -10,6 +10,7 @@ import kz.bsbnb.usci.core.service.ProtocolBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Protocol;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
@@ -23,13 +24,12 @@ import java.util.*;
  * @author Aidar.Myrzahanov
  */
 public class BeanDataProvider implements DataProvider {
-
     private ProtocolBeanRemoteBusiness protocolBusiness;
     private InputInfoBeanRemoteBusiness inputInfoBusiness;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
-    private InputFileBeanRemoteBusiness inputFileBusiness;
 
-    private static final String ENTITY_EDITOR_PAGE = "http://localhost:8081/entity_editor";
+    private static final String ENTITY_EDITOR_PAGE = "http://" + StaticRouter.getAsIP() + ":" +
+            StaticRouter.getPortalPort() + "/entity_editor";
 
     public BeanDataProvider() {
         initializeBeans();
@@ -37,32 +37,28 @@ public class BeanDataProvider implements DataProvider {
 
     private void initializeBeans() {
         RmiProxyFactoryBean protocolBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        protocolBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/protocolBeanRemoteBusiness");
+        protocolBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                ":1099/protocolBeanRemoteBusiness");
         protocolBeanRemoteBusinessFactoryBean.setServiceInterface(ProtocolBeanRemoteBusiness.class);
 
         protocolBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         protocolBusiness = (ProtocolBeanRemoteBusiness) protocolBeanRemoteBusinessFactoryBean.getObject();
 
         RmiProxyFactoryBean inputInfoBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        inputInfoBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/inputInfoBeanRemoteBusiness");
+        inputInfoBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                ":1099/inputInfoBeanRemoteBusiness");
         inputInfoBeanRemoteBusinessFactoryBean.setServiceInterface(InputInfoBeanRemoteBusiness.class);
 
         inputInfoBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         inputInfoBusiness = (InputInfoBeanRemoteBusiness) inputInfoBeanRemoteBusinessFactoryBean.getObject();
 
         RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
+        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" +StaticRouter.getAsIP() +
+                ":1099/portalUserBeanRemoteBusiness");
         portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
 
         portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
-
-        RmiProxyFactoryBean inputFileBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        inputFileBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/inputFileBeanRemoteBusiness");
-        inputFileBeanRemoteBusinessFactoryBean.setServiceInterface(InputFileBeanRemoteBusiness.class);
-
-        inputFileBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-        inputFileBusiness = (InputFileBeanRemoteBusiness) inputFileBeanRemoteBusinessFactoryBean.getObject();
     }
 
     public List<Creditor> getCreditorsList() {

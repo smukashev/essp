@@ -1,6 +1,19 @@
 package kz.bsbnb.usci.portlets.upload.ui;
 
-//import com.bsbnb.creditregistry.dm.Report;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.VerticalLayout;
+import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
+import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
+import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.cr.model.Report;
+import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.util.ReportStatus;
+import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
+import kz.bsbnb.usci.portlets.upload.UploadApplication;
+import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import org.springframework.remoting.rmi.RmiProxyFactoryBean;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,68 +22,42 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
-//import com.bsbnb.creditregistry.dm.maintenance.InputFile;
-//import com.bsbnb.creditregistry.dm.maintenance.InputInfo;
-//import com.bsbnb.creditregistry.dm.ref.Creditor;
-//import com.bsbnb.creditregistry.dm.ref.Shared;
-//import com.bsbnb.creditregistry.dm.ref.shared.ReportType;
-//import com.bsbnb.creditregistry.ejb.api.ReportBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.InputFileBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.InputInfoBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.PortalUserBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.ref.business.remote.IRemoteSharedBusiness;
-//import com.bsbnb.creditregistry.ejb.ref.exception.ResultInconsistentException;
-//import com.bsbnb.creditregistry.ejb.ref.exception.ResultNotFoundException;
-import kz.bsbnb.usci.eav.util.ReportStatus;
-import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
-import kz.bsbnb.usci.core.service.*;
-import kz.bsbnb.usci.cr.model.*;
-import kz.bsbnb.usci.portlets.upload.UploadApplication;
-import kz.bsbnb.usci.receiver.service.IBatchProcessService;
-import org.springframework.remoting.rmi.RmiProxyFactoryBean;
-
-/**
- *
- * @author Aidar.Myrzahanov
- */
 public abstract class AbstractUploadComponent extends VerticalLayout {
-    private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
-    private RmiProxyFactoryBean reportBusinessFactoryBean;
-    private RmiProxyFactoryBean batchProcessServiceFactoryBean;
-
     private PortalUserBeanRemoteBusiness portalUserBusiness;
-    //private IRemoteSharedBusiness sharedBusiness;
-    //private InputInfoBeanRemoteBusiness inputInfoBusiness;
-    //private InputFileBeanRemoteBusiness inputFileBusiness;
+
     private ReportBeanRemoteBusiness reportBusiness;
+
     private IBatchProcessService batchProcessService;
+
     private Creditor creditor;
+
     private VerticalLayout statusPanel;
-    private Label errorMessageLabel;
-    private static final String UPLOADS_PATH = "/tmp/";
+
+    private static final String UPLOADS_PATH = "\\\\" + StaticRouter.getAsIP() + "\\tmp\\";
+
     public static final long MAX_FILE_LENGTH = 5 * (1L << 20);
+
     private PortletEnvironmentFacade portletEnvironment;
 
     private void initializeBeans() {
-        portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
+        RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                ":1099/portalUserBeanRemoteBusiness");
+
         portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
 
         portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
-        reportBusinessFactoryBean = new RmiProxyFactoryBean();
-        reportBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/reportBeanRemoteBusiness");
+        RmiProxyFactoryBean reportBusinessFactoryBean = new RmiProxyFactoryBean();
+        reportBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/reportBeanRemoteBusiness");
         reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
 
         reportBusinessFactoryBean.afterPropertiesSet();
         reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
 
-        batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-        batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchProcessService");
+        RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+        batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchProcessService");
         batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
 
         batchProcessServiceFactoryBean.afterPropertiesSet();
@@ -143,7 +130,8 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
         normalFileNameBuilder.append("/");
         String normalFileName;
         if (normalFileNameBuilder.length() > 25) {
-            normalFileName = normalFileNameBuilder.substring(normalFileNameBuilder.length() - 20, normalFileNameBuilder.length());
+            normalFileName = normalFileNameBuilder.substring(normalFileNameBuilder.length() - 20,
+                    normalFileNameBuilder.length());
         } else {
             normalFileName = normalFileNameBuilder.toString();
         }
@@ -160,18 +148,10 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
             System.out.println("#%% " + fileName);
             String path = saveFileOnDisk(array, fileName);
             UploadApplication.log.log(Level.INFO, "Path: {0}", path);
-            //Shared webServiceLoadType = sharedBusiness.findByC_T("WS", "input_type");
-            //Shared inQueueStatus = sharedBusiness.findByC_T("IN_QUEUE", "input_info_status");
-            //InputInfo ii = inputInfoBusiness.insert(portletEnvironment.getUserID(), creditor,
-              //      fileName, new Date(), webServiceLoadType, inQueueStatus);
-            //log.log(Level.INFO, "Input info ID: {0}", ii.getId());
-            //InputFile inputFile = new InputFile();
-            //inputFile.setFilePath(path);
-            //inputFile.setInputInfo(ii);
-            //inputFileBusiness.insertInputFile(inputFile);
             System.out.println("### " + path);
             batchProcessService.processBatch(path, portletEnvironment.getUserID(), portletEnvironment.isNB());
-            addStatusMessage(String.format(getResourceString(Localization.UPLOAD_SUCCEDED_MESSAGE.getKey()), fileName), false);
+            addStatusMessage(String.format(getResourceString(Localization.UPLOAD_SUCCEDED_MESSAGE.getKey()),
+                    fileName), false);
         } catch (IOException ioe) {
             UploadApplication.log.log(Level.SEVERE, "Can't save file {0}", fileName);
         }
@@ -213,17 +193,19 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
      * Метод загружает интерфейс, содержащий только сообщение об ошибке
      */
     private void initializeErrorComponents(String errorMessage) {
-        errorMessageLabel = new Label("<h2>" + errorMessage + "<h2>", Label.CONTENT_XHTML);
+        Label errorMessageLabel = new Label("<h2>" + errorMessage + "<h2>", Label.CONTENT_XHTML);
         addComponent(errorMessageLabel);
     }
 
     protected boolean isFileValid(long length, String filename) {
         if (length > MAX_FILE_LENGTH) {
-            addStatusMessage(String.format(getResourceString(Localization.FILE_TOO_LARGE_MESSAGE.getKey()), filename, MAX_FILE_LENGTH / (1 << 20), length), true);
+            addStatusMessage(String.format(getResourceString(Localization.FILE_TOO_LARGE_MESSAGE.getKey()),
+                    filename, MAX_FILE_LENGTH / (1 << 20), length), true);
             return false;
         }
         if (filename == null || !filename.endsWith(".zip")) {
-            addStatusMessage(String.format(getResourceString(Localization.NOT_A_ZIP_FILE_MESSAGE.getKey()), filename), true);
+            addStatusMessage(String.format(getResourceString(Localization.NOT_A_ZIP_FILE_MESSAGE.getKey()),
+                    filename), true);
             return false;
         }
         return true;
@@ -231,6 +213,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
 
     /**
      * Метод проверяет возможность загрузки пакетного файла
+     *
      * @return сообщение об ошибке
      * если сообщение пусто, то пользователь имеет возможность загрузки
      */
@@ -258,7 +241,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
                 creditor = creditors.get(0);
                 Date reportDate = reportBusiness.getReportDate(creditor.getId());
                 Report report = reportBusiness.getByCreditor_ReportDate(creditor, reportDate);
-                if(report!=null && ReportStatus.ORGANIZATION_APPROVED.code().equals(report.getStatus().getCode())) {
+                if (report != null && ReportStatus.ORGANIZATION_APPROVED.code().equals(report.getStatus().getCode())) {
                     result = getResourceString(Localization.ORGANIZATION_APPROVED_DATA_MESSAGE.getKey());
                 }
             }

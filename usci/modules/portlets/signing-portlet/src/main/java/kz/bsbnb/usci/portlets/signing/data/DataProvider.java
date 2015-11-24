@@ -9,14 +9,13 @@ import java.util.List;
  * @author Aidar.Myrzahanov
  */
 public interface DataProvider {
-   
-    public List<Creditor> getCreditorsList(long userId);
+   List<Creditor> getCreditorsList(long userId);
     
-    public List<FileSignatureRecord> getFilesToSign(long userId);
-    
-    public String getBaseUrl();
-    
-    public void addInputFileToQueue(FileSignatureRecord record);
+    List<FileSignatureRecord> getFilesToSign(long userId);
 
-    public void signFile(long fileId, String sign);
+    String getBaseUrl();
+    
+    void addInputFileToQueue(FileSignatureRecord record);
+
+    void signFile(long fileId, String sign);
 }
