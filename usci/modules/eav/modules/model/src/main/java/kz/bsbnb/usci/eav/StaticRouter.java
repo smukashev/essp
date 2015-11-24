@@ -42,7 +42,7 @@ public final class StaticRouter {
     private final static String prodShowcaseSchemaName = "SHOWCASE3";
 
     /* Credit Registry DB IP */
-    private final static String devCRDBIP = "10.10.20.4";
+    private final static String devCRDBIP = "10.10.20.44";
     private final static String prodCRDBIP  = "10.8.1.97";
 
     /* Credit Registry DB Username */
