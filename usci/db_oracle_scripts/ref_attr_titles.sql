@@ -109,3 +109,23 @@ update eav_m_simple_attributes set title = 'Значение' where name = 'valu
 update eav_m_simple_attributes set title = 'Валюта' where name = 'value_currency';
 update eav_m_simple_attributes set title = 'Значение' where   name = 'weight';
 --update eav_m_simple_attributes set title = '' where name = 'write_off';
+
+update eav_m_simple_attributes set title = 'Дата погашения займа' where   name = 'contract_maturity_date';
+update eav_m_simple_attributes set title = 'Детали' where   name = 'details';
+update eav_m_simple_attributes set title = 'Значение дискаунта' where   name = 'discounted_value';
+update eav_m_simple_attributes set title = 'Пятое значение НПС' where   name = 'fifth_sign';
+update eav_m_simple_attributes set title = 'Четырехзначный номер НПС' where   name = 'first_fourth_signs';
+--update eav_m_simple_attributes set title = '' where   name = 'has_currency_earn';
+update eav_m_simple_attributes set title = 'Годовая процентная ставка' where   name = 'interest_rate_yearly';
+update eav_m_simple_attributes set title = 'В балансе' where   name = 'is_in_balance';
+update eav_m_simple_attributes set title = 'Входящее значение' where   name = 'is_input_value';
+update eav_m_simple_attributes set title = 'Дата погашения' where   name = 'maturity_date';
+update eav_m_simple_attributes set title = 'Код' where   name = 'nokbdb_code';
+update eav_m_simple_attributes set title = 'Дата пролонгации' where   name = 'prolongation_date';
+update eav_m_simple_attributes set title = 'Размер резерва (провизии) (в % от суммы основного долга) по займу (условному обязательству), за исключением портфеля однородных кредитов' where   name = 'provision_debt';
+update eav_m_simple_attributes set title = 'Максимальный размер резерва (провизии) (в % от портфеля однородных кредитов)' where   name = 'provision_portfolio_max';
+update eav_m_simple_attributes set title = 'Минимальный размер резерва (провизии) (в % от портфеля однородных кредитов)' where   name = 'provision_portfolio_min';
+update eav_m_simple_attributes set title = 'Седьмое значение НПС' where   name = 'seventh_sign';
+update eav_m_simple_attributes set title = 'Шестое значение НПС' where   name = 'sixth_sign';
+update eav_m_simple_attributes set title = 'Тип' where   name = 'type';
+update eav_m_simple_attributes set title = 'Значение' where   name = 'weight';
