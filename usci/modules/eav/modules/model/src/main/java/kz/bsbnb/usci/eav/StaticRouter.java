@@ -53,6 +53,10 @@ public final class StaticRouter {
     private final static String devCRDBPassword = "core_sep_2014";
     private final static String prodCRDBPassword = "core_aug_2015";
 
+    /* Report files catalog */
+    private final static String devReportFilesCatalog = "/home/essp/Portal_afn/Report/";
+    private final static String prodReportFilesCatalog = "C:\\Portal_afn\\Report\\";
+
     public static String getAsIP() {
         switch(mode) {
             case DEV:
@@ -169,6 +173,17 @@ public final class StaticRouter {
                 return devCRDBPassword;
             case PROD:
                 return prodCRDBPassword;
+            default:
+                throw new IllegalStateException("Неизвестный мод;");
+        }
+    }
+
+    public static String getReportFilesCatalog() {
+        switch(mode) {
+            case DEV:
+                return devReportFilesCatalog;
+            case PROD:
+                return prodReportFilesCatalog;
             default:
                 throw new IllegalStateException("Неизвестный мод;");
         }

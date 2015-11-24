@@ -36,6 +36,7 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.portlet.report.Localization;
 import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 import static kz.bsbnb.usci.portlet.report.ReportApplication.setStartTime;
@@ -68,7 +69,7 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
 
     @Override
     public List<Component> getActionComponents() {
-        String reportFolderPath = ConstantValues.REPORT_FILES_CATALOG + getTargetReportComponent().getReport().getName() + File.separator;
+        String reportFolderPath = StaticRouter.getReportFilesCatalog() + getTargetReportComponent().getReport().getName() + File.separator;
         templateFilePath = reportFolderPath + "template.xls";
         loadConfig(reportFolderPath + "export.properties");
         exportButton = new Button(Localization.DOWNLOAD_XLS_BUTTON_CAPTION.getValue(), new Button.ClickListener() {
