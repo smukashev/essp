@@ -2462,7 +2462,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
-        for (IBaseEntity unusedBaseEntity : baseEntityManager.getUnusedBaseEntities()) {
+        // TODO: fix problem with repeated deletion
+        /*for (IBaseEntity unusedBaseEntity : baseEntityManager.getUnusedBaseEntities()) {
             IBaseEntityDao baseEntityDao = persistableDaoPool
                     .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
 
@@ -2470,7 +2471,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
             if (isReferenceCacheEnabled && unusedBaseEntity.getMeta().isReference())
                 refRepositoryDao.delRef(unusedBaseEntity.getId(), unusedBaseEntity.getReportDate());
-        }
+        }*/
     }
 
     private Object returnCastedValue(IMetaValue metaValue, IBaseValue baseValue) {
