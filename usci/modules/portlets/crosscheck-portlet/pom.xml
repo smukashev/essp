@@ -161,5 +161,10 @@
             <artifactId>javaee-api</artifactId>
             <version>6.0</version>
         </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci.eav</groupId>
+            <artifactId>model</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
      </dependencies>
 </project>

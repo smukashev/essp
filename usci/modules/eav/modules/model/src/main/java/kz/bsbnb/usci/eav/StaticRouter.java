@@ -57,6 +57,10 @@ public final class StaticRouter {
     private final static String devReportFilesCatalog = "/home/essp/Portal_afn/Report/";
     private final static String prodReportFilesCatalog = "C:\\Portal_afn\\Report\\";
 
+    /* Report files folder */
+    private final static String devReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
+    private final static String prodReportFilesFolder = "C:\\Portal_afn\\generated_reports\\";
+
     public static String getAsIP() {
         switch(mode) {
             case DEV:
@@ -184,6 +188,17 @@ public final class StaticRouter {
                 return devReportFilesCatalog;
             case PROD:
                 return prodReportFilesCatalog;
+            default:
+                throw new IllegalStateException("Неизвестный мод;");
+        }
+    }
+
+    public static String getReportFilesFolder() {
+        switch(mode) {
+            case DEV:
+                return devReportFilesFolder;
+            case PROD:
+                return prodReportFilesFolder;
             default:
                 throw new IllegalStateException("Неизвестный мод;");
         }
