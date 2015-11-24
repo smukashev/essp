@@ -70,7 +70,7 @@ public class ProtocolDisplayBean {
 
     public Embedded getStatusIcon() {
         if (statusIcon == null) {
-            Resource resource = getIconByMessageTypeName(getMessageTypeName());
+            Resource resource = getIconByMessageTypeName(getMessageTypeCode());
             statusIcon = new Embedded("", resource);
             statusIcon.setDescription(getMessageTypeName());
         }
