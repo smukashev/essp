@@ -41,6 +41,18 @@ public final class StaticRouter {
     private final static String devShowcaseSchemaName = "C##SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHOWCASE3";
 
+    /* Credit Registry DB IP */
+    private final static String devCRDBIP = "10.10.20.4";
+    private final static String prodCRDBIP  = "10.8.1.97";
+
+    /* Credit Registry DB Username */
+    private final static String devCRDBUsername = "core";
+    private final static String prodCRDBUsername = "core";
+
+    /* Credit Registry DB Password */
+    private final static String devCRDBPassword = "core_sep_2014";
+    private final static String prodCRDBPassword = "core_aug_2015";
+
     public static String getAsIP() {
         switch(mode) {
             case DEV:
@@ -124,6 +136,39 @@ public final class StaticRouter {
                 return devShowcaseSchemaName;
             case PROD:
                 return prodShowcaseSchemaName;
+            default:
+                throw new IllegalStateException("Неизвестный мод;");
+        }
+    }
+
+    public static String getCRDBIP() {
+        switch(mode) {
+            case DEV:
+                return devCRDBIP;
+            case PROD:
+                return prodCRDBIP;
+            default:
+                throw new IllegalStateException("Неизвестный мод;");
+        }
+    }
+
+    public static String getCRDBUsername() {
+        switch(mode) {
+            case DEV:
+                return devCRDBUsername;
+            case PROD:
+                return prodCRDBUsername;
+            default:
+                throw new IllegalStateException("Неизвестный мод;");
+        }
+    }
+
+    public static String getCRDBPassword() {
+        switch(mode) {
+            case DEV:
+                return devCRDBPassword;
+            case PROD:
+                return prodCRDBPassword;
             default:
                 throw new IllegalStateException("Неизвестный мод;");
         }

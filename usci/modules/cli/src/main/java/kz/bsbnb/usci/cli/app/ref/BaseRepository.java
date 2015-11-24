@@ -4,6 +4,7 @@ import kz.bsbnb.usci.cli.app.ref.craw.*;
 import kz.bsbnb.usci.cli.app.ref.refs.CreditorDoc;
 import kz.bsbnb.usci.cli.app.ref.refs.DocType;
 import kz.bsbnb.usci.cli.app.ref.reps.*;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.w3c.dom.Document;
@@ -148,7 +149,8 @@ public class BaseRepository implements  Runnable
     public static Statement getStatement(){
         try {
             if(connection == null){
-                    connection = DriverManager.getConnection("jdbc:oracle:thin:@10.10.20.44:1521:CREDITS", "core","core_sep_2014");
+                    connection = DriverManager.getConnection("jdbc:oracle:thin:@" + StaticRouter.getCRDBIP() +
+                            ":1521:CREDITS", StaticRouter.getCRDBUsername(), StaticRouter.getCRDBPassword());
                     return statement = connection.createStatement();
             }
 
