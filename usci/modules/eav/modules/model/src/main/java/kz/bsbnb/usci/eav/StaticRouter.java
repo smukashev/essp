@@ -33,6 +33,14 @@ public final class StaticRouter {
     private final static String devPortalPort = "80";
     private final static String prodPortalPort = "80";
 
+    /* Core Schema name */
+    private final static String devCoreSchemaName = "C##CORE";
+    private final static String prodCoreSchemaName = "CORE";
+
+    /* Showcase Schema name */
+    private final static String devShowcaseSchemaName = "C##SHOWCASE";
+    private final static String prodShowcaseSchemaName = "SHOWCASE3";
+
     public static String getAsIP() {
         switch(mode) {
             case DEV:
@@ -94,6 +102,28 @@ public final class StaticRouter {
                 return devPortalPort;
             case PROD:
                 return prodPortalPort;
+            default:
+                throw new IllegalStateException("Неизвестный мод;");
+        }
+    }
+
+    public static String getCoreSchemaName() {
+        switch(mode) {
+            case DEV:
+                return devCoreSchemaName;
+            case PROD:
+                return prodCoreSchemaName;
+            default:
+                throw new IllegalStateException("Неизвестный мод;");
+        }
+    }
+
+    public static String getShowcaseSchemaName() {
+        switch(mode) {
+            case DEV:
+                return devShowcaseSchemaName;
+            case PROD:
+                return prodShowcaseSchemaName;
             default:
                 throw new IllegalStateException("Неизвестный мод;");
         }
