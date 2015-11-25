@@ -105,8 +105,7 @@ public class XSDGenerator {
     private void printDateType(PrintStream ps) {
         ps.println("<xsd:simpleType name=\"date\">");
         ps.println("<xsd:restriction base=\"xsd:string\">");
-        ps.println("<xsd:pattern value=\"([1-9]|0[1-9]|1[0-9]|2[0-9]|3[01])[.](0?[1-9]|1[0-2])[.](19|20)\\d\\d\"/>");
-        ps.println("<xsd:pattern value=\"(19|20)\\d\\d[\\-](0?[1-9]|1[0-2])[\\-]([1-9]|0[1-9]|1[0-9]|2[0-9]|3[01])\"/>");
+        ps.println("<xsd:pattern value=\"[0-9][0-9].[0-9][0-9].[0-9][0-9][0-9][0-9]\"/>");
         ps.println("</xsd:restriction>");
         ps.println("</xsd:simpleType>");
     }
