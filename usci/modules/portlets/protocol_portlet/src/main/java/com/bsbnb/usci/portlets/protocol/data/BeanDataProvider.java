@@ -28,7 +28,7 @@ public class BeanDataProvider implements DataProvider {
     private InputInfoBeanRemoteBusiness inputInfoBusiness;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
 
-    private static final String ENTITY_EDITOR_PAGE = "http://" + StaticRouter.getAsIP() + ":" +
+    private static final String ENTITY_EDITOR_PAGE = "http://" + StaticRouter.getPortalUrl() + ":" +
             StaticRouter.getPortalPort() + "/entity_editor";
 
     public BeanDataProvider() {
