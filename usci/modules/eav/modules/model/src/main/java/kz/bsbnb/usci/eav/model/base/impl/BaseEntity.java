@@ -501,9 +501,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         if (thisValueCount != thatValueCount)
             return false;
 
-        if (meta.isReference())
-            return this.getId() == that.getId();
-
         for (String attributeName : meta.getAttributeNames()) {
             IMetaAttribute metaAttribute = meta.getMetaAttribute(attributeName);
             IMetaType metaType = metaAttribute.getMetaType();
