@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.portlet.report.export;
 
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.portlet.report.dm.ReportController;
 import kz.bsbnb.usci.portlet.report.dm.ReportLoad;
 import kz.bsbnb.usci.portlet.report.dm.ReportLoadFile;
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public abstract class AbstractReportExporter extends VerticalLayout {
 
-    public static final File REPORT_FILES_FOLDER = new File("/home/sadmin/Portal_afn/generated_reports/");
+    public static final File REPORT_FILES_FOLDER = new File(StaticRouter.getReportFilesFolder());
     protected ReportComponent targetReportComponent;
     private ReportLoad load;
     private ReportController controller = new ReportController();

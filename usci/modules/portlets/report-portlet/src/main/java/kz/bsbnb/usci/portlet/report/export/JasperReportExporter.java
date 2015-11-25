@@ -5,6 +5,7 @@ import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.portlet.report.Localization;
 import kz.bsbnb.usci.portlet.report.ReportApplication;
 import kz.bsbnb.usci.portlet.report.ReportPortletResource;
@@ -56,7 +57,7 @@ public class JasperReportExporter extends AbstractReportExporter{
             Report report = getTargetReportComponent().getReport();
             final String reportName = report.getName();
 
-            final String reportPath = ConstantValues.REPORT_FILES_CATALOG+reportName+"\\";
+            final String reportPath = StaticRouter.getReportFilesCatalog() + reportName + "\\";
             final String jasperFilePath = reportPath+reportName+".jasper";
             final String resourceFilePath = reportPath+reportName+"_"+ ReportApplication.getApplicationLocale().getLanguage()+".properties";
             ReportApplication.log.log(Level.INFO, "Report name: {0}", reportName);

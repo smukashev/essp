@@ -1,71 +1,35 @@
 package kz.bsbnb.usci.portlets.signing.data;
 
-//import com.bsbnb.creditregistry.dm.maintenance.InputFile;
-//import com.bsbnb.creditregistry.dm.maintenance.InputFileSignature;
-//import com.bsbnb.creditregistry.dm.maintenance.InputInfo;
-//import com.bsbnb.creditregistry.dm.ref.Creditor;
-//import com.bsbnb.creditregistry.dm.ref.shared.InputInfoStatus;
-//import com.bsbnb.creditregistry.dm.ref.shared.SharedType;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.InputFileBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.InputInfoBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.PortalUserBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.ProtocolBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.api.maintenance.SysconfigBeanRemoteBusiness;
-//import com.bsbnb.creditregistry.ejb.ref.business.remote.IRemoteSharedBusiness;
-//import com.bsbnb.creditregistry.ejb.ref.exception.ResultInconsistentException;
-//import com.bsbnb.creditregistry.ejb.ref.exception.ResultNotFoundException;
 import kz.bsbnb.usci.core.service.InputFileBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputFile;
+import kz.bsbnb.usci.eav.StaticRouter;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Aidar.Myrzahanov
  */
 public class BeanDataProvider implements DataProvider {
-    private RmiProxyFactoryBean protocolBeanRemoteBusinessFactoryBean;
-    private RmiProxyFactoryBean inputInfoBeanRemoteBusinessFactoryBean;
-    private RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean;
-    private RmiProxyFactoryBean inputFileBeanRemoteBusinessFactoryBean;
-
-    private static final String PORTAL_BASE_URL_CODE = "PORTAL_BASE_URL";
-    private InputInfoBeanRemoteBusiness inputInfoBusiness;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private InputFileBeanRemoteBusiness inputFileBusiness;
-    //private SysconfigBeanRemoteBusiness sysconfigBusiness;
-    //private IRemoteSharedBusiness sharedBusiness;
 
     public BeanDataProvider() {
-        inputInfoBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        inputInfoBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/inputInfoBeanRemoteBusiness");
-        inputInfoBeanRemoteBusinessFactoryBean.setServiceInterface(InputInfoBeanRemoteBusiness.class);
-
-        inputInfoBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-        inputInfoBusiness = (InputInfoBeanRemoteBusiness) inputInfoBeanRemoteBusinessFactoryBean.getObject();
-        if (inputInfoBusiness == null)
-        {
-            System.out.println("InputInfoBusiness is null!");
-        }
-
-        //////////////////////////////
-
-        portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
+        RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                ":1099/portalUserBeanRemoteBusiness");
         portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
 
         portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
-        //////////////////////////////
-
-        inputFileBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        inputFileBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/inputFileBeanRemoteBusiness");
+        RmiProxyFactoryBean inputFileBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+        inputFileBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                ":1099/inputFileBeanRemoteBusiness");
         inputFileBeanRemoteBusinessFactoryBean.setServiceInterface(InputFileBeanRemoteBusiness.class);
 
         inputFileBeanRemoteBusinessFactoryBean.afterPropertiesSet();
@@ -78,12 +42,6 @@ public class BeanDataProvider implements DataProvider {
 
     public List<FileSignatureRecord> getFilesToSign(long userId) {
         List<InputFile> inputFiles = inputFileBusiness.getFilesForSigning(userId);
-        //List<InputFile> inputFiles = new ArrayList<InputFile>();
-        //InputFile inputFile1 = new InputFile();
-
-        //inputFile1.setFilePath("batch22838.zip");
-        //inputFile1.setId(1L);
-        //inputFiles.add(inputFile1);
 
         List<FileSignatureRecord> resultList = new ArrayList<FileSignatureRecord>(inputFiles.size());
         for (InputFile inputFile : inputFiles) {
@@ -98,15 +56,6 @@ public class BeanDataProvider implements DataProvider {
     }
 
     public String getBaseUrl() {
-        /*try {
-            return sysconfigBusiness.getSysconfigByKey(PORTAL_BASE_URL_CODE).getValue();
-        } catch (ResultInconsistentException ex) {
-            //log.log(Level.SEVERE, null, ex);
-        } catch (ResultNotFoundException ex) {
-            //log.log(Level.SEVERE, null, ex);
-        }
-        return null;*/
-
         return "http://localhost:8085";
     }
 

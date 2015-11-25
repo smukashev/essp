@@ -10,21 +10,17 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.liferay.util.portlet.PortletProps;
 import kz.bsbnb.usci.core.service.IBaseEntityMergeService;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
-import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.core.service.form.ISearcherFormService;
-import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.base.impl.BaseContainerType;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.util.Pair;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.commons.lang.StringUtils;
@@ -38,9 +34,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MainPortlet extends MVCPortlet {
-    private RmiProxyFactoryBean searcherFormEntryServiceFactoryBean;
-    private RmiProxyFactoryBean portalUserBean;
-
     private IMetaFactoryService metaFactoryService;
     private IEntityService entityService;
     private IBaseEntityMergeService entityMergeService;
@@ -51,7 +44,8 @@ public class MainPortlet extends MVCPortlet {
     void connectToServices() {
         try {
             RmiProxyFactoryBean metaFactoryServiceFactoryBean = new RmiProxyFactoryBean();
-            metaFactoryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/metaFactoryService");
+            metaFactoryServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1098/metaFactoryService");
             metaFactoryServiceFactoryBean.setServiceInterface(IMetaFactoryService.class);
             metaFactoryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
@@ -59,7 +53,8 @@ public class MainPortlet extends MVCPortlet {
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
-            entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
+            entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1098/entityService");
             entityServiceFactoryBean.setServiceInterface(IEntityService.class);
             entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
@@ -67,23 +62,26 @@ public class MainPortlet extends MVCPortlet {
             entityService = (IEntityService) entityServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean entityMergeServiceFactoryBean = new RmiProxyFactoryBean();
-            entityMergeServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/entityMergeService");
+            entityMergeServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1099/entityMergeService");
             entityMergeServiceFactoryBean.setServiceInterface(IBaseEntityMergeService.class);
             entityMergeServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
             entityMergeServiceFactoryBean.afterPropertiesSet();
             entityMergeService = (IBaseEntityMergeService) entityMergeServiceFactoryBean.getObject();
 
-            searcherFormEntryServiceFactoryBean = new RmiProxyFactoryBean();
-            searcherFormEntryServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/searcherFormService");
+            RmiProxyFactoryBean searcherFormEntryServiceFactoryBean = new RmiProxyFactoryBean();
+            searcherFormEntryServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1098/searcherFormService");
             searcherFormEntryServiceFactoryBean.setServiceInterface(ISearcherFormService.class);
             searcherFormEntryServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
             searcherFormEntryServiceFactoryBean.afterPropertiesSet();
             searcherFormService = (ISearcherFormService) searcherFormEntryServiceFactoryBean.getObject();
 
-            portalUserBean = new RmiProxyFactoryBean();
-            portalUserBean.setServiceUrl("rmi://127.0.0.1:1099/portalUserBeanRemoteBusiness");
+            RmiProxyFactoryBean portalUserBean = new RmiProxyFactoryBean();
+            portalUserBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1099/portalUserBeanRemoteBusiness");
             portalUserBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
             portalUserBean.setRefreshStubOnConnectFailure(true);
             portalUserBean.afterPropertiesSet();
@@ -102,7 +100,7 @@ public class MainPortlet extends MVCPortlet {
 
         classesFilter = new LinkedList<>();
 
-        for(String s : PortletProps.get("classes.filter").split(",")) {
+        for (String s : PortletProps.get("classes.filter").split(",")) {
             classesFilter.add(s);
         }
 
@@ -120,7 +118,7 @@ public class MainPortlet extends MVCPortlet {
 
         try {
             User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
-            if(user != null) {
+            if (user != null) {
                 for (Role role : user.getRoles()) {
                     if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
                             || role.getName().equals("NationalBankEmployee"))
@@ -133,7 +131,7 @@ public class MainPortlet extends MVCPortlet {
             e.printStackTrace();
         }
 
-        if(!hasRights)
+        if (!hasRights)
             return;
 
         super.doView(renderRequest, renderResponse);
@@ -169,7 +167,7 @@ public class MainPortlet extends MVCPortlet {
         if (title == null)
             title = code;
 
-        if(meta == null)
+        if (meta == null)
             throw new NullPointerException("Meta is null");
 
         String str = "{";
@@ -375,7 +373,7 @@ public class MainPortlet extends MVCPortlet {
         if (title == null)
             title = code;
 
-        if(type == null)
+        if (type == null)
             throw new NullPointerException("Type is null");
 
         String str = "{";
@@ -605,7 +603,7 @@ public class MainPortlet extends MVCPortlet {
 
                     Long creditorId = 0L;
 
-                    if(creditorList.size() == 1) {
+                    if (creditorList.size() == 1) {
                         creditorId = creditorList.get(0).getId();
                     } else {
                         System.err.println("Not correct creditors number(" + creditorList.size() + ")");
@@ -618,26 +616,26 @@ public class MainPortlet extends MVCPortlet {
                     MetaClass metaClass = metaFactoryService.getMetaClass(resourceRequest.getParameter("metaClass"));
                     searchClassName = resourceRequest.getParameter("searchName");
                     prefix = resourceRequest.getParameter("prefix");
-                    HashMap<String,String> parameters = new HashMap<String,String>();
+                    HashMap<String, String> parameters = new HashMap<String, String>();
 
-                    while(list.hasMoreElements()) {
+                    while (list.hasMoreElements()) {
                         String attribute = list.nextElement();
-                        if(attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
+                        if (attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
                             continue;
                         parameters.put(attribute, resourceRequest.getParameter(attribute));
                     }
 
                     ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, prefix, creditorId);
 
-                    if(searchResult.getData() == null)
+                    if (searchResult.getData() == null)
                         throw new RuntimeException("ошибка сериализации");
 
                     Iterator<BaseEntity> cursor = searchResult.iterator();
 
                     long ret = -1;
 
-                        
-                    if(cursor.hasNext()) {
+
+                    if (cursor.hasNext()) {
                         ret = cursor.next().getId();
                         ret = ret > 0 ? ret : -1;
                     }
@@ -648,19 +646,19 @@ public class MainPortlet extends MVCPortlet {
                 case LIST_CLASSES:
                     Long userId = 0L;
 
-                    if(currentUser != null)
+                    if (currentUser != null)
                         userId = currentUser.getUserId();
 
                     List<String[]> classes = searcherFormService.getMetaClasses(userId);
 
-                    if(classes.size() < 1)
+                    if (classes.size() < 1)
                         throw new RuntimeException("no.any.rights");
 
                     List<String[]> afterFilter = new LinkedList<>();
 
                     //portlet props + remove cr implementations
-                    for(String[]  c: classes)
-                        if(classesFilter.contains(c[1]) && !c[0].contains("cr"))
+                    for (String[] c : classes)
+                        if (classesFilter.contains(c[1]) && !c[0].contains("cr"))
                             afterFilter.add(c);
 
                     writer.write(JsonMaker.getCaptionedArray(afterFilter,
@@ -685,7 +683,7 @@ public class MainPortlet extends MVCPortlet {
                             StringUtils.isNotEmpty(leftReportDate) && StringUtils.isNotEmpty(rightReportDate)) {
 
                         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                        Date leftRD = df.   parse(leftReportDate);
+                        Date leftRD = df.parse(leftReportDate);
                         Date rightRD = df.parse(rightReportDate);
 
                         BaseEntity entityLeft = entityService.load(Integer.parseInt(leftEntityId), leftRD);
@@ -698,13 +696,12 @@ public class MainPortlet extends MVCPortlet {
                     }
                     break;
                 }
-                case LIST_CREDITOR:
-                {
+                case LIST_CREDITOR: {
                     Map m = new HashMap();
                     List<Map> l = new LinkedList<>();
                     List<Creditor> creditors =
                             portalUserBeanRemoteBusiness.getPortalUserCreditorList(currentUser.getUserId());
-                    for(Creditor creditor: creditors) {
+                    for (Creditor creditor : creditors) {
                         Map creditorMap = new HashMap();
                         creditorMap.put("id", creditor.getId());
                         creditorMap.put("title", creditor.getName());

@@ -6,6 +6,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.portlet.report.ReportApplication;
 import kz.bsbnb.usci.portlet.report.ReportPortletResource;
 import kz.bsbnb.usci.portlet.report.dm.Report;
@@ -82,8 +83,10 @@ public class TableReportExporter extends AbstractReportExporter {
         try {
             Report report = getTargetReportComponent().getReport();
             final String reportName = report.getName();
-            final String reportPath = ConstantValues.REPORT_FILES_CATALOG + reportName + "\\";
-            final String resourceFilePath = reportPath + reportName + "_" + getApplicationLocale().getLanguage() + ".properties";
+            final String reportPath = StaticRouter.getReportFilesCatalog() + reportName + "\\";
+            final String resourceFilePath = reportPath + reportName + "_" +
+                    getApplicationLocale().getLanguage() + ".properties";
+
             log.log(Level.INFO, "Resources file: {0}", resourceFilePath);
             PropertyResourceBundle resourceBundle = new PropertyResourceBundle(new FileInputStream(resourceFilePath));
             Object[] columnNames = table.getVisibleColumns();

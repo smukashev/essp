@@ -1134,7 +1134,7 @@ Ext.onReady(function() {
                 }, {
                     xtype: 'datefield',
                     id: 'edDate',
-                    fieldLabel: 'label_date',
+                    fieldLabel: 'Дата',
                     listeners: {
                         change: function(){
                             console.log('datefield changed');

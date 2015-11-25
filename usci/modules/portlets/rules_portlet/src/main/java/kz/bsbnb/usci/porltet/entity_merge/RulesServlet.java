@@ -6,6 +6,7 @@ import kz.bsbnb.usci.brms.rulesvr.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.porltet.entity_merge.model.json.JsonMaker;
@@ -207,7 +208,7 @@ public class RulesServlet extends HttpServlet {
         //rulesSingleton.reloadCache();
 
         entityServiceFactoryBean = new RmiProxyFactoryBean();
-        entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
+        entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1098/entityService");
         entityServiceFactoryBean.setServiceInterface(IEntityService.class);
         entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
@@ -216,7 +217,7 @@ public class RulesServlet extends HttpServlet {
 
 
         ruleServiceFactoryBean = new RmiProxyFactoryBean();
-        ruleServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/ruleService");
+        ruleServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/ruleService");
         ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
 
         ruleServiceFactoryBean.afterPropertiesSet();
@@ -225,7 +226,7 @@ public class RulesServlet extends HttpServlet {
         //rulesSingleton = ruleService.getRulesSingleton();
 
         batchServiceFactoryBean = new RmiProxyFactoryBean();
-        batchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
+        batchServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchService");
         batchServiceFactoryBean.setServiceInterface(IBatchService.class);
 
         batchServiceFactoryBean.afterPropertiesSet();

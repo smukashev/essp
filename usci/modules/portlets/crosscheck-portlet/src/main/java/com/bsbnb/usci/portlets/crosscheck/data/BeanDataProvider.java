@@ -5,6 +5,7 @@ import com.bsbnb.usci.portlets.crosscheck.PortletEnvironmentFacade;
 import com.bsbnb.usci.portlets.crosscheck.dm.*;
 import com.bsbnb.usci.portlets.crosscheck.helper.DbHelper;
 import com.bsbnb.usci.portlets.crosscheck.helper.ModelHelper;
+import kz.bsbnb.usci.eav.StaticRouter;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -56,8 +57,8 @@ public class BeanDataProvider implements DataProvider {
         Statement stmt = null;
         String query = "SELECT t0.REF_CREDITOR_ID AS ID, t0.OPEN_DATE AS CHANGE_DATE, t0.CODE, t0.NAME, t0.SHORT_NAME, " +
                 "t0.CLOSE_DATE AS SHUTDOWN_DATE, 0 AS MAIN_OFFICE_ID, t0.SUBJECT_TYPE_ID " +
-                "FROM " + CrossCheckApplication.SHOWCASE_SCHEMA + ".R_REF_CREDITOR t0, " + CrossCheckApplication.CORE_SCHEMA +
-                ".EAV_A_CREDITOR_USER t2, " + CrossCheckApplication.CORE_SCHEMA + ".EAV_A_USER t1 " +
+                "FROM " + StaticRouter.getShowcaseSchemaName() + ".R_REF_CREDITOR t0, " + StaticRouter.getCoreSchemaName() +
+                ".EAV_A_CREDITOR_USER@core t2, " + StaticRouter.getCoreSchemaName() + ".EAV_A_USER@core t1 " +
                 "WHERE ((t1.USER_ID = " + BigInteger.valueOf(facade.getUserID()) +") " +
                 "AND ((t2.CREDITOR_ID = t0.REF_CREDITOR_ID) AND (t1.USER_ID = t2.USER_ID))) " +
                 "AND (t0.REF_CREDITOR_ID = "+CreditorId+" OR "+CreditorId+" is NULL )"+
@@ -219,7 +220,7 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM " + CrossCheckApplication.SHOWCASE_SCHEMA +
+        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM " + StaticRouter.getShowcaseSchemaName() +
                 ".R_REF_CREDITOR";
 
         log.log(Level.INFO, "getFirstNotApprovedDate: " + query);
@@ -254,7 +255,7 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM " + CrossCheckApplication.SHOWCASE_SCHEMA +
+        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM " + StaticRouter.getShowcaseSchemaName() +
                 ".R_REF_CREDITOR";
 
         log.log(Level.INFO, "getLastApprovedDate: " + query);
