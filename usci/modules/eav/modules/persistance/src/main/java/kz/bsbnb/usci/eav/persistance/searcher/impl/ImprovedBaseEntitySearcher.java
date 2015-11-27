@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -103,7 +104,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 if ((baseValue == null || baseValue.getValue() == null) &&
                         metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
-                    throw new IllegalArgumentException("Ключевой атрибут(" + name + ") не может быть пустым. " +
+                    throw new KnownException("Ключевой атрибут(" + name + ") не может быть пустым. " +
                             "Мета класс: " + entity.getMeta().getClassName() + ";");
 
 
@@ -122,8 +123,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                     String valueAlias = "v_" + name;
                                     condition = condition == null ?
                                             EAV_BE_BOOLEAN_VALUES.as(valueAlias).VALUE.equal(DataUtils.convert(booleanValue))
-                                                    .and(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.equal(DataUtils.convert(false)))
-                                                    .and(EAV_BE_BOOLEAN_VALUES.IS_LAST.equal(DataUtils.convert(true))) :
+                                                    .and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
+                                                    .and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).IS_LAST.equal(DataUtils.convert(true))) :
                                             condition.and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).VALUE.equal(DataUtils.convert(booleanValue)))
                                                     .and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
                                                     .and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).IS_LAST.equal(DataUtils.convert(true)));
@@ -146,8 +147,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                     String valueAlias = "v_" + name;
                                     condition = condition == null ?
                                             EAV_BE_DATE_VALUES.as(valueAlias).VALUE.equal(dateValue)
-                                                    .and(EAV_BE_DATE_VALUES.IS_CLOSED.equal(DataUtils.convert(false)))
-                                                    .and(EAV_BE_DATE_VALUES.IS_LAST.equal(DataUtils.convert(true))) :
+                                                    .and(EAV_BE_DATE_VALUES.as(valueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
+                                                    .and(EAV_BE_DATE_VALUES.as(valueAlias).IS_LAST.equal(DataUtils.convert(true))) :
                                             condition.and(EAV_BE_DATE_VALUES.as(valueAlias).VALUE.equal(dateValue))
                                                     .and(EAV_BE_DATE_VALUES.as(valueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
                                                     .and(EAV_BE_DATE_VALUES.as(valueAlias).IS_LAST.equal(DataUtils.convert(true)));

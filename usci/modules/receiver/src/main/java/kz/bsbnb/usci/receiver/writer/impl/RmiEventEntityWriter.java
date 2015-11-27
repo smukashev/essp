@@ -3,6 +3,7 @@ package kz.bsbnb.usci.receiver.writer.impl;
 import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.receiver.common.Global;
@@ -80,8 +81,10 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
             List<String> errors = new LinkedList<>(entity.getValidationErrors());
             String ruleRuntimeException = null;
 
+            // Fixme!
             if(global.isRulesEnabled() && entity.getMeta() != null &&
-                    metaRules.contains(entity.getMeta().getClassName())) {
+                    metaRules.contains(entity.getMeta().getClassName()) && (entity.getOperation() != null
+            && (entity.getOperation().equals(OperationType.INSERT) || entity.getOperation().equals(OperationType.UPDATE)))) {
                 try {
                     long t1 = System.currentTimeMillis();
 
