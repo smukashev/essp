@@ -89,7 +89,7 @@ public class ReportController {
                     log.log(Level.WARNING, "REPORT_INPUT_PARAMETER: ", e);
                     throw e;
                 }
-                String query3 = "select ep.* from reporter.report_export_type rep, reporter.export_type ep    where rep.export_type_id=ep.id and rep.report_id="+rs.getLong("ID");
+                String query3 = "select ep.* from report_export_type rep, export_type ep    where rep.export_type_id=ep.id and rep.report_id="+rs.getLong("ID");
                 try
                 {
                     stmt3 = conn.createStatement();
