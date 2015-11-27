@@ -4,8 +4,8 @@ rule clear
 # credit
 #===========================================================================================
 rule set date 01.04.2001
-#rule create package credit_parser
-#rule rc
+rule create package credit_parser
+rule rc
 rule set package credit_parser
 rule set version
 
@@ -30,9 +30,9 @@ rule import usci/modules/cli/src/main/resources/rules/ba/rule_noba.cli
 #===========================================================================================
 # ref_creditor
 #===========================================================================================
-#rule set date 01.04.2001
-#rule create package ref_creditor_parser
-#rule rc
+rule set date 01.04.2001
+rule create package ref_creditor_parser
+rule rc
 rule set package ref_creditor_parser
 rule set version
 
@@ -44,9 +44,9 @@ rule import usci/modules/cli/src/main/resources/rules/docs/ref_creditor.cli
 #===========================================================================================
 # ref_creditor_branch
 #===========================================================================================
-#rule set date 01.04.2001
-#rule create package ref_creditor_branch_parser
-#rule rc
+rule set date 01.04.2001
+rule create package ref_creditor_branch_parser
+rule rc
 rule set package ref_creditor_branch_parser
 rule set version
 
@@ -58,9 +58,9 @@ rule import usci/modules/cli/src/main/resources/rules/docs/ref_creditor_branch.c
 #===========================================================================================
 # ref_exclusive_doc
 #===========================================================================================
-#rule set date 01.04.2001
-#rule create package ref_exclusive_doc_parser
-#rule rc
+rule set date 01.04.2001
+rule create package ref_exclusive_doc_parser
+rule rc
 rule set package ref_exclusive_doc_parser
 rule set version
 
