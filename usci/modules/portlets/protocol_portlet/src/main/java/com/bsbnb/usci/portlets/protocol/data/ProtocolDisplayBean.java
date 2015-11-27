@@ -47,7 +47,7 @@ public class ProtocolDisplayBean {
      * ERROR or INFO
      */
     public String getMessageType() {
-        String typeName = getTypeName();
+        String typeName = getMessageTypeCode();
 
         if ("ERROR".equals(typeName)) {
             return "ERROR";
@@ -115,7 +115,7 @@ public class ProtocolDisplayBean {
     }
 
     public boolean isError() {
-        return "ERROR".equals(getMessageType());
+        return "ERROR".equals(getMessageTypeCode());
     }
 
     public String getMessageTypeCode() {
