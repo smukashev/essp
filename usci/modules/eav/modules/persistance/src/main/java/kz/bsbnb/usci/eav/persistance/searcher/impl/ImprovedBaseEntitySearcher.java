@@ -123,8 +123,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                     String valueAlias = "v_" + name;
                                     condition = condition == null ?
                                             EAV_BE_BOOLEAN_VALUES.as(valueAlias).VALUE.equal(DataUtils.convert(booleanValue))
-                                                    .and(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.equal(DataUtils.convert(false)))
-                                                    .and(EAV_BE_BOOLEAN_VALUES.IS_LAST.equal(DataUtils.convert(true))) :
+                                                    .and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
+                                                    .and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).IS_LAST.equal(DataUtils.convert(true))) :
                                             condition.and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).VALUE.equal(DataUtils.convert(booleanValue)))
                                                     .and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
                                                     .and(EAV_BE_BOOLEAN_VALUES.as(valueAlias).IS_LAST.equal(DataUtils.convert(true)));
@@ -147,8 +147,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                     String valueAlias = "v_" + name;
                                     condition = condition == null ?
                                             EAV_BE_DATE_VALUES.as(valueAlias).VALUE.equal(dateValue)
-                                                    .and(EAV_BE_DATE_VALUES.IS_CLOSED.equal(DataUtils.convert(false)))
-                                                    .and(EAV_BE_DATE_VALUES.IS_LAST.equal(DataUtils.convert(true))) :
+                                                    .and(EAV_BE_DATE_VALUES.as(valueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
+                                                    .and(EAV_BE_DATE_VALUES.as(valueAlias).IS_LAST.equal(DataUtils.convert(true))) :
                                             condition.and(EAV_BE_DATE_VALUES.as(valueAlias).VALUE.equal(dateValue))
                                                     .and(EAV_BE_DATE_VALUES.as(valueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
                                                     .and(EAV_BE_DATE_VALUES.as(valueAlias).IS_LAST.equal(DataUtils.convert(true)));
