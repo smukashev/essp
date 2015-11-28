@@ -67,7 +67,7 @@
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.3.0</version>
+            <version>11.2.0.4</version>
         </dependency>
         <dependency>
             <groupId>postgresql</groupId>
@@ -174,7 +174,7 @@
                     <dependency>
                         <groupId>com.oracle</groupId>
                         <artifactId>ojdbc6</artifactId>
-                        <version>11.2.0.3.0</version>
+                        <version>11.2.0.4</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -244,42 +244,42 @@
                 </configuration>
             </plugin>
             <!-- Uncomment this to recreate the database  -->
-            <!--<plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
+            <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.2.1</version>
 
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
+            <executions>
+                <execution>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>java</goal>
+                    </goals>
+                </execution>
+            </executions>
 
-                <dependencies>
-                    <dependency>
-                        <groupId>kz.bsbnb.usci.eav</groupId>
-                        <artifactId>tool</artifactId>
-                        <version>0.0.1-SNAPSHOT</version>
-                    </dependency>
-                </dependencies>
+            <dependencies>
+                <dependency>
+                    <groupId>kz.bsbnb.usci.eav</groupId>
+                    <artifactId>tool</artifactId>
+                    <version>0.0.1-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
 
-                <configuration>
-                    <mainClass>kz.bsbnb.usci.tool.ddl.DDLHelper</mainClass>
-                    <arguments>
-                        <argument>apply</argument>
-                        <argument>${basedir}/src/main/resources/tmpl/create_db.ddl</argument>
-                    </arguments>
-                    <systemProperties>
-                        <systemProperty>
-                            <key>spring.profiles.active</key>
-                            <value>oracle</value>
-                        </systemProperty>
-                    </systemProperties>
-                </configuration>
-            </plugin>-->
+            <configuration>
+                <mainClass>kz.bsbnb.usci.tool.ddl.DDLHelper</mainClass>
+                <arguments>
+                    <argument>apply</argument>
+                    <argument>${basedir}/src/main/resources/tmpl/create_db.ddl</argument>
+                </arguments>
+                <systemProperties>
+                    <systemProperty>
+                        <key>spring.profiles.active</key>
+                        <value>oracle</value>
+                    </systemProperty>
+                </systemProperties>
+            </configuration>
+        </plugin>
         </plugins>
     </build>
 
