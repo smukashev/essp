@@ -773,6 +773,7 @@
 	  <column name="key_string" primaryKey="false" required="true" type="VARCHAR" size="32" autoIncrement="false"/>
 	  <column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 	  <unique name="eo_UN_ks">
+	    <unique-column name="meta_id"/>
       <unique-column name="key_string"/>
     </unique>
     <index name="eo_IN_mi_ks">
