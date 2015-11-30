@@ -596,20 +596,19 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + meta.hashCode();
-        result = 31 * result + values.hashCode();
+        result += 31 * result + meta.hashCode();
+        result += 31 * result + values.hashCode();
+
         return result;
     }
     public int hashCode2() {
-        int result = 0;
-        result = 31 * result + meta.hashCode();
+        int result = 31 * meta.hashCode();
 
         for(String name : meta.getAttributeNames()) {
             IMetaAttribute metaAttribute = meta.getMetaAttribute(name);
             if (metaAttribute.isKey()) {
                 result += values.get(name).getValue().toString().hashCode();
             }
-
         }
 
         return result;
