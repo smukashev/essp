@@ -11,11 +11,6 @@ import java.util.TreeSet;
 
 public class BasicOptimizer implements IEavOptimizer {
     @Override
-    public String getMetaName() {
-        return null;
-    }
-
-    @Override
     public String getKeyString(IBaseEntity iBaseEntity) {
         MetaClass meta = iBaseEntity.getMeta();
 

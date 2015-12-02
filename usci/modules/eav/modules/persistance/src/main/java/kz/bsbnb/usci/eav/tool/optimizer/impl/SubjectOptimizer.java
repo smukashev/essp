@@ -12,11 +12,6 @@ import java.util.List;
 
 public class SubjectOptimizer implements IEavOptimizer {
     @Override
-    public String getMetaName() {
-        return "subject";
-    }
-
-    @Override
     public String getKeyString(IBaseEntity iBaseEntity) {
         StringBuilder stringBuilder = new StringBuilder();
 
