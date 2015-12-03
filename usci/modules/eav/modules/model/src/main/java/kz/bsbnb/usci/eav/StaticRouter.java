@@ -33,7 +33,7 @@ public final class StaticRouter {
     /* Portal URL */
     private final static String stendPortalUrl = "10.10.20.22";
     private final static String devPortalUrl = "localhost";
-    private final static String prodPortalUrl = "192.168.20.50";
+    private final static String prodPortalUrl = "essp.nationalbank.kz";
 
     /* Portal port */
     private final static String stendPortalPort = "8080";
