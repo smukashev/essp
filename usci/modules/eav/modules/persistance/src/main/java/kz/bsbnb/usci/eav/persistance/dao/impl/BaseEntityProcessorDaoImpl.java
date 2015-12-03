@@ -124,7 +124,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
                         if (childBaseEntity.getValueCount() != 0)
-                            prepare((IBaseEntity) baseValue.getValue(), creditorId);
+                          baseValue.setValue(prepare((IBaseEntity) baseValue.getValue(), creditorId));
                     }
                 }
             } else {
