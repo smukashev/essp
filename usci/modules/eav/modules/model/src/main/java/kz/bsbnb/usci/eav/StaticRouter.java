@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav;
 
 public final class StaticRouter {
     private enum MODE {
+        STEND,
         DEV,
         PROD
     }
@@ -10,59 +11,74 @@ public final class StaticRouter {
     private static final MODE mode = MODE.PROD;
 
     /* Application Server IP */
+    private final static String stendAsIP = "10.10.20.28";
     private final static String devAsIP = "localhost";
     private final static String prodAsIP = "10.8.1.116";
 
     /* Core Schema IP */
+    private final static String stendDBCoreIP = "10.10.20.27";
     private final static String devDBCoreIP = "localhost";
     private final static String prodDBCoreIp = "10.8.1.200";
 
     /* Showcase Schema IP */
+    private final static String stendDBShowcaseIP = "10.10.20.27";
     private final static String devDBShowcaseIP = "localhost";
     private final static String prodDBShowcaseIP = "10.8.1.85";
 
     /* Reporter Schema IP */
+    private final static String stendDBReporterIP = "10.10.20.27";
     private final static String devDBReporterIP = "localhost";
     private final static String prodDBReporterIP = "10.8.1.85";
 
     /* Portal URL */
+    private final static String stendPortalUrl = "10.10.20.22";
     private final static String devPortalUrl = "localhost";
     private final static String prodPortalUrl = "essp.nationalbank.kz";
 
     /* Portal port */
+    private final static String stendPortalPort = "8080";
     private final static String devPortalPort = "80";
     private final static String prodPortalPort = "80";
 
     /* Core Schema name */
+    private final static String stendCoreSchemaName = "C##CORE";
     private final static String devCoreSchemaName = "C##CORE";
     private final static String prodCoreSchemaName = "CORE";
 
     /* Showcase Schema name */
+    private final static String stendShowcaseSchemaName = "C##SHOWCASE";
     private final static String devShowcaseSchemaName = "C##SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHOWCASE3";
 
     /* Credit Registry DB IP */
+    private final static String stendCRDBIP = "10.10.20.44";
     private final static String devCRDBIP = "10.10.20.44";
     private final static String prodCRDBIP  = "10.8.1.97";
 
     /* Credit Registry DB Username */
+    private final static String stendCRDBUsername = "core";
     private final static String devCRDBUsername = "core";
     private final static String prodCRDBUsername = "core";
 
     /* Credit Registry DB Password */
+    private final static String stendCRDBPassword = "core_sep_2014";
     private final static String devCRDBPassword = "core_sep_2014";
     private final static String prodCRDBPassword = "core_aug_2015";
 
     /* Report files catalog */
+    private final static String stendReportFilesCatalog = "/home/essp/Portal_afn/Report/";
     private final static String devReportFilesCatalog = "/home/essp/Portal_afn/Report/";
     private final static String prodReportFilesCatalog = "C:\\Portal_afn\\Report\\";
 
     /* Report files folder */
+    private final static String stendReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
     private final static String devReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
     private final static String prodReportFilesFolder = "C:\\Portal_afn\\generated_reports\\";
 
     public static String getAsIP() {
         switch(mode) {
+            case STEND:
+                return stendAsIP;
             case DEV:
                 return devAsIP;
             case PROD:
@@ -74,6 +90,8 @@ public final class StaticRouter {
 
     public static String getDBCoreIP() {
         switch(mode) {
+            case STEND:
+                return stendDBCoreIP;
             case DEV:
                 return devDBCoreIP;
             case PROD:
@@ -85,6 +103,8 @@ public final class StaticRouter {
 
     public static String getDBShowcaseIP() {
         switch(mode) {
+            case STEND:
+                return stendDBShowcaseIP;
             case DEV:
                 return devDBShowcaseIP;
             case PROD:
@@ -96,6 +116,8 @@ public final class StaticRouter {
 
     public static String getDBReporterIP() {
         switch(mode) {
+            case STEND:
+                return stendDBReporterIP;
             case DEV:
                 return devDBReporterIP;
             case PROD:
@@ -107,6 +129,8 @@ public final class StaticRouter {
 
     public static String getPortalUrl() {
         switch(mode) {
+            case STEND:
+                return stendPortalUrl;
             case DEV:
                 return devPortalUrl;
             case PROD:
@@ -118,6 +142,8 @@ public final class StaticRouter {
 
     public static String getPortalPort() {
         switch(mode) {
+            case STEND:
+                return stendPortalPort;
             case DEV:
                 return devPortalPort;
             case PROD:
@@ -129,6 +155,8 @@ public final class StaticRouter {
 
     public static String getCoreSchemaName() {
         switch(mode) {
+            case STEND:
+                return stendCoreSchemaName;
             case DEV:
                 return devCoreSchemaName;
             case PROD:
@@ -140,6 +168,8 @@ public final class StaticRouter {
 
     public static String getShowcaseSchemaName() {
         switch(mode) {
+            case STEND:
+                return stendShowcaseSchemaName;
             case DEV:
                 return devShowcaseSchemaName;
             case PROD:
@@ -151,6 +181,8 @@ public final class StaticRouter {
 
     public static String getCRDBIP() {
         switch(mode) {
+            case STEND:
+                return stendCRDBIP;
             case DEV:
                 return devCRDBIP;
             case PROD:
@@ -162,6 +194,8 @@ public final class StaticRouter {
 
     public static String getCRDBUsername() {
         switch(mode) {
+            case STEND:
+                return stendCRDBUsername;
             case DEV:
                 return devCRDBUsername;
             case PROD:
@@ -173,6 +207,8 @@ public final class StaticRouter {
 
     public static String getCRDBPassword() {
         switch(mode) {
+            case STEND:
+                return stendCRDBPassword;
             case DEV:
                 return devCRDBPassword;
             case PROD:
@@ -184,6 +220,8 @@ public final class StaticRouter {
 
     public static String getReportFilesCatalog() {
         switch(mode) {
+            case STEND:
+                return stendReportFilesCatalog;
             case DEV:
                 return devReportFilesCatalog;
             case PROD:
@@ -195,6 +233,8 @@ public final class StaticRouter {
 
     public static String getReportFilesFolder() {
         switch(mode) {
+            case STEND:
+                return stendReportFilesFolder;
             case DEV:
                 return devReportFilesFolder;
             case PROD:
