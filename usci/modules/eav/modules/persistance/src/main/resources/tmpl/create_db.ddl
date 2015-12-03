@@ -776,9 +776,8 @@
 	    <unique-column name="meta_id"/>
       <unique-column name="key_string"/>
     </unique>
-    <index name="eo_IN_mi_ks">
-			<index-column name="meta_id"/>
-			<index-column name="key_string"/>
+    <index name="eo_IN_ei">
+			<index-column name="entity_id"/>
 		</index>
 	</table>
 	<!-- DROOLS -->

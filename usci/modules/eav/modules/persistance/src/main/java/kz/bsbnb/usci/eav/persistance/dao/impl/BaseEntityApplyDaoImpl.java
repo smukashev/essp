@@ -2407,9 +2407,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         if (insertedObject instanceof BaseEntity) {
                             BaseEntity be = (BaseEntity) insertedObject;
-                            if (be.getMeta().getClassName().equals("subject")) {
+                            if (BasicOptimizer.metaList.contains(be.getMeta().getClassName())) {
                                 EavOptimizerData eod = new EavOptimizerData(be.getMeta().getId(), be.getId(),
-                                        new BasicOptimizer().getKeyString(be));
+                                        BasicOptimizer.getKeyString(be));
                                 eavOptimizerDao.insert(eod);
                             }
                         }
