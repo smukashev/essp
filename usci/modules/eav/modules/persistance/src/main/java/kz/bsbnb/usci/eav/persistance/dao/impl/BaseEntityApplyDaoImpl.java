@@ -14,6 +14,8 @@ import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
+import kz.bsbnb.usci.eav.tool.optimizer.EavOptimizerData;
+import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,16 +27,19 @@ import java.util.*;
 @Repository
 public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityApplyDao {
     @Autowired
-    IPersistableDaoPool persistableDaoPool;
+    private IPersistableDaoPool persistableDaoPool;
 
     @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
+    private IBaseEntityLoadDao baseEntityLoadDao;
 
     @Autowired
-    IBaseEntityReportDateDao baseEntityReportDateDao;
+    private IBaseEntityReportDateDao baseEntityReportDateDao;
 
     @Autowired
-    IRefRepository refRepositoryDao;
+    private IRefRepository refRepositoryDao;
+
+    @Autowired
+    private IEavOptimizerDao eavOptimizerDao;
 
     @Value("${refs.cache.enabled}")
     private boolean isReferenceCacheEnabled;
@@ -2399,6 +2404,15 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 for (IPersistable insertedObject : insertedObjects) {
                     try {
                         persistableDao.insert(insertedObject);
+
+                        if (insertedObject instanceof BaseEntity) {
+                            BaseEntity be = (BaseEntity) insertedObject;
+                            if (be.getMeta().getClassName().equals("subject")) {
+                                EavOptimizerData eod = new EavOptimizerData(be.getMeta().getId(), be.getId(),
+                                        new BasicOptimizer().getKeyString(be));
+                                eavOptimizerDao.insert(eod);
+                            }
+                        }
                     } catch (Exception e) {
                         throw new IllegalStateException("Ошибка при вставке: " + e.getMessage() +
                                 "\n" + insertedObject);

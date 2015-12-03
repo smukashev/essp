@@ -22,6 +22,7 @@ import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherP
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
+import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Select;
@@ -58,6 +59,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Autowired
     IRefProcessorDao refProcessorDao;
+
+    @Autowired
+    IEavOptimizerDao eavOptimizerDao;
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -99,6 +103,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             if (refBaseEntity != null)
                 return refBaseEntity;
         }
+
         creditorId = metaClass.isReference() ? 0 : creditorId;
 
         for (String attribute : baseEntity.getAttributes()) {
@@ -124,7 +129,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
                         if (childBaseEntity.getValueCount() != 0)
-                          baseValue.setValue(prepare((IBaseEntity) baseValue.getValue(), creditorId));
+                            baseValue.setValue(prepare((IBaseEntity) baseValue.getValue(), creditorId));
                     }
                 }
             } else {
@@ -134,10 +139,20 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
 
         if (metaClass.isSearchable()) {
-            long baseEntityId = search(baseEntity, creditorId);
+            long baseEntityId;
+            if (metaClass.getClassName().equals("subject")) {
+                baseEntityId = eavOptimizerDao.find(new BasicOptimizer().getKeyString(baseEntity));
+            } else {
+                baseEntityId = search(baseEntity, creditorId);
+            }
 
             if (baseEntityId > 0)
                 baseEntity.setId(baseEntityId);
+        }
+
+        // fixme!
+        if (metaClass.getClassName().equals("ref_doc_type") && baseEntity.getId() > 0) {
+            baseEntity = baseEntityLoadDao.load(baseEntity.getId());
         }
 
         return baseEntity;

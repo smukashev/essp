@@ -12,24 +12,24 @@ global add --type=REPORT_STATUS --code=ORGANIZATION_APPROVED --value=128 --desc=
 #
 # ENTITY_STATUS
 #
-global add --type=ENTITY_STATUS --code=ERROR --value=ERROR --desc=ERROR
-global add --type=ENTITY_STATUS --code=PARSING --value=PARSING --desc=PARSING
-global add --type=ENTITY_STATUS --code=CHECK_IN_PARSER --value=CHECK_IN_PARSER --desc=CHECK_IN_PARSER
-global add --type=ENTITY_STATUS --code=WAITING --value=WAITING --desc=WAITING
-global add --type=ENTITY_STATUS --code=PROCESSING --value=PROCESSING --desc=PROCESSING
-global add --type=ENTITY_STATUS --code=CHECK_IN_CORE --value=CHECK_IN_CORE --desc=CHECK_IN_CORE
-global add --type=ENTITY_STATUS --code=SAVING --value=SAVING --desc=SAVING
-global add --type=ENTITY_STATUS --code=COMPLETED --value=COMPLETED --desc=COMPLETED
-global add --type=ENTITY_STATUS --code=TOTAL_COUNT --value=TOTAL_COUNT --desc=TOTAL_COUNT
-global add --type=ENTITY_STATUS --code=ACTUAL_COUNT --value=ACTUAL_COUNT --desc=ACTUAL_COUNT
+global add --type=ENTITY_STATUS --code=ERROR --value=ERROR --desc=Ошибка
+global add --type=ENTITY_STATUS --code=PARSING --value=PARSING --desc=Парсинг
+global add --type=ENTITY_STATUS --code=CHECK_IN_PARSER --value=CHECK_IN_PARSER --desc=Проверка в парсере
+global add --type=ENTITY_STATUS --code=WAITING --value=WAITING --desc=В ожиданий
+global add --type=ENTITY_STATUS --code=PROCESSING --value=PROCESSING --desc=В обработке
+global add --type=ENTITY_STATUS --code=CHECK_IN_CORE --value=CHECK_IN_CORE --desc=Проверка
+global add --type=ENTITY_STATUS --code=SAVING --value=SAVING --desc=В процессе сохранения
+global add --type=ENTITY_STATUS --code=COMPLETED --value=COMPLETED --desc=Завершён
+global add --type=ENTITY_STATUS --code=TOTAL_COUNT --value=TOTAL_COUNT --desc=Общее количество
+global add --type=ENTITY_STATUS --code=ACTUAL_COUNT --value=ACTUAL_COUNT --desc=Заявленное количество
 
 #
 # BATCH_STATUS
 #
 global add --type=BATCH_STATUS --code=WAITING --value=WAITING --desc=В_очереди
 global add --type=BATCH_STATUS --code=PROCESSING --value=PROCESSING --desc=В_обработке
-global add --type=BATCH_STATUS --code=ERROR --value=ERROR --desc=ERROR
-global add --type=BATCH_STATUS --code=COMPLETED --value=COMPLETED --desc=COMPLETED
+global add --type=BATCH_STATUS --code=ERROR --value=ERROR --desc=Ошибка
+global add --type=BATCH_STATUS --code=COMPLETED --value=COMPLETED --desc=Завершён
 
 #
 # NOTIFICATION
