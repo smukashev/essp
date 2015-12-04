@@ -325,7 +325,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                 MetaClass metaClass = metaClassRepository.getMetaClass(metaId);
 
-                sbUsages.append(metaClass.getClassName() + ", ");
+                sbUsages.append(metaClass.getClassName()).append(", ");
             }
 
             if (rows.size() > 0) {
@@ -362,10 +362,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        Iterator<Map<String, Object>> i = rows.iterator();
-        while (i.hasNext()) {
-            Map<String, Object> row = i.next();
-
+        for (Map<String, Object> row : rows) {
             entityIds.add(((BigDecimal) row.get(EAV_BE_ENTITIES.ID.getName())).longValue());
         }
 
