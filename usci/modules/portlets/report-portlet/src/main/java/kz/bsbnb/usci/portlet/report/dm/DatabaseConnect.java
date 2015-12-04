@@ -249,7 +249,7 @@ public class DatabaseConnect {
                 String parameterValueString = "";
                 if (parameter instanceof Date) {
                     Date dateParameter = (Date) parameter;
-                    statement.setTimestamp(parameterIndex + 4, new Timestamp(dateParameter.getTime()));
+                    statement.setDate(parameterIndex + 4, new java.sql.Date(dateParameter.getTime()));//setTimestamp(parameterIndex + 4, new Timestamp(dateParameter.getTime()));
                 } else {
                     parameterValueString = parameter.toString();
                     statement.setString(parameterIndex + 4, parameterValueString);
@@ -261,6 +261,8 @@ public class DatabaseConnect {
             return ocs.getCursor(1);
         } finally {
             closeResources(null, null, null, connection);
+
+
         }
     }
 

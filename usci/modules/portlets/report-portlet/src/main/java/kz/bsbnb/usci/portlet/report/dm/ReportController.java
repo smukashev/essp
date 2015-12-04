@@ -73,7 +73,7 @@ public class ReportController {
                             input.setNameRu(rs2.getString("NAME_RU"));
                             input.setNameKz(rs2.getString("NAME_KZ"));
                             input.setOrderNumber(rs2.getInt("ORDER_NUMBER"));
-                            input.setParameterName("NAME");
+                            input.setParameterName(rs2.getString("NAME"));
                             if(rs2.getString("TYPE")!=null) {
                                 input.setParameterType(ParameterType.fromString(rs2.getString("TYPE")));
                             }
