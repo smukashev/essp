@@ -2256,7 +2256,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseEntity childBaseEntityLoaded = (IBaseEntity) childBaseValueLoaded.getValue();
 
                     if (childBaseEntityLoaded != null)
-                        baseEntityManager.registerUnusedBaseEntity(childBaseEntityLoaded);
+                        baseEntityManager.registerAsDeleted(childBaseEntityLoaded);
 
                     boolean last = childBaseValueLoaded.isLast();
 
@@ -2268,7 +2268,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             IBaseEntity childBaseEntityNext = (IBaseEntity) childBaseValueNext.getValue();
 
                             if (childBaseEntityNext != null)
-                                baseEntityManager.registerUnusedBaseEntity(childBaseEntityNext);
+                                baseEntityManager.registerAsDeleted(childBaseEntityNext);
 
                             last = childBaseValueNext.isLast();
                         }
