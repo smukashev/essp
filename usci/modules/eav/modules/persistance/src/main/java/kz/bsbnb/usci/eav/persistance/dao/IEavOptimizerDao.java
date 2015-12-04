@@ -6,4 +6,6 @@ public interface IEavOptimizerDao {
     long insert (EavOptimizerData eavOptimizerData);
 
     long find (String keyString);
+
+    void delete(long baseEntityId);
 }

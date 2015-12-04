@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IEavOptimizerDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.tool.optimizer.EavOptimizerData;
 import org.jooq.DSLContext;
+import org.jooq.Delete;
 import org.jooq.Insert;
 import org.jooq.Select;
 import org.slf4j.Logger;
@@ -57,5 +58,16 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
         Map<String, Object> row = rows.get(0);
 
         return ((BigDecimal) row.get(EAV_OPTIMIZER.as(tableAlias).ENTITY_ID.getName())).longValue();
+    }
+
+    @Override
+    public void delete(long baseEntityId) {
+        String tableAlias = "sv";
+        Delete delete = context
+                .delete(EAV_OPTIMIZER.as(tableAlias))
+                .where(EAV_OPTIMIZER.as(tableAlias).ENTITY_ID.equal(baseEntityId));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
     }
 }
