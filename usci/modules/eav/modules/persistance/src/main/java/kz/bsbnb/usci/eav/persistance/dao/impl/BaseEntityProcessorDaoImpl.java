@@ -140,8 +140,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         if (metaClass.isSearchable()) {
             long baseEntityId;
-            if (metaClass.getClassName().equals("subject")) {
-                baseEntityId = eavOptimizerDao.find(new BasicOptimizer().getKeyString(baseEntity));
+
+            if (BasicOptimizer.metaList.contains(metaClass.getClassName())) {
+                baseEntityId = eavOptimizerDao.find(BasicOptimizer.getKeyString(baseEntity));
             } else {
                 baseEntityId = search(baseEntity, creditorId);
             }

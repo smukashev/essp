@@ -3,25 +3,23 @@ package kz.bsbnb.usci.eav.tool.optimizer.impl;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.tool.optimizer.IEavOptimizer;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class SubjectOptimizer implements IEavOptimizer {
-    @Override
-    public String getKeyString(IBaseEntity iBaseEntity) {
-        StringBuilder stringBuilder = new StringBuilder();
+public class SubjectOptimizer {
+    private SubjectOptimizer() {
+    }
 
-        if (iBaseEntity == null)
-            throw new IllegalStateException("keyString не может применяться на пустые обьекты;");
+    public static String getKeyString(final IBaseEntity iBaseEntity) {
+        StringBuilder stringBuilder = new StringBuilder();
 
         IBaseValue docsBaseValue = iBaseEntity.getBaseValue("docs");
 
         if (docsBaseValue == null || docsBaseValue.getValue() == null)
-            throw new IllegalStateException("Ключевое поле docs пустое;");
+            throw new IllegalStateException("Ключевое поле docs пустое; \n" + iBaseEntity);
 
         BaseSet docSet = (BaseSet) docsBaseValue.getValue();
 
@@ -33,8 +31,12 @@ public class SubjectOptimizer implements IEavOptimizer {
             IBaseEntity docType = (IBaseEntity) document.getBaseValue("doc_type").getValue();
             boolean isIdentification = (boolean) docType.getBaseValue("is_identification").getValue();
 
-            if (isIdentification)
+            if (isIdentification) {
+                if (document.getId() == 0)
+                    return null;
+
                 documents.add(document);
+            }
         }
 
         if (documents.size() == 0)
@@ -49,9 +51,9 @@ public class SubjectOptimizer implements IEavOptimizer {
 
         for (IBaseEntity tmpEntity : documents) {
             if (stringBuilder.length() > 0)
-                stringBuilder.append("|");
+                stringBuilder.append(",");
 
-            stringBuilder.append(new BasicOptimizer().getKeyString(tmpEntity));
+            stringBuilder.append(tmpEntity.getId());
         }
 
         return stringBuilder.toString();
