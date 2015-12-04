@@ -43,7 +43,6 @@ public class BaseEntityManager implements IBaseEntityManager {
     private Map<Class, List<IPersistable>> updatedObjects = new HashMap<>();
     private Map<Class, List<IPersistable>> deletedObjects = new HashMap<>();
 
-    private Set<IBaseEntity> unusedBaseEntities = new HashSet<>();
     private HashMap<String, List<IBaseEntity>> processedEntities = new HashMap<>();
 
     public void registerAsInserted(IPersistable insertedObject) {
@@ -92,14 +91,6 @@ public class BaseEntityManager implements IBaseEntityManager {
     }
 
     @Override
-    public void registerUnusedBaseEntity(IBaseEntity unusedBaseEntity) {
-        if (unusedBaseEntity == null)
-            throw new RuntimeException("Неиспользуемые обьект для очистки не может быть NULL");
-
-        unusedBaseEntities.add(unusedBaseEntity);
-    }
-
-    @Override
     public void registerProcessedBaseEntity(IBaseEntity processedBaseEntity) {
         List<IBaseEntity> entityList = processedEntities.get(processedBaseEntity.getMeta().getClassName());
 
@@ -123,11 +114,6 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public List<IPersistable> getDeletedObjects(Class objectClass) {
         return deletedObjects.get(objectClass);
-    }
-
-    @Override
-    public Set<IBaseEntity> getUnusedBaseEntities() {
-        return unusedBaseEntities;
     }
 
     @Override
