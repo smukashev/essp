@@ -31,7 +31,7 @@ public final class StaticRouter {
     private final static String prodDBReporterIP = "10.8.1.85";
 
     /* Portal URL */
-    private final static String stendPortalUrl = "10.10.20.22";
+    private final static String stendPortalUrl = "10.10.20.28";
     private final static String devPortalUrl = "localhost";
     private final static String prodPortalUrl = "essp.nationalbank.kz";
 
