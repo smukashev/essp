@@ -300,24 +300,6 @@ public class BaseSet extends BaseContainer implements IBaseSet {
         return baseSetCloned;
     }
 
-    public int sizeWithFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException {
-        if (arrayKeyFilter == null) return values.size();
-        if (arrayKeyFilter.size() == 0) return values.size();
-
-        int counter = 0;
-        if (metaType.isComplex() && !metaType.isSet()) {
-            for (String name : values.keySet()) {
-                BaseEntity value = (BaseEntity) values.get(name).getValue();
-
-                if (value.applyKeyFilter(arrayKeyFilter)) {
-                    counter++;
-                }
-            }
-        }
-
-        return counter;
-    }
-
     @Override
     public boolean isSet() {
         return true;

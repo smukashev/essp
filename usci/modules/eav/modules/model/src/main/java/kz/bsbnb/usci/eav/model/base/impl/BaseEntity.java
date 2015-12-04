@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -27,8 +26,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     private static final long serialVersionUID = 1L;
 
     Logger logger = LoggerFactory.getLogger(BaseEntity.class);
-
-    protected DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private UUID uuid = UUID.randomUUID();
 
@@ -133,10 +130,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             String childAttribute = attribute.substring(index, attribute.length() - 1);
 
             IMetaType metaType = meta.getMemberType(parentAttribute);
-            if (metaType == null) {
-                throw new IllegalArgumentException(String.format("Instance of MetaClass with class name {0} " +
-                        "does not contain attribute {1}.", meta.getClassName(), parentAttribute));
-            }
+            if (metaType == null)
+                throw new IllegalArgumentException("Мета класс " + meta.getClassName() + " не содержит " +
+                        "атрибут " + parentAttribute);
+
 
             if (metaType.isComplex() && !metaType.isSet()) {
                 IBaseValue baseValue = values.get(parentAttribute);
@@ -156,10 +153,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         } else {
             IMetaType metaType = meta.getMemberType(attribute);
 
-            if (metaType == null) {
-                throw new IllegalArgumentException(String.format("Instance of MetaClass with class name {0} " +
-                        "does not contain attribute {1}.", meta.getClassName(), attribute));
-            }
+            if (metaType == null)
+                throw new IllegalArgumentException("Мета класс " + meta.getClassName() + " не содержит " +
+                        "атрибут " + attribute);
 
             return values.get(attribute);
         }
@@ -174,7 +170,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
      *                                  or key has type different from <code>DataTypes.DATE</code>
      * @see DataTypes
      */
-    //TODO: Add exception on metaClass mismatch
     @Override
     public void put(final String attribute, IBaseValue baseValue) {
         IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
@@ -265,44 +260,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     }
 
     /**
-     * Set of simple key names that are actually set in entity
-     *
-     * @param dataType - attributes are filtered by this type
-     * @return - set of needed attributes
-     */
-    public Set<String> getPresentSimpleAttributeNames(DataTypes dataType) {
-        return SetUtils.intersection(meta.getSimpleAttributesNames(dataType), values.keySet());
-    }
-
-    /**
-     * Set of complex key names that are actually set in entity
-     *
-     * @return - set of needed attributes
-     */
-    public Set<String> getPresentComplexAttributeNames() {
-        return SetUtils.intersection(meta.getComplexAttributesNames(), values.keySet());
-    }
-
-    /**
-     * Set of simpleSet key names that are actually set in entity
-     *
-     * @param dataType - attributes are filtered by this type
-     * @return - set of needed attributes
-     */
-    public Set<String> getPresentSimpleSetAttributeNames(DataTypes dataType) {
-        return SetUtils.intersection(meta.getSimpleSetAttributesNames(dataType), values.keySet());
-    }
-
-    /**
-     * Set of complexSet key names that are actually set in entity
-     *
-     * @return - set of needed attributes
-     */
-    public Set<String> getPresentComplexArrayAttributeNames() {
-        return SetUtils.intersection(meta.getComplexArrayAttributesNames(), values.keySet());
-    }
-
-    /**
      * Names of all attributes that are actually set in entity
      *
      * @return - set of needed attributes
@@ -312,15 +269,14 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     }
 
     public int getValueCount() {
-
         return values.size();
     }
 
     public Date getReportDate() {
-        if (baseEntityReportDate == null) {
+        if (baseEntityReportDate == null)
             throw new RuntimeException("Instance of BaseEntityReportDate is null. " +
                     "Check the correctness of instance creation");
-        }
+
         return baseEntityReportDate.getReportDate();
     }
 
@@ -601,10 +557,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
         return result;
     }
+
     public int hashCode2() {
         int result = 31 * meta.hashCode();
 
-        for(String name : meta.getAttributeNames()) {
+        for (String name : meta.getAttributeNames()) {
             IMetaAttribute metaAttribute = meta.getMetaAttribute(name);
             if (metaAttribute.isKey()) {
                 result += values.get(name).getValue().toString().hashCode();
@@ -642,7 +599,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
         if (function == null) throw new RuntimeException("no function");
 
-        Set allowedSet = new TreeSet<Long>();
+        Set allowedSet = new TreeSet<>();
 
         if (function.startsWith("set")) {
             String[] elems = function.substring(function.indexOf('(') + 1, function.indexOf(')')).split(",");
@@ -1154,58 +1111,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return baseEntityCloned;
     }
 
-    public boolean applyKeyFilter(HashMap<String, ArrayList<String>> arrayKeyFilter) throws ParseException {
-        for (String attrName : arrayKeyFilter.keySet()) {
-            IMetaType type = meta.getMemberType(attrName);
-
-            IBaseValue value = safeGetValue(attrName);
-
-            if (value == null) {
-                throw new IllegalArgumentException("Key attribute " + attrName + " can't be null, " +
-                        "it is used in array filter");
-            }
-
-            if (testValueOnString(type, value, arrayKeyFilter.get(attrName))) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean testValueOnString(IMetaType type, IBaseValue value, ArrayList<String> filter) throws ParseException {
-        MetaValue simple_value = (MetaValue) type;
-
-        for (String strValue : filter) {
-            switch (simple_value.getTypeCode()) {
-                case BOOLEAN:
-                    Boolean booleanValue = (Boolean) value.getValue();
-                    if (booleanValue == Boolean.parseBoolean(strValue)) return true;
-                    break;
-                case DATE:
-                    java.sql.Date dateValue = DataUtils.convert((java.util.Date) value.getValue());
-                    if (dateValue == dateFormat.parse(strValue)) return true;
-                    break;
-                case DOUBLE:
-                    Double doubleValue = (Double) value.getValue();
-                    if (doubleValue == Double.parseDouble(strValue)) return true;
-                    break;
-                case INTEGER:
-                    Integer integerValue = (Integer) value.getValue();
-                    if (integerValue == Integer.parseInt(strValue)) return true;
-                    break;
-                case STRING:
-                    String stringValue = (String) value.getValue();
-                    if (stringValue.equals(strValue)) return true;
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown data type: " + simple_value.getTypeCode());
-            }
-        }
-
-        return false;
-    }
-
     @Override
     public boolean isSet() {
         return false;
@@ -1299,11 +1204,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return index;
     }
 
-    public boolean isInsert(){
+    public boolean isInsert() {
         return operationType == null || operationType.equals(OperationType.INSERT);
     }
 
-    public boolean isUpdate(){
+    public boolean isUpdate() {
         return OperationType.UPDATE.equals(operationType);
     }
 }
