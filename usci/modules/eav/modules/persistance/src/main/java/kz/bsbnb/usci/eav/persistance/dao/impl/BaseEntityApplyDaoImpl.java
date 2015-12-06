@@ -2265,8 +2265,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         if (childBaseValueNext != null && childBaseValueNext.isClosed()) {
                             baseEntityManager.registerAsDeleted(childBaseValueNext);
-                            IBaseEntity childBaseEntityNext = (IBaseEntity) childBaseValueNext.getValue();
-
                             last = childBaseValueNext.isLast();
                         }
                     }
