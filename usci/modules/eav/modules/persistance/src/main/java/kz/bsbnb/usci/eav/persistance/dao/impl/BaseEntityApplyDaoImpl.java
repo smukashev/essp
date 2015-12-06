@@ -517,6 +517,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 Object baseV;
                 if (baseValueSaving.getNewBaseValue() != null) {
                     baseV = baseValueSaving.getNewBaseValue().getValue();
+                    /* Обновление ключевых полей в оптимизаторе */
+                    baseEntityManager.addOptimizerEntity(baseEntityApplied);
                 } else {
                     baseV = returnCastedValue(metaValue, baseValueLoaded);
                 }
@@ -2471,16 +2473,13 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
-        // TODO: fix problem with repeated deletion
-        /*for (IBaseEntity unusedBaseEntity : baseEntityManager.getUnusedBaseEntities()) {
-            IBaseEntityDao baseEntityDao = persistableDaoPool
-                    .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
-
-            baseEntityDao.deleteRecursive(unusedBaseEntity.getId(), unusedBaseEntity.getMeta());
-
-            if (isReferenceCacheEnabled && unusedBaseEntity.getMeta().isReference())
-                refRepositoryDao.delRef(unusedBaseEntity.getId(), unusedBaseEntity.getReportDate());
-        }*/
+        /* Изменение ключевых полей в оптимизаторе */
+        for (Map.Entry<Long, IBaseEntity> entry : baseEntityManager.getOptimizerEntities().entrySet()) {
+            EavOptimizerData eod = new EavOptimizerData(entry.getValue().getMeta().getId(), entry.getValue().getId(),
+                    BasicOptimizer.getKeyString(entry.getValue()));
+            eod.setId(eavOptimizerDao.find(entry.getValue().getId()));
+            eavOptimizerDao.update(eod);
+        }
     }
 
     private Object returnCastedValue(IMetaValue metaValue, IBaseValue baseValue) {

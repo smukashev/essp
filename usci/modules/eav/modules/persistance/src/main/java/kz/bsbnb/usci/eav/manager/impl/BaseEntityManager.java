@@ -43,8 +43,11 @@ public class BaseEntityManager implements IBaseEntityManager {
     private Map<Class, List<IPersistable>> updatedObjects = new HashMap<>();
     private Map<Class, List<IPersistable>> deletedObjects = new HashMap<>();
 
+    private Map<Long, IBaseEntity> optimizerEntities = new HashMap<>();
+
     private HashMap<String, List<IBaseEntity>> processedEntities = new HashMap<>();
 
+    @Override
     public void registerAsInserted(IPersistable insertedObject) {
         if (insertedObject == null)
             throw new RuntimeException("Обьект для вставки не может быть NULL;");
@@ -60,6 +63,7 @@ public class BaseEntityManager implements IBaseEntityManager {
         }
     }
 
+    @Override
     public void registerAsUpdated(IPersistable updatedObject) {
         if (updatedObject == null)
             throw new RuntimeException("Обьект для обновления не может быть NULL");
@@ -75,6 +79,7 @@ public class BaseEntityManager implements IBaseEntityManager {
         }
     }
 
+    @Override
     public void registerAsDeleted(IPersistable deletedObject) {
         if (deletedObject == null)
             throw new RuntimeException("Обьект для удаления не может быть NULL");
@@ -99,6 +104,17 @@ public class BaseEntityManager implements IBaseEntityManager {
 
         entityList.add(processedBaseEntity);
         processedEntities.put(processedBaseEntity.getMeta().getClassName(), entityList);
+    }
+
+
+    @Override
+    public void addOptimizerEntity(IBaseEntity entity) {
+        optimizerEntities.put(entity.getId(), entity);
+    }
+
+    @Override
+    public Map<Long, IBaseEntity> getOptimizerEntities() {
+        return optimizerEntities;
     }
 
     @Override

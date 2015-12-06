@@ -7,5 +7,9 @@ public interface IEavOptimizerDao {
 
     long find (String keyString);
 
+    long find (Long entityId);
+
     void delete(long baseEntityId);
+
+    void update(EavOptimizerData eavOptimizerData);
 }

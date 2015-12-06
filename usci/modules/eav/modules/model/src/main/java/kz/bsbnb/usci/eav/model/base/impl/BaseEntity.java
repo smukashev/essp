@@ -524,6 +524,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
                 if (!thisValue.equals(thatValue))
                     return false;
+
+                // Проверка на изменение ключевых полей
+                if (!metaType.isComplex() && (thisBaseValue.getNewBaseValue() != null ||
+                        thatBaseValue.getNewBaseValue() != null))
+                    return false;
             }
         }
 

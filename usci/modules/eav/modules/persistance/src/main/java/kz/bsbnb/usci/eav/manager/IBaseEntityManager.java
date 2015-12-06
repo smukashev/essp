@@ -4,8 +4,13 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IBaseEntityManager {
+    void addOptimizerEntity(IBaseEntity entity);
+
+    Map<Long, IBaseEntity> getOptimizerEntities();
+
     void registerAsInserted(IPersistable persistableObject);
 
     void registerAsUpdated(IPersistable persistableObject);

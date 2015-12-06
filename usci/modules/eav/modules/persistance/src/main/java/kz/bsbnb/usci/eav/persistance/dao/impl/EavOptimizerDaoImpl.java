@@ -3,10 +3,7 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 import kz.bsbnb.usci.eav.persistance.dao.IEavOptimizerDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.tool.optimizer.EavOptimizerData;
-import org.jooq.DSLContext;
-import org.jooq.Delete;
-import org.jooq.Insert;
-import org.jooq.Select;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +58,28 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
     }
 
     @Override
+    public long find(Long entityId) {
+        String tableAlias = "e";
+        Select select = context
+                .select(EAV_OPTIMIZER.as(tableAlias).ID)
+                .from(EAV_OPTIMIZER.as(tableAlias))
+                .where(EAV_OPTIMIZER.as(tableAlias).ENTITY_ID.equal(entityId));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new IllegalArgumentException("Найдено более одной записи, " + entityId + ";");
+
+        if (rows.size() < 1)
+            return 0;
+
+        Map<String, Object> row = rows.get(0);
+
+        return ((BigDecimal) row.get(EAV_OPTIMIZER.as(tableAlias).ID.getName())).longValue();
+    }
+
+    @Override
     public void delete(long baseEntityId) {
         String tableAlias = "sv";
         Delete delete = context
@@ -69,5 +88,22 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
 
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
+    @Override
+    public void update(EavOptimizerData eavOptimizerData) {
+        String tableAlias = "sv";
+        Update update = context
+                .update(EAV_OPTIMIZER.as(tableAlias))
+                .set(EAV_OPTIMIZER.as(tableAlias).ENTITY_ID, eavOptimizerData.getEntityId())
+                .set(EAV_OPTIMIZER.as(tableAlias).META_ID, eavOptimizerData.getMetaId())
+                .set(EAV_OPTIMIZER.as(tableAlias).KEY_STRING, eavOptimizerData.getKeyString())
+                .where(EAV_OPTIMIZER.as(tableAlias).ID.equal(eavOptimizerData.getId()));
+
+        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
+
+        if (count != 1)
+            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + eavOptimizerData.getId() +
+                    ", EAV_OPTIMIZER);");
     }
 }
