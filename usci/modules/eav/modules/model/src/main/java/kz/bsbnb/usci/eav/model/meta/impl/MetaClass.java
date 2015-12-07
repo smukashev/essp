@@ -250,6 +250,9 @@ public class MetaClass extends MetaContainer implements IMetaClass {
             return false;
         else {
             MetaClass tmp = (MetaClass) obj;
+            if (this.getId() > 0 && tmp.getId() > 0 && this.getId() == tmp.getId())
+                return true;
+
             if (tmp.getAttributesCount() != this.getAttributesCount())
                 return false;
 

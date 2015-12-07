@@ -399,24 +399,24 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             IMetaAttribute metaAttribute = this.meta.getMetaAttribute(name);
             IMetaType metaType = metaAttribute.getMetaType();
 
-            if (metaAttribute.isImmutable())
-                continue;
-
-            IBaseValue thisValue = this.getBaseValue(name);
-            IBaseValue thatValue = that.getBaseValue(name);
-
             if (metaAttribute.isKey()) {
+                if (metaAttribute.isImmutable())
+                    continue;
+
+                IBaseValue thisBaseValue = this.getBaseValue(name);
+                IBaseValue thatBaseValue = that.getBaseValue(name);
+
                 if (!metaType.isSet()) {
                     if (metaType.isComplex()) {
-                        if (((BaseEntity) thisValue.getValue()).equalsByKey(thatValue.getValue()))
+                        if (((BaseEntity) thisBaseValue.getValue()).equalsByKey(thatBaseValue.getValue()))
                             return true;
                     } else {
-                        if (thisValue.getValue().equals(thatValue.getValue()))
+                        if (thisBaseValue.getValue().equals(thatBaseValue.getValue()))
                             return true;
                     }
                 } else {
-                    BaseSet thisChildSet = (BaseSet) thisValue.getValue();
-                    BaseSet thatChildSet = (BaseSet) thatValue.getValue();
+                    BaseSet thisChildSet = (BaseSet) thisBaseValue.getValue();
+                    BaseSet thatChildSet = (BaseSet) thatBaseValue.getValue();
 
                     for (IBaseValue thisChildBaseValue : thisChildSet.get()) {
                         for (IBaseValue thatChildBaseValue : thatChildSet.get()) {
