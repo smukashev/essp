@@ -33,7 +33,7 @@ public class BatchInfo {
         setActualCount(batch.getActualCount() != null ? batch.getActualCount() : 0);
         setUserId(batch.getUserId());
         setCreditorId(batch.getCreditorId());
-        setContentSize(batch.getContent().length);
+        setContentSize(batch.getContent() == null ? 0 : batch.getContent().length);
         setReceiptDate(batch.getReceiptDate());
     }
 
