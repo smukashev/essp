@@ -1796,38 +1796,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
 
-                        if (!metaAttribute.isImmutable() && !childMetaClass.isSearchable()) {
-                            for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
-                                IBaseEntity childBaseEntityLoaded = (IBaseEntity) childBaseValueLoaded.getValue();
-
-                                IBaseEntity childBaseEntitySaving = new BaseEntity(childBaseEntityLoaded,
-                                        baseValueSaving.getRepDate());
-
-                                for (String attributeName : childMetaClass.getAttributeNames()) {
-                                    childBaseEntitySaving.put(attributeName,
-                                            BaseValueFactory.create(
-                                                    MetaContainerTypes.META_CLASS,
-                                                    childMetaType,
-                                                    0,
-                                                    baseValueSaving.getCreditorId(),
-                                                    new Date(baseValueSaving.getRepDate().getTime()),
-                                                    null,
-                                                    false,
-                                                    true));
-                                }
-                                applyBaseEntityAdvanced(creditorId, childBaseEntitySaving, childBaseEntityLoaded,
-                                        baseEntityManager);
-
-                                IBaseSetComplexValueDao baseSetComplexValueDao = persistableDaoPool
-                                        .getPersistableDao(childBaseValueLoaded.getClass(), IBaseSetComplexValueDao.class);
-
-                                boolean singleBaseValue = baseSetComplexValueDao.isSingleBaseValue(childBaseValueLoaded);
-
-                                if (singleBaseValue)
-                                    baseEntityManager.registerAsDeleted(childBaseEntityLoaded);
-                            }
-                        }
-
                         isBaseSetDeleted = true;
                         // case#2
                     } else {
@@ -1857,38 +1825,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseValuePrevious.setMetaAttribute(metaAttribute);
                                 baseValuePrevious.setLast(true);
                                 baseEntityManager.registerAsUpdated(baseValuePrevious);
-                            }
-                        }
-
-                        if (!metaAttribute.isImmutable() && !childMetaClass.isSearchable()) {
-                            for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
-                                IBaseEntity childBaseEntityLoaded = (IBaseEntity) childBaseValueLoaded.getValue();
-
-                                IBaseEntity childBaseEntitySaving = new BaseEntity(childBaseEntityLoaded,
-                                        baseValueSaving.getRepDate());
-
-                                for (String attributeName : childMetaClass.getAttributeNames()) {
-                                    childBaseEntitySaving.put(attributeName,
-                                            BaseValueFactory.create(
-                                                    MetaContainerTypes.META_CLASS,
-                                                    childMetaType,
-                                                    0,
-                                                    baseValueSaving.getCreditorId(),
-                                                    new Date(baseValueSaving.getRepDate().getTime()),
-                                                    null,
-                                                    false,
-                                                    true));
-                                }
-                                applyBaseEntityAdvanced(creditorId, childBaseEntitySaving, childBaseEntityLoaded,
-                                        baseEntityManager);
-
-                                IBaseSetComplexValueDao baseSetComplexValueDao = persistableDaoPool
-                                        .getPersistableDao(childBaseValueLoaded.getClass(), IBaseSetComplexValueDao.class);
-
-                                boolean singleBaseValue = baseSetComplexValueDao.isSingleBaseValue(childBaseValueLoaded);
-
-                                if (singleBaseValue)
-                                    baseEntityManager.registerAsDeleted(childBaseEntityLoaded);
                             }
                         }
 
@@ -2257,6 +2193,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     IBaseEntity childBaseEntityLoaded = (IBaseEntity) childBaseValueLoaded.getValue();
 
+                    //fixme!
                     if (childBaseEntityLoaded != null)
                         baseEntityManager.registerAsDeleted(childBaseEntityLoaded);
 
