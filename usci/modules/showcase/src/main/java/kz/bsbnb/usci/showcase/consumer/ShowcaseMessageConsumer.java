@@ -26,9 +26,6 @@ public class ShowcaseMessageConsumer implements MessageListener {
     final static Logger logger = Logger.getLogger(ShowcaseMessageConsumer.class);
 
     @Autowired
-    SQLQueriesStats stats;
-
-    @Autowired
     ShowcaseDao showcaseDao;
 
     private ExecutorService exec = Executors.newCachedThreadPool();
