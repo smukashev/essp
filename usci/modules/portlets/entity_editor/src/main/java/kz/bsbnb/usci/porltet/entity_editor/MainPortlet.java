@@ -675,7 +675,7 @@ public class MainPortlet extends MVCPortlet {
             }
         } catch (Exception e) {
             //e.printStackTrace();
-            String originalError = e.getMessage();
+            String originalError = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
             if(originalError.contains("connect") || originalError.contains("rmi"))
                 if(!retry) {
                     retry = true;
@@ -693,7 +693,7 @@ public class MainPortlet extends MVCPortlet {
                     }
                 }
 
-            out.write(("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}").getBytes());
+            out.write(("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}").getBytes());
         }
     }
 

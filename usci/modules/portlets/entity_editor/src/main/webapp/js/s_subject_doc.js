@@ -115,7 +115,14 @@ Ext.onReady(function() {
 
         panel.doSearch = function(){
             var docs = Ext.getCmp('s_person_doc_tree').getRootNode().getChildAt(0);
-            var params = {op: 'LIST_ENTITY', metaClass: 'subject', searchName: serviceCode, timeout: 120000};
+            var params = {
+                op: 'LIST_ENTITY',
+                metaClass: 'subject',
+                searchName: serviceCode,
+                timeout: 120000,
+                date: Ext.getCmp('edDate').value,
+                creditorId: Ext.getCmp('edCreditor').value
+            };
             params.childCnt = docs.childNodes.length;
             for(var i = 0; i< params.childCnt; i++) {
                 var doc = docs.getChildAt(i);
