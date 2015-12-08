@@ -62,37 +62,37 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
-    public void process(BaseEntity baseEntity) {
+    public void process(BaseEntity mockEntity) {
         try {
             long t1 = System.currentTimeMillis();
-            BaseEntity entity = (BaseEntity) baseEntityProcessorDao.process(baseEntity);
+            BaseEntity baseEntity = (BaseEntity) baseEntityProcessorDao.process(mockEntity);
             long t2 = System.currentTimeMillis() - t1;
 
-            entity.setBatchId(baseEntity.getBatchId());
-            entity.setIndex(baseEntity.getBatchIndex());
+            baseEntity.setBatchId(mockEntity.getBatchId());
+            baseEntity.setIndex(mockEntity.getBatchIndex());
 
-            stats.put("coreService", t2);
+            stats.put("core.EntityService.process()", t2);
 
             EntityStatus entityStatus = new EntityStatus();
-            entityStatus.setBatchId(entity.getBatchId());
-            entityStatus.setEntityId(entity.getId());
+            entityStatus.setBatchId(baseEntity.getBatchId());
+            entityStatus.setEntityId(baseEntity.getId());
             entityStatus.setStatus(EntityStatuses.COMPLETED);
             entityStatus.setDescription(StatusProperties.getSpecificParams(baseEntity));
-            entityStatus.setIndex(entity.getBatchIndex());
+            entityStatus.setIndex(baseEntity.getBatchIndex());
             entityStatus.setReceiptDate(new Date());
 
             batchService.addEntityStatus(entityStatus);
         } catch (Exception e) {
             if (!(e instanceof KnownException))
-                logger.error("Batch id: " + baseEntity.getBatchId() + ", Index: " + (baseEntity.getBatchIndex() - 1)
+                logger.error("Батч: " + mockEntity.getBatchId() + ", Индекс: " + (mockEntity.getBatchIndex() - 1)
                         + "\n" + e.getMessage() + "\n" + ExceptionUtils.getStackTrace(e));
 
             EntityStatus entityStatus = new EntityStatus();
-            entityStatus.setBatchId(baseEntity.getBatchId());
-            entityStatus.setEntityId(baseEntity.getId());
+            entityStatus.setBatchId(mockEntity.getBatchId());
+            entityStatus.setEntityId(-1);
             entityStatus.setStatus(EntityStatuses.ERROR);
-            entityStatus.setDescription(StatusProperties.getSpecificParams(baseEntity) + " (" + e.getMessage() + ")");
-            entityStatus.setIndex(baseEntity.getBatchIndex() - 1);
+            entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity) + " (" + e.getMessage() + ")");
+            entityStatus.setIndex(mockEntity.getBatchIndex() - 1);
             entityStatus.setReceiptDate(new Date());
 
             batchService.addEntityStatus(entityStatus);

@@ -19,9 +19,8 @@ public class StatusProperties {
     public static String getSpecificParams(BaseEntity entity) {
         String result = "";
 
-        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-
         if (entity.getMeta().getClassName().equals("credit")) {
+            DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             Date contractDate = (Date) entity.getEl("primary_contract.date");
             String sContractDate = df.format(contractDate);
             String contractNo = (String) entity.getEl("primary_contract.no");
