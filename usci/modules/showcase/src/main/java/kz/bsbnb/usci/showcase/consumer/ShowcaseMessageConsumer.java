@@ -79,30 +79,28 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 } else {
                     boolean found = false;
 
+                    final String metaClassName = queueEntry.getBaseEntityApplied().getMeta().getClassName();
+
                     for (ShowcaseHolder holder : holders) {
-                        if (!holder.getShowCaseMeta().getMeta().getClassName()
-                                .equals(queueEntry.getBaseEntityApplied().getMeta().getClassName()))
-                            continue;
+                        if (holder.getShowCaseMeta().getMeta().getClassName().equals(metaClassName)) {
+                            if (scId == null || scId == 0L || scId == holder.getShowCaseMeta().getId()) {
+                                Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(),
+                                        queueEntry.getBaseEntityLoaded(), holder));
 
-                        if (scId == null || scId == 0L || scId == holder.getShowCaseMeta().getId()) {
-                            Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(),
-                                    queueEntry.getBaseEntityLoaded(), holder));
+                                futures.add(future);
 
-                            futures.add(future);
-
-                            found = true;
+                                found = true;
+                            }
                         }
                     }
 
                     if(!found)
-                        System.err.println("Для мета класа  " +
-                                queueEntry.getBaseEntityApplied().getMeta().getClassName() +
-                                " нет существующих витрин;");
+                        System.err.println("Для мета класа  " + metaClassName + " нет существующих витрин;");
 
                     for (Future f : futures)
                         f.get();
 
-                    futures.removeAll(futures);
+                    futures.clear();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
