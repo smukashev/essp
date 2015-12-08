@@ -301,22 +301,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
         }
 
-        if (applyListener != null) {
-            IBaseEntity baseEntityLoaded = entityHolder.getLoaded();
-            IBaseEntity baseEntityApplied1 = entityHolder.getApplied();
-            IBaseEntity subjectLoaded = null;
-
-            if (baseEntityLoaded != null && baseEntityLoaded.getBaseValue("subject") != null)
-                subjectLoaded = (IBaseEntity) baseEntityLoaded.getBaseValue("subject").getValue();
-
-            IBaseEntity subjectApplied = (IBaseEntity) baseEntityApplied1.getBaseValue("subject").getValue();
-
-            applyListener.applyToDBEnded(entityHolder.getSaving(),
-                    subjectLoaded,
-                    subjectApplied,
-                    baseEntityManager);
-        }
-
+        if (applyListener != null)
+            applyListener.applyToDBEnded(entityHolder.getSaving(), entityHolder.getLoaded(),
+                    entityHolder.getApplied(), baseEntityManager);
 
         return baseEntityApplied;
     }
