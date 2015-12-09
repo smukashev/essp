@@ -57,6 +57,7 @@ public class SubjectDocFormImpl extends JDBCSupport implements ISearcherForm {
         Date reportDate = reportDate = (Date) DataTypes.fromString(DataTypes.DATE, parameters.get("date"));
         BaseEntity subject = new BaseEntity(metaClassRepository.getMetaClass("subject"), reportDate);
         BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("document"));
+        int successfullDocCount = 0;
 
 
         for(int i=0;i<numDocs;i++) {
@@ -65,23 +66,26 @@ public class SubjectDocFormImpl extends JDBCSupport implements ISearcherForm {
             document.put("doc_type", new BaseValue(creditorId, reportDate, docType));
             document.put("no", new BaseValue(creditorId, reportDate, parameters.get("no" + i)));
             //if(docType.getEl("is_identification") == true) {
-                Long docId = searcherPool.getSearcher("document").findSingle((BaseEntity) document, creditorId);
+            Long docId = searcherPool.getSearcher("document").findSingle((BaseEntity) document, creditorId);
+            if(docId != null) {
                 document.setId(docId);
-            //}
-            docs.put(new BaseValue(creditorId, reportDate, document));
+                docs.put(new BaseValue(creditorId, reportDate, document));
+                successfullDocCount ++;
+            }
         }
 
         subject.put("docs", new BaseValue(creditorId, reportDate, docs));
-
-        Long id = searcherPool.getSearcher("subject").findSingle(subject, creditorId);
         List<BaseEntity> entities = new LinkedList<>();
         ISearchResult ret = new NonPaginableSearchResult();
-        ret.setData(entities);
 
-        if(id != null) {
-            entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
+        if(successfullDocCount > 0) {
+            Long id = searcherPool.getSearcher("subject").findSingle(subject, creditorId);
+            if (id != null) {
+                entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
+            }
         }
 
+        ret.setData(entities);
         return ret;
     }
 }
