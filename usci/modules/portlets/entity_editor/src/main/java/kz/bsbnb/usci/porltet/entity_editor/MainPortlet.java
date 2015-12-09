@@ -602,8 +602,9 @@ public class MainPortlet extends MVCPortlet {
                         searchClassName = resourceRequest.getParameter("searchName");
                         metaName = resourceRequest.getParameter("metaClass");
                         metaClass = metaFactoryService.getMetaClass(metaName);
+                        if(resourceRequest.getParameter("creditorId").length() < 1)
+                            throw new IllegalArgumentException("Не заполнено поле кредитор");
                         creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
-
                         list = resourceRequest.getParameterNames();
                         parameters = new HashMap<>();
                         while(list.hasMoreElements()) {
