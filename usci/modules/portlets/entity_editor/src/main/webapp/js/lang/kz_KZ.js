@@ -25,3 +25,7 @@ var LABEL_UPDATE = 'Жанарту';
 var label_date = 'Күні';
 var label_CONFIRM_CHANGES = "Подтвердить изменения";
 var label_REQUIRED_FIELD = "Обязательное поле";
+
+var errors = {
+    "communication failure" : "уакыт шамадан тыс, суракты толыктыру мумкиндигин карастырыныз"
+}

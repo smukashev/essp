@@ -35,8 +35,19 @@ Ext.onReady(function() {
                 params: params,
                 callback: function (records, operation, success) {
                     if (!success) {
-                        Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
+                        var error = '';
+                        if(operation.error != undefined) {
+                            if(operation.error.statusText in errors)
+                                error = errors[operation.error.statusText];
+                            else
+                                error = operation.error.statusText;
+                        }
+                        else
+                            error = operation.request.proxy.reader.rawData.errorMessage;
+                        Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(error));
                     }
+                    if(records && records.length == 0)
+                        Ext.MessageBox.alert(label_INFO, 'Поиск вернул 0 результатов');
                 }});
         }
     };
