@@ -26,3 +26,7 @@ var LABEL_UPDATE = 'Обновить';
 var label_date = 'Дата';
 var label_CONFIRM_CHANGES = "Подтвердить изменения";
 var label_REQUIRED_FIELD = "Обязательное поле";
+
+var errors = {
+    "communication failure" : "превышен таймаут, попробуйте указать больше данных"
+}
