@@ -157,7 +157,8 @@ public class BatchServiceImpl implements IBatchService {
 
             try {
                 File file = new File(batch.getFileName());
-                file.delete();
+                if (!file.delete())
+                    logger.error("Не удалось удалить файл после завершения " + batch.getFileName());
             } catch (Exception e) {
                 e.printStackTrace();
             }

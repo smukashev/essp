@@ -194,7 +194,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     public BatchFullJModel getBatchFullModel(BigInteger batchId) {
         Batch batch = batchService.getBatch(batchId.longValue());
 
-        BatchFullJModel batchFullJModel = new BatchFullJModel(
+        return new BatchFullJModel(
                 batch.getId(),
                 batch.getFileName(),
                 batch.getContent(),
@@ -202,7 +202,5 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 batch.getUserId(),
                 batch.getCreditorId()
         );
-
-        return batchFullJModel;
     }
 }
