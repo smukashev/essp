@@ -280,24 +280,29 @@ public class CLIXMLReader {
                 metaType = currentContainer.getMemberType(localName);
 
             if (metaType.isComplex() || metaType.isSet()) {
-                Object o = currentContainer;
+                Object obj = currentContainer;
                 currentContainer = stack.pop();
 
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
                         ((BaseSet) currentContainer).put(BaseValueFactory
                                 .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(),
-                                        o, false, true));
+                                        obj, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
                         hasMembers = flagsStack.pop();
                     }
                 } else {
+                    /* Временный костыль для филиалов без документа */
+                    /* fixme */
+                    if (localName.equals("creditor_branch") && ((BaseEntity) obj).getBaseValue("docs") == null)
+                        obj = null;
+
                     if (hasMembers) {
                         currentContainer.put(localName, BaseValueFactory
                                 .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(),
-                                        o, false, true));
+                                        obj, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
