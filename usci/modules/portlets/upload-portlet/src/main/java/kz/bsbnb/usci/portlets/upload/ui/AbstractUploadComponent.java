@@ -122,6 +122,8 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
             char ch = fileName.charAt(i);
             if (Character.isLetterOrDigit(ch) || ch == '.' || ch == '_' || ch == '-') {
                 normalFileNameBuilder.append(fileName.charAt(i));
+            } else {
+                normalFileNameBuilder.append("_");
             }
         }
         if (normalFileNameBuilder.length() == 0) {
@@ -129,8 +131,8 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
         }
         normalFileNameBuilder.append("/");
         String normalFileName;
-        if (normalFileNameBuilder.length() > 25) {
-            normalFileName = normalFileNameBuilder.substring(normalFileNameBuilder.length() - 20,
+        if (normalFileNameBuilder.length() > 128) {
+            normalFileName = normalFileNameBuilder.substring(normalFileNameBuilder.length() - 128,
                     normalFileNameBuilder.length());
         } else {
             normalFileName = normalFileNameBuilder.toString();

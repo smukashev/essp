@@ -249,7 +249,7 @@ public class ZipFilesMonitor {
         long batchId = batchService.save(batch);
         batch.setId(batchId);
 
-        Long cId = -1l;
+        Long cId = -1L;
         boolean haveError = false;
 
         if (batchInfo.getUserId() != 100500L) {
@@ -341,7 +341,7 @@ public class ZipFilesMonitor {
                 }
 
                 if (!foundCreditor) {
-                    logger.error("Can't find creditor: " + docType +
+                    logger.error("Кредитор не найден: " + docType +
                             ", " + docValue);
 
                     batchService.addBatchStatus(new BatchStatus()

@@ -2,6 +2,8 @@ package com.bsbnb.creditregistry.portlets.approval.data;
 
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Link;
+import kz.bsbnb.usci.eav.StaticRouter;
+
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,7 +14,9 @@ import java.util.Date;
  */
 public class CrossCheckLink extends Link implements Comparable<Object> {
 
-    public static final String URL_PREFIX = "http://localhost:8081/cross-check?";
+    public static final String URL_PREFIX = "http://" + StaticRouter.getPortalUrl() + ":" +
+            StaticRouter.getPortalPort() + "/cross-check?";
+
     public static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private Long orderValue;
 
