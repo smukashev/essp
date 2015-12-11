@@ -399,10 +399,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             IMetaAttribute metaAttribute = this.meta.getMetaAttribute(name);
             IMetaType metaType = metaAttribute.getMetaType();
 
-            if (metaAttribute.isKey()) {
-                if (metaAttribute.isImmutable())
-                    continue;
+            if (metaAttribute.isImmutable())
+                continue;
 
+            if (metaAttribute.isKey()) {
                 IBaseValue thisBaseValue = this.getBaseValue(name);
                 IBaseValue thatBaseValue = that.getBaseValue(name);
 
@@ -431,6 +431,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                         }
                     }
                 }
+            } else if (metaType instanceof  MetaClass && ((MetaClass) metaType).isSearchable()) {
+                IBaseValue thisBaseValue = this.getBaseValue(name);
+                IBaseValue thatBaseValue = that.getBaseValue(name);
+
+                if (((BaseEntity) thisBaseValue.getValue()).equalsByKey(thatBaseValue.getValue()))
+                    return true;
             }
         }
 

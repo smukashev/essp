@@ -1177,8 +1177,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 } else {
                     IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueSaving);
 
-                    if (metaAttribute.isImmutable())
-                        throw new IllegalStateException("Запись класс " + metaAttribute.getName() + " не найдена;");
+                    if (metaAttribute.isImmutable() && baseEntitySaving.getId() == 0)
+                        throw new IllegalStateException("Запись класса " + metaAttribute.getName() + " не найдена;");
 
                     if (baseValueNext != null) {
                         baseValueNext.setBaseContainer(baseEntity);
