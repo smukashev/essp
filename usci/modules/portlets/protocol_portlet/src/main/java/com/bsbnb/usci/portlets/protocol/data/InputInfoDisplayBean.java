@@ -1,19 +1,18 @@
 package com.bsbnb.usci.portlets.protocol.data;
 
-import java.io.*;
-import java.math.BigInteger;
-import java.util.Date;
-
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
 import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.FileResource;
-import com.vaadin.terminal.StreamResource;
-import com.vaadin.terminal.Terminal;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.themes.BaseTheme;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.math.BigInteger;
+import java.util.Date;
 
 public class InputInfoDisplayBean implements Button.ClickListener {
     private InputInfo inputInfo;
@@ -36,7 +35,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
     }
 
     public String getFileName() {
-        return inputInfo == null ? "" : new File(inputInfo.getFileName()).getName();
+        return inputInfo == null ? "" : inputInfo.getFileName() == null ? "" : new File(inputInfo.getFileName()).getName();
     }
 
     public Button getFileLink() {
