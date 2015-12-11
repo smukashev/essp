@@ -294,10 +294,11 @@ public class CLIXMLReader {
                         hasMembers = flagsStack.pop();
                     }
                 } else {
-                    /* Временный костыль для филиалов без документа */
                     /* fixme */
-                    if (localName.equals("creditor_branch") && ((BaseEntity) obj).getBaseValue("docs") == null)
+                    if (localName.equals("creditor_branch") &&
+                            ((((BaseEntity) obj).getBaseValue("docs") == null) || ((BaseEntity) obj).getBaseValue("docs").getValue() == null))
                         obj = null;
+
 
                     if (hasMembers) {
                         currentContainer.put(localName, BaseValueFactory
