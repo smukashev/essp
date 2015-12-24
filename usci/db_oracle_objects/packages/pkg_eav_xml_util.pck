@@ -2776,7 +2776,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         INTO v_xml
         FROM dual;
     ELSE
-      SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
+      SELECT xmlelement(evalname(p_tag_name), xmlelement("short_name", t.short_name))
         INTO v_xml
         FROM ref.currency t
        WHERE t.parent_id = p_currency_id
