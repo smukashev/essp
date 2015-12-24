@@ -581,15 +581,22 @@ title: функций проверки филиала
 
 function boolean creditorBranchIsGood(IEntityService entityService, BaseEntity entity) {
    try {
+      //Извлечь филиал
+      BaseEntity creditorBranch = (BaseEntity) entity.getEl("creditor_branch");
+
+      if(creditorBranch == null)
+        return true;
+
+      //Проствить ид
+      BaseEntity creditorBranchFound = entityService.prepare(creditorBranch);
+
+      if(creditorBranchFound.getId() < 1)
+          return false;
+
       //Извлечь кредитор
       BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
       //Проставить ид
       BaseEntity creditorLoaded = entityService.prepare(creditor);
-
-      //Извлечь филиал
-      BaseEntity creditorBranch = (BaseEntity) entity.getEl("creditor_branch");
-      //Проствить ид
-      BaseEntity creditorBranchFound = entityService.prepare(creditorBranch);
       //Подгрузить все поля филиала
       BaseEntity creditorBranchLoaded = entityService.load(creditorBranchFound.getId());
 
