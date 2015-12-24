@@ -50,6 +50,15 @@ public class CreditParser extends BatchParser {
                     false, true));
         } else if (localName.equals("currency")) {
 
+            event = (XMLEvent) xmlReader.next();
+            BaseEntity currency = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"),
+                    batch.getRepDate());
+            currency.put("short_name", new BaseValue(0, -1, batch.getRepDate(), event.asCharacters().getData()));
+
+            currentBaseEntity.put("currency", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    currency, false, true));
+
+            /*
             RefListResponse refListResponse = refProcessorDao.getRefListResponse(
                     metaClassRepository.getMetaClass("ref_currency").getId(), batch.getRepDate(), false);
 
@@ -70,6 +79,7 @@ public class CreditParser extends BatchParser {
 
             if (!found)
                 currentBaseEntity.addValidationError(String.format("Валюта с кодом %s не найдена", crCode));
+                */
 
         } else if (localName.equals("interest_rate_yearly")) {
             event = (XMLEvent) xmlReader.next();

@@ -535,12 +535,12 @@ meta add --name=ref_credit_purpose --attribute=name_ru --type=string --required
 
 meta create --name=ref_currency --reference
 meta add --name=ref_currency --attribute=code --type=string --required
-meta key --name=ref_currency --attribute=code
+meta add --name=ref_currency --attribute=short_name --type=string --type=string --required
+meta key --name=ref_currency --attribute=short_name
 meta add --name=ref_currency --attribute=is_convertible --type=boolean
 meta add --name=ref_currency --attribute=name_kz --type=string --required
 meta add --name=ref_currency --attribute=name_ru --type=string --required
 meta add --name=ref_currency --attribute=rating --type=string
-meta add --name=ref_currency --attribute=short_name --type=string --type=string --required
 
 #====================================
 #= REF_FINANCE_SOURCE

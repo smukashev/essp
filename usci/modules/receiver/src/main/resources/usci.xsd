@@ -918,8 +918,8 @@
         <xsd:all>
             <xsd:element name="name_ru" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="rating" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="code" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="false"/>
-            <xsd:element name="short_name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="code" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="short_name" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="false"/>
             <xsd:element name="name_kz" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="is_convertible" type="xsd:boolean" minOccurs="0" maxOccurs="1" nillable="true"/>
         </xsd:all>

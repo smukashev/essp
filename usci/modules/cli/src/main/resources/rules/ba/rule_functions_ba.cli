@@ -58,7 +58,7 @@ function boolean isBA7thSymbolCorrect(String ba,String currencyCode, Date report
     if(ba.length() < 7) return true;
     if(ba.length() == 7 && ba.endsWith("000")) return true;
 
-    if(currencyCode.equals("398") || currencyCode.equals("035"))
+    if(currencyCode.equals("KZT"))
        return ba.charAt(6) == '1';
 
     boolean isConvertible = isCurrencyConvertible(currencyCode, reportDate);
