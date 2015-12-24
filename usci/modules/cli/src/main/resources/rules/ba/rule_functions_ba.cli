@@ -11,7 +11,7 @@ function boolean isCurrencyConvertible(String currencyCode, Date reportDate){
         BaseEntity be = new BaseEntity(metaService.getMetaClass("ref_currency"), reportDate);
 
         //заполнять параметры поиска
-        be.put("code",new BaseValue(currencyCode));
+        be.put("short_name",new BaseValue(currencyCode));
 
         //находить все иденификаторы сущности (проставлять идшники)
         BaseEntity preparedBe  = entityService.prepare(be);
