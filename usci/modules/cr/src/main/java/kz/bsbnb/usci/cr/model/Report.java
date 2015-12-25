@@ -54,7 +54,7 @@ public class Report implements Serializable {
 
     private Date lastManualEditDate;
 
-    private transient Shared status;
+    private Shared status;
 
     public Long getId() {
         return id;
