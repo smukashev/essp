@@ -46,11 +46,10 @@ public class BatchJobListener implements IListener {
         IBatchService batchService = serviceFactory.getBatchService();
         Batch batch = batchService.getBatch(batchId);
 
-        /*Properties properties = new Properties();
+        Properties properties = new Properties();
         properties.put("FILENAME", batch.getFileName());
-
         serviceFactory.getMailMessageBeanCommonBusiness().sendMailMessage("FILE_PROCESSING_COMPLETED",
-            batch.getUserId(), properties);*/
+            batch.getUserId(), properties);
 
         batchService.endBatch(batchId);
         receiverStatusSingleton.batchEnded();
