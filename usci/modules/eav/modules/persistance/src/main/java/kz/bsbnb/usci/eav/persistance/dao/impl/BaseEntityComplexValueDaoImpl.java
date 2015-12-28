@@ -214,8 +214,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
 
-            IBaseEntity childBaseEntity = baseEntityLoadDao
-                    .loadByMaxReportDate(entityValueId, reportDate);
+            IBaseEntity childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, reportDate);
 
             nextBaseValue = BaseValueFactory.create(
                     metaClass.getType(),
@@ -308,8 +307,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
 
-            IBaseEntity childBaseEntity = baseEntityLoadDao
-                    .loadByMaxReportDate(entityValueId, reportDate);
+            IBaseEntity childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, reportDate);
 
             previousBaseValue = BaseValueFactory.create(
                     metaClass.getType(),
@@ -445,8 +443,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
 
-            IBaseEntity childBaseEntity = baseEntityLoadDao
-                    .loadByMaxReportDate(entityValueId, reportDate);
+            IBaseEntity childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, reportDate);
 
             lastBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,
@@ -469,8 +466,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
         Table tableOfAttributes = EAV_M_COMPLEX_ATTRIBUTES.as("a");
         Table tableOfValues = EAV_BE_COMPLEX_VALUES.as("v");
-        Select select = null;
-
+        Select select;
 
         Table tableNumbering = context
                 .select(DSL.rank().over()
@@ -511,10 +507,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        Iterator<Map<String, Object>> it = rows.iterator();
-        while (it.hasNext()) {
-            Map<String, Object> row = it.next();
-
+        for (Map<String, Object> row : rows) {
             long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
 
             long entityValueId = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
@@ -529,8 +522,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             String attribute = (String) row.get(EAV_M_COMPLEX_ATTRIBUTES.NAME.getName());
 
             IMetaType metaType = metaClass.getMemberType(attribute);
-            IBaseEntity childBaseEntity = baseEntityLoadDao.
-                    loadByMaxReportDate(entityValueId, actualReportDate);
+
+            IBaseEntity childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, actualReportDate);
 
             baseEntity.put(attribute, BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,

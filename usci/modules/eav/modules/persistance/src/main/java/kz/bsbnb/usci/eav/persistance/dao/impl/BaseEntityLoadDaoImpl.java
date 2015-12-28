@@ -13,18 +13,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Repository
 public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBean {
     @Autowired
-    IPersistableDaoPool persistableDaoPool;
+    private IPersistableDaoPool persistableDaoPool;
 
     @Value("${refs.cache.enabled}")
     private boolean isReferenceCacheEnabled;
 
     @Autowired
-    IRefRepository refRepositoryDao;
+    private IRefRepository refRepositoryDao;
+
+    private DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -36,38 +40,29 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
         if (id == 0L || savingReportDate == null)
             throw new IllegalStateException("Необходимо предоставить ID записи и отчётную дату");
 
-        IBaseEntity loadedEntity;
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id, savingReportDate);
         if (maxReportDate == null)
-            throw new RuntimeException("В базе нет данных для сущности(" + id + ") до отчетной даты(включительно): "
-                    + savingReportDate + ";");
+            throw new RuntimeException("Запись(" + id + ") не действует на отчётный период " +
+                    df.format(savingReportDate) + ";");
 
-        if (!isReferenceCacheEnabled) {
-            loadedEntity = load(id, maxReportDate, savingReportDate);
-        } else {
-            loadedEntity = refRepositoryDao.getRef(id, maxReportDate);
-            if (loadedEntity == null) {
-                loadedEntity = load(id, maxReportDate, savingReportDate);
-                if (loadedEntity.getMeta().isReference())
-                    refRepositoryDao.setRef(id, savingReportDate, loadedEntity);
-            }
-        }
-
-        return loadedEntity;
+        return load(id, maxReportDate, savingReportDate);
     }
 
     @Override
     public IBaseEntity loadByMinReportDate(long id, Date savingReportDate) {
+        if (id == 0L || savingReportDate == null)
+            throw new IllegalStateException("Необходимо предоставить ID записи и отчётную дату");
+
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
         Date minReportDate = baseEntityReportDateDao.getMinReportDate(id, savingReportDate);
         if (minReportDate == null)
-            throw new RuntimeException("В базе нет данных для сущности(" + id + ") после отчетной даты(включительно): "
-                    + savingReportDate + ";");
+            throw new RuntimeException("Запись(" + id + ") не действует на отчётный период " +
+                    df.format(savingReportDate) + ";");
 
         return load(id, minReportDate, savingReportDate);
     }
@@ -76,6 +71,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
     public IBaseEntity load(long id) {
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id);
         if (maxReportDate == null)
             throw new UnsupportedOperationException("В базе отсутсвует отчетная дата на ID: " + id + ";");

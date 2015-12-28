@@ -5,7 +5,6 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
@@ -308,7 +307,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
         IMetaType metaType = baseSet.getMemberType();
 
-        if (baseContainer == null || baseContainer.getId() < 1)
+        if (baseContainer.getId() == 0)
             throw new RuntimeException("Can not find closed instance of BaseValue without container or container ID.");
 
         IBaseValue closedBaseValue = null;
@@ -421,9 +420,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @Override
     @SuppressWarnings("unchecked")
     public void loadBaseValues(IBaseSet baseSet, Date actualReportDate) {
-        IMetaType metaType = baseSet.getMemberType();
-        IMetaClass metaClass = (IMetaClass) metaType;
-
         Table tableOfValues = EAV_BE_COMPLEX_SET_VALUES.as("csv");
         Select select;
 
@@ -455,10 +451,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        Iterator<Map<String, Object>> it = rows.iterator();
-        while (it.hasNext()) {
-            Map<String, Object> row = it.next();
-
+        for (Map<String, Object> row : rows) {
             long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
 
             long entityValueId = ((BigDecimal)
@@ -501,7 +494,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
     @Override
     public Set<Long> getChildBaseEntityIds(long baseSetId) {
-        Set<Long> childBaseEntityIds = new HashSet<Long>();
+        Set<Long> childBaseEntityIds = new HashSet<>();
 
         String tableAlias = "bv";
         Select select = context
@@ -514,14 +507,9 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 0) {
-            Iterator<Map<String, Object>> it = rows.iterator();
-            while (it.hasNext()) {
-                Map<String, Object> row = it.next();
-
-                long childBaseEntityId = ((BigDecimal) row
-                        .get(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID.getName())).longValue();
-                childBaseEntityIds.add(childBaseEntityId);
-            }
+            for (Map<String, Object> row : rows)
+                childBaseEntityIds.add(((BigDecimal) row
+                        .get(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID.getName())).longValue());
         }
 
         return childBaseEntityIds;
