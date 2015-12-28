@@ -462,7 +462,15 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
-            IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, actualReportDate);
+            IBaseEntity baseEntity;
+
+            // tmp solution
+            // fixme
+            try {
+                baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, actualReportDate);
+            } catch (Exception e) {
+                baseEntity = baseEntityLoadDao.loadByMinReportDate(entityValueId, actualReportDate);
+            }
 
             baseSet.put(BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
