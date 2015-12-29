@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.batch_entry.model.json;
+package kz.bsbnb.usci.porltet.entity_merge.model.json;
 
 public class MetaClassListEntry
 {

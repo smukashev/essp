@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.batch_entry;
+package kz.bsbnb.usci.porltet.entity_merge;
 
 import com.google.gson.Gson;
 
