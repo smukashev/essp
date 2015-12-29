@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.porltet.entity_merge;
+package kz.bsbnb.usci.porltet.batch_entry;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
