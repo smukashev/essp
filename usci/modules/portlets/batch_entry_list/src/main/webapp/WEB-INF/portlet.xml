@@ -4,7 +4,7 @@
 	<portlet>
 		<portlet-name>batch_entry_list</portlet-name>
 		<display-name>Портлет отправки изменений</display-name>
-		<portlet-class>kz.bsbnb.usci.porltet.entity_merge.MainPortlet</portlet-class>
+		<portlet-class>kz.bsbnb.usci.porltet.batch_entry.MainPortlet</portlet-class>
 		<init-param>
 			<name>view-template</name>
 			<value>/view.jsp</value>
