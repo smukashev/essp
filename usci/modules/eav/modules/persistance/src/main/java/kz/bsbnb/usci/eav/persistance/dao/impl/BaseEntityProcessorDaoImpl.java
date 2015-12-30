@@ -197,6 +197,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     entityHolder.setApplied(baseEntityApplied);
+
+                    baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
                 case CLOSE:
                     if (baseEntityPostPrepared.getId() <= 0)
