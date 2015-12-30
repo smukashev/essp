@@ -3147,10 +3147,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
        WHERE vch.id = p_creditor_id
          AND vch.open_date <= p_report_date
-         AND (vch.close_date > p_report_date OR vch.close_date IS NULL);
+         AND (vch.close_date > p_report_date OR vch.close_date IS NULL)
+         AND (p_tag_name = 'creditor' or vch.main_office_id IS NOT NULL);
     END IF;
 
     RETURN v_xml;
+
+    EXCEPTION
+      WHEN no_data_found then
+        v_xml := null;
+        RETURN v_xml;
   END;
   
   FUNCTION get_ref_creditor_doc_xml
