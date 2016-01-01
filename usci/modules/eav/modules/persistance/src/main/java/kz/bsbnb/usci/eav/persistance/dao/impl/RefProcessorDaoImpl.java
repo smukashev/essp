@@ -150,9 +150,11 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
         Collection<Field> fields = new ArrayList<Field>();
         fields.add(DSL.field("id"));
         fields.add(DSL.min(DSL.field("report_date")).as("report_date"));
+        fields.add(DSL.field("\"closed_date\""));
 
         Collection<Field> groupByFields = new ArrayList<Field>();
         groupByFields.add(DSL.field("id"));
+        groupByFields.add(DSL.field("\"closed_date\""));
 
         for (Map<String, Object> attr : simpleAttrs) {
             String attrName = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
@@ -165,6 +167,10 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
 
         fieldsInner.add(DSL.field("\"dat\".id"));
         fieldsInner.add(DSL.field("\"dat\".report_date"));
+        fieldsInner.add(context.select(DSL.min(DSL.field("report_date")))
+                .from(EAV_BE_ENTITY_REPORT_DATES)
+                .where(DSL.field("entity_id").eq(DSL.field("\"dat\".id")))
+                .and(DSL.field("is_closed").eq(DataUtils.convert(true))).asField("closed_date"));
 
         for (Map<String, Object> attr : simpleAttrs) {
             BigDecimal attrId = (BigDecimal) attr.get(EAV_M_SIMPLE_ATTRIBUTES.ID.getName());
@@ -310,6 +316,8 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
             if (prev != null) {
                 Object id = row.get("ID");
                 Object prevId = prev.get("ID");
+                if(row.get("closed_date") != null)
+                    row.put("close_date", df.format(row.get("closed_date")));
 
                 if (id.equals(prevId)) {
                     prev.put("close_date", sRepDate);
