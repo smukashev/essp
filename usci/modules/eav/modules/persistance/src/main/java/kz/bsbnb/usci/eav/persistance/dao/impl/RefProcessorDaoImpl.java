@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.eav.persistance.generated.tables.EavBeComplexValues;
+import kz.bsbnb.eav.persistance.generated.tables.EavBeStringValues;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
@@ -144,8 +146,36 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
         Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).
                 where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
 
+        Collection<Field> complexAttrsFields = new ArrayList<>();
+
+        Field keyAttrField = context.select(DSL.field("id")).from(EAV_M_SIMPLE_ATTRIBUTES)
+                .where(EAV_M_COMPLEX_ATTRIBUTES.as("m1").CLASS_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID))
+                .and(EAV_M_SIMPLE_ATTRIBUTES.IS_KEY.eq(DataUtils.convert(true))).asField("KEY_ATTR");
+
+        Field settingAttrField = context.select(EAV_M_SIMPLE_ATTRIBUTES.as("m3").ID)
+                .from(EAV_M_SIMPLE_ATTRIBUTES.as("m3"))
+                .join(EAV_M_CLASSES.as("m4")).on(EAV_M_SIMPLE_ATTRIBUTES.as("m3").CONTAINING_ID.eq(EAV_M_CLASSES.as("m4").ID))
+                .join(EAV_GLOBAL.as("m5")).on(EAV_M_CLASSES.as("m4").NAME.eq(EAV_GLOBAL.as("m5").CODE))
+                .where(EAV_M_CLASSES.as("m4").ID.eq(EAV_M_COMPLEX_ATTRIBUTES.as("m1").CLASS_ID))
+                .and(EAV_GLOBAL.as("m5").TYPE.eq("REF_VIEW_SETTING"))
+                .and(EAV_GLOBAL.as("m5").VALUE.eq(EAV_M_SIMPLE_ATTRIBUTES.as("m3").NAME)).asField("SETTING_ATTR");
+
+        complexAttrsFields.add(DSL.field("id"));
+        complexAttrsFields.add(DSL.field("name"));
+        complexAttrsFields.add(keyAttrField);
+        complexAttrsFields.add(settingAttrField);
+
+        Select complexAttrsSelect = context.select(complexAttrsFields.toArray(new Field[]{})).from(EAV_M_COMPLEX_ATTRIBUTES.as("m1"))
+                .where(EAV_M_COMPLEX_ATTRIBUTES.as("m1").CONTAINING_ID.eq(metaClassId));
+
+        System.out.println(complexAttrsSelect.toString());
+
+
         List<Map<String, Object>> simpleAttrs = queryForListWithStats(simpleAttrsSelect.getSQL(),
                 simpleAttrsSelect.getBindValues().toArray());
+
+        List<Map<String, Object>> complexAttrs = queryForListWithStats(complexAttrsSelect.getSQL(),
+                complexAttrsSelect.getBindValues().toArray());
 
         Collection<Field> fields = new ArrayList<Field>();
         fields.add(DSL.field("id"));
@@ -197,6 +227,47 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
                             selectMaxRepDate
                     ).and(DSL.field("entity_id").eq(DSL.field("\"dat\".id"))))
                     .asField(attrName);
+
+            fieldsInner.add(fieldInner);
+        }
+
+        for(Map<String,Object> attr: complexAttrs) {
+            Long attrId = ((BigDecimal) attr.get(EAV_M_COMPLEX_ATTRIBUTES.ID.getName())).longValue();
+            String attrName = (String) attr.get(EAV_M_COMPLEX_ATTRIBUTES.NAME.getName());
+
+            Long childAttrId = null;
+
+            if(attr.get("SETTING_ATTR") != null)
+                childAttrId = ((BigDecimal)attr.get("SETTING_ATTR")).longValue();
+
+            if(childAttrId == null && attr.get("KEY_ATTR") != null)
+                childAttrId = ((BigDecimal)attr.get("KEY_ATTR")).longValue();
+
+            if(childAttrId == null)
+                continue;
+
+            fields.add(DSL.field("\"" + attrName + "\""));
+            groupByFields.add(DSL.field("\"" + attrName + "\""));
+
+            EavBeComplexValues comp = EAV_BE_COMPLEX_VALUES.as("t1");
+            EavBeStringValues str = EAV_BE_STRING_VALUES.as("t2");
+
+            SelectConditionStep<Record1<java.sql.Date>> selectMaxRepDate = context.select(DSL.max(str.REPORT_DATE))
+                    .from(comp)
+                    .join(str).on(comp.ENTITY_VALUE_ID.eq(str.ENTITY_ID))
+                    .where(comp.ENTITY_ID.eq(DSL.field("\"dat\".id").cast(Long.class)))
+                    .and(comp.ATTRIBUTE_ID.eq(attrId))
+                    .and(str.ATTRIBUTE_ID.eq(childAttrId));
+
+
+            Field fieldInner = context.select(str.VALUE)
+                    .from(comp)
+                    .join(str).on(comp.ENTITY_VALUE_ID.eq(str.ENTITY_ID))
+                    .where(comp.ENTITY_ID.eq(DSL.field("\"dat\".id").cast(Long.class)))
+                    .and(comp.ATTRIBUTE_ID.eq(attrId))
+                    .and(str.ATTRIBUTE_ID.eq(childAttrId))
+                    .and(str.REPORT_DATE.eq(selectMaxRepDate)).asField(attrName);
+
 
             fieldsInner.add(fieldInner);
         }
