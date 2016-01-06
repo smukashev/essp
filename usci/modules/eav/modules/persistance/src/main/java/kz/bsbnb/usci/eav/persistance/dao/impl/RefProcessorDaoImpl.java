@@ -168,9 +168,6 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
         Select complexAttrsSelect = context.select(complexAttrsFields.toArray(new Field[]{})).from(EAV_M_COMPLEX_ATTRIBUTES.as("m1"))
                 .where(EAV_M_COMPLEX_ATTRIBUTES.as("m1").CONTAINING_ID.eq(metaClassId));
 
-        System.out.println(complexAttrsSelect.toString());
-
-
         List<Map<String, Object>> simpleAttrs = queryForListWithStats(simpleAttrsSelect.getSQL(),
                 simpleAttrsSelect.getBindValues().toArray());
 
