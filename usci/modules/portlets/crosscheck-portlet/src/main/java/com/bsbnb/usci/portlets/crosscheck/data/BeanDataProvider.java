@@ -1,6 +1,5 @@
 package com.bsbnb.usci.portlets.crosscheck.data;
 
-import com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication;
 import com.bsbnb.usci.portlets.crosscheck.PortletEnvironmentFacade;
 import com.bsbnb.usci.portlets.crosscheck.dm.*;
 import com.bsbnb.usci.portlets.crosscheck.helper.DbHelper;
@@ -103,7 +102,7 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT ID, DATE_BEGIN, DATE_END, REPORT_DATE, STATUS_ID, 0 AS STATUS_NAME, USER_NAME, CREDITOR_ID " +
+        String query = "SELECT ID, DATE_BEGIN, DATE_END, REPORT_DATE, STATUS_ID, decode(status_id, 43, 'Ошибка', 44, 'Успешно')  AS STATUS_NAME, USER_NAME, CREDITOR_ID " +
                 "FROM reporter.CROSS_CHECK " +
                 "WHERE ((CREDITOR_ID IN (";
 
