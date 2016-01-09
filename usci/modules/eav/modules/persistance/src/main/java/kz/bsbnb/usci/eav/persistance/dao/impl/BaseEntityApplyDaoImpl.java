@@ -948,10 +948,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseValueClosed.setMetaAttribute(metaAttribute);
 
                     baseEntityManager.registerAsInserted(baseValueClosed);
-                } else if (compare == -1) {
+                }/* else if (compare == -1) {
                     throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
                             + ". " + baseValueSaving.getMetaAttribute().getName() + ";");
-                }
+                }*/
 
                 return;
             }
@@ -1868,10 +1868,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
 
                     isBaseSetDeleted = true;
-                } else if (compare == -1) {
+                }/* else if (compare == -1) {
                     throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
                             + "( " + baseValueSaving.getMetaAttribute().getName() + ");");
-                }
+                }*/
                 // case#4
             } else {
                 reportDateSaving = baseValueSaving.getRepDate();
