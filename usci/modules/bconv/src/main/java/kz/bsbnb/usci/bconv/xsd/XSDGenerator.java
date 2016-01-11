@@ -5,13 +5,13 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by maksat on 7/20/15.
@@ -39,6 +39,7 @@ public class XSDGenerator {
         ps.println("<xsd:restriction base=\"xsd:string\">");
         ps.println("<xsd:enumeration value=\"DELETE\"/>");
         ps.println("<xsd:enumeration value=\"CLOSE\"/>");
+        ps.println("<xsd:enumeration value=\"INSERT\"/>");
         ps.println("</xsd:restriction>");
         ps.println("</xsd:simpleType>");
 
