@@ -8,7 +8,7 @@ public final class StaticRouter {
     }
 
     /* Set up before compiling */
-    private static final MODE mode = MODE.DEV;
+    private static final MODE mode = MODE.PROD;
 
     /* Application Server IP */
     private final static String stendAsIP = "10.10.20.28";
@@ -42,12 +42,12 @@ public final class StaticRouter {
 
     /* Core Schema name */
     private final static String stendCoreSchemaName = "C##CORE";
-    private final static String devCoreSchemaName = "C##CORE2";
+    private final static String devCoreSchemaName = "C##CORE";
     private final static String prodCoreSchemaName = "CORE";
 
     /* Showcase Schema name */
     private final static String stendShowcaseSchemaName = "C##SHOWCASE";
-    private final static String devShowcaseSchemaName = "C##CORE2";
+    private final static String devShowcaseSchemaName = "C##SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHOWCASE3";
 
     /* Credit Registry DB IP */

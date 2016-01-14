@@ -9,23 +9,23 @@ rule rc
 rule set package credit_parser
 rule set version
 
-rule import modules/cli/src/main/resources/rules/imports.cli
-rule import modules/cli/src/main/resources/rules/rule_functions.cli
-rule import modules/cli/src/main/resources/rules/rule_functions2.cli
-rule import modules/cli/src/main/resources/rules/docs/rule_functions_iin.cli
-rule import modules/cli/src/main/resources/rules/docs/rule_iins.cli
-rule import modules/cli/src/main/resources/rules/rule_indicators.cli
-rule import modules/cli/src/main/resources/rules/rule_cr.cli
-rule import modules/cli/src/main/resources/rules/docs/rule_docs_12d.cli
-rule import modules/cli/src/main/resources/rules/docs/rule_docs_12z.cli
-rule import modules/cli/src/main/resources/rules/docs/rule_functions_ain.cli
-rule import modules/cli/src/main/resources/rules/docs/rule_ain.cli
-rule import modules/cli/src/main/resources/rules/ba/rule_functions_ba.cli
-rule import modules/cli/src/main/resources/rules/ba/rule_ba_5.cli
-rule import modules/cli/src/main/resources/rules/ba/rule_ba_7.cli
-rule import modules/cli/src/main/resources/rules/ba/rule_bact.cli
-rule import modules/cli/src/main/resources/rules/ba/rule_badrt.cli
-rule import modules/cli/src/main/resources/rules/ba/rule_noba.cli
+rule import usci/modules/cli/src/main/resources/rules/imports.cli
+rule import usci/modules/cli/src/main/resources/rules/rule_functions.cli
+rule import usci/modules/cli/src/main/resources/rules/rule_functions2.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/rule_functions_iin.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/rule_iins.cli
+rule import usci/modules/cli/src/main/resources/rules/rule_indicators.cli
+rule import usci/modules/cli/src/main/resources/rules/rule_cr.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/rule_docs_12d.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/rule_docs_12z.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/rule_functions_ain.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/rule_ain.cli
+rule import usci/modules/cli/src/main/resources/rules/ba/rule_functions_ba.cli
+rule import usci/modules/cli/src/main/resources/rules/ba/rule_ba_5.cli
+rule import usci/modules/cli/src/main/resources/rules/ba/rule_ba_7.cli
+rule import usci/modules/cli/src/main/resources/rules/ba/rule_bact.cli
+rule import usci/modules/cli/src/main/resources/rules/ba/rule_badrt.cli
+rule import usci/modules/cli/src/main/resources/rules/ba/rule_noba.cli
 
 #===========================================================================================
 # ref_creditor
@@ -36,9 +36,9 @@ rule rc
 rule set package ref_creditor_parser
 rule set version
 
-rule import modules/cli/src/main/resources/rules/imports.cli
-rule import modules/cli/src/main/resources/rules/rule_functions.cli
-rule import modules/cli/src/main/resources/rules/docs/ref_creditor.cli
+rule import usci/modules/cli/src/main/resources/rules/imports.cli
+rule import usci/modules/cli/src/main/resources/rules/rule_functions.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/ref_creditor.cli
 
 
 #===========================================================================================
