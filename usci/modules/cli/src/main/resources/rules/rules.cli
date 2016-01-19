@@ -50,9 +50,9 @@ rule rc
 rule set package ref_creditor_branch_parser
 rule set version
 
-rule import modules/cli/src/main/resources/rules/imports.cli
-rule import modules/cli/src/main/resources/rules/rule_functions.cli
-rule import modules/cli/src/main/resources/rules/docs/ref_creditor_branch.cli
+rule import usci/modules/cli/src/main/resources/rules/imports.cli
+rule import usci/modules/cli/src/main/resources/rules/rule_functions.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/ref_creditor_branch.cli
 
 
 #===========================================================================================
@@ -64,11 +64,11 @@ rule rc
 rule set package ref_exclusive_doc_parser
 rule set version
 
-rule import modules/cli/src/main/resources/rules/imports.cli
-rule import modules/cli/src/main/resources/rules/rule_functions.cli
-rule import modules/cli/src/main/resources/rules/rule_functions2.cli
-rule import modules/cli/src/main/resources/rules/docs/rule_functions_iin.cli
-rule import modules/cli/src/main/resources/rules/rule_ref_exclusive_doc.cli
+rule import usci/modules/cli/src/main/resources/rules/imports.cli
+rule import usci/modules/cli/src/main/resources/rules/rule_functions.cli
+rule import usci/modules/cli/src/main/resources/rules/rule_functions2.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/rule_functions_iin.cli
+rule import usci/modules/cli/src/main/resources/rules/rule_ref_exclusive_doc.cli
 
 rule rc
 
