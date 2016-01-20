@@ -13,6 +13,11 @@ public class StatusProperties {
                 return (String) entity.getBaseValue(attr).getValue();
             }
         }
+
+        for (String attr: entity.getAttributes()) {
+            if(attr.equals("code"))
+                return (String) entity.getBaseValue(attr).getValue();
+        }
         return null;
     }
 
