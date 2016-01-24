@@ -4,7 +4,7 @@ rule read $$$
 title: Остаток - Основной долг - Непросроченная  задолженность
 rule "gen_remains_debt_current"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
                 && getEls("{setString(KZT)}currency.short_name") == 0
                 && getEl("change.remains.debt.current.value") != null
                 && getEl("change.remains.debt.current.value") > 0
@@ -20,7 +20,7 @@ rule read $$$
 title: Остаток - Основной долг - Просроченная задолженность
 rule "gen_remains_debt_pastdue"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
                 && getEls("{setString(KZT)}currency.short_name") == 0
                 && getEl("change.remains.debt.pastdue.value") != null
                 && getEl("change.remains.debt.pastdue.value") > 0
@@ -36,7 +36,7 @@ rule read $$$
 title: Остаток - Основной долг - Списанная с баланса задолженность
 rule "credit_gen_remains_debt_writeoff"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
                 && getEls("{setString(KZT)}currency.short_name") == 0
                 && getEl("change.remains.debt.write_off.value") != null
                 && getEl("change.remains.debt.write_off.value") > 0
@@ -52,7 +52,7 @@ rule read $$$
 title: Остаток - Вознаграждение - Непросроченная  задолженность
 rule "gen_remains_interest_current"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
                 && getEls("{setString(KZT)}currency.short_name") == 0
                 && getEl("change.remains.interest.current.value") != null
                 && getEl("change.remains.interest.current.value") > 0
@@ -68,7 +68,7 @@ rule read $$$
 title: Остаток - Вознаграждение - Просроченная  задолженность
 rule "gen_remains_interest_pastdue"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
                 && getEls("{setString(KZT)}currency.short_name") == 0
                 && getEl("change.remains.interest.pastdue.value") != null
                 && getEl("change.remains.interest.pastdue.value") > 0
@@ -84,7 +84,7 @@ rule read $$$
 title: Остаток - Вознаграждение - Списанная с баланса задолженность
 rule "gen_remains_interest_writeoff"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
                 && getEls("{setString(KZT)}currency.short_name") == 0
                 && getEl("change.remains.interest.write_off.value") != null
                 && getEl("change.remains.interest.write_off.value") > 0
@@ -100,7 +100,7 @@ rule read $$$
 title: Остаток - Положительная/отрицательная корректировка
 rule "gen_remains_correction"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
                 && getEls("{setString(KZT)}currency.short_name") == 0
                 && getEl("change.remains.correction.value") != null
                 && getEl("change.remains.correction.value") > 0
@@ -116,7 +116,7 @@ rule read $$$
 title: Остаток - Дисконт/премия
 rule "gen_remains_discount"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
                 && getEls("{setString(KZT)}currency.short_name") == 0
                 && getEl("change.remains.discount.value") != null
                 && getEl("change.remains.discount.value") > 0
@@ -133,7 +133,7 @@ rule read $$$
 title: Руководитель юридического лица
 rule "head juridical"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
             && getEls("{setString(17,18,19,24)}credit_type.code") == 0
             && getEls("{count}subject[is_organization=true]organization_info[is_se!=true][head=null]") > 0)
 then
@@ -147,7 +147,7 @@ rule read $$$
 title: cумма займа
 rule "amount"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
             && getEl("credit_type.code") != "12"
             && getEl("amount") == null)
 then
@@ -161,7 +161,7 @@ rule read $$$
 title: Вид экономической деятельности
 rule "econ_trade"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
             && getEls("{setString(17,18)}credit_type.code") == 0
             && getEls("{count}subject[is_organization=true]organization_info[country.code_numeric=398][econ_trade.code=null]") > 0)
 then
@@ -175,7 +175,7 @@ rule read $$$
 title: Субъект кредитной истории
 rule "credit subject"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
             && getEls("{setString(17,18)}credit_type.code") == 0
             && getEls("{count}subject") == 0)
 then
@@ -189,7 +189,7 @@ rule read $$$
 title: Вид валюты по договору
 rule "currency by credit"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
             && getEls("{setString(15,25)}credit_type.code") == 0
             && getEl("currency.short_name") == null)
 then
@@ -203,7 +203,7 @@ rule read $$$
 title: Организационно-правовая форма
 rule "legal_form in jur"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
             && getEls("{setString(17,18,19,24)}credit_type.code") == 0
             && getEls("{count}subject[is_organization=true]organization_info[is_se!=true][country.code_numeric=398][legal_form=null]") > 0)
 then
@@ -217,7 +217,7 @@ rule read $$$
 title: Дата погашения по условиям договора
 rule "contract_maturity_date"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
             && getEls("{setString(02,10,12,13,14,15,25,26)}credit_type.code") == 0
             && getEl("contract_maturity_date") == null)
 then
@@ -231,7 +231,7 @@ rule read $$$
 title: Источник финансирования банка
 rule "finance source"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
             && getEls("{setString(02,03,10,12,13,14,15,17,18,24,25,26)}credit_type.code") == 0
             && getEl("finance_source.code") == null)
 then
@@ -245,7 +245,7 @@ rule read $$$
 title: Цель кредитования
 rule "credit purpose"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
             && getEls("{setString(02,03,10,12,13,14,15,16,17,18,24,25,26)}credit_type.code") == 0
             && getEl("credit_purpose.code") == null)
 then
@@ -259,7 +259,7 @@ rule read $$$
 title: Объект кредитования
 rule "credit object"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
             && getEls("{setString(02,03,10,12,13,14,15,16,17,18,24,25,26)}credit_type.code") == 0
             && getEl("credit_object.code") == null)
 then
@@ -274,7 +274,7 @@ rule read $$$
 title: Вид экономической деятельности для КЗ
 rule "econ trade KZ"
 when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
+  $entity: BaseEntity(getMeta().getClassName() == "credit" 
             && getEls("{count}subject[is_organization=true]organization_info[country.code_numeric=398][econ_trade.code=null]") > 0)
 then
   $entity.addValidationError("Не указан вид экономической деятельности");
