@@ -140,7 +140,7 @@
     <bean id="remoteRuleService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="refreshStubOnConnectFailure" value="true"/>
         <property name="serviceUrl" value="rmi://127.0.0.1:1097/ruleService"/>
-        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulesvr.service.IRuleService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IRuleService"/>
     </bean>
 
     <bean id="mailRemoteBusiness" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">

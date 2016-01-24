@@ -1,6 +1,6 @@
-package kz.bsbnb.usci.brms.rulesvr.model;
+package kz.bsbnb.usci.brms.rulemodel.model;
 
-import kz.bsbnb.usci.brms.rulesvr.persistable.IPersistable;
+import kz.bsbnb.usci.brms.rulemodel.persistable.IPersistable;
 
 import java.util.Date;
 

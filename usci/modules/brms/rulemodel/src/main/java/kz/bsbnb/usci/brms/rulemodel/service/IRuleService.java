@@ -1,9 +1,7 @@
-package kz.bsbnb.usci.brms.rulesvr.service;
+package kz.bsbnb.usci.brms.rulemodel.service;
 
-import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
-
+import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import java.util.Date;
 import java.util.List;

@@ -1,11 +1,11 @@
 package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.service.IBatchService;
+import kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulesvr.service.IBatchService;
-import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.service.IEntityService;

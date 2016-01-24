@@ -18,6 +18,7 @@ import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
+import kz.bsbnb.usci.eav.persistance.logic.IRuleServicePool;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -71,6 +72,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private BasicBaseEntitySearcherPool searcherPool;
 
     private IDaoListener applyListener;
+
+    @Autowired
+    private IRuleServicePool ruleServicePool;
 
     @Autowired
     public void setApplyListener(IDaoListener applyListener) {
@@ -291,6 +295,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         } else {
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                     baseEntityManager, entityHolder);
+
+            List<String > errors = ruleServicePool.getRuleService().runRules((BaseEntity)baseEntityApplied,
+                    baseEntityApplied.getMeta().getClassName() + "_process", baseEntityApplied.getReportDate());
+
+            if(errors.size() > 0)
+                throw new RuntimeException(errors.iterator().next());
 
             baseEntityApplyDao.applyToDb(baseEntityManager);
 

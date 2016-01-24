@@ -1,7 +1,8 @@
 package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
-import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.SimpleTrack;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Delete;
@@ -12,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;

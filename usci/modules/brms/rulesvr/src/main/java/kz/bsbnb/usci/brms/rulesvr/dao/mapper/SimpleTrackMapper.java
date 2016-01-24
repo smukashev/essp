@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.brms.rulesvr.dao.mapper;
 
-import kz.bsbnb.usci.brms.rulesvr.model.impl.SimpleTrack;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.SimpleTrack;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
