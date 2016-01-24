@@ -197,7 +197,7 @@ public class RulesSingleton
             if(r.getId() != ruleId)
                 packages += r.getRule() + "\n";
             else {
-                packages += ruleEdited ? ruleBody : r.getRule()+ "\n";
+                packages += (ruleEdited ? ruleBody : r.getRule() ) + "\n";
             }
         }
 
