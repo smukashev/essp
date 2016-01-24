@@ -1,7 +1,7 @@
 rule clear
 
 #===========================================================================================
-# credit
+# credit_parser
 #===========================================================================================
 rule set date 01.04.2001
 rule create package credit_parser
@@ -39,7 +39,7 @@ rule set version
 #no rules
 
 #===========================================================================================
-# ref_creditor
+# ref_creditor_parser
 #===========================================================================================
 rule set date 01.04.2001
 rule create package ref_creditor_parser
@@ -64,7 +64,7 @@ rule set version
 #no rules
 
 #===========================================================================================
-# ref_creditor_branch
+# ref_creditor_branch_parser
 #===========================================================================================
 rule set date 01.04.2001
 rule create package ref_creditor_branch_parser
@@ -88,7 +88,7 @@ rule set version
 #no rules
 
 #===========================================================================================
-# ref_exclusive_doc
+# ref_exclusive_doc_parser
 #===========================================================================================
 rule set date 01.04.2001
 rule create package ref_exclusive_doc_parser
