@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.exceptions.KnownException;
+import kz.bsbnb.usci.eav.model.exceptions.KnownIterativeException;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -260,6 +261,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);
 
+                    processLogicControl(baseEntityApplied);
+
                     baseEntityApplyDao.applyToDb(baseEntityManager);
 
                     if(isReferenceCacheEnabled) {
@@ -277,6 +280,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);
+
+                    processLogicControl(baseEntityApplied);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
 
@@ -296,12 +301,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                     baseEntityManager, entityHolder);
 
-            List<String > errors = ruleServicePool.getRuleService().runRules((BaseEntity)baseEntityApplied,
-                    baseEntityApplied.getMeta().getClassName() + "_process", baseEntityApplied.getReportDate());
-
-            if(errors.size() > 0)
-                throw new RuntimeException(errors.iterator().next());
-
             baseEntityApplyDao.applyToDb(baseEntityManager);
 
             if(isReferenceCacheEnabled) {
@@ -318,6 +317,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     entityHolder.getApplied(), baseEntityManager);
 
         return baseEntityApplied;
+    }
+
+    private void processLogicControl(IBaseEntity baseEntityApplied){
+        List<String > errors = ruleServicePool.getRuleService().runRules((BaseEntity)baseEntityApplied,
+                baseEntityApplied.getMeta().getClassName() + "_process", baseEntityApplied.getReportDate());
+
+        if(errors.size() > 0) {
+            throw new KnownIterativeException(errors);
+        }
     }
 
     private void failIfHasUsages(IBaseEntity baseEntity) {
