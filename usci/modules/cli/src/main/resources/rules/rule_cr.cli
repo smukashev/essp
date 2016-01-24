@@ -1,19 +1,6 @@
 #portion cr hard coded rules
 
 rule read $$$
-title: rd_first_day
-rule "rd_first_day"
-//MES401
-when
-  $entity: BaseEntity(getFirstDay($entity.getReportDate()) !=1)
-then
-  $entity.addValidationError("Неверная отчетная дата");
-end
-$$$
-
-rule save
-
-rule read $$$
 title: debt_pastdue_vs_report_date
 rule "DEBTREMAINS_DEBT_PASDUE_OPEN_DATE_MORE_THAN_OR_EQUAL_TO_REPORT_DATE"
 //MES825
@@ -499,48 +486,6 @@ when:
                 && getEls("{count}subject.docs[doc_type.code!=16][name!=null]") > 0 )
 then
  $entity.addValidationError("При указании иного документа наименование документа не должен быть пустым");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: бин у юр лиц с кодам 02 является иином
-rule "бин у юр лиц с кодам 02 является иином"
-when:
- $entity: BaseEntity( getMeta().getClassName == "credit"
-                && $r: getInvalidIINs((List) getEls("{get}subject[organization_info.enterprise_type.code=02]docs[doc_type.code=07]no") )
-                && $r.size() > 0 )
-then
- $entity.addValidationError("Не правильный БИН у юр лица" + $r);
-end
-$$$
-
-rule save
-
-rule read $$$
-title: бин у юр лиц с кодам 05 является иином
-rule "бин у юр лиц с кодам 05 является иином"
-when:
- $entity: BaseEntity( getMeta().getClassName == "credit"
-                && $r: getInvalidIINs((List) getEls("{get}subject[organization_info.enterprise_type.code=05]docs[doc_type.code=07]no") )
-                && $r.size() > 0 )
-then
- $entity.addValidationError("Не правильный БИН у юр лица" + $r);
-end
-$$$
-
-rule save
-
-rule read $$$
-title: бин у юр лиц с кодам 08 является иином
-rule "бин у юр лиц с кодам 08 является иином"
-when:
- $entity: BaseEntity( getMeta().getClassName == "credit"
-                && $r: getInvalidIINs((List) getEls("{get}subject[organization_info.enterprise_type.code=08]docs[doc_type.code=07]no") )
-                && $r.size() > 0 )
-then
- $entity.addValidationError("Не правильный БИН у юр лица" + $r);
 end
 $$$
 
