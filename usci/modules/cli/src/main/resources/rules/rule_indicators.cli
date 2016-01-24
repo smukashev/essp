@@ -10,7 +10,7 @@ when
                 && getEl("change.remains.debt.current.value") > 0
                 && getEl("change.remains.debt.current.value_currency") == null )
 then
-  $entity.addValidationError("Остаток\\Основной долг\\Непросроченная  задолженность\\Значение остатка в валюте договора должен указываться");
+  $entity.addValidationError("Не заполнен остаток основного долга в валюте договора: непросроченная задолженность");
 end
 $$$
 
@@ -26,7 +26,7 @@ when
                 && getEl("change.remains.debt.pastdue.value") > 0
                 && getEl("change.remains.debt.pastdue.value_currency") == null )
 then
-  $entity.addValidationError("Остаток\\Основной долг\\Просроченная задолженность\\Значение остатка в валюте договора должен указываться для данного типа кредита");
+  $entity.addValidationError("Не заполнен остаток основного долга в валюте договора: просроченная задолженность");
 end
 $$$
 
@@ -42,7 +42,7 @@ when
                 && getEl("change.remains.debt.write_off.value") > 0
                 && getEl("change.remains.debt.write_off.value_currency") == null )
 then
-  $entity.addValidationError("Остаток\\Основной долг\\Списанная с баланса задолженность должен указываться для данного типа кредита");
+  $entity.addValidationError("Не заполнен остаток основного долга в валюте договора: списанная с баланса задолженность");
 end
 $$$
 
@@ -58,7 +58,7 @@ when
                 && getEl("change.remains.interest.current.value") > 0
                 && getEl("change.remains.interest.current.value_currency") == null )
 then
-  $entity.addValidationError("Остаток\\Вознаграждение\\Непросроченная  задолженность\\Значение остатка в валюте договора");
+  $entity.addValidationError("Не заполнен остаток начисленного вознаграждения в валюте договора: непогашенного");
 end
 $$$
 
@@ -74,7 +74,7 @@ when
                 && getEl("change.remains.interest.pastdue.value") > 0
                 && getEl("change.remains.interest.pastdue.value_currency") == null )
 then
-  $entity.addValidationError("Остаток\\Вознаграждение\\Просроченная задолженность\\Значение остатка в валюте договора должен указываться для данного кредита");
+  $entity.addValidationError("Не заполнен остаток начисленного вознаграждения в валюте договора: просроченного");
 end
 $$$
 
@@ -90,7 +90,7 @@ when
                 && getEl("change.remains.interest.write_off.value") > 0
                 && getEl("change.remains.interest.write_off.value_currency") == null )
 then
-  $entity.addValidationError("Остаток\\Вознаграждение\\Списанная с баланса задолженность\\Значение остатка в валюте договора должен указываться");
+  $entity.addValidationError("Не заполнен остаток начисленного вознаграждения в валюте договора: списанного с баланса");
 end
 $$$
 
@@ -106,7 +106,7 @@ when
                 && getEl("change.remains.correction.value") > 0
                 && getEl("change.remains.correction.value_currency") == null )
 then
-  $entity.addValidationError("Остаток\\Положительная/отрицательная корректировка\\Значение остатка в валюте договора должен указываться");
+  $entity.addValidationError("Не заполнена положительная (отрицательная) корректировка в валюте договора");
 end
 $$$
 
@@ -122,39 +122,12 @@ when
                 && getEl("change.remains.discount.value") > 0
                 && getEl("change.remains.discount.value_currency") == null )
 then
-  $entity.addValidationError("Остаток\\Дисконт/премия\\Значение остатка в валюте договора должен указываться");
+  $entity.addValidationError("Не заполнен дисконт (премия) в валюте договора");
 end
 $$$
 
 rule save
 #end of remains
-
-
-rule read $$$
-title: проверка суммы обязательства
-rule "pledge sum check"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
-            && ( getEls("{count}pledges[pledge_type.code!=47][value=null]") > 0) )
-then
-  $entity.addValidationError("Для небланковых залогов сумма залога должна указываться");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: номер контракта обязательства
-rule "pledge contract check"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
-            && ( getEls("{count}pledges[pledge_type.code!=47][contract=null]") > 0) )
-then
-  $entity.addValidationError("Для небланковых залогов контракт залога должнен указываться");
-end
-$$$
-
-rule save
 
 rule read $$$
 title: Руководитель юридического лица
@@ -162,9 +135,9 @@ rule "head juridical"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
             && getEls("{setString(17,18,19,24)}credit_type.code") == 0
-            && getEls("{count}subject[is_organization=true]organization_info[head=null]") > 0)
+            && getEls("{count}subject[is_organization=true]organization_info[is_se!=true][head=null]") > 0)
 then
-  $entity.addValidationError("Руководитель юридического лица должен указываться для данного типа кредита");
+  $entity.addValidationError("Не заполнен руководитель юридического лица");
 end
 $$$
 
@@ -178,21 +151,21 @@ when
             && getEl("credit_type.code") != "12"
             && getEl("amount") == null)
 then
-  $entity.addValidationError("Сумма займа должен указываться для данного кредита");
+  $entity.addValidationError("Не указана сумма займа (условного обязательства) в валюте договора");
 end
 $$$
 
 rule save
 
 rule read $$$
-title: юр. лицо: вид экон деятельности
-rule "jur econ_trade"
+title: Вид экономической деятельности
+rule "econ_trade"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
             && getEls("{setString(17,18)}credit_type.code") == 0
-            && getEls("{count}subject[is_organization=true]organization_info[econ_trade.code=null]") > 0)
+            && getEls("{count}subject[is_organization=true]organization_info[country.code_numeric=398][econ_trade.code=null]") > 0)
 then
-  $entity.addValidationError("Вид экономической деятельности должен указываться для данного типа кредита");
+  $entity.addValidationError("Не заполнен вид экономической деятельности");
 end
 $$$
 
@@ -204,11 +177,9 @@ rule "credit subject"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
             && getEls("{setString(17,18)}credit_type.code") == 0
-            && getEls("{count}subject[is_organization=true]organization_info") == 0
-            && getEls("{count}subject[is_person=true]person_info") == 0
-            && getEls("{count}subject[is_creditor=true]organization_info") == 0)
+            && getEls("{count}subject") == 0)
 then
-  $entity.addValidationError("Субъект кредитной истории должен указываться для данного типа кредита");
+  $entity.addValidationError("Отсутствует информация о субъекте кредитной истории");
 end
 $$$
 
@@ -222,7 +193,7 @@ when
             && getEls("{setString(15,25)}credit_type.code") == 0
             && getEl("currency.short_name") == null)
 then
-  $entity.addValidationError("Вид валюты по договору должен указываться для данного типа кредита");
+  $entity.addValidationError("Не указан вид валюты по договору");
 end
 $$$
 
@@ -234,9 +205,9 @@ rule "legal_form in jur"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
             && getEls("{setString(17,18,19,24)}credit_type.code") == 0
-            && getEls("{count}subject[is_organization=true]organization_info[legal_form=null]") > 0)
+            && getEls("{count}subject[is_organization=true]organization_info[is_se!=true][country.code_numeric=398][legal_form=null]") > 0)
 then
-  $entity.addValidationError("Организационно-правовая форма должна указываться для данного типа кредита");
+  $entity.addValidationError("Не заполнена организационно-правовая форма");
 end
 $$$
 
@@ -250,7 +221,7 @@ when
             && getEls("{setString(02,10,12,13,14,15,25,26)}credit_type.code") == 0
             && getEl("contract_maturity_date") == null)
 then
-  $entity.addValidationError("Дата погашения по условиям договора должен указываться для данного типа кредита");
+  $entity.addValidationError("Не заполнена дата погашения по условиям договора");
 end
 $$$
 
@@ -264,7 +235,7 @@ when
             && getEls("{setString(02,03,10,12,13,14,15,17,18,24,25,26)}credit_type.code") == 0
             && getEl("finance_source.code") == null)
 then
-  $entity.addValidationError("Источник финансирования банка (организации), выдавшей заем должен указываться для данного типа кредита");
+  $entity.addValidationError("Не заполнен источник финансирования банка (организации), выдавшей заем");
 end
 $$$
 
@@ -278,7 +249,7 @@ when
             && getEls("{setString(02,03,10,12,13,14,15,16,17,18,24,25,26)}credit_type.code") == 0
             && getEl("credit_purpose.code") == null)
 then
-  $entity.addValidationError("Цель кредитования должен указываться для данного типа кредита");
+  $entity.addValidationError("Не заполнена цель кредитования");
 end
 $$$
 
@@ -292,7 +263,7 @@ when
             && getEls("{setString(02,03,10,12,13,14,15,16,17,18,24,25,26)}credit_type.code") == 0
             && getEl("credit_object.code") == null)
 then
-  $entity.addValidationError("Объект кредитования должен указываться для данного типа кредита");
+  $entity.addValidationError("Не заполнен объект кредитования");
 end
 $$$
 
@@ -306,7 +277,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit" && isInsert()
             && getEls("{count}subject[is_organization=true]organization_info[country.code_numeric=398][econ_trade.code=null]") > 0)
 then
-  $entity.addValidationError("Вид экономической деятельности должен указываться для юр лица Казахстана");
+  $entity.addValidationError("Не указан вид экономической деятельности");
 end
 $$$
 
