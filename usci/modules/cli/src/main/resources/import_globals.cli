@@ -47,4 +47,13 @@ global add --type=QUEUE_ALGO_OPTION --code=MINIMUM_WEIGHT --value=MINIMUM_WEIGHT
 global add --type=QUEUE_SETTING --code=QUEUE_ALGO --value=CHRONOLOGICAL --desc=Алгоритм_очереди
 global add --type=QUEUE_SETTING --code=PRIORITY_CREDITOR_IDS --value=-1 --desc=Список_приоритетных_организаций
 
+#
+# REF SETTINGS
+#
+global add --type=REF_VIEW_SETTING --code=ref_debt_remains_type --value=name_ru --desc=Настройка_справочника
+global add --type=REF_VIEW_SETTING --code=ref_credit_type --value=name_ru --desc=Настройка_справочника
+global add --type=REF_VIEW_SETTING --code=ref_subject_type --value=name_ru --desc=Настройка_справочника
+global add --type=REF_VIEW_SETTING --code=ref_region --value=name_ru --desc=Настройка_справочника
+global add --type=REF_VIEW_SETTING --code=ref_creditor --value=name --desc=Настройка_справочника
+
 quit

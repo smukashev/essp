@@ -22,6 +22,7 @@
         <module>vaadin-messagebox</module>
         <module>vaadin-filterable-selector</module>
         <module>vaadin-formatted-table</module>
+        <module>portlet-base-vaadin</module>
         <module>static</module>
         <module>translit-util</module>
         <module>approval-portlet</module>
@@ -41,6 +42,7 @@
         <module>notifications_portlet</module>
         <module>queue-portlet</module>
         <module>server_browser</module>
+        <module>credit-registry-query-portlet</module>
     </modules>
 
     <distributionManagement>

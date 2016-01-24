@@ -314,7 +314,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         IBaseEntity baseEntityApplied = new BaseEntity(baseEntityLoaded, baseEntitySaving.getReportDate());
 
-        if (baseEntitySaving.equals(baseEntityLoaded))
+        if (baseEntitySaving.equals(baseEntityLoaded) && baseEntitySaving.getReportDate()
+                .compareTo(baseEntityLoaded.getReportDate()) >= 0)
             return baseEntityLoaded;
 
         // Устанавливает ID для !metaClass.isSearchable()
@@ -948,10 +949,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseValueClosed.setMetaAttribute(metaAttribute);
 
                     baseEntityManager.registerAsInserted(baseValueClosed);
-                } else if (compare == -1) {
+                }/* else if (compare == -1) {
                     throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
                             + ". " + baseValueSaving.getMetaAttribute().getName() + ";");
-                }
+                }*/
 
                 return;
             }
@@ -1868,10 +1869,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
 
                     isBaseSetDeleted = true;
-                } else if (compare == -1) {
+                }/* else if (compare == -1) {
                     throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
                             + "( " + baseValueSaving.getMetaAttribute().getName() + ");");
-                }
+                }*/
                 // case#4
             } else {
                 reportDateSaving = baseValueSaving.getRepDate();

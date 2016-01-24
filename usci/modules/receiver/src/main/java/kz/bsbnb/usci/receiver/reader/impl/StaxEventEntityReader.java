@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
-import com.google.gson.Gson;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
@@ -47,7 +46,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -216,6 +217,12 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                         .equalsIgnoreCase(OperationType.NEW.toString());
     }
 
+    private boolean hasOperationInsert(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation")) != null &&
+                startElement.getAttributeByName(new QName("operation")).getValue()
+                        .equalsIgnoreCase(OperationType.INSERT.toString());
+    }
+
     private HashMap<String, MetaClass> metaCache = new HashMap<>();
 
     private MetaClass getMeta(String metaName) {
@@ -247,6 +254,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             if (hasOperationClose(startElement))
                 baseEntity.setOperation(OperationType.CLOSE);
 
+            if(hasOperationInsert(startElement))
+                baseEntity.setOperation(OperationType.INSERT);
             currentContainer = baseEntity;
         } else {
             logger.debug("other: " + localName);
