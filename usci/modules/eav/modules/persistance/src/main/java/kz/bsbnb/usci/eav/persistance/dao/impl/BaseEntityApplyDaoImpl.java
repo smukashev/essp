@@ -2036,7 +2036,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
-        Set<UUID> processedUuids = new HashSet<>();
+        Set<UUID> processedUUIDSet = new HashSet<>();
         if (childBaseSetSaving != null && childBaseSetSaving.getValueCount() > 0) {
             boolean baseValueFound;
 
@@ -2050,14 +2050,20 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseValueFound = false;
 
                         for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
-                            if (processedUuids.contains(childBaseValueLoaded.getUuid()))
+                            if (processedUUIDSet.contains(childBaseValueLoaded.getUuid()))
                                 continue;
 
                             IBaseEntity childBaseEntityLoaded = (IBaseEntity) childBaseValueLoaded.getValue();
 
                             if (childBaseValueSaving.equals(childBaseValueLoaded)) {
-                                processedUuids.add(childBaseValueLoaded.getUuid());
+                                processedUUIDSet.add(childBaseValueLoaded.getUuid());
                                 baseValueFound = true;
+
+                                IBaseEntity baseEntityApplied = applyBaseEntityAdvanced(
+                                        creditorId,
+                                        childBaseEntitySaving,
+                                        childBaseEntityLoaded,
+                                        baseEntityManager);
 
                                 IBaseValue baseValueApplied = BaseValueFactory.create(
                                         MetaContainerTypes.META_SET,
@@ -2065,8 +2071,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                         childBaseValueLoaded.getId(),
                                         childBaseValueLoaded.getCreditorId(),
                                         new Date(childBaseValueLoaded.getRepDate().getTime()),
-                                        applyBaseEntityAdvanced(creditorId, childBaseEntitySaving,
-                                                childBaseEntityLoaded, baseEntityManager),
+                                        baseEntityApplied,
                                         childBaseValueLoaded.isClosed(),
                                         childBaseValueLoaded.isLast());
 
@@ -2178,7 +2183,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         if (childBaseSetLoaded != null &&
                 ((metaAttribute.isCumulative() && isBaseSetDeleted) || !metaAttribute.isCumulative())) {
             for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
-                if (processedUuids.contains(childBaseValueLoaded.getUuid()))
+                if (processedUUIDSet.contains(childBaseValueLoaded.getUuid()))
                     continue;
 
                 IBaseSetValueDao setValueDao = persistableDaoPool
@@ -2221,6 +2226,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseValue childBaseValueNext = setValueDao.getNextBaseValue(childBaseValueLoaded);
 
                     if (childBaseValueNext == null || !childBaseValueNext.isClosed()) {
+
+                        /* Не идентифицируемый эдемент массива не может быт закрыт */
+                        if (!childMetaClass.isSearchable())
+                            continue;
+
                         IBaseValue childBaseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_SET,
                                 childMetaType,
@@ -2257,7 +2267,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
-        /* Обработка документов по типу*/
+        /* Обработка документов по типу */
         if(savedDocTypes.size() > 0 && childBaseSetLoaded != null) {
             for (IBaseValue savedValue : savedDocTypes) {
                 for (IBaseValue loadedValue : childBaseSetLoaded.get()) {
