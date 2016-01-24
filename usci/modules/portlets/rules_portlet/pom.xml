@@ -130,7 +130,7 @@
         </dependency>
         <dependency>
             <groupId>kz.bsbnb.usci.brms</groupId>
-            <artifactId>rulesvr</artifactId>
+            <artifactId>rulemodel</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
