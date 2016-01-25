@@ -25,6 +25,7 @@
 
     <modules>
         <module>rulesvr</module>
+        <module>rulemodel</module>
     </modules>
 
     <build>

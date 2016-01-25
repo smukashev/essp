@@ -402,9 +402,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             if (metaAttribute.isImmutable())
                 continue;
 
-            if (metaAttribute.isKey()) {
+            if (metaAttribute.isKey() || metaType.isComplex()) {
                 IBaseValue thisBaseValue = this.getBaseValue(name);
                 IBaseValue thatBaseValue = that.getBaseValue(name);
+
+                if (thisBaseValue == null || thatBaseValue == null)
+                    continue;
 
                 if (!metaType.isSet()) {
                     if (metaType.isComplex()) {
@@ -431,12 +434,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                         }
                     }
                 }
-            } else if (metaType instanceof  MetaClass && ((MetaClass) metaType).isSearchable()) {
-                IBaseValue thisBaseValue = this.getBaseValue(name);
-                IBaseValue thatBaseValue = that.getBaseValue(name);
-
-                if (((BaseEntity) thisBaseValue.getValue()).equalsByKey(thatBaseValue.getValue()))
-                    return true;
             }
         }
 
@@ -493,6 +490,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     Object thisChildValue = thisChildBaseValue.getValue();
 
                     boolean childValueFound = false;
+
 
                     for (IBaseValue thatChildBaseValue : thatBaseSet.get()) {
                         Object thatChildValue = thatChildBaseValue.getValue();

@@ -5,10 +5,10 @@ import com.google.gson.stream.JsonReader;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
-import kz.bsbnb.usci.brms.rulesvr.service.IRuleService;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService;
+import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.cli.app.command.impl.*;
 import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
@@ -133,7 +133,7 @@ public class CLI {
     private RmiProxyFactoryBean entityServiceFactoryBean;
     private IRuleService ruleService;
     private IBatchService batchService;
-    private kz.bsbnb.usci.brms.rulesvr.service.IBatchService ruleBatchService;
+    private kz.bsbnb.usci.brms.rulemodel.service.IBatchService ruleBatchService;
     private IBatchVersionService batchVersionService;
     private ShowcaseService showcaseService;
     private Rule currentRule;
@@ -1901,10 +1901,10 @@ public class CLI {
 
             ruleBatchServiceFactoryBean = new RmiProxyFactoryBean();
             ruleBatchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
-            ruleBatchServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.brms.rulesvr.service.IBatchService.class);
+            ruleBatchServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.brms.rulemodel.service.IBatchService.class);
 
             ruleBatchServiceFactoryBean.afterPropertiesSet();
-            ruleBatchService = (kz.bsbnb.usci.brms.rulesvr.service.IBatchService) ruleBatchServiceFactoryBean.getObject();
+            ruleBatchService = (kz.bsbnb.usci.brms.rulemodel.service.IBatchService) ruleBatchServiceFactoryBean.getObject();
 
             initBatchService();
 
@@ -2018,7 +2018,7 @@ public class CLI {
                 Date reportDate = dateFormatter.parse("02.05.2015");
 
                 try {
-                    CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchService, reportDate);
+                    CLIXMLReader reader = new CLIXMLReader("/home/bauka/a.xml", metaClassRepository, batchService, reportDate);
                     currentBaseEntity = reader.read();
                     reader.close();
                     List<String> errors = ruleService.runRules(currentBaseEntity, currentPackageName, currentDate);
@@ -2049,8 +2049,8 @@ public class CLI {
                 } catch (IllegalArgumentException e) {
                     throw e;
                 }
-                kz.bsbnb.usci.brms.rulesvr.model.impl.Batch batch =
-                        new kz.bsbnb.usci.brms.rulesvr.model.impl.Batch(args.get(2), currentDate);
+                kz.bsbnb.usci.brms.rulemodel.model.impl.Batch batch =
+                        new kz.bsbnb.usci.brms.rulemodel.model.impl.Batch(args.get(2), currentDate);
 
                 Long id = ruleBatchService.save(batch);
                 batch.setId(id);

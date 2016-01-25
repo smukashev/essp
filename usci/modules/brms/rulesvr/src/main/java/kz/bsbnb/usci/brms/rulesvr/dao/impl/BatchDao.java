@@ -1,10 +1,10 @@
 package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
+import kz.bsbnb.usci.brms.rulemodel.model.IBatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.mapper.BatchMapper;
-import kz.bsbnb.usci.brms.rulesvr.model.IBatchVersion;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;

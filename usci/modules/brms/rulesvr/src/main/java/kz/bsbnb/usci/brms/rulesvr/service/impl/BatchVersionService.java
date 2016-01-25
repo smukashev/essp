@@ -1,11 +1,11 @@
 package kz.bsbnb.usci.brms.rulesvr.service.impl;
 
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchVersionDao;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
-import kz.bsbnb.usci.brms.rulesvr.service.IBatchVersionService;
 
 import java.util.List;
 import java.util.Date;

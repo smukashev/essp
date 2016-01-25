@@ -176,7 +176,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            throw new IllegalStateException("Найдено более одной предыдущей записи массива(" +
+                    childBaseEntity.getId() + ", " + childBaseEntity.getMeta().getClassName() + ")");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -257,8 +258,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row. Query: " +
-                    select.toString());
+            throw new IllegalStateException("Найдено более одной следующей записи массива(" +
+                    childBaseEntity.getId() + ", " + childBaseEntity.getMeta().getClassName() + ")");
 
         if (rows.size() >= 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -328,7 +329,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for get next instance of BaseValue return more than one row.");
+            throw new IllegalStateException("Найдено более одной закрытой записи массива(" +
+                    childBaseEntity.getId() + ", " + childBaseEntity.getMeta().getClassName() + ")");
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();

@@ -303,7 +303,7 @@ function createMetaClassesListView() {
         title: label_CLASSES,
         listeners : {
             cellclick: function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
-                if(cellIndex == 2) {
+                if (cellIndex > 0) {
                     fillMetaClassTree(record.get('classId'), record.get('className'));
                 }
             },

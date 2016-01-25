@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.brms.rulesvr.persistable.impl;
 
-import kz.bsbnb.usci.brms.rulesvr.persistable.IPersistable;
+import kz.bsbnb.usci.brms.rulemodel.persistable.IPersistable;
 
 /**
  * @author abukabayev

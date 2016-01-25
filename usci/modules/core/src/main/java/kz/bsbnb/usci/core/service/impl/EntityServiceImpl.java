@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.exceptions.KnownException;
+import kz.bsbnb.usci.eav.model.exceptions.KnownIterativeException;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.IBaseEntitySearcherPool;
@@ -87,15 +88,29 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
                 logger.error("Батч: " + mockEntity.getBatchId() + ", Индекс: " + (mockEntity.getBatchIndex() - 1)
                         + "\n" + e.getMessage() + "\n" + ExceptionUtils.getStackTrace(e));
 
-            EntityStatus entityStatus = new EntityStatus();
-            entityStatus.setBatchId(mockEntity.getBatchId());
-            entityStatus.setEntityId(-1);
-            entityStatus.setStatus(EntityStatuses.ERROR);
-            entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity) + " (" + e.getMessage() + ")");
-            entityStatus.setIndex(mockEntity.getBatchIndex() - 1);
-            entityStatus.setReceiptDate(new Date());
+            if (e instanceof KnownIterativeException) {
+                for (String error : ((KnownIterativeException) e).getMessages()) {
+                    EntityStatus entityStatus = new EntityStatus();
+                    entityStatus.setBatchId(mockEntity.getBatchId());
+                    entityStatus.setEntityId(-1);
+                    entityStatus.setStatus(EntityStatuses.ERROR);
+                    entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity) + " (" + error + ")");
+                    entityStatus.setIndex(mockEntity.getBatchIndex() - 1);
+                    entityStatus.setReceiptDate(new Date());
 
-            batchService.addEntityStatus(entityStatus);
+                    batchService.addEntityStatus(entityStatus);
+                }
+            } else {
+                EntityStatus entityStatus = new EntityStatus();
+                entityStatus.setBatchId(mockEntity.getBatchId());
+                entityStatus.setEntityId(-1);
+                entityStatus.setStatus(EntityStatuses.ERROR);
+                entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity) + " (" + e.getMessage() + ")");
+                entityStatus.setIndex(mockEntity.getBatchIndex() - 1);
+                entityStatus.setReceiptDate(new Date());
+
+                batchService.addEntityStatus(entityStatus);
+            }
         }
     }
 
