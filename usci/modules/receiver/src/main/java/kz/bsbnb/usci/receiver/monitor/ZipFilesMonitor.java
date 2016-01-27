@@ -98,6 +98,8 @@ public class ZipFilesMonitor {
         return false;
     }
 
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
     @PostConstruct
     public void init() {
         batchService = serviceFactory.getBatchService();
@@ -114,13 +116,11 @@ public class ZipFilesMonitor {
         if (pendingBatchList.size() > 0) {
             System.out.println("Найдены не законченные батчи: " + pendingBatchList.size());
 
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-
             System.out.println("-------------------------------------------------------------------------");
 
             for (Batch b : pendingBatchList)
                 System.out.println(b.getId() + ", " + b.getFileName() + ", " +
-                        sdf.format(b.getRepDate()));
+                        dateFormat.format(b.getRepDate()));
 
             System.out.println("-------------------------------------------------------------------------");
 
@@ -419,16 +419,10 @@ public class ZipFilesMonitor {
 
         if (existing != null) {
             if (ReportStatus.COMPLETED.code().equals(existing.getStatus().getCode())) {
-                String errMsg = "Отчет со статусом 'Завершен' уже существует для кредитора = "
-                        + creditorId + ", отчетная дата = " + batchInfo.getRepDate();
+                String errMsg = "Данные на указанную отчетную дату утверждены организацией = "
+                        + creditorId + ", отчетная дата = " + dateFormat.format(batchInfo.getRepDate());
                 logger.error(errMsg);
-
-                batchService.addBatchStatus(new BatchStatus()
-                                .setBatchId(batchId)
-                                .setStatus(BatchStatuses.ERROR)
-                                .setDescription(errMsg)
-                                .setReceiptDate(new Date())
-                );
+                failFast(batchId, errMsg);
                 return false;
             }
         } else {
