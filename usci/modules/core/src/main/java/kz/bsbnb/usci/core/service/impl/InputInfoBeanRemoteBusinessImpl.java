@@ -130,9 +130,23 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
         }
         {
             Shared s = new Shared();
-            s.setCode("S");
-            s.setNameRu(batchStatus.getStatus().code());
-            s.setNameKz(batchStatus.getStatus().code());
+            s.setCode(batchStatus.getStatus().code());
+
+            switch (s.getCode()) {
+                case "ERROR":
+                    s.setNameRu("Ошибка");
+                    s.setNameKz("Ошибка");
+                    break;
+                case "COMPLETED":
+                    s.setNameRu("Завершен");
+                    s.setNameKz("Завершен");
+                    break;
+                default:
+                    s.setNameRu(batchStatus.getStatus().code());
+                    s.setNameKz(batchStatus.getStatus().code());
+                    break;
+            }
+
             protocol.setMessageType(s);
             protocol.setProtocolType(s);
         }

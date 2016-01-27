@@ -417,8 +417,18 @@ public class ProtocolLayout extends VerticalLayout {
         Set<String> messageTypeCodes = new HashSet<>();
 
         if (listOfProtocols.isEmpty()) {
+            boolean errorStatus = false;
             for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
-                listOfProtocols.add(new ProtocolDisplayBean(batchStatus));
+                if("ERROR".equals(batchStatus.getMessageType().getCode())){
+                    errorStatus = true;
+                    break;
+                }
+            }
+
+            for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
+                if(!errorStatus || "ERROR".equals(batchStatus.getMessageType().getCode())){
+                    listOfProtocols.add(new ProtocolDisplayBean(batchStatus));
+                }
             }
         }
 

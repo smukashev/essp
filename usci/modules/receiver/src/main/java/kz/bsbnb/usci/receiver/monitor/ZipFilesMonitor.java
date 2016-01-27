@@ -258,6 +258,22 @@ public class ZipFilesMonitor {
             if (isNB) {
                 cId = 0L;
             } else if (cList.size() == 1) {
+                cId = getCreditor(batchInfo, cList);
+
+                if(cId == -1) {
+                    String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
+                    String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
+
+                    if (docType == null) docType = "";
+                    if (docValue == null) docValue = "";
+
+                    logger.error("Несоответствие кредитора пользователю портала: " + docType +
+                            ", " + docValue);
+
+                    failFast(batchId, "Несоответствие кредитора пользователю портала");
+                    haveError = true;
+                }
+
                 cId = cList.get(0).getId();
             } else {
                 cId = -1L;
@@ -272,87 +288,24 @@ public class ZipFilesMonitor {
                 haveError = true;
             }
         } else {
-            if (batchInfo.getAdditionalParams() != null && batchInfo.getAdditionalParams().size() > 0) {
+            cId = getCreditor(batchInfo, creditors);
+            if(cId == -1L) {
                 String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
                 String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
-
-                String code = batchInfo.getAdditionalParams().get("CODE");
-                String bin = batchInfo.getAdditionalParams().get("BIN");
-                String bik = batchInfo.getAdditionalParams().get("BIK");
-                String rnn = batchInfo.getAdditionalParams().get("RNN");
-
 
                 if (docType == null) docType = "";
                 if (docValue == null) docValue = "";
 
-                boolean foundCreditor = false;
+                logger.error("Кредитор не найден: " + docType +
+                        ", " + docValue);
 
-                for (Creditor creditor : creditors) {
-                    if (creditor.getBIK() != null && docType.equals("15") &&
-                            creditor.getBIK().equals(docValue)) {
-                        cId = creditor.getId();
-                        foundCreditor = true;
-                        break;
-
-                    }
-
-                    if (creditor.getBIN() != null && docType.equals("07") &&
-                            creditor.getBIN().equals(docValue)) {
-                        cId = creditor.getId();
-                        foundCreditor = true;
-                        break;
-
-                    }
-
-                    if (creditor.getRNN() != null && docType.equals("11") &&
-                            creditor.getRNN().equals(docValue)) {
-                        cId = creditor.getId();
-                        foundCreditor = true;
-                        break;
-                    }
-
-                    if (code != null && code.length() > 0 && creditor.getCode() != null
-                            && creditor.getCode().length() > 0 && code.equals(creditor.getCode())) {
-                        cId = creditor.getId();
-                        foundCreditor = true;
-                        break;
-                    }
-
-                    if (bin != null && bin.length() > 0 && creditor.getBIN() != null
-                            && creditor.getBIN().length() > 0 && bin.equals(creditor.getBIN())) {
-                        cId = creditor.getId();
-                        foundCreditor = true;
-                        break;
-                    }
-
-                    if (bik != null && bik.length() > 0 && creditor.getBIK() != null
-                            && creditor.getBIK().length() > 0 && bik.equals(creditor.getBIK())) {
-                        cId = creditor.getId();
-                        foundCreditor = true;
-                        break;
-                    }
-
-                    if (rnn != null && rnn.length() > 0 && creditor.getRNN() != null
-                            && creditor.getRNN().length() > 0 && rnn.equals(creditor.getRNN())) {
-                        cId = creditor.getId();
-                        foundCreditor = true;
-                        break;
-                    }
-                }
-
-                if (!foundCreditor) {
-                    logger.error("Кредитор не найден: " + docType +
-                            ", " + docValue);
-
-                    batchService.addBatchStatus(new BatchStatus()
-                                    .setBatchId(batchId)
-                                    .setStatus(BatchStatuses.ERROR)
-                                    .setDescription("Кредитор не найден")
-                                    .setReceiptDate(new Date())
-                    );
-
-                    haveError = true;
-                }
+                batchService.addBatchStatus(new BatchStatus()
+                                .setBatchId(batchId)
+                                .setStatus(BatchStatuses.ERROR)
+                                .setDescription("Кредитор не найден")
+                                .setReceiptDate(new Date())
+                );
+                haveError = true;
             }
         }
 
@@ -367,7 +320,7 @@ public class ZipFilesMonitor {
 
         if (!haveError) {
             batchService.addBatchStatus(new BatchStatus()
-                            .setBatchId(batchId)
+                    .setBatchId(batchId)
                             .setStatus(BatchStatuses.WAITING)
                             .setReceiptDate(new Date()));
 
@@ -377,6 +330,86 @@ public class ZipFilesMonitor {
             //sender.addJob(batchId, batchInfo);
             jobLauncherQueue.addJob(batchId, batchInfo);
         }
+    }
+
+    private void failFast(Long batchId, String error){
+        batchService.addBatchStatus(new BatchStatus()
+                        .setBatchId(batchId)
+                        .setStatus(BatchStatuses.ERROR)
+                        .setDescription(error)
+                        .setReceiptDate(new Date())
+        );
+
+        batchService.addBatchStatus(new BatchStatus()
+                        .setBatchId(batchId)
+                        .setStatus(BatchStatuses.PROCESSING)
+                        .setReceiptDate(new Date())
+        );
+
+        batchService.endBatch(batchId);
+
+    }
+
+    private Long getCreditor(BatchInfo batchInfo, List<Creditor> creditors){
+        Long cId = -1L;
+
+        if (batchInfo.getAdditionalParams() != null && batchInfo.getAdditionalParams().size() > 0) {
+            String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
+            String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
+
+            String code = batchInfo.getAdditionalParams().get("CODE");
+            String bin = batchInfo.getAdditionalParams().get("BIN");
+            String bik = batchInfo.getAdditionalParams().get("BIK");
+            String rnn = batchInfo.getAdditionalParams().get("RNN");
+
+            if (docType == null) docType = "";
+            if (docValue == null) docValue = "";
+
+            for (Creditor creditor : creditors) {
+                if (creditor.getBIK() != null && docType.equals("15") &&
+                        creditor.getBIK().equals(docValue)) {
+                    cId = creditor.getId();
+                    break;
+                }
+
+                if (creditor.getBIN() != null && docType.equals("07") &&
+                        creditor.getBIN().equals(docValue)) {
+                    cId = creditor.getId();
+                    break;
+                }
+
+                if (creditor.getRNN() != null && docType.equals("11") &&
+                        creditor.getRNN().equals(docValue)) {
+                    cId = creditor.getId();
+                    break;
+                }
+
+                if (code != null && code.length() > 0 && creditor.getCode() != null
+                        && creditor.getCode().length() > 0 && code.equals(creditor.getCode())) {
+                    cId = creditor.getId();
+                    break;
+                }
+
+                if (bin != null && bin.length() > 0 && creditor.getBIN() != null
+                        && creditor.getBIN().length() > 0 && bin.equals(creditor.getBIN())) {
+                    cId = creditor.getId();
+                    break;
+                }
+
+                if (bik != null && bik.length() > 0 && creditor.getBIK() != null
+                        && creditor.getBIK().length() > 0 && bik.equals(creditor.getBIK())) {
+                    cId = creditor.getId();
+                    break;
+                }
+
+                if (rnn != null && rnn.length() > 0 && creditor.getRNN() != null
+                        && creditor.getRNN().length() > 0 && rnn.equals(creditor.getRNN())) {
+                    cId = creditor.getId();
+                    break;
+                }
+            }
+        }
+        return cId;
     }
 
     private boolean checkAndFillEavReport(long creditorId, BatchInfo batchInfo, long batchId) {
