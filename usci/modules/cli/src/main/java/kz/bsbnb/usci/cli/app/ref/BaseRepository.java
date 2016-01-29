@@ -1,27 +1,15 @@
 package kz.bsbnb.usci.cli.app.ref;
 
 import kz.bsbnb.usci.cli.app.ref.craw.*;
-import kz.bsbnb.usci.cli.app.ref.refs.CreditorDoc;
-import kz.bsbnb.usci.cli.app.ref.refs.DocType;
-import kz.bsbnb.usci.cli.app.ref.reps.*;
 import kz.bsbnb.usci.eav.StaticRouter;
-import kz.bsbnb.usci.eav.util.DataUtils;
 import org.apache.commons.lang.NotImplementedException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import javax.security.auth.Subject;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * My BaseRepository
@@ -87,6 +75,7 @@ public class BaseRepository implements  Runnable
             new BACTCrawler().work();
             new DRTCrawler().work();
             new BADRTCrawler().work();
+            new ExclDocCrawler().work();
 
             if(f.list().length == 0) {
                 f.delete();
@@ -173,6 +162,8 @@ public class BaseRepository implements  Runnable
                 return "ref.v_creditor_his";
             case "ref_debt_remains_type":
                 return "dual";
+            case "ref_exclusive_doc":
+                return "REF.SPECIAL_DOC_NO";
             default:
                 return crawler.getClassName().replaceAll("ref_", "ref.");
         }
@@ -203,7 +194,7 @@ public class BaseRepository implements  Runnable
     public static String[] getDatesAsStringArray(BaseCrawler crawler) throws SQLException {
 
         //because it is from table shared
-        if(crawler instanceof DRTCrawler)
+        if(crawler instanceof DRTCrawler || crawler instanceof ExclDocCrawler)
             return new String[] {"01.01.1990"};
 
         try {
@@ -230,6 +221,9 @@ public class BaseRepository implements  Runnable
 
         if(crawler instanceof BADRTCrawler)
             return new String[] {};
+
+        if(crawler instanceof ExclDocCrawler)
+            return  new String[] {};
 
         ResultSet rows = getStatement()
                 .executeQuery("select distinct(to_char(close_date,'dd.MM.yyyy')) as close_date from "
