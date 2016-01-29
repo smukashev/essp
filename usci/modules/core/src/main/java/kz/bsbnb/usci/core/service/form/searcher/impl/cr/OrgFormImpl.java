@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
+import kz.bsbnb.usci.eav.model.searchForm.SearchPagination;
 import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
 import kz.bsbnb.usci.eav.model.searchForm.impl.PaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
@@ -44,6 +45,8 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
     @Autowired
     IBaseEntityLoadDao baseEntityLoadDao;
+
+    final private static int fetchSize = SearchPagination.fetchSize;
 
     private final Logger logger = LoggerFactory.getLogger(OrgFormImpl.class);
 
@@ -89,10 +92,16 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
         IMetaAttribute namesAttribute = orgMeta.getMetaAttribute("names");
 
 
-        Select nameSelect = context.select(EAV_BE_STRING_VALUES.ENTITY_ID)
+        SelectConditionStep nameSelect = context.select(EAV_BE_STRING_VALUES.ENTITY_ID)
                 .from(EAV_BE_STRING_VALUES)
                 .where(EAV_BE_STRING_VALUES.VALUE.lower().like("%" + name.toLowerCase() + "%"))
                 .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(attribute.getId()));
+
+        if(creditorId > 0)
+            nameSelect = nameSelect.and(EAV_BE_STRING_VALUES.CREDITOR_ID.eq(creditorId));
+
+        if(reportDate != null)
+            nameSelect = nameSelect.and(EAV_BE_COMPLEX_VALUES.REPORT_DATE.lessOrEqual(DataUtils.convert(reportDate)));
 
         Select setSelect = context.select(EAV_BE_COMPLEX_SET_VALUES.SET_ID)
                 .from(EAV_BE_COMPLEX_SET_VALUES)
@@ -118,16 +127,30 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
         logger.debug(subjectSelect.toString());
 
-
         List<Long> subjectIds = jdbcTemplate.queryForList(subjectSelect.getSQL(), subjectSelect.getBindValues().toArray(), Long.class);
+        SearchPagination pagination = new SearchPagination(subjectIds.size());
+        ret.setPagination(pagination);
+
+        Long pageNo = 1L;
+
+        if(parameters.get("pageNo") != null) {
+            pageNo = Long.parseLong(parameters.get("pageNo"));
+        }
 
         if(reportDate != null) {
+            int i = 0;
             for (Long id : subjectIds) {
-                entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
+                i++;
+                if((pageNo - 1) * fetchSize < i && i <= pageNo * fetchSize)
+                    entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
             }
         } else {
-            for(Long id : subjectIds)
-                entities.add((BaseEntity) baseEntityLoadDao.load(id));
+            int i = 0;
+            for(Long id : subjectIds) {
+                i++;
+                if ((pageNo - 1) * fetchSize < i && i <= pageNo * fetchSize)
+                    entities.add((BaseEntity) baseEntityLoadDao.load(id));
+            }
         }
 
         return ret;
