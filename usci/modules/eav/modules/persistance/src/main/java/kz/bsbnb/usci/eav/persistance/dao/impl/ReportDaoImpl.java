@@ -50,9 +50,9 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                 report.getStatusId(),
                 report.getTotalCount(),
                 report.getActualCount(),
-                DataUtils.convert(report.getBeginningDate()),
-                DataUtils.convert(report.getEndDate()),
-                DataUtils.convert(report.getLastManualEditDate()));
+                DataUtils.convertToTimestamp(report.getBeginningDate()),
+                DataUtils.convertToTimestamp(report.getEndDate()),
+                DataUtils.convertToTimestamp(report.getLastManualEditDate()));
 
         Long reportId = 1L;
         try {
@@ -65,9 +65,9 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                     .set(EAV_REPORT.STATUS_ID, report.getStatusId())
                     .set(EAV_REPORT.TOTAL_COUNT, report.getTotalCount())
                     .set(EAV_REPORT.ACTUAL_COUNT, report.getActualCount())
-                    .set(EAV_REPORT.BEG_DATE, DataUtils.convert(report.getBeginningDate()))
-                    .set(EAV_REPORT.END_DATE, DataUtils.convert(report.getEndDate()))
-                    .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convert(report.getLastManualEditDate()))
+                    .set(EAV_REPORT.BEG_DATE, DataUtils.convertToTimestamp(report.getBeginningDate()))
+                    .set(EAV_REPORT.END_DATE, DataUtils.convertToTimestamp(report.getEndDate()))
+                    .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convertToTimestamp(report.getLastManualEditDate()))
                     .where(EAV_REPORT.USERNAME.equal(username)).
                             and(EAV_REPORT.REPORT_DATE.eq(DataUtils.convert(report.getBeginningDate())));
 
@@ -111,9 +111,9 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
             report.setCreditor(creditorMap.get(((BigDecimal) row.get(EAV_REPORT.CREDITOR_ID.getName())).longValue()));
             report.setTotalCount(((BigDecimal) row.get(EAV_REPORT.TOTAL_COUNT.getName())).longValue());
             report.setActualCount(((BigDecimal) row.get(EAV_REPORT.ACTUAL_COUNT.getName())).longValue());
-            report.setBeginningDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.BEG_DATE.getName())));
-            report.setEndDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.END_DATE.getName())));
-            report.setLastManualEditDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.LAST_MANUAL_EDIT_DATE.getName())));
+            report.setBeginningDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.BEG_DATE.getName())));
+            report.setEndDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.END_DATE.getName())));
+            report.setLastManualEditDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.LAST_MANUAL_EDIT_DATE.getName())));
             report.setStatusId(((BigDecimal) row.get(EAV_REPORT.STATUS_ID.getName())).longValue());
             report.setReportDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.REPORT_DATE.getName())));
             reports.add(report);
@@ -293,7 +293,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                 .set(EAV_REPORT.TOTAL_COUNT, report.getTotalCount())
                 .set(EAV_REPORT.ACTUAL_COUNT, report.getActualCount())
                 .set(EAV_REPORT.STATUS_ID, report.getStatusId())
-                .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convert(report.getLastManualEditDate()));
+                .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convertToTimestamp(report.getLastManualEditDate()));
 
         if (username != null) {
             update.set(EAV_REPORT.USERNAME, username);
@@ -340,9 +340,9 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
 
         report.setTotalCount(((BigDecimal) row.get(EAV_REPORT.TOTAL_COUNT.getName())).longValue());
         report.setActualCount(((BigDecimal) row.get(EAV_REPORT.ACTUAL_COUNT.getName())).longValue());
-        report.setBeginningDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.BEG_DATE.getName())));
-        report.setEndDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.END_DATE.getName())));
-        report.setLastManualEditDate(DataUtils.convert((Timestamp)
+        report.setBeginningDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.BEG_DATE.getName())));
+        report.setEndDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.END_DATE.getName())));
+        report.setLastManualEditDate(DataUtils.convertToTimestamp((Timestamp)
                 row.get(EAV_REPORT.LAST_MANUAL_EDIT_DATE.getName())));
 
         report.setStatusId(((BigDecimal) row.get(EAV_REPORT.STATUS_ID.getName())).longValue());
