@@ -3,12 +3,20 @@ package kz.bsbnb.usci.eav.model.searchForm;
 import java.io.Serializable;
 
 public class SearchPagination implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     public static final int fetchSize = 50;
     private int pagesCount;
     private int totalCount;
 
     public SearchPagination(int count){
         totalCount = count;
+        pagesCount = (totalCount + fetchSize - 1 ) / fetchSize;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
         pagesCount = (totalCount + fetchSize - 1 ) / fetchSize;
     }
 

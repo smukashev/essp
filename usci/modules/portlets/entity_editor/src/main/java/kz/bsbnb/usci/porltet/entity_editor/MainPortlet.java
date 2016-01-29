@@ -624,7 +624,7 @@ public class MainPortlet extends MVCPortlet {
                             sb = sb.append(",\"totalCount\":" + searchResult.getTotalCount());
                         sb = sb.append(",\"children\":[\n");
 
-                        Iterator<BaseEntity> it = searchResult.iterator();
+                        Iterator<BaseEntity> it = searchResult.getData().iterator();
                         do {
                             if(!it.hasNext())
                                 break;

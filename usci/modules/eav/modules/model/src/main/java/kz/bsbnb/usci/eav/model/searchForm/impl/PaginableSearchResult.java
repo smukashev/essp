@@ -8,6 +8,8 @@ import java.util.Iterator;
 
 public class PaginableSearchResult extends AbstractSearchResult implements ISearchResult {
 
+    private static final long serialVersionUID = 1L;
+
     SearchPagination pagination;
 
     @Override

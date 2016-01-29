@@ -6,7 +6,9 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
+import kz.bsbnb.usci.eav.model.searchForm.SearchPagination;
 import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
+import kz.bsbnb.usci.eav.model.searchForm.impl.PaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
@@ -53,7 +55,7 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
             throw new RuntimeException("incorrect use");
         Date reportDate = new Date();
         IBaseEntitySearcher searcher = searcherPool.getSearcher("credit");
-        ISearchResult result = new NonPaginableSearchResult();
+        ISearchResult result = new PaginableSearchResult();
         BaseEntity credit = new BaseEntity(metaClass, reportDate);
 
         BaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"), reportDate);
@@ -61,10 +63,14 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
         primaryContract.put("date", new BaseValue(creditorId, reportDate, DataTypes.fromString(DataTypes.DATE, parameters.get("date"))));
         credit.put("primary_contract", new BaseValue(creditorId, reportDate, primaryContract));
         Long id = searcher.findSingle(credit, creditorId);
+
+        List<BaseEntity> entityList = new ArrayList<>();
+        result.setData(entityList);
+        SearchPagination pagination = new SearchPagination(0);
+        result.setPagination(pagination);
         if(id != null) {
-            List<BaseEntity> res = new ArrayList<>();
-            res.add((BaseEntity)baseEntityLoadDao.load(id));
-            result.setData(res);
+            entityList.add((BaseEntity) baseEntityLoadDao.load(id));
+            pagination.setTotalCount(1);
         }
         return result;
     }
