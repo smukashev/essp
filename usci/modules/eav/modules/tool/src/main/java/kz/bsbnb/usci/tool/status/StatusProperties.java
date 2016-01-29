@@ -13,6 +13,11 @@ public class StatusProperties {
                 return (String) entity.getBaseValue(attr).getValue();
             }
         }
+
+        for (String attr: entity.getAttributes()) {
+            if(attr.equals("code"))
+                return (String) entity.getBaseValue(attr).getValue();
+        }
         return null;
     }
 
@@ -22,7 +27,7 @@ public class StatusProperties {
         if (entity.getMeta().getClassName().equals("credit")) {
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             Date contractDate = (Date) entity.getEl("primary_contract.date");
-            String sContractDate = df.format(contractDate);
+            String sContractDate = (contractDate == null) ? "" : df.format(contractDate);
             String contractNo = (String) entity.getEl("primary_contract.no");
 
             result = contractNo + " | " + sContractDate;

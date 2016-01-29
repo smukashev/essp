@@ -1,7 +1,7 @@
-package kz.bsbnb.usci.brms.rulesvr.model.impl;
+package kz.bsbnb.usci.brms.rulemodel.model.impl;
 
-import kz.bsbnb.usci.brms.rulesvr.model.ISimpleTrack;
-import kz.bsbnb.usci.brms.rulesvr.persistable.impl.Persistable;
+import kz.bsbnb.usci.brms.rulemodel.model.ISimpleTrack;
+import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 
 /**
  * Simple class to rerpesent [<b>id</b>, <b>name</b>] combination <br/>

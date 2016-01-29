@@ -1,6 +1,6 @@
-package kz.bsbnb.usci.brms.rulesvr.service;
+package kz.bsbnb.usci.brms.rulemodel.service;
 
-import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
 import kz.bsbnb.usci.eav.util.Pair;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.brms.rulesvr.dao.mapper;
 
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import org.springframework.jdbc.core.RowMapper;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.Rule;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

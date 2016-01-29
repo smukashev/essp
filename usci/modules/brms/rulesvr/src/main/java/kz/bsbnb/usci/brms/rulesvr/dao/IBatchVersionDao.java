@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.brms.rulesvr.dao;
 
-import kz.bsbnb.usci.brms.rulesvr.model.impl.Batch;
-import kz.bsbnb.usci.brms.rulesvr.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 
 import java.util.List;
 import java.util.Date;

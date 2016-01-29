@@ -4,7 +4,9 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.cr.model.SubjectType;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
@@ -92,6 +94,27 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
             IBaseEntity entity = baseEntityLoadDao.load(id);
 
             Creditor creditor = new Creditor();
+
+            BaseSet docs = (BaseSet)entity.getBaseValue("docs").getValue();
+
+            for(IBaseValue docBaseValue : docs.get() ) {
+                IBaseEntity doc = (BaseEntity) docBaseValue.getValue();
+                try {
+                    switch ((String) doc.getEl("doc_type.code")) {
+                        case "15":
+                            creditor.setBIK((String)doc.getEl("no"));
+                            break;
+                        case "11":
+                            creditor.setRNN((String)doc.getEl("no"));
+                            break;
+                        case "07":
+                            creditor.setBIN((String)doc.getEl("no"));
+                            break;
+                    }
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
+                }
+            }
 
             creditor.setId(entity.getId());
             BaseValue value = (BaseValue) entity.getBaseValue("name");

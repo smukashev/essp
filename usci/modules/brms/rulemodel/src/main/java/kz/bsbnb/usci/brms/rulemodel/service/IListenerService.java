@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.brms.rulesvr.service;
+package kz.bsbnb.usci.brms.rulemodel.service;
 import java.util.Date;
 
 /**

@@ -1,8 +1,8 @@
-package kz.bsbnb.usci.brms.rulesvr.model.impl;
+package kz.bsbnb.usci.brms.rulemodel.model.impl;
 
-import kz.bsbnb.usci.brms.rulesvr.model.IBatch;
+import kz.bsbnb.usci.brms.rulemodel.model.IBatch;
+import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import org.springframework.stereotype.Component;
-import kz.bsbnb.usci.brms.rulesvr.persistable.impl.Persistable;
 import java.util.Date;
 
 /**

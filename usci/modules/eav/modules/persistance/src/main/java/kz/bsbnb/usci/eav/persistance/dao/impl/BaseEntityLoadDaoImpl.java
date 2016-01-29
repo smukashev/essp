@@ -45,7 +45,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
 
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id, savingReportDate);
         if (maxReportDate == null)
-            throw new RuntimeException("Запись(" + id + ") не действует на отчётный период " +
+            throw new RuntimeException("Запись(" + id + ") не действует до отчётного периода " +
                     df.format(savingReportDate) + ";");
 
         return load(id, maxReportDate, savingReportDate);
@@ -61,7 +61,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
 
         Date minReportDate = baseEntityReportDateDao.getMinReportDate(id, savingReportDate);
         if (minReportDate == null)
-            throw new RuntimeException("Запись(" + id + ") не действует на отчётный период " +
+            throw new RuntimeException("Запись(" + id + ") не действует после отчётного периода " +
                     df.format(savingReportDate) + ";");
 
         return load(id, minReportDate, savingReportDate);

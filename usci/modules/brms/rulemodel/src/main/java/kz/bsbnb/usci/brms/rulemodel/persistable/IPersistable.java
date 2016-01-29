@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.brms.rulesvr.persistable;
+package kz.bsbnb.usci.brms.rulemodel.persistable;
 
 import java.io.Serializable;
 
