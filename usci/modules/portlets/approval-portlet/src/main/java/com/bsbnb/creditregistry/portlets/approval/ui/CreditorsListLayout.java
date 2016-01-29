@@ -1,6 +1,5 @@
 package com.bsbnb.creditregistry.portlets.approval.ui;
 
-import static com.bsbnb.creditregistry.portlets.approval.ApprovalApplication.log;
 import com.bsbnb.creditregistry.portlets.approval.ApprovalPortletResource;
 import com.bsbnb.creditregistry.portlets.approval.PortletEnvironmentFacade;
 import com.bsbnb.creditregistry.portlets.approval.data.DataProvider;
@@ -14,33 +13,28 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.DateField;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.BaseTheme;
+import jxl.CellView;
+import jxl.Workbook;
+import jxl.format.Border;
+import jxl.format.BorderLineStyle;
+import jxl.write.*;
+import jxl.write.Label;
+import kz.bsbnb.usci.cr.model.Creditor;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.Number;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
-import jxl.CellView;
-import jxl.Workbook;
-import jxl.format.Border;
-import jxl.format.BorderLineStyle;
-import jxl.write.DateFormat;
-import jxl.write.Label;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-import kz.bsbnb.usci.cr.model.Creditor;
+
+import static com.bsbnb.creditregistry.portlets.approval.ApprovalApplication.log;
 
 /**
  *
@@ -198,8 +192,8 @@ public class CreditorsListLayout extends VerticalLayout implements ReportDisplay
         String[] columnCaptions = environment.getResourceString(Localization.CREDITORS_TABLE_COLUMN_CAPTIONS).split("\\|");
         reportsTable.setVisibleColumns(columnNames);
         reportsTable.setColumnHeaders(columnCaptions);
-        reportsTable.addDateFormat("beginDate", "dd.MM.yyyy");
-        reportsTable.addDateFormat("endDate", "dd.MM.yyyy");
+        reportsTable.addDateFormat("beginDate", "dd.MM.yyyy hh:mm:ss");
+        reportsTable.addDateFormat("endDate", "dd.MM.yyyy hh:mm:ss");
         reportsTable.setColumnWidth("creditorNameLink", 200);
         reportsTable.setColumnWidth("actualCount", 140);
         reportsTable.setColumnWidth("beginDate", 150);
