@@ -136,4 +136,5 @@ entity read  usci/modules/cli/src/main/resources/refs/12.06.2015/ref_ba_drt_12_0
 #custom doc_type
 entity read  usci/modules/cli/src/main/resources/refs/usci_ref_doc_type.xml 01.04.2013
 
+entity read  usci/modules/cli/src/main/resources/refs/01.01.1990/ref_exclusive_doc_01_01_1990.xml 01.01.1990
 quit
