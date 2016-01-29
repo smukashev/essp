@@ -48,6 +48,11 @@ Ext.onReady(function() {
                     }
                     if(records && records.length == 0)
                         Ext.MessageBox.alert(label_INFO, 'Поиск вернул 0 результатов');
+
+                    var totalCount = operation.request.proxy.reader.rawData.totalCount;
+                    if(totalCount) {
+                        userNavHistory.success(totalCount);
+                    }
                 }});
         }
     };

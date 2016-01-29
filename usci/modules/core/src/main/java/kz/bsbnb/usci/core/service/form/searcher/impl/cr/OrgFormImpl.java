@@ -1,17 +1,14 @@
 package kz.bsbnb.usci.core.service.form.searcher.impl.cr;
 
-import kz.bsbnb.usci.core.service.form.searcher.ISearcherForm;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
+import kz.bsbnb.usci.eav.model.searchForm.SearchPagination;
 import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
 import kz.bsbnb.usci.eav.model.searchForm.impl.PaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
-import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Pair;
@@ -31,19 +28,13 @@ import java.util.List;
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Component
-public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
+public class OrgFormImpl extends AbstractSubjectForm {
 
     @Autowired
     IMetaClassRepository metaClassRepository;
 
     @Autowired
     DSLContext context;
-
-    @Autowired
-    IBaseEntityProcessorDao baseEntityProcessorDao;
-
-    @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
 
     private final Logger logger = LoggerFactory.getLogger(OrgFormImpl.class);
 
@@ -89,10 +80,16 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
         IMetaAttribute namesAttribute = orgMeta.getMetaAttribute("names");
 
 
-        Select nameSelect = context.select(EAV_BE_STRING_VALUES.ENTITY_ID)
+        SelectConditionStep nameSelect = context.select(EAV_BE_STRING_VALUES.ENTITY_ID)
                 .from(EAV_BE_STRING_VALUES)
                 .where(EAV_BE_STRING_VALUES.VALUE.lower().like("%" + name.toLowerCase() + "%"))
                 .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(attribute.getId()));
+
+        if(creditorId > 0)
+            nameSelect = nameSelect.and(EAV_BE_STRING_VALUES.CREDITOR_ID.eq(creditorId));
+
+        if(reportDate != null)
+            nameSelect = nameSelect.and(EAV_BE_COMPLEX_VALUES.REPORT_DATE.lessOrEqual(DataUtils.convert(reportDate)));
 
         Select setSelect = context.select(EAV_BE_COMPLEX_SET_VALUES.SET_ID)
                 .from(EAV_BE_COMPLEX_SET_VALUES)
@@ -118,18 +115,14 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
 
         logger.debug(subjectSelect.toString());
 
-
         List<Long> subjectIds = jdbcTemplate.queryForList(subjectSelect.getSQL(), subjectSelect.getBindValues().toArray(), Long.class);
-
-        if(reportDate != null) {
-            for (Long id : subjectIds) {
-                entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
-            }
-        } else {
-            for(Long id : subjectIds)
-                entities.add((BaseEntity) baseEntityLoadDao.load(id));
+        SearchPagination pagination = new SearchPagination(subjectIds.size());
+        ret.setPagination(pagination);
+        Long pageNo = 1L;
+        if(parameters.get("pageNo") != null) {
+            pageNo = Long.parseLong(parameters.get("pageNo"));
         }
-
+        prepareByPageNo(subjectIds, entities, reportDate, pageNo);
         return ret;
     }
 }

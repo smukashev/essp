@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.core.service.form.searcher.impl.cr;
 
-import kz.bsbnb.usci.core.service.form.searcher.ISearcherForm;
+import kz.bsbnb.eav.persistance.generated.tables.EavBeStringValues;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
@@ -10,17 +10,11 @@ import kz.bsbnb.usci.eav.model.searchForm.SearchPagination;
 import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
 import kz.bsbnb.usci.eav.model.searchForm.impl.PaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
-import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -31,21 +25,8 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
  * Created by Bauyrzhan.Makhambeto on 01/07/2015.
  */
 @Component
-public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
+public class PersonFormImpl extends AbstractSubjectForm {
 
-    @Autowired
-    IMetaClassRepository metaClassRepository;
-
-    @Autowired
-    DSLContext context;
-
-    @Autowired
-    IBaseEntityProcessorDao baseEntityProcessorDao;
-
-    @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
-
-    final private static int maxPageSize = 50;
     final private static int maxResultSize = 500;
 
     private final Logger logger = LoggerFactory.getLogger(PersonFormImpl.class);
@@ -100,25 +81,56 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
         if(firstName == null && lastName == null && middleName == null)
             return ret;
 
-        SelectJoinStep select = context.select(EAV_BE_STRING_VALUES.as("t1").ENTITY_ID)
-                .from(EAV_BE_STRING_VALUES.as("t1"));
+        EavBeStringValues t1 = EAV_BE_STRING_VALUES.as("t1");
+        EavBeStringValues t2 = EAV_BE_STRING_VALUES.as("t2");
+        EavBeStringValues t3 = EAV_BE_STRING_VALUES.as("t3");
 
-        if(vals.size() > 1)
-            select = select.join(EAV_BE_STRING_VALUES.as("t2"))
-                    .on(EAV_BE_STRING_VALUES.as("t1").ENTITY_ID.eq(EAV_BE_STRING_VALUES.as("t2").ENTITY_ID))
-                    .and(EAV_BE_STRING_VALUES.as("t2").ATTRIBUTE_ID.eq(attributeIds.get(1)))
-                    .and(EAV_BE_STRING_VALUES.as("t2").VALUE.lower().like("%" + vals.get(1).toLowerCase() + "%"));
+        SelectJoinStep select = context.select(t1.ENTITY_ID)
+                .from(t1);
 
-        if(vals.size() > 2)
-            select = select.join(EAV_BE_STRING_VALUES.as("t3"))
-                    .on(EAV_BE_STRING_VALUES.as("t1").ENTITY_ID.eq(EAV_BE_STRING_VALUES.as("t3").ENTITY_ID))
-                    .and(EAV_BE_STRING_VALUES.as("t3").ATTRIBUTE_ID.eq(attributeIds.get(2)))
-                    .and(EAV_BE_STRING_VALUES.as("t3").VALUE.lower().like("%" + vals.get(2).toLowerCase() + "%"))
-                    .and(EAV_BE_STRING_VALUES.as("t2").ENTITY_ID.eq(EAV_BE_STRING_VALUES.as("t3").ENTITY_ID));
+        SelectOnConditionStep tempOnSelect;
 
-        Select fioSelect = select.where(EAV_BE_STRING_VALUES.as("t1").ATTRIBUTE_ID.eq(attributeIds.get(0)))
-                .and(EAV_BE_STRING_VALUES.as("t1").VALUE.lower().like("%" + vals.get(0).toLowerCase() + "%"));
+        if(vals.size() > 1) {
+            tempOnSelect = select.join(t2)
+                    .on(t1.ENTITY_ID.eq(t2.ENTITY_ID))
+                    .and(t2.ATTRIBUTE_ID.eq(attributeIds.get(1)))
+                    .and(t2.VALUE.lower().like("%" + vals.get(1).toLowerCase() + "%"));
 
+
+            if(creditorId > 0)
+                tempOnSelect = tempOnSelect.and(t2.CREDITOR_ID.eq(creditorId));
+
+            if(reportDate != null)
+                tempOnSelect = tempOnSelect.and(t2.REPORT_DATE.lessOrEqual(DataUtils.convert(reportDate)));
+
+            select = tempOnSelect;
+        }
+
+
+        if(vals.size() > 2) {
+            tempOnSelect = select.join(t3)
+                    .on(t1.ENTITY_ID.eq(t3.ENTITY_ID))
+                    .and(t3.ATTRIBUTE_ID.eq(attributeIds.get(2)))
+                    .and(t3.VALUE.lower().like("%" + vals.get(2).toLowerCase() + "%"))
+                    .and(t2.ENTITY_ID.eq(t3.ENTITY_ID));
+
+            if(creditorId > 0)
+                tempOnSelect = tempOnSelect.and(t3.CREDITOR_ID.eq(creditorId));
+
+            if(reportDate != null)
+                tempOnSelect = tempOnSelect.and(t3.REPORT_DATE.lessOrEqual(DataUtils.convert(reportDate)));
+
+            select = tempOnSelect;
+        }
+
+        SelectConditionStep fioSelect = select.where(t1.ATTRIBUTE_ID.eq(attributeIds.get(0)))
+                .and(t1.VALUE.lower().like("%" + vals.get(0).toLowerCase() + "%"));
+
+        if(creditorId > 0)
+            fioSelect = fioSelect.and(t1.CREDITOR_ID.eq(creditorId));
+
+        if(reportDate != null)
+            fioSelect = fioSelect.and(t1.REPORT_DATE.lessOrEqual(DataUtils.convert(reportDate)));
 
         Select setSelect = context.select(EAV_BE_COMPLEX_SET_VALUES.SET_ID)
                 .from(EAV_BE_COMPLEX_SET_VALUES)
@@ -142,26 +154,26 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
         if(reportDate != null)
             subjectSelect = subjectSelectWhere.and(EAV_BE_COMPLEX_VALUES.REPORT_DATE.lessOrEqual(DataUtils.convert(reportDate)));
 
-        if(parameters.get("pageNo") != null) {
+        /*if(parameters.get("pageNo") != null) {
             Select countSelect = context.select(DSL.count()).from(personInfoSelect);
             int cnt = jdbcTemplate.queryForInt(countSelect.getSQL(), countSelect.getBindValues().toArray());
             SearchPagination pagination = new SearchPagination(cnt);
             ret.setPagination(pagination);
-        }
+        }*/
 
         logger.debug(subjectSelect.toString());
 
-        List<Long> subjectIds = jdbcTemplate.queryForList(subjectSelect.getSQL(), subjectSelect.getBindValues().toArray(), Long.class);
+        Long pageNo = 1L;
 
-        if(reportDate != null) {
-            for (Long id : subjectIds) {
-                entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
-            }
-        } else {
-            for(Long id : subjectIds)
-                entities.add((BaseEntity) baseEntityLoadDao.load(id));
+        if(parameters.get("pageNo") != null) {
+            pageNo = Long.parseLong(parameters.get("pageNo"));
         }
 
+        List<Long> subjectIds = jdbcTemplate.queryForList(subjectSelect.getSQL(), subjectSelect.getBindValues().toArray(), Long.class);
+
+        SearchPagination pagination = new SearchPagination(subjectIds.size());
+        ret.setPagination(pagination);
+        prepareByPageNo(subjectIds, entities, reportDate, pageNo);
         return ret;
     }
 
