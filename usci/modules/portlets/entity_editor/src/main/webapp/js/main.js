@@ -25,6 +25,30 @@ var ADDITION_META_NAME = "credit";
 var modalWindow;
 var arrayElWindow;
 
+var fetchSize = 50;
+
+var userNavHistory = {
+    currentPage: 1,
+    nextPage: 1,
+    getNextPage: function(){
+        return this.nextPage;
+    },
+    setNextPage: function(nextPage){
+        this.nextPage = nextPage;
+        console.log(this.nextPage);
+    },
+    init: function(){
+        this.nextPage = 1;
+    },
+    success: function(totalCount){
+        this.currentPage = this.nextPage;
+        if(totalCount) {
+            Ext.getCmp('totalCount').setText(totalCount);
+            Ext.getCmp('totalPageNo').setText(Math.floor((fetchSize - 1 + totalCount) / fetchSize));
+            Ext.getCmp('currentPageNo').setText(this.currentPage);
+        }
+    }
+};
 var forms = [];
 
 function getForm(){
@@ -733,6 +757,7 @@ Ext.onReady(function() {
         text: label_VIEW,
         handler : function (){
             //entityId = Ext.getCmp("entityId");
+            userNavHistory.init();
             Ext.getCmp('form-area').doSearch();
             return;
             var keySearchComponent = document.getElementById('inp-1-' + currentMeta + '-null');
@@ -1156,7 +1181,27 @@ Ext.onReady(function() {
             width: "40%",
             split: true,
             items: [entityGrid],
-            autoScroll:true
+            autoScroll:true,
+            bbar: [
+                {text: '<<',
+                    id: 'previousNav',
+                    handler: function(){
+                        userNavHistory.setNextPage(userNavHistory.currentPage - 1);
+                        Ext.getCmp('form-area').doSearch();
+                    }
+                },
+                {xtype: 'label', text: '1', id: 'currentPageNo'},
+                {xtype: 'label', text: '/'},
+                {xtype: 'label', text: '1', id: 'totalPageNo'},
+                {text: '>>', id: 'nextNav',
+                    handler: function(){
+                        userNavHistory.setNextPage(userNavHistory.currentPage + 1);
+                        Ext.getCmp('form-area').doSearch();
+                    }
+                },
+                {xtype: 'label', text: 'Всего результатов:' },
+                {xtype: 'label', text: '0' , id: 'totalCount'}
+            ]
         },{
             id: "EntityEditorFormPanel",
             xtype : 'form',

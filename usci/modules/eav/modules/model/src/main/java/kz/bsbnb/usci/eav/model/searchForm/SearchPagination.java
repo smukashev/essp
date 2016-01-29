@@ -1,13 +1,15 @@
 package kz.bsbnb.usci.eav.model.searchForm;
 
-public class SearchPagination {
-    private final int maxPageSize = 50;
+import java.io.Serializable;
+
+public class SearchPagination implements Serializable {
+    public static final int fetchSize = 50;
     private int pagesCount;
     private int totalCount;
 
     public SearchPagination(int count){
         totalCount = count;
-        pagesCount = (totalCount + maxPageSize - 1 ) / maxPageSize;
+        pagesCount = (totalCount + fetchSize - 1 ) / fetchSize;
     }
 
     public String getForm(){
@@ -19,5 +21,9 @@ public class SearchPagination {
             prefix += "<a href='' onclick='search(this);'>" + i + "</a>";
 
         return prefix + suffix + countDom;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
     }
 }

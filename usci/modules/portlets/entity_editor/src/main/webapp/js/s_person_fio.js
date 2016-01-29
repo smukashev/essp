@@ -36,7 +36,8 @@ Ext.onReady(function() {
                 lastName: Ext.getCmp('edLastName').value,
                 middleName: Ext.getCmp('edMiddleName').value,
                 date: Ext.getCmp('edDate').value,
-                creditorId: Ext.getCmp('edCreditor').value
+                creditorId: Ext.getCmp('edCreditor').value,
+                pageNo: userNavHistory.getNextPage()
             };
 
             entityStore.load({
@@ -56,6 +57,11 @@ Ext.onReady(function() {
                     }
                     if(records && records.length == 0)
                         Ext.MessageBox.alert(label_INFO, 'Поиск вернул 0 результатов');
+
+                    var totalCount = operation.request.proxy.reader.rawData.totalCount;
+                    if(totalCount) {
+                        userNavHistory.success(totalCount);
+                    }
                 }});
         }
     };

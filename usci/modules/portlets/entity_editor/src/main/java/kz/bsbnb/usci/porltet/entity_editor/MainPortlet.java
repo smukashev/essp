@@ -602,9 +602,11 @@ public class MainPortlet extends MVCPortlet {
                         searchClassName = resourceRequest.getParameter("searchName");
                         metaName = resourceRequest.getParameter("metaClass");
                         metaClass = metaFactoryService.getMetaClass(metaName);
-                        if(resourceRequest.getParameter("creditorId").length() < 1)
-                            throw new IllegalArgumentException("Не заполнено поле кредитор");
-                        creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
+                        try {
+                            creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
+                        } catch (Exception e) {
+                            creditorId = -1;
+                        }
                         list = resourceRequest.getParameterNames();
                         parameters = new HashMap<>();
                         while(list.hasMoreElements()) {
@@ -617,7 +619,11 @@ public class MainPortlet extends MVCPortlet {
 
                         searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "", creditorId);
 
-                        StringBuilder sb = new StringBuilder("{\"text\":\".\",\"children\": [\n");
+                        StringBuilder sb = new StringBuilder("{\"text\":\".\"");
+                        if(searchResult.hasPagination())
+                            sb = sb.append(",\"totalCount\":" + searchResult.getTotalCount());
+                        sb = sb.append(",\"children\":[\n");
+
                         Iterator<BaseEntity> it = searchResult.iterator();
                         do {
                             if(!it.hasNext())

@@ -22,7 +22,7 @@ public class PaginableSearchResult extends AbstractSearchResult implements ISear
 
     @Override
     public int getTotalCount() {
-        return data.size();
+        return pagination.getTotalCount();
     }
 
     @Override
