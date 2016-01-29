@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.core.service.form.searcher.impl.cr;
 
-import kz.bsbnb.usci.core.service.form.searcher.ISearcherForm;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
@@ -10,9 +9,6 @@ import kz.bsbnb.usci.eav.model.searchForm.SearchPagination;
 import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
 import kz.bsbnb.usci.eav.model.searchForm.impl.PaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
-import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Pair;
@@ -32,21 +28,13 @@ import java.util.List;
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Component
-public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
+public class OrgFormImpl extends AbstractSubjectForm {
 
     @Autowired
     IMetaClassRepository metaClassRepository;
 
     @Autowired
     DSLContext context;
-
-    @Autowired
-    IBaseEntityProcessorDao baseEntityProcessorDao;
-
-    @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
-
-    final private static int fetchSize = SearchPagination.fetchSize;
 
     private final Logger logger = LoggerFactory.getLogger(OrgFormImpl.class);
 
@@ -130,29 +118,11 @@ public class OrgFormImpl extends JDBCSupport implements ISearcherForm {
         List<Long> subjectIds = jdbcTemplate.queryForList(subjectSelect.getSQL(), subjectSelect.getBindValues().toArray(), Long.class);
         SearchPagination pagination = new SearchPagination(subjectIds.size());
         ret.setPagination(pagination);
-
         Long pageNo = 1L;
-
         if(parameters.get("pageNo") != null) {
             pageNo = Long.parseLong(parameters.get("pageNo"));
         }
-
-        if(reportDate != null) {
-            int i = 0;
-            for (Long id : subjectIds) {
-                i++;
-                if((pageNo - 1) * fetchSize < i && i <= pageNo * fetchSize)
-                    entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
-            }
-        } else {
-            int i = 0;
-            for(Long id : subjectIds) {
-                i++;
-                if ((pageNo - 1) * fetchSize < i && i <= pageNo * fetchSize)
-                    entities.add((BaseEntity) baseEntityLoadDao.load(id));
-            }
-        }
-
+        prepareByPageNo(subjectIds, entities, reportDate, pageNo);
         return ret;
     }
 }

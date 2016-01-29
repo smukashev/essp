@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.core.service.form.searcher.impl.cr;
 
 import kz.bsbnb.eav.persistance.generated.tables.EavBeStringValues;
-import kz.bsbnb.usci.core.service.form.searcher.ISearcherForm;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
@@ -11,17 +10,11 @@ import kz.bsbnb.usci.eav.model.searchForm.SearchPagination;
 import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
 import kz.bsbnb.usci.eav.model.searchForm.impl.PaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
-import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -32,21 +25,8 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
  * Created by Bauyrzhan.Makhambeto on 01/07/2015.
  */
 @Component
-public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
+public class PersonFormImpl extends AbstractSubjectForm {
 
-    @Autowired
-    IMetaClassRepository metaClassRepository;
-
-    @Autowired
-    DSLContext context;
-
-    @Autowired
-    IBaseEntityProcessorDao baseEntityProcessorDao;
-
-    @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
-
-    final private static int fetchSize = SearchPagination.fetchSize;
     final private static int maxResultSize = 500;
 
     private final Logger logger = LoggerFactory.getLogger(PersonFormImpl.class);
@@ -193,23 +173,7 @@ public class PersonFormImpl extends JDBCSupport implements ISearcherForm {
 
         SearchPagination pagination = new SearchPagination(subjectIds.size());
         ret.setPagination(pagination);
-
-        if(reportDate != null) {
-            int i = 0;
-            for (Long id : subjectIds) {
-                i++;
-                if((pageNo - 1) * fetchSize < i && i <= pageNo * fetchSize)
-                    entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
-            }
-        } else {
-            int i = 0;
-            for(Long id : subjectIds) {
-                i++;
-                if((pageNo - 1) * fetchSize  < i && i <= pageNo * fetchSize)
-                    entities.add((BaseEntity) baseEntityLoadDao.load(id));
-            }
-        }
-
+        prepareByPageNo(subjectIds, entities, reportDate, pageNo);
         return ret;
     }
 
