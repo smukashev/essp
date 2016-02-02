@@ -355,7 +355,9 @@ public class MainPortlet extends MVCPortlet {
                         }
 
                         if(attribute.isComplex()) {
-                            MetaClass metaParent = (MetaClass)attribute;
+                            MetaClass metaParent = (attribute instanceof MetaClass) ? (MetaClass) attribute :
+                                    (attribute instanceof MetaSet) ? (MetaClass) ((MetaSet) attribute).getMemberType() :
+                                            null;
 
                             int attrType = Integer.parseInt(resourceRequest.getParameter("attrType"));
                             String attrPathCode = resourceRequest.getParameter("attrPathCode");
