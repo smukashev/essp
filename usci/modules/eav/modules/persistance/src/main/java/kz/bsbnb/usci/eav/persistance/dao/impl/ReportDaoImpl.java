@@ -293,7 +293,8 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                 .set(EAV_REPORT.TOTAL_COUNT, report.getTotalCount())
                 .set(EAV_REPORT.ACTUAL_COUNT, report.getActualCount())
                 .set(EAV_REPORT.STATUS_ID, report.getStatusId())
-                .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convertToTimestamp(report.getLastManualEditDate()));
+                .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convertToTimestamp(report.getLastManualEditDate()))
+                .set(EAV_REPORT.END_DATE, DataUtils.convertToTimestamp(report.getEndDate()));
 
         if (username != null) {
             update.set(EAV_REPORT.USERNAME, username);
