@@ -88,6 +88,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Value("${refs.cache.enabled}")
     private boolean isReferenceCacheEnabled;
 
+    @Value("${rules.enabled}")
+    private boolean rulesEnabled;
+
     @Override
     public long search(IBaseEntity baseEntity, long creditorId) {
         IMetaClass metaClass = baseEntity.getMeta();
@@ -261,7 +264,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);
 
-                    processLogicControl(baseEntityApplied);
+                    if(rulesEnabled)
+                        processLogicControl(baseEntityApplied);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
 
@@ -281,7 +285,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);
 
-                    processLogicControl(baseEntityApplied);
+                    if(rulesEnabled)
+                        processLogicControl(baseEntityApplied);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
 

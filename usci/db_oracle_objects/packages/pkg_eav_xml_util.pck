@@ -279,21 +279,22 @@
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'creditor'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_creditor_doc_xml
   (
     p_creditor_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'docs'
   ) RETURN XMLTYPE;
-  
+
   FUNCTION get_ref_creditor_info
   (
     p_creditor_id IN NUMBER,
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'creditor_info'
   ) RETURN XMLTYPE;
-  
+
+
 
   FUNCTION get_debt_remains_xml
   (
@@ -356,7 +357,8 @@
     p_person_id IN NUMBER,
     p_organization_id IN NUMBER,
     p_report_date IN DATE,
-    p_tag_name IN VARCHAR2 DEFAULT 'docs'
+    p_tag_name IN VARCHAR2 DEFAULT 'docs',
+    p_person_type IN NUMBER DEFAULT 0 -- 0 - PERSON, 1 - HEAD
   ) RETURN XMLTYPE;
 
   FUNCTION get_contacts_xml
@@ -403,8 +405,8 @@
     p_report_date IN DATE,
     p_tag_name IN VARCHAR2 DEFAULT 'pledges'
   ) RETURN XMLTYPE;
-  
-  
+
+
   FUNCTION get_subject
   (
     p_credit_id NUMBER,
@@ -3158,7 +3160,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         v_xml := null;
         RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_creditor_doc_xml
   (
     p_creditor_id IN NUMBER,
@@ -3196,7 +3198,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_ref_creditor_info
   (
     p_creditor_id IN NUMBER,
@@ -3221,7 +3223,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
     RETURN v_xml;
   END;
-  
+
 
   FUNCTION get_debt_remains_xml
   (
@@ -4172,7 +4174,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         ELSE
           SELECT xmlelement(evalname(p_tag_name),
                    -- DOCUMENTS
-                   get_documents_xml(vph.id, null, p_report_date),
+                   get_documents_xml(vph.id, null, p_report_date, p_person_type => 1),
                    -- NAMES
                    get_person_names_xml(vph.id, p_report_date)
                  )
@@ -4202,13 +4204,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     p_person_id IN NUMBER,
     p_organization_id IN NUMBER,
     p_report_date IN DATE,
-    p_tag_name IN VARCHAR2 DEFAULT 'docs'
+    p_tag_name IN VARCHAR2 DEFAULT 'docs',
+    p_person_type IN NUMBER DEFAULT 0 -- 0 - PERSON, 1 - HEAD
   ) RETURN XMLTYPE
   IS
     v_xml xmltype;
     v_iden_cnt NUMBER;
   BEGIN
-    
+
   SELECT count(1) INTO v_iden_cnt
     FROM core.v_debtor_doc_his vddh
    WHERE ((vddh.person_id = p_person_id AND vddh.org_id IS NULL)
@@ -4217,7 +4220,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
      AND (vddh.close_date > p_report_date OR vddh.close_date is null)
      AND vddh.type_id in (SELECT id from ref.doc_type where is_identification = 1);
 
-  
+
     BEGIN
       SELECT xmlelement(evalname(p_tag_name),
                xmlagg(
@@ -4240,9 +4243,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
            UNION ALL
               SELECT 99 as type_id, to_char(decode(p_person_id, null, p_organization_id, p_person_id)) as no_
                  FROM DUAL
-                WHERE v_iden_cnt = 0
+                WHERE v_iden_cnt = 0 AND p_person_type = 0
           ) t;
-         
+
     EXCEPTION
       WHEN no_data_found THEN
         v_xml := null;
@@ -4513,7 +4516,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
     RETURN v_xml;
   END;
-  
+
   FUNCTION get_subject
   (
     p_credit_id NUMBER,
@@ -4539,8 +4542,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        EXCEPTION
          WHEN no_data_found THEN
             v_person_id := null;
-     END;    
-       
+     END;
+
      BEGIN
       SELECT vdh.org_id
         INTO v_org_id
@@ -4553,8 +4556,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        EXCEPTION
          WHEN no_data_found THEN
             v_org_id := null;
-     END; 
-     
+     END;
+
      BEGIN
       SELECT vdh.creditor_id
         INTO v_creditor_id
@@ -4567,37 +4570,37 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        EXCEPTION
          WHEN no_data_found THEN
             v_creditor_id := null;
-     END; 
-       
+     END;
+
     v_subject_cnt := 0;
     IF v_person_id IS NOT NULL THEN
       v_subject_cnt := v_subject_cnt + 1;
     END IF;
-    
+
     IF v_org_id IS NOT NULL THEN
       v_subject_cnt := v_subject_cnt + 1;
     END IF;
-    
+
     IF v_creditor_id IS NOT NULL THEN
       v_subject_cnt := v_subject_cnt + 1;
     END IF;
-    
-    
+
+
     IF(v_subject_cnt > 1) THEN
       write_log(SYSDATE, 'More than 1 subjects found in credit: ' || p_credit_id, 'ERROR', '');
     END IF;
-    
+
     IF(v_subject_cnt = 0) THEN
       write_log(SYSDATE, 'Subject not found in credit: ' || p_credit_id, 'ERROR', '');
     END IF;
 
-    
+
     IF v_person_id IS NOT NULL THEN
-      SELECT get_documents_xml(v_person_id, NULL, p_report_date) 
+      SELECT get_documents_xml(v_person_id, NULL, p_report_date)
         INTO v_doc_xml
         FROM dual;
     ELSIF v_org_id IS NOT NULL THEN
-      SELECT get_documents_xml(NULL, v_org_id, p_report_date) 
+      SELECT get_documents_xml(NULL, v_org_id, p_report_date)
         INTO v_doc_xml
         FROM dual;
     ElSE
@@ -4605,7 +4608,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         INTO v_doc_xml
         FROM dual;
     END IF;
-    
+
     SELECT xmlelement("subject",
                   v_doc_xml,
                   get_person_xml(v_person_id, p_report_date, 'person_info' ),
@@ -4613,13 +4616,13 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                   get_ref_creditor_info(v_creditor_id, p_report_date),
                   nillable_xml('is_creditor', decode(v_creditor_id, NULL, 0, 1)),
                   nillable_xml('is_person', decode(v_person_id, NULL, 0, 1)),
-                  nillable_xml('is_organization', decode(v_org_id, NULL, 0, 1))                  
+                  nillable_xml('is_organization', decode(v_org_id, NULL, 0, 1))
               )
       INTO v_xml
       FROM dual;
-      
+
    RETURN v_xml;
-      
+
    EXCEPTION
      WHEN OTHERS THEN
         write_log(p_log_date => SYSDATE,p_log_text => SQLERRM,p_log_level => c_log_level_error,p_procedure_call => '');
