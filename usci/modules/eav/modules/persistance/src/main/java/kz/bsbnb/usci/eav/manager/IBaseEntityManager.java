@@ -26,4 +26,8 @@ public interface IBaseEntityManager {
     List<IPersistable> getDeletedObjects(Class objectClass);
 
     IBaseEntity getProcessed(IBaseEntity baseEntity);
+
+    void registerCreditorId(Long creditorId);
+
+    Long getCreditorId();
 }

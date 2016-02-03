@@ -2353,8 +2353,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         if (insertedObject instanceof BaseEntity) {
                             BaseEntity be = (BaseEntity) insertedObject;
                             if (BasicOptimizer.metaList.contains(be.getMeta().getClassName())) {
-                                EavOptimizerData eod = new EavOptimizerData(be.getMeta().getId(), be.getId(),
-                                        BasicOptimizer.getKeyString(be));
+                                EavOptimizerData eod = new EavOptimizerData(baseEntityManager.getCreditorId(),
+                                        be.getMeta().getId(), be.getId(),BasicOptimizer.getKeyString(be));
                                 eavOptimizerDao.insert(eod);
                             }
                         }
@@ -2423,8 +2423,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         /* Изменение ключевых полей в оптимизаторе */
         for (Map.Entry<Long, IBaseEntity> entry : baseEntityManager.getOptimizerEntities().entrySet()) {
-            EavOptimizerData eod = new EavOptimizerData(entry.getValue().getMeta().getId(), entry.getValue().getId(),
+            EavOptimizerData eod = new EavOptimizerData(
+                    baseEntityManager.getCreditorId(),
+                    entry.getValue().getMeta().getId(),
+                    entry.getValue().getId(),
                     BasicOptimizer.getKeyString(entry.getValue()));
+
             eod.setId(eavOptimizerDao.find(entry.getValue().getId()));
             eavOptimizerDao.update(eod);
         }

@@ -47,6 +47,8 @@ public class BaseEntityManager implements IBaseEntityManager {
 
     private HashMap<String, List<IBaseEntity>> processedEntities = new HashMap<>();
 
+    private Long creditorId;
+
     @Override
     public void registerAsInserted(IPersistable insertedObject) {
         if (insertedObject == null)
@@ -146,5 +148,15 @@ public class BaseEntityManager implements IBaseEntityManager {
                 return currentBaseEntity;
 
         return null;
+    }
+
+    @Override
+    public void registerCreditorId(Long creditorId) {
+        this.creditorId = creditorId;
+    }
+
+    @Override
+    public Long getCreditorId() {
+        return creditorId;
     }
 }

@@ -150,7 +150,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             long baseEntityId;
 
             if (BasicOptimizer.metaList.contains(metaClass.getClassName())) {
-                baseEntityId = eavOptimizerDao.find(BasicOptimizer.getKeyString(baseEntity));
+                baseEntityId = eavOptimizerDao.find(creditorId, BasicOptimizer.getKeyString(baseEntity));
             } else {
                 baseEntityId = search(baseEntity, creditorId);
             }
@@ -186,6 +186,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             if (creditorId < 1)
                 throw new IllegalStateException("Кредитор не найден; \n" + creditor);
         }
+
+        baseEntityManager.registerCreditorId(creditorId);
 
         baseEntityPostPrepared = prepare(((BaseEntity) baseEntity).clone(), creditorId);
 
