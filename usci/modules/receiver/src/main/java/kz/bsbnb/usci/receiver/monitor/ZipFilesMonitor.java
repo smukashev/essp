@@ -41,8 +41,10 @@ import java.io.*;
 import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -503,7 +505,7 @@ public class ZipFilesMonitor {
         try {
             ZipFile zipFile = new ZipFile(filename);
             ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
-            
+
             if(manifestEntry == null) { // credit-registry
                 // this is fix for zip extract for file names with non latin chars
                 String batchName = null;
@@ -568,11 +570,13 @@ public class ZipFilesMonitor {
                     e.printStackTrace();
                 }
 
-                Date date = null;
+                Date date = new Date();
 
                 try {
-                    date = new SimpleDateFormat("yyyy-MM-dd").parse(
-                            document.getElementsByTagName("report_date").item(0).getTextContent());
+                    String reportDate = document.getElementsByTagName("report_date").item(0).getTextContent();
+                    if (reportDate.matches("([0-9]{4})\\-([0-9]{2})\\-([0-9]{2})")) {
+                        date = new SimpleDateFormat("yyyy-MM-dd").parse(reportDate);
+                    }
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
