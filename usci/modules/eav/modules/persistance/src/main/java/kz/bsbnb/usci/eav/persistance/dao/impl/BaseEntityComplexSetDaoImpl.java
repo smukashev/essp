@@ -376,7 +376,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                     MetaContainerTypes.META_CLASS,
                     metaType,
                     id,
-                    0,
+                    baseValue.getCreditorId(),
                     reportDate,
                     baseSet,
                     true,
