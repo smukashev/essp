@@ -116,8 +116,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         for (String attribute : baseEntity.getAttributes()) {
             IMetaType metaType = baseEntity.getMemberType(attribute);
+            IBaseValue baseValue = baseEntity.getBaseValue(attribute);
+
             if (metaType.isComplex()) {
-                IBaseValue baseValue = baseEntity.getBaseValue(attribute);
                 if (baseValue.getValue() != null) {
                     if (metaType.isSet()) {
                         IMetaSet childMetaSet = (IMetaSet) metaType;
@@ -137,11 +138,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
                         if (childBaseEntity.getValueCount() != 0)
-                            baseValue.setValue(prepare((IBaseEntity) baseValue.getValue(), creditorId));
+                            baseValue.setValue(prepare(childBaseEntity, creditorId));
                     }
+                    baseValue.setCreditorId(creditorId);
                 }
             } else {
-                IBaseValue baseValue = baseEntity.getBaseValue(attribute);
                 baseValue.setCreditorId(creditorId);
             }
         }

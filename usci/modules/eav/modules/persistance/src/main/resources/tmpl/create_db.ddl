@@ -181,6 +181,7 @@
 	</table>
 	<table name="eav_be_complex_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="entity_value_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -193,11 +194,13 @@
 			<reference local="entity_value_id" foreign="id"/>
 		</foreign-key>-->
 		<index name="ebcsv_IN_si_rd_ic">
+			<index-column name="creditor_id"/>
 			<index-column name="set_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
 		<index name="ebcsv_IN_si_il">
+		  <index-column name="creditor_id"/>
 			<index-column name="set_id"/>
 			<index-column name="is_last"/>
 		</index>
@@ -208,6 +211,7 @@
 	</table>
 	<table name="eav_be_complex_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
@@ -221,22 +225,26 @@
 			<reference local="attribute_id" foreign="id"/>
 		</foreign-key>-->
 		<unique name="ebcv_UN_ei_ai_rd">
+		  <unique-column name="creditor_id"/>
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebcv_IN_ei_ai_rd_ic">
+			<index-column name="creditor_id"/>
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
 		<index name="ebcv_IN_ei_ai_il">
+		  <index-column name="creditor_id"/>
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="is_last"/>
 		</index>
 		<index name="ebcv_IN_ai_evi">
+		  <index-column name="creditor_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="entity_value_id"/>
 		</index>
@@ -244,6 +252,7 @@
 			<index-column name="entity_id"/>
 		</index>
 		<index name="ebcv_ai_evi_ei">
+		  <index-column name="creditor_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="entity_value_id"/>
 			<index-column name="entity_id"/>
@@ -397,6 +406,7 @@
 	</table>
 	<table name="eav_be_entity_complex_sets">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
@@ -413,11 +423,13 @@
 			<reference local="entity_id" foreign="id"/>
 		</foreign-key>-->
 		<unique name="ebecs_UN_ei_ai_rd">
+		  <unique-column name="creditor_id"/>
 			<unique-column name="entity_id"/>
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
 		<index name="ebecs_IN_ei_ai_si_rd_ic">
+		  <unique-column name="creditor_id"/>
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="set_id"/>

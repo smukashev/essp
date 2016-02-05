@@ -55,31 +55,21 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         IBaseValue baseValue = (IBaseValue) persistable;
         IBaseEntity baseEntity = (IBaseEntity) baseValue.getValue();
 
-        long baseValueId = save(
-                baseValue.getBaseContainer().getId(),
-                baseValue.getMetaAttribute().getId(),
-                baseValue.getRepDate(),
-                baseEntity.getId(),
-                baseValue.isClosed(),
-                baseValue.isLast());
+        Insert insert = context
+                .insertInto(EAV_BE_COMPLEX_VALUES)
+                .set(EAV_BE_COMPLEX_VALUES.ENTITY_ID, baseValue.getBaseContainer().getId())
+                .set(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID, baseValue.getMetaAttribute().getId())
+                .set(EAV_BE_COMPLEX_VALUES.CREDITOR_ID, baseValue.getCreditorId())
+                .set(EAV_BE_COMPLEX_VALUES.REPORT_DATE, DataUtils.convert(baseValue.getRepDate()))
+                .set(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID, baseEntity.getId())
+                .set(EAV_BE_COMPLEX_VALUES.IS_CLOSED, DataUtils.convert(baseValue.isClosed()))
+                .set(EAV_BE_COMPLEX_VALUES.IS_LAST, DataUtils.convert(baseValue.isLast()));
+
+        long baseValueId =  insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
         baseValue.setId(baseValueId);
 
         return baseValueId;
-    }
-
-    protected long save(long baseEntityId, long metaAttributeId, Date reportDate, long childBaseEntityId,
-                        boolean closed, boolean last) {
-        Insert insert = context
-                .insertInto(EAV_BE_COMPLEX_VALUES)
-                .set(EAV_BE_COMPLEX_VALUES.ENTITY_ID, baseEntityId)
-                .set(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID, metaAttributeId)
-                .set(EAV_BE_COMPLEX_VALUES.REPORT_DATE, DataUtils.convert(reportDate))
-                .set(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID, childBaseEntityId)
-                .set(EAV_BE_COMPLEX_VALUES.IS_CLOSED, DataUtils.convert(closed))
-                .set(EAV_BE_COMPLEX_VALUES.IS_LAST, DataUtils.convert(last));
-
-        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     @Override
@@ -87,54 +77,39 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         IBaseValue baseValue = (IBaseValue) persistable;
         IBaseEntity baseEntity = (IBaseEntity) baseValue.getValue();
 
-        update(baseValue.getId(),
-                baseValue.getBaseContainer().getId(),
-                baseValue.getMetaAttribute().getId(),
-                baseValue.getRepDate(),
-                baseEntity.getId(),
-                baseValue.isClosed(),
-                baseValue.isLast());
-    }
-
-    protected void update(long id, long baseEntityId, long metaAttributeId, Date reportDate, long childBaseEntityId,
-                          boolean closed, boolean last) {
         String tableAlias = "cv";
         Update update = context
                 .update(EAV_BE_COMPLEX_VALUES.as(tableAlias))
-                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID, baseEntityId)
-                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID, metaAttributeId)
-                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE, DataUtils.convert(reportDate))
-                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID, childBaseEntityId)
-                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_CLOSED, DataUtils.convert(closed))
-                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST, DataUtils.convert(last))
-                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ID.equal(id));
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID, baseValue.getBaseContainer().getId())
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID, baseValue.getMetaAttribute().getId())
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).CREDITOR_ID, baseValue.getCreditorId())
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE, DataUtils.convert(baseValue.getRepDate()))
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID, baseEntity.getId())
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_CLOSED, DataUtils.convert(baseValue.isClosed()))
+                .set(EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST, DataUtils.convert(baseValue.isLast()))
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ID.equal(baseValue.getId()));
 
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + id +
+            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + baseValue.getId() +
                     ", EAV_BE_COMPLEX_VALUES);");
     }
 
     @Override
     public void delete(IPersistable persistable) {
-        delete(persistable.getId());
-    }
-
-    protected void delete(long id) {
         String tableAlias = "cv";
         Delete delete = context
                 .delete(EAV_BE_COMPLEX_VALUES.as(tableAlias))
-                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ID.equal(id));
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ID.equal(persistable.getId()));
 
         logger.debug(delete.toString());
 
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + id +
+            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + persistable.getId() +
                     ", EAV_BE_COMPLEX_VALUES);");
-
     }
 
     @Override
@@ -170,6 +145,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                                 .orderBy(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).ID,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST)
@@ -178,11 +154,13 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
                         DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .asTable(subqueryAlias);
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_COMPLEX_VALUES.ID),
                         subqueryTable.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.CREDITOR_ID),
                         subqueryTable.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
                         subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
                         subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
@@ -202,6 +180,9 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             long id = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
 
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.CREDITOR_ID.getName())).longValue();
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
@@ -220,7 +201,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                     metaClass.getType(),
                     metaType,
                     id,
-                    0,
+                    creditorId,
                     reportDate,
                     childBaseEntity,
                     closed,
@@ -263,6 +244,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                                 .orderBy(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.desc()).as("num_pp"),
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).ID,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST)
@@ -271,11 +253,13 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.lessThan(
                         DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .asTable(subqueryAlias);
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_COMPLEX_VALUES.ID),
                         subqueryTable.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
+                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.CREDITOR_ID),
                         subqueryTable.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
                         subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
                         subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
@@ -295,6 +279,10 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             long id = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
 
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.CREDITOR_ID.getName())).longValue();
+
+
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
@@ -313,7 +301,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                     metaClass.getType(),
                     metaType,
                     id,
-                    0,
+                    creditorId,
                     reportDate,
                     childBaseEntity,
                     closed,
@@ -347,12 +335,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         Select select = context
                 .select(EAV_BE_COMPLEX_VALUES.as(tableAlias).ID,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_COMPLEX_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.lessOrEqual(
                         DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
@@ -367,6 +357,9 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             long id = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
 
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.CREDITOR_ID.getName())).longValue();
+
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.IS_LAST.getName())).longValue() == 1;
 
@@ -380,7 +373,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                     MetaContainerTypes.META_CLASS,
                     metaType,
                     id,
-                    0,
+                    creditorId,
                     baseValue.getRepDate(),
                     childBaseEntity,
                     true,
@@ -414,12 +407,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         Select select = context
                 .select(EAV_BE_COMPLEX_VALUES.as(tableAlias).ID,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_COMPLEX_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST,
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_CLOSED)
                 .from(EAV_BE_COMPLEX_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).IS_LAST.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
@@ -433,6 +428,9 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
             long id = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
+
+            long creditorId = ((BigDecimal) row
+                    .get(EAV_BE_COMPLEX_VALUES.CREDITOR_ID.getName())).longValue();
 
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
@@ -449,7 +447,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                     MetaContainerTypes.META_CLASS,
                     metaType,
                     id,
-                    0,
+                    creditorId,
                     reportDate,
                     childBaseEntity,
                     closed,
@@ -476,6 +474,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                         tableOfValues.field(EAV_BE_COMPLEX_VALUES.ID),
                         tableOfValues.field(EAV_BE_COMPLEX_VALUES.ENTITY_ID),
                         tableOfValues.field(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID),
+                        tableOfValues.field(EAV_BE_COMPLEX_VALUES.CREDITOR_ID),
                         tableOfValues.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
                         tableOfValues.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
                         tableOfValues.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
@@ -490,6 +489,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .select(tableOfAttributes.field(EAV_M_COMPLEX_ATTRIBUTES.NAME),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.ID),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
+                        tableNumbering.field(EAV_BE_COMPLEX_VALUES.CREDITOR_ID),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
@@ -510,6 +510,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         for (Map<String, Object> row : rows) {
             long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
 
+            long creditorId = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.CREDITOR_ID.getName())).longValue();
+
             long entityValueId = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
 
             boolean isClosed = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
@@ -529,7 +531,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                     MetaContainerTypes.META_CLASS,
                     metaType,
                     id,
-                    0,
+                    creditorId,
                     reportDate,
                     childBaseEntity,
                     isClosed,
@@ -549,9 +551,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
-        for (long childBaseEntityId : childBaseEntityIds) {
+        for (long childBaseEntityId : childBaseEntityIds)
             baseEntityDao.deleteRecursive(childBaseEntityId);
-        }
     }
 
     @Override
@@ -569,10 +570,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 0) {
-            Iterator<Map<String, Object>> it = rows.iterator();
-            while (it.hasNext()) {
-                Map<String, Object> row = it.next();
-
+            for (Map<String, Object> row : rows) {
                 long childBaseEntityId = ((BigDecimal) row
                         .get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
                 baseEntityIds.add(childBaseEntityId);
@@ -605,10 +603,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 0) {
-            Iterator<Map<String, Object>> it = rows.iterator();
-            while (it.hasNext()) {
-                Map<String, Object> row = it.next();
-
+            for (Map<String, Object> row : rows) {
                 long childBaseEntityId = ((BigDecimal) row
                         .get(EAV_BE_ENTITIES.ID.getName())).longValue();
                 baseEntityIds.add(childBaseEntityId);
