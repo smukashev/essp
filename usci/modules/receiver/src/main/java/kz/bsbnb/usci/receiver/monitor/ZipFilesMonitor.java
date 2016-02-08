@@ -41,10 +41,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -77,6 +74,9 @@ public class ZipFilesMonitor {
 
 	public static final int ZIP_BUFFER_SIZE = 1024;
 	public static final int MAX_SYNC_QUEUE_SIZE = 256;
+
+	private static final String DIGITAL_SIGNING_SETTINGS = "DIGITAL_SIGNING_SETTINGS";
+	private static final String DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE = "DIGITAL_SIGNING_ORGANIZATIONS_IDS";
 
 	private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
@@ -321,17 +321,37 @@ public class ZipFilesMonitor {
 		batchService.uploadBatch(batch);
 
 		if (!haveError) {
+			if(signCheckPassed(batch, batchInfo)) {
+				batchService.addBatchStatus(new BatchStatus()
+						.setBatchId(batchId)
+						.setStatus(BatchStatuses.WAITING)
+						.setReceiptDate(new Date()));
+
+				batchInfo.setContentSize(batch.getContent().length);
+				batchInfo.setCreditorId(batch.getCreditorId());
+				batchInfo.setReceiptDate(batch.getReceiptDate());
+				//sender.addJob(batchId, batchInfo);
+				jobLauncherQueue.addJob(batchId, batchInfo);
+			}
+		}
+	}
+
+	boolean signCheckPassed(Batch batch, BatchInfo batchInfo){
+		String digitalSignOrgs = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS, DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
+		String[] orgIds = digitalSignOrgs.split(",");
+		if(batch.getCreditorId() > 0 && Arrays.asList(orgIds).contains(batch.getCreditorId() + "")) {
 			batchService.addBatchStatus(new BatchStatus()
-					.setBatchId(batchId)
-					.setStatus(BatchStatuses.WAITING)
+					.setBatchId(batch.getId())
+					.setStatus(BatchStatuses.WAITING_FOR_SIGNATURE)
 					.setReceiptDate(new Date()));
 
 			batchInfo.setContentSize(batch.getContent().length);
 			batchInfo.setCreditorId(batch.getCreditorId());
 			batchInfo.setReceiptDate(batch.getReceiptDate());
-			//sender.addJob(batchId, batchInfo);
-			jobLauncherQueue.addJob(batchId, batchInfo);
+
+			return false;
 		}
+		return true;
 	}
 
 	private void failFast(Long batchId, String error) {
