@@ -83,6 +83,12 @@
             <artifactId>easyuploads</artifactId>
             <version>0.5.1</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>vaadin-messagebox</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- javax dependencies -->
         <!--<dependency>
             <groupId>${project.groupId}</groupId>
