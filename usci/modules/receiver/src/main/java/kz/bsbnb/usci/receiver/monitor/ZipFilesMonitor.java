@@ -321,7 +321,7 @@ public class ZipFilesMonitor {
 		batchService.uploadBatch(batch);
 
 		if (!haveError) {
-			if(signCheckPassed(batch, batchInfo)) {
+			if(!waitForSignature(batch, batchInfo)) {
 				batchService.addBatchStatus(new BatchStatus()
 						.setBatchId(batchId)
 						.setStatus(BatchStatuses.WAITING)
@@ -336,7 +336,7 @@ public class ZipFilesMonitor {
 		}
 	}
 
-	boolean signCheckPassed(Batch batch, BatchInfo batchInfo){
+	boolean waitForSignature(Batch batch, BatchInfo batchInfo) {
 		String digitalSignOrgs = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS, DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
 		String[] orgIds = digitalSignOrgs.split(",");
 		if(batch.getCreditorId() > 0 && Arrays.asList(orgIds).contains(batch.getCreditorId() + "")) {
@@ -349,9 +349,9 @@ public class ZipFilesMonitor {
 			batchInfo.setCreditorId(batch.getCreditorId());
 			batchInfo.setReceiptDate(batch.getReceiptDate());
 
-			return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	private void failFast(Long batchId, String error) {
