@@ -7,6 +7,7 @@ public enum BatchStatuses implements IGlobal {
     WAITING,
     PROCESSING,
     ERROR,
+    WAITING_FOR_SIGNATURE,
     COMPLETED;
 
     @Override

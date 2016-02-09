@@ -6,6 +6,7 @@ import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputFile;
 import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.List;
 public class BeanDataProvider implements DataProvider {
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private InputFileBeanRemoteBusiness inputFileBusiness;
+    private IBatchProcessService batchProcessService;
 
     public BeanDataProvider() {
         RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
@@ -34,6 +36,15 @@ public class BeanDataProvider implements DataProvider {
 
         inputFileBeanRemoteBusinessFactoryBean.afterPropertiesSet();
         inputFileBusiness = (InputFileBeanRemoteBusiness) inputFileBeanRemoteBusinessFactoryBean.getObject();
+
+        RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+        batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+            + ":1097/batchProcessService");
+        batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+        batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+        batchProcessServiceFactoryBean.afterPropertiesSet();
+        batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
     }
 
     public List<Creditor> getCreditorsList(long userId) {
@@ -60,6 +71,7 @@ public class BeanDataProvider implements DataProvider {
     }
 
     public void addInputFileToQueue(FileSignatureRecord record) {
+        batchProcessService.restartBatch(record.getInputFile().getId());
         /*try {
             final InputFileSignature inputFileSignature = new InputFileSignature();
             inputFileSignature.setSignature(record.getSignature());

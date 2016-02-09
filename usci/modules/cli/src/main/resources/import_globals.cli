@@ -30,6 +30,7 @@ global add --type=BATCH_STATUS --code=WAITING --value=WAITING --desc=В_очер
 global add --type=BATCH_STATUS --code=PROCESSING --value=PROCESSING --desc=В_обработке
 global add --type=BATCH_STATUS --code=ERROR --value=ERROR --desc=Ошибка
 global add --type=BATCH_STATUS --code=COMPLETED --value=COMPLETED --desc=Завершён
+global add --type=BATCH_STATUS --code=WAITING_FOR_SIGNATURE --value=WAITING_FOR_SIGNATURE --desc=Ожидает_подписи
 
 #
 # NOTIFICATION
@@ -55,5 +56,11 @@ global add --type=REF_VIEW_SETTING --code=ref_credit_type --value=name_ru --desc
 global add --type=REF_VIEW_SETTING --code=ref_subject_type --value=name_ru --desc=Настройка_справочника
 global add --type=REF_VIEW_SETTING --code=ref_region --value=name_ru --desc=Настройка_справочника
 global add --type=REF_VIEW_SETTING --code=ref_creditor --value=name --desc=Настройка_справочника
+
+
+#
+# SIGN SETTINGS
+#
+global add --type=DIGITAL_SIGNING_SETTINGS --code=DIGITAL_SIGNING_ORGANIZATIONS_IDS --value=-1 --desc=Настройка_цифровой_подписи
 
 quit

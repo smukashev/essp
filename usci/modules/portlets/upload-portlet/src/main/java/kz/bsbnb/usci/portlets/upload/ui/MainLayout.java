@@ -2,6 +2,8 @@ package kz.bsbnb.usci.portlets.upload.ui;
 
 import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
 import com.vaadin.ui.TabSheet;
+import kz.bsbnb.usci.portlets.upload.data.BeanDataProvider;
+import kz.bsbnb.usci.portlets.upload.data.DataProvider;
 
 /**
  *
@@ -17,6 +19,7 @@ public class MainLayout extends TabSheet{
     
     @Override 
     public void attach() {
+        DataProvider provider = new BeanDataProvider();
         Tab singleUploadTab = addTab(new SingleUploadComponent(portletEnvironment));
         singleUploadTab.setCaption(portletEnvironment.getResourceString(Localization.SINGLE_UPLOAD_TAB_CAPTION.getKey()));
         
@@ -25,6 +28,11 @@ public class MainLayout extends TabSheet{
         
         Tab digitalSigningConfigurationTab = addTab(new DigitalSignConfigurationComponent(portletEnvironment));
         digitalSigningConfigurationTab.setCaption(portletEnvironment.getResourceString(Localization.DIGITAL_SIGN_TAB_CAPTION.getKey()));
+
+        if (portletEnvironment.isNB()) {
+            Tab configurationTab = addTab(new ConfigurationComponent(portletEnvironment, provider));
+            configurationTab.setCaption(portletEnvironment.getResourceString(Localization.CONFIGURATION_TAB_CAPTION.getKey()));
+        }
     }
     
 }
