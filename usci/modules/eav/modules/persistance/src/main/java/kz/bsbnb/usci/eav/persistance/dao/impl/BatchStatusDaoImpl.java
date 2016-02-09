@@ -45,7 +45,7 @@ public class BatchStatusDaoImpl extends JDBCSupport implements IBatchStatusDao {
     public List<BatchStatus> getList(long batchId) {
         Select select = context.selectFrom(EAV_BATCH_STATUSES)
                 .where(EAV_BATCH_STATUSES.BATCH_ID.eq(batchId))
-                .orderBy(EAV_BATCH_STATUSES.RECEIPT_DATE, EAV_BATCH_STATUSES.STATUS_ID);
+                .orderBy(EAV_BATCH_STATUSES.RECEIPT_DATE.desc(), EAV_BATCH_STATUSES.STATUS_ID.asc());
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 

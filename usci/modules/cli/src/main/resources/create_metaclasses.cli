@@ -78,7 +78,6 @@ meta add --name=person_name --attribute=firstname --type=string
 meta add --name=person_name --attribute=lang --type=string
 meta add --name=person_name --attribute=lastname --type=string
 meta add --name=person_name --attribute=middlename --type=string
-meta add --name=person_name --attribute=middlename --type=string
 
 #====================================
 #= REF_COUNTRY

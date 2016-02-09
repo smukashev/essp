@@ -29,7 +29,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     @Autowired
     private IGlobalService globalService;
 
-    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED);
+    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE);
 
     private Map<Long, EavGlobal> globalMap = new HashMap<>();
 
@@ -84,6 +84,8 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 lastStatus = "Завершён";
             } else if (lastStatus.equals("ERROR")) {
                 lastStatus = "Ошибка";
+            } else if(lastStatus.equals("WAITING_FOR_SIGNATURE")) {
+                lastStatus = "Ожидает подписи";
             }
 
             Shared s = new Shared();
@@ -109,7 +111,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             inputInfo.setStartedDate(batchStatus.getReceiptDate());
         } else if (lastStatus == COMPLETED) {
             inputInfo.setCompletionDate(batchStatus.getReceiptDate());
-        } else if (lastStatus == WAITING) {
+        } else if (lastStatus == WAITING || lastStatus == WAITING_FOR_SIGNATURE) {
             inputInfo.setReceiverDate(batchStatus.getReceiptDate());
         } else if (lastStatus == ERROR && inputInfo.getReceiverDate() == null) {
             inputInfo.setReceiverDate(batchStatus.getReceiptDate());
@@ -140,6 +142,10 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 case "COMPLETED":
                     s.setNameRu("Завершен");
                     s.setNameKz("Завершен");
+                    break;
+                case "WAITING_FOR_SIGNATURE":
+                    s.setNameRu("Ожидает подписи");
+                    s.setNameKz("Ожидает подписи");
                     break;
                 default:
                     s.setNameRu(batchStatus.getStatus().code());
