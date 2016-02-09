@@ -30,19 +30,19 @@ var fetchSize = 50;
 var userNavHistory = {
     currentPage: 1,
     nextPage: 1,
-    getNextPage: function(){
+    getNextPage: function () {
         return this.nextPage;
     },
-    setNextPage: function(nextPage){
+    setNextPage: function (nextPage) {
         this.nextPage = nextPage;
         console.log(this.nextPage);
     },
-    init: function(){
+    init: function () {
         this.nextPage = 1;
     },
-    success: function(totalCount){
+    success: function (totalCount) {
         this.currentPage = this.nextPage;
-        if(totalCount) {
+        if (totalCount) {
             Ext.getCmp('totalCount').setText(totalCount);
             Ext.getCmp('totalPageNo').setText(Math.floor((fetchSize - 1 + totalCount) / fetchSize));
             Ext.getCmp('currentPageNo').setText(this.currentPage);
@@ -51,7 +51,7 @@ var userNavHistory = {
 };
 var forms = [];
 
-function getForm(){
+function getForm() {
     currentSearch = Ext.getCmp('edSearch').value;
     currentMeta = Ext.getCmp('edSearch').displayTplData[0].metaName;
     Ext.Ajax.request({
@@ -62,11 +62,11 @@ function getForm(){
             search: currentSearch,
             metaName: currentMeta
         },
-        success: function(data){
+        success: function (data) {
             document.getElementById('entity-editor-form').innerHTML = data.responseText;
             var all = document.getElementsByClassName("usci-date");
-            for(var i = 0; i < all.length;i++) {
-                var info =  all[i].id.match(regex);
+            for (var i = 0; i < all.length; i++) {
+                var info = all[i].id.match(regex);
                 Ext.create('Ext.form.DateField', {
                     renderTo: all[i].id,
                     fieldLabel: 'дата',
@@ -81,21 +81,21 @@ function getForm(){
 
 var errors = [];
 
-function filterLeaf(control, queryObject){
-    for(var i =0 ;i<control.childNodes.length;i++) {
+function filterLeaf(control, queryObject) {
+    for (var i = 0; i < control.childNodes.length; i++) {
         var childControl = control.childNodes[i];
-        if(childControl.tagName == 'INPUT' || childControl.tagName=='SELECT') {
-            var info =  childControl.id.match(regex);
+        if (childControl.tagName == 'INPUT' || childControl.tagName == 'SELECT') {
+            var info = childControl.id.match(regex);
             var id = info[1];
 
-            if(childControl.value.length == 0) {
+            if (childControl.value.length == 0) {
                 errors.push(document.getElementById('err-' + id));
             }
 
             queryObject[info[3]] = childControl.value;
-        } else if(childControl.tagName == 'DIV') {
+        } else if (childControl.tagName == 'DIV') {
             var info = childControl.id.match(regex);
-            if(info == null)
+            if (info == null)
                 continue;
             var id = info[1];
             queryObject[info[3]] = Ext.getCmp('inp-' + id).value;
@@ -103,39 +103,39 @@ function filterLeaf(control, queryObject){
     }
 }
 
-function filterNode(control, queryObject){
-    for(var i =0; i<control.childNodes.length;i++) {
+function filterNode(control, queryObject) {
+    for (var i = 0; i < control.childNodes.length; i++) {
         var childControl = control.childNodes[i];
-        if(childControl.className != undefined && childControl.className.indexOf('leaf') > -1) {
+        if (childControl.className != undefined && childControl.className.indexOf('leaf') > -1) {
             filterLeaf(childControl, queryObject);
             break;
         }
     }
 }
 
-function find(control){
+function find(control) {
     var nextDiv = control.parentNode.nextSibling;
     var inputDiv = control.previousSibling.previousSibling;
 
     var info = inputDiv.id.match(regex);
 
 
-    var params = {op : 'FIND_ACTION', metaClass: info[2], searchName: currentSearch};
-    for(var i=0;i<errors.length;i++)
+    var params = {op: 'FIND_ACTION', metaClass: info[2], searchName: currentSearch};
+    for (var i = 0; i < errors.length; i++)
         errors[i].style.display = 'none';
 
     errors = [];
 
-    for (var  i = 0; i < nextDiv.childNodes.length; i++) {
+    for (var i = 0; i < nextDiv.childNodes.length; i++) {
         var preKeyElem = nextDiv.childNodes[i];
-        if(preKeyElem.className.indexOf('leaf') > -1) {
+        if (preKeyElem.className.indexOf('leaf') > -1) {
             filterLeaf(preKeyElem, params);
         } else {
             filterNode(preKeyElem, params);
         }
     }
 
-    if(errors.length > 0) {
+    if (errors.length > 0) {
         for (var i = 0; i < errors.length; i++) {
             errors[i].style.display = 'inline';
         }
@@ -150,16 +150,16 @@ function find(control){
         url: dataUrl,
         method: 'POST',
         params: params,
-        success: function(response) {
+        success: function (response) {
             var data = JSON.parse(response.responseText);
-            if(data.data > -1)
+            if (data.data > -1)
                 inputDiv.value = data.data;
             else
                 inputDiv.value = '';
 
             loadDiv.style.display = 'none';
         },
-        failure: function() {
+        failure: function () {
             console.log('woops');
         }
     });
@@ -170,10 +170,10 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
 
     var children = currentNode.childNodes;
 
-    if(arrayEl) {
+    if (arrayEl) {
         xmlStr += offset + "<item>\n";
     } else {
-        if(first) {
+        if (first) {
             xmlStr += offset + "<" + currentNode.data.code +
                 (operation ? " operation=\"" + operation + "\"" : "") + ">\n";
         } else {
@@ -181,9 +181,9 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
         }
     }
 
-    for(var i = 0; i < children.length; i++){
-        if(children[i].data.simple) {
-            if(currentNode.data.array) {
+    for (var i = 0; i < children.length; i++) {
+        if (children[i].data.simple) {
+            if (currentNode.data.array) {
                 xmlStr += offset + "  " + "<item>";
                 xmlStr += children[i].data.value;
                 xmlStr += "</item>\n";
@@ -197,7 +197,7 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
         }
     }
 
-    if(arrayEl) {
+    if (arrayEl) {
         xmlStr += offset + "</item>\n";
     } else {
         xmlStr += offset + "</" + currentNode.data.code + ">\n";
@@ -212,7 +212,7 @@ function addArrayElementButton(form) {
         text: "Добавить элемент",
         margin: '0 0 5 0',
 
-        handler : function () {
+        handler: function () {
             var tree = Ext.getCmp('entityTreeView');
             var selectedNode = tree.getSelectionModel().getLastSelected();
 
@@ -227,7 +227,7 @@ function addArrayElementButton(form) {
                 newArrayElements.push(element);
                 addField(form, element, "_edit", selectedNode);
             } else {
-                var arrayElForm= Ext.getCmp('ArrayElFormPanel');
+                var arrayElForm = Ext.getCmp('ArrayElFormPanel');
                 arrayElForm.removeAll();
                 loadAttributes(arrayElForm, selectedNode, true);
                 arrayElWindow.show();
@@ -273,7 +273,7 @@ function loadAttributes(form, selectedNode, arrayElAddition) {
 
             fillAttrValuesFromTree(attributes, children);
 
-            for(var i = 0; i < attributes.length; i++) {
+            for (var i = 0; i < attributes.length; i++) {
                 addField(form, attributes[i].data, idSuffix, selectedNodeData);
             }
         }
@@ -298,12 +298,12 @@ function loadSubEntity(subNode, idSuffix) {
 
     subEntityStore.load({
         params: {
-            op : 'LIST_ENTITY',
+            op: 'LIST_ENTITY',
             entityId: subEntityId,
             date: Ext.getCmp('edDate').value,
             asRoot: false
         },
-        callback: function(records, operation, success) {
+        callback: function (records, operation, success) {
             if (!success) {
                 Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
             } else {
@@ -353,7 +353,7 @@ function addField(form, attr, idSuffix, node) {
                     labelWidth: labelWidth,
                     width: width,
                     format: 'd.m.Y',
-                    value: attr.value ? new Date(attr.value.replace(/(\d{2})\.(\d{2})\.(\d{4})/,'$3-$2-$1')) : null,
+                    value: attr.value ? new Date(attr.value.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$3-$2-$1')) : null,
                     readOnly: readOnly,
                     allowBlank: allowBlank,
                     blankText: label_REQUIRED_FIELD
@@ -385,7 +385,7 @@ function addField(form, attr, idSuffix, node) {
                     readOnly: readOnly,
                     allowBlank: allowBlank,
                     blankText: label_REQUIRED_FIELD,
-                    editable : false,
+                    editable: false,
                     store: Ext.create('Ext.data.Store', {
                         fields: ['value', 'title'],
                         data: [
@@ -413,7 +413,7 @@ function addField(form, attr, idSuffix, node) {
                 proxy: {
                     type: 'ajax',
                     url: dataUrl,
-                    extraParams: {op : 'LIST_BY_CLASS_SHORT', metaId: attr.metaId},
+                    extraParams: {op: 'LIST_BY_CLASS_SHORT', metaId: attr.metaId},
                     actionMethods: {
                         read: 'POST'
                     },
@@ -429,7 +429,7 @@ function addField(form, attr, idSuffix, node) {
             displayField: 'title',
             valueField: 'ID',
             value: attr.value,
-            editable : false
+            editable: false
         }));
     } else {
         form.add(Ext.create("Ext.form.field.Text",
@@ -450,13 +450,13 @@ function addField(form, attr, idSuffix, node) {
 function loadEntity(entityId, date, currentSearch) {
     entityStore.load({
         params: {
-            op : 'LIST_ENTITY',
+            op: 'LIST_ENTITY',
             entityId: entityId,
             date: date,
             searchName: currentSearch,
             asRoot: true
         },
-        callback: function(records, operation, success) {
+        callback: function (records, operation, success) {
             if (!success) {
                 Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
             }
@@ -568,7 +568,7 @@ function saveFormValues(formKind) {
 }
 
 function hasEmptyKeyAttr(mainNode) {
-    for(var i = 0; i < mainNode.childNodes.length; i++) {
+    for (var i = 0; i < mainNode.childNodes.length; i++) {
         var currentNode = mainNode.childNodes[i];
 
         if (currentNode.data.simple) {
@@ -590,9 +590,9 @@ function hasEmptyKeyAttr(mainNode) {
     return false;
 }
 
-Ext.onReady(function() {
+Ext.onReady(function () {
 
-    Ext.override(Ext.data.proxy.Ajax, { timeout: 120000 });
+    Ext.override(Ext.data.proxy.Ajax, {timeout: 120000});
 
     Ext.define('MyCheckboxField', {
         extend: 'Ext.form.field.Checkbox',
@@ -602,7 +602,7 @@ Ext.onReady(function() {
             this.callParent();
         },
 
-        getSubTplData: function() {
+        getSubTplData: function () {
             var me = this;
             return Ext.apply(me.callParent(), {
                 checked: (me.checked ? 'checked' : '')
@@ -611,16 +611,15 @@ Ext.onReady(function() {
     });
 
     Ext.override(Ext.form.NumberField, {
-        forcePrecision : false,
+        forcePrecision: false,
 
-        valueToRaw: function(value) {
+        valueToRaw: function (value) {
             var me = this,
                 decimalSeparator = me.decimalSeparator;
             value = me.parseValue(value);
             value = me.fixPrecision(value);
             value = Ext.isNumber(value) ? value : parseFloat(String(value).replace(decimalSeparator, '.'));
-            if (isNaN(value))
-            {
+            if (isNaN(value)) {
                 value = '';
             } else {
                 value = me.forcePrecision ? value.toFixed(me.decimalPrecision) : parseFloat(value);
@@ -633,18 +632,18 @@ Ext.onReady(function() {
     Ext.define('attrsStoreModel', {
         extend: 'Ext.data.Model',
         fields: [
-            {name: 'title',     type: 'string'},
-            {name: 'code',     type: 'string'},
-            {name: 'value',     type: 'string'},
-            {name: 'simple',     type: 'boolean'},
-            {name: 'array',     type: 'boolean'},
-            {name: 'ref',     type: 'boolean'},
-            {name: 'type',     type: 'string'},
-            {name: 'isKey',     type: 'boolean'},
-            {name: 'isRequired',     type: 'boolean'},
-            {name: 'metaId',     type: 'string'},
-            {name: 'childMetaId',     type: 'string'},
-            {name: 'childType',     type: 'string'},
+            {name: 'title', type: 'string'},
+            {name: 'code', type: 'string'},
+            {name: 'value', type: 'string'},
+            {name: 'simple', type: 'boolean'},
+            {name: 'array', type: 'boolean'},
+            {name: 'ref', type: 'boolean'},
+            {name: 'type', type: 'string'},
+            {name: 'isKey', type: 'boolean'},
+            {name: 'isRequired', type: 'boolean'},
+            {name: 'metaId', type: 'string'},
+            {name: 'childMetaId', type: 'string'},
+            {name: 'childType', type: 'string'},
         ]
     });
 
@@ -663,38 +662,38 @@ Ext.onReady(function() {
 
     Ext.define('searchStoreModel', {
         extend: 'Ext.data.Model',
-        fields: ['searchName','metaName', 'title']
+        fields: ['searchName', 'metaName', 'title']
     });
 
     Ext.define('entityModel', {
         extend: 'Ext.data.Model',
         fields: [
-            {name: 'title',     type: 'string'},
-            {name: 'code',     type: 'string'},
-            {name: 'value',     type: 'string'},
-            {name: 'simple',     type: 'boolean'},
-            {name: 'array',     type: 'boolean'},
-            {name: 'ref',     type: 'boolean'},
-            {name: 'type',     type: 'string'},
-            {name: 'isKey',     type: 'boolean'},
-            {name: 'isRequired',     type: 'boolean'},
-            {name: 'metaId',     type: 'string'},
-            {name: 'childMetaId',     type: 'string'},
-            {name: 'childType',     type: 'string'},
+            {name: 'title', type: 'string'},
+            {name: 'code', type: 'string'},
+            {name: 'value', type: 'string'},
+            {name: 'simple', type: 'boolean'},
+            {name: 'array', type: 'boolean'},
+            {name: 'ref', type: 'boolean'},
+            {name: 'type', type: 'string'},
+            {name: 'isKey', type: 'boolean'},
+            {name: 'isRequired', type: 'boolean'},
+            {name: 'metaId', type: 'string'},
+            {name: 'childMetaId', type: 'string'},
+            {name: 'childType', type: 'string'},
         ]
     });
 
     var types = Ext.create('Ext.data.Store', {
         fields: ['searchName', 'title'],
         /*data : [
-            {"id":"s_credit_pc", "name":"Договор по номеру и дате договора"},
-            {"id":"s_person_doc", "name":"Физ лицо по документу"},
-            {"id":"s_org_doc", "name":"Юр лицо по документу"}
-        ]*/
+         {"id":"s_credit_pc", "name":"Договор по номеру и дате договора"},
+         {"id":"s_person_doc", "name":"Физ лицо по документу"},
+         {"id":"s_org_doc", "name":"Юр лицо по документу"}
+         ]*/
         proxy: {
             type: 'ajax',
             url: dataUrl,
-            extraParams: {op : 'LIST_CLASSES'},
+            extraParams: {op: 'LIST_CLASSES'},
             reader: {
                 type: 'json',
                 root: 'data',
@@ -703,12 +702,12 @@ Ext.onReady(function() {
         }
     });
 
-    var creditors = Ext.create('Ext.data.Store',{
-        fields: ['id','name'],
+    var creditors = Ext.create('Ext.data.Store', {
+        fields: ['id', 'name'],
         proxy: {
             type: 'ajax',
             url: dataUrl,
-            extraParams: {op : 'LIST_CREDITORS'},
+            extraParams: {op: 'LIST_CREDITORS'},
             reader: {
                 type: 'json',
                 root: 'data',
@@ -724,7 +723,7 @@ Ext.onReady(function() {
         proxy: {
             type: 'ajax',
             url: dataUrl,
-            extraParams: {op : 'LIST_ENTITY'}
+            extraParams: {op: 'LIST_ENTITY'}
         },
         folderSort: true
     });
@@ -735,7 +734,7 @@ Ext.onReady(function() {
         proxy: {
             type: 'ajax',
             url: dataUrl,
-            extraParams: {op : 'LIST_ENTITY'}
+            extraParams: {op: 'LIST_ENTITY'}
         },
         folderSort: true
     });
@@ -743,7 +742,7 @@ Ext.onReady(function() {
     var buttonAdd = Ext.create('Ext.button.Button', {
         id: "entityEditorAddBtn",
         text: 'Добавить',
-        handler : function (){
+        handler: function () {
             nextArrayIndex = 0;
             var form = Ext.getCmp('ModalFormPannel');
             form.removeAll();
@@ -755,22 +754,22 @@ Ext.onReady(function() {
     var buttonShow = Ext.create('Ext.button.Button', {
         id: "entityEditorShowBtn",
         text: label_VIEW,
-        handler : function (){
+        handler: function () {
             //entityId = Ext.getCmp("entityId");
             userNavHistory.init();
             Ext.getCmp('form-area').doSearch();
             return;
             var keySearchComponent = document.getElementById('inp-1-' + currentMeta + '-null');
 
-            if(keySearchComponent != null) {
+            if (keySearchComponent != null) {
                 var entityId = document.getElementById('inp-1-' + currentMeta + '-null').value;
                 loadEntity(entityId, Ext.getCmp('edDate').value, currentSearch);
             } else {
                 //for custom implementations
-                var params = {op : 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch, timeout: 120000 };
+                var params = {op: 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch, timeout: 120000};
                 var inputs = document.getElementById("entity-editor-form").childNodes;
-                for(i=0;i<inputs.length;i++) {
-                    if(inputs[i].tagName == 'INPUT') {
+                for (i = 0; i < inputs.length; i++) {
+                    if (inputs[i].tagName == 'INPUT') {
                         params[inputs[i].name] = inputs[i].value;
                     }
                 }
@@ -786,7 +785,8 @@ Ext.onReady(function() {
                             Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
                         }
                         loadingGif.style.display = 'none';
-                    }});
+                    }
+                });
             }
         },
         maxWidth: 70,
@@ -796,7 +796,7 @@ Ext.onReady(function() {
     var buttonXML = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
-        handler : function (){
+        handler: function () {
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
@@ -817,7 +817,7 @@ Ext.onReady(function() {
                     date: Ext.getCmp('edDate').value,
                     op: 'SAVE_XML'
                 },
-                success: function() {
+                success: function () {
                     Ext.MessageBox.alert("", "Сохранено успешно");
                 }
             });
@@ -828,7 +828,7 @@ Ext.onReady(function() {
     var buttonShowXML = Ext.create('Ext.button.Button', {
         id: "entityEditorShowXmlBtn",
         text: 'XML',
-        handler : function (){
+        handler: function () {
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
@@ -841,7 +841,7 @@ Ext.onReady(function() {
             var buttonClose = Ext.create('Ext.button.Button', {
                 id: "itemFormCancel",
                 text: label_CANCEL,
-                handler : function (){
+                handler: function () {
                     Ext.getCmp('xmlFromWin').destroy();
                 }
             });
@@ -872,10 +872,10 @@ Ext.onReady(function() {
             xmlFromWin = new Ext.Window({
                 id: "xmlFromWin",
                 layout: 'fit',
-                title:'XML',
+                title: 'XML',
                 modal: true,
                 maximizable: true,
-                items:[xmlForm]
+                items: [xmlForm]
             });
 
             xmlFromWin.show();
@@ -887,7 +887,7 @@ Ext.onReady(function() {
         id: "buttonDelete",
         text: label_DEL,
         maxWidth: 200,
-        handler : function (){
+        handler: function () {
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
@@ -905,7 +905,7 @@ Ext.onReady(function() {
                     date: Ext.getCmp('edDate').value,
                     op: 'SAVE_XML'
                 },
-                success: function(response) {
+                success: function (response) {
                     Ext.MessageBox.alert("", "Операция выполнена успешно");
                 }
             });
@@ -916,7 +916,7 @@ Ext.onReady(function() {
         id: "buttonClose",
         text: label_CLOSE,
         maxWidth: 200,
-        handler : function (){
+        handler: function () {
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
 
@@ -934,20 +934,20 @@ Ext.onReady(function() {
                     date: Ext.getCmp('edDate').value,
                     op: 'SAVE_XML'
                 },
-                success: function(response) {
+                success: function (response) {
                     Ext.MessageBox.alert("", "Операция выполнена успешно");
                 }
             });
         }
     });
 
-    modalWindow = Ext.create("Ext.Window",{
-        title : 'Добавление записи',
-        width : 400,
-        modal : true,
-        closable : true,
+    modalWindow = Ext.create("Ext.Window", {
+        title: 'Добавление записи',
+        width: 400,
+        modal: true,
+        closable: true,
         closeAction: 'hide',
-        items  : [
+        items: [
             {
                 id: "ModalFormPannel",
                 xtype: 'form',
@@ -956,11 +956,11 @@ Ext.onReady(function() {
                 defaults: {
                     anchor: '100%'
                 },
-                autoScroll:true
+                autoScroll: true
             }],
-        tbar : [{
-            text : 'Сохранить новую запись' ,
-            handler :function(){
+        tbar: [{
+            text: 'Сохранить новую запись',
+            handler: function () {
                 var form = Ext.getCmp('ModalFormPannel');
                 if (form.isValid()) {
                     saveFormValues(FORM_ADD);
@@ -969,13 +969,13 @@ Ext.onReady(function() {
         }]
     });
 
-    arrayElWindow = Ext.create("Ext.Window",{
-        title : 'Добавление элемента массива',
-        width : 400,
-        modal : true,
-        closable : true,
+    arrayElWindow = Ext.create("Ext.Window", {
+        title: 'Добавление элемента массива',
+        width: 400,
+        modal: true,
+        closable: true,
         closeAction: 'hide',
-        items : [
+        items: [
             {
                 id: "ArrayElFormPanel",
                 xtype: 'form',
@@ -984,11 +984,11 @@ Ext.onReady(function() {
                 defaults: {
                     anchor: '100%'
                 },
-                autoScroll:true
+                autoScroll: true
             }],
-        tbar : [{
-            text : 'Сохранить новую запись' ,
-            handler :function() {
+        tbar: [{
+            text: 'Сохранить новую запись',
+            handler: function () {
                 var form = Ext.getCmp('ArrayElFormPanel');
                 if (form.isValid()) {
                     saveFormValues(FORM_ADD_ARRAY_EL);
@@ -1009,14 +1009,61 @@ Ext.onReady(function() {
         columns: [{
             xtype: 'treecolumn',
             text: label_TITLE,
-            flex: 2,
+            flex: 4,
             sortable: true,
             dataIndex: 'title'
-        },{
+        }, {
             text: label_VALUE,
-            flex: 4,
+            flex: 2,
             dataIndex: 'value',
             sortable: true
+        }, {
+            text: label_SUBJECT_NAME,
+            flex: 4,
+            dataIndex: 'code',
+            sortable: true,
+            renderer: function (val, meta, record) {
+                if (val == 'subject') {
+                    var subjectName;
+                    record.eachChild(function (n) {
+                        if (n.get('code') == 'person_info') {
+                            var lastname;
+                            var firstname;
+                            var middlename;
+                            n.eachChild(function (n) {
+                                if (n.get('code') == 'names') {
+                                    if (n.firstChild) {
+                                        n.firstChild.eachChild(function (n) {
+                                            if (n.get('code') == 'lastname') {
+                                                lastname = n.get('value')
+                                            } else if (n.get('code') == 'firstname') {
+                                                firstname = n.get('value')
+                                            } else if (n.get('code') == 'middlename') {
+                                                middlename = n.get('value')
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                            subjectName = "{0} {1} {2}".format(lastname ? lastname : '', firstname ? firstname : '', middlename ? middlename : '')
+                        } else if (n.get('code') == 'organization_info') {
+                            n.eachChild(function (n) {
+                                if (n.get('code') == 'names') {
+                                    if (n.firstChild) {
+                                        n.firstChild.eachChild(function (n) {
+                                            if (n.get('code') == 'name') {
+                                                subjectName = n.get('value')
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                }
+                return subjectName;
+            }
         }/*,{
          text: label_CODE,
          flex: 1,
@@ -1043,8 +1090,8 @@ Ext.onReady(function() {
          dataIndex: 'type',
          sortable: true
          }*/],
-        listeners : {
-            itemclick: function(view, record, item, index, e, eOpts) {
+        listeners: {
+            itemclick: function (view, record, item, index, e, eOpts) {
                 nextArrayIndex = 0;
                 newArrayElements = [];
                 Ext.getCmp('btnConfirmChanges').show();
@@ -1063,7 +1110,7 @@ Ext.onReady(function() {
 
                         addArrayElementButton(form);
 
-                        for(var i = 0; i < children.length; i++){
+                        for (var i = 0; i < children.length; i++) {
                             addField(form, children[i].data, true, selectedNode.data);
                         }
                     }
@@ -1077,18 +1124,18 @@ Ext.onReady(function() {
     // --------------------------------------------
     var today = new Date();
     var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
+    var mm = today.getMonth() + 1; //January is 0!
     var yyyy = today.getFullYear();
 
-    if(dd<10) {
-        dd='0'+dd
+    if (dd < 10) {
+        dd = '0' + dd
     }
 
-    if(mm<10) {
-        mm='0'+mm
+    if (mm < 10) {
+        mm = '0' + mm
     }
 
-    today = dd+'.'+mm+'.'+yyyy;
+    today = dd + '.' + mm + '.' + yyyy;
     // ------------------------------------------------
 
     var classesStore = Ext.create('Ext.data.Store', {
@@ -1097,7 +1144,7 @@ Ext.onReady(function() {
         proxy: {
             type: 'ajax',
             url: dataUrl,
-            extraParams: {op : 'LIST_CLASSES'},
+            extraParams: {op: 'LIST_CLASSES'},
             actionMethods: {
                 read: 'POST'
             },
@@ -1111,7 +1158,7 @@ Ext.onReady(function() {
         remoteSort: true
     });
 
-    var mainPanel = Ext.create('Ext.panel.Panel',{
+    var mainPanel = Ext.create('Ext.panel.Panel', {
         height: 500,
         renderTo: 'entity-editor-content',
         title: '&nbsp',
@@ -1134,16 +1181,16 @@ Ext.onReady(function() {
                 items: [{
                     id: 'edSearch',
                     xtype: 'combobox',
-                    displayField:'title',
+                    displayField: 'title',
                     store: types,
                     labelWidth: 70,
-                    valueField:'searchName',
+                    valueField: 'searchName',
                     fieldLabel: 'Вид поиска',
                     editable: false,
-                    listeners : {
-                        change: function(a,key,prev){
-                            for(p in forms)
-                                if(p == key)
+                    listeners: {
+                        change: function (a, key, prev) {
+                            for (p in forms)
+                                if (p == key)
                                     forms[p](Ext.getCmp('form-area'));
                         }
                     }
@@ -1153,7 +1200,7 @@ Ext.onReady(function() {
                     displayField: 'name',
                     store: creditors,
                     labelWidth: 70,
-                    valueField:'id',
+                    valueField: 'id',
                     fieldLabel: 'Кредитор',
                     editable: false
                 }, {
@@ -1161,14 +1208,14 @@ Ext.onReady(function() {
                     id: 'edDate',
                     fieldLabel: 'Дата',
                     listeners: {
-                        change: function(){
+                        change: function () {
                             console.log('datefield changed');
                         }
                     },
                     format: 'd.m.Y',
-                    value : '01.11.2015'
+                    value: '01.11.2015'
                 }]
-            },{
+            }, {
                 region: 'center',
                 id: 'form-area',
                 height: '80%',
@@ -1176,16 +1223,17 @@ Ext.onReady(function() {
                 html: '<div id="entity-editor-form"></div>',
                 tbar: [buttonShow, buttonXML, buttonShowXML, buttonDelete, buttonClose/*, buttonAdd*/]
             }]
-        },{
+        }, {
             region: 'center',
             width: "40%",
             split: true,
             items: [entityGrid],
-            autoScroll:true,
+            autoScroll: true,
             bbar: [
-                {text: '<<',
+                {
+                    text: '<<',
                     id: 'previousNav',
-                    handler: function(){
+                    handler: function () {
                         userNavHistory.setNextPage(userNavHistory.currentPage - 1);
                         Ext.getCmp('form-area').doSearch();
                     }
@@ -1193,22 +1241,23 @@ Ext.onReady(function() {
                 {xtype: 'label', text: '1', id: 'currentPageNo'},
                 {xtype: 'label', text: '/'},
                 {xtype: 'label', text: '1', id: 'totalPageNo'},
-                {text: '>>', id: 'nextNav',
-                    handler: function(){
+                {
+                    text: '>>', id: 'nextNav',
+                    handler: function () {
                         userNavHistory.setNextPage(userNavHistory.currentPage + 1);
                         Ext.getCmp('form-area').doSearch();
                     }
                 },
-                {xtype: 'label', text: 'Всего результатов:' },
-                {xtype: 'label', text: '0' , id: 'totalCount'}
+                {xtype: 'label', text: 'Всего результатов:'},
+                {xtype: 'label', text: '0', id: 'totalCount'}
             ]
-        },{
+        }, {
             id: "EntityEditorFormPanel",
-            xtype : 'form',
+            xtype: 'form',
             region: 'east',
             width: "40%",
             collapsible: true,
-            split:true,
+            split: true,
             //preventHeader: true,
             title: label_INPUT_FORM,
             defaults: {
@@ -1220,7 +1269,7 @@ Ext.onReady(function() {
                 Ext.create('Ext.button.Button', {
                     id: "btnConfirmChanges",
                     text: label_CONFIRM_CHANGES,
-                    handler : function () {
+                    handler: function () {
                         var form = Ext.getCmp('EntityEditorFormPanel');
                         if (form.isValid()) {
                             saveFormValues(FORM_EDIT);
