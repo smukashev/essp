@@ -84,9 +84,9 @@
             <version>0.5.1</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>com.bsbnb</groupId>
             <artifactId>vaadin-messagebox</artifactId>
-            <version>${project.version}</version>
+            <version>0.1</version>
         </dependency>
 
         <!-- javax dependencies -->
