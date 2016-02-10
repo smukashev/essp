@@ -406,7 +406,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 IBaseValue thisBaseValue = this.getBaseValue(name);
                 IBaseValue thatBaseValue = that.getBaseValue(name);
 
-                if (thisBaseValue == null || thatBaseValue == null)
+                if (thisBaseValue == null || thatBaseValue == null || thisBaseValue.getValue() == null ||
+                        thatBaseValue.getValue() == null)
                     continue;
 
                 if (!metaType.isSet()) {
