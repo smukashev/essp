@@ -20,17 +20,22 @@ public class EntityProcessorListenerImpl implements IDaoListener {
                                IBaseEntity baseEntityApplied, IBaseEntityManager entityManager) {
         long t1 = System.currentTimeMillis();
 
-        QueueEntry queueEntry = new QueueEntry()
+        final QueueEntry queueEntry = new QueueEntry()
                 .setBaseEntityApplied(baseEntityApplied)
                 .setBaseEntityLoaded(baseEntityLoaded);
                 /*.setBaseEntitySaving(baseEntitySaving)
                 .setEntityManager(entityManager);*/
 
-        try {
-            producer.produce(queueEntry);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    producer.produce(queueEntry);
+                } catch (Exception e) {
+                    throw new RuntimeException("Проблемы с очередью: " + e.getMessage());
+                }
+            }
+        }).start();
 
         stats.put("producer.produce(queueEntry)", (System.currentTimeMillis() - t1));
     }
