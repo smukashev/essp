@@ -115,6 +115,8 @@ public class ZipFilesMonitor {
 
 		List<Batch> pendingBatchList = batchService.getPendingBatchList();
 
+		filterUnsignedBatches(pendingBatchList);
+
 		if (pendingBatchList.size() > 0) {
 			System.out.println("Найдены не законченные батчи: " + pendingBatchList.size());
 
@@ -352,6 +354,18 @@ public class ZipFilesMonitor {
 			return true;
 		}
 		return false;
+	}
+
+	private void filterUnsignedBatches(List<Batch> pendingBatchList) {
+		String digitalSignOrgs = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS, DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
+		String[] orgIds = digitalSignOrgs.split(",");
+		Iterator<Batch> it = pendingBatchList.iterator();
+		while(it.hasNext()) {
+			Batch batch = it.next();
+			if(batch.getSign() == null && batch.getCreditorId() > 0
+					&& Arrays.asList(orgIds).contains(batch.getCreditorId() + ""))
+				it.remove();
+		}
 	}
 
 	private void failFast(Long batchId, String error) {
