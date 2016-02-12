@@ -472,7 +472,7 @@ when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
                 && getEls("{count}subject.docs[doc_type.code=16][name=null]") > 0 )
 then
- $entity.addValidationError("Наименование документа указывается только для иного документа");
+ $entity.addValidationError("При указании иного документа наименование документа не должен быть пустым");
 end
 $$$
 
@@ -485,7 +485,7 @@ when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
                 && getEls("{count}subject.docs[doc_type.code!=16][name!=null]") > 0 )
 then
- $entity.addValidationError("При указании иного документа наименование документа не должен быть пустым");
+ $entity.addValidationError("Наименование документа указывается только для иного документа");
 end
 $$$
 

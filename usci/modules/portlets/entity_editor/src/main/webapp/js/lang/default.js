@@ -26,6 +26,7 @@ var LABEL_UPDATE = 'Обновить';
 var label_date = 'Дата';
 var label_CONFIRM_CHANGES = "Подтвердить изменения";
 var label_REQUIRED_FIELD = "Обязательное поле";
+var label_SUBJECT_NAME = "Ф.И.О./Организация";
 
 Date.dayNames = [
     'Воскресенье',
