@@ -34,8 +34,8 @@ class SqlExecutor {
             + "  DBMS_SQL.close_cursor(c);\n"
             + "END;";
 
-    private final ObjectProperty<String> connectionStringProperty = new ObjectProperty<String>("jdbc:oracle:thin:@127.0.0.1:1521:ORCL");
-    private final ObjectProperty<String> usernameProperty = new ObjectProperty<String>("C##CORE2");
+    private final ObjectProperty<String> connectionStringProperty = new ObjectProperty<String>("jdbc:oracle:thin:@10.8.1.200:1521:ORCL");
+    private final ObjectProperty<String> usernameProperty = new ObjectProperty<String>("CORE");
     private final ObjectProperty<String> passwordProperty = new ObjectProperty<String>("CORE_2013");
     private final ObjectProperty<Integer> limitProperty = new ObjectProperty<Integer>(1000);
     private final ObjectProperty<Integer> timeoutProperty = new ObjectProperty<Integer>(300);
