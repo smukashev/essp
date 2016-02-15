@@ -7,13 +7,17 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
+import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
+import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
+import org.w3c.dom.Document;
 
 import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilder;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,6 +28,7 @@ import java.util.zip.ZipOutputStream;
 
 public class MainPortlet extends MVCPortlet {
     private IBatchProcessService batchProcessService;
+    private PortalUserBeanRemoteBusiness portalUserBusiness;
 
     //должен быть отличен от C:/zips (т.е папки receiver-а)
     private final static String TMP_FILE_DIR = "\\\\" + StaticRouter.getAsIP() + "\\batch_entry_list_temp_folder";
@@ -49,6 +54,15 @@ public class MainPortlet extends MVCPortlet {
 
             batchProcessServiceFactoryBean.afterPropertiesSet();
             batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+
+            RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                    ":1099/portalUserBeanRemoteBusiness");
+            portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
+
+            portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+
         } catch (Exception e) {
             System.out.println("Can\"t initialise services: " + e.getMessage());
         }
@@ -156,7 +170,8 @@ public class MainPortlet extends MVCPortlet {
                     entries = batchEntryService.getListByUser(currentUser.getUserId());
 
                     DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-
+                    Document document = null;
+                    DocumentBuilder documentBuilder = null;
                     List<Long> batchEntryIds = new ArrayList<Long>();
 
                     for (BatchEntry batchEntry : entries) {
@@ -171,7 +186,12 @@ public class MainPortlet extends MVCPortlet {
 
                         xml += "\n</entities>\n" +
                                 "</batch>";
-
+                        List<Creditor> creditors = portalUserBusiness.getMainCreditorsInAlphabeticalOrder(currentUser.getUserId());
+                        Creditor creditor = creditors.get(0);
+                        String creditorName = creditor.getName();
+                        String creditorCode = creditor.getCode();
+                        String creditorBIN = creditor.getBIN();
+                        String creditorBIK = creditor.getBIK();
                         String manifest = "<manifest>\n" +
                                 "\t<type>1</type>\n" +
                                 "\t<name>data.xml</name>\n" +
@@ -180,6 +200,24 @@ public class MainPortlet extends MVCPortlet {
                                 "\t<date>" +
                                 sRepDate +
                                 "</date>\n" +
+                                "\t<properties>"+
+                                    "\t<property>" +
+                                        "\t<name>CODE</name>\n"+
+                                        "\t<value>"+ creditorCode +"</value>\n"+
+                                    "</property>\n"+
+                                    "\t<property>" +
+                                        "\t<name>NAME</name>\n"+
+                                        "\t<value>"+ creditorName +"</value>\n"+
+                                    "</property>\n"+
+                                    "\t<property>" +
+                                        "\t<name>BIN</name>\n"+
+                                        "\t<value>"+ creditorBIN +"</value>\n"+
+                                    "</property>\n"+
+                                    "\t<property>" +
+                                        "\t<name>BIK</name>\n"+
+                                        "\t<value>"+ creditorBIK +"</value>\n"+
+                                    "</property>\n"+
+                                "</properties>\n"+
                                 "</manifest>";
 
                         File f = File.createTempFile("tmp", ".zip", new File(TMP_FILE_DIR));
