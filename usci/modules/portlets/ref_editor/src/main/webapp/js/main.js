@@ -12,7 +12,7 @@ var entityStore;
 var subEntityStore;
 var attrStore;
 var newArrayElements = [];
-
+var maxId = 0;
 var nextArrayIndex = 0;
 
 var modalWindow;
@@ -131,6 +131,17 @@ function createItemsGrid(itemId) {
             var refsGridContainer = Ext.getCmp('refsGridContainer');
             refsGridContainer.removeAll();
             refsGridContainer.add(grid);
+            refStore.on('load', function (store, records, successful, eOpts){
+                if (store.getCount() > 0)
+                {
+                    maxId = store.getAt(0).get('code'); // initialise to the first record's id value.
+                    store.each(function(rec) // go through all the records
+                    {
+                        maxId = Math.max(maxId, rec.get('code'));
+                    });
+                    maxId = maxId+1;
+                }
+            });
         }
     });
 }
@@ -280,6 +291,21 @@ function addField(form, attr, idSuffix, node) {
                 })
         );
     } else if (attr.ref) {
+        if(attr.code=="creditor") {
+            form.add(Ext.create("Ext.form.field.Text",
+                    {
+                        id: attr.code + "FromItem" + idSuffix,
+                        fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                        labelWidth: "60%",
+                        width: "40%",
+                        value: attr.value,
+                        readOnly: readOnly,
+                        allowBlank: allowBlank,
+                        blankText: label_REQUIRED_FIELD,
+                        hidden: attr.isHidden
+                    })
+            );
+        } else {
         form.add(Ext.create("Ext.form.field.ComboBox", {
             id: attr.code + "FromItem" + idSuffix,
             fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
@@ -312,8 +338,25 @@ function addField(form, attr, idSuffix, node) {
             value: attr.value,
             editable : false
         }));
+        }
     } else {
-        form.add(Ext.create("Ext.form.field.Text",
+        if(attr.code=="code" && attr.metaId=="36"){
+            refStore.load();
+            form.add(Ext.create("Ext.form.field.Text",
+                {
+                    id: attr.code + "FromItem" + idSuffix,
+                    fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
+                    labelWidth: "60%",
+                    width: "40%",
+                    value: maxId,
+                    readOnly: readOnly,
+                    allowBlank: allowBlank,
+                    blankText: label_REQUIRED_FIELD,
+                    hidden: attr.isHidden
+                })
+            );
+        } else {
+            form.add(Ext.create("Ext.form.field.Text",
                 {
                     id: attr.code + "FromItem" + idSuffix,
                     fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
@@ -324,7 +367,7 @@ function addField(form, attr, idSuffix, node) {
                     allowBlank: allowBlank,
                     blankText: label_REQUIRED_FIELD
                 })
-        );
+        );}
     }
 }
 
@@ -589,6 +632,7 @@ Ext.onReady(function() {
             {name: 'metaId',     type: 'string'},
             {name: 'childMetaId',     type: 'string'},
             {name: 'childType',     type: 'string'},
+            {name: 'isHidden',     type: 'boolean'},
         ]
     });
 
@@ -612,6 +656,7 @@ Ext.onReady(function() {
             {name: 'metaId',     type: 'string'},
             {name: 'childMetaId',     type: 'string'},
             {name: 'childType',     type: 'string'},
+            {name: 'isHidden',     type: 'boolean'},
         ]
     });
 

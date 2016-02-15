@@ -13,6 +13,8 @@ import jxl.format.Border;
 import jxl.format.BorderLineStyle;
 import jxl.write.*;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
+import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
+import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
@@ -36,19 +38,18 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.lang.Boolean;
 import java.lang.Number;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
 
 public class MainPortlet extends MVCPortlet {
     private IMetaFactoryService metaFactoryService;
     private IEntityService entityService;
     private IBatchEntryService batchEntryService;
+    private PortalUserBeanRemoteBusiness portalUserBusiness;
 
     public void connectToServices() {
         try {
@@ -76,6 +77,15 @@ public class MainPortlet extends MVCPortlet {
 
             batchEntryServiceFactoryBean.afterPropertiesSet();
             batchEntryService = (IBatchEntryService) batchEntryServiceFactoryBean.getObject();
+
+            RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                    ":1099/portalUserBeanRemoteBusiness");
+            portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
+
+            portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+
         } catch (Exception e) {
             System.out.println("Can\"t initialise services: " + e.getMessage());
         }
@@ -464,7 +474,9 @@ public class MainPortlet extends MVCPortlet {
 
                     if (StringUtils.isNotEmpty(metaId)) {
                         MetaClass metaClass = metaFactoryService.getMetaClass(Long.valueOf(metaId));
-                        sJson = getAttributesJson(metaClass);
+                        sJson = getAttributesJson(metaClass, currentUser);
+
+
                         out.write(sJson.getBytes());
                     }
 
@@ -681,7 +693,7 @@ public class MainPortlet extends MVCPortlet {
         return new RefListResponse(shortRows);
     }
 
-    private String getAttributesJson(IMetaClass meta) {
+    private String getAttributesJson(IMetaClass meta, User currentUser) {
         StringBuilder result = new StringBuilder();
 
         result.append("{\"total\":");
@@ -734,6 +746,35 @@ public class MainPortlet extends MVCPortlet {
             result.append("\"");
             result.append(metaAttribute.getMetaType().isReference());
             result.append("\"");
+
+            if(meta.getClassName().equals("ref_portfolio")) {
+                if (attrName.equals("creditor") || attrName.equals("code")) {
+                    if (attrName.equals("creditor") ) {
+                        List<Creditor> creditors = portalUserBusiness.getMainCreditorsInAlphabeticalOrder(currentUser.getUserId());
+                        for (Creditor creditor : creditors) {
+
+                            result.append(",\"value\":");
+                            result.append("\"");
+                            result.append(creditor.getId());
+                            result.append("\"");
+                        }
+                    } else {
+                            result.append(",\"metaId\":");
+                            result.append("\"");
+                            result.append(meta.getId());
+                            result.append("\"");
+                    }
+                    result.append(",\"isHidden\":");
+                    result.append("\"");
+                    result.append("true");
+                    result.append("\"");
+                } else {
+                    result.append(",\"isHidden\":");
+                    result.append("\"");
+                    result.append("false");
+                    result.append("\"");
+                }
+            }
 
             if (metaAttribute.getMetaType().isComplex() && !metaAttribute.getMetaType().isSet()) {
                 result.append(",\"metaId\":");
