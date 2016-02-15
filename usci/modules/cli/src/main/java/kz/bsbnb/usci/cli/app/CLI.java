@@ -10,6 +10,8 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.cli.app.command.impl.*;
+import kz.bsbnb.usci.cli.app.exporter.Entity;
+import kz.bsbnb.usci.cli.app.exporter.EntityExporter;
 import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
@@ -22,12 +24,14 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.dao.*;
+import kz.bsbnb.usci.eav.persistance.dao.impl.BaseEntityDaoImpl;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -117,10 +121,16 @@ public class CLI {
     private IBaseEntityMergeDao baseEntityMergeDao;
 
     @Autowired
+    private IBaseEntityDao baseEntityDao;
+
+    @Autowired
     private ImprovedBaseEntitySearcher searcher;
 
     @Autowired
     ApplicationContext context;
+
+    @Autowired
+    EntityExporter entityExporter;
 
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
     private InputStream inputStream = null;
@@ -1846,12 +1856,27 @@ public class CLI {
                 } else {
                     System.out.println("Argument needed: <test> <fileName> <rep_date>");
                 }
+            } else if (args.get(0).equals("sql")) {
+                if (args.size() == 3) {
+                    if (args.get(1).equals("dump"))
+                        dumpEntityToSQL(args.get(2));
+                } else {
+                    System.out.println("Argument needed: <sql> <dump> <id>");
+                }
             } else {
                 System.out.println("No such operation: " + args.get(0));
             }
         } else {
             System.out.println("Argument needed: <show, read> <id, attr, sq, inter> <id> [attributePath, id2]");
         }
+    }
+
+    private void dumpEntityToSQL(String id) {
+        IMetaClass metaClass = baseEntityDao.getMetaClass(Long.parseLong(id));
+        if (!metaClass.isReference())
+            entityExporter.export(Long.parseLong(id));
+        else
+            System.out.println("no need to dump refs");
     }
 
     public void commandTest() {
@@ -2246,22 +2271,20 @@ public class CLI {
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName]");
                 throw new IllegalArgumentException();
             }
-        } else if(args.get(0).equals("addIndex")){
+        } else if (args.get(0).equals("addIndex")) {
 
-            if(args.get(1).equals("unique")||args.get(1).equals("nonunique")){
+            if (args.get(1).equals("unique") || args.get(1).equals("nonunique")) {
                 String IndexType = args.get(1);
                 args.remove(0);
                 args.remove(0);
                 ShowCaseIndex index = new ShowCaseIndex(IndexType, showCase.getTableName(), args);
                 showCase.addIndex(index.getIndex());
-            }
-            else {
+            } else {
                 System.err.println("Example: addIndex [unique/nonunique] [columName1] .. [columNameN]");
             }
 
 
-        }
-        else if (args.get(0).equals("save")) {
+        } else if (args.get(0).equals("save")) {
             long scId = showcaseService.add(showCase);
             if (scId > 0)
                 System.out.println(showCase.getName() + ": Showcase successfully added!");
@@ -2396,7 +2419,7 @@ public class CLI {
                 commandGetBatch();
             } else if (command.equals("mnt")) {
                 commandMaintenance(line);
-            } else if(command.equals("cp")) {
+            } else if (command.equals("cp")) {
                 commandCp();
             } else {
                 System.out.println("No such command: " + command);
@@ -2411,7 +2434,7 @@ public class CLI {
 
         final String usage = "cp sourceFolder [targetFolder]";
 
-        if(args.size() < 1) {
+        if (args.size() < 1) {
             System.out.println(usage);
             return;
         }
@@ -2419,7 +2442,7 @@ public class CLI {
         String sourceFolder = args.get(0);
         String targetFolder = "C:\\zips";
 
-        if(args.size() > 1)
+        if (args.size() > 1)
             targetFolder = args.get(1);
 
         String copy = "cp";
@@ -2434,8 +2457,8 @@ public class CLI {
 
         File[] files = new File(sourceFolder).listFiles();
         Arrays.sort(files);
-        for(File file: files) {
-            if(file.isDirectory())
+        for (File file : files) {
+            if (file.isDirectory())
                 continue;
             try {
                 Process p = Runtime.getRuntime().exec("cmd /c " + copy + " " + file.getAbsolutePath() + " " + targetFolder);
