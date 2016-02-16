@@ -2282,7 +2282,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 loadedValue.getRepDate());
 
                         if (compare == 0) {
-                            IBaseValue deletedDocument = BaseValueFactory.create(
+                            IBaseValue deletedBaseValue = BaseValueFactory.create(
                                     MetaContainerTypes.META_SET,
                                     loadedDocument.getMeta(),
                                     loadedValue.getId(),
@@ -2292,12 +2292,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     loadedValue.isClosed(),
                                     loadedValue.isLast());
 
-                            deletedDocument.setBaseContainer(loadedValue.getBaseContainer());
-                            baseEntityManager.registerAsDeleted(deletedDocument);
+                            deletedBaseValue.setBaseContainer(loadedValue.getBaseContainer());
+                            baseEntityManager.registerAsDeleted(deletedBaseValue);
 
                             /* Для удаления из витрин */
                             loadedDocument.setOperation(OperationType.DELETE);
-                            childBaseSetApplied.put(deletedDocument);
+                            childBaseSetApplied.put(deletedBaseValue);
                         } else if (compare == 1) {
                             IBaseValue closedDocument = BaseValueFactory.create(
                                     MetaContainerTypes.META_SET,
