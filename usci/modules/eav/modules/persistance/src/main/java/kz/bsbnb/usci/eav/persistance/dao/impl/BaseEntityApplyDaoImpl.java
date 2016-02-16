@@ -2299,7 +2299,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             loadedDocument.setOperation(OperationType.DELETE);
                             childBaseSetApplied.put(deletedBaseValue);
                         } else if (compare == 1) {
-                            IBaseValue closedDocument = BaseValueFactory.create(
+                            IBaseValue closedBaseValue = BaseValueFactory.create(
                                     MetaContainerTypes.META_SET,
                                     loadedDocument.getMeta(),
                                     0,
@@ -2309,14 +2309,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     true,
                                     true);
 
-                            closedDocument.setBaseContainer(loadedValue.getBaseContainer());
-                            baseEntityManager.registerAsInserted(closedDocument);
+                            closedBaseValue.setBaseContainer(loadedValue.getBaseContainer());
+                            baseEntityManager.registerAsInserted(closedBaseValue);
 
                             /* Для закрытия записи в витринах*/
                             loadedDocument.setOperation(OperationType.CLOSE);
-                            childBaseSetApplied.put(closedDocument);
+                            childBaseSetApplied.put(closedBaseValue);
                         } else if (compare == -1) {
-                            IBaseValue closedDocument = BaseValueFactory.create(
+                            IBaseValue closedBaseValue = BaseValueFactory.create(
                                     MetaContainerTypes.META_SET,
                                     savedDocument.getMeta(),
                                     0,
@@ -2326,8 +2326,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     true,
                                     true);
 
-                            closedDocument.setBaseContainer(loadedValue.getBaseContainer());
-                            baseEntityManager.registerAsInserted(closedDocument);
+                            closedBaseValue.setBaseContainer(loadedValue.getBaseContainer());
+                            baseEntityManager.registerAsInserted(closedBaseValue);
 
                             savedDocument.setOperation(OperationType.CLOSE);
                         }
