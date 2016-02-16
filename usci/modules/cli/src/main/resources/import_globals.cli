@@ -14,14 +14,14 @@ global add --type=REPORT_STATUS --code=ORGANIZATION_APPROVED --value=128 --desc=
 #
 global add --type=ENTITY_STATUS --code=ERROR --value=ERROR --desc=Ошибка
 global add --type=ENTITY_STATUS --code=PARSING --value=PARSING --desc=Парсинг
-global add --type=ENTITY_STATUS --code=CHECK_IN_PARSER --value=CHECK_IN_PARSER --desc=Проверка в парсере
-global add --type=ENTITY_STATUS --code=WAITING --value=WAITING --desc=В ожиданий
+global add --type=ENTITY_STATUS --code=CHECK_IN_PARSER --value=CHECK_IN_PARSER --desc=Проверка_в_парсере
+global add --type=ENTITY_STATUS --code=WAITING --value=WAITING --desc=В_ожиданий
 global add --type=ENTITY_STATUS --code=PROCESSING --value=PROCESSING --desc=В обработке
 global add --type=ENTITY_STATUS --code=CHECK_IN_CORE --value=CHECK_IN_CORE --desc=Проверка
 global add --type=ENTITY_STATUS --code=SAVING --value=SAVING --desc=В процессе сохранения
 global add --type=ENTITY_STATUS --code=COMPLETED --value=COMPLETED --desc=Завершён
-global add --type=ENTITY_STATUS --code=TOTAL_COUNT --value=TOTAL_COUNT --desc=Общее количество
-global add --type=ENTITY_STATUS --code=ACTUAL_COUNT --value=ACTUAL_COUNT --desc=Заявленное количество
+global add --type=ENTITY_STATUS --code=TOTAL_COUNT --value=TOTAL_COUNT --desc=Общее_количество
+global add --type=ENTITY_STATUS --code=ACTUAL_COUNT --value=ACTUAL_COUNT --desc=Заявленное_количество
 
 #
 # BATCH_STATUS
@@ -56,11 +56,17 @@ global add --type=REF_VIEW_SETTING --code=ref_credit_type --value=name_ru --desc
 global add --type=REF_VIEW_SETTING --code=ref_subject_type --value=name_ru --desc=Настройка_справочника
 global add --type=REF_VIEW_SETTING --code=ref_region --value=name_ru --desc=Настройка_справочника
 global add --type=REF_VIEW_SETTING --code=ref_creditor --value=name --desc=Настройка_справочника
+global add --type=REF_VIEW_SETTING --code=ref_doc_type --value=name_ru --desc=Настройка_справочника
 
 
 #
 # SIGN SETTINGS
 #
 global add --type=DIGITAL_SIGNING_SETTINGS --code=DIGITAL_SIGNING_ORGANIZATIONS_IDS --value=-1 --desc=Настройка_цифровой_подписи
+
+#
+# RULE SETTINGS
+#
+global add --type=LOGIC_RULE_SETTING --code=LOGIC_RULE_META --value=credit,ref_creditor,ref_creditor_branch,ref_exclusive_doc --desc=Метаклассы правил
 
 quit
