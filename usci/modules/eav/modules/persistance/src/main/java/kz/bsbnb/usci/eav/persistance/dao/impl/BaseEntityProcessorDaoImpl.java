@@ -261,7 +261,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case INSERT:
                     if (baseEntityPostPrepared.getId() > 0)
-                        throw new KnownException("Запись была найдена в базе(" +
+                        throw new KnownException("Запись найдена в базе(" +
                                 baseEntityPostPrepared.getId() + "). Вставка не произведена;");
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
@@ -282,8 +282,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case UPDATE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new KnownException("Запись не была найдена в базе. " +
-                                "Обновление не выполнено;");
+                        throw new KnownException("Запись не найдена в базе. Обновление не выполнено;");
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);

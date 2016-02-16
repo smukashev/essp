@@ -177,7 +177,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
             throw new IllegalArgumentException("Найдено более одной записи (ID: " + baseEntityId + ";");
 
         if (rows.size() < 1)
-            throw new IllegalStateException("Запись не была найдена (ID: " + baseEntityId + ");");
+            throw new IllegalStateException("Запись не найдена (ID: " + baseEntityId + ");");
 
         Map<String, Object> row = rows.get(0);
 

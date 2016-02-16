@@ -146,7 +146,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(baseEntity.getId(), baseEntity.getReportDate());
 
         if(maxReportDate == null)
-            throw new UnsupportedOperationException("Запись не была найдена в базе; \n" + baseEntity);
+            throw new UnsupportedOperationException("Запись не найдена в базе; \n" + baseEntity);
 
         return (BaseEntity)baseEntityLoadDao.load(baseEntity.getId(), maxReportDate, baseEntity.getReportDate());
     }

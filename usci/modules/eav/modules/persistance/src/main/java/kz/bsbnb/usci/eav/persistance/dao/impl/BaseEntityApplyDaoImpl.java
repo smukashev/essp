@@ -1962,7 +1962,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueClosed);
 
                     if (baseValuePrevious == null)
-                        throw new IllegalStateException("Предыдущая запись не была найдена(" +
+                        throw new IllegalStateException("Предыдущая запись не найдена(" +
                                 metaAttribute.getName() + ");");
 
                     baseValuePrevious.setBaseContainer(baseEntity);
