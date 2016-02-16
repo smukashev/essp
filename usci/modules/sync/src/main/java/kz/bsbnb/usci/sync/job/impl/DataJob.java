@@ -22,6 +22,7 @@ import java.util.concurrent.Executors;
  * @author k.tulbassiyev
  */
 public final class DataJob extends AbstractDataJob {
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     @Qualifier(value = "remoteEntityService")
     private RmiProxyFactoryBean rmiProxyFactoryBean;
@@ -60,9 +61,13 @@ public final class DataJob extends AbstractDataJob {
 
         public Boolean call() {
             try {
-                if (myEntity.equalsByKey(currentEntity)) {
-                    currentIntersection = true;
-                    return true;
+                for (BaseEntity myEntityKeyElement : myEntity.getKeyElements()) {
+                    for (BaseEntity currentEntityKeyElement : currentEntity.getKeyElements()) {
+                        if (myEntityKeyElement.equalsByKey(currentEntityKeyElement)) {
+                            currentIntersection = true;
+                            return true;
+                        }
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -147,8 +152,8 @@ public final class DataJob extends AbstractDataJob {
                             }
                         }
 
-                        System.out.println("Threads: " + currentThread + ", avgPrev: " +
-                                avgTimePrev + ", avgCur: " + avgTimeCur + ", offset: " + offset);
+                        System.out.println("Threads: " + currentThread + ", avgCur: " +
+                                avgTimeCur + ", counter: " + entityCounter);
                     }
                     entityCounter = 0;
                     avgTimePrev = avgTimeCur;
@@ -196,6 +201,8 @@ public final class DataJob extends AbstractDataJob {
         Iterator<BaseEntity> iterator = entities.listIterator(clearJobsIndex);
         while(iterator.hasNext()) {
             BaseEntity entity = iterator.next();
+
+            entity.getKeyElements();
 
             if(!isInProcessWithThreads(entity)) {
                 iterator.remove();

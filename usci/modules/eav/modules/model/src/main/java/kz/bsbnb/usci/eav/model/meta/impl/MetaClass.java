@@ -5,7 +5,6 @@ import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
-import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
 
 import java.util.*;
@@ -151,96 +150,6 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         return members.keySet();
     }
 
-    public Set<String> getSimpleAttributesNames(DataTypes dataType) {
-        Set<String> allAttributeNames = this.members.keySet();
-        Set<String> filteredAttributeNames = new HashSet<>();
-
-        for (String attributeName : allAttributeNames) {
-            IMetaType type = this.getMemberType(attributeName);
-
-            if (!type.isSet() && !type.isComplex()) {
-                MetaValue metaValue = (MetaValue) type;
-                if (metaValue.getTypeCode().equals(dataType))
-                    filteredAttributeNames.add(attributeName);
-            }
-        }
-        return filteredAttributeNames;
-    }
-
-    public Set<String> getSimpleAttributesNames() {
-        Set<String> allAttributeNames = this.members.keySet();
-        Set<String> filteredAttributeNames = new HashSet<>();
-
-        for (String attributeName : allAttributeNames) {
-            IMetaType type = this.getMemberType(attributeName);
-
-            if (!type.isSet() && !type.isComplex())
-                filteredAttributeNames.add(attributeName);
-        }
-
-        return filteredAttributeNames;
-    }
-
-    public Set<String> getSimpleSetAttributesNames() {
-        Set<String> allAttributeNames = this.members.keySet();
-        Set<String> filteredAttributeNames = new HashSet<>();
-
-        for (String attributeName : allAttributeNames) {
-            IMetaType type = this.getMemberType(attributeName);
-
-            if (type.isSet() && !type.isComplex())
-                filteredAttributeNames.add(attributeName);
-        }
-
-        return filteredAttributeNames;
-    }
-
-    public Set<String> getComplexAttributesNames() {
-        Set<String> allAttributeNames = this.members.keySet();
-        Set<String> filteredAttributeNames = new HashSet<>();
-
-        for (String attributeName : allAttributeNames) {
-            IMetaType type = this.getMemberType(attributeName);
-
-            if (!type.isSet() && type.isComplex())
-                filteredAttributeNames.add(attributeName);
-        }
-
-        return filteredAttributeNames;
-    }
-
-    public Set<String> getSimpleSetAttributesNames(DataTypes dataType) {
-        Set<String> allAttributeNames = this.members.keySet();
-        Set<String> filteredAttributeNames = new HashSet<>();
-
-        for (String attributeName : allAttributeNames) {
-            IMetaType type = this.getMemberType(attributeName);
-
-            if (type.isSet() && !type.isComplex()) {
-                MetaSet metaValueArray = (MetaSet) type;
-
-                if (metaValueArray.getTypeCode().equals(dataType))
-                    filteredAttributeNames.add(attributeName);
-            }
-        }
-
-        return filteredAttributeNames;
-    }
-
-    public Set<String> getComplexArrayAttributesNames() {
-        Set<String> allAttributeNames = this.members.keySet();
-        Set<String> filteredAttributeNames = new HashSet<>();
-
-        for (String attributeName : allAttributeNames) {
-            IMetaType type = this.getMemberType(attributeName);
-
-            if (type.isSet() && type.isComplex())
-                filteredAttributeNames.add(attributeName);
-        }
-
-        return filteredAttributeNames;
-    }
-
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
@@ -288,18 +197,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
     }
 
     public boolean isSearchable() {
-        //return searchable;
-        //TODO:fix this, searchable flag is not set if attribute is changed outside
-
-        Iterator<IMetaAttribute> it = members.values().iterator();
-        while (it.hasNext()) {
-            IMetaAttribute metaAttribute = it.next();
-            if (metaAttribute.isKey()) {
-                return true;
-            }
-        }
-
-        return false;
+        return searchable;
     }
 
     public String toString(String prefix) {
@@ -418,7 +316,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
     }
 
     public List<String> getAllPaths(MetaClass subMeta, String path) {
-        ArrayList<String> paths = new ArrayList<String>();
+        ArrayList<String> paths = new ArrayList<>();
 
         for (String memberName : members.keySet()) {
             IMetaAttribute attribute = members.get(memberName);

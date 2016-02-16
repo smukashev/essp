@@ -12,12 +12,9 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
-import kz.bsbnb.usci.eav.util.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +39,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     private Long batchId;
 
     private Long index;
+
+    private final List<BaseEntity> keyElements = new ArrayList<>();
+
+    private boolean keyElementsInstalled = false;
 
     @Override
     public OperationType getOperation() {
@@ -70,8 +71,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 thatBaseEntityReportDate.getDoubleValuesCount(),
                 thatBaseEntityReportDate.getComplexValuesCount(),
                 thatBaseEntityReportDate.getSimpleSetsCount(),
-                thatBaseEntityReportDate.getComplexSetsCount()
-        );
+                thatBaseEntityReportDate.getComplexSetsCount());
+
         thisBaseEntityReportDate.setBaseEntity(this);
 
         this.meta = baseEntity.getMeta();
@@ -376,19 +377,48 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         baseEntityReportDate.setComplexSetsCount(complexSetsCount);
     }
 
+    public List<BaseEntity> getKeyElements() {
+        if (!keyElementsInstalled) {
+            if (!this.containsComplexKey() && meta.isSearchable())
+                keyElements.add(this);
+
+            for (String name : this.meta.getAttributeNames()) {
+                IMetaAttribute metaAttribute = this.meta.getMetaAttribute(name);
+                IMetaType metaType = metaAttribute.getMetaType();
+
+                if (metaAttribute.isImmutable()) continue;
+
+                if (metaType.isComplex()) {
+                    IBaseValue baseValue = getBaseValue(name);
+
+                    if (baseValue == null || baseValue.getValue() == null) continue;
+
+                    if (!metaType.isSet()) {
+                        keyElements.addAll(((BaseEntity) baseValue.getValue()).getKeyElements());
+                    } else {
+                        BaseSet baseSet = (BaseSet) baseValue.getValue();
+                        for (IBaseValue childBaseValue : baseSet.get())
+                            keyElements.addAll(((BaseEntity) childBaseValue.getValue()).getKeyElements());
+                    }
+                }
+            }
+
+            keyElementsInstalled = true;
+        }
+
+        return keyElements;
+    }
+
     @Override
     public boolean equalsByKey(Object obj) {
-        if (obj == this) {
+        if (obj == this)
             return true;
-        }
 
-        if (obj == null) {
+        if (obj == null)
             return false;
-        }
 
-        if (!(getClass() == obj.getClass())) {
+        if (!(getClass() == obj.getClass()))
             return false;
-        }
 
         BaseEntity that = (BaseEntity) obj;
 
@@ -399,46 +429,21 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             IMetaAttribute metaAttribute = this.meta.getMetaAttribute(name);
             IMetaType metaType = metaAttribute.getMetaType();
 
-            if (metaAttribute.isImmutable())
-                continue;
-
-            if (metaAttribute.isKey() || metaType.isComplex()) {
+            if (metaAttribute.isKey()) {
                 IBaseValue thisBaseValue = this.getBaseValue(name);
                 IBaseValue thatBaseValue = that.getBaseValue(name);
 
-                if (thisBaseValue == null || thatBaseValue == null || thisBaseValue.getValue() == null ||
-                        thatBaseValue.getValue() == null)
-                    continue;
-
-                if (!metaType.isSet()) {
-                    if (metaType.isComplex()) {
-                        if (((BaseEntity) thisBaseValue.getValue()).equalsByKey(thatBaseValue.getValue()))
-                            return true;
-                    } else {
-                        if (thisBaseValue.getValue().equals(thatBaseValue.getValue()))
-                            return true;
-                    }
+                if (metaType.isComplex()) {
+                    if (!((BaseEntity) thisBaseValue.getValue()).equalsByKey((BaseEntity) thatBaseValue.getValue()))
+                        return false;
                 } else {
-                    BaseSet thisChildSet = (BaseSet) thisBaseValue.getValue();
-                    BaseSet thatChildSet = (BaseSet) thatBaseValue.getValue();
-
-                    for (IBaseValue thisChildBaseValue : thisChildSet.get()) {
-                        for (IBaseValue thatChildBaseValue : thatChildSet.get()) {
-                            if (metaType.isComplex()) {
-                                if (((BaseEntity) thisChildBaseValue.getValue()).equalsByKey(
-                                        thatChildBaseValue.getValue()))
-                                    return true;
-                            } else {
-                                if (thisChildBaseValue.getValue().equals(thatChildBaseValue.getValue()))
-                                    return true;
-                            }
-                        }
-                    }
+                    if (!thisBaseValue.getValue().equals(thatBaseValue.getValue()))
+                        return false;
                 }
             }
         }
 
-        return false;
+        return true;
     }
 
     /* Проверяет на соответсвие атрибутов */
