@@ -2405,6 +2405,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 for (IPersistable deletedObject : deletedObjects) {
                     try {
+                        if (deletedObject instanceof BaseEntity &&
+                                ((BaseEntity) deletedObject).getMeta().isSearchable()) {
+                            System.err.println("Searchable entity removed : " +
+                                    ((BaseEntity) deletedObject).getMeta().getClassName());
+                            eavOptimizerDao.delete(deletedObject.getId());
+                        }
                         persistableDao.delete(deletedObject);
                     } catch (Exception e) {
                         throw new IllegalStateException("Ошибка при удалений: " + e.getMessage() +
