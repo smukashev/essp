@@ -24,59 +24,59 @@ import java.util.Queue;
 
 @Component
 public class EntityExporter {
-  //int offset = 0;
+    //int offset = 0;
 
-  @Autowired
-  List<ITable> tableList;
+    @Autowired
+    List<ITable> tableList;
 
-  @Autowired
-  IBaseEntityLoadDao baseEntityDao;
+    @Autowired
+    IBaseEntityLoadDao baseEntityDao;
 
-  @Autowired
-  IBaseEntityDao entityDao;
+    @Autowired
+    IBaseEntityDao entityDao;
 
-  OutputStream outputStream;
+    OutputStream outputStream;
 
-  Logger logger = LoggerFactory.getLogger(EntityExporter.class);
+    Logger logger = LoggerFactory.getLogger(EntityExporter.class);
 
-  public void setFile(String fileName) {
-    try {
-      outputStream = new FileOutputStream(fileName);
-    } catch (Exception e) {
-      logger.warn("invalid filename: " + fileName + " " + e.getMessage() + "falling back to stdout");
-      outputStream = System.out;
-    }
-  }
-
-  public void export(List<Long> entityList) {
-    PrintWriter out = new PrintWriter(outputStream);
-
-    for (Long entityId : entityList) {
-
-      out.println("-- dump with id: " + entityId);
-
-      Queue<Long> q = new LinkedList<>();
-      q.add(entityId);
-      List<String> queries = new ArrayList<>();
-      while (q.size() > 0) {
-        Long id = q.poll();
-        IMetaClass meta = entityDao.getMetaClass(id);
-        if (meta.isReference())
-          continue;
-        for (ITable table : tableList) {
-          Query query = table.getQueries(id);
-          queries.addAll(query.getQueries());
-          for (Long nextId : query.entityList) {
-            q.add(nextId);
-          }
+    public void setFile(String fileName) {
+        try {
+            outputStream = new FileOutputStream(fileName);
+        } catch (Exception e) {
+            logger.warn("invalid filename: " + fileName + " " + e.getMessage() + "falling back to stdout");
+            outputStream = System.out;
         }
-      }
-
-      for (String s : queries) {
-        out.println(s);
-      }
     }
 
-    out.close();
-  }
+    public void export(List<Long> entityList) {
+        PrintWriter out = new PrintWriter(outputStream);
+
+        for (Long entityId : entityList) {
+
+            out.println("-- dump with id: " + entityId);
+
+            Queue<Long> q = new LinkedList<>();
+            q.add(entityId);
+            List<String> queries = new ArrayList<>();
+            while (q.size() > 0) {
+                Long id = q.poll();
+                IMetaClass meta = entityDao.getMetaClass(id);
+                if (meta.isReference())
+                    continue;
+                for (ITable table : tableList) {
+                    Query query = table.getQueries(id);
+                    queries.addAll(query.getQueries());
+                    for (Long nextId : query.entityList) {
+                        q.add(nextId);
+                    }
+                }
+            }
+
+            for (String s : queries) {
+                out.println(s);
+            }
+        }
+
+        out.close();
+    }
 }
