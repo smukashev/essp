@@ -23,9 +23,8 @@ import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
@@ -93,7 +92,8 @@ public class MainPortlet extends MVCPortlet {
         DEL_CLASS,
         SAVE_ATTR,
         GET_ATTR,
-        DEL_ATTR
+        DEL_ATTR,
+        DOWNLOAD_XSD
     }
 
     @Override
@@ -114,6 +114,15 @@ public class MainPortlet extends MVCPortlet {
             Gson gson = new Gson();
 
             switch (operationType) {
+                case DOWNLOAD_XSD:
+                    List<MetaClass> metaClasses = metaFactoryService.getMetaClasses();
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    xsdGenerator.generate(out, metaClasses);
+
+                    resourceResponse.setContentType("text/plain");
+                    writer.write(new String(out.toByteArray()));
+
+                    break;
                 case LIST_ALL:
                     MetaClassList classesListJson = new MetaClassList();
                     List<MetaClassName> metaClassesList = metaFactoryService.getMetaClassesNames();
@@ -317,9 +326,6 @@ public class MainPortlet extends MVCPortlet {
                         metaFactoryService.saveMetaClass(meta);
 
 
-                        List<MetaClass> metaClasses = metaFactoryService.getMetaClasses();
-                        OutputStream out = new FileOutputStream("C:\\Users\\bauyrzhan.ibraimov\\IdeaProjects\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd");
-                        xsdGenerator.generate(out, metaClasses);
 
 
 
@@ -415,9 +421,7 @@ public class MainPortlet extends MVCPortlet {
                             }
 
                             metaFactoryService.saveMetaClass(metaParent);
-                            List<MetaClass> metaClasses = metaFactoryService.getMetaClasses();
-                            OutputStream out = new FileOutputStream("C:\\Users\\bauyrzhan.ibraimov\\IdeaProjects\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd");
-                            xsdGenerator.generate(out, metaClasses);
+
                             writer.write("{\"success\": true, \"data\": {}}");
                         } else {
                             writer.write("{\"success\": false, " +
