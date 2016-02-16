@@ -2200,7 +2200,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseEntity childBaseEntityLoaded = (IBaseEntity) childBaseValueLoaded.getValue();
 
                     //fixme!
-                    if (childBaseEntityLoaded != null)
+                    if (childBaseEntityLoaded != null && !childMetaClass.isSearchable())
                         baseEntityManager.registerAsDeleted(childBaseEntityLoaded);
 
                     boolean last = childBaseValueLoaded.isLast();
