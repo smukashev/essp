@@ -64,8 +64,7 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
         batchService = serviceFactory.getBatchService();
 
         String[] metas = serviceFactory.getGlobalService().getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
-        for(String meta: metas)
-            metaRules.add(meta);
+        Collections.addAll(metaRules, metas);
     }
 
     @Override
