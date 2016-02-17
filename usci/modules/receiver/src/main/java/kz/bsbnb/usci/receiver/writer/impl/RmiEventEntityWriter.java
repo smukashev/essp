@@ -30,10 +30,13 @@ import java.util.*;
 public class RmiEventEntityWriter<T> implements IWriter<T> {
     public static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
     public static final String LOGIC_RULE_META = "LOGIC_RULE_META";
+
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     @Qualifier(value = "remoteEntityService")
     private RmiProxyFactoryBean rmiProxyFactoryBean;
 
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     @Qualifier(value="remoteRuleService")
     private RmiProxyFactoryBean rmiProxyRuleService;
