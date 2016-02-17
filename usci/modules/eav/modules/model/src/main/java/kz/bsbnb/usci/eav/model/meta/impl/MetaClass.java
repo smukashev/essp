@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
@@ -92,8 +93,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         IMetaAttribute metaAttribute = members.get(name);
 
         if (metaAttribute == null)
-            throw new IllegalArgumentException("Атрибут: " + name +
-                    " не найден в мета классе: " + this.getClassName());
+            throw new IllegalArgumentException(Errors.E45 + "|" + name + "|" + this.getClassName());
 
         return metaAttribute.getMetaType();
     }
@@ -475,7 +475,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
                 }
             } else {
                 if (tokenizer.hasMoreTokens()) {
-                    throw new IllegalArgumentException("Путь не может иметь простые элементы;");
+                    throw new IllegalArgumentException(Errors.E44 + "");
                 }
             }
         }
@@ -517,7 +517,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
                 }
             } else {
                 if (tokenizer.hasMoreTokens())
-                    throw new IllegalArgumentException("Путь не может иметь простые элементы;");
+                    throw new IllegalArgumentException(Errors.E44 + "");
             }
         }
 
@@ -557,7 +557,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
             if (metaType.isComplex()) {
                 if (metaType.isSet()) {
                     if (metaType.isSetOfSets())
-                        throw new UnsupportedOperationException("Не реализовано;");
+                        throw new UnsupportedOperationException(Errors.E2+"");
 
                     IMetaSet childMetaSet = (IMetaSet) metaType;
                     IMetaClass childMetaClass = (IMetaClass) childMetaSet.getMemberType();

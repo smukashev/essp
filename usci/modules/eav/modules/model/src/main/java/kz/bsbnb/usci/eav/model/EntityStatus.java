@@ -10,6 +10,8 @@ public class EntityStatus extends Persistable {
     private long entityId;
     private long statusId;
     private String description;
+    private String errorCode;
+    private String devDescription;
     private Date receiptDate;
     private Long index;
 
@@ -57,6 +59,22 @@ public class EntityStatus extends Persistable {
             this.description = null;
         }
         return this;
+    }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public String getDevDescription() {
+        return devDescription;
+    }
+
+    public void setDevDescription(String devDescription) {
+        this.devDescription = devDescription;
     }
 
     public Date getReceiptDate() {

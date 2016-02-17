@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.persistance.dao.IEavOptimizerDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.tool.optimizer.EavOptimizerData;
@@ -43,13 +44,13 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
                 .select(EAV_OPTIMIZER.as(tableAlias).ENTITY_ID)
                 .from(EAV_OPTIMIZER.as(tableAlias))
                 .where(EAV_OPTIMIZER.as(tableAlias).CREDITOR_ID.equal(creditorId)
-                    .and(EAV_OPTIMIZER.as(tableAlias).KEY_STRING.equal(keyString)));
+                        .and(EAV_OPTIMIZER.as(tableAlias).KEY_STRING.equal(keyString)));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException("Найдено более одной записи, " + keyString + ";");
+            throw new IllegalArgumentException(Errors.E91 + "|" + keyString);
 
         if (rows.size() < 1)
             return 0;
@@ -71,7 +72,7 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException("Найдено более одной записи, " + entityId + ";");
+            throw new IllegalArgumentException(Errors.E91 + "|" + entityId);
 
         if (rows.size() < 1)
             return 0;
@@ -106,7 +107,6 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + eavOptimizerData.getId() +
-                    ", EAV_OPTIMIZER);");
+            throw new IllegalStateException(Errors.E157+"|" + count + "|" + eavOptimizerData.getId());
     }
 }

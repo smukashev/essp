@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.searcher.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
@@ -40,7 +41,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
         List<Long> ids = searcherPool.getSearcher(entity.getMeta().getClassName()).findAll(entity, creditorId);
 
         if (ids.size() > 1)
-            throw new RuntimeException("Найдено более одного договора;");
+            throw new RuntimeException(Errors.E174+"");
 
         if (ids.size() < 1)
             return null;

@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchEntriesDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
@@ -50,12 +51,12 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
 
         if (rows.size() > 1)
         {
-            throw new IllegalArgumentException("More then one BatchEntry found.");
+            throw new IllegalArgumentException(Errors.E151+"");
         }
 
         if (rows.size() < 1)
         {
-            throw new IllegalStateException(String.format("BatchEntry with identifier {0} was not found.", id));
+            throw new IllegalStateException(Errors.E152+"|"+ id);
         }
 
         Map<String, Object> row = rows.get(0);
@@ -99,7 +100,7 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
     public void remove(BatchEntry batch) {
         if(batch.getId() < 1)
         {
-            throw new IllegalArgumentException("Can't remove BatchEntry without id");
+            throw new IllegalArgumentException(Errors.E153+"");
         }
 
         DeleteConditionStep delete = context

@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.searcher.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -68,8 +69,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     select.getBindValues().toArray());
 
             if (rows.size() > 1)
-                throw new IllegalStateException("Найдено больше одной записи(" +
-                        entity.getMeta().getClassName() + "), " + entity);
+                throw new IllegalStateException(Errors.E83+"|" +entity.getMeta().getClassName());
 
             if (rows.size() < 1)
                 return null;
@@ -94,7 +94,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 .from(EAV_BE_ENTITIES.as(entityAlias));
 
         if (metaClass == null)
-            throw new IllegalArgumentException("Метакласс не может быть NULL;");
+            throw new IllegalArgumentException(Errors.E176+"");
 
         Condition condition = null;
         for (String name : metaClass.getMemberNames()) {
@@ -106,8 +106,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 if ((baseValue == null || baseValue.getValue() == null)
                         && metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
-                    throw new KnownException("Ключевой атрибут(" + name + ") не может быть пустым. " +
-                            "Родитель: " + entity.getMeta().getClassName() + ";");
+                    throw new KnownException(Errors.E177+"|" + name + "|" +
+                            "|" + entity.getMeta().getClassName());
 
 
                 if ((baseValue == null || baseValue.getValue() == null) &&
@@ -182,12 +182,12 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
 
                     if (baseSet.get().size() == 0)
-                        throw new UnsupportedOperationException("Массив должен содержать элементы(" +
-                                (childMetaClass).getClassName() + ";");
+                        throw new UnsupportedOperationException(Errors.E178+"|" +
+                                (childMetaClass).getClassName());
 
                     if (!memberType.isComplex())
-                        throw new UnsupportedOperationException("Простой массив не может быть ключевым(" +
-                                childMetaClass.getClassName() + ");");
+                        throw new UnsupportedOperationException(Errors.E179+"|" +
+                                childMetaClass.getClassName());
 
                     List<Long> childBaseEntityIds = new ArrayList<>();
 

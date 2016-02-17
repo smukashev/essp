@@ -32,6 +32,8 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
                 EAV_ENTITY_STATUSES.ENTITY_ID,
                 EAV_ENTITY_STATUSES.STATUS_ID,
                 EAV_ENTITY_STATUSES.DESCRIPTION,
+                EAV_ENTITY_STATUSES.ERROR_CODE,
+                EAV_ENTITY_STATUSES.DEV_DESCRIPTION,
                 EAV_ENTITY_STATUSES.RECEIPT_DATE,
                 EAV_ENTITY_STATUSES.INDEX_
         ).values(
@@ -39,11 +41,13 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
                 entityStatus.getEntityId(),
                 entityStatus.getStatusId(),
                 entityStatus.getDescription(),
+                entityStatus.getErrorCode(),
+                entityStatus.getDevDescription(),
                 DataUtils.convertToTimestamp(entityStatus.getReceiptDate()),
                 entityStatus.getIndex()
         );
         String insert_sql =
-                "insert /*+ APPEND PARALLEL(EAV_ENTITY_STATUSES, 5) */ into \"EAV_ENTITY_STATUSES\" (\"BATCH_ID\", \"ENTITY_ID\", \"STATUS_ID\", \"DESCRIPTION\", \"RECEIPT_DATE\", \"INDEX_\") values (?, ?, ?, ?, ?, ?)";
+                "insert /*+ APPEND PARALLEL(EAV_ENTITY_STATUSES, 5) */ into \"EAV_ENTITY_STATUSES\" (\"BATCH_ID\", \"ENTITY_ID\", \"STATUS_ID\", \"DESCRIPTION\", \"ERROR_CODE\", \"DEV_DESCRIPTION\", \"RECEIPT_DATE\", \"INDEX_\") values (?, ?, ?, ?, ?, ?, ?, ?)";
         return insertWithId(insert_sql, insert.getBindValues().toArray());
     }
 
@@ -72,6 +76,8 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
         entityStatus.setEntityId(getNullSafeLong(row, EAV_ENTITY_STATUSES.ENTITY_ID));
         entityStatus.setStatusId(getNullSafeLong(row, EAV_ENTITY_STATUSES.STATUS_ID));
         entityStatus.setDescription((String) row.get(EAV_ENTITY_STATUSES.DESCRIPTION.getName()));
+        entityStatus.setErrorCode((String) row.get(EAV_ENTITY_STATUSES.ERROR_CODE.getName()));
+        entityStatus.setDevDescription((String) row.get(EAV_ENTITY_STATUSES.DEV_DESCRIPTION.getName()));
         entityStatus.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_ENTITY_STATUSES.RECEIPT_DATE.getName())));
         entityStatus.setIndex(getNullSafeLong(row, EAV_ENTITY_STATUSES.INDEX_));
         return entityStatus;

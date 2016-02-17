@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
@@ -45,6 +46,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
     public void setApplyListener(IDaoListener applyListener) {
         this.applyListener = applyListener;
     }
+
     /**
      * Given two entities, merge manager. and merge result choice, perform merge
      * operation and return resulting base entity. The choice of the resulting entity
@@ -99,15 +101,14 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
             long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("creditor")).getId();
 
             if (creditorIdLeft != creditorIdRight)
-                throw new IllegalStateException("Нельзя обьединять сущности разных банков");
+                throw new IllegalStateException(Errors.E104 + "");
 
             creditorId = creditorIdLeft;
         }
 
         // although it is safe to assume that both entities exist in DB, it is still worth checking
         if (baseEntityLeft.getId() < 1 && baseEntityRight.getId() < 1) {
-            throw new RuntimeException("Merging two BaseEntity objects requires " +
-                    "for both objects to exits in DB.");
+            throw new RuntimeException(Errors.E105 + "");
         }
 
         IMetaClass metaClass = baseEntityLeft.getMeta();
@@ -131,7 +132,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                 // since there is no child map - there is need to look for child merge manager
                 if (mergeManager.getChildMap() == null) {
                     if (metaType.isSetOfSets()) {
-                        throw new UnsupportedOperationException("Не реализовано;");
+                        throw new UnsupportedOperationException(Errors.E2 + "");
                     }
 
                     if (metaType.isSet()) {
@@ -148,7 +149,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                     if (mergeManager.containsKey(attrKey)) {
 
                         if (metaType.isSetOfSets()) {
-                            throw new UnsupportedOperationException("Не реализовано;");
+                            throw new UnsupportedOperationException(Errors.E2 + "");
                         }
 
                         if (metaType.isSet()) {
@@ -243,7 +244,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
             long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("creditor")).getId();
 
             if (creditorIdLeft != creditorIdRight)
-                throw new IllegalStateException("Нельзя обьединять сущности разных банков");
+                throw new IllegalStateException(Errors.E104 + "");
 
             creditorId = creditorIdLeft;
         }
@@ -494,7 +495,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
         // we haven't reached the base case
         if (mergeManager.getChildMap() != null) {
             if (mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE) {
-                throw new UnsupportedOperationException("Can't process sets after MERGE operation.");
+                throw new UnsupportedOperationException(Errors.E106+"");
             }
 
             Set<UUID> processedUuidsLeft = new HashSet<UUID>();
@@ -514,7 +515,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                     if (mergeManager.containsKey(idKey) && (mergeManager.getChildManager(idKey) != null)) {
                         if (processedUuidsLeft.contains(childBaseValueLeft.getUuid()) ||
                                 processedUuidsRight.contains(childBaseValueRight.getUuid())) {
-                            throw new RuntimeException("Two BaseValue objects can be paired only once");
+                            throw new RuntimeException(Errors.E107+"");
                         } else {
                             processedUuidsLeft.add(childBaseValueLeft.getUuid());
                             processedUuidsRight.add(childBaseValueRight.getUuid());
@@ -679,7 +680,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
             }
             if (mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE) {
-                throw new RuntimeException("Invalid structure of MergeManager");
+                throw new RuntimeException(Errors.E108+"");
             }
         }
 

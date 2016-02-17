@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -73,7 +74,7 @@ public class BaseValueFactory {
                                 break;
                             }
                             default:
-                                throw new RuntimeException("Unknown data type.");
+                                throw new RuntimeException(Errors.E42+"");
                         }
                     }
                 }
@@ -81,7 +82,7 @@ public class BaseValueFactory {
             }
             case MetaContainerTypes.META_SET: {
                 if (metaType.isSet()) {
-                    throw new UnsupportedOperationException("Не реализовано;");
+                    throw new UnsupportedOperationException(Errors.E2+"");
                 } else {
                     if (metaType.isComplex()) {
                         IBaseEntity baseEntity = (IBaseEntity) value;
@@ -115,7 +116,7 @@ public class BaseValueFactory {
                                 break;
                             }
                             default:
-                                throw new RuntimeException("Unknown data type.");
+                                throw new RuntimeException(Errors.E42+"");
                         }
                     }
                 }
@@ -124,7 +125,7 @@ public class BaseValueFactory {
         }
 
         if (baseValue == null) {
-            throw new RuntimeException("Can not create instance of BaseValue.");
+            throw new RuntimeException(Errors.E43+"");
         }
 
         return baseValue;

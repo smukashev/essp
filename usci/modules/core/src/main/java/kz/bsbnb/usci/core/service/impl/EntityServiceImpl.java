@@ -2,6 +2,7 @@ package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.IBatchService;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
@@ -17,6 +18,7 @@ import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.tool.status.StatusProperties;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +96,17 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
                     entityStatus.setBatchId(mockEntity.getBatchId());
                     entityStatus.setEntityId(-1);
                     entityStatus.setStatus(EntityStatuses.ERROR);
-                    entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity) + " (" + error + ")");
+                    entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity));
+
+                    String[] params = e.getMessage().split("\\|");
+                    if (params[0].length() > 4) {
+                        entityStatus.setErrorCode(params[0].length() > 255 ? params[0].substring(0, 255) : params[0]);
+                    } else {
+                        entityStatus.setErrorCode(params[0]);
+                        if (params.length > 1)
+                            entityStatus.setDevDescription(StringUtils.join(Arrays.copyOfRange(params, 1, params.length), "|"));
+                    }
+
                     entityStatus.setIndex(mockEntity.getBatchIndex() - 1);
                     entityStatus.setReceiptDate(new Date());
 
@@ -105,7 +117,17 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
                 entityStatus.setBatchId(mockEntity.getBatchId());
                 entityStatus.setEntityId(-1);
                 entityStatus.setStatus(EntityStatuses.ERROR);
-                entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity) + " (" + e.getMessage() + ")");
+                entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity));
+
+                String[] params = e.getMessage().split("\\|");
+                if (params[0].length() > 4) {
+                    entityStatus.setErrorCode(params[0].length() > 255 ? params[0].substring(0, 255) : params[0]);
+                } else {
+                    entityStatus.setErrorCode(params[0]);
+                    if (params.length > 1)
+                        entityStatus.setDevDescription(StringUtils.join(Arrays.copyOfRange(params, 1, params.length), "|"));
+                }
+
                 entityStatus.setIndex(mockEntity.getBatchIndex() - 1);
                 entityStatus.setReceiptDate(new Date());
 
@@ -137,7 +159,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public BaseEntity getActualBaseEntity(BaseEntity baseEntity) {
 
-        if(baseEntity.getId() < 1)
+        if (baseEntity.getId() < 1)
             throw new IllegalArgumentException(baseEntity.getMeta().getClassTitle() + " не найден");
 
         IBaseEntityReportDateDao baseEntityReportDateDao =
@@ -145,10 +167,10 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(baseEntity.getId(), baseEntity.getReportDate());
 
-        if(maxReportDate == null)
+        if (maxReportDate == null)
             throw new UnsupportedOperationException("Запись не была найдена в базе; \n" + baseEntity);
 
-        return (BaseEntity)baseEntityLoadDao.load(baseEntity.getId(), maxReportDate, baseEntity.getReportDate());
+        return (BaseEntity) baseEntityLoadDao.load(baseEntity.getId(), maxReportDate, baseEntity.getReportDate());
     }
 
     @Override

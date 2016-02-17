@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -62,7 +63,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Override
     public void update(IPersistable persistable) {
-        throw new UnsupportedOperationException("Не реализовано;");
+        throw new UnsupportedOperationException(Errors.E2 + "");
     }
 
     @Override
@@ -78,10 +79,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
             int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
             if (count > 1)
-                throw new IllegalStateException("Попытка удалений более 1 записи (ID: " + baseEntity.getId() + ");");
+                throw new IllegalStateException(Errors.E89 + "|" + baseEntity.getId());
 
             if (count < 1)
-                throw new IllegalStateException("Удаление не произошло (ID: " + baseEntity.getId() + ");");
+                throw new IllegalStateException(Errors.E90 + "|" + baseEntity.getId());
         } else {
             delete(persistable.getId());
         }
@@ -97,10 +98,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count > 1)
-            throw new IllegalStateException("Попытка удалений более 1 записи (ID: " + id + ");");
+            throw new IllegalStateException(Errors.E89 + "|" + id);
 
         if (count < 1)
-            throw new IllegalStateException("Удаление не произошло (ID: " + id + ");");
+            throw new IllegalStateException(Errors.E90 + "|" + id);
     }
 
     @Override
@@ -122,10 +123,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Override
     public IBaseEntity load(long id, Date reportDate, Date savingReportDate) {
         if (id < 1)
-            throw new IllegalArgumentException("Запись должна иметь идентификатор;");
+            throw new IllegalArgumentException(Errors.E93 + "");
 
         if (reportDate == null)
-            throw new IllegalArgumentException("Запись должна иметь отчётную дату;");
+            throw new IllegalArgumentException(Errors.E94 + "");
 
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
@@ -174,10 +175,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException("Найдено более одной записи (ID: " + baseEntityId + ";");
+            throw new IllegalArgumentException(Errors.E91 + "|" + baseEntityId);
 
         if (rows.size() < 1)
-            throw new IllegalStateException("Запись не была найдена (ID: " + baseEntityId + ");");
+            throw new IllegalStateException(Errors.E92 + "|" + baseEntityId);
 
         Map<String, Object> row = rows.get(0);
 
@@ -196,15 +197,15 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                 .select(DSL.val(1L).as("ex_flag"))
                 .from("dual")
                 .where(DSL.exists(context.select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
-                                .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                                .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
-                                .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.notEqual(exceptContainingId))
+                                        .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
+                                        .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
+                                        .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.notEqual(exceptContainingId))
                         )
                 ).or(DSL.exists(context.select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
                         .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias)
-                                .join(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias)).on(
-                                        EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).SET_ID
-                                                .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).SET_ID))
+                                        .join(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias)).on(
+                                                EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).SET_ID
+                                                        .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).SET_ID))
                         ).where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.
                                 equal(baseEntityId))
                         .and(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).ENTITY_ID.

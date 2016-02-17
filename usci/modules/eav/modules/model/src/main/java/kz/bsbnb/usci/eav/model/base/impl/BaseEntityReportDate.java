@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
+import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
@@ -28,7 +30,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         super(id);
 
         if (reportDate == null) {
-            throw new IllegalArgumentException("Отчетная не можеть быть NULL;");
+            throw new IllegalArgumentException(Errors.E29+"");
         } else {
             Date newReportDate = (Date) reportDate.clone();
             DataUtils.toBeginningOfTheDay(newReportDate);
@@ -52,7 +54,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         super(id);
 
         if (reportDate == null) {
-            throw new IllegalArgumentException("Отчетная не можеть быть NULL;");
+            throw new IllegalArgumentException(Errors.E29+"");
         } else {
             Date newReportDate = (Date) reportDate.clone();
             DataUtils.toBeginningOfTheDay(newReportDate);
@@ -72,8 +74,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
 
     public BaseEntityReportDate(IBaseEntity baseEntity, Date reportDate) {
         if (reportDate == null) {
-            throw new IllegalArgumentException("Can not create instance of BaseEntityReportDate " +
-                    "with report date equal to null.");
+            throw new IllegalArgumentException(Errors.E28 + "");
         } else {
             Date newReportDate = (Date) reportDate.clone();
             DataUtils.toBeginningOfTheDay(newReportDate);
@@ -178,7 +179,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
             baseEntityReportDate = (BaseEntityReportDate) super.clone();
             baseEntity.setReportDate((Date) reportDate.clone());
         } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException("BaseEntityReportDate class does not implement interface Cloneable.");
+            throw new RuntimeException(Errors.E30+"");
         }
         return baseEntityReportDate;
     }

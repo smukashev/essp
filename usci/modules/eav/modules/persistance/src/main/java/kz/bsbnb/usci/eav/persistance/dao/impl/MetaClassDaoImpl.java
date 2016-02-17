@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.eav.persistance.generated.tables.records.EavMClassesRecord;
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -82,7 +83,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         if (metaClass.getId() < 1) {
             if (metaClass.getClassName() == null)
-                throw new IllegalArgumentException("Meta class does not have name or id. Can't load.");
+                throw new IllegalArgumentException(Errors.E162 + "");
 
             if (beginDateStrict) {
                 select = context.select(
@@ -142,12 +143,10 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException("More then one class found. Can't load class : "
-                    + metaClass.getClassName());
+            throw new IllegalArgumentException(Errors.E82 + "|" + metaClass.getClassName());
 
         if (rows.size() < 1)
-            throw new IllegalArgumentException("Class not found. Can't load class : "
-                    + metaClass.getClassName());
+            throw new IllegalArgumentException(Errors.E163 + "|" + metaClass.getClassName());
 
         Map<String, Object> row = rows.get(0);
 
@@ -173,7 +172,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         if (metaClass.getId() < 1) {
             if (metaClass.getClassName() == null)
-                throw new IllegalArgumentException("Meta class does not have name or id. Can't load.");
+                throw new IllegalArgumentException(Errors.E162 + "");
 
             if (beginDateStrict) {
                 select = context.select(
@@ -229,12 +228,10 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException("More then one class found. Can't load class : "
-                    + metaClass.getClassName());
+            throw new IllegalArgumentException(Errors.E83 + "|" + metaClass.getClassName());
 
         if (rows.size() < 1)
-            throw new IllegalArgumentException("Class not found. Can't load class : "
-                    + metaClass.getClassName());
+            throw new IllegalArgumentException(Errors.E163 + "|" + metaClass.getClassName());
 
         Map<String, Object> row = rows.get(0);
 
@@ -276,7 +273,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         long metaId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
         if (metaId < 1)
-            throw new IllegalStateException("Мета класс не был создан;");
+            throw new IllegalStateException(Errors.E158 + "");
 
         metaClass.setId(metaId);
 
@@ -285,7 +282,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     private void updateClass(MetaClass metaClass) {
         if (metaClass.getId() < 1)
-            throw new IllegalArgumentException("MetaClass must have id to be updated");
+            throw new IllegalArgumentException(Errors.E170+"");
 
         UpdateConditionStep update = context.update(EAV_M_CLASSES).
                 set(EAV_M_CLASSES.NAME, metaClass.getClassName()).
@@ -306,7 +303,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         long id;
 
         if (!type.isSet()) {
-            throw new IllegalStateException(attributeName + " is not an array.");
+            throw new IllegalStateException(Errors.E168+"|"+attributeName);
         }
 
         MetaSet metaSet = (MetaSet) type;
@@ -359,7 +356,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         InsertOnDuplicateStep insert;
 
         if (type.isSet()) {
-            throw new IllegalStateException(attributeName + " is an array, single value expected.");
+            throw new IllegalStateException(Errors.E167 + "|" + attributeName);
         }
 
         if (type.isComplex()) {
@@ -414,7 +411,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     private void insertAttributes(Set<String> addNames, MetaClass meta) {
         if (meta.getId() < 1) {
-            throw new IllegalArgumentException("MetaClass must have an id filled before attributes insertion to DB");
+            throw new IllegalArgumentException(Errors.E161 + "");
         }
 
         for (String typeName : addNames) {
@@ -432,7 +429,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     private void updateAttributes(Set<String> updateNames, MetaClass meta, MetaClass dbMeta) {
         if (dbMeta.getId() < 1) {
-            throw new IllegalArgumentException("MetaClass must have an id filled before attributes update in DB");
+            throw new IllegalArgumentException(Errors.E169+"");
         }
 
         UpdateConditionStep update;
@@ -509,7 +506,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         DeleteConditionStep delete;
 
         if (meta.getId() < 1) {
-            throw new IllegalArgumentException("MetaClass must have an id filled before attributes deletion to DB");
+            throw new IllegalArgumentException(Errors.E159 + "");
         }
 
         for (String typeName : deleteNames) {
@@ -771,7 +768,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     void loadAttributes(MetaClass meta) {
         if (meta.getId() < 1)
-            throw new IllegalStateException("Can't load atributes of metaclass without id!");
+            throw new IllegalStateException(Errors.E164 + "");
 
         meta.removeMembers();
 
@@ -799,7 +796,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         }
 
         if (dbMeta.getId() < 1) {
-            throw new IllegalArgumentException("Can't determine meta id");
+            throw new IllegalArgumentException(Errors.E166 + "");
         }
 
         Set<String> oldNames = dbMeta.getMemberNames();
@@ -875,10 +872,9 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
     }
 
     @Override
-    public List<Long> loadContaining(long id)
-    {
-        List<Long> l= new ArrayList<>();
-        if(id<1)
+    public List<Long> loadContaining(long id) {
+        List<Long> l = new ArrayList<>();
+        if (id < 1)
             return null;
 
         Select selectComplexSetIds = context.select(
@@ -896,12 +892,10 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         List<Map<String, Object>> complexIds = jdbcTemplate.queryForList(selectComplexIds.getSQL(),
                 selectComplexIds.getBindValues().toArray());
 
-        for(Map<String, Object> complexSetId : complexSetIds)
-        {
+        for (Map<String, Object> complexSetId : complexSetIds) {
             l.add(Long.parseLong(complexSetId.get("CONTAINING_ID").toString()));
         }
-        for(Map<String, Object> complexId : complexIds)
-        {
+        for (Map<String, Object> complexId : complexIds) {
             l.add(Long.parseLong(complexId.get("CONTAINING_ID").toString()));
         }
 
@@ -955,7 +949,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
     @Transactional
     public void remove(MetaClass metaClass) {
         if (metaClass.getId() < 1) {
-            throw new IllegalArgumentException("Can't remove MetaClass without id");
+            throw new IllegalArgumentException(Errors.E165 + "");
         }
 
         long t = 0;
@@ -1031,7 +1025,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
 
         if (rows.size() < 1)
-            throw new IllegalArgumentException("Classes not found.");
+            throw new IllegalArgumentException(Errors.E160 + "");
 
         for (Map<String, Object> row : rows) {
 
