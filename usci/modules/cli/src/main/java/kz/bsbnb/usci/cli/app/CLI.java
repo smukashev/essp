@@ -1826,11 +1826,12 @@ public class CLI {
                     System.out.println("Argument needed: <test> <fileName> <rep_date>");
                 }
             } else if (args.get(0).equals("sql")) {
-                if (args.size() == 3) {
-                    if (args.get(1).equals("dump"))
-                        dumpEntityToSQL(args.get(2));
+                if (args.size() == 2) {
+                    dumpEntityToSQL(args.get(1), null); }
+                else if(args.size() == 3){
+                    dumpEntityToSQL(args.get(1), args.get(2));
                 } else {
-                    System.out.println("Argument needed: <sql> <dump> <id>");
+                    System.out.println("Argument needed: <sql> <id1,id2...> [filename]");
                 }
             } else {
                 System.out.println("No such operation: " + args.get(0));
@@ -1840,12 +1841,14 @@ public class CLI {
         }
     }
 
-    private void dumpEntityToSQL(String id) {
-        IMetaClass metaClass = baseEntityDao.getMetaClass(Long.parseLong(id));
-        if (!metaClass.isReference())
-            entityExporter.export(Long.parseLong(id));
-        else
-            System.out.println("no need to dump refs");
+    private void dumpEntityToSQL(String idsString, String fileName) {
+        entityExporter.setFile(fileName);
+        String[] ids = idsString.split(",");
+        List<Long> longList = new ArrayList<>();
+        for(int i=0;i<ids.length;i++)
+            longList.add(Long.parseLong(ids[i]));
+
+        entityExporter.export(longList);
     }
 
     public void commandTest() {

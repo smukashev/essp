@@ -42,6 +42,8 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Repository
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
+    public static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
+    public static final String LOGIC_RULE_META = "LOGIC_RULE_META";
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
     @Autowired
@@ -76,6 +78,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Autowired
     private IRuleServicePool ruleServicePool;
+    private Set<String> metaRules;
 
     @Autowired
     public void setApplyListener(IDaoListener applyListener) {
@@ -90,6 +93,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Value("${rules.enabled}")
     private boolean rulesEnabled;
+
+    @Autowired
+    IEavGlobalDao globalDao;
 
     @Override
     public long search(IBaseEntity baseEntity, long creditorId) {
@@ -327,11 +333,18 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     private void processLogicControl(IBaseEntity baseEntityApplied){
-        List<String > errors = ruleServicePool.getRuleService().runRules((BaseEntity)baseEntityApplied,
-                baseEntityApplied.getMeta().getClassName() + "_process", baseEntityApplied.getReportDate());
+        if(metaRules == null) {
+            String[] metas = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
+            metaRules = new HashSet<>(Arrays.asList(metas));
+        }
 
-        if(errors.size() > 0) {
-            throw new KnownIterativeException(errors);
+        if(metaRules.contains(baseEntityApplied.getMeta().getClassName())) {
+            List<String> errors = ruleServicePool.getRuleService().runRules((BaseEntity) baseEntityApplied,
+                    baseEntityApplied.getMeta().getClassName() + "_process", baseEntityApplied.getReportDate());
+
+            if (errors.size() > 0) {
+                throw new KnownIterativeException(errors);
+            }
         }
     }
 
