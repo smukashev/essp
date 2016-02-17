@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.helper.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.helper.IHelper;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
@@ -47,7 +48,7 @@ public class ParserHelper implements IHelper {
             case DOUBLE:
                 return Double.parseDouble(value);
             default:
-                throw new IllegalArgumentException("Unknown type");
+                throw new IllegalArgumentException(Errors.E127+"");
         }
     }
 }

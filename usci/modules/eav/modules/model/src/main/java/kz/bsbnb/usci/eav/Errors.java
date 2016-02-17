@@ -13,7 +13,7 @@ public enum Errors {
     E124, E125, E126, E127, E128, E129, E130, E131, E132, E133, E134, E135, E136, E137, E138, E139, E140, E141,
     E142, E143, E144, E145, E146, E147, E148, E149, E150, E151, E152, E153, E154, E155, E156, E157, E158, E159, E160,
     E161, E162, E163, E164, E165, E166, E167, E168, E169, E170, E171, E172, E173, E174, E175, E176, E177, E178, E179,
-    E180, E181, E182, E183, E184, E185, E186, E187, E188, E189, E190;
+    E180, E181, E182, E183, E184, E185, E186, E187, E188, E189, E190, E191, E192, E193, E194;
 
     private static final String LOCALE = "RU";
 
@@ -237,6 +237,9 @@ public enum Errors {
         errors.put("E189", "Субъект должен иметь идентификационные документы; #iBaseEntity");
 
         errors.put("E190", "Тип данных не определён #dataTypes");
-
+        errors.put("E191", "ZIP file does not contain any files");
+        errors.put("E192", "Sync timeout in reader");
+        errors.put("E193", "XML validation error");
+        errors.put("E194", "Cast error: #localName , exception text:  #e.getMessage()");
     }
 }
