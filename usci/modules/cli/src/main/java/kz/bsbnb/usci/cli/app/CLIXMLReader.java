@@ -22,10 +22,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,6 +40,7 @@ public class CLIXMLReader {
     private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
     private Stack<Boolean> flagsStack = new Stack<Boolean>();
     private IBaseContainer currentContainer;
+    private IBatchService batchService;
     private Batch batch;
     private Long index = 1L, level = 0L;
     private boolean hasMembers = false;
@@ -65,14 +63,16 @@ public class CLIXMLReader {
         this.reportDate = repDate;
 
         batch = new Batch(reportDate, 1L);
+        this.batchService = batchService;
 
-        batchService.save(batch);
+        this.batchService.save(batch);
     }
 
     public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate)
             throws FileNotFoundException {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
+        this.batchService = batchService;
 
         inputStream = new FileInputStream(fileName);
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -87,9 +87,14 @@ public class CLIXMLReader {
         this.reportDate = repDate;
 
         batch = new Batch(reportDate, 1L);
-
-        long batchId = batchService.save(batch);
+        batch.setFileName(new File(fileName).getName());
+        long batchId = this.batchService.save(batch);
         batch.setId(batchId);
+
+    }
+
+    public Batch getBatch(){
+        return batch;
     }
 
     public Object getCastObject(DataTypes typeCode, String value) {
@@ -237,7 +242,9 @@ public class CLIXMLReader {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
 
-                if (endElement(localName)) return (BaseEntity) currentContainer;
+                if (endElement(localName)) {
+                    return (BaseEntity) currentContainer;
+                }
             } else if (event.isEndDocument()) {
                 logger.info("end document");
             } else {

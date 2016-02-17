@@ -10,7 +10,6 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.cli.app.command.impl.*;
-import kz.bsbnb.usci.cli.app.exporter.Entity;
 import kz.bsbnb.usci.cli.app.exporter.EntityExporter;
 import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
@@ -31,7 +30,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.dao.*;
-import kz.bsbnb.usci.eav.persistance.dao.impl.BaseEntityDaoImpl;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -951,15 +949,23 @@ public class CLI {
             Date reportDate = sdfout.parse(repDate);
             CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate);
             BaseEntity entity;
+            long totalcount = 0;
+            long actualcount = 0;
             while ((entity = reader.read()) != null) {
+                totalcount++;
                 try {
                     long id = baseEntityProcessorDao.process(entity).getId();
                     System.out.println("Запись сохранилась с ИД: " + id);
+                    actualcount++;
                 } catch (Exception ex) {
                     lastException = ex;
                     System.out.println("Ошибка: " + ex.getMessage());
                 }
             }
+            Batch batch = reader.getBatch();
+            batch.setActualCount(actualcount);
+            batch.setTotalCount(totalcount);
+            batchService.save(batch);
         } catch (FileNotFoundException e) {
             System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
         } catch (ParseException e) {
