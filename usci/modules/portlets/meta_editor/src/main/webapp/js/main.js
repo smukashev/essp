@@ -321,6 +321,14 @@ function createMetaClassesListView() {
                     grid = Ext.getCmp("metaClassesGrid");
                     createMCForm("", "", "", "",  grid, null).show();
                 }
+            },
+                {
+                    xtype: 'button'
+                    , icon: contextPathUrl + '/pics/download.png'
+                    , text: label_DOWNLOAD_XSD
+                    , href: dataUrl + '&op=DOWNLOAD_XSD'
+                    , target: '_blank'
+                    , hrefTarget: '_blank'
             }]
         }]
     });
