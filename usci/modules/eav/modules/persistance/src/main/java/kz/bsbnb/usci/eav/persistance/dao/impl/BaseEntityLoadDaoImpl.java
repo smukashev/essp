@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
@@ -38,15 +39,14 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
 
     public IBaseEntity loadByMaxReportDate(long id, Date savingReportDate) {
         if (id == 0L || savingReportDate == null)
-            throw new IllegalStateException("Необходимо предоставить ID записи и отчётную дату");
+            throw new IllegalStateException(Errors.E102 + "");
 
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id, savingReportDate);
         if (maxReportDate == null)
-            throw new RuntimeException("Запись(" + id + ") не действует до отчётного периода " +
-                    df.format(savingReportDate) + ";");
+            throw new RuntimeException(Errors.E103 + "|" + id + "|" + df.format(savingReportDate));
 
         return load(id, maxReportDate, savingReportDate);
     }
@@ -54,15 +54,14 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
     @Override
     public IBaseEntity loadByMinReportDate(long id, Date savingReportDate) {
         if (id == 0L || savingReportDate == null)
-            throw new IllegalStateException("Необходимо предоставить ID записи и отчётную дату");
+            throw new IllegalStateException(Errors.E102 + "");
 
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
         Date minReportDate = baseEntityReportDateDao.getMinReportDate(id, savingReportDate);
         if (minReportDate == null)
-            throw new RuntimeException("Запись(" + id + ") не действует после отчётного периода " +
-                    df.format(savingReportDate) + ";");
+            throw new RuntimeException(Errors.E103 + "|" + id + "|" + df.format(savingReportDate));
 
         return load(id, minReportDate, savingReportDate);
     }
@@ -74,7 +73,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
 
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id);
         if (maxReportDate == null)
-            throw new UnsupportedOperationException("В базе отсутсвует отчетная дата на ID: " + id + ";");
+            throw new UnsupportedOperationException(Errors.E101 + "|" + id);
 
         IBaseEntityDao baseEntityDao = persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
         if (baseEntityDao.isDeleted(id))

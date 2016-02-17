@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.searchForm.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.searchForm.SearchPagination;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
@@ -27,16 +28,16 @@ public class NonPaginableSearchResult extends AbstractSearchResult implements IS
 
     @Override
     public SearchPagination getPagination() {
-        throw new UnsupportedOperationException("no pagination");
+        throw new UnsupportedOperationException(Errors.E47+"");
     }
 
     @Override
     public void setTotalCount(int totalCount) {
-        throw new UnsupportedOperationException("not supported");
+        throw new UnsupportedOperationException(Errors.E48+"");
     }
 
     @Override
     public void setPagination(SearchPagination searchPagination) {
-        throw new UnsupportedOperationException("not supported");
+        throw new UnsupportedOperationException(Errors.E48+"");
     }
 }

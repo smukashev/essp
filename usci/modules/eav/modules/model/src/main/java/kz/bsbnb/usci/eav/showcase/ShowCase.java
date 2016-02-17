@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.showcase;
 
 
 import kz.bsbnb.ddlutils.model.Index;
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -74,9 +75,13 @@ public class ShowCase extends Persistable {
         customFields.add(field);
     }
 
-    public void addIndex(Index index) {Indexes.add(index);}
+    public void addIndex(Index index) {
+        Indexes.add(index);
+    }
 
-    public ArrayList<Index> getIndexes() { return  Indexes;}
+    public ArrayList<Index> getIndexes() {
+        return Indexes;
+    }
 
     public boolean isFinal() {
         return isFinal;
@@ -96,12 +101,12 @@ public class ShowCase extends Persistable {
 
     public void addField(String attributePath, String columnName) {
         if (meta == null)
-            throw new IllegalArgumentException("customMeta not set for showcase");
+            throw new IllegalArgumentException(Errors.E52+"");
 
         IMetaAttribute attr = getActualMeta().getElAttribute(attributePath);
 
         if (attr == null)
-            throw new IllegalArgumentException(getName() + ": Can't get attribute: " + attributePath);
+            throw new IllegalArgumentException(Errors.E51+"|"+getName() + "|" + attributePath);
 
         ShowCaseField showCaseField = new ShowCaseField();
         showCaseField.setMetaId(this.getActualMeta().getId());
@@ -114,18 +119,18 @@ public class ShowCase extends Persistable {
 
     public void addCustomField(String attributePath, String columnName, MetaClass customMeta) {
         if (customMeta == null)
-            throw new IllegalArgumentException("customMeta can't be null");
+            throw new IllegalArgumentException(Errors.E50 + "");
 
         IMetaAttribute attr = null;
-        if(!attributePath.equals("root"))
+        if (!attributePath.equals("root"))
             attr = customMeta.getElAttribute(attributePath);
 
         if (attr == null && !attributePath.equals("root"))
-            throw new IllegalArgumentException(getName() + ": Can't get attribute: " + attributePath);
+            throw new IllegalArgumentException(Errors.E51 + "|" + getName() + "|" + attributePath);
 
         ShowCaseField showCaseField = new ShowCaseField();
 
-        if(attr != null)
+        if (attr != null)
             showCaseField.setAttributeId(attr.getId());
         else
             showCaseField.setAttributeId(0L);

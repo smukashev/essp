@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -20,7 +21,7 @@ public final class PrimaryContractOptimizer {
 
         if (noBaseValue == null || dateBaseValue == null ||
                 noBaseValue.getValue() == null || dateBaseValue.getValue() == null)
-            throw new IllegalStateException("Договор не содержит обязательные поля; \n" + iBaseEntity);
+            throw new IllegalStateException(Errors.E187+"|" + iBaseEntity);
 
         stringBuilder.append(noBaseValue.getValue());
 

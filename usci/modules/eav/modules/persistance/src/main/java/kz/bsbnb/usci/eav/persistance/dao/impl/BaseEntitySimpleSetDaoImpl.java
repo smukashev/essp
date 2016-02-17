@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -123,8 +124,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + id +
-                    ", EAV_BE_ENTITY_SIMPLE_SETS);");
+            throw new IllegalStateException(Errors.E128 + "|" + count + "|" + id);
     }
 
     @Override
@@ -143,18 +143,16 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + id +
-                    ", EAV_BE_ENTITY_SIMPLE_SETS);");
+            throw new IllegalStateException(Errors.E126 + "|" + count + "|" + id);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -199,7 +197,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + subqueryTable.toString() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + subqueryTable.toString());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -240,10 +238,9 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -288,7 +285,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + subqueryTable.toString() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + subqueryTable.toString());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -329,10 +326,9 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -359,7 +355,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + select.toString() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + select.toString());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -397,10 +393,9 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -425,7 +420,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено более одной записи(" + select.toString() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + select.toString());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -468,20 +463,20 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         Select select;
 
         Table tableNumbering = context
-            .select(DSL.rank().over()
-                            .partitionBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID))
-                            .orderBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE)).as("num_pp"),
-                    tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
-                    tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID),
-                    tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
-                    tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID),
-                    tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
-                    tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
-            .from(tableOfEntitySimpleSets)
-            .where(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID).eq(baseEntity.getId()))
-            .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE)
-                    .lessOrEqual(DataUtils.convert(actualReportDate)))
-            .asTable("essn");
+                .select(DSL.rank().over()
+                                .partitionBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID))
+                                .orderBy(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE)).as("num_pp"),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
+                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
+                .from(tableOfEntitySimpleSets)
+                .where(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID).eq(baseEntity.getId()))
+                .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE)
+                        .lessOrEqual(DataUtils.convert(actualReportDate)))
+                .asTable("essn");
 
         select = context
                 .select(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.NAME),
@@ -542,7 +537,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         IMetaType metaType = baseSet.getMemberType();
 
         if (metaType.isSet())
-            throw new UnsupportedOperationException("Не реализовано;");
+            throw new UnsupportedOperationException(Errors.E2 + "");
 
         IMetaValue metaValue = (IMetaValue) metaType;
         DataTypes dataType = metaValue.getTypeCode();
@@ -569,7 +564,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                 break;
             }
             default:
-                throw new IllegalArgumentException("Unknown type.");
+                throw new IllegalArgumentException(Errors.E127 + "");
         }
     }
 

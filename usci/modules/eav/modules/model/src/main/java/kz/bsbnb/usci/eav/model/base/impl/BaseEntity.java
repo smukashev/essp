@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
+import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -132,9 +134,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
             IMetaType metaType = meta.getMemberType(parentAttribute);
             if (metaType == null)
-                throw new IllegalArgumentException("Мета класс " + meta.getClassName() + " не содержит " +
-                        "атрибут " + parentAttribute);
-
+                throw new IllegalArgumentException(Errors.E12 + "|" + meta.getClassName() + "|" + parentAttribute);
 
             if (metaType.isComplex() && !metaType.isSet()) {
                 IBaseValue baseValue = values.get(parentAttribute);
@@ -155,8 +155,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             IMetaType metaType = meta.getMemberType(attribute);
 
             if (metaType == null)
-                throw new IllegalArgumentException("Мета класс " + meta.getClassName() + " не содержит " +
-                        "атрибут " + attribute);
+                throw new IllegalArgumentException(Errors.E12 + "|" + meta.getClassName() + "|" + attribute);
 
             return values.get(attribute);
         }
@@ -177,11 +176,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         IMetaType type = metaAttribute.getMetaType();
 
         if (type == null)
-            throw new IllegalArgumentException("Type: " + attribute +
-                    ", not found in class: " + meta.getClassName());
+            throw new IllegalArgumentException(Errors.E25 + "|" + attribute + "|" + meta.getClassName());
 
         if (baseValue == null)
-            throw new IllegalArgumentException("Value not be equal to null.");
+            throw new IllegalArgumentException(Errors.E26 + "");
 
         if (baseValue.getValue() != null) {
             Class<?> valueClass = baseValue.getValue().getClass();
@@ -214,9 +212,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             }
 
             if (expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
-                throw new IllegalArgumentException("Type mismatch in class: " +
-                        meta.getClassName() + ". Needed " + expValueClass + ", got: " +
-                        valueClass);
+                throw new IllegalArgumentException(Errors.E27+"|" +
+                        meta.getClassName() + "|" + expValueClass + "|" +valueClass);
         }
 
         baseValue.setBaseContainer(this);
@@ -275,8 +272,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     public Date getReportDate() {
         if (baseEntityReportDate == null)
-            throw new RuntimeException("Instance of BaseEntityReportDate is null. " +
-                    "Check the correctness of instance creation");
+            throw new RuntimeException(Errors.E11 + "");
 
         return baseEntityReportDate.getReportDate();
     }
@@ -295,8 +291,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     @Override
     public IBaseEntityReportDate getBaseEntityReportDate() {
         if (baseEntityReportDate == null) {
-            throw new RuntimeException("Instance of BaseEntityReportDate is null. " +
-                    "Check the correctness of instance creation");
+            throw new RuntimeException(Errors.E11 + "");
         }
         return baseEntityReportDate;
     }
@@ -318,7 +313,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
         if (baseEntityLoaded != null) {
             if (baseEntityLoaded.getBaseEntityReportDate() == null)
-                throw new IllegalStateException("Сущность не содержит данные из EAV_BE_ENTITY_REPORT_DATES;");
+                throw new IllegalStateException(Errors.E6 + "");
 
             integerValuesCount = baseEntityLoaded.getBaseEntityReportDate().getIntegerValuesCount();
             dateValuesCount = baseEntityLoaded.getBaseEntityReportDate().getDateValuesCount();
@@ -360,7 +355,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                             doubleValuesCount++;
                             break;
                         default:
-                            throw new RuntimeException("Unknown data type.");
+                            throw new RuntimeException(Errors.E7 + "");
                     }
 
                 }
@@ -603,7 +598,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         boolean[] isFilter = new boolean[500];
         String function = null;
 
-        if (!path.startsWith("{")) throw new RuntimeException("function must be specified");
+        if (!path.startsWith("{")) throw new RuntimeException(Errors.E14 + "");
         for (int i = 0; i < path.length(); i++) {
             if (path.charAt(i) == '}') {
                 function = path.substring(1, i);
@@ -612,7 +607,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             }
         }
 
-        if (function == null) throw new RuntimeException("no function");
+        if (function == null) throw new RuntimeException(Errors.E15 + "");
 
         Set allowedSet = new TreeSet<>();
 
@@ -643,8 +638,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             if (m.find()) {
                 downPath = m.group(1);
             } else {
-                throw new RuntimeException("function duplicates not correct: " +
-                        "example {hasDuplicates(subjects)}doc_type.code,date");
+                throw new RuntimeException(Errors.E16 + "");
             }
 
             LinkedList list = (LinkedList) getEls("{get}" + downPath);
@@ -657,7 +651,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 controlSet = new HashSet<String>();
             else if (fields.length == 2)
                 controlSet = new HashSet<Map.Entry>();
-            else throw new RuntimeException("rule not yet implemented");
+            else throw new RuntimeException(Errors.E17 + "");
 
             for (Object o : list) {
                 BaseEntity entity = (BaseEntity) o;
@@ -687,20 +681,20 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         for (int i = 0; i <= path.length(); i++) {
             if (i == path.length()) {
                 if (open != 0)
-                    throw new RuntimeException("opening bracket not correct");
+                    throw new RuntimeException(Errors.E18 + "");
                 break;
             }
             if (path.charAt(i) == '=') eqCnt++;
             if (path.charAt(i) == '!' && (i + 1 == path.length() || path.charAt(i + 1) != '='))
-                throw new RuntimeException("equal sign must be present after exlaim");
+                throw new RuntimeException(Errors.E21 + "");
 
             if (path.charAt(i) == '[') open++;
             if (path.charAt(i) == ']') {
                 open--;
-                if (eqCnt != 1) throw new RuntimeException("only exactly one equal sign in filter and only in filter");
+                if (eqCnt != 1) throw new RuntimeException(Errors.E20 + "");
                 eqCnt = 0;
             }
-            if (open < 0 || open > 1) throw new RuntimeException("brackets not correct");
+            if (open < 0 || open > 1) throw new RuntimeException(Errors.E22 + "");
         }
 
         for (int i = 0; i <= path.length(); i++) {
@@ -867,7 +861,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 theMeta = (MetaClass) type;
             } else {
                 if (tokenizer.hasMoreTokens()) {
-                    throw new IllegalArgumentException("Path can't have intermediate simple values");
+                    throw new IllegalArgumentException(Errors.E13 + "");
                 }
             }
         }
@@ -915,11 +909,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     } else {
                         if (tokenizer.hasMoreTokens()) {
                             if (!set.getMemberType().isComplex()) {
-                                throw new IllegalArgumentException("Simple sets not supported");
+                                throw new IllegalArgumentException(Errors.E23 + "");
                             }
 
                             if (set.getMemberType().isSet()) {
-                                throw new IllegalArgumentException("Set of sets not supported");
+                                throw new IllegalArgumentException(Errors.E24 + "");
                             }
 
                             String restOfPath = "";
@@ -951,7 +945,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     theMeta = (MetaClass) type;
                 } else {
                     if (tokenizer.hasMoreTokens()) {
-                        throw new IllegalArgumentException("Path can't have intermediate simple values");
+                        throw new IllegalArgumentException(Errors.E13 + "");
                     }
                 }
 
@@ -984,10 +978,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             IMetaType mtype = meta.getMemberType(ownFieldName);
 
             if (mtype == null)
-                throw new IllegalArgumentException("No such field: " + fieldName);
+                throw new IllegalArgumentException(Errors.E9 + "|" + fieldName);
 
             if (mtype.isSet())
-                throw new IllegalArgumentException("Can't handle arrays: " + fieldName);
+                throw new IllegalArgumentException(Errors.E10 + "|" + fieldName);
 
             BaseValue bvalue = (BaseValue) getBaseValue(ownFieldName);
 
@@ -1037,7 +1031,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             }
             baseEntityCloned.values = valuesCloned;
         } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException("BaseEntity class does not implement interface Cloneable.");
+            throw new RuntimeException(Errors.E8 + "");
         }
         return baseEntityCloned;
     }

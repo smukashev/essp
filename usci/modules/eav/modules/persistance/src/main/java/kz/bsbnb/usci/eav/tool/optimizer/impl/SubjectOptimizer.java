@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -19,7 +20,7 @@ public class SubjectOptimizer {
         IBaseValue docsBaseValue = iBaseEntity.getBaseValue("docs");
 
         if (docsBaseValue == null || docsBaseValue.getValue() == null)
-            throw new IllegalStateException("Ключевое поле docs пустое; \n" + iBaseEntity);
+            throw new IllegalStateException(Errors.E188+"|" + iBaseEntity);
 
         BaseSet docSet = (BaseSet) docsBaseValue.getValue();
 
@@ -40,7 +41,7 @@ public class SubjectOptimizer {
         }
 
         if (documents.size() == 0)
-            throw new IllegalStateException("Субъект должен иметь идентификационные документы; \n" + iBaseEntity);
+            throw new IllegalStateException(Errors.E189+"|" + iBaseEntity);
 
         Collections.sort(documents, new Comparator<IBaseEntity>() {
             @Override

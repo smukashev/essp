@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.comparator.impl;
 
+import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.comparator.IBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -112,7 +114,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
             IBaseValue value2 = c2.safeGetValue(name);
 
             if (value1 == null || value2 == null)
-                throw new IllegalArgumentException("Ключевой атрибут (" + name + ") не может быть пустым;");
+                throw new IllegalArgumentException(Errors.E1 + "|" + name);
 
             if (meta.getComplexKeyType() == ComplexKeyTypes.ALL) {
                 if (!type.isSet())
@@ -189,7 +191,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
 
                         //paths.addAll(intersect(entity1, c2));
                     } else {
-                        throw new IllegalStateException("Unimplemented");
+                        throw new IllegalStateException(Errors.E2+"");
                     }
                 }
             }
@@ -252,7 +254,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
                         }
                     }
                 } else {
-                    throw new IllegalStateException("Unimplemented");
+                    throw new IllegalStateException(Errors.E2+"");
                 }
             }
         }
@@ -316,7 +318,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
 
                         //paths.addAll(intersect(entity1, c2));
                     } else {
-                        throw new IllegalStateException("Unimplemented");
+                        throw new IllegalStateException(Errors.E2+"");
                     }
                 }
             }
@@ -385,7 +387,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
                         }
                     }
                 } else {
-                    throw new IllegalStateException("Unimplemented");
+                    throw new IllegalStateException(Errors.E2+"");
                 }
             }
         }

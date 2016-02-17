@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
+import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -140,7 +142,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
     public Object getElSimple(String filter) {
         if (metaType.isComplex() || metaType.isSet()) {
-            throw new IllegalArgumentException("Get simple attribute method called for complex attribute or array");
+            throw new IllegalArgumentException(Errors.E35+"");
         }
 
         for (IBaseValue value : values.values()) {
@@ -158,7 +160,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
     public Object getElComplex(String filter) {
         if (!metaType.isComplex() || metaType.isSet()) {
-            throw new IllegalArgumentException("Get complex attribute method called for simple attribute or array");
+            throw new IllegalArgumentException(Errors.E33+"");
         }
 
         StringTokenizer tokenizer = new StringTokenizer(filter, ",");
@@ -173,7 +175,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
             String fieldName = innerTokenizer.nextToken().trim();
             if (!innerTokenizer.hasMoreTokens())
-                throw new IllegalStateException("Field value expected.");
+                throw new IllegalStateException(Errors.E34+"");
 
             String fieldValue = innerTokenizer.nextToken().trim();
 
@@ -248,12 +250,12 @@ public class BaseSet extends BaseContainer implements IBaseSet {
                 } else {
                     Object thisObject = thisBaseValue.getValue();
                     if (thisObject == null) {
-                        throw new RuntimeException("Element of the set can not be equal to null.");
+                        throw new RuntimeException(Errors.E32+"");
                     }
 
                     Object thatObject = thatBaseValue.getValue();
                     if (thatObject == null) {
-                        throw new RuntimeException("Element of the set can not be equal to null.");
+                        throw new RuntimeException(Errors.E32+"");
                     }
 
                     if (date) {
@@ -295,7 +297,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
             }
             baseSetCloned.values = valuesCloned;
         } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException("BaseSet class does not implement interface Cloneable.");
+            throw new RuntimeException(Errors.E31+"");
         }
         return baseSetCloned;
     }

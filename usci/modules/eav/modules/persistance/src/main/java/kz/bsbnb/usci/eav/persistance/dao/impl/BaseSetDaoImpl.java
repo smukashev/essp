@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
@@ -75,7 +76,7 @@ public class BaseSetDaoImpl extends JDBCSupport implements IBaseSetDao {
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
         if (count != 1)
         {
-            throw new RuntimeException("UPDATE operation should be update only one record.");
+            throw new RuntimeException(Errors.E140+"");
         }
     }
 
@@ -94,7 +95,7 @@ public class BaseSetDaoImpl extends JDBCSupport implements IBaseSetDao {
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
         if (count != 1)
         {
-            throw new RuntimeException("DELETE operation should be delete only one record.");
+            throw new RuntimeException(Errors.E139+"");
         }
     }
 

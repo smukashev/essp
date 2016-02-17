@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -65,7 +66,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .set(EAV_BE_COMPLEX_VALUES.IS_CLOSED, DataUtils.convert(baseValue.isClosed()))
                 .set(EAV_BE_COMPLEX_VALUES.IS_LAST, DataUtils.convert(baseValue.isLast()));
 
-        long baseValueId =  insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        long baseValueId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
         baseValue.setId(baseValueId);
 
@@ -92,8 +93,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + baseValue.getId() +
-                    ", EAV_BE_COMPLEX_VALUES);");
+            throw new IllegalStateException(Errors.E88 + "|" + count + "|" + baseValue.getId());
     }
 
     @Override
@@ -108,8 +108,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + persistable.getId() +
-                    ", EAV_BE_COMPLEX_VALUES);");
+            throw new IllegalStateException(Errors.E87 + "|" + count + "|" + persistable.getId());
     }
 
     @Override
@@ -117,15 +116,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -172,7 +170,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -216,15 +214,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -271,7 +268,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -315,15 +312,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -349,7 +345,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -387,15 +383,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -421,7 +416,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -624,14 +619,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .from(EAV_BE_ENTITIES.as(entitiesTableAlias))
                 .where(EAV_BE_ENTITIES.as(entitiesTableAlias).ID.equal(childBaseEntity.getId()))
                 .and(DSL.exists(context
-                                .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
-                                .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                                .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ATTRIBUTE_ID.
-                                        equal(metaAttribute.getId()))
-                                .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID
-                                        .equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
-                                .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID.
-                                        notEqual(baseValue.getId()))));
+                        .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
+                        .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
+                        .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ATTRIBUTE_ID.
+                                equal(metaAttribute.getId()))
+                        .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID
+                                .equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
+                        .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID.
+                                notEqual(baseValue.getId()))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
@@ -205,11 +206,11 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1) {
-            throw new IllegalArgumentException("More than one batch found. Can't load.");
+            throw new IllegalArgumentException(Errors.E149+"");
         }
 
         if (rows.size() < 1) {
-            throw new IllegalArgumentException("Batch not found. Can't load.");
+            throw new IllegalArgumentException(Errors.E150+"");
         }
 
         Map<String, Object> row = rows.get(0);

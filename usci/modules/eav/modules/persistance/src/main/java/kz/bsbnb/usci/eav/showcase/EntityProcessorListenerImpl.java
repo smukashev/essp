@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.showcase;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
@@ -32,7 +33,7 @@ public class EntityProcessorListenerImpl implements IDaoListener {
                 try {
                     producer.produce(queueEntry);
                 } catch (Exception e) {
-                    throw new RuntimeException("Проблемы с очередью: " + e.getMessage());
+                    throw new RuntimeException(Errors.E181+"|" + (e.getMessage().length() > 255 ? e.getMessage().substring(0, 255) : e.getMessage()));
                 }
             }
         }).start();
