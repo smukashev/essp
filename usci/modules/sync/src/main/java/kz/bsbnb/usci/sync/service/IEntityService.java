@@ -20,7 +20,6 @@ public interface IEntityService {
 
     BaseEntity load(long id, Date date);
 
-    //used in rules
     BaseEntity prepare(BaseEntity baseEntity);
 
     BaseEntity getActualBaseEntity(BaseEntity baseEntity);
@@ -34,8 +33,6 @@ public interface IEntityService {
     RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis);
 
     int getQueueSize();
-
-    void setThreadsCount(int threadsCount, boolean allowAutoIncrement);
 
     SyncStatus getStatus();
 

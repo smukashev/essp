@@ -26,6 +26,7 @@ public class EntityServiceImpl implements IEntityService {
     @Autowired
     private DataJob dataJob;
 
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     @Qualifier(value = "remoteEntityService")
     RmiProxyFactoryBean rmiProxyFactoryBean;
@@ -88,12 +89,6 @@ public class EntityServiceImpl implements IEntityService {
     @Override
     public int getQueueSize() {
         return dataJob.getQueueSize();
-    }
-
-    @Override
-    public void setThreadsCount(int threadsCount, boolean allowAutoIncrement) {
-        dataJob.setCurrentThread(threadsCount);
-        dataJob.setAutoChooseThreshold(allowAutoIncrement);
     }
 
     @Override

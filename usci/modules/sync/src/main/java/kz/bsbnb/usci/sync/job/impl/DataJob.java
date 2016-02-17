@@ -1,10 +1,7 @@
 package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
-import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
-import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.sync.job.AbstractDataJob;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.SyncStatusSingleton;
@@ -13,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -87,35 +86,31 @@ public final class DataJob extends AbstractDataJob {
         actualCountJob = new ActualCountJob(batchService);
         actualCountJob.start();
 
-        while(true) {
+        //noinspection InfiniteLoopStatement
+        while (true) {
             try {
-                if(entities.size() > 0 && entitiesInProcess.size() < currentThread)
+                if (entities.size() > 0 && entitiesInProcess.size() < THREAD_MAX_LIMIT)
                     processNewEntities();
 
-                if(processingJobs.size() > 0)
+                if (processingJobs.size() > 0)
                     removeDeadJobs();
 
-                if(entities.size() == 0 && entitiesInProcess.size() == 0) {
-                    skip_count++;
+                if (entities.size() == 0 && entitiesInProcess.size() == 0) {
                     Thread.sleep(SLEEP_TIME_NORMAL);
+                    skip_count++;
                 }
 
-                if(skip_count > SKIP_TIME_MAX) {
+                if (skip_count > SKIP_TIME_MAX) {
                     Thread.sleep(SLEEP_TIME_LONG);
                     skip_count = 0;
                 }
 
-                syncStatusSingleton.put(entities.size(), entitiesInProcess.size(), currentThread, avgTimeCur);
+                syncStatusSingleton.put(entities.size(), entitiesInProcess.size(), avgTimeCur);
 
-                /* Debug */
-                if(entitiesInProcess.size() != processingJobs.size())
-                    throw new IllegalStateException("CRITICAL: EntitiesInProcess != ProcessJobs");
-            }
-            catch(NullPointerException ne) {
-                ne.printStackTrace();
-                System.exit(11);
-            }
-            catch(Exception e) {
+                /* Uncomment only to check, time cost operation */
+                /*if(entitiesInProcess.size() != processingJobs.size())
+                    throw new IllegalStateException("CRITICAL: EntitiesInProcess != ProcessJobs");*/
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -124,37 +119,20 @@ public final class DataJob extends AbstractDataJob {
     private void removeDeadJobs() {
         Iterator<ProcessJob> processJobIterator = processingJobs.iterator();
 
-        while(processJobIterator.hasNext()) {
+        while (processJobIterator.hasNext()) {
             ProcessJob processJob = processJobIterator.next();
 
-            if(!processJob.isAlive()) {
+            if (!processJob.isAlive()) {
                 BaseEntity entity = processJob.getBaseEntity();
 
                 entityCounter++;
-                if (entityCounter < WATCH_INTERVAL) {
+                if (entityCounter < STAT_INTERVAL) {
                     avgTimeCur = (avgTimeCur * (entityCounter - 1)) / entityCounter +
                             processJob.getTimeSpent() / entityCounter;
                 } else {
-                    if (avgTimePrev > 0) {
-                        double offset = avgTimeCur / avgTimePrev - 1;
-                        if (autoChooseThreshold) {
-                            if (offset > THRESHOLD) {
-                                currentThread--;
-                            } else {
-                                currentThread++;
-                            }
+                    if (avgTimePrev > 0)
+                        System.out.println("Скорость обработки: " + avgTimeCur);
 
-                            if (currentThread >= MAX_THREAD) {
-                                currentThread = MAX_THREAD - 10;
-                            }
-                            if (currentThread < MIN_THREAD) {
-                                currentThread = MIN_THREAD;
-                            }
-                        }
-
-                        System.out.println("Threads: " + currentThread + ", avgCur: " +
-                                avgTimeCur + ", counter: " + entityCounter);
-                    }
                     entityCounter = 0;
                     avgTimePrev = avgTimeCur;
                 }
@@ -163,15 +141,15 @@ public final class DataJob extends AbstractDataJob {
 
                 boolean found = false;
 
-                while(entityProcessIterator.hasNext()) {
-                    if(entity.hashCode() == entityProcessIterator.next().getMyEntity().hashCode()) {
+                while (entityProcessIterator.hasNext()) {
+                    if (entity.hashCode() == entityProcessIterator.next().getMyEntity().hashCode()) {
                         entityProcessIterator.remove();
                         found = true;
                         break;
                     }
                 }
 
-                if(!found)
+                if (!found)
                     throw new IllegalStateException("CRITICAL: Entity not found.");
 
                 processJobIterator.remove();
@@ -181,9 +159,9 @@ public final class DataJob extends AbstractDataJob {
 
     private void processNewEntities() {
         final BaseEntity entity = getClearEntity();
-        final ProcessJob processJob = new ProcessJob(entityService, entity, batchService);
+        final ProcessJob processJob = new ProcessJob(entityService, entity);
 
-        if(entity != null) {
+        if (entity != null) {
             logger.debug("Starting job");
             entitiesInProcess.add(new InProcessTester(entity));
             processingJobs.add(processJob);
@@ -195,16 +173,16 @@ public final class DataJob extends AbstractDataJob {
     }
 
     private synchronized BaseEntity getClearEntity() {
-        if(clearJobsIndex >= entities.size())
+        if (clearJobsIndex >= entities.size())
             clearJobsIndex = 0;
 
         Iterator<BaseEntity> iterator = entities.listIterator(clearJobsIndex);
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             BaseEntity entity = iterator.next();
 
             entity.getKeyElements();
 
-            if(!isInProcessWithThreads(entity)) {
+            if (!isInProcessWithThreads(entity)) {
                 iterator.remove();
                 return entity;
             }

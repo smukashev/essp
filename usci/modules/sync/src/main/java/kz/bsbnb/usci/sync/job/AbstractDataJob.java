@@ -4,28 +4,35 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.job.impl.ProcessJob;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author k.tulbassiyev
  */
 public abstract class AbstractDataJob extends Thread {
+    /* List of entities to process */
     protected final List<BaseEntity> entities = new ArrayList<>();
 
+    /* Jobs to process entities */
     protected final List<ProcessJob> processingJobs = new ArrayList<>();
 
-    protected final int SLEEP_TIME_NORMAL = 1000;
-    protected final int SLEEP_TIME_LONG = 5000;
+    /* Number of sleeps until SLEEP_TIME_LONG */
     protected final int SKIP_TIME_MAX = 10;
-    protected final int MAX_THREAD = 42;
-    protected final int MIN_THREAD = 16;
-    protected final int WATCH_INTERVAL = 1000;
-    protected final double THRESHOLD = 0.1;
-    protected int currentThread = ((MAX_THREAD + MIN_THREAD) / 2);
-    protected boolean autoChooseThreshold = false;
 
+    /* Counter to SKIP_TIME_MAX */
     protected volatile int skip_count = 0;
+
+    /* Inactive sleep time */
+    protected final int SLEEP_TIME_NORMAL = 1000;
+
+    /* Sleep time after SKIP_TIME_MAX */
+    protected final int SLEEP_TIME_LONG = 5000;
+
+    /* Number of processed entities to show stats */
+    protected final int STAT_INTERVAL = 1000;
+
+    /* Number of max processing threads */
+    protected final int THREAD_MAX_LIMIT = 33;
 
     public final synchronized void addAll(List<BaseEntity> entities) {
         this.entities.addAll(entities);
@@ -33,17 +40,5 @@ public abstract class AbstractDataJob extends Thread {
 
     public int getQueueSize() {
         return entities.size();
-    }
-
-    public int getCurrentThread() {
-        return currentThread;
-    }
-
-    public void setCurrentThread(int currentThread) {
-        this.currentThread = currentThread;
-    }
-
-    public void setAutoChooseThreshold(boolean autoChooseThreshold) {
-        this.autoChooseThreshold = autoChooseThreshold;
     }
 }

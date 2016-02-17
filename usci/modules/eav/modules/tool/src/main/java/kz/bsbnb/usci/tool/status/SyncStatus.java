@@ -2,60 +2,40 @@ package kz.bsbnb.usci.tool.status;
 
 import java.io.Serializable;
 
-public class SyncStatus implements Serializable
-{
-    long queueSize;
-    long threadsCount;
-    long maxThreadsCount;
-    double avgTime;
+public class SyncStatus implements Serializable {
+    private long queueSize;
+    private long threadsCount;
+    private double avgTime;
 
-    public long getQueueSize()
-    {
+    public long getQueueSize() {
         return queueSize;
     }
 
-    public void setQueueSize(long queueSize)
-    {
+    public void setQueueSize(long queueSize) {
         this.queueSize = queueSize;
     }
 
-    public long getThreadsCount()
-    {
+    public long getThreadsCount() {
         return threadsCount;
     }
 
-    public void setThreadsCount(long threadsCount)
-    {
+    public void setThreadsCount(long threadsCount) {
         this.threadsCount = threadsCount;
     }
 
-    public long getMaxThreadsCount()
-    {
-        return maxThreadsCount;
-    }
-
-    public void setMaxThreadsCount(long maxThreadsCount)
-    {
-        this.maxThreadsCount = maxThreadsCount;
-    }
-
-    public double getAvgTime()
-    {
+    public double getAvgTime() {
         return avgTime;
     }
 
-    public void setAvgTime(double avgTime)
-    {
+    public void setAvgTime(double avgTime) {
         this.avgTime = avgTime;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "SyncStatus{" +
                 "queueSize=" + queueSize +
                 ", threadsCount=" + threadsCount +
-                ", maxThreadsCount=" + maxThreadsCount +
                 ", avgTime=" + avgTime +
                 '}';
     }

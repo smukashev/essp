@@ -1748,37 +1748,6 @@ public class CLI {
         }
     }
 
-    public void commandSTC() {
-        if (args.size() > 2) {
-            Connection conn = null;
-
-            RmiProxyFactoryBean serviceFactory = null;
-
-            kz.bsbnb.usci.sync.service.IEntityService entityService = null;
-
-            try {
-                serviceFactory = new RmiProxyFactoryBean();
-                serviceFactory.setServiceUrl(args.get(0));
-                serviceFactory.setServiceInterface(kz.bsbnb.usci.sync.service.IEntityService.class);
-                serviceFactory.setRefreshStubOnConnectFailure(true);
-
-                serviceFactory.afterPropertiesSet();
-                entityService = (kz.bsbnb.usci.sync.service.IEntityService) serviceFactory.getObject();
-            } catch (Exception e) {
-                System.out.println("Can't connect to receiver service: " + e.getMessage());
-            }
-
-            int tCount = Integer.parseInt(args.get(1));
-            boolean allowAutoIncrement = Boolean.parseBoolean(args.get(2));
-
-            if (entityService != null)
-                entityService.setThreadsCount(tCount, allowAutoIncrement);
-        } else {
-            System.out.println("Argument needed: <core_url> <threads_count> <allow_auto_increment>");
-            System.out.println("Example: stc rmi://127.0.0.1:1098/entityService 32 false");
-        }
-    }
-
     public void commandEntity() {
         if (args.size() > 1) {
             if (args.get(0).equals("show")) {
@@ -2409,8 +2378,6 @@ public class CLI {
                 batchRestartAll();
             } else if (command.equals("sbatchrestart")) {
                 batchRestartSingle();
-            } else if (command.equals("stc")) {
-                commandSTC();
             } else if (command.equals("showcase")) {
                 commandShowCase();
             } else if (command.equals("merge")) {

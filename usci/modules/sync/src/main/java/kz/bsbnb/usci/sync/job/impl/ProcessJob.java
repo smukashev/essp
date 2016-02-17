@@ -2,7 +2,6 @@ package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.sync.service.IBatchService;
 
 /**
  * @author k.tulbassiyev
@@ -10,13 +9,11 @@ import kz.bsbnb.usci.sync.service.IBatchService;
 public class ProcessJob extends Thread {
     private BaseEntity baseEntity;
     private IEntityService entityService;
-    private IBatchService batchService;
     private long timeSpent = 0;
 
-    public ProcessJob(IEntityService entityService, BaseEntity baseEntity, IBatchService batchService) {
+    public ProcessJob(IEntityService entityService, BaseEntity baseEntity) {
         this.entityService = entityService;
         this.baseEntity = baseEntity;
-        this.batchService = batchService;
     }
 
     @Override
