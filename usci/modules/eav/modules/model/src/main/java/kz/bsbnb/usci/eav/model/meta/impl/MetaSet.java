@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -28,7 +29,7 @@ public class MetaSet extends MetaContainer implements IMetaSet
 
         if (metaType == null)
         {
-            throw new IllegalArgumentException("MetaType can not be null.");
+            throw new IllegalArgumentException(Errors.E46+"");
         }
         this.metaType = metaType;
     }
@@ -72,7 +73,7 @@ public class MetaSet extends MetaContainer implements IMetaSet
     {
         if (metaType == null)
         {
-            throw new IllegalArgumentException("MetaType can not be null.");
+            throw new IllegalArgumentException(Errors.E46+"");
         }
         this.metaType = metaType;
     }
@@ -80,10 +81,10 @@ public class MetaSet extends MetaContainer implements IMetaSet
     public DataTypes getTypeCode()
     {
         if(isComplex())
-            throw new IllegalStateException();
+            throw new IllegalStateException("");
 
         if(metaType.isSet())
-            throw new IllegalStateException();
+            throw new IllegalStateException("");
 
         return ((MetaValue) metaType).getTypeCode();
     }
@@ -120,7 +121,7 @@ public class MetaSet extends MetaContainer implements IMetaSet
     {
         if (metaAttribute.getMetaType() == null)
         {
-            throw new IllegalArgumentException("MetaType can not be null.");
+            throw new IllegalArgumentException(Errors.E46+"");
         }
         setMetaType(metaAttribute.getMetaType());
     }

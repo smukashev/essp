@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -106,8 +107,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + id +
-                    ", EAV_BE_DOUBLE_VALUES);");
+            throw new IllegalStateException(Errors.E98 + "|" + count + "|" + id);
     }
 
     @Override
@@ -126,8 +126,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + id +
-                    ", EAV_BE_DOUBLE_VALUES);");
+            throw new IllegalStateException(Errors.E97 + "|" + count + "|" + id);
     }
 
     @Override
@@ -136,16 +135,15 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
 
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -191,7 +189,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -204,7 +202,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
 
             boolean last = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
+            double value = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_DOUBLE_VALUES.REPORT_DATE.getName()));
@@ -229,16 +227,15 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
 
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -284,7 +281,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -301,7 +298,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_DOUBLE_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
+            double value = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_DOUBLE_VALUES.REPORT_DATE.getName()));
@@ -325,16 +322,15 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
 
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -360,7 +356,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -374,7 +370,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
             boolean last = ((BigDecimal) row
                     .get(EAV_BE_DOUBLE_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
+            double value = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
 
             closedBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,
@@ -395,16 +391,15 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
 
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -430,7 +425,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -444,7 +439,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
             boolean closed = ((BigDecimal) row
                     .get(EAV_BE_DOUBLE_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
-            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
+            double value = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
                     .get(EAV_BE_DOUBLE_VALUES.REPORT_DATE.getName()));
@@ -515,13 +510,13 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
 
             long id = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.ID.getName())).longValue();
 
-            long creditorId =  ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.CREDITOR_ID.getName())).longValue();
+            long creditorId = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.CREDITOR_ID.getName())).longValue();
 
             boolean closed = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
             boolean last = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            double value = ((BigDecimal)row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
+            double value = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.VALUE.getName())).doubleValue();
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_DOUBLE_VALUES.REPORT_DATE.getName()));
@@ -551,4 +546,5 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
 
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-    }}
+    }
+}

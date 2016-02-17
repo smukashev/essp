@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -95,8 +96,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Обновление затронуло " + count + " записей(ID: " + baseValue.getId() +
-                    ", EAV_BE_ENTITY_COMPLEX_SETS);");
+            throw new IllegalStateException(Errors.E86 + "|" + count + "|" + baseValue.getId());
     }
 
     @Override
@@ -111,8 +111,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + persistable.getId() +
-                    ", EAV_BE_ENTITY_COMPLEX_SETS);");
+            throw new IllegalStateException(Errors.E85 + "|" + count + "|" + persistable.getId());
     }
 
     @Override
@@ -122,14 +121,13 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -175,7 +173,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -220,14 +218,13 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -273,7 +270,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() >= 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -316,14 +313,13 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -351,7 +347,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -392,14 +388,13 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException("Мета данные атрибута не могут быть NULL;");
+            throw new IllegalStateException(Errors.E80 + "");
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException("Мета данные атрибута должны иметь ID больше 0;");
+            throw new IllegalStateException(Errors.E81 + "");
 
         if (baseContainer == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
 
         if (baseContainer.getId() < 1)
             return null;
@@ -425,7 +420,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + metaAttribute.getName() + ");");
+            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -468,39 +463,39 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         Select select;
 
         Table tableNumbering = context
-            .select(DSL.rank().over()
-                        .partitionBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID))
-                        .orderBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE)).as("num_pp"),
-                    tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
-                    tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.CREDITOR_ID),
-                    tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID),
-                    tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
-                    tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
-                    tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
-                    tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST))
-            .from(tableOfEntityComplexSets)
-            .where(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID).eq(baseEntity.getId()))
-            .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE)
-                    .lessOrEqual(DataUtils.convert(actualReportDate)))
-            .asTable("essn");
+                .select(DSL.rank().over()
+                                .partitionBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID))
+                                .orderBy(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE)).as("num_pp"),
+                        tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
+                        tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.CREDITOR_ID),
+                        tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID),
+                        tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
+                        tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
+                        tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
+                        tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST))
+                .from(tableOfEntityComplexSets)
+                .where(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID).eq(baseEntity.getId()))
+                .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE)
+                        .lessOrEqual(DataUtils.convert(actualReportDate)))
+                .asTable("essn");
 
         select = context
-            .select(tableOfComplexSets.field(EAV_M_COMPLEX_SET.NAME),
-                tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
-                tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
-                    tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.CREDITOR_ID),
-                    tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
-                tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
-                tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST))
-            .from(tableNumbering)
-            .join(tableOfComplexSets)
-            .on(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID)
-                    .eq(tableOfComplexSets.field(EAV_M_COMPLEX_SET.ID)))
-            .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-            .and((tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED).equal(false)
-                .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).equal(false)))
-                .or(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE).equal(actualReportDate)
-                    .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).equal(true))));
+                .select(tableOfComplexSets.field(EAV_M_COMPLEX_SET.NAME),
+                        tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.ID),
+                        tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE),
+                        tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.CREDITOR_ID),
+                        tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID),
+                        tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED),
+                        tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST))
+                .from(tableNumbering)
+                .join(tableOfComplexSets)
+                .on(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID)
+                        .eq(tableOfComplexSets.field(EAV_M_COMPLEX_SET.ID)))
+                .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
+                .and((tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED).equal(false)
+                        .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).equal(false)))
+                        .or(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE).equal(actualReportDate)
+                                .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).equal(true))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -523,7 +518,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             IBaseSet baseSet = new BaseSet(setId, metaSetMemberType);
 
             if (metaSetMemberType.isSet())
-                throw new UnsupportedOperationException("Не реализовано;");
+                throw new UnsupportedOperationException(Errors.E2 + "");
 
             baseSetComplexValueDao.loadBaseValues(baseSet, actualReportDate);
 

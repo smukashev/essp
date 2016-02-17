@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.manager.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -52,7 +53,7 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public void registerAsInserted(IPersistable insertedObject) {
         if (insertedObject == null)
-            throw new RuntimeException("Обьект для вставки не может быть NULL;");
+            throw new RuntimeException(Errors.E54+"");
 
         Class objectClass = insertedObject.getClass();
         if (insertedObjects.containsKey(objectClass)) {
@@ -68,7 +69,7 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public void registerAsUpdated(IPersistable updatedObject) {
         if (updatedObject == null)
-            throw new RuntimeException("Обьект для обновления не может быть NULL");
+            throw new RuntimeException(Errors.E55+"");
 
         Class objectClass = updatedObject.getClass();
         if (updatedObjects.containsKey(objectClass)) {
@@ -84,7 +85,7 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public void registerAsDeleted(IPersistable deletedObject) {
         if (deletedObject == null)
-            throw new RuntimeException("Обьект для удаления не может быть NULL");
+            throw new RuntimeException(Errors.E53+"");
 
         Class objectClass = deletedObject.getClass();
         if (deletedObjects.containsKey(objectClass)) {

@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
@@ -32,7 +33,7 @@ public final class BasicOptimizer {
             case "credit":
                 return CreditOptimizer.getKeyString(iBaseEntity);
             default:
-                throw new IllegalStateException("Мета класс для оптимизаций не найден; \n" + iBaseEntity);
+                throw new IllegalStateException(Errors.E183+"|" + iBaseEntity);
         }
     }
 }

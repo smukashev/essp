@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 
@@ -15,13 +16,13 @@ public final class CreditOptimizer {
 
         if (primaryContractBaseValue == null || creditorBaseValue == null ||
                 primaryContractBaseValue.getValue() == null || creditorBaseValue.getValue() == null)
-            throw new IllegalStateException("Документ не содержит обязательные поля; \n" + iBaseEntity);
+            throw new IllegalStateException(Errors.E184 + "|" + iBaseEntity);
 
         IBaseEntity primaryContractEntity = (IBaseEntity) primaryContractBaseValue.getValue();
         IBaseEntity creditorEntity = (IBaseEntity) creditorBaseValue.getValue();
 
         if (creditorEntity.getId() == 0)
-            throw new IllegalStateException("Кредитор не найден в справочнике; \n" + iBaseEntity);
+            throw new IllegalStateException(Errors.E185+"|" + iBaseEntity);
 
         if (primaryContractEntity.getId() == 0)
             return null;

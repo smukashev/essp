@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IEavGlobalDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
@@ -54,8 +55,7 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException("Операция должна была обновить 1 запись. Былог обновлено " + count +
-                    " записей;");
+            throw new RuntimeException(Errors.E156+"|" + count );
     }
 
     @Override
@@ -70,8 +70,7 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException("Операция должна была удалить 1 запись. Было удалено " + count +
-                    " записей;");
+            throw new RuntimeException(Errors.E154+"|" + count);
     }
 
     @Override
@@ -160,6 +159,6 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
             return (String)row.get("VALUE");
         }
 
-        throw new RuntimeException("value not found");
+        throw new RuntimeException(Errors.E155+"");
     }
 }

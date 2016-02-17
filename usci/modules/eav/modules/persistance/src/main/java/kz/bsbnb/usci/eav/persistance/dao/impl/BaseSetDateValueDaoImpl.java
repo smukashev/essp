@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -101,8 +102,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + id +
-                    ", EAV_BE_DATE_SET_VALUES);");
+            throw new IllegalStateException(Errors.E142+"|" + count + "|" + id);
 
     }
 
@@ -122,18 +122,16 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + id +
-                    ", EAV_BE_DATE_SET_VALUES);");
+            throw new IllegalStateException(Errors.E141 + "|" + count + "|" + id);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -157,8 +155,8 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
                 .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).VALUE.equal(
                         DataUtils.convert((Date) baseValue.getValue())))
-                        .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE.lessThan(
-                                DataUtils.convert(baseValue.getRepDate()))).asTable(subqueryAlias);
+                .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE.lessThan(
+                        DataUtils.convert(baseValue.getRepDate()))).asTable(subqueryAlias);
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_DATE_SET_VALUES.ID),
@@ -174,7 +172,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
+            throw new RuntimeException(Errors.E83+"|" + baseValue.getMetaAttribute().getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -212,10 +210,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -237,10 +234,10 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
                 .from(EAV_BE_DATE_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_DATE_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Date) baseValue.getValue())))
-                        .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
-                        .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
-                                DataUtils.convert(baseValue.getRepDate())))
-                        .asTable(subqueryAlias);
+                .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
+                        DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subqueryAlias);
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_DATE_SET_VALUES.ID),
@@ -256,7 +253,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
+            throw new RuntimeException(Errors.E83+"|" + baseValue.getMetaAttribute().getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -294,10 +291,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
     @SuppressWarnings("unchecked")
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName() );
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -324,7 +320,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
+            throw new RuntimeException(Errors.E83+"|" + baseValue.getMetaAttribute().getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -358,10 +354,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -386,7 +381,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Найдено более одной записи(" + baseValue.getMetaAttribute().getName() + ");");
+            throw new RuntimeException(Errors.E83+"|" + baseValue.getMetaAttribute().getName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();

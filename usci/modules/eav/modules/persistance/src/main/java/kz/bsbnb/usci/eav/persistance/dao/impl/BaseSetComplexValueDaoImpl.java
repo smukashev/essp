@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -90,8 +91,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Обновление затронуло " + count + " записей(" + baseValue.getId() +
-                    ", EAV_BE_COMPLEX_SET_VALUES);");
+            throw new IllegalStateException(Errors.E138+"|" + count + "|" + baseValue.getId());
     }
 
     @Override
@@ -104,16 +104,14 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException("Удаление затронуло " + count + " записей(" + persistable.getId() +
-                    ", EAV_BE_COMPLEX_SET_VALUES);");
+            throw new IllegalStateException(Errors.E133+"|" + count + "|" + persistable.getId());
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -157,8 +155,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено более одной предыдущей записи массива(" +
-                    childBaseEntity.getId() + ", " + childBaseEntity.getMeta().getClassName() + ")");
+            throw new IllegalStateException(Errors.E137+"|" +childBaseEntity.getId() + "|" + childBaseEntity.getMeta().getClassName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -199,8 +196,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -245,8 +241,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено более одной следующей записи массива(" +
-                    childBaseEntity.getId() + ", " + childBaseEntity.getMeta().getClassName() + ")");
+            throw new IllegalStateException(Errors.E136+"|" + childBaseEntity.getId() + "|" + childBaseEntity.getMeta().getClassName());
 
         if (rows.size() >= 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -287,8 +282,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @SuppressWarnings("unchecked")
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -299,7 +293,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         IMetaType metaType = baseSet.getMemberType();
 
         if (baseContainer.getId() == 0)
-            throw new RuntimeException("Can not find closed instance of BaseValue without container or container ID.");
+            throw new RuntimeException(Errors.E134+"");
 
         IBaseValue closedBaseValue = null;
 
@@ -321,8 +315,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено более одной закрытой записи массива(" +
-                    childBaseEntity.getId() + ", " + childBaseEntity.getMeta().getClassName() + ")");
+            throw new IllegalStateException(Errors.E135+"|" +
+                    childBaseEntity.getId() + "|" + childBaseEntity.getMeta().getClassName());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -356,8 +350,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException("Родитель записи(" + baseValue.getMetaAttribute().getName() +
-                    ") является NULL;");
+            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -385,7 +378,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException("Найдено больше одной записи(" + select.toString() + ");");
+            throw new IllegalStateException(Errors.E83+"|" + select.toString());
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();

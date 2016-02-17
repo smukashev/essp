@@ -4,6 +4,7 @@ import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.cr.model.Report;
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EavGlobal;
@@ -167,7 +168,7 @@ public class ZipFilesMonitor {
 					}
 					sleepCounter++;
 					if (sleepCounter > WAIT_TIMEOUT) {
-						throw new IllegalStateException("Sync timeout in reader.");
+						throw new IllegalStateException(Errors.E192+"");
 					}
 					continue;
 				}
@@ -577,7 +578,7 @@ public class ZipFilesMonitor {
 				}
 
 				if (extractedBytes == null)
-					throw new IOException("ZIP file does not contain any files.");
+					throw new IOException(Errors.E191+"");
 
 				if (userId == null)
 					userId = 100500L;

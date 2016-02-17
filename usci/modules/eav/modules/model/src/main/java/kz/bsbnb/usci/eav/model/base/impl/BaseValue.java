@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -66,8 +67,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         super(id);
 
         if (reportDate == null)
-            throw new IllegalArgumentException
-                    ("reportDate is null. Initialization of the BaseValue ​​is not possible.");
+            throw new IllegalArgumentException(Errors.E36+"");
 
         Date newReportDate = (Date) reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
@@ -194,8 +194,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         IMetaAttribute thatMetaAttribute = baseValue.getMetaAttribute();
 
         if (thisMetaAttribute == null || thatMetaAttribute == null)
-            throw new IllegalStateException("Comparison values of two instances of BaseValue " +
-                    "without meta data is not possible.");
+            throw new IllegalStateException(Errors.E38+"");
 
         return thisMetaAttribute.getId() == thatMetaAttribute.getId() &&
                 this.equalsByValue(thisMetaAttribute.getMetaType(), baseValue);
@@ -207,11 +206,10 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         Object thatValue = baseValue.getValue();
 
         if (thisValue == null || thatValue == null)
-            throw new RuntimeException("Comparison values of two instances of BaseValue " +
-                    "with null values is not possible.");
+            throw new RuntimeException(Errors.E39+"");
 
         if (metaType.isSetOfSets())
-            throw new UnsupportedOperationException("Not yet implemented");
+            throw new UnsupportedOperationException(Errors.E40+"");
 
         if (metaType.isComplex()) {
             if (metaType.isSet()) {
@@ -240,7 +238,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
             }
         } else {
             if (metaType.isSetOfSets()) {
-                throw new UnsupportedOperationException("Не реализовано;");
+                throw new UnsupportedOperationException(Errors.E2+"");
             }
 
             if (metaType.isSet()) {
@@ -289,7 +287,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                 break;
             case DATE:
                 //TODO: add date format
-                throw new UnsupportedOperationException("DATE is not supported!;");
+                throw new UnsupportedOperationException(Errors.E41+"");
             case STRING:
                 if (value.equals(str))
                     return true;
@@ -303,7 +301,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                     return true;
                 break;
             default:
-                throw new IllegalStateException("Unknown DataType: " + type);
+                throw new IllegalStateException(Errors.E42+"|" + type);
         }
 
         return false;
@@ -328,7 +326,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                 }
             }
         } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException("BaseValue class does not implement interface Cloneable.");
+            throw new RuntimeException(Errors.E37+"");
         }
         return baseValue;
     }

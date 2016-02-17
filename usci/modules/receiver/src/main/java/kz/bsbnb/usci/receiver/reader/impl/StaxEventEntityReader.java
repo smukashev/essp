@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
@@ -132,7 +133,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 if (validateSchema(new ByteArrayInputStream(out.toByteArray()))) {
                     xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
                 } else {
-                    throw new RuntimeException("XML validation error");
+                    throw new RuntimeException(Errors.E193+"");
                 }
             }
         } catch (XMLStreamException e) {
@@ -284,7 +285,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
                     logger.error("Cast error: " + localName + ", exception text: " + n.getMessage());
-                    throw new RuntimeException("Cast error: " + localName + ", exception text: " + n.getMessage());
+                    throw new RuntimeException(Errors.E194+"|" + localName + "|"
+                            + (n.getMessage().length() > 255 ? n.getMessage().substring(0, 255) : n.getMessage()));
                 } catch (ClassCastException ex) {
                     logger.debug("Empty tag: " + localName);
                     level--;
@@ -351,7 +353,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             }
             sleepCounter++;
             if (sleepCounter > WAIT_TIMEOUT) {
-                throw new IllegalStateException("Sync timeout in reader.");
+                throw new IllegalStateException(Errors.E192+"");
             }
         }
         while (xmlEventReader.hasNext()) {

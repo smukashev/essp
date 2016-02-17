@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.model.type;
 
+import kz.bsbnb.usci.eav.Errors;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -48,7 +50,7 @@ public enum DataTypes
             case DOUBLE:
                 return Double.class;
             default:
-                throw new IllegalArgumentException("Unknown type. Can not be returned an appropriate class.");
+                throw new IllegalArgumentException(Errors.E49+"");
         }
     }
 
@@ -89,7 +91,7 @@ public enum DataTypes
 
                 return date;
             default:
-                throw new IllegalArgumentException("Unknown type. Can not be returned an appropriate class.");
+                throw new IllegalArgumentException(Errors.E49+"");
         }
     }
 }

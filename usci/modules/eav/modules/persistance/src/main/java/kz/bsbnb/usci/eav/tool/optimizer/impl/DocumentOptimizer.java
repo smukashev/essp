@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 
@@ -15,12 +16,12 @@ public final class DocumentOptimizer {
 
         if (noBaseValue == null || docTypeBaseValue == null || noBaseValue.getValue() == null ||
                 docTypeBaseValue.getValue() == null)
-            throw new IllegalStateException("Документ не содержит обязательные поля; \n" + iBaseEntity);
+            throw new IllegalStateException(Errors.E184+"|" + iBaseEntity);
 
         IBaseEntity docTypeEntity = (IBaseEntity) docTypeBaseValue.getValue();
 
         if (docTypeEntity.getId() == 0)
-            throw new IllegalStateException("Тип документа не найден; \n" + iBaseEntity);
+            throw new IllegalStateException(Errors.E186+"|" + iBaseEntity);
 
         stringBuilder.append(noBaseValue.getValue());
         stringBuilder.append("|").append(docTypeEntity.getId());

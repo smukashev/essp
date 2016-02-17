@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.EntityHolder;
@@ -68,24 +69,21 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             reportDateSaving);
 
                     if (minReportDate == null)
-                        throw new UnsupportedOperationException("Найденный объект (" + baseEntitySaving.getId()
-                                + ") не имеет отчетный даты;");
+                        throw new UnsupportedOperationException(Errors.E56 + "|" + baseEntitySaving.getId());
 
                     baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), minReportDate,
-                                reportDateSaving);
+                            reportDateSaving);
 
                     if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
-                        throw new UnsupportedOperationException("Запись с ID(" + baseEntityLoaded.getId() +
-                                ") является закрытой с даты " + baseEntityLoaded.getBaseEntityReportDate().getReportDate()
-                                + ". Обновление после закрытия сущностей не является возможным;");
+                        throw new UnsupportedOperationException(Errors.E57 + "|" + baseEntityLoaded.getId() +
+                                "|" + baseEntityLoaded.getBaseEntityReportDate().getReportDate());
 
                 } else {
                     baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), maxReportDate, reportDateSaving);
 
                     if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
-                        throw new UnsupportedOperationException("Запись с ID(" + baseEntityLoaded.getId() +
-                                ") является закрытой с даты " + baseEntityLoaded.getBaseEntityReportDate().getReportDate()
-                                + ". Обновление после закрытия сущностей не является возможным;");
+                        throw new UnsupportedOperationException(Errors.E57 + "|" + baseEntityLoaded.getId() +
+                                "|" + baseEntityLoaded.getBaseEntityReportDate().getReportDate());
 
                 }
             }
@@ -138,17 +136,17 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     IBaseEntityManager baseEntityManager) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException("Атрибут должен содержать мета данные;");
+            throw new IllegalStateException(Errors.E60 + "");
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer != null && baseContainer.getBaseContainerType() != BaseContainerType.BASE_ENTITY)
-            throw new IllegalStateException("Родитель атрибута(" + metaAttribute.getName() + ") должна быть сущность;");
+            throw new IllegalStateException(Errors.E59 + "|" + metaAttribute.getName());
 
         IMetaType metaType = metaAttribute.getMetaType();
         if (metaType.isComplex()) {
             if (metaType.isSet()) {
                 if (metaType.isSetOfSets())
-                    throw new UnsupportedOperationException("Поддержка массив массивов не реализовано;");
+                    throw new UnsupportedOperationException(Errors.E61 + "");
 
                 IMetaSet childMetaSet = (IMetaSet) metaType;
                 IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
@@ -159,8 +157,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     if (metaAttribute.isImmutable() && childBaseEntity.getValueCount() != 0 &&
                             childBaseEntity.getId() < 1)
-                        throw new KnownException("Запись класса " + childBaseEntity.getMeta().
-                                getClassName() + " не найдена;" + "\n" + childBaseEntity.toString());
+                        throw new KnownException(Errors.E62 + "|" + childBaseEntity.getMeta().
+                                getClassName() + "|" + childBaseEntity.toString());
 
                     IBaseEntity childBaseEntityApplied = apply(creditorId, childBaseEntity, null,
                             baseEntityManager, null);
@@ -199,16 +197,15 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     if (childBaseEntity.getValueCount() != 0) {
                         if (childBaseEntity.getId() < 1)
-                            throw new KnownException("Запись класса " +
-                                    childBaseEntity.getMeta().getClassName() + " не найдена;" +
-                                    "\n" + childBaseEntity.toString());
+                            throw new KnownException(Errors.E62 + "|" + childBaseEntity.getMeta().getClassName()
+                                    + "|" + childBaseEntity.toString());
 
                         IBaseEntity childBaseEntityImmutable = baseEntityLoadDao.loadByMaxReportDate(
                                 childBaseEntity.getId(), childBaseEntity.getReportDate());
 
                         if (childBaseEntityImmutable == null)
-                            throw new RuntimeException("В базе нет данных для записи(" + childBaseEntity.getId()
-                                    + ") до отчетной даты(включительно): " + childBaseEntity.getReportDate() + ";");
+                            throw new RuntimeException(Errors.E63 + "|" + childBaseEntity.getId()
+                                    + "|" + childBaseEntity.getReportDate());
 
                         IBaseValue baseValueApplied = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -223,8 +220,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
                         baseEntityManager.registerAsInserted(baseValueApplied);
                     } else {
-                        throw new IllegalStateException("Комплексный элелемент не содержит внутренних элементов(" +
-                                childBaseEntity.getMeta().getClassName() + ");");
+                        throw new IllegalStateException(Errors.E64 + "|" + childBaseEntity.getMeta().getClassName());
                     }
                 } else {
                     IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
@@ -248,7 +244,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         } else {
             if (metaType.isSet()) {
                 if (metaType.isSetOfSets())
-                    throw new UnsupportedOperationException("Не реализовано;");
+                    throw new UnsupportedOperationException(Errors.E2 + "");
 
                 IMetaSet childMetaSet = (IMetaSet) metaType;
                 IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
@@ -331,19 +327,18 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
             IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
             if (metaAttribute == null)
-                throw new RuntimeException("Атрибут должен иметь мета данные;");
+                throw new RuntimeException(Errors.E58 + "");
 
             IBaseContainer baseContainerSaving = baseValueSaving.getBaseContainer();
             if (baseContainerSaving != null && baseContainerSaving.getBaseContainerType()
                     != BaseContainerType.BASE_ENTITY)
-                throw new RuntimeException("Родитель атрибута(" + baseValueSaving.getMetaAttribute().getName()
-                        + ") должна быть сущность;");
+                throw new RuntimeException(Errors.E59 + "|" + baseValueSaving.getMetaAttribute().getName());
 
             IMetaType metaType = metaAttribute.getMetaType();
 
             if (metaType.isComplex()) {
                 if (metaType.isSetOfSets())
-                    throw new UnsupportedOperationException("Не реализовано;");
+                    throw new UnsupportedOperationException(Errors.E2 + "");
 
                 if (metaType.isSet())
                     applyComplexSet(creditorId, baseEntityApplied, baseValueSaving, baseValueLoaded,
@@ -353,7 +348,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseEntityManager);
             } else {
                 if (metaType.isSetOfSets())
-                    throw new UnsupportedOperationException("Не реализовано;");
+                    throw new UnsupportedOperationException(Errors.E2 + "");
 
                 if (metaType.isSet())
                     applySimpleSet(creditorId, baseEntityApplied, baseValueSaving, baseValueLoaded,
@@ -464,8 +459,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     // case#3
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
-                        throw new IllegalStateException("Оперативные данные могут быть закрыты только за " +
-                                "существующий отчетный период(" + metaAttribute.getName() + ");");
+                        throw new IllegalStateException(Errors.E66 + "|" + metaAttribute.getName());
 
                     if (baseValueLoaded.isLast()) {
                         IBaseValue baseValueLast = BaseValueFactory.create(
@@ -499,8 +493,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     baseEntityManager.registerAsInserted(baseValueClosed);
                 } else {
-                    throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является " +
-                            "возможным. " + baseValueSaving.getMetaAttribute().getName() + ";");
+                    throw new UnsupportedOperationException(Errors.E75 + "|" + baseValueSaving.getMetaAttribute().getName());
                 }
 
                 return;
@@ -588,8 +581,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     // case#8
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
-                        throw new RuntimeException("Оперативные данные(" + metaAttribute.getName() + ")" +
-                                " могут изменятся только за существующие периоды;");
+                        throw new RuntimeException(Errors.E69 + "|" + metaAttribute.getName());
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -667,8 +659,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueClosed);
 
                         if (baseValuePrevious == null)
-                            throw new IllegalStateException("Предыдущая запись не найдена(" +
-                                    baseValueClosed.getMetaAttribute().getName() + ");");
+                            throw new IllegalStateException(Errors.E70 + "|" + baseValueClosed.getMetaAttribute().getName());
 
                         baseValuePrevious.setMetaAttribute(metaAttribute);
                         baseValuePrevious.setBaseContainer(baseEntityApplied);
@@ -781,9 +772,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     // case#1
                     if (metaAttribute.isFinal()) {
                         if (metaClass.hasNotFinalAttributes() && !metaClass.isSearchable())
-                            throw new IllegalStateException("Оперативные атрибуты могут сожержать только оперативные "
-                                    + "данные. Мета: " + baseEntity.getMeta().getClassName()
-                                    + ", атрибут: " + metaAttribute.getName());
+                            throw new IllegalStateException(Errors.E65 + "|" + baseEntity.getMeta().getClassName()
+                                    + "|" + metaAttribute.getName());
 
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -915,8 +905,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     // case#3
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
-                        throw new IllegalStateException("Оперативные данные могут быть закрыты только за " +
-                                "существующий отчетный период(" + metaAttribute.getName() + ");");
+                        throw new IllegalStateException(Errors.E66 + "|" + metaAttribute.getName());
 
                     if (baseValueLoaded.isLast()) {
                         IBaseValue baseValueLast = BaseValueFactory.create(
@@ -966,8 +955,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1)
-                        throw new KnownException("Запись класса " + baseEntitySaving.getMeta().
-                                getClassName() + " не найдена;" + "\n" + baseEntitySaving.toString());
+                        throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().
+                                getClassName() + "|" + baseEntitySaving.toString());
 
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
@@ -1004,9 +993,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1)
-                        throw new KnownException("Запись класса " +
-                                baseEntitySaving.getMeta().getClassName() + " не найдена;" +
-                                "\n" + baseEntitySaving.toString());
+                        throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().getClassName() +
+                                "|" + baseEntitySaving.toString());
 
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
@@ -1037,8 +1025,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseEntityManager.registerAsUpdated(baseValueApplied);
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
-                        throw new RuntimeException("Оперативные данные(" + metaAttribute.getName() + ")" +
-                                " могут изменятся только за существующие периоды;");
+                        throw new RuntimeException(Errors.E69 + "|" + metaAttribute.getName());
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1074,8 +1061,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
                 } else if (compare == -1) {
                     if (metaAttribute.isFinal())
-                        throw new RuntimeException("Оперативные данные(" + metaAttribute.getName() + ")" +
-                                " могут изменятся только за существующие периоды;");
+                        throw new RuntimeException(Errors.E69 + "|" + metaAttribute.getName());
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1120,8 +1106,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueClosed);
 
                         if (baseValuePrevious == null)
-                            throw new IllegalStateException("Предыдущая запись не найдена(" +
-                                    baseValueClosed.getMetaAttribute().getName() + ");");
+                            throw new IllegalStateException(Errors.E70 + "|" + baseValueClosed.getMetaAttribute().getName());
 
                         baseValuePrevious.setBaseContainer(baseEntity);
                         baseValuePrevious.setMetaAttribute(metaAttribute);
@@ -1129,9 +1114,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             if (baseEntitySaving.getId() < 1)
-                                throw new KnownException("Запись класса " +
-                                        baseEntitySaving.getMeta().getClassName() + " не найдена;" +
-                                        "\n" + baseEntitySaving.toString());
+                                throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().getClassName()
+                                        + "|" + baseEntitySaving.toString());
 
                             baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                                     baseEntitySaving.getReportDate());
@@ -1156,9 +1140,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             if (baseEntitySaving.getId() < 1)
-                                throw new KnownException("Запись класса " +
-                                        baseEntitySaving.getMeta().getClassName() + " не найдена;" +
-                                        "\n" + baseEntitySaving.toString());
+                                throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().getClassName()
+                                        + "|" + baseEntitySaving.toString());
 
                             baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                                     baseEntitySaving.getReportDate());
@@ -1179,7 +1162,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueSaving);
 
                     if (metaAttribute.isImmutable() && baseEntitySaving.getId() == 0)
-                        throw new IllegalStateException("Запись класса " + metaAttribute.getName() + " не найдена;");
+                        throw new IllegalStateException(Errors.E71 + "|" + metaAttribute.getName());
 
                     if (baseValueNext != null) {
                         baseValueNext.setBaseContainer(baseEntity);
@@ -1221,8 +1204,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 if (metaAttribute.isImmutable()) {
                     if (baseEntitySaving.getId() < 1)
-                        throw new KnownException("Запись класса " + baseEntitySaving.getMeta().
-                                getClassName() + " не найдена;" + "\n" + baseEntitySaving.toString());
+                        throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().
+                                getClassName() + "|" + baseEntitySaving.toString());
 
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
@@ -1297,7 +1280,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         IMetaType metaType = metaAttribute.getMetaType();
 
         if (metaAttribute.isFinal())
-            throw new UnsupportedOperationException("Не реализовано;");
+            throw new UnsupportedOperationException(Errors.E2 + "");
 
         IMetaSet metaSet = (IMetaSet) metaType;
         IMetaType childMetaType = metaSet.getMemberType();
@@ -1385,8 +1368,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
                     isBaseSetDeleted = true;
                 } else {
-                    throw new IllegalStateException("Дата закрытия атрибута(" + metaAttribute.getName() + ") должна "
-                            + "быть больше или равна дате открытия атрибута;");
+                    throw new IllegalStateException(Errors.E72 + "|" + metaAttribute.getName());
                 }
             } else {
                 Date reportDateSaving = baseValueSaving.getRepDate();
@@ -1460,8 +1442,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueClosed);
 
                 if (baseValuePrevious == null)
-                    throw new IllegalStateException("Предыдущая запись не найдена(" +
-                            baseValueClosed.getMetaAttribute().getName() + ");");
+                    throw new IllegalStateException(Errors.E70 + "|" + baseValueClosed.getMetaAttribute().getName());
 
                 baseValuePrevious.setBaseContainer(baseValueSaving.getBaseContainer());
                 baseValuePrevious.setMetaAttribute(baseValueSaving.getMetaAttribute());
@@ -1608,8 +1589,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             childBaseSetApplied.put(childBaseValuePrevious);
                         }
                     } else {
-                        throw new IllegalStateException("Запись открытия не была найдена(" +
-                                metaAttribute.getName() + ");");
+                        throw new IllegalStateException(Errors.E73 + "|" + metaAttribute.getName());
                     }
 
                     continue;
@@ -1644,7 +1624,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         childBaseSetApplied.put(childBaseValueApplied);
                         baseEntityManager.registerAsInserted(childBaseValueApplied);
                     } else {
-                        throw new IllegalStateException("Last значение выгружено неправильно;");
+                        throw new IllegalStateException(Errors.E74 + "");
                     }
 
                     continue;
@@ -1764,8 +1744,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     // case#1
                     if (metaAttribute.isFinal()) {
                         if (!childMetaClass.isSearchable() && childMetaClass.hasNotFinalAttributes())
-                            throw new IllegalStateException("Оперативные атрибуты могут сожержать только оперативные "
-                                    + "данные. Мета: " + baseEntity.getMeta().getClassName() + ", атрибут: " +
+                            throw new IllegalStateException(Errors.E65 + "|" + baseEntity.getMeta().getClassName() + "|" +
                                     metaAttribute.getName());
 
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
@@ -1834,8 +1813,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     // case#3
                 } else if (compare == 1) {
                     if (metaAttribute.isFinal())
-                        throw new IllegalStateException("Оперативные данные могут быть закрыты только за " +
-                                "существующий отчетный период(" + metaAttribute.getName() + ");");
+                        throw new IllegalStateException(Errors.E66 + "|" + metaAttribute.getName());
 
                     IBaseValue baseValueClosed = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1880,8 +1858,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
 
                 if (metaAttribute.isFinal() && compare != 0)
-                    throw new IllegalStateException("Оперативные данные выгружены неправильно(" +
-                            metaAttribute.getName() + "); ");
+                    throw new IllegalStateException(Errors.E67 + "|" + metaAttribute.getName());
 
                 if (compare == 0 || compare == 1) {
                     childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
@@ -1962,8 +1939,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseValue baseValuePrevious = baseValueDao.getPreviousBaseValue(baseValueClosed);
 
                     if (baseValuePrevious == null)
-                        throw new IllegalStateException("Предыдущая запись не найдена(" +
-                                metaAttribute.getName() + ");");
+                        throw new IllegalStateException(Errors.E68 + "|" + metaAttribute.getName());
 
                     baseValuePrevious.setBaseContainer(baseEntity);
                     baseValuePrevious.setMetaAttribute(metaAttribute);
@@ -2268,7 +2244,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
 
         /* Обработка документов по типу */
-        if(savedDocTypes.size() > 0 && childBaseSetLoaded != null) {
+        if (savedDocTypes.size() > 0 && childBaseSetLoaded != null) {
             for (IBaseValue savedValue : savedDocTypes) {
                 for (IBaseValue loadedValue : childBaseSetLoaded.get()) {
                     BaseEntity savedDocument = (BaseEntity) savedValue.getValue();
@@ -2354,13 +2330,13 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             BaseEntity be = (BaseEntity) insertedObject;
                             if (BasicOptimizer.metaList.contains(be.getMeta().getClassName())) {
                                 EavOptimizerData eod = new EavOptimizerData(baseEntityManager.getCreditorId(),
-                                        be.getMeta().getId(), be.getId(),BasicOptimizer.getKeyString(be));
+                                        be.getMeta().getId(), be.getId(), BasicOptimizer.getKeyString(be));
                                 eavOptimizerDao.insert(eod);
                             }
                         }
                     } catch (Exception e) {
-                        throw new IllegalStateException("Ошибка при вставке: " + e.getMessage() +
-                                "\n" + insertedObject);
+                        throw new IllegalStateException(Errors.E76 + "|" + (e.getMessage().length() > 255 ? e.getMessage().substring(0, 255) : e.getMessage())
+                                + "|" + insertedObject);
                     }
 
                     if (isReferenceCacheEnabled && (insertedObject instanceof IBaseEntity)) {
@@ -2383,8 +2359,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     try {
                         persistableDao.update(updatedObject);
                     } catch (Exception e) {
-                        throw new IllegalStateException("Ошибка при обновлений: " + e.getMessage() +
-                                "\n" + updatedObject);
+                        throw new IllegalStateException(Errors.E77 + "|" + (e.getMessage().length() > 255 ? e.getMessage().substring(0, 255) : e.getMessage())
+                                + "|" + updatedObject);
                     }
 
                     if (isReferenceCacheEnabled && (updatedObject instanceof IBaseEntity)) {
@@ -2413,8 +2389,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         }
                         persistableDao.delete(deletedObject);
                     } catch (Exception e) {
-                        throw new IllegalStateException("Ошибка при удалений: " + e.getMessage() +
-                                "\n" + deletedObject);
+                        throw new IllegalStateException(Errors.E78 + "|" + (e.getMessage().length() > 255 ? e.getMessage().substring(0, 255) : e.getMessage())
+                                + "|" + deletedObject);
                     }
 
                     if (isReferenceCacheEnabled && (deletedObject instanceof IBaseEntity)) {
