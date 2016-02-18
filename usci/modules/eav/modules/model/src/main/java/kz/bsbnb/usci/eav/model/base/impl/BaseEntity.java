@@ -913,7 +913,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                             }
 
                             if (set.getMemberType().isSet()) {
-                                throw new IllegalArgumentException(Errors.E24 + "");
+                                throw new IllegalArgumentException(Errors.E23 + "");
                             }
 
                             String restOfPath = "";
