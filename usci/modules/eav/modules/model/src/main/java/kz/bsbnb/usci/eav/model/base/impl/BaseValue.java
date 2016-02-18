@@ -209,7 +209,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
             throw new RuntimeException(Errors.E39+"");
 
         if (metaType.isSetOfSets())
-            throw new UnsupportedOperationException(Errors.E40+"");
+            throw new UnsupportedOperationException(Errors.E2+"");
 
         if (metaType.isComplex()) {
             if (metaType.isSet()) {
@@ -301,7 +301,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                     return true;
                 break;
             default:
-                throw new IllegalStateException(Errors.E42+"|" + type);
+                throw new IllegalStateException(Errors.E7+"|" + type);
         }
 
         return false;

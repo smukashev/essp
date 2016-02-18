@@ -74,7 +74,7 @@ public class BaseValueFactory {
                                 break;
                             }
                             default:
-                                throw new RuntimeException(Errors.E42+"");
+                                throw new RuntimeException(Errors.E7+"");
                         }
                     }
                 }
@@ -116,7 +116,7 @@ public class BaseValueFactory {
                                 break;
                             }
                             default:
-                                throw new RuntimeException(Errors.E42+"");
+                                throw new RuntimeException(Errors.E7+"");
                         }
                     }
                 }
