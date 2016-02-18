@@ -12,6 +12,8 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.w3c.dom.Document;
 
@@ -34,6 +36,8 @@ public class MainPortlet extends MVCPortlet {
     private final static String TMP_FILE_DIR = "\\\\" + StaticRouter.getAsIP() + "\\batch_entry_list_temp_folder";
 
     private IBatchEntryService batchEntryService;
+    private Logger logger = LoggerFactory.getLogger(MainPortlet.class);
+    private boolean retry;
 
     public void connectToServices() {
         try {
@@ -265,8 +269,27 @@ public class MainPortlet extends MVCPortlet {
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            writer.write("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}");
+            //e.printStackTrace();
+            String originalError = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
+            retry = false;
+            if(originalError.contains("connect") || originalError.contains("rmi"))
+                if(!retry) {
+                    retry = true;
+                    logger.info("connect failed, reconnect triggered");
+                    try {
+                        init();
+                        serveResource(resourceRequest, resourceResponse);
+                    } catch (PortletException e1) {
+                        //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
+                        writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError + e1.getMessage()
+                                .replaceAll("\"","").replaceAll("\n","")+"\"}");
+                    } finally {
+                        retry = false;
+                        return;
+                    }
+                }
+
+            writer.write("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}");
         }
     }
 }

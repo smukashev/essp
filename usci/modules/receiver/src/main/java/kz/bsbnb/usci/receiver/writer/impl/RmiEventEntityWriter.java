@@ -28,10 +28,15 @@ import java.util.*;
 @Component
 @Scope("step")
 public class RmiEventEntityWriter<T> implements IWriter<T> {
+    public static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
+    public static final String LOGIC_RULE_META = "LOGIC_RULE_META";
+
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     @Qualifier(value = "remoteEntityService")
     private RmiProxyFactoryBean rmiProxyFactoryBean;
 
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     @Qualifier(value="remoteRuleService")
     private RmiProxyFactoryBean rmiProxyRuleService;
@@ -61,10 +66,8 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
         ruleService = (IRuleService) rmiProxyRuleService.getObject();
         batchService = serviceFactory.getBatchService();
 
-        metaRules.add("credit");
-        metaRules.add("ref_creditor");
-        metaRules.add("ref_creditor_branch");
-        metaRules.add("ref_exclusive_doc");
+        String[] metas = serviceFactory.getGlobalService().getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
+        Collections.addAll(metaRules, metas);
     }
 
     @Override
