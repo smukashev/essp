@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,43 +31,42 @@ public abstract class AbstractTable implements ITable {
     @Override
     public Query getQueries(Long entityId) {
         Select select = context.selectFrom(getTable())
-            .where(getTable().field("ENTITY_ID").eq(entityId));
+                .where(getTable().field("ENTITY_ID").eq(entityId));
 
         List<java.lang.String> qList = new ArrayList<>();
         List<Long> eList = new ArrayList<>();
         Query ret = new Query(qList, eList);
 
-        List<Map<java.lang.String,Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
+        List<Map<java.lang.String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
 
-        for(Map<String,Object> row : rows) {
+        for (Map<String, Object> row : rows) {
             StringBuilder fields = new StringBuilder("insert into " + getTable().getName() + "( ");
             StringBuilder vals = new StringBuilder(" values (");
 
             Iterator<String> iterator = row.keySet().iterator();
 
-            while(iterator.hasNext()) {
+            while (iterator.hasNext()) {
                 String field = iterator.next();
                 Object val = row.get(field);
 
-                if(val instanceof String) {
+                if (val instanceof String) {
                     val = "'" + val + "'";
                 }
 
-                if(val instanceof Date) {
-                    val = "date '"+val.toString().substring(0, 10)+"'";
+                if (val instanceof Date || val instanceof Timestamp) {
+                    val = "date '" + val.toString().substring(0, 10) + "'";
                 }
-
 
                 fields.append(field);
                 vals.append(val);
 
-                if(iterator.hasNext()) {
+                if (iterator.hasNext()) {
                     fields.append(',');
                     vals.append(',');
                 }
             }
 
-            if(row.get("ENTITY_VALUE_ID") != null)
+            if (row.get("ENTITY_VALUE_ID") != null)
                 eList.add(((BigDecimal) row.get("ENTITY_VALUE_ID")).longValue());
 
             fields.append(")");

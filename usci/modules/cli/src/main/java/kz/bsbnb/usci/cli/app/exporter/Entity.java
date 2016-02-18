@@ -6,6 +6,7 @@ import org.jooq.Table;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -46,7 +47,7 @@ public class Entity extends AbstractTable {
           val = "'" + val + "'";
         }
 
-        if(val instanceof Date) {
+        if(val instanceof Date || val instanceof Timestamp) {
           val = "date '"+val.toString().substring(0, 10)+"'";
         }
 

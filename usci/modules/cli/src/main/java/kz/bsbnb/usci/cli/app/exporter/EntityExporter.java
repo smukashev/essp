@@ -47,26 +47,4 @@ public class EntityExporter {
         }
     }
 
-    public void run(){
-        Queue<Long> q = new LinkedList<>();
-        q.add(entityId);
-        List<String> queries = new ArrayList<>();
-        while(q.size() > 0) {
-            Long id = q.poll();
-            IBaseEntity be = baseEntityDao.load(id);
-            if(be.getMeta().isReference())
-                continue;
-            for(ITable table : tableList) {
-                Query query = table.getQueries(id);
-                queries.addAll(query.getQueries());
-                for(Long nextId: query.entityList) {
-                    q.add(nextId);
-                }
-            }
-        }
-
-        for(String s: queries) {
-            System.out.println(s);
-        }
-    }
 }

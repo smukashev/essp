@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.*;
 import java.lang.String;
 
@@ -56,7 +57,7 @@ public class SimpleSets extends AbstractTable {
           val = "'" + val + "'";
         }
 
-        if(val instanceof Date) {
+        if(val instanceof Date || val instanceof Timestamp) {
           val = "date '"+val.toString().substring(0, 10)+"'";
         }
 
