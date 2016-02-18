@@ -545,6 +545,42 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         }
                     }
                 }
+
+                // experiment
+                // checkme!
+                if (globalEntityApplied.getReportDate().compareTo(globalEntityLoaded.getReportDate()) == 0) {
+                    for (BaseEntity tmpLoaded : allLoaded) {
+                        HashMap<ArrayElement, HashMap<ValueElement, Object>> tmpLoadedMap = generateMap(tmpLoaded, showcaseHolder);
+
+                        if (tmpLoadedMap == null) continue;
+
+                        for (BaseEntity tmpApplied : allApplied) {
+                            HashMap<ArrayElement, HashMap<ValueElement, Object>> tmpAppliedMap = generateMap(tmpApplied, showcaseHolder);
+
+                            if (tmpAppliedMap == null) continue;
+
+                            for (ArrayElement elTmpLoaded : tmpLoadedMap.keySet()) {
+                                boolean tmpLoadedFound = false;
+
+                                for (ArrayElement elTmpApplied : tmpAppliedMap.keySet()) {
+                                    if (elTmpLoaded.valueElement.equals(elTmpApplied.valueElement))
+                                        tmpLoadedFound = true;
+                                }
+
+                                if (!tmpLoadedFound) {
+                                    KeyData keyDataLoaded = new KeyData(tmpLoadedMap.get(elTmpLoaded));
+                                    String sql = "DELETE FROM %s WHERE " + keyDataLoaded.queryKeys;
+                                    sql = String.format(sql, getActualTableName(showcaseHolder.getShowCaseMeta()),
+                                            COLUMN_PREFIX, showcaseHolder.getRootClassName());
+
+                                    jdbcTemplateSC.update(sql, getObjectArray(false, keyDataLoaded.vals));
+                                }
+                            }
+                        }
+                    }
+                }
+                // experiment
+
             } else {
                 for (BaseEntity baseEntityApplied : allApplied) {
                     dbCarteageGenerate(globalEntityApplied, baseEntityApplied, showcaseHolder);
