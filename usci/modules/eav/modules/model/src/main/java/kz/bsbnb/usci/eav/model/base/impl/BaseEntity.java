@@ -744,6 +744,16 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             if (curO == null)
                 continue;
 
+            //showcase info
+            if(curO instanceof BaseEntity) {
+                if(((BaseEntity) curO).operationType != null)
+                    switch (((BaseEntity) curO).operationType) {
+                        case DELETE:
+                        case CLOSE:
+                            continue;
+                    }
+            }
+
             if (step == yk) {
                 if (function.startsWith("count")) {
                     retCount++;

@@ -23,7 +23,7 @@
         <module>modules/receiver</module>
         <module>modules/sync</module>
         <module>modules/brms</module>
-        <module>modules/portlets</module>
+        <!--<module>modules/portlets</module>-->
         <module>modules/bconv</module>
         <module>modules/cli</module>
         <module>modules/cr</module>
