@@ -17,7 +17,7 @@ public enum Errors {
 
     private static final String LOCALE = "RU";
 
-    public static String getError(Errors code) {
+    public static String getError(String code) {
         if (errors.get(code + "_" + LOCALE) == null)
             return errors.get(code + "");
         return errors.get(code + "_" + LOCALE);
@@ -26,9 +26,9 @@ public enum Errors {
     private static HashMap<String, String> errors = new HashMap<>();
 
     static {
-        errors.put("E1_RU", "Ключевой атрибут (#attr) не может быть пустым");
-        errors.put("E1_KZ", "Ключевой атрибут (#attr) не может быть пустым");
-        errors.put("E1_EN", "Ключевой атрибут (#attr) не может быть пустым");
+        errors.put("E1_RU", "Ключевой атрибут ( #attr ) не может быть пустым");
+        errors.put("E1_KZ", "Ключевой атрибут ( #attr ) не может быть пустым");
+        errors.put("E1_EN", "Ключевой атрибут ( #attr ) не может быть пустым");
 
         errors.put("E2", "Не реализован");
         errors.put("E3", "Документ является NULL");
@@ -143,9 +143,9 @@ public enum Errors {
         errors.put("E106", "Невозможно обработать sets после операции слияния");//Can't process sets after MERGE operation
         errors.put("E107", "Два объекта BaseValue может быть в паре только один раз");//Two BaseValue objects can be paired only once
         errors.put("E108", "Неверная структура MergeManager-а");//Invalid structure of MergeManager
-        errors.put("E109", "Невозможно удалить сущность #metaclass (id: #id) используется в классах: #sbUsages");
+        errors.put("E109", "Невозможно удалить сущность #metaclass (id: #id ) используется в классах: #sbUsages");
 
-        errors.put("E110", "Невозмозжно удалить кредитор у которго есть связки с пользователями (id: #id)");
+        errors.put("E110", "Невозмозжно удалить кредитор у которго есть связки с пользователями (id: #id )");
         errors.put("E111", "Кредитор не найден #creditor");
         errors.put("E112", "Сущность для удаления не найдена #baseEntity");
         errors.put("E113", "Справочник с историей не может быть удалена #baseEntity");
