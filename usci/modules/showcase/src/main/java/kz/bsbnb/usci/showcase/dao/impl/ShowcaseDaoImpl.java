@@ -574,8 +574,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                                             COLUMN_PREFIX, showcaseHolder.getRootClassName());
 
                                     jdbcTemplateSC.update(sql, getObjectArray(false, keyDataLoaded.vals));
-
-                                    System.out.println(showcaseHolder.getShowCaseMeta().getTableName());
                                 }
                             }
                         }
