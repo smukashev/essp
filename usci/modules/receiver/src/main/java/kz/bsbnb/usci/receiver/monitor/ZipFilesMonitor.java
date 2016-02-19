@@ -160,7 +160,6 @@ public class ZipFilesMonitor {
 				JobInfo nextJob;
 
 				if (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
-					System.out.println("Can't send more files because of file limit or sync queue overload.");
 					try {
 						sleep(10000L);
 					} catch (InterruptedException e) {
@@ -179,7 +178,12 @@ public class ZipFilesMonitor {
 
 					try {
 						JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-						jobParametersBuilder.addParameter("batchId", new JobParameter(nextJob.getBatchId()));
+
+                        jobParametersBuilder.addParameter("creditorId",
+                                new JobParameter(nextJob.getBatchInfo().getCreditorId()));
+
+                        jobParametersBuilder.addParameter("batchId",
+                                new JobParameter(nextJob.getBatchId()));
 
 						jobParametersBuilder.addParameter("userId",
 								new JobParameter(nextJob.getBatchInfo().getUserId()));
@@ -201,36 +205,28 @@ public class ZipFilesMonitor {
 									.setStatus(BatchStatuses.PROCESSING)
 									.setReceiptDate(new Date()));
 						} else {
-							logger.error("Unknown batch file type: " + nextJob.getBatchInfo().getBatchType() +
-									" in batch with id: " + nextJob.getBatchId());
+							logger.error("Неивестный тип батч файла: " + nextJob.getBatchInfo().getBatchType() +
+									" ID: " + nextJob.getBatchId());
 
 							batchService.addBatchStatus(new BatchStatus()
 									.setBatchId(nextJob.getBatchId())
 									.setStatus(BatchStatuses.ERROR)
-									.setDescription("Unknown batch file type: " +
+									.setDescription("Неивестный тип батч файла: " +
 											nextJob.getBatchInfo().getBatchType())
 									.setReceiptDate(new Date()));
 						}
 
 						sleep(10000);
-					} catch (JobExecutionAlreadyRunningException e) {
-						e.printStackTrace();
-					} catch (JobRestartException e) {
-						e.printStackTrace();
-					} catch (JobInstanceAlreadyCompleteException e) {
-						e.printStackTrace();
-					} catch (JobParametersInvalidException e) {
-						e.printStackTrace();
-					} catch (InterruptedException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
-				} else {
+                } else {
 					try {
 						sleep(1000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					logger.debug("No files to send");
+					logger.debug("Нет файлов для отправки");
 				}
 			}
 		}
@@ -340,7 +336,8 @@ public class ZipFilesMonitor {
 	}
 
 	boolean waitForSignature(Batch batch, BatchInfo batchInfo) {
-		String digitalSignOrgs = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS, DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
+		String digitalSignOrgs = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,
+                DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
 		String[] orgIds = digitalSignOrgs.split(",");
 		if(batch.getCreditorId() > 0 && Arrays.asList(orgIds).contains(batch.getCreditorId() + "")) {
 			batchService.addBatchStatus(new BatchStatus()
@@ -358,7 +355,8 @@ public class ZipFilesMonitor {
 	}
 
 	private void filterUnsignedBatches(List<Batch> pendingBatchList) {
-		String digitalSignOrgs = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS, DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
+		String digitalSignOrgs = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,
+                DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
 		String[] orgIds = digitalSignOrgs.split(",");
 		Iterator<Batch> it = pendingBatchList.iterator();
 		while(it.hasNext()) {
@@ -480,7 +478,7 @@ public class ZipFilesMonitor {
 			if (portalUser != null)
 				reportBeanRemoteBusiness.updateReport(existing, portalUser.getScreenName());
 			else
-				reportBeanRemoteBusiness.updateReport(existing, "Unknown");
+				reportBeanRemoteBusiness.updateReport(existing, "Неивестный");
 
 			batchInfo.setReportId(existing.getId());
 		} else {
@@ -503,7 +501,7 @@ public class ZipFilesMonitor {
 			if (portalUser != null)
 				reportId = reportBeanRemoteBusiness.insert(report, portalUser.getScreenName());
 			else
-				reportId = reportBeanRemoteBusiness.insert(report, "Unknown");
+				reportId = reportBeanRemoteBusiness.insert(report, "Неизвестный");
 			batchInfo.setReportId(reportId);
 		}
 
@@ -673,8 +671,6 @@ public class ZipFilesMonitor {
 				batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent().
 						replaceAll("\\s+", ""));
 
-                /*batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent().
-						replaceAll("\\s+", ""));*/
 				batchInfo.setBatchName(parseFileNameFromPath(filename));
 
 				batchInfo.setUserId(userId == null ?
