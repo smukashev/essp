@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.Errors;
-import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -405,17 +404,17 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     }
 
     @Override
-    public boolean equalsByKey(Object obj) {
-        if (obj == this)
+    public boolean equalsByKey(IBaseEntity baseEntity) {
+        if (baseEntity == this)
             return true;
 
-        if (obj == null)
+        if (baseEntity == null)
             return false;
 
-        if (!(getClass() == obj.getClass()))
+        if (!(getClass() == baseEntity.getClass()))
             return false;
 
-        BaseEntity that = (BaseEntity) obj;
+        BaseEntity that = (BaseEntity) baseEntity;
 
         if (!this.getMeta().equals(that.getMeta()))
             return false;
@@ -429,7 +428,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 IBaseValue thatBaseValue = that.getBaseValue(name);
 
                 if (metaType.isComplex()) {
-                    if (!((BaseEntity) thisBaseValue.getValue()).equalsByKey((BaseEntity) thatBaseValue.getValue()))
+                    if (!((BaseEntity) thisBaseValue.getValue()).equalsByKey((IBaseEntity) thatBaseValue.getValue()))
                         return false;
                 } else {
                     if (!thisBaseValue.getValue().equals(thatBaseValue.getValue()))

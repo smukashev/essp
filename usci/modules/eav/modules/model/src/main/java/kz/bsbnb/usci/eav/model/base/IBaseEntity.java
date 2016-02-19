@@ -2,12 +2,10 @@ package kz.bsbnb.usci.eav.model.base;
 
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public interface IBaseEntity extends IBaseContainer {
@@ -47,7 +45,7 @@ public interface IBaseEntity extends IBaseContainer {
 
     Long getBatchIndex();
 
-    boolean equalsByKey(Object obj);
+    boolean equalsByKey(IBaseEntity baseEntity);
 
     boolean containsComplexKey();
 }
