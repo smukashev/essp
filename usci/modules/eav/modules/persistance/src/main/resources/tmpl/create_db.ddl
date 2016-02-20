@@ -786,7 +786,7 @@
 	  <column name="creditor_id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
 	  <column name="meta_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 	  <column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-	  <column name="key_string" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
+	  <column name="key_string" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>
 	  <unique name="eo_UN_ks">
 	    <unique-column name="creditor_id"/>
 	    <unique-column name="meta_id"/>
