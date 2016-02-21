@@ -2,15 +2,12 @@ package kz.bsbnb.usci.bconv.cr.parser;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
-import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
