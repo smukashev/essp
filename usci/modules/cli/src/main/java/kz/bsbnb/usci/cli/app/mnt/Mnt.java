@@ -220,11 +220,10 @@ public class Mnt {
                         Long creditorId = resultSet.getLong("creditor_id");
                         Long mntId = resultSet.getLong("ID");
 
-                        IBaseEntity credit = new BaseEntity(metaClassRepository.getMetaClass("credit"),
-                                new Date());
+                        // checkme!
+                        IBaseEntity credit = new BaseEntity(metaClassRepository.getMetaClass("credit"), new Date(), 0);
 
-                        IBaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"),
-                                new Date());
+                        IBaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"), new Date(), 0);
 
                         IBaseValue contractNoValue = BaseValueFactory.create(
                                 BaseContainerType.BASE_ENTITY,

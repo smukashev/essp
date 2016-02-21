@@ -34,26 +34,26 @@ public class MainParser extends BatchParser {
 
     public void parse(InputStream in, Batch batch) throws SAXException, IOException, XMLStreamException {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-        parse(inputFactory.createXMLEventReader(in), batch, 1L);
+        parse(inputFactory.createXMLEventReader(in), batch, 1L, creditorId);
     }
 
     public void parseNextPackage() throws SAXException {
         long currentIndex = index++;
 
-        packageParser.parse(xmlReader, batch, currentIndex);
+        packageParser.parse(xmlReader, batch, currentIndex, creditorId);
 
         if (packageParser.hasMore()) {
             currentBaseEntity = packageParser.getCurrentBaseEntity();
             BaseEntity creditor = infoParser.getCurrentBaseEntity();
 
-            currentBaseEntity.put("creditor", new BaseEntityComplexValue(0, -1, batch.getRepDate(), creditor,
+            currentBaseEntity.put("creditor", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditor,
                     false, true));
 
             for (String s : creditor.getValidationErrors()) {
                 currentBaseEntity.addValidationError(s);
             }
         } else {
-            parse(xmlReader, batch, index = 1L);
+            parse(xmlReader, batch, index = 1L, creditorId);
         }
     }
 
@@ -80,10 +80,10 @@ public class MainParser extends BatchParser {
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if (localName.equals("batch")) {
         } else if (localName.equals("info")) {
-            infoParser.parse(xmlReader, batch, index);
+            infoParser.parse(xmlReader, batch, index, creditorId);
         } else if (localName.equals("packages")) {
         } else if (localName.equals("package")) {
-            BaseEntity pkg = new BaseEntity(metaClassRepository.getMetaClass("credit"), batch.getRepDate());
+            BaseEntity pkg = new BaseEntity(metaClassRepository.getMetaClass("credit"), batch.getRepDate(), creditorId);
 
             String strOperationType = event.asStartElement().getAttributeByName(
                     new QName("operation_type")).getValue();
@@ -102,9 +102,9 @@ public class MainParser extends BatchParser {
             return true;
         } else if (localName.equals("portfolio_data")) {
             hasMore = true;
-            portfolioDataParser.parse(xmlReader, batch, index);
+            portfolioDataParser.parse(xmlReader, batch, index, creditorId);
             currentBaseEntity = portfolioDataParser.getCurrentBaseEntity();
-            currentBaseEntity.put("creditor", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("creditor", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
                     infoParser.getCurrentBaseEntity(), false, true));
             return true;
         } else {

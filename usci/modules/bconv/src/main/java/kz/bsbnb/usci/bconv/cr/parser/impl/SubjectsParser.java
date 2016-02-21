@@ -41,13 +41,13 @@ public class SubjectsParser extends BatchParser {
         if(localName.equals("subjects")) {
         } else if(localName.equals("subject")) {
         } else if(localName.equals("person")) {
-            subjectPersonParser.parse(xmlReader, batch, index);
+            subjectPersonParser.parse(xmlReader, batch, index, creditorId);
             currentBaseEntity = subjectPersonParser.getCurrentBaseEntity();
         } else if(localName.equals("organization")) {
-            subjectOrganizationParser.parse(xmlReader, batch, index);
+            subjectOrganizationParser.parse(xmlReader, batch, index, creditorId);
             currentBaseEntity = subjectOrganizationParser.getCurrentBaseEntity();
         } else if(localName.equals("creditor")) {
-            subjectCreditorParser.parse(xmlReader, batch, index);
+            subjectCreditorParser.parse(xmlReader, batch, index, creditorId);
             currentBaseEntity = subjectCreditorParser.getCurrentBaseEntity();
         } else {
             throw new UnknownTagException(localName);

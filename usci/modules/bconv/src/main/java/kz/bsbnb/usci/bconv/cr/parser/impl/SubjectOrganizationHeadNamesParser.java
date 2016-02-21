@@ -23,18 +23,18 @@ public class SubjectOrganizationHeadNamesParser extends BatchParser {
             throws SAXException {
         if (localName.equals("names")) {
         } else if (localName.equals("name")) {
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("person_name"), batch.getRepDate());
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("person_name"), batch.getRepDate(), creditorId);
         } else if (localName.equals("firstname")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("firstname", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("firstname", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else if (localName.equals("lastname")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("lastname", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("lastname", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else if (localName.equals("middlename")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("middlename", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("middlename", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else {
             throw new UnknownTagException(localName);

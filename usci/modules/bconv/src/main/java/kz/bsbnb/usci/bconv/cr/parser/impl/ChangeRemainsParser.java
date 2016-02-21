@@ -39,36 +39,36 @@ public class ChangeRemainsParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains"), batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains"), batch.getRepDate(), creditorId);
     }
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if (localName.equals("remains")) {
         } else if (localName.equals("debt")) {
-            changeRemainsDebtParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("debt", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+            changeRemainsDebtParser.parse(xmlReader, batch, index, creditorId);
+            currentBaseEntity.put("debt", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
                     changeRemainsDebtParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("interest")) {
-            changeRemainsInterestParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("interest", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+            changeRemainsInterestParser.parse(xmlReader, batch, index, creditorId);
+            currentBaseEntity.put("interest", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
                     changeRemainsInterestParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("discount")) {
-            changeRemainsDiscountParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("discount", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+            changeRemainsDiscountParser.parse(xmlReader, batch, index, creditorId);
+            currentBaseEntity.put("discount", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
                     changeRemainsDiscountParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("correction")) {
-            changeRemainsCorrectionParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("correction", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+            changeRemainsCorrectionParser.parse(xmlReader, batch, index, creditorId);
+            currentBaseEntity.put("correction", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
                     changeRemainsCorrectionParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("discounted_value")) {
-            changeRemainsDiscountedValueParser.parse(xmlReader, batch, index);
+            changeRemainsDiscountedValueParser.parse(xmlReader, batch, index, creditorId);
             currentBaseEntity.put("discounted_value",
-                    new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+                    new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
                             changeRemainsDiscountedValueParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("limit")) {
-            changeRemainsLimitParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("limit", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+            changeRemainsLimitParser.parse(xmlReader, batch, index, creditorId);
+            currentBaseEntity.put("limit", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
                     changeRemainsLimitParser.getCurrentBaseEntity(), false, true));
         } else {
             throw new UnknownTagException(localName);

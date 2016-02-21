@@ -109,7 +109,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         if (foundProcessedBaseEntity != null)
             return foundProcessedBaseEntity;
 
-        IBaseEntity baseEntityApplied = new BaseEntity(baseEntitySaving.getMeta(), baseEntitySaving.getReportDate());
+        IBaseEntity baseEntityApplied = new BaseEntity(baseEntitySaving.getMeta(),
+                baseEntitySaving.getReportDate(), creditorId);
 
         for (String attribute : baseEntitySaving.getAttributes()) {
             IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attribute);

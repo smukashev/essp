@@ -26,6 +26,7 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import oracle.sql.REF;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.slf4j.Logger;
@@ -118,7 +119,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 return refBaseEntity;
         }
 
-        creditorId = metaClass.isReference() ? 0 : creditorId;
+        final boolean isReference = metaClass.isReference();
+        creditorId =  isReference ? 0 : creditorId;
+
+        final String REF_DOC_TYPE = "ref_doc_type";
 
         for (String attribute : baseEntity.getAttributes()) {
             IMetaType metaType = baseEntity.getMemberType(attribute);
@@ -127,30 +131,27 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             if (metaType.isComplex()) {
                 if (baseValue.getValue() != null) {
                     if (metaType.isSet()) {
-                        IMetaSet childMetaSet = (IMetaSet) metaType;
-                        IMetaType childMetaType = childMetaSet.getMemberType();
-                        if (childMetaType.isSet()) {
-                            throw new UnsupportedOperationException("Не реализовано;");
-                        } else {
-                            IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
-                            for (IBaseValue childBaseValue : childBaseSet.get()) {
-                                IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
+                        IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
+                        for (IBaseValue childBaseValue : childBaseSet.get()) {
+                            IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
 
-                                if (childBaseEntity.getValueCount() != 0)
-                                    prepare((IBaseEntity) childBaseValue.getValue(), creditorId);
-                            }
+                            if (childBaseEntity.getValueCount() != 0)
+                                prepare((IBaseEntity) childBaseValue.getValue(), creditorId);
                         }
                     } else {
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
-                        if (childBaseEntity.getValueCount() != 0)
-                            baseValue.setValue(prepare(childBaseEntity, creditorId));
+                        if (childBaseEntity.getValueCount() != 0) {
+                            if (childBaseEntity.getMeta().getClassName().equals(REF_DOC_TYPE))
+                                baseValue.setValue(prepare(childBaseEntity, creditorId));
+                            else
+                                prepare(childBaseEntity, creditorId);
+                        }
                     }
-                    baseValue.setCreditorId(creditorId);
                 }
-            } else {
-                baseValue.setCreditorId(creditorId);
             }
+
+            if (isReference) baseValue.setCreditorId(creditorId);
         }
 
         if (metaClass.isSearchable()) {
@@ -162,12 +163,17 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 baseEntityId = search(baseEntity, creditorId);
             }
 
+
+
             if (baseEntityId > 0)
                 baseEntity.setId(baseEntityId);
         }
 
+        if (isReference)
+            baseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
+
         // fixme!
-        if (metaClass.getClassName().equals("ref_doc_type") && baseEntity.getId() > 0) {
+        if (metaClass.getClassName().equals(REF_DOC_TYPE) && baseEntity.getId() > 0) {
             baseEntity = baseEntityLoadDao.load(baseEntity.getId());
         }
 
@@ -183,17 +189,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseEntity baseEntityPostPrepared;
         IBaseEntity baseEntityApplied;
 
-        long creditorId = 0L;
-
-        if (baseEntity.getMeta().getClassName().equals("credit")) {
-            BaseEntity creditor = ((BaseEntity) baseEntity.getEl("creditor"));
-            prepare(creditor, 0);
-            creditorId = creditor.getId();
-
-            if (creditorId < 1)
-                throw new IllegalStateException("Кредитор не найден; \n" + creditor);
-        }
-
+        long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
 
         baseEntityPostPrepared = prepare(((BaseEntity) baseEntity).clone(), creditorId);

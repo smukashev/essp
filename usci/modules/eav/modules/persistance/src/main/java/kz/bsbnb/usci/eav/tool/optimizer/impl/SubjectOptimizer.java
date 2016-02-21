@@ -12,6 +12,7 @@ import java.util.List;
 
 public class SubjectOptimizer {
     private SubjectOptimizer() {
+        super();
     }
 
     public static String getKeyString(final IBaseEntity iBaseEntity) {

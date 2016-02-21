@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
@@ -33,6 +34,8 @@ public abstract class BatchParser {
 
     protected long index;
 
+    protected long creditorId;
+
     @Autowired
     protected IMetaClassRepository metaClassRepository;
 
@@ -47,11 +50,13 @@ public abstract class BatchParser {
         dateFormat.setLenient(false);
     }
 
-    public void parse(XMLEventReader xmlReader, Batch batch, long index) throws SAXException {
+    public void parse(XMLEventReader xmlReader, Batch batch, long index, long creditorId) throws SAXException {
         this.batch = batch;
-        init();
         this.xmlReader = xmlReader;
         this.index = index;
+        this.creditorId = creditorId;
+
+        init();
 
         while (xmlReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlReader.next();

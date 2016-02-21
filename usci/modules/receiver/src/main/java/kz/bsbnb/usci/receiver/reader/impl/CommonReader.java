@@ -34,6 +34,15 @@ public abstract class CommonReader<T> implements IReader<T> {
     @Value("#{jobParameters['userId']}")
     protected Long userId;
 
+    @Value("#{jobParameters['reportId']}")
+    protected Long reportId;
+
+    @Value("#{jobParameters['actualCount']}")
+    protected Long actualCount;
+
+    @Value("#{jobParameters['creditorId']}")
+    protected Long creditorId;
+
     protected XMLEventReader xmlEventReader;
 
     protected DateFormat dateFormat = new SimpleDateFormat(Global.DATE_FORMAT);

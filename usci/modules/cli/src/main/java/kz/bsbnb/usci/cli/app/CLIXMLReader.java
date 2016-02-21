@@ -37,8 +37,8 @@ public class CLIXMLReader {
     private Date reportDate;
     private FileInputStream inputStream;
     private Logger logger = Logger.getLogger(CLIXMLReader.class);
-    private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
-    private Stack<Boolean> flagsStack = new Stack<Boolean>();
+    private Stack<IBaseContainer> stack = new Stack<>();
+    private Stack<Boolean> flagsStack = new Stack<>();
     private IBaseContainer currentContainer;
     private IBatchService batchService;
     private Batch batch;
@@ -47,8 +47,10 @@ public class CLIXMLReader {
     private boolean rootEntityExpected = false;
     private String currentRootMeta = null;
 
-    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService,
-                        Date repDate) {
+    private long creditorId = 0L;
+
+    public void init (InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService,
+                      Date repDate) {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -66,6 +68,14 @@ public class CLIXMLReader {
         this.batchService = batchService;
 
         this.batchService.save(batch);
+    }
+    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate) {
+        init(inputStream, metaRepo, batchService, repDate);
+    }
+
+    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate, long creditorId) {
+        this.creditorId = creditorId;
+        init(inputStream, metaRepo, batchService, repDate);
     }
 
     public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate)
@@ -155,7 +165,7 @@ public class CLIXMLReader {
             currentRootMeta = localName;
             rootEntityExpected = false;
 
-            BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass(localName), batch.getRepDate());
+            BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass(localName), batch.getRepDate(), creditorId);
 
             if (hasOperationDelete(startElement))
                 baseEntity.setOperation(OperationType.DELETE);
@@ -176,7 +186,7 @@ public class CLIXMLReader {
                 level++;
             } else if (metaType.isComplex() && !metaType.isSet()) {
                 stack.push(currentContainer);
-                currentContainer = new BaseEntity((MetaClass) metaType, batch.getRepDate());
+                currentContainer = new BaseEntity((MetaClass) metaType, batch.getRepDate(), creditorId);
                 flagsStack.push(hasMembers);
                 hasMembers = false;
                 //metaFactoryService.getBaseEntity((MetaClass)metaType, batch.getRepDate());

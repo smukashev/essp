@@ -47,5 +47,9 @@ public interface IBaseEntityReportDate extends IBaseObject {
 
     boolean isClosed();
 
+    void setCreditorId(long creditorId);
+
+    long getCreditorId();
+
     void setClosed(boolean is_closed);
 }

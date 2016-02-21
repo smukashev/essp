@@ -396,10 +396,6 @@
 		<index name="ebe_IN_ci">
 			<index-column name="class_id"/>
 		</index>
-		<index name="ebe_IN_i_ci">
-			<index-column name="id"/>
-			<index-column name="class_id"/>
-		</index>
 		<index name="ebe_IN_d">
 			<index-column name="deleted"/>
 		</index>
@@ -458,6 +454,7 @@
 	<table name="eav_be_entity_report_dates">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="integer_values_count" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="date_values_count" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>

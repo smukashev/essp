@@ -23,7 +23,7 @@ public class PrimaryContractParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"), batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"), batch.getRepDate(), creditorId);
     }
 
     @Override
@@ -32,13 +32,13 @@ public class PrimaryContractParser extends BatchParser {
         if (localName.equals("primary_contract")) {
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("no", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else if (localName.equals("date")) {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                currentBaseEntity.put("date", new BaseEntityDateValue(0, -1, batch.getRepDate(),
+                currentBaseEntity.put("date", new BaseEntityDateValue(0, creditorId, batch.getRepDate(),
                         dateFormat.parse(dateRaw), false, true));
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);

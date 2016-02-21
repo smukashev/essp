@@ -22,7 +22,7 @@ public class SubjectOrganizationDocsParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate(), creditorId);
     }
 
     @Override
@@ -30,21 +30,21 @@ public class SubjectOrganizationDocsParser extends BatchParser {
         if (localName.equals("docs")) {
         } else if (localName.equals("doc")) {
             BaseEntity organizationDoc = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
-                    batch.getRepDate());
+                    batch.getRepDate(), creditorId);
 
-            organizationDoc.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            organizationDoc.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
 
-            currentBaseEntity.put("doc_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), organizationDoc,
+            currentBaseEntity.put("doc_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), organizationDoc,
                     false, true));
 
         } else if (localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("name", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("no", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else {
             throw new UnknownTagException(localName);

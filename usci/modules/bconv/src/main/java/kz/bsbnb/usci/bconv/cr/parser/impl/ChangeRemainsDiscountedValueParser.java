@@ -22,7 +22,7 @@ public class ChangeRemainsDiscountedValueParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_discounted_value"),
-                batch.getRepDate());
+                batch.getRepDate(), creditorId);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class ChangeRemainsDiscountedValueParser extends BatchParser {
         if (localName.equals("discounted_value")) {
         } else if (localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
                     new Double(event.asCharacters().getData()), false, true));
         } else {
             throw new UnknownTagException(localName);

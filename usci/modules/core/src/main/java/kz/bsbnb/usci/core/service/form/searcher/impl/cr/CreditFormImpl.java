@@ -56,11 +56,13 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
         Date reportDate = new Date();
         IBaseEntitySearcher searcher = searcherPool.getSearcher("credit");
         ISearchResult result = new PaginableSearchResult();
-        BaseEntity credit = new BaseEntity(metaClass, reportDate);
+        BaseEntity credit = new BaseEntity(metaClass, reportDate, creditorId);
 
-        BaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"), reportDate);
+        BaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"),
+                reportDate, creditorId);
         primaryContract.put("no", new BaseValue(creditorId, reportDate, parameters.get("no")));
-        primaryContract.put("date", new BaseValue(creditorId, reportDate, DataTypes.fromString(DataTypes.DATE, parameters.get("date"))));
+        primaryContract.put("date", new BaseValue(creditorId, reportDate,
+                DataTypes.fromString(DataTypes.DATE, parameters.get("date"))));
         credit.put("primary_contract", new BaseValue(creditorId, reportDate, primaryContract));
         Long id = searcher.findSingle(credit, creditorId);
 

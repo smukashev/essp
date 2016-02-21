@@ -81,14 +81,13 @@ public class CreditUtilsImpl implements ICreditUtils {
         }
 
         try {
-            IBaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"), new Date());
+            // checkme!
+            IBaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"), new Date(), 0);
             IBaseSet baseSet = new BaseSet(metaClassRepository.getMetaClass("document"));
 
             while (resultSet.next()) {
-                IBaseEntity doc = new BaseEntity(metaClassRepository.getMetaClass("document"),
-                        new Date());
-                IBaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
-                        new Date());
+                IBaseEntity doc = new BaseEntity(metaClassRepository.getMetaClass("document"), new Date(), 0);
+                IBaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), new Date(), 0);
                 String code = resultSet.getString("code");
                 String no = resultSet.getString("no_");
 
@@ -129,11 +128,10 @@ public class CreditUtilsImpl implements ICreditUtils {
         Batch batch = new Batch(new Date());
         batch.setId(777);
 
-        IBaseEntity credit = new BaseEntity(metaClassRepository.getMetaClass("credit"),
-                new Date());
+        // checkme!
+        IBaseEntity credit = new BaseEntity(metaClassRepository.getMetaClass("credit"), new Date(), 0);
 
-        IBaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"),
-                new Date());
+        IBaseEntity primaryContract = new BaseEntity(metaClassRepository.getMetaClass("primary_contract"), new Date(), 0);
 
         primaryContract.put("no", new BaseValue(-1, batch.getRepDate(), contractNo));
         primaryContract.put("date", new BaseValue(-1, batch.getRepDate(), contractDate));

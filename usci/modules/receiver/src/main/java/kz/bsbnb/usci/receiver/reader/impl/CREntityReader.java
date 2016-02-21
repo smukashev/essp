@@ -39,33 +39,20 @@ import java.util.Stack;
 @Scope("step")
 public class CREntityReader<T> extends CommonReader<T> {
     private Logger logger = Logger.getLogger(CREntityReader.class);
-    private Stack<IBaseContainer> stack = new Stack<IBaseContainer>();
-    private IBaseContainer currentContainer;
+
     private Batch batch;
 
     private IBatchService batchService;
-    private IMetaFactoryService metaFactoryService;
-    private ReportBeanRemoteBusiness reportService;
 
-    private Gson gson = new Gson();
+    private ReportBeanRemoteBusiness reportService;
 
     @Autowired
     private MainParser crParser;
-
-    @Value("#{jobParameters['reportId']}")
-    private Long reportId;
-
-    @Value("#{jobParameters['actualCount']}")
-    private Long actualCount;
-
-    @Value("#{jobParameters['batchId']}")
-    private Long batchId;
 
     @PostConstruct
     public void init() {
         logger.info("Reader init.");
         batchService = serviceRepository.getBatchService();
-        metaFactoryService = serviceRepository.getMetaFactoryService();
         reportService = serviceRepository.getReportBeanRemoteBusinessService();
 
         batch = batchService.getBatch(batchId);
@@ -75,7 +62,7 @@ public class CREntityReader<T> extends CommonReader<T> {
         inputFactory.setProperty("javax.xml.stream.isCoalescing", true);
 
         byte[] buffer = new byte[4096];
-        ByteArrayOutputStream out = null;
+        ByteArrayOutputStream out;
 
         try {
             zais.getNextZipEntry();
@@ -98,24 +85,22 @@ public class CREntityReader<T> extends CommonReader<T> {
         }
 
         try {
-            if (out != null)
-                xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
+            xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
         } catch (XMLStreamException e) {
 
             batchService.addBatchStatus(new BatchStatus()
                             .setBatchId(batchId)
                             .setStatus(BatchStatuses.ERROR)
                             .setDescription(e.getMessage())
-                            .setReceiptDate(new Date())
-            );
+                            .setReceiptDate(new Date()));
 
             throw new RuntimeException(e);
         }
 
         try {
-            crParser.parse(xmlEventReader, batch, 1L);
+            crParser.parse(xmlEventReader, batch, 1L, creditorId);
         } catch (SAXException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
     }
 
@@ -129,15 +114,14 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         if (crParser.hasMore()) {
             try {
-                crParser.parse(xmlEventReader, batch, index);
+                crParser.parse(xmlEventReader, batch, index, creditorId);
             } catch (SAXException e) {
                 batchService.addEntityStatus(new EntityStatus()
                                 .setBatchId(batchId)
                                 .setReceiptDate(new Date())
                                 .setDescription("Can't parse")
                                 .setStatus(EntityStatuses.ERROR)
-                                .setIndex(index)
-                );
+                                .setIndex(index));
 
                 e.printStackTrace();
                 return null;
@@ -161,15 +145,13 @@ public class CREntityReader<T> extends CommonReader<T> {
                         .setBatchId(batchId)
                         .setStatus(EntityStatuses.ACTUAL_COUNT)
                         .setDescription(String.valueOf(actualCount))
-                        .setReceiptDate(new Date())
-        );
+                        .setReceiptDate(new Date()));
 
         batchService.addEntityStatus(new EntityStatus()
                         .setBatchId(batchId)
                         .setStatus(EntityStatuses.TOTAL_COUNT)
                         .setDescription(String.valueOf(crParser.getPackageCount()))
-                        .setReceiptDate(new Date())
-        );
+                        .setReceiptDate(new Date()));
     }
 
 }

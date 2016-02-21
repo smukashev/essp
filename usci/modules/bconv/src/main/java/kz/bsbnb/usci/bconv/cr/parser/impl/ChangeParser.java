@@ -35,7 +35,7 @@ public class ChangeParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("change"), batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("change"), batch.getRepDate(), creditorId);
         maturityDate = null;
         prolongationDate = null;
     }
@@ -44,22 +44,22 @@ public class ChangeParser extends BatchParser {
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if (localName.equals("change")) {
         } else if (localName.equals("turnover")) {
-            changeTurnoverParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("turnover", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+            changeTurnoverParser.parse(xmlReader, batch, index, creditorId);
+            currentBaseEntity.put("turnover", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
                     changeTurnoverParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("remains")) {
-            changeRemainsParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("remains", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+            changeRemainsParser.parse(xmlReader, batch, index, creditorId);
+            currentBaseEntity.put("remains", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
                     changeRemainsParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("credit_flow")) {
-            changeCreditFlowParser.parse(xmlReader, batch, index);
-            currentBaseEntity.put("credit_flow", new BaseEntityComplexValue(0, -1, batch.getRepDate(),
+            changeCreditFlowParser.parse(xmlReader, batch, index, creditorId);
+            currentBaseEntity.put("credit_flow", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
                     changeCreditFlowParser.getCurrentBaseEntity(), false, true));
         } else if (localName.equals("maturity_date")) {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                maturityDate = new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw),
+                maturityDate = new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw),
                         false, true);
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
@@ -68,7 +68,7 @@ public class ChangeParser extends BatchParser {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                prolongationDate = new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw),
+                prolongationDate = new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw),
                         false, true);
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);

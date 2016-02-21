@@ -65,18 +65,27 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     @Value("#{jobParameters['actualCount']}")
     private Long actualCount;
 
-    @Value("#{jobParameters['batchId']}")
-    private Long batchId;
+    @Value("#{jobParameters['creditorId']}")
+    private Long creditorId;
+
+    private Logger logger = Logger.getLogger(StaxEventEntityReader.class);
 
     private static final long WAIT_TIMEOUT = 3600; // in sec
-    private Logger logger = Logger.getLogger(StaxEventEntityReader.class);
+
     private Stack<IBaseContainer> stack = new Stack<>();
+
     private Stack<Boolean> flagsStack = new Stack<>();
+
     private IBaseContainer currentContainer;
+
     private Batch batch;
+
     private Long index = 1L, level = 0L;
+
     private IBatchService batchService;
+
     private IMetaFactoryService metaFactoryService;
+
     private ReportBeanRemoteBusiness reportService;
 
     private boolean hasMembers = false;
@@ -84,6 +93,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     private int totalCount = 0;
 
     private boolean rootEntityExpected = false;
+
     private String currentRootMeta = null;
 
     @PostConstruct
@@ -136,30 +146,13 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     throw new RuntimeException(Errors.E193+"");
                 }
             }
-        } catch (XMLStreamException e) {
+        } catch (XMLStreamException | SAXException | IOException e) {
             batchService.addBatchStatus(new BatchStatus()
                     .setBatchId(batchId)
                     .setStatus(BatchStatuses.ERROR)
                     .setDescription(e.getMessage())
-                    .setReceiptDate(new Date())
-            );
+                    .setReceiptDate(new Date()));
 
-            throw new RuntimeException(e);
-        } catch (SAXException e) {
-            batchService.addBatchStatus(new BatchStatus()
-                            .setBatchId(batchId)
-                            .setStatus(BatchStatuses.ERROR)
-                            .setDescription(e.getMessage())
-                            .setReceiptDate(new Date())
-            );
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            batchService.addBatchStatus(new BatchStatus()
-                            .setBatchId(batchId)
-                            .setStatus(BatchStatuses.ERROR)
-                            .setDescription(e.getMessage())
-                            .setReceiptDate(new Date())
-            );
             throw new RuntimeException(e);
         }
     }
@@ -168,12 +161,17 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         URL schemaURL = getClass().getClassLoader().getResource("usci.xsd");
         Source xml = new StreamSource(xmlInputStream);
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+        if (schemaURL == null)
+            throw new IllegalStateException();
+
         Schema schema = schemaFactory.newSchema(schemaURL);
 
         Validator validator = schema.newValidator();
 
         final boolean[] success = {true};
 
+        // fixme!
         validator.setErrorHandler(new ErrorHandler() {
             @Override
             public void warning(SAXParseException exception) throws SAXException {
@@ -186,8 +184,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                                 .setBatchId(batchId)
                                 .setStatus(BatchStatuses.ERROR)
                                 .setDescription(exception.getMessage())
-                                .setReceiptDate(new Date())
-                );
+                                .setReceiptDate(new Date()));
             }
 
             @Override
@@ -246,8 +243,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             rootEntityExpected = false;
 
             logger.debug(localName);
-            //BaseEntity baseEntity = metaFactoryService.getBaseEntity(localName, batch.getRepDate());
-            BaseEntity baseEntity = new BaseEntity(getMeta(localName), batch.getRepDate());
+            MetaClass metaClass = getMeta(localName);
+            BaseEntity baseEntity = new BaseEntity(metaClass, batch.getRepDate(), creditorId);
 
             if (hasOperationDelete(startElement))
                 baseEntity.setOperation(OperationType.DELETE);
@@ -266,12 +263,11 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 stack.push(currentContainer);
                 flagsStack.push(hasMembers);
                 hasMembers = false;
-                //currentContainer = metaFactoryService.getBaseSet(((MetaSet) metaType).getMemberType());
                 currentContainer = new BaseSet(((MetaSet) metaType).getMemberType());
                 level++;
             } else if (metaType.isComplex()) {
                 stack.push(currentContainer);
-                currentContainer = new BaseEntity((MetaClass) metaType, batch.getRepDate());
+                currentContainer = new BaseEntity((MetaClass) metaType, batch.getRepDate(), creditorId);
                 flagsStack.push(hasMembers);
                 hasMembers = false;
                 level++;
@@ -284,7 +280,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     obj = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
-                    logger.error("Cast error: " + localName + ", exception text: " + n.getMessage());
                     throw new RuntimeException(Errors.E194+"|" + localName + "|"
                             + (n.getMessage().length() > 255 ? n.getMessage().substring(0, 255) : n.getMessage()));
                 } catch (ClassCastException ex) {
@@ -301,14 +296,14 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
 
                 IBaseValue baseValue = BaseValueFactory
-                        .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(), obj,
-                                false, true);
+                        .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId,
+                                batch.getRepDate(), obj, false, true);
 
                 if (hasOperationNew(startElement)) {
-                    IBaseValue newBaseValue = BaseValueFactory.create(currentContainer.getBaseContainerType(),
-                            metaType, 0, -1, batch.getRepDate(),
-                            parserHelper.getCastObject(metaValue.getTypeCode(),
-                                    startElement.getAttributeByName(new QName("data")).getValue()), false, true);
+                    IBaseValue newBaseValue = BaseValueFactory
+                            .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId,
+                                    batch.getRepDate(), parserHelper.getCastObject(metaValue.getTypeCode(),
+                                        startElement.getAttributeByName(new QName("data")).getValue()), false, true);
 
                     baseValue.setNewBaseValue(newBaseValue);
                 }
@@ -340,12 +335,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     }
 
     private T readInner() {
-        logger.debug("Read called");
-        logger.debug("Sync queue size: " + serviceFactory.getEntityService().getQueueSize());
         long sleepCounter = 0;
 
         while (serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
-            logger.debug("Sync queue limit exceeded: " + serviceFactory.getEntityService().getQueueSize());
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -435,9 +427,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
-                        ((BaseSet) currentContainer).put(BaseValueFactory.create(
-                                currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(), obj,
-                                false, true));
+                        ((BaseSet) currentContainer).put(BaseValueFactory
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId,
+                                    batch.getRepDate(), obj, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
@@ -447,19 +439,19 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     /* Временный костыль для филиалов без документа */
                     /* fixme */
                     if (localName.equals("creditor_branch") &&
-                            ((((BaseEntity) obj).getBaseValue("docs") == null) || ((BaseEntity) obj).getBaseValue("docs").getValue() == null))
-                        obj = null;
+                            ((((BaseEntity) obj).getBaseValue("docs") == null) ||
+                                    ((BaseEntity) obj).getBaseValue("docs").getValue() == null)) obj = null;
 
                     if (hasMembers) {
-                        currentContainer.put(localName, BaseValueFactory.create(
-                                currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(), obj,
-                                false, true));
+                        currentContainer.put(localName, BaseValueFactory
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId,
+                                    batch.getRepDate(), obj, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
                         currentContainer.put(localName, BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(),
-                                        null, false, true));
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId,
+                                        batch.getRepDate(), null, false, true));
                         hasMembers = flagsStack.pop();
                     }
                 }

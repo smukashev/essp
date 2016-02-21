@@ -17,8 +17,6 @@ public interface IBaseEntity extends IBaseContainer {
 
     Date getReportDate();
 
-    void setReportDate(Date reportDate);
-
     MetaClass getMeta();
 
     void remove(String attribute);

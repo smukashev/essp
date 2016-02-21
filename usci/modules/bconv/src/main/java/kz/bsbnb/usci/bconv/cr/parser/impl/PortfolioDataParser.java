@@ -32,7 +32,7 @@ public class PortfolioDataParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_data"), batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_data"), batch.getRepDate(), creditorId);
     }
 
     @Override
@@ -40,13 +40,13 @@ public class PortfolioDataParser extends BatchParser {
         if (localName.equals("portfolio_data")) {
             // do nothing
         } else if (localName.equals("portfolio_flow")) {
-            portfolioFlowParser.parse(xmlReader, batch, index);
-            getPortfolioFlow().put(new BaseSetComplexValue(0, -1, batch.getRepDate(),
+            portfolioFlowParser.parse(xmlReader, batch, index, creditorId);
+            getPortfolioFlow().put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
                     portfolioFlowParser.getCurrentBaseEntity(), false, true));
 
         } else if (localName.equals("portfolio_flow_msfo")) {
-            portfolioFlowMsfoParser.parse(xmlReader, batch, index);
-            getPortfolioFlowMsfo().put(new BaseSetComplexValue(0, -1, batch.getRepDate(),
+            portfolioFlowMsfoParser.parse(xmlReader, batch, index, creditorId);
+            getPortfolioFlowMsfo().put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
                     portfolioFlowMsfoParser.getCurrentBaseEntity(), false, true));
 
         } else {
@@ -60,11 +60,11 @@ public class PortfolioDataParser extends BatchParser {
     public boolean endElement(String localName) throws SAXException {
         if (localName.equals("portfolio_data")) {
             if (portfolioFlow != null) {
-                currentBaseEntity.put("portfolio_flows_kfn", new BaseEntityComplexSet(0, -1, batch.getRepDate(),
+                currentBaseEntity.put("portfolio_flows_kfn", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(),
                         portfolioFlow, false, true));
             }
             if (portfolioFlowMsfo != null) {
-                currentBaseEntity.put("portfolio_flows_msfo", new BaseEntityComplexSet(0, -1, batch.getRepDate(),
+                currentBaseEntity.put("portfolio_flows_msfo", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(),
                         portfolioFlowMsfo, false, true));
             }
             return true;

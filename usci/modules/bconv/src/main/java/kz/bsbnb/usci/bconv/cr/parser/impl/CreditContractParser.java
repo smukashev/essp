@@ -23,7 +23,7 @@ public class CreditContractParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("contract"), batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("contract"), batch.getRepDate(), creditorId);
     }
 
     @Override
@@ -32,11 +32,11 @@ public class CreditContractParser extends BatchParser {
             if (localName.equals("contract")) {
             } else if (localName.equals("no")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                currentBaseEntity.put("no", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                         event.asCharacters().getData(), false, true));
             } else if (localName.equals("date")) {
                 event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("date", new BaseEntityDateValue(0, -1, batch.getRepDate(),
+                currentBaseEntity.put("date", new BaseEntityDateValue(0, creditorId, batch.getRepDate(),
                         dateFormat.parse(event.asCharacters().getData()), false, true));
             } else {
                 throw new UnknownTagException(localName);

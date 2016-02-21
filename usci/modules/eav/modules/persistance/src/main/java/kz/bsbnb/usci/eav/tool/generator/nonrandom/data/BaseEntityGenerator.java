@@ -17,7 +17,7 @@ import java.util.Date;
 public class BaseEntityGenerator  extends AbstractDataGenerator {
     public BaseEntity generateBaseEntity(Batch batch, MetaClass metaClass, long index) {
         // TODO: Implement generation of the reporting date.
-        BaseEntity entity = new BaseEntity(metaClass, new Date());
+        BaseEntity entity = new BaseEntity(metaClass, new Date(), 0);
 
         for (String name : metaClass.getMemberNames()) {
             IMetaType metaType = metaClass.getMemberType(name);

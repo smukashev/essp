@@ -39,7 +39,7 @@ public class InfoParser extends BatchParser {
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if (localName.equals("info")) {
         } else if (localName.equals("creditor")) {
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"), batch.getRepDate());
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"), batch.getRepDate(), creditorId);
 
         } else if (localName.equals("code")) {
             event = (XMLEvent) xmlReader.next();
@@ -59,18 +59,18 @@ public class InfoParser extends BatchParser {
                     for (IBaseValue bv : creditorDocsLoaded.get()) {
                         BaseEntity docLoaded = (BaseEntity) bv.getValue();
                         BaseEntity doc = new BaseEntity(metaClassRepository.getMetaClass("document"),
-                                batch.getRepDate());
-                        doc.put("no", new BaseValue<>(0, -1, batch.getRepDate(), docLoaded.getEl("no")));
+                                batch.getRepDate(), creditorId);
+                        doc.put("no", new BaseValue<>(0, creditorId, batch.getRepDate(), docLoaded.getEl("no")));
 
                         BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
-                                batch.getRepDate());
-                        docType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                                batch.getRepDate(), creditorId);
+                        docType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                                 (String) docLoaded.getEl("doc_type.code"), false, true));
-                        doc.put("doc_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), docType,
+                        doc.put("doc_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), docType,
                                 false, true));
-                        creditorDocs.put(new BaseValue<>(0, -1, batch.getRepDate(), doc));
+                        creditorDocs.put(new BaseValue<>(0, creditorId, batch.getRepDate(), doc));
                     }
-                    currentBaseEntity.put("docs", new BaseEntityComplexSet(0, -1, batch.getRepDate(),
+                    currentBaseEntity.put("docs", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(),
                             creditorDocs, false, true));
                     found = true;
                     break;
@@ -81,26 +81,26 @@ public class InfoParser extends BatchParser {
         } else if (localName.equals("docs")) {
             docs = new BaseSet(metaClassRepository.getMetaClass("document"));
         } else if (localName.equals("doc")) {
-            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate());
+            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate(), creditorId);
 
-            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate());
-            docType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate(), creditorId);
+            docType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
-            currentDoc.put("doc_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), docType, false, true));
+            currentDoc.put("doc_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), docType, false, true));
         } else if (localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            currentDoc.put("name", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentDoc.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            currentDoc.put("no", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else if (localName.equals("account_date")) {
         } else if (localName.equals("report_date")) {
             event = (XMLEvent) xmlReader.next();
             String dateRaw = event.asCharacters().getData();
             try {
-                reportDate = new BaseEntityDateValue(0, -1, batch.getRepDate(), dateFormat.parse(dateRaw),
+                reportDate = new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw),
                         false, true);
             } catch (ParseException e) {
                 currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
@@ -120,9 +120,9 @@ public class InfoParser extends BatchParser {
         } else if (localName.equals("creditor")) {
         } else if (localName.equals("code")) {
         } else if (localName.equals("docs")) {
-            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, -1, batch.getRepDate(), docs, false, true));
+            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), docs, false, true));
         } else if (localName.equals("doc")) {
-            docs.put(new BaseSetComplexValue(0, -1, batch.getRepDate(), currentDoc, false, true));
+            docs.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentDoc, false, true));
         } else if (localName.equals("name")) {
         } else if (localName.equals("no")) {
         } else if (localName.equals("account_date")) {

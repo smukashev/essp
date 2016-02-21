@@ -29,7 +29,7 @@ public class SubjectOrganizationHeadParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("head"), batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("head"), batch.getRepDate(), creditorId);
     }
 
     @Override
@@ -39,25 +39,25 @@ public class SubjectOrganizationHeadParser extends BatchParser {
         } else if (localName.equals("names")) {
             BaseSet headNames = new BaseSet(metaClassRepository.getMetaClass("person_name"));
             while (true) {
-                subjectOrganizationHeadNamesParser.parse(xmlReader, batch, index);
+                subjectOrganizationHeadNamesParser.parse(xmlReader, batch, index, creditorId);
                 if (subjectOrganizationHeadNamesParser.hasMore()) {
-                    headNames.put(new BaseSetComplexValue(0, -1, batch.getRepDate(),
+                    headNames.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
                             subjectOrganizationHeadNamesParser.getCurrentBaseEntity(), false, true));
                 } else break;
             }
-            currentBaseEntity.put("names", new BaseEntityComplexSet(0, -1, batch.getRepDate(), headNames, false, true));
+            currentBaseEntity.put("names", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), headNames, false, true));
         } else if (localName.equals("docs")) {
             BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("document"));
             while (true) {
-                subjectOrganizationHeadDocsParser.parse(xmlReader, batch, index);
+                subjectOrganizationHeadDocsParser.parse(xmlReader, batch, index, creditorId);
                 if (subjectOrganizationHeadDocsParser.hasMore()) {
-                    docs.put(new BaseSetComplexValue(0, -1, batch.getRepDate(),
+                    docs.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
                             subjectOrganizationHeadDocsParser.getCurrentBaseEntity(), false, true));
                 } else {
                     break;
                 }
             }
-            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, -1, batch.getRepDate(), docs, false, true));
+            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), docs, false, true));
 
         } else {
             throw new UnknownTagException(localName);

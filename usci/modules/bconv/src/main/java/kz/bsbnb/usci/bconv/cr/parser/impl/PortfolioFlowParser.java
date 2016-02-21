@@ -25,7 +25,7 @@ public class PortfolioFlowParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_kfn"),
-                batch.getRepDate());
+                batch.getRepDate(), creditorId);
         currentDetails = null;
         currentDetail = null;
     }
@@ -35,26 +35,26 @@ public class PortfolioFlowParser extends BatchParser {
         if (localName.equals("portfolio_flow")) {
         } else if (localName.equals("portfolio")) {
             BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),
-                    batch.getRepDate());
+                    batch.getRepDate(), creditorId);
             event = (XMLEvent) xmlReader.next();
-            portfolio.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(),
+            portfolio.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(),
                     false, true));
-            currentBaseEntity.put("portfolio", new BaseEntityComplexValue(0, -1, batch.getRepDate(), portfolio,
+            currentBaseEntity.put("portfolio", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), portfolio,
                     false, true));
         } else if (localName.equals("details")) {
             currentDetails = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_detail"));
         } else if (localName.equals("detail")) {
             currentDetail = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_detail"),
-                    batch.getRepDate());
+                    batch.getRepDate(), creditorId);
         } else if (localName.equals("balance_account")) {
-            BaseEntity ba = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"), batch.getRepDate());
+            BaseEntity ba = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"), batch.getRepDate(), creditorId);
             event = (XMLEvent) xmlReader.next();
-            ba.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(),
+            ba.put("no_", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(),
                     false, true));
-            currentDetail.put(localName, new BaseEntityComplexValue(0, -1, batch.getRepDate(), ba, false, true));
+            currentDetail.put(localName, new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), ba, false, true));
         } else if (localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            currentDetail.put(localName, new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+            currentDetail.put(localName, new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
                     new Double(event.asCharacters().getData()), false, true));
         } else {
             throw new UnknownTagException(localName);
@@ -69,10 +69,10 @@ public class PortfolioFlowParser extends BatchParser {
             return true;
         } else if (localName.equals("portfolio")) {
         } else if (localName.equals("details")) {
-            currentBaseEntity.put(localName, new BaseEntityComplexSet(0, -1, batch.getRepDate(), currentDetails,
+            currentBaseEntity.put(localName, new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), currentDetails,
                     false, true));
         } else if (localName.equals("detail")) {
-            currentDetails.put(new BaseSetComplexValue(0, -1, batch.getRepDate(), currentDetail, false, true));
+            currentDetails.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentDetail, false, true));
         } else if (localName.equals("balance_account")) {
         } else if (localName.equals("value")) {
         } else {

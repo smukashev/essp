@@ -22,27 +22,27 @@ public class SubjectOrganizationHeadDocsParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate(), creditorId);
     }
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if (localName.equals("docs")) {
         } else if (localName.equals("doc")) {
-            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate());
+            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate(), creditorId);
 
-            docType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            docType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
 
-            currentBaseEntity.put("doc_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(), docType,
+            currentBaseEntity.put("doc_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), docType,
                     false, true));
         } else if (localName.equals("name")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("name", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("name", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("no", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("no", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else {
             throw new UnknownTagException(localName);

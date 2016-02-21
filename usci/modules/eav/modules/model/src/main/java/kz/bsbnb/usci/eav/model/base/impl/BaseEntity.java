@@ -12,7 +12,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
-import kz.bsbnb.usci.eav.util.DataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +61,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         super(baseEntity.getId(), BaseContainerType.BASE_ENTITY);
 
         IBaseEntityReportDate thatBaseEntityReportDate = baseEntity.getBaseEntityReportDate();
+
         IBaseEntityReportDate thisBaseEntityReportDate = new BaseEntityReportDate(
                 thatBaseEntityReportDate.getId(),
+                thatBaseEntityReportDate.getCreditorId(),
                 reportDate,
                 thatBaseEntityReportDate.getIntegerValuesCount(),
                 thatBaseEntityReportDate.getDateValuesCount(),
@@ -80,11 +81,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         this.baseEntityReportDate = thisBaseEntityReportDate;
     }
 
-    public BaseEntity(MetaClass meta, Date reportDate) {
+    public BaseEntity(MetaClass meta, Date reportDate, long creditorId) {
         super(BaseContainerType.BASE_ENTITY);
 
         this.meta = meta;
-        this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate);
+        this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate, creditorId);
     }
 
     public BaseEntity(long id, MetaClass meta) {
@@ -92,10 +93,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         this.meta = meta;
     }
 
-    public BaseEntity(long id, MetaClass meta, Date reportDate) {
+    public BaseEntity(long id, MetaClass meta, Date reportDate, long creditorId) {
         super(id, BaseContainerType.BASE_ENTITY);
         this.meta = meta;
-        this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate);
+        this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate, creditorId);
     }
 
     public BaseEntity(long id, MetaClass meta, IBaseEntityReportDate baseEntityReportDate) {
@@ -274,17 +275,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             throw new RuntimeException(Errors.E11 + "");
 
         return baseEntityReportDate.getReportDate();
-    }
-
-    public void setReportDate(Date reportDate) {
-        Date newReportDate = (Date) reportDate.clone();
-        DataUtils.toBeginningOfTheDay(newReportDate);
-
-        if (baseEntityReportDate == null) {
-            this.baseEntityReportDate = new BaseEntityReportDate(this, newReportDate);
-        } else {
-            this.baseEntityReportDate.setReportDate(newReportDate);
-        }
     }
 
     @Override
@@ -613,15 +603,15 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         if (function.startsWith("set")) {
             String[] elems = function.substring(function.indexOf('(') + 1, function.indexOf(')')).split(",");
             if (function.startsWith("setInt")) {
-                allowedSet = new TreeSet<Integer>();
+                allowedSet = new TreeSet<>();
                 for (String e : elems)
                     allowedSet.add(Integer.parseInt(e.trim()));
             } else if (function.startsWith("setLong")) {
-                allowedSet = new TreeSet<Long>();
+                allowedSet = new TreeSet<>();
                 for (String e : elems)
                     allowedSet.add(Long.parseLong(e.trim()));
             } else if (function.startsWith("setString")) {
-                allowedSet = new TreeSet<String>();
+                allowedSet = new TreeSet<>();
                 for (String e : elems)
                     allowedSet.add(e.trim());
             }

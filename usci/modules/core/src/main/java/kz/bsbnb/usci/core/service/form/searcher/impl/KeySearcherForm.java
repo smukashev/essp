@@ -151,7 +151,7 @@ public class KeySearcherForm implements ISearcherForm {
 
     @Override
     public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix, long creditorId) {
-        BaseEntity baseEntity = new BaseEntity(metaClass, new Date());
+        BaseEntity baseEntity = new BaseEntity(metaClass, new Date(), creditorId);
         ISearchResult ret = new NonPaginableSearchResult();
         Iterator<String> it = parameters.keySet().iterator();
         while(it.hasNext()) {
@@ -171,7 +171,7 @@ public class KeySearcherForm implements ISearcherForm {
             if(metaType.isSet()) {
                 BaseSet childBaseSet = new BaseSet(metaType);
                 IMetaType itemMeta = ((MetaSet) metaType).getMemberType();
-                BaseEntity childBaseEntity = new BaseEntity((MetaClass) itemMeta, new Date());
+                BaseEntity childBaseEntity = new BaseEntity((MetaClass) itemMeta, new Date(), creditorId);
                 long childId = Long.valueOf(parameterValue);
                 if(((MetaClass) itemMeta).getClassName().equals("document"))
                     childBaseEntity = (BaseEntity) baseEntityLoadDao.load(childId);
@@ -190,7 +190,7 @@ public class KeySearcherForm implements ISearcherForm {
                 ));
                 value = childBaseSet;
             } else if(metaType.isComplex()) {
-                BaseEntity childBaseEntity = new BaseEntity((MetaClass) metaType, new Date());
+                BaseEntity childBaseEntity = new BaseEntity((MetaClass) metaType, new Date(), creditorId);
                 childBaseEntity.setId(Long.valueOf(parameterValue));
                 value = childBaseEntity;
 

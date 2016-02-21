@@ -1,8 +1,5 @@
 package kz.bsbnb.usci.sync.service.impl;
 
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
@@ -12,7 +9,6 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,6 +16,7 @@ import java.util.List;
  */
 @Service
 public class MetaFactoryServiceImpl implements IMetaFactoryService {
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     @Qualifier(value = "remoteMetaFactoryService")
     RmiProxyFactoryBean rmiProxyFactoryBean;
@@ -30,36 +27,6 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     public void init() {
         remoteMetaFactoryService =
                 (kz.bsbnb.usci.core.service.IMetaFactoryService) rmiProxyFactoryBean.getObject();
-    }
-
-    @Override
-    public BaseEntity getBaseEntity(String className) {
-        return remoteMetaFactoryService.getBaseEntity(className);
-    }
-
-    @Override
-    public BaseEntity getBaseEntity(MetaClass metaClass) {
-        return remoteMetaFactoryService.getBaseEntity(metaClass);
-    }
-
-    @Override
-    public BaseEntity getBaseEntity(String className, Date reportDate) {
-        return remoteMetaFactoryService.getBaseEntity(className, reportDate);
-    }
-
-    @Override
-    public BaseEntity getBaseEntity(MetaClass metaClass, Date reportDate) {
-        return remoteMetaFactoryService.getBaseEntity(metaClass, reportDate);
-    }
-
-    @Override
-    public BaseSet getBaseSet(IMetaType meta) {
-        return remoteMetaFactoryService.getBaseSet(meta);
-    }
-
-    @Override
-    public List<BaseEntity> getBaseEntities() {
-        return remoteMetaFactoryService.getBaseEntities();
     }
 
     @Override
@@ -86,6 +53,7 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     public MetaClass getDisabledMetaClass(String name) {
         return remoteMetaFactoryService.getDisabledMetaClass(name);
     }
+
     @Override
     public MetaClass getMetaClass(Long metaId) {
         return remoteMetaFactoryService.getMetaClass(metaId);

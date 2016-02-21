@@ -22,7 +22,7 @@ public class ChangeRemainsLimitParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_limit"), batch.getRepDate());
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_limit"), batch.getRepDate(), creditorId);
     }
 
     @Override
@@ -30,19 +30,19 @@ public class ChangeRemainsLimitParser extends BatchParser {
         if (localName.equals("limit")) {
         } else if (localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
                     new Double(event.asCharacters().getData()), false, true));
         } else if (localName.equals("value_currency")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value_currency", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("value_currency", new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
                     new Double(event.asCharacters().getData()), false, true));
         } else if (localName.equals("balance_account")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
-                    batch.getRepDate());
-            baseEntity.put("no_", new BaseEntityStringValue(0, -1, batch.getRepDate(), event.asCharacters().getData(),
+                    batch.getRepDate(), creditorId);
+            baseEntity.put("no_", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(),
                     false, true));
-            currentBaseEntity.put("balance_account", new BaseEntityComplexValue(0, -1, batch.getRepDate(), baseEntity,
+            currentBaseEntity.put("balance_account", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), baseEntity,
                     false, true));
         } else {
             throw new UnknownTagException(localName);

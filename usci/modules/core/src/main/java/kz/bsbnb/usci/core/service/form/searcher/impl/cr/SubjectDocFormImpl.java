@@ -55,13 +55,13 @@ public class SubjectDocFormImpl extends JDBCSupport implements ISearcherForm {
 
         long numDocs = Long.parseLong(parameters.get("childCnt"));
         Date reportDate = reportDate = (Date) DataTypes.fromString(DataTypes.DATE, parameters.get("date"));
-        BaseEntity subject = new BaseEntity(metaClassRepository.getMetaClass("subject"), reportDate);
+        BaseEntity subject = new BaseEntity(metaClassRepository.getMetaClass("subject"), reportDate, creditorId);
         BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("document"));
         int successfullDocCount = 0;
 
 
         for(int i=0;i<numDocs;i++) {
-            IBaseEntity document = new BaseEntity(metaClassRepository.getMetaClass("document"), reportDate);
+            IBaseEntity document = new BaseEntity(metaClassRepository.getMetaClass("document"), reportDate, creditorId);
             IBaseEntity docType = baseEntityLoadDao.load(Long.parseLong(parameters.get("doc_type" + i)));
             document.put("doc_type", new BaseValue(creditorId, reportDate, docType));
             document.put("no", new BaseValue(creditorId, reportDate, parameters.get("no" + i)));

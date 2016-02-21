@@ -24,23 +24,23 @@ public class PledgesParser extends BatchParser {
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         if (localName.equals("pledges")) {
         } else if (localName.equals("pledge")) {
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("pledge"), batch.getRepDate());
+            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("pledge"), batch.getRepDate(), creditorId);
         } else if (localName.equals("pledge_type")) {
             event = (XMLEvent) xmlReader.next();
             BaseEntity pledgeType = new BaseEntity(metaClassRepository.getMetaClass("ref_pledge_type"),
-                    batch.getRepDate());
-            pledgeType.put("code", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+                    batch.getRepDate(), creditorId);
+            pledgeType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
-            currentBaseEntity.put("pledge_type", new BaseEntityComplexValue(0, -1, batch.getRepDate(),pledgeType,
+            currentBaseEntity.put("pledge_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),pledgeType,
                     false, true));
         } else if (localName.equals("contract")) {
         } else if (localName.equals("no")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("contract", new BaseEntityStringValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("contract", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                     event.asCharacters().getData(), false, true));
         } else if (localName.equals("value")) {
             event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, -1, batch.getRepDate(),
+            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
                     new Double(event.asCharacters().getData()), false, true));
         } else {
             throw new UnknownTagException(localName);

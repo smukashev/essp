@@ -25,18 +25,18 @@ public class BasicBaseEntityComparatorTest {
         metaDocument.setMetaAttribute("no", new MetaAttribute(true, false, new MetaValue(DataTypes.STRING)));
 
         MetaSet metaDocs = new MetaSet(metaDocument);
-        BaseEntity refDocType = new BaseEntity(metaRefDocType, new Date());
+        BaseEntity refDocType = new BaseEntity(metaRefDocType, new Date(), 0);
         refDocType.put("code", new BaseValue<>("01"));
 
-        BaseEntity document1 = new BaseEntity(metaDocument, new Date());
+        BaseEntity document1 = new BaseEntity(metaDocument, new Date(), 0);
         document1.put("doc_type", new BaseValue<>(refDocType));
         document1.put("no", new BaseValue<>("no#1"));
 
-        BaseEntity document2 = new BaseEntity(metaDocument, new Date());
+        BaseEntity document2 = new BaseEntity(metaDocument, new Date(), 0);
         document2.put("doc_type", new BaseValue<>(refDocType));
         document2.put("no", new BaseValue<>("no#2"));
 
-        BaseEntity document3 = new BaseEntity(metaDocument, new Date());
+        BaseEntity document3 = new BaseEntity(metaDocument, new Date(), 0);
         document3.put("doc_type", new BaseValue<>(refDocType));
         document3.put("no", new BaseValue<>("no#2"));
 
@@ -49,10 +49,10 @@ public class BasicBaseEntityComparatorTest {
         MetaClass metaSubject = new MetaClass("subject");
         metaSubject.setMetaAttribute("docs", new MetaAttribute(true, false, metaDocs));
 
-        BaseEntity subject1 = new BaseEntity(metaSubject, new Date());
+        BaseEntity subject1 = new BaseEntity(metaSubject, new Date(), 0);
         subject1.put("docs", new BaseValue<>(docs1));
 
-        BaseEntity subject2 = new BaseEntity(metaSubject, new Date());
+        BaseEntity subject2 = new BaseEntity(metaSubject, new Date(), 0);
         subject2.put("docs", new BaseValue<>(docs2));
 
         Assert.assertFalse(subject1.equalsByKey(subject2));
@@ -78,15 +78,15 @@ public class BasicBaseEntityComparatorTest {
         metaDocument.setMetaAttribute("is_identification", new MetaAttribute(false, true, new
                 MetaValue(DataTypes.BOOLEAN)));
 
-        BaseEntity refDocType = new BaseEntity(metaRefDocType, new Date());
+        BaseEntity refDocType = new BaseEntity(metaRefDocType, new Date(), 0);
         refDocType.put("code", new BaseValue<>("01"));
 
-        BaseEntity document1 = new BaseEntity(metaDocument, new Date());
+        BaseEntity document1 = new BaseEntity(metaDocument, new Date(), 0);
         document1.put("is_identification", new BaseValue<>(false));
         document1.put("doc_type", new BaseValue<>(refDocType));
         document1.put("no", new BaseValue<>("no#1"));
 
-        BaseEntity document2 = new BaseEntity(metaDocument, new Date());
+        BaseEntity document2 = new BaseEntity(metaDocument, new Date(), 0);
         document2.put("is_identification", new BaseValue<>(true));
         document2.put("doc_type", new BaseValue<>(refDocType));
         document2.put("no", new BaseValue<>("no#1"));
