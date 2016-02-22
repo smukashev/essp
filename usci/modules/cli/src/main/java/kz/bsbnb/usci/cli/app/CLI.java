@@ -2066,10 +2066,22 @@ public class CLI {
                 kz.bsbnb.usci.brms.rulemodel.model.impl.Batch batch =
                         new kz.bsbnb.usci.brms.rulemodel.model.impl.Batch(args.get(2), currentDate);
 
-                Long id = ruleBatchService.save(batch);
-                batch.setId(id);
-                batchVersionService.save(batch);
-                System.out.println("ok batch created with id:" + id);
+                boolean exists = false;
+                Long id;
+                for (kz.bsbnb.usci.brms.rulemodel.model.impl.Batch ruleBatch : ruleBatchService.getAllBatches()) {
+                    if (ruleBatch.getName().equals(batch.getName()) && ruleBatch.getRepDate().equals(batch.getRepDate())) {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists) {
+                    id = ruleBatchService.save(batch);
+                    batch.setId(id);
+                    batchVersionService.save(batch);
+                    System.out.println("ok batch created with id:" + id);
+                }
+
             } else if (args.get(0).equals("rc")) {
                 ruleService.reloadCache();
             } else if (args.get(0).equals("eval")) {
