@@ -88,6 +88,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate, creditorId);
     }
 
+    public BaseEntity(MetaClass meta, Date reportDate) {
+        super(BaseContainerType.BASE_ENTITY);
+        this.meta = meta;
+        this.baseEntityReportDate = new BaseEntityReportDate(this, reportDate, 0L);
+    }
+
     public BaseEntity(long id, MetaClass meta) {
         super(id, BaseContainerType.BASE_ENTITY);
         this.meta = meta;
