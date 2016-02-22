@@ -167,7 +167,7 @@ public class ZipFilesMonitor {
 					}
 					sleepCounter++;
 					if (sleepCounter > WAIT_TIMEOUT) {
-						throw new IllegalStateException(Errors.E192+"");
+						throw new IllegalStateException(String.valueOf(Errors.E192));
 					}
 					continue;
 				}
@@ -576,7 +576,7 @@ public class ZipFilesMonitor {
 				}
 
 				if (extractedBytes == null)
-					throw new IOException(Errors.E191+"");
+					throw new IOException(String.valueOf(Errors.E191));
 
 				if (userId == null)
 					userId = 100500L;

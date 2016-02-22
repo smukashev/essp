@@ -94,7 +94,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 .from(EAV_BE_ENTITIES.as(entityAlias));
 
         if (metaClass == null)
-            throw new IllegalArgumentException(Errors.E176+"");
+            throw new IllegalArgumentException(String.valueOf(Errors.E176));
 
         Condition condition = null;
         for (String name : metaClass.getMemberNames()) {

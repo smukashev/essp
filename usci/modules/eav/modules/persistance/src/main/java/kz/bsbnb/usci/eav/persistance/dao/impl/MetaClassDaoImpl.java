@@ -282,7 +282,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     private void updateClass(MetaClass metaClass) {
         if (metaClass.getId() < 1)
-            throw new IllegalArgumentException(Errors.E170+"");
+            throw new IllegalArgumentException(String.valueOf(Errors.E170));
 
         UpdateConditionStep update = context.update(EAV_M_CLASSES).
                 set(EAV_M_CLASSES.NAME, metaClass.getClassName()).
@@ -429,7 +429,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     private void updateAttributes(Set<String> updateNames, MetaClass meta, MetaClass dbMeta) {
         if (dbMeta.getId() < 1) {
-            throw new IllegalArgumentException(Errors.E169+"");
+            throw new IllegalArgumentException(String.valueOf(Errors.E169));
         }
 
         UpdateConditionStep update;

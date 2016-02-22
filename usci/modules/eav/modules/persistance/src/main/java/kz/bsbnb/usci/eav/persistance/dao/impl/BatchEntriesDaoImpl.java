@@ -51,7 +51,7 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
 
         if (rows.size() > 1)
         {
-            throw new IllegalArgumentException(Errors.E151+"");
+            throw new IllegalArgumentException(String.valueOf(Errors.E151));
         }
 
         if (rows.size() < 1)
@@ -100,7 +100,7 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
     public void remove(BatchEntry batch) {
         if(batch.getId() < 1)
         {
-            throw new IllegalArgumentException(Errors.E153+"");
+            throw new IllegalArgumentException(String.valueOf(Errors.E153));
         }
 
         DeleteConditionStep delete = context

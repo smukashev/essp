@@ -191,7 +191,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
 
                         //paths.addAll(intersect(entity1, c2));
                     } else {
-                        throw new IllegalStateException(Errors.E2+"");
+                        throw new IllegalStateException(String.valueOf(Errors.E2));
                     }
                 }
             }
@@ -254,7 +254,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
                         }
                     }
                 } else {
-                    throw new IllegalStateException(Errors.E2+"");
+                    throw new IllegalStateException(String.valueOf(Errors.E2));
                 }
             }
         }
@@ -318,7 +318,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
 
                         //paths.addAll(intersect(entity1, c2));
                     } else {
-                        throw new IllegalStateException(Errors.E2+"");
+                        throw new IllegalStateException(String.valueOf(Errors.E2));
                     }
                 }
             }
@@ -387,7 +387,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
                         }
                     }
                 } else {
-                    throw new IllegalStateException(Errors.E2+"");
+                    throw new IllegalStateException(String.valueOf(Errors.E2));
                 }
             }
         }

@@ -143,7 +143,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 if (validateSchema(new ByteArrayInputStream(out.toByteArray()))) {
                     xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
                 } else {
-                    throw new RuntimeException(Errors.E193+"");
+                    throw new RuntimeException(String.valueOf(Errors.E193));
                 }
             }
         } catch (XMLStreamException | SAXException | IOException e) {
@@ -345,7 +345,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             }
             sleepCounter++;
             if (sleepCounter > WAIT_TIMEOUT) {
-                throw new IllegalStateException(Errors.E192+"");
+                throw new IllegalStateException(String.valueOf(Errors.E192));
             }
         }
         while (xmlEventReader.hasNext()) {

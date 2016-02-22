@@ -101,7 +101,7 @@ public class ShowCase extends Persistable {
 
     public void addField(String attributePath, String columnName) {
         if (meta == null)
-            throw new IllegalArgumentException(Errors.E52+"");
+            throw new IllegalArgumentException(String.valueOf(Errors.E52));
 
         IMetaAttribute attr = getActualMeta().getElAttribute(attributePath);
 

@@ -50,7 +50,7 @@ public enum DataTypes
             case DOUBLE:
                 return Double.class;
             default:
-                throw new IllegalArgumentException(Errors.E49+"");
+                throw new IllegalArgumentException(String.valueOf(Errors.E49));
         }
     }
 
@@ -91,7 +91,7 @@ public enum DataTypes
 
                 return date;
             default:
-                throw new IllegalArgumentException(Errors.E49+"");
+                throw new IllegalArgumentException(String.valueOf(Errors.E49));
         }
     }
 }

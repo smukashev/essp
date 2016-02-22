@@ -456,7 +456,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
             if (metaType.isComplex()) {
                 if (metaType.isSet()) {
                     if (metaType.isSetOfSets())
-                        throw new UnsupportedOperationException(Errors.E2+"");
+                        throw new UnsupportedOperationException(String.valueOf(Errors.E2));
 
                     IMetaSet childMetaSet = (IMetaSet) metaType;
                     IMetaClass childMetaClass = (IMetaClass) childMetaSet.getMemberType();
