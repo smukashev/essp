@@ -16,6 +16,8 @@ import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static kz.bsbnb.usci.brms.rulesvr.generated.Tables.*;
@@ -78,7 +80,8 @@ public class BatchDao implements IBatchDao
 
         String SQL = "INSERT INTO " + PREFIX_ + "packages(NAME, REPORT_DATE) VALUES (?, ?)";
         jdbcTemplate.update(SQL,batch.getName(),batch.getRepDate());
-        System.out.println("Created batch with repodate"+batch.getRepDate()+" called "+batch.getName());
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        System.out.println("Created batch with repdate "+dateFormat.format(batch.getRepDate())+" called "+batch.getName());
 
         SQL = "SELECT id FROM " + PREFIX_ + "packages WHERE NAME = ?";
         long id = jdbcTemplate.queryForLong(SQL,batch.getName());
