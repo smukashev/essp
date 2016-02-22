@@ -29,6 +29,13 @@ public class DataUtils {
         return newComparingDate.compareTo(newAnotherDate);
     }
 
+    public static void toBeginningOfTheMonth (Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        date.setTime(cal.getTime().getTime());
+    }
+
     public static void toBeginningOfTheDay(final Date date) {
         final long oldTime = date.getTime();
         final long timeZoneOffset = TimeZone.getDefault().getOffset(oldTime);
