@@ -5,6 +5,7 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.mapper.BatchMapper;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static kz.bsbnb.usci.brms.rulesvr.generated.Tables.*;
 
@@ -79,7 +80,8 @@ public class BatchDao implements IBatchDao
 
         String SQL = "INSERT INTO " + PREFIX_ + "packages(NAME, REPORT_DATE) VALUES (?, ?)";
         jdbcTemplate.update(SQL,batch.getName(),batch.getRepDate());
-        System.out.println("Created batch with repodate"+batch.getRepDate()+" called "+batch.getName());
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        System.out.println("Created batch with repdate "+dateFormat.format(batch.getRepDate())+" called "+batch.getName());
 
         SQL = "SELECT id FROM " + PREFIX_ + "packages WHERE NAME = ?";
         long id = jdbcTemplate.queryForLong(SQL,batch.getName());
@@ -107,8 +109,19 @@ public class BatchDao implements IBatchDao
 
     @Override
     public List<Batch> getAllBatches() {
-        String SQL = "SELECT * FROM " + PREFIX_ + "packages";
-        List<Batch> batchList = jdbcTemplate.query(SQL, new BeanPropertyRowMapper(Batch.class));
+        Select select = context.selectFrom(LOGIC_PACKAGES);
+
+        List<Map<String,Object> > rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
+        List<Batch> batchList = new ArrayList<>();
+
+        for(Map<String,Object> row: rows) {
+            Batch b = new Batch();
+            b.setId(((BigDecimal) row.get(LOGIC_PACKAGES.ID.getName())).longValue());
+            b.setName(((String) row.get(LOGIC_PACKAGES.NAME.getName())));
+            b.setRepDate(DataUtils.convert((Timestamp) row.get(LOGIC_PACKAGES.REPORT_DATE.getName())));
+            batchList.add(b);
+        }
+
         return batchList;
     }
 

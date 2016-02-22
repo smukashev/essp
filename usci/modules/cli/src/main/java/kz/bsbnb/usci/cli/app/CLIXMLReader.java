@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
@@ -69,20 +70,21 @@ public class CLIXMLReader {
 
         this.batchService.save(batch);
     }
-    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate) {
-        init(inputStream, metaRepo, batchService, repDate);
-    }
 
-    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate, long creditorId) {
+    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService,
+                        Date repDate, long creditorId) {
         this.creditorId = creditorId;
+        DataUtils.toBeginningOfTheMonth(repDate);
+        DataUtils.toBeginningOfTheDay(repDate);
         init(inputStream, metaRepo, batchService, repDate);
     }
 
-    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate)
-            throws FileNotFoundException {
+    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchService batchService,
+                        Date repDate, long creditorId) throws FileNotFoundException {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
         this.batchService = batchService;
+        this.creditorId = creditorId;
 
         inputStream = new FileInputStream(fileName);
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -95,6 +97,8 @@ public class CLIXMLReader {
         }
 
         this.reportDate = repDate;
+        DataUtils.toBeginningOfTheMonth(this.reportDate);
+        DataUtils.toBeginningOfTheDay(this.reportDate);
 
         batch = new Batch(reportDate, 1L);
         batch.setFileName(new File(fileName).getName());

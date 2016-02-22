@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.ReportStatus;
 import kz.bsbnb.usci.receiver.queue.JobInfo;
 import kz.bsbnb.usci.receiver.queue.JobLauncherQueue;
@@ -25,11 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -131,7 +128,6 @@ public class ZipFilesMonitor {
 
 			for (Batch batch : pendingBatchList) {
 				try {
-					//sender.addJob(batch.getId(), new BatchInfo(batch));
 					jobLauncherQueue.addJob(batch.getId(), new BatchInfo(batch));
 					receiverStatusSingleton.batchReceived();
 					System.out.println("Перезагрузка батча : " + batch.getId() + " - " + batch.getFileName());
@@ -610,6 +606,8 @@ public class ZipFilesMonitor {
 					date = new SimpleDateFormat("yyyy-MM-dd").parse(reportDate);
 				}
 
+                DataUtils.toBeginningOfTheMonth(date);
+				DataUtils.toBeginningOfTheDay(date);
 				batchInfo.setRepDate(date);
 
 				String actualCreditCount = document.getElementsByTagName("actual_credit_count").item(0).
@@ -693,6 +691,8 @@ public class ZipFilesMonitor {
 					e.printStackTrace();
 				}
 
+                DataUtils.toBeginningOfTheMonth(date);
+				DataUtils.toBeginningOfTheDay(date);
 				batchInfo.setRepDate(date);
 
 				NodeList propertiesList = document.getElementsByTagName("properties");
@@ -776,8 +776,6 @@ public class ZipFilesMonitor {
 			batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent()
 					.replaceAll("\\s+", ""));
 
-            /*batchInfo.setBatchName(document.getElementsByTagName("name").item(0).getTextContent()
-                    .replaceAll("\\s+", ""));*/
 			batchInfo.setBatchName(parseFileNameFromPath(filename));
 
 			batchInfo.setUserId(100500L);
