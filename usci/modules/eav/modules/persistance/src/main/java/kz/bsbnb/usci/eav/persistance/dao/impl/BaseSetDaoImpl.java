@@ -76,7 +76,7 @@ public class BaseSetDaoImpl extends JDBCSupport implements IBaseSetDao {
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
         if (count != 1)
         {
-            throw new RuntimeException(Errors.E140+"");
+            throw new RuntimeException(String.valueOf(Errors.E140));
         }
     }
 
@@ -95,7 +95,7 @@ public class BaseSetDaoImpl extends JDBCSupport implements IBaseSetDao {
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
         if (count != 1)
         {
-            throw new RuntimeException(Errors.E139+"");
+            throw new RuntimeException(String.valueOf(Errors.E139));
         }
     }
 

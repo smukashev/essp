@@ -136,10 +136,10 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80+"");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81+"");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
 
@@ -224,10 +224,10 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80+"");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81+"");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
 
@@ -320,10 +320,10 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80+"");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81+"");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
 
@@ -390,10 +390,10 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80+"");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81+"");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
 

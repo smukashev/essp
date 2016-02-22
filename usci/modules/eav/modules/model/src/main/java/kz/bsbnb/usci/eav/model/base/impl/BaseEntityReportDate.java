@@ -41,7 +41,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         this.creditorId = creditorId;
 
         if (reportDate == null) {
-            throw new IllegalArgumentException(Errors.E29+"");
+            throw new IllegalArgumentException(String.valueOf(Errors.E29));
         } else {
             Date newReportDate = (Date) reportDate.clone();
             DataUtils.toBeginningOfTheDay(newReportDate);
@@ -67,7 +67,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         this.creditorId = creditorId;
 
         if (reportDate == null) {
-            throw new IllegalArgumentException(Errors.E29+"");
+            throw new IllegalArgumentException(String.valueOf(Errors.E29));
         } else {
             Date newReportDate = (Date) reportDate.clone();
             DataUtils.toBeginningOfTheDay(newReportDate);

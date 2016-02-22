@@ -29,7 +29,7 @@ public class MetaSet extends MetaContainer implements IMetaSet
 
         if (metaType == null)
         {
-            throw new IllegalArgumentException(Errors.E46+"");
+            throw new IllegalArgumentException(String.valueOf(Errors.E46));
         }
         this.metaType = metaType;
     }
@@ -73,7 +73,7 @@ public class MetaSet extends MetaContainer implements IMetaSet
     {
         if (metaType == null)
         {
-            throw new IllegalArgumentException(Errors.E46+"");
+            throw new IllegalArgumentException(String.valueOf(Errors.E46));
         }
         this.metaType = metaType;
     }
@@ -121,7 +121,7 @@ public class MetaSet extends MetaContainer implements IMetaSet
     {
         if (metaAttribute.getMetaType() == null)
         {
-            throw new IllegalArgumentException(Errors.E46+"");
+            throw new IllegalArgumentException(String.valueOf(Errors.E46));
         }
         setMetaType(metaAttribute.getMetaType());
     }

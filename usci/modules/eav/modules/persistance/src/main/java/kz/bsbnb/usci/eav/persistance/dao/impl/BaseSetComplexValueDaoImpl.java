@@ -293,7 +293,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         IMetaType metaType = baseSet.getMemberType();
 
         if (baseContainer.getId() == 0)
-            throw new RuntimeException(Errors.E134+"");
+            throw new RuntimeException(String.valueOf(Errors.E134));
 
         IBaseValue closedBaseValue = null;
 

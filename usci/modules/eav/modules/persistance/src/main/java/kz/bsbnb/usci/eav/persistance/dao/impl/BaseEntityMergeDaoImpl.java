@@ -495,7 +495,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
         // we haven't reached the base case
         if (mergeManager.getChildMap() != null) {
             if (mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE) {
-                throw new UnsupportedOperationException(Errors.E106+"");
+                throw new UnsupportedOperationException(String.valueOf(Errors.E106));
             }
 
             Set<UUID> processedUuidsLeft = new HashSet<UUID>();
@@ -515,7 +515,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                     if (mergeManager.containsKey(idKey) && (mergeManager.getChildManager(idKey) != null)) {
                         if (processedUuidsLeft.contains(childBaseValueLeft.getUuid()) ||
                                 processedUuidsRight.contains(childBaseValueRight.getUuid())) {
-                            throw new RuntimeException(Errors.E107+"");
+                            throw new RuntimeException(String.valueOf(Errors.E107));
                         } else {
                             processedUuidsLeft.add(childBaseValueLeft.getUuid());
                             processedUuidsRight.add(childBaseValueRight.getUuid());
@@ -680,7 +680,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
             }
             if (mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE) {
-                throw new RuntimeException(Errors.E108+"");
+                throw new RuntimeException(String.valueOf(Errors.E108));
             }
         }
 

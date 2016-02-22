@@ -138,7 +138,7 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
     @Override
     public void update(IPersistable persistable) {
         if (persistable.getId() < 1)
-            throw new RuntimeException(Errors.E124+"");
+            throw new RuntimeException(String.valueOf(Errors.E124));
 
         IBaseEntityReportDate baseEntityReportDate = (IBaseEntityReportDate) persistable;
 
@@ -169,7 +169,7 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException(Errors.E125+"");
+            throw new RuntimeException(String.valueOf(Errors.E125));
     }
 
     @Override

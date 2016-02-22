@@ -48,7 +48,7 @@ public class ParserHelper implements IHelper {
             case DOUBLE:
                 return Double.parseDouble(value);
             default:
-                throw new IllegalArgumentException(Errors.E127+"");
+                throw new IllegalArgumentException(String.valueOf(Errors.E127));
         }
     }
 }

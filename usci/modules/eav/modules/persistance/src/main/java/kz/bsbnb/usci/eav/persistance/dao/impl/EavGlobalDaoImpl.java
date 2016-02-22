@@ -159,6 +159,6 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
             return (String)row.get("VALUE");
         }
 
-        throw new RuntimeException(Errors.E155+"");
+        throw new RuntimeException(String.valueOf(Errors.E155));
     }
 }
