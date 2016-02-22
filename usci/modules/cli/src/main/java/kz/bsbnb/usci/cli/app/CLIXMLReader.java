@@ -69,20 +69,19 @@ public class CLIXMLReader {
 
         this.batchService.save(batch);
     }
-    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate) {
-        init(inputStream, metaRepo, batchService, repDate);
-    }
 
-    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate, long creditorId) {
+    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService,
+                        Date repDate, long creditorId) {
         this.creditorId = creditorId;
         init(inputStream, metaRepo, batchService, repDate);
     }
 
-    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchService batchService, Date repDate)
-            throws FileNotFoundException {
+    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchService batchService,
+                        Date repDate, long creditorId) throws FileNotFoundException {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
         this.batchService = batchService;
+        this.creditorId = creditorId;
 
         inputStream = new FileInputStream(fileName);
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();

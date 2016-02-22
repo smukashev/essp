@@ -925,7 +925,7 @@ public class CLI {
         try {
             Date reportDate = sdfout.parse(repDate);
             CLIXMLReader reader = new CLIXMLReader(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))
-                    , metaClassRepository, batchService, reportDate);
+                    , metaClassRepository, batchService, reportDate, 0);
 
             BaseEntity entity;
             while ((entity = reader.read()) != null) {
@@ -943,27 +943,29 @@ public class CLI {
         }
     }
 
-    public void readEntityFromXML(String fileName, String repDate) {
+    public void readEntityFromXML(String fileName, String repDate, long creditorId) {
         try {
             Date reportDate = sdfout.parse(repDate);
-            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate);
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate, creditorId);
             BaseEntity entity;
-            long totalcount = 0;
-            long actualcount = 0;
+
+            long totalCount = 0;
+            long actualCount = 0;
+
             while ((entity = reader.read()) != null) {
-                totalcount++;
+                totalCount++;
                 try {
                     long id = baseEntityProcessorDao.process(entity).getId();
-         System.out.println("Запись сохранилась с ИД: " + id);
-                    actualcount++;
+                    System.out.println("Запись сохранилась с ИД: " + id);
+                    actualCount++;
                 } catch (Exception ex) {
                     lastException = ex;
                     System.out.println("Ошибка: " + ex.getMessage());
                 }
             }
             Batch batch = reader.getBatch();
-            batch.setActualCount(actualcount);
-            batch.setTotalCount(totalcount);
+            batch.setActualCount(actualCount);
+            batch.setTotalCount(totalCount);
             batchService.save(batch);
         } catch (FileNotFoundException e) {
             System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
@@ -975,7 +977,8 @@ public class CLI {
     public void findEntityFromXML(String fileName, String repDate) {
         try {
             Date reportDate = sdfout.parse(repDate);
-            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate);
+            // checkme!
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate, 0);
             BaseEntity entity;
             while ((entity = reader.read()) != null) {
                 long creditorId = 0L;
@@ -1006,7 +1009,9 @@ public class CLI {
     public void testEntityFromXML(String fileName, String repDate) {
         try {
             Date reportDate = sdfout.parse(repDate);
-            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate);
+            // checkme!
+            long creditorId = 0;
+            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate, creditorId);
             BaseEntity entity;
             while ((entity = reader.read()) != null) {
                 BaseEntity clonedEntity = entity.clone();
@@ -1814,9 +1819,12 @@ public class CLI {
                 }
             } else if (args.get(0).equals("read")) {
                 if (args.size() > 2) {
-                    readEntityFromXML(args.get(1), args.get(2));
+                    long creditorId = 0L;
+                    if (args.size() == 4)
+                        creditorId = Long.parseLong(args.get(3));
+                    readEntityFromXML(args.get(1), args.get(2), creditorId);
                 } else {
-                    System.out.println("Argument needed: <read> <fileName> <rep_date>");
+                    System.out.println("Argument needed: <read> <fileName> <rep_date> {creditorId}");
                 }
             } else if (args.get(0).equals("find")) {
                 if (args.size() > 2) {
@@ -1946,7 +1954,9 @@ public class CLI {
                 Date date = dateFormatter.parse("05.04.2015");
 
                 try {
-                    CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchService, date);
+                    // checkme!
+                    long creditorId = 0;
+                    CLIXMLReader reader = new CLIXMLReader("c:/a.xml", metaClassRepository, batchService, date, creditorId);
                     BaseEntity baseEntity = reader.read();
                     //System.out.println(ma);
                 } catch (FileNotFoundException e) {
@@ -2020,7 +2030,9 @@ public class CLI {
                 Date reportDate = dateFormatter.parse("02.05.2015");
 
                 try {
-                    CLIXMLReader reader = new CLIXMLReader("/home/bauka/a.xml", metaClassRepository, batchService, reportDate);
+                    long creditorId = 0L;
+                    CLIXMLReader reader = new CLIXMLReader("/home/bauka/a.xml", metaClassRepository, batchService,
+                            reportDate, creditorId);
                     currentBaseEntity = reader.read();
                     reader.close();
                     List<String> errors = ruleService.runRules(currentBaseEntity, currentPackageName, currentDate);
@@ -2578,7 +2590,9 @@ public class CLI {
             List<IBaseEntity> entityList = new ArrayList<IBaseEntity>();
             try {
                 Date reportDate = sdfout.parse(repDate);
-                CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate);
+                // checkme!
+                long creditorId = 0L;
+                CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate, creditorId);
                 BaseEntity entityToWrite;
                 IBaseEntity savedEntity;
                 while ((entityToWrite = reader.read()) != null) {
