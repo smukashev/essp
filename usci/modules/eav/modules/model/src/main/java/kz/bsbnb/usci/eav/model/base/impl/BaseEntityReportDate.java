@@ -87,7 +87,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
 
     public BaseEntityReportDate(IBaseEntity baseEntity, Date reportDate, long creditorId) {
         if (reportDate == null) {
-            throw new IllegalArgumentException(Errors.E28 + "");
+            throw new IllegalArgumentException(String.valueOf(Errors.E28));
         } else {
             Date newReportDate = (Date) reportDate.clone();
             DataUtils.toBeginningOfTheDay(newReportDate);

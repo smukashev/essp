@@ -537,7 +537,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         IMetaType metaType = baseSet.getMemberType();
 
         if (metaType.isSet())
-            throw new UnsupportedOperationException(Errors.E2 + "");
+            throw new UnsupportedOperationException(String.valueOf(Errors.E2));
 
         IMetaValue metaValue = (IMetaValue) metaType;
         DataTypes dataType = metaValue.getTypeCode();
@@ -564,7 +564,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                 break;
             }
             default:
-                throw new IllegalArgumentException(Errors.E127 + "");
+                throw new IllegalArgumentException(String.valueOf(Errors.E127));
         }
     }
 

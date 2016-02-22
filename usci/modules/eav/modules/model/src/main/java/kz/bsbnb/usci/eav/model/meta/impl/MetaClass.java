@@ -374,7 +374,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
                 }
             } else {
                 if (tokenizer.hasMoreTokens()) {
-                    throw new IllegalArgumentException(Errors.E44 + "");
+                    throw new IllegalArgumentException(String.valueOf(Errors.E44));
                 }
             }
         }
@@ -416,7 +416,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
                 }
             } else {
                 if (tokenizer.hasMoreTokens())
-                    throw new IllegalArgumentException(Errors.E44 + "");
+                    throw new IllegalArgumentException(String.valueOf(Errors.E44));
             }
         }
 

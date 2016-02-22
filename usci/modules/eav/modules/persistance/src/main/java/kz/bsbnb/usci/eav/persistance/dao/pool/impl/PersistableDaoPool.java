@@ -45,7 +45,7 @@ public class PersistableDaoPool implements IPersistableDaoPool {
 
     public IPersistableDao getPersistableDao(Class<? extends IPersistable> persistableClass) {
         if (persistableClass == null)
-            throw new RuntimeException(Errors.E172 + "");
+            throw new RuntimeException(String.valueOf(Errors.E172));
 
         Class<? extends IPersistableDao> persistableDaoClass = persistableDaoMap.get(persistableClass);
 
@@ -59,7 +59,7 @@ public class PersistableDaoPool implements IPersistableDaoPool {
     public <T extends IPersistableDao> T getPersistableDao(Class<? extends IPersistable> persistableClass,
                                                            Class<T> extendedPersistableDaoClass) {
         if (persistableClass == null)
-            throw new RuntimeException(Errors.E172 + "");
+            throw new RuntimeException(String.valueOf(Errors.E172));
 
         Class<? extends IPersistableDao> persistableDaoClass = persistableDaoMap.get(persistableClass);
 

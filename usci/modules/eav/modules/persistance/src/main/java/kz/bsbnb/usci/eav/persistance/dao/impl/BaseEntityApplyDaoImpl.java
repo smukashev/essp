@@ -18,6 +18,8 @@ import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.tool.optimizer.EavOptimizerData;
 import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -44,6 +46,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
     @Value("${refs.cache.enabled}")
     private boolean isReferenceCacheEnabled;
+
+    private final Logger logger = LoggerFactory.getLogger(BaseEntityApplyDaoImpl.class);
 
     @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded,
@@ -137,7 +141,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                     IBaseEntityManager baseEntityManager) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E60 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E60));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer != null && baseContainer.getBaseContainerType() != BaseContainerType.BASE_ENTITY)
@@ -147,7 +151,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         if (metaType.isComplex()) {
             if (metaType.isSet()) {
                 if (metaType.isSetOfSets())
-                    throw new UnsupportedOperationException(Errors.E61 + "");
+                    throw new UnsupportedOperationException(String.valueOf(Errors.E61));
 
                 IMetaSet childMetaSet = (IMetaSet) metaType;
                 IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
@@ -157,9 +161,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
 
                     if (metaAttribute.isImmutable() && childBaseEntity.getValueCount() != 0 &&
-                            childBaseEntity.getId() < 1)
-                        throw new KnownException(Errors.E62 + "|" + childBaseEntity.getMeta().
-                                getClassName() + "|" + childBaseEntity.toString());
+                            childBaseEntity.getId() < 1) {
+                        logger.error(Errors.getError(String.valueOf(Errors.E62)) + " : \n" + childBaseEntity.getMeta().
+                                getClassName() + "\n" + childBaseEntity.toString());
+                        throw new KnownException(Errors.E62 + "|" + childBaseEntity.getMeta().getClassName());
+                    }
 
                     IBaseEntity childBaseEntityApplied = apply(creditorId, childBaseEntity, null,
                             baseEntityManager, null);
@@ -197,9 +203,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
                     if (childBaseEntity.getValueCount() != 0) {
-                        if (childBaseEntity.getId() < 1)
-                            throw new KnownException(Errors.E62 + "|" + childBaseEntity.getMeta().getClassName()
-                                    + "|" + childBaseEntity.toString());
+                        if (childBaseEntity.getId() < 1) {
+                            logger.error(Errors.getError(String.valueOf(Errors.E62)) + ": \n" + childBaseEntity.getMeta().getClassName()
+                                    + "\n" + childBaseEntity.toString());
+                            throw new KnownException(Errors.E62 + "|" + childBaseEntity.getMeta().getClassName());
+                        }
 
                         IBaseEntity childBaseEntityImmutable = baseEntityLoadDao.loadByMaxReportDate(
                                 childBaseEntity.getId(), childBaseEntity.getReportDate());
@@ -245,7 +253,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         } else {
             if (metaType.isSet()) {
                 if (metaType.isSetOfSets())
-                    throw new UnsupportedOperationException(Errors.E2 + "");
+                    throw new UnsupportedOperationException(String.valueOf(Errors.E2));
 
                 IMetaSet childMetaSet = (IMetaSet) metaType;
                 IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
@@ -328,7 +336,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
             IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
             if (metaAttribute == null)
-                throw new RuntimeException(Errors.E58 + "");
+                throw new RuntimeException(String.valueOf(Errors.E58));
 
             IBaseContainer baseContainerSaving = baseValueSaving.getBaseContainer();
             if (baseContainerSaving != null && baseContainerSaving.getBaseContainerType()
@@ -339,7 +347,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
             if (metaType.isComplex()) {
                 if (metaType.isSetOfSets())
-                    throw new UnsupportedOperationException(Errors.E2 + "");
+                    throw new UnsupportedOperationException(String.valueOf(Errors.E2));
 
                 if (metaType.isSet())
                     applyComplexSet(creditorId, baseEntityApplied, baseValueSaving, baseValueLoaded,
@@ -349,7 +357,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseEntityManager);
             } else {
                 if (metaType.isSetOfSets())
-                    throw new UnsupportedOperationException(Errors.E2 + "");
+                    throw new UnsupportedOperationException(String.valueOf(Errors.E2));
 
                 if (metaType.isSet())
                     applySimpleSet(creditorId, baseEntityApplied, baseValueSaving, baseValueLoaded,
@@ -955,9 +963,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseEntity baseEntityApplied;
 
                 if (metaAttribute.isImmutable()) {
-                    if (baseEntitySaving.getId() < 1)
-                        throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().
-                                getClassName() + "|" + baseEntitySaving.toString());
+                    if (baseEntitySaving.getId() < 1) {
+                        logger.error(Errors.getError(String.valueOf(Errors.E62)) + " : \n" + baseEntitySaving.getMeta().
+                                getClassName() + "\n" + baseEntitySaving.toString());
+                        throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().getClassName());
+                    }
+
 
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
@@ -993,9 +1004,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseEntity baseEntityApplied;
 
                 if (metaAttribute.isImmutable()) {
-                    if (baseEntitySaving.getId() < 1)
-                        throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().getClassName() +
-                                "|" + baseEntitySaving.toString());
+                    if (baseEntitySaving.getId() < 1) {
+                        logger.error(Errors.getError(String.valueOf(Errors.E62)) + " : \n" + baseEntitySaving.getMeta().
+                                getClassName() + "\n" + baseEntitySaving.toString());
+                        throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().getClassName());
+                    }
 
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
@@ -1114,9 +1127,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
-                            if (baseEntitySaving.getId() < 1)
-                                throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().getClassName()
-                                        + "|" + baseEntitySaving.toString());
+                            if (baseEntitySaving.getId() < 1) {
+                                logger.error(Errors.getError(String.valueOf(Errors.E62)) + " : \n" + baseEntitySaving.getMeta().
+                                        getClassName() + "\n" + baseEntitySaving.toString());
+                                throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().getClassName());
+                            }
 
                             baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                                     baseEntitySaving.getReportDate());
@@ -1140,9 +1155,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     } else {
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
-                            if (baseEntitySaving.getId() < 1)
-                                throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().getClassName()
-                                        + "|" + baseEntitySaving.toString());
+                            if (baseEntitySaving.getId() < 1) {
+                                logger.error(Errors.getError(String.valueOf(Errors.E62)) + " : \n" + baseEntitySaving.getMeta().
+                                        getClassName() + "\n" + baseEntitySaving.toString());
+                                throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().getClassName());
+                            }
+
 
                             baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                                     baseEntitySaving.getReportDate());
@@ -1204,9 +1222,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseEntity baseEntityApplied;
 
                 if (metaAttribute.isImmutable()) {
-                    if (baseEntitySaving.getId() < 1)
-                        throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().
-                                getClassName() + "|" + baseEntitySaving.toString());
+                    if (baseEntitySaving.getId() < 1) {
+                        logger.error(Errors.getError(String.valueOf(Errors.E62)) + " : \n" + baseEntitySaving.getMeta().
+                                getClassName() + "\n" + baseEntitySaving.toString());
+                        throw new KnownException(Errors.E62 + "|" + baseEntitySaving.getMeta().getClassName());
+                    }
+
 
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
@@ -1281,7 +1302,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         IMetaType metaType = metaAttribute.getMetaType();
 
         if (metaAttribute.isFinal())
-            throw new UnsupportedOperationException(Errors.E2 + "");
+            throw new UnsupportedOperationException(String.valueOf(Errors.E2));
 
         IMetaSet metaSet = (IMetaSet) metaType;
         IMetaType childMetaType = metaSet.getMemberType();
@@ -1625,7 +1646,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         childBaseSetApplied.put(childBaseValueApplied);
                         baseEntityManager.registerAsInserted(childBaseValueApplied);
                     } else {
-                        throw new IllegalStateException(Errors.E74 + "");
+                        throw new IllegalStateException(String.valueOf(Errors.E74));
                     }
 
                     continue;
@@ -2336,8 +2357,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
                     } catch (Exception e) {
-                        throw new IllegalStateException(Errors.E76 + "|" + (e.getMessage().length() > 255 ? e.getMessage().substring(0, 255) : e.getMessage())
-                                + "|" + insertedObject);
+                        logger.error(Errors.getError(String.valueOf(Errors.E76)) + ": \n" + e.getMessage()
+                                + "\n" + insertedObject);
+                        throw new IllegalStateException(Errors.E76 + "|" + (e.getMessage().length() > 255 ? e.getMessage().substring(0, 255) : e.getMessage()));
                     }
 
                     if (isReferenceCacheEnabled && (insertedObject instanceof IBaseEntity)) {
@@ -2360,8 +2382,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     try {
                         persistableDao.update(updatedObject);
                     } catch (Exception e) {
-                        throw new IllegalStateException(Errors.E77 + "|" + (e.getMessage().length() > 255 ? e.getMessage().substring(0, 255) : e.getMessage())
-                                + "|" + updatedObject);
+                        logger.error(Errors.getError(String.valueOf(Errors.E77)) + " : \n" + e.getMessage() + "\n" + updatedObject);
+                        throw new IllegalStateException(Errors.E77 + "|" + (e.getMessage().length() > 255 ? e.getMessage().substring(0, 255) : e.getMessage()));
                     }
 
                     if (isReferenceCacheEnabled && (updatedObject instanceof IBaseEntity)) {
@@ -2390,8 +2412,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         }
                         persistableDao.delete(deletedObject);
                     } catch (Exception e) {
-                        throw new IllegalStateException(Errors.E78 + "|" + (e.getMessage().length() > 255 ? e.getMessage().substring(0, 255) : e.getMessage())
-                                + "|" + deletedObject);
+                        logger.error(Errors.getError(String.valueOf(Errors.E78) + " : \n" + e.getMessage()
+                                + "\n" + deletedObject));
+                        throw new IllegalStateException(Errors.E78 + "|" + (e.getMessage().length() > 255 ? e.getMessage().substring(0, 255) : e.getMessage()));
                     }
 
                     if (isReferenceCacheEnabled && (deletedObject instanceof IBaseEntity)) {

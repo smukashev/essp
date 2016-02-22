@@ -63,7 +63,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Override
     public void update(IPersistable persistable) {
-        throw new UnsupportedOperationException(Errors.E2 + "");
+        throw new UnsupportedOperationException(String.valueOf(Errors.E2));
     }
 
     @Override
@@ -123,10 +123,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Override
     public IBaseEntity load(long id, Date reportDate, Date savingReportDate) {
         if (id < 1)
-            throw new IllegalArgumentException(Errors.E93 + "");
+            throw new IllegalArgumentException(String.valueOf(Errors.E93));
 
         if (reportDate == null)
-            throw new IllegalArgumentException(Errors.E94 + "");
+            throw new IllegalArgumentException(String.valueOf(Errors.E94));
 
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);

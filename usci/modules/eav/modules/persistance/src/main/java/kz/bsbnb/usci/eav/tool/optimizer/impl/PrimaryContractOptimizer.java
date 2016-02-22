@@ -4,12 +4,17 @@ import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public final class PrimaryContractOptimizer {
+
+    private static final Logger logger = LoggerFactory.getLogger(PrimaryContractOptimizer.class);
+
     private PrimaryContractOptimizer() {
     }
 
@@ -20,8 +25,10 @@ public final class PrimaryContractOptimizer {
         IBaseValue dateBaseValue = iBaseEntity.getBaseValue("date");
 
         if (noBaseValue == null || dateBaseValue == null ||
-                noBaseValue.getValue() == null || dateBaseValue.getValue() == null)
-            throw new IllegalStateException(Errors.E187+"|" + iBaseEntity);
+                noBaseValue.getValue() == null || dateBaseValue.getValue() == null){
+            logger.error(Errors.getError(String.valueOf(Errors.E187))+" : \n"+iBaseEntity);
+            throw new IllegalStateException(String.valueOf(Errors.E187));
+        }
 
         stringBuilder.append(noBaseValue.getValue());
 

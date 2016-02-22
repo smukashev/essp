@@ -121,10 +121,10 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         if (baseContainer == null)
             throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
@@ -218,10 +218,10 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         if (baseContainer == null)
             throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
@@ -313,10 +313,10 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         if (baseContainer == null)
             throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
@@ -388,10 +388,10 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         if (baseContainer == null)
             throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
@@ -518,7 +518,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             IBaseSet baseSet = new BaseSet(setId, metaSetMemberType);
 
             if (metaSetMemberType.isSet())
-                throw new UnsupportedOperationException(Errors.E2 + "");
+                throw new UnsupportedOperationException(String.valueOf(Errors.E2));
 
             baseSetComplexValueDao.loadBaseValues(baseSet, actualReportDate);
 

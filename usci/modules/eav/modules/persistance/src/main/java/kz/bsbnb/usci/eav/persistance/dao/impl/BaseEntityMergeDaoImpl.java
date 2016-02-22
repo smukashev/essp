@@ -101,14 +101,14 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
             long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("creditor")).getId();
 
             if (creditorIdLeft != creditorIdRight)
-                throw new IllegalStateException(Errors.E104 + "");
+                throw new IllegalStateException(String.valueOf(Errors.E104));
 
             creditorId = creditorIdLeft;
         }
 
         // although it is safe to assume that both entities exist in DB, it is still worth checking
         if (baseEntityLeft.getId() < 1 && baseEntityRight.getId() < 1) {
-            throw new RuntimeException(Errors.E105 + "");
+            throw new RuntimeException(String.valueOf(Errors.E105));
         }
 
         IMetaClass metaClass = baseEntityLeft.getMeta();
@@ -132,7 +132,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                 // since there is no child map - there is need to look for child merge manager
                 if (mergeManager.getChildMap() == null) {
                     if (metaType.isSetOfSets()) {
-                        throw new UnsupportedOperationException(Errors.E2 + "");
+                        throw new UnsupportedOperationException(String.valueOf(Errors.E2));
                     }
 
                     if (metaType.isSet()) {
@@ -149,7 +149,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                     if (mergeManager.containsKey(attrKey)) {
 
                         if (metaType.isSetOfSets()) {
-                            throw new UnsupportedOperationException(Errors.E2 + "");
+                            throw new UnsupportedOperationException(String.valueOf(Errors.E2));
                         }
 
                         if (metaType.isSet()) {
@@ -244,7 +244,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
             long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("creditor")).getId();
 
             if (creditorIdLeft != creditorIdRight)
-                throw new IllegalStateException(Errors.E104 + "");
+                throw new IllegalStateException(String.valueOf(Errors.E104));
 
             creditorId = creditorIdLeft;
         }

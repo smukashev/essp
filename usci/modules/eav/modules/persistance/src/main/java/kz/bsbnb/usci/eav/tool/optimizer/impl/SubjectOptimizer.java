@@ -4,6 +4,8 @@ import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +13,9 @@ import java.util.Comparator;
 import java.util.List;
 
 public class SubjectOptimizer {
+
+    private static Logger logger = LoggerFactory.getLogger(SubjectOptimizer.class);
+
     private SubjectOptimizer() {
         super();
     }
@@ -20,8 +25,10 @@ public class SubjectOptimizer {
 
         IBaseValue docsBaseValue = iBaseEntity.getBaseValue("docs");
 
-        if (docsBaseValue == null || docsBaseValue.getValue() == null)
-            throw new IllegalStateException(Errors.E188+"|" + iBaseEntity);
+        if (docsBaseValue == null || docsBaseValue.getValue() == null){
+            logger.error(Errors.getError(String.valueOf(Errors.E188)) +" : "+iBaseEntity);
+            throw new IllegalStateException(String.valueOf(Errors.E188));
+        }
 
         BaseSet docSet = (BaseSet) docsBaseValue.getValue();
 
@@ -41,8 +48,11 @@ public class SubjectOptimizer {
             }
         }
 
-        if (documents.size() == 0)
-            throw new IllegalStateException(Errors.E189+"|" + iBaseEntity);
+        if (documents.size() == 0){
+            logger.error(Errors.getError(String.valueOf(Errors.E189)) +" : "+iBaseEntity);
+            throw new IllegalStateException(String.valueOf(Errors.E189));
+        }
+
 
         Collections.sort(documents, new Comparator<IBaseEntity>() {
             @Override

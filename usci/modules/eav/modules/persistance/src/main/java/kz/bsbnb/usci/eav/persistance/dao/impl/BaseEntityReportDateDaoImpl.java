@@ -33,10 +33,10 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
     @Override
     public IBaseEntityReportDate load(long baseEntityId, Date reportDate) {
         if (baseEntityId < 1)
-            throw new IllegalArgumentException(Errors.E120 + "");
+            throw new IllegalArgumentException(String.valueOf(Errors.E120));
 
         if (reportDate == null)
-            throw new IllegalArgumentException(Errors.E121 + "");
+            throw new IllegalArgumentException(String.valueOf(Errors.E121));
 
         String tableAlias = "rd";
         Select select = context
@@ -58,7 +58,7 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException(Errors.E122 + "");
+            throw new IllegalArgumentException(String.valueOf(Errors.E122));
 
         if (rows.size() < 1)
             throw new IllegalStateException(Errors.E123 + "|" + baseEntityId + "|" + reportDate);
@@ -183,7 +183,7 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException(Errors.E119 + "");
+            throw new RuntimeException(String.valueOf(Errors.E119));
     }
 
     @Override

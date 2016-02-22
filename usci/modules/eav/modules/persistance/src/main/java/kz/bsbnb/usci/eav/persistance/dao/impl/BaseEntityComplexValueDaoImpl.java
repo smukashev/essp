@@ -116,10 +116,10 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
@@ -214,10 +214,10 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
@@ -312,10 +312,10 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
@@ -383,10 +383,10 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.E80 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.E81 + "");
+            throw new IllegalStateException(String.valueOf(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)

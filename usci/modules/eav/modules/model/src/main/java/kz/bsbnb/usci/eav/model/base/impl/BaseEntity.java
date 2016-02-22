@@ -179,7 +179,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             throw new IllegalArgumentException(Errors.E25 + "|" + attribute + "|" + meta.getClassName());
 
         if (baseValue == null)
-            throw new IllegalArgumentException(Errors.E26 + "");
+            throw new IllegalArgumentException(String.valueOf(Errors.E26));
 
         if (baseValue.getValue() != null) {
             Class<?> valueClass = baseValue.getValue().getClass();
@@ -272,7 +272,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     public Date getReportDate() {
         if (baseEntityReportDate == null)
-            throw new RuntimeException(Errors.E11 + "");
+            throw new RuntimeException(String.valueOf(Errors.E11));
 
         return baseEntityReportDate.getReportDate();
     }
@@ -280,7 +280,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     @Override
     public IBaseEntityReportDate getBaseEntityReportDate() {
         if (baseEntityReportDate == null) {
-            throw new RuntimeException(Errors.E11 + "");
+            throw new RuntimeException(String.valueOf(Errors.E11));
         }
         return baseEntityReportDate;
     }
@@ -302,7 +302,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
         if (baseEntityLoaded != null) {
             if (baseEntityLoaded.getBaseEntityReportDate() == null)
-                throw new IllegalStateException(Errors.E6 + "");
+                throw new IllegalStateException(String.valueOf(Errors.E6));
 
             integerValuesCount = baseEntityLoaded.getBaseEntityReportDate().getIntegerValuesCount();
             dateValuesCount = baseEntityLoaded.getBaseEntityReportDate().getDateValuesCount();
@@ -344,7 +344,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                             doubleValuesCount++;
                             break;
                         default:
-                            throw new RuntimeException(Errors.E7 + "");
+                            throw new RuntimeException(String.valueOf(Errors.E7));
                     }
 
                 }
@@ -587,7 +587,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         boolean[] isFilter = new boolean[500];
         String function = null;
 
-        if (!path.startsWith("{")) throw new RuntimeException(Errors.E14 + "");
+        if (!path.startsWith("{")) throw new RuntimeException(String.valueOf(Errors.E14));
         for (int i = 0; i < path.length(); i++) {
             if (path.charAt(i) == '}') {
                 function = path.substring(1, i);
@@ -596,7 +596,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             }
         }
 
-        if (function == null) throw new RuntimeException(Errors.E15 + "");
+        if (function == null) throw new RuntimeException(String.valueOf(Errors.E15));
 
         Set allowedSet = new TreeSet<>();
 
@@ -627,7 +627,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             if (m.find()) {
                 downPath = m.group(1);
             } else {
-                throw new RuntimeException(Errors.E16 + "");
+                throw new RuntimeException(String.valueOf(Errors.E16));
             }
 
             LinkedList list = (LinkedList) getEls("{get}" + downPath);
@@ -640,7 +640,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 controlSet = new HashSet<String>();
             else if (fields.length == 2)
                 controlSet = new HashSet<Map.Entry>();
-            else throw new RuntimeException(Errors.E17 + "");
+            else throw new RuntimeException(String.valueOf(Errors.E17));
 
             for (Object o : list) {
                 BaseEntity entity = (BaseEntity) o;
@@ -670,20 +670,20 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         for (int i = 0; i <= path.length(); i++) {
             if (i == path.length()) {
                 if (open != 0)
-                    throw new RuntimeException(Errors.E18 + "");
+                    throw new RuntimeException(String.valueOf(Errors.E18));
                 break;
             }
             if (path.charAt(i) == '=') eqCnt++;
             if (path.charAt(i) == '!' && (i + 1 == path.length() || path.charAt(i + 1) != '='))
-                throw new RuntimeException(Errors.E21 + "");
+                throw new RuntimeException(String.valueOf(Errors.E21));
 
             if (path.charAt(i) == '[') open++;
             if (path.charAt(i) == ']') {
                 open--;
-                if (eqCnt != 1) throw new RuntimeException(Errors.E20 + "");
+                if (eqCnt != 1) throw new RuntimeException(String.valueOf(Errors.E20));
                 eqCnt = 0;
             }
-            if (open < 0 || open > 1) throw new RuntimeException(Errors.E22 + "");
+            if (open < 0 || open > 1) throw new RuntimeException(String.valueOf(Errors.E22));
         }
 
         for (int i = 0; i <= path.length(); i++) {
@@ -860,7 +860,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 theMeta = (MetaClass) type;
             } else {
                 if (tokenizer.hasMoreTokens()) {
-                    throw new IllegalArgumentException(Errors.E13 + "");
+                    throw new IllegalArgumentException(String.valueOf(Errors.E13));
                 }
             }
         }
@@ -908,11 +908,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     } else {
                         if (tokenizer.hasMoreTokens()) {
                             if (!set.getMemberType().isComplex()) {
-                                throw new IllegalArgumentException(Errors.E23 + "");
+                                throw new IllegalArgumentException(String.valueOf(Errors.E23));
                             }
 
                             if (set.getMemberType().isSet()) {
-                                throw new IllegalArgumentException(Errors.E23 + "");
+                                throw new IllegalArgumentException(String.valueOf(Errors.E23));
                             }
 
                             String restOfPath = "";
@@ -944,7 +944,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     theMeta = (MetaClass) type;
                 } else {
                     if (tokenizer.hasMoreTokens()) {
-                        throw new IllegalArgumentException(Errors.E13 + "");
+                        throw new IllegalArgumentException(String.valueOf(Errors.E13));
                     }
                 }
 
@@ -1030,7 +1030,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             }
             baseEntityCloned.values = valuesCloned;
         } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException(Errors.E8 + "");
+            throw new RuntimeException(String.valueOf(Errors.E8));
         }
         return baseEntityCloned;
     }

@@ -119,7 +119,7 @@ public class ShowCase extends Persistable {
 
     public void addCustomField(String attributePath, String columnName, MetaClass customMeta) {
         if (customMeta == null)
-            throw new IllegalArgumentException(Errors.E50 + "");
+            throw new IllegalArgumentException(String.valueOf(Errors.E50));
 
         IMetaAttribute attr = null;
         if (!attributePath.equals("root"))
