@@ -1,22 +1,18 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
 import kz.bsbnb.usci.eav.Errors;
-import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
-
-import java.text.ParseException;
 import java.util.*;
 
 /**
  * @author k.tulbassiyev
  */
 public class BaseSet extends BaseContainer implements IBaseSet {
-
     private UUID uuid = UUID.randomUUID();
 
     /**
@@ -166,7 +162,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
         StringTokenizer tokenizer = new StringTokenizer(filter, ",");
 
         Object valueOut = null;
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
 
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
@@ -235,19 +231,12 @@ public class BaseSet extends BaseContainer implements IBaseSet {
             return false;
         }
 
-        Set<UUID> uuids = new HashSet<UUID>();
-        Iterator<IBaseValue> thisIt = this.get().iterator();
-        while (thisIt.hasNext()) {
-            IBaseValue thisBaseValue = thisIt.next();
-
+        Set<UUID> uuids = new HashSet<>();
+        for (IBaseValue thisBaseValue : this.get()) {
             boolean found = false;
 
-            Iterator<IBaseValue> thatIt = that.get().iterator();
-            while (thatIt.hasNext()) {
-                IBaseValue thatBaseValue = thatIt.next();
-                if (uuids.contains(thatBaseValue.getUuid())) {
-                    continue;
-                } else {
+            for (IBaseValue thatBaseValue : that.get()) {
+                if (!uuids.contains(thatBaseValue.getUuid())) {
                     Object thisObject = thisBaseValue.getValue();
                     if (thisObject == null) {
                         throw new RuntimeException(String.valueOf(Errors.E32));
@@ -281,12 +270,13 @@ public class BaseSet extends BaseContainer implements IBaseSet {
     }
 
     public BaseSet clone() {
-        BaseSet baseSetCloned = null;
+        BaseSet baseSetCloned;
         try {
             baseSetCloned = (BaseSet) super.clone();
 
-            HashMap<String, IBaseValue> valuesCloned = new HashMap<String, IBaseValue>();
+            HashMap<String, IBaseValue> valuesCloned = new HashMap<>();
             Iterator<String> items = values.keySet().iterator();
+
             while (items.hasNext()) {
                 String attribute = items.next();
 
@@ -295,6 +285,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
                 baseValueCloned.setBaseContainer(baseSetCloned);
                 valuesCloned.put(attribute, baseValueCloned);
             }
+
             baseSetCloned.values = valuesCloned;
         } catch (CloneNotSupportedException ex) {
             throw new RuntimeException(String.valueOf(Errors.E31));
