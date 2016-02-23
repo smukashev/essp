@@ -577,7 +577,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return result;
     }
 
-    public Object getEls(String path) {
+    public Object getEls(String path, boolean skipCloseDelete) {
         Queue<Object> queue = new LinkedList<>();
 
         StringBuilder str = new StringBuilder();
@@ -627,7 +627,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 throw new RuntimeException(String.valueOf(Errors.E16));
             }
 
-            LinkedList list = (LinkedList) getEls("{get}" + downPath);
+            LinkedList list = (LinkedList) getEls("{get}" + downPath, false);
 
             String[] fields = path.split(",");
 
@@ -731,7 +731,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 continue;
 
             //showcase info
-            if(curO instanceof BaseEntity) {
+            if(!skipCloseDelete && (curO instanceof BaseEntity)) {
                 if(((BaseEntity) curO).operationType != null)
                     switch (((BaseEntity) curO).operationType) {
                         case DELETE:

@@ -2085,7 +2085,7 @@ public class CLI {
             } else if (args.get(0).equals("rc")) {
                 ruleService.reloadCache();
             } else if (args.get(0).equals("eval")) {
-                System.out.println(currentBaseEntity.getEls(args.get(1)));
+                System.out.println(currentBaseEntity.getEls(args.get(1), false));
             } else if (args.get(0).equals("eval2")) {
                 System.out.println(currentBaseEntity.getEl(args.get(1)));
             } else if (args.get(0).equals("clear")) {
