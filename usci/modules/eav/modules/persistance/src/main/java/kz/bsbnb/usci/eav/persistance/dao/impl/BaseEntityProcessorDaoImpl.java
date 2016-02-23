@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.EntityHolder;
@@ -263,8 +264,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case INSERT:
                     if (baseEntityPostPrepared.getId() > 0)
-                        throw new KnownException("Запись найдена в базе(" +
-                                baseEntityPostPrepared.getId() + "). Вставка не произведена;");
+                        throw new KnownException(Errors.E196 + "|" + baseEntityPostPrepared.getId());
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);
