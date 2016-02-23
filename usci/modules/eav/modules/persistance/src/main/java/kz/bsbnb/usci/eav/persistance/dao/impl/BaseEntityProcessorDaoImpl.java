@@ -330,8 +330,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     private void processLogicControl(IBaseEntity baseEntityApplied){
         if(metaRules == null) {
-            String[] metas = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
-            metaRules = new HashSet<>(Arrays.asList(metas));
+            String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
+            metaRules = new HashSet<>(Arrays.asList(metaArray));
         }
 
         if(metaRules.contains(baseEntityApplied.getMeta().getClassName())) {

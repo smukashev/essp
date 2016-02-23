@@ -646,8 +646,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
                 if (fields.length == 1)
                     entry = entity.getEl(fields[0]);
-                else {
-                    entry = new AbstractMap.SimpleEntry(entity.getEl(fields[0]), entity.getEl(fields[1]));
+                else { // fields.length  == 2
+                    entry = new AbstractMap.SimpleEntry<>(entity.getEl(fields[0]), entity.getEl(fields[1]));
                 }
 
 
