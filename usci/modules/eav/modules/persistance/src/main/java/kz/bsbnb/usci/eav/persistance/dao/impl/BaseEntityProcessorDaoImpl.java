@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.EntityHolder;
@@ -263,8 +264,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case INSERT:
                     if (baseEntityPostPrepared.getId() > 0)
-                        throw new KnownException("Запись найдена в базе(" +
-                                baseEntityPostPrepared.getId() + "). Вставка не произведена;");
+                        throw new KnownException(Errors.E196 + "|" + baseEntityPostPrepared.getId());
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);
@@ -330,8 +330,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     private void processLogicControl(IBaseEntity baseEntityApplied){
         if(metaRules == null) {
-            String[] metas = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
-            metaRules = new HashSet<>(Arrays.asList(metas));
+            String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
+            metaRules = new HashSet<>(Arrays.asList(metaArray));
         }
 
         if(metaRules.contains(baseEntityApplied.getMeta().getClassName())) {

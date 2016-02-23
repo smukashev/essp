@@ -488,12 +488,13 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         List<Long> foundIds = new ArrayList<>();
 
         if (showcaseHolder.getShowCaseMeta().getDownPath() != null) {
-            List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" +
-                    showcaseHolder.getShowCaseMeta().getDownPath());
+            List<BaseEntity> allApplied;
+            allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" +
+                    showcaseHolder.getShowCaseMeta().getDownPath(), true);
 
             if (globalEntityLoaded != null) {
                 List<BaseEntity> allLoaded = (List<BaseEntity>) globalEntityLoaded.getEls("{get}" +
-                        showcaseHolder.getShowCaseMeta().getDownPath());
+                        showcaseHolder.getShowCaseMeta().getDownPath(), true);
 
                 for (BaseEntity baseEntityApplied : allApplied) {
                     for (BaseEntity baseEntityLoaded : allLoaded) {

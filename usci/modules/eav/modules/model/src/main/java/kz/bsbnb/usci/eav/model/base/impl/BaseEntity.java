@@ -549,6 +549,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return BaseEntityOutput.toString(this);
     }
 
+    @SuppressWarnings("unused")
     public String toJava(String fName) {
         return BaseEntityOutput.getJavaFunction(fName, this);
     }
@@ -576,18 +577,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return result;
     }
 
+    public Object getEls(String path, boolean skipCloseDelete) {
+        Queue<Object> queue = new LinkedList<>();
 
-    private Queue queue;
-    public List lastRuleErrors;
-
-    public List getLastRuleErrors() {
-        if (lastRuleErrors == null)
-            lastRuleErrors = new LinkedList();
-        return lastRuleErrors;
-    }
-
-    public synchronized Object getEls(String path) {
-        queue = new LinkedList();
         StringBuilder str = new StringBuilder();
         String[] operations = new String[500];
         boolean[] isFilter = new boolean[500];
@@ -604,7 +596,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
         if (function == null) throw new RuntimeException(String.valueOf(Errors.E15));
 
-        Set allowedSet = new TreeSet<>();
+        Set<Object> allowedSet = new TreeSet<>();
 
         if (function.startsWith("set")) {
             String[] elems = function.substring(function.indexOf('(') + 1, function.indexOf(')')).split(",");
@@ -628,7 +620,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             Matcher m = Pattern.compile(pattern).matcher(function);
             String downPath;
             boolean ret = false;
-            lastRuleErrors = new LinkedList();
 
             if (m.find()) {
                 downPath = m.group(1);
@@ -636,31 +627,32 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 throw new RuntimeException(String.valueOf(Errors.E16));
             }
 
-            LinkedList list = (LinkedList) getEls("{get}" + downPath);
+            LinkedList list = (LinkedList) getEls("{get}" + downPath, false);
 
             String[] fields = path.split(",");
 
-            Set controlSet;
+            Set<Object> controlSet;
 
             if (fields.length == 1)
-                controlSet = new HashSet<String>();
+                controlSet = new HashSet<>();
             else if (fields.length == 2)
-                controlSet = new HashSet<Map.Entry>();
-            else throw new RuntimeException(String.valueOf(Errors.E17));
+                controlSet = new HashSet<>();
+            else
+                throw new RuntimeException(String.valueOf(Errors.E17));
 
             for (Object o : list) {
                 BaseEntity entity = (BaseEntity) o;
-                Object entry = null;
+                Object entry;
 
                 if (fields.length == 1)
                     entry = entity.getEl(fields[0]);
-                else if (fields.length == 2) {
-                    entry = new AbstractMap.SimpleEntry(entity.getEl(fields[0]), entity.getEl(fields[1]));
+                else { // fields.length  == 2
+                    entry = new AbstractMap.SimpleEntry<>(entity.getEl(fields[0]), entity.getEl(fields[1]));
                 }
+
 
                 if (controlSet.contains(entry)) {
                     ret = true;
-                    lastRuleErrors.add(entry);
                 } else {
                     controlSet.add(entry);
                 }
@@ -696,8 +688,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             if (i == path.length()) {
                 if (str.length() > 0) {
                     String[] arr = str.toString().split("\\.");
-                    for (int j = 0; j < arr.length; j++) {
-                        operations[yk] = arr[j];
+                    for (String anArr : arr) {
+                        operations[yk] = anArr;
                         isFilter[yk] = false;
                         yk++;
                     }
@@ -713,9 +705,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                         yk++;
                     } else {
                         String[] arr = str.toString().split("\\.");
-                        for (int j = 0; j < arr.length; j++) {
-                            //operations[yk] = str.toString();
-                            operations[yk] = arr[j];
+                        for (String anArr : arr) {
+                            operations[yk] = anArr;
                             isFilter[yk] = false;
                             yk++;
                         }
@@ -727,7 +718,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             }
         }
 
-        List ret = new LinkedList();
+        List<Object> ret = new LinkedList<>();
         queue.add(this);
         queue.add(0);
         int retCount = 0;
@@ -740,7 +731,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 continue;
 
             //showcase info
-            if(curO instanceof BaseEntity) {
+            if(!skipCloseDelete && (curO instanceof BaseEntity)) {
                 if(((BaseEntity) curO).operationType != null)
                     switch (((BaseEntity) curO).operationType) {
                         case DELETE:
@@ -760,6 +751,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             }
 
 
+            //noinspection ConstantConditions
             BaseEntity curBE = (BaseEntity) curO;
             MetaClass curMeta = curBE.getMeta();
 
@@ -852,6 +844,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
             valueOut = value.getValue();
 
+            if (type == null)
+                throw new IllegalStateException(String.valueOf(Errors.E46));
+
             if (type.isSet()) {
                 if (arrayIndexes != null) {
                     valueOut = ((BaseSet) valueOut).getEl(arrayIndexes.replaceAll("->", "."));
@@ -879,8 +874,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
         BaseEntity entity = this;
         MetaClass theMeta = meta;
-        ArrayList<Object> valueOut = new ArrayList<Object>();
-        Object currentValue = null;
+        ArrayList<Object> valueOut = new ArrayList<>();
+        Object currentValue;
 
         try {
             while (tokenizer.hasMoreTokens()) {
@@ -946,6 +941,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 }
 
                 if (type.isComplex() && !type.isSet()) {
+                    //noinspection ConstantConditions
                     entity = (BaseEntity) currentValue;
                     theMeta = (MetaClass) type;
                 } else {
@@ -977,9 +973,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 ownFieldName = fieldName;
             }
 
-            //System.out.println(ownFieldName + " " + innerPath);
-
-
             IMetaType mtype = meta.getMemberType(ownFieldName);
 
             if (mtype == null)
@@ -988,14 +981,14 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             if (mtype.isSet())
                 throw new IllegalArgumentException(Errors.E10 + "|" + fieldName);
 
-            BaseValue bvalue = (BaseValue) getBaseValue(ownFieldName);
+            BaseValue baseValue = (BaseValue) getBaseValue(ownFieldName);
 
             if (mtype.isComplex()) {
-                bvalue = (BaseValue) ((BaseEntity) (bvalue.getValue())).getBaseValue(innerPath);
+                baseValue = (BaseValue) ((BaseEntity) (baseValue.getValue())).getBaseValue(innerPath);
                 mtype = ((MetaClass) mtype).getMemberType(innerPath);
             }
 
-            if (!((BaseValue) bvalue).equalsToString(params.get(fieldName), ((MetaValue) mtype).getTypeCode()))
+            if (!baseValue.equalsToString(params.get(fieldName), ((MetaValue) mtype).getTypeCode()))
                 return false;
         }
 
@@ -1016,7 +1009,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     @Override
     public BaseEntity clone() {
-        BaseEntity baseEntityCloned = null;
+        BaseEntity baseEntityCloned;
+
         try {
             baseEntityCloned = (BaseEntity) super.clone();
 
@@ -1024,8 +1018,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             baseEntityReportDateCloned.setBaseEntity(baseEntityCloned);
             baseEntityCloned.setBaseEntityReportDate(baseEntityReportDateCloned);
 
-            HashMap<String, IBaseValue> valuesCloned = new HashMap<String, IBaseValue>();
+            HashMap<String, IBaseValue> valuesCloned = new HashMap<>();
             Iterator<String> attributesIt = values.keySet().iterator();
+
             while (attributesIt.hasNext()) {
                 String attribute = attributesIt.next();
 
@@ -1034,10 +1029,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 baseValueCloned.setBaseContainer(baseEntityCloned);
                 valuesCloned.put(attribute, baseValueCloned);
             }
+
             baseEntityCloned.values = valuesCloned;
         } catch (CloneNotSupportedException ex) {
             throw new RuntimeException(String.valueOf(Errors.E8));
         }
+
         return baseEntityCloned;
     }
 
