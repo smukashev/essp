@@ -503,7 +503,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         }
                     }
 
-                    dbCarteageGenerate(globalEntityApplied, baseEntityApplied, showcaseHolder);
+                    dbCortegeGenerate(globalEntityApplied, baseEntityApplied, showcaseHolder);
                 }
 
                 for (BaseEntity baseEntityLoaded : allLoaded) {
@@ -583,14 +583,14 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
             } else {
                 for (BaseEntity baseEntityApplied : allApplied) {
-                    dbCarteageGenerate(globalEntityApplied, baseEntityApplied, showcaseHolder);
+                    dbCortegeGenerate(globalEntityApplied, baseEntityApplied, showcaseHolder);
                 }
             }
         } else {
             List<KeyData> foundKeys = new ArrayList<>();
 
             if (globalEntityLoaded == null) {
-                dbCarteageGenerate(globalEntityApplied, globalEntityApplied, showcaseHolder);
+                dbCortegeGenerate(globalEntityApplied, globalEntityApplied, showcaseHolder);
             } else {
                 HashMap<ArrayElement, HashMap<ValueElement, Object>> appliedMap =
                         generateMap(globalEntityApplied, showcaseHolder);
@@ -602,7 +602,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                     return;
 
                 if (loadedMap == null || loadedMap.size() == 0)
-                    dbCarteageGenerate(globalEntityApplied, globalEntityApplied, showcaseHolder);
+                    dbCortegeGenerate(globalEntityApplied, globalEntityApplied, showcaseHolder);
 
                 for (Map.Entry entryApplied : appliedMap.entrySet()) {
                     HashMap<ValueElement, Object> entryMapApplied = (HashMap) entryApplied.getValue();
@@ -621,7 +621,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         }
                     }
 
-                    dbCarteageGenerate(globalEntityApplied, globalEntityApplied, showcaseHolder);
+                    dbCortegeGenerate(globalEntityApplied, globalEntityApplied, showcaseHolder);
                 }
 
                 for (Map.Entry entryLoaded : loadedMap.entrySet()) {
@@ -691,7 +691,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     @Transactional
-    private void dbCarteageGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
+    private void dbCortegeGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowcaseHolder showcaseHolder) {
         Date openDate, closeDate = null;
         String sql;
 

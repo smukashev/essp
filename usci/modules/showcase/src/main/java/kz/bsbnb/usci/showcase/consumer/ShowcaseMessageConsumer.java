@@ -3,7 +3,6 @@ package kz.bsbnb.usci.showcase.consumer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
-import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
 import org.apache.log4j.Logger;
@@ -81,7 +80,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     for (ShowcaseHolder holder : holders) {
                         if (holder.getShowCaseMeta().getMeta().getClassName().equals(metaClassName)) {
                             if (scId == null || scId == 0L || scId == holder.getShowCaseMeta().getId()) {
-                                Future future = exec.submit(new CarteageGenerator(queueEntry.getBaseEntityApplied(),
+                                Future future = exec.submit(new CortegeGenerator(queueEntry.getBaseEntityApplied(),
                                         queueEntry.getBaseEntityLoaded(), holder));
 
                                 futures.add(future);
@@ -115,12 +114,12 @@ public class ShowcaseMessageConsumer implements MessageListener {
         }
     }
 
-    private class CarteageGenerator implements Runnable {
+    private class CortegeGenerator implements Runnable {
         private IBaseEntity entity;
         private IBaseEntity entityLoaded;
         private ShowcaseHolder holder;
 
-        public CarteageGenerator(IBaseEntity entity, IBaseEntity entityLoaded, ShowcaseHolder holder) {
+        public CortegeGenerator(IBaseEntity entity, IBaseEntity entityLoaded, ShowcaseHolder holder) {
             this.entity = entity;
             this.entityLoaded = entityLoaded;
             this.holder = holder;
