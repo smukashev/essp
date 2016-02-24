@@ -116,14 +116,14 @@ showcase save
 
 showcase set name CORE_ORG_HEAD_NAMES
 showcase set tableName CORE_ORG_HEAD_NAMES
-showcase set downPath subject.organization_info
+showcase set downPath subject.organization_info.head
 
-showcase list add head.names name_id
+showcase list add names name_id
 
-showcase list add head.names.firstname firstname
-showcase list add head.names.lastname lastname
-showcase list add head.names.middlename middlename
-showcase list add head.names.lang lang
+showcase list add names.firstname firstname
+showcase list add names.lastname lastname
+showcase list add names.middlename middlename
+showcase list add names.lang lang
 
 
 showcase list addCustom credit creditor creditor_id
