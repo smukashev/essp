@@ -80,8 +80,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     for (ShowcaseHolder holder : holders) {
                         if (holder.getShowCaseMeta().getMeta().getClassName().equals(metaClassName)) {
                             if (scId == null || scId == 0L || scId == holder.getShowCaseMeta().getId()) {
-                                Future future = exec.submit(new CortegeGenerator(queueEntry.getBaseEntityApplied(),
-                                        queueEntry.getBaseEntityLoaded(), holder));
+                                Future future = exec.submit(new CortegeGenerator(queueEntry.getBaseEntityApplied(), holder));
 
                                 futures.add(future);
 
@@ -116,18 +115,16 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
     private class CortegeGenerator implements Runnable {
         private IBaseEntity entity;
-        private IBaseEntity entityLoaded;
         private ShowcaseHolder holder;
 
-        public CortegeGenerator(IBaseEntity entity, IBaseEntity entityLoaded, ShowcaseHolder holder) {
+        public CortegeGenerator(IBaseEntity entity, ShowcaseHolder holder) {
             this.entity = entity;
-            this.entityLoaded = entityLoaded;
             this.holder = holder;
         }
 
         @Override
         public void run() {
-            showcaseDao.generate(entity, entityLoaded, holder);
+            showcaseDao.generate(entity, holder);
         }
     }
 }

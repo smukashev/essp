@@ -21,6 +21,4 @@ public interface ShowcaseService {
     void reloadCash();
 
     ShowCase load(Long id);
-
-    List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate);
 }

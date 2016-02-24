@@ -22,9 +22,9 @@ public class EntityProcessorListenerImpl implements IDaoListener {
         long t1 = System.currentTimeMillis();
 
         final QueueEntry queueEntry = new QueueEntry()
-                .setBaseEntityApplied(baseEntityApplied)
-                .setBaseEntityLoaded(baseEntityLoaded);
-                /*.setBaseEntitySaving(baseEntitySaving)
+                .setBaseEntityApplied(baseEntityApplied);
+                /*.setBaseEntityLoaded(baseEntityLoaded)
+                .setBaseEntitySaving(baseEntitySaving)
                 .setEntityManager(entityManager);*/
 
         new Thread(new Runnable() {
