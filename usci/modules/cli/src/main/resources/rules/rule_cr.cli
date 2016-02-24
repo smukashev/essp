@@ -548,30 +548,16 @@ function boolean creditorBranchIsGood(IEntityService entityService, BaseEntity e
       //Извлечь филиал
       BaseEntity creditorBranch = (BaseEntity) entity.getEl("creditor_branch");
 
-      if(creditorBranch == null)
-        return true;
-
-      //Проствить ид
-      BaseEntity creditorBranchFound = entityService.prepare(creditorBranch);
-
-      if(creditorBranchFound.getId() < 1)
-          return false;
-
       //Извлечь кредитор
       BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
-      //Проставить ид
-      BaseEntity creditorLoaded = entityService.prepare(creditor);
-      //Подгрузить все поля филиала
-      BaseEntity creditorBranchLoaded = entityService.load(creditorBranchFound.getId());
 
       //Извлечь головной банк филиала
-      BaseEntity mainOffice = (BaseEntity) creditorBranchLoaded.getEl("main_office");
+      BaseEntity mainOffice = (BaseEntity) creditorBranch.getEl("main_office");
 
       //Проверить на соответсвие
-      return creditorLoaded.getId() == mainOffice.getId();
+      return creditor.getId() == mainOffice.getId();
    } catch (Exception e){
      //В случае ошибок
-     entity.addValidationError(e.getMessage());
      return false;
    }
 }
