@@ -48,10 +48,10 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     /* Prefix for showcase table names */
     private final static String TABLES_PREFIX = "R_";
 
-    /*Prefix for showcase column names */
+    /* Prefix for showcase column names */
     private final static String COLUMN_PREFIX = "";
 
-    /*Postfix for showcase history tables */
+    /* Postfix for showcase history tables */
     private final static String HISTORY_POSTFIX = "_HIS";
 
     /* Same showcases could not be processes in parallel */
