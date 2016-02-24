@@ -270,7 +270,7 @@ public class RulesPortlet extends MVCPortlet{
             }
 
         } catch (Exception e) {
-            String originalError = e.getMessage();
+            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : "";
             if(!retry) {
                 retry = true;
                 try {
