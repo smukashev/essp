@@ -289,12 +289,12 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
 
-        Object[] vals;
+        Object[] valueArray;
 
         if (!showCaseHolder.getShowCaseMeta().isFinal()) {
-            vals = new Object[map.size() + 2];
+            valueArray = new Object[map.size() + 2];
         } else {
-            vals = new Object[map.size() + 1];
+            valueArray = new Object[map.size() + 1];
         }
 
         int i = 0;
@@ -302,23 +302,23 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         for (Map.Entry<ValueElement, Object> entry : map.entrySet()) {
             sql.append(COLUMN_PREFIX).append(entry.getKey().columnName).append(", ");
             values.append("?, ");
-            vals[i++] = entry.getValue();
+            valueArray[i++] = entry.getValue();
         }
 
         if (!showCaseHolder.getShowCaseMeta().isFinal()) {
             sql.append("cdc, open_date, close_date");
             values.append("sysdate, ?, ?)");
-            vals[i++] = openDate;
-            vals[i] = closeDate;
+            valueArray[i++] = openDate;
+            valueArray[i] = closeDate;
         } else {
             sql.append("cdc, rep_date");
             values.append("SYSDATE, ?)");
-            vals[i] = openDate;
+            valueArray[i] = openDate;
         }
 
         sql.append(") VALUES ").append(values);
 
-        jdbcTemplateSC.update(sql.toString(), vals);
+        jdbcTemplateSC.update(sql.toString(), valueArray);
     }
 
     /* Updates close_date column using @keyData with entity.getReportDate() */
