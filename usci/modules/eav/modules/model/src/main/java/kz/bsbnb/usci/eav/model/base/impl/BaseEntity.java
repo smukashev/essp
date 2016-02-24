@@ -577,6 +577,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return result;
     }
 
+    public Object getEls(String path){
+        return getEls(path, false);
+    }
+
     public Object getEls(String path, boolean skipCloseDelete) {
         Queue<Object> queue = new LinkedList<>();
 
