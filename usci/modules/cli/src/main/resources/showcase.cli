@@ -439,7 +439,7 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
 showcase list addKey creditor_id
-showcaes list addKey credit_id
+showcase list addKey credit_id
 
 showcase addIndex nonunique creditor_id credit_id
 
