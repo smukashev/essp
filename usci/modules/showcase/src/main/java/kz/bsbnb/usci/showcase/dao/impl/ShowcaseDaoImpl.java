@@ -20,7 +20,6 @@ import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
 import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -649,7 +648,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     /* Adds custom keys to existing map */
-    public void addCustomKeys(HashMap<ValueElement, Object> entryMap, IBaseEntity globalEntity, ShowcaseHolder showcaseHolder) {
+    public void addCustomKeys(HashMap<ValueElement, Object> entryMap, IBaseEntity globalEntity,
+                              ShowcaseHolder showcaseHolder) {
         for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
             if (sf.getAttributePath().equals("root")) {
                 entryMap.put(new ValueElement(sf.getColumnName(), globalEntity.getId()), globalEntity.getId());
@@ -666,7 +666,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
             try {
                 if (customObject instanceof BaseEntity) {
-                    entryMap.put(new ValueElement(sf.getColumnName(), ((BaseEntity) customObject).getId()), ((BaseEntity) customObject).getId());
+                    entryMap.put(new ValueElement(sf.getColumnName(), ((BaseEntity) customObject).getId()),
+                            ((BaseEntity) customObject).getId());
                 } else if (customObject instanceof BaseSet) {
                     throw new UnsupportedOperationException("CustomSet is not supported!");
                 } else {
@@ -695,7 +696,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     }
 
     /* Generates path for relational tables using showcaseHolder */
-    private HashMap<String, HashSet<PathElement>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder, HashSet<PathElement> keyPaths) {
+    private HashMap<String, HashSet<PathElement>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder,
+                                                                HashSet<PathElement> keyPaths) {
         HashMap<String, HashSet<PathElement>> paths = new HashMap<>();
 
         HashSet<PathElement> tmpSet;
@@ -746,16 +748,19 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 }
 
                 if (attributeMetaType.isSet()) {
-                    keyPaths.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName()));
+                    keyPaths.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
+                            sf.getColumnName()));
 
-                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName()));
+                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
+                            sf.getColumnName()));
                     paths.put("root", tmpSet);
 
                     tmpSet = new HashSet<>();
                     tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName()));
                     paths.put("root." + sf.getAttributePath(), tmpSet);
                 } else if (attributeMetaType.isComplex()) {
-                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName()));
+                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
+                            sf.getColumnName()));
                     paths.put("root", tmpSet);
 
                     tmpSet = new HashSet<>();
@@ -795,7 +800,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         if (container instanceof BaseEntity) {
                             BaseEntity innerEntity = (BaseEntity) container;
 
-                            map.put(new ValueElement(attribute.columnName, innerEntity.getId()), readMap(attribute.elementPath, innerEntity, paths, false));
+                            map.put(new ValueElement(attribute.columnName, innerEntity.getId()),
+                                    readMap(attribute.elementPath, innerEntity, paths, false));
                         } else if (container instanceof BaseSet) {
                             BaseSet innerSet = (BaseSet) container;
 
@@ -804,15 +810,19 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                             if (innerSet.getMemberType().isComplex()) {
                                 for (IBaseValue bValue : innerSet.get()) {
                                     BaseEntity bValueEntity = (BaseEntity) bValue.getValue();
-                                    arrayMap.put(new ValueElement(attribute.elementPath, bValueEntity.getId(), false), readMap(attribute.elementPath, bValueEntity, paths, true));
+                                    arrayMap.put(new ValueElement(attribute.elementPath, bValueEntity.getId(), false),
+                                            readMap(attribute.elementPath, bValueEntity, paths, true));
                                 }
 
-                                map.put(new ValueElement(attribute.elementPath, ((BaseSet) container).getId(), true, false), arrayMap);
+                                map.put(new ValueElement(attribute.elementPath, ((BaseSet) container).getId(),
+                                        true, false), arrayMap);
                             } else {
                                 for (IBaseValue bValue : innerSet.get())
-                                    arrayMap.put(new ValueElement(attribute.elementPath, bValue.getId(), false), bValue.getValue());
+                                    arrayMap.put(new ValueElement(attribute.elementPath, bValue.getId(), false),
+                                            bValue.getValue());
 
-                                map.put(new ValueElement(attribute.elementPath, ((BaseSet) container).getId(), true, true), arrayMap);
+                                map.put(new ValueElement(attribute.elementPath, ((BaseSet) container).getId(),
+                                        true, true), arrayMap);
                             }
                         }
                     } else {
@@ -820,7 +830,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
                         if (iBaseValue != null && iBaseValue.getMetaAttribute().getMetaType().isComplex() &&
                                 !iBaseValue.getMetaAttribute().getMetaType().isSet()) {
-                            map.put(new ValueElement(attribute.columnName, iBaseValue.getId()), readMap(curPath + "." + attribute.elementPath, (BaseEntity) iBaseValue.getValue(), paths, false));
+                            map.put(new ValueElement(attribute.columnName, iBaseValue.getId()), readMap(curPath + "."
+                                    + attribute.elementPath, (BaseEntity) iBaseValue.getValue(), paths, false));
                         } else if (iBaseValue != null && iBaseValue.getMetaAttribute().getMetaType().isComplex() &&
                                 iBaseValue.getMetaAttribute().getMetaType().isSet()) {
                             throw new UnsupportedOperationException("Complex entity cannot contain complex set");
@@ -830,7 +841,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                             HashMap<ValueElement, Object> arrayMap = new HashMap<>();
 
                             for (IBaseValue innerValue : bSet.get())
-                                arrayMap.put(new ValueElement(attribute.elementPath, innerValue.getId(), false, true), innerValue.getValue());
+                                arrayMap.put(new ValueElement(attribute.elementPath, innerValue.getId(), false, true),
+                                        innerValue.getValue());
 
                             map.put(new ValueElement(attribute.elementPath, iBaseValue.getId(), true, true),
                                     arrayMap);
@@ -870,7 +882,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                     HashMap<ValueElement, Object> newHashMap = new HashMap<>();
                     newHashMap.put(innerEntry.getKey(), innerEntry.getValue());
 
-                    newHashMap.put(new ValueElement(innerEntry.getKey().columnName + "_id", innerEntry.getKey().elementId), innerEntry.getKey().elementId);
+                    newHashMap.put(new ValueElement(innerEntry.getKey().columnName + "_id",
+                            innerEntry.getKey().elementId), innerEntry.getKey().elementId);
 
                     arrayEl.put(new ArrayElement(index++, innerEntry.getKey()), newHashMap);
                 }
@@ -996,7 +1009,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 sql = String.format(sql, getHistoryTableName(showcaseHolder.getShowCaseMeta()),
                         COLUMN_PREFIX, showcaseHolder.getRootClassName(), entity.getReportDate());
 
-                dbElement = jdbcTemplateSC.queryForMap(sql, getObjectArray(false, keyData.values, entity.getReportDate()));
+                dbElement = jdbcTemplateSC.queryForMap(sql, getObjectArray(false, keyData.values,
+                        entity.getReportDate()));
             }
 
             for (ValueElement valueElement : savingMap.keySet()) {
@@ -1368,7 +1382,16 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             int i = 0;
             for (ShowCaseField sf : keyFields) {
                 keys[i] = sf.getColumnName();
-                values[i] = map.get(sf.getColumnName());
+
+                for (Map.Entry<ValueElement, Object> entry : map.entrySet()) {
+                    if (entry.getKey().columnName.equals(sf.getColumnName())) {
+                        values[i] = entry.getValue();
+                        break;
+                    }
+                }
+
+                queryKeys += sf.getColumnName() + " = ? ";
+                if (++i < keyFields.size()) queryKeys += " AND ";
             }
         }
     }
