@@ -1138,8 +1138,12 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     @Override
     public ShowCase load(long id) {
         Select select = context
-                .select(EAV_SC_SHOWCASES.ID, EAV_SC_SHOWCASES.TITLE, EAV_SC_SHOWCASES.TABLE_NAME,
-                        EAV_SC_SHOWCASES.NAME, EAV_SC_SHOWCASES.CLASS_NAME, EAV_SC_SHOWCASES.DOWN_PATH,
+                .select(EAV_SC_SHOWCASES.ID,
+                        EAV_SC_SHOWCASES.TITLE,
+                        EAV_SC_SHOWCASES.TABLE_NAME,
+                        EAV_SC_SHOWCASES.NAME,
+                        EAV_SC_SHOWCASES.CLASS_NAME,
+                        EAV_SC_SHOWCASES.DOWN_PATH,
                         EAV_SC_SHOWCASES.IS_FINAL)
                 .from(EAV_SC_SHOWCASES)
                 .where(EAV_SC_SHOWCASES.ID.equal(id));
@@ -1160,7 +1164,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         ShowCase showCase = new ShowCase();
         showCase.setId(id);
         showCase.setName((String) row.get(EAV_SC_SHOWCASES.NAME.getName()));
-        showCase.setTitle((String) row.get(EAV_SC_SHOWCASES.TITLE.getName()));
         showCase.setTableName((String) row.get(EAV_SC_SHOWCASES.TABLE_NAME.getName()));
         showCase.setDownPath((String) row.get(EAV_SC_SHOWCASES.DOWN_PATH.getName()));
         showCase.setFinal((row.get(EAV_SC_SHOWCASES.IS_FINAL.getName())).toString().equals("1"));
@@ -1198,6 +1201,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
                 if (showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.CUSTOM) {
                     showCase.addCustomField(showCaseField);
+                } else if (showCaseField.getType() == ShowCaseField.ShowCaseFieldTypes.KEY) {
+                    showCase.addKeyField(showCaseField);
                 } else {
                     showCase.addField(showCaseField);
                 }
@@ -1278,7 +1283,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 .insertInto(EAV_SC_SHOWCASES)
                 .set(EAV_SC_SHOWCASES.NAME, showCase.getName())
                 .set(EAV_SC_SHOWCASES.TABLE_NAME, showCase.getTableName())
-                .set(EAV_SC_SHOWCASES.TITLE, showCase.getTitle())
                 .set(EAV_SC_SHOWCASES.CLASS_NAME, showCase.getMeta().getClassName())
                 .set(EAV_SC_SHOWCASES.DOWN_PATH, showCase.getDownPath())
                 .set(EAV_SC_SHOWCASES.IS_FINAL, showCase.isFinal() ? 1 : 0);
@@ -1291,10 +1295,13 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         showCase.setId(showCaseId);
 
         for (ShowCaseField sf : showCase.getFieldsList())
-            insertField(sf, showCase.getId());
+            insertField(sf, showCaseId);
 
         for (ShowCaseField sf : showCase.getCustomFieldsList())
-            insertField(sf, showCase.getId());
+            insertField(sf, showCaseId);
+
+        for (ShowCaseField sf : showCase.getKeyFieldsList())
+            insertField(sf, showCaseId);
 
         return showCaseId;
     }
@@ -1317,7 +1324,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 .update(EAV_SC_SHOWCASES.as(tableAlias))
                 .set(EAV_SC_SHOWCASES.as(tableAlias).NAME, showCaseSaving.getName())
                 .set(EAV_SC_SHOWCASES.as(tableAlias).TABLE_NAME, showCaseSaving.getTableName())
-                .set(EAV_SC_SHOWCASES.as(tableAlias).TITLE, showCaseSaving.getTitle())
                 .set(EAV_SC_SHOWCASES.as(tableAlias).DOWN_PATH, showCaseSaving.getDownPath())
                 .set(EAV_SC_SHOWCASES.as(tableAlias).IS_FINAL, showCaseSaving.isFinal() ? 1 : 0)
                 .where(EAV_SC_SHOWCASES.as(tableAlias).as(tableAlias).ID.equal(showCaseSaving.getId()));

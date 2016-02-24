@@ -2241,8 +2241,6 @@ public class CLI {
                 showCase.setName(args.get(2));
             } else if (args.get(1).equals("tableName")) {
                 showCase.setTableName(args.get(2));
-            } else if (args.get(1).equals("title")) {
-                showCase.setTitle(args.get(2));
             } else if (args.get(1).equals("downPath")) {
                 MetaClass metaClass = showCase.getMeta();
                 if (metaClass.getEl(args.get(2)) == null)
@@ -2267,6 +2265,8 @@ public class CLI {
                     throw new UnsupportedOperationException("MetaClass, attributePath and columnName cannot be empty");
 
                 showCase.addCustomField(args.get(3), args.get(4), metaClassRepository.getMetaClass(args.get(2)));
+            } else if (args.get(1).equals("addKey")) {
+                showCase.addKeyField(args.get(2));
             } else {
                 System.err.println("Example: showcase list add [path] [columnName]");
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName]");

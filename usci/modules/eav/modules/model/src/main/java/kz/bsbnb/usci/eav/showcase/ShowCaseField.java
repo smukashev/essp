@@ -61,5 +61,6 @@ public class ShowCaseField extends Persistable {
     public final static class ShowCaseFieldTypes {
         public final static int DEFAULT = 1;
         public final static int CUSTOM = 2;
+        public final static int KEY = 3;
     }
 }

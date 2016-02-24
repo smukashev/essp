@@ -14,14 +14,14 @@ import java.util.List;
 public class ShowCase extends Persistable {
     private String name;
     private String tableName;
-    private String title;
     private MetaClass meta;
     private String downPath = "";
     private boolean isFinal = false;
 
-    private ArrayList<ShowCaseField> fields = new ArrayList<ShowCaseField>();
-    private ArrayList<ShowCaseField> customFields = new ArrayList<ShowCaseField>();
-    private ArrayList<Index> Indexes = new ArrayList<Index>();
+    private ArrayList<ShowCaseField> fields = new ArrayList<>();
+    private ArrayList<ShowCaseField> customFields = new ArrayList<>();
+    private ArrayList<ShowCaseField> keyFields = new ArrayList<>();
+    private ArrayList<Index> indexes = new ArrayList<>();
 
     public ShowCase() {
         super();
@@ -51,14 +51,6 @@ public class ShowCase extends Persistable {
         this.tableName = tableName;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getDownPath() {
         return downPath;
     }
@@ -75,12 +67,16 @@ public class ShowCase extends Persistable {
         customFields.add(field);
     }
 
+    public void addKeyField(ShowCaseField field) {
+        keyFields.add(field);
+    }
+
     public void addIndex(Index index) {
-        Indexes.add(index);
+        indexes.add(index);
     }
 
     public ArrayList<Index> getIndexes() {
-        return Indexes;
+        return indexes;
     }
 
     public boolean isFinal() {
@@ -143,6 +139,21 @@ public class ShowCase extends Persistable {
         customFields.add(showCaseField);
     }
 
+    public void addKeyField(String columnName) {
+        ShowCaseField showCaseField = new ShowCaseField();
+        showCaseField.setAttributeId(0L);
+        showCaseField.setMetaId(0L);
+        showCaseField.setAttributePath(columnName);
+        showCaseField.setColumnName(columnName);
+        showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.KEY);
+
+        addKeyField(showCaseField);
+    }
+
+    public List<ShowCaseField> getKeyFieldsList() {
+        return keyFields;
+    }
+
     public ArrayList<ShowCaseField> getCustomFieldsList() {
         return customFields;
     }
@@ -156,7 +167,6 @@ public class ShowCase extends Persistable {
         return "ShowCase{" +
                 "name='" + name + '\'' +
                 ", tableName='" + tableName + '\'' +
-                ", title='" + title + '\'' +
                 ", downPath='" + downPath + '\'' +
                 ", isFinal=" + isFinal +
                 ", customMeta=" + (meta != null ? meta.getClassName() : null) +
