@@ -478,12 +478,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     @Transactional
     public void generate(IBaseEntity globalEntityApplied, ShowcaseHolder showcaseHolder) {
         if (showcaseHolder.getShowCaseMeta().getDownPath() != null) {
-            List<BaseEntity> allApplied;
-            allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showcaseHolder.getShowCaseMeta().getDownPath(), true);
+            List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" +
+                    showcaseHolder.getShowCaseMeta().getDownPath(), true);
 
-            for (BaseEntity baseEntityApplied : allApplied) {
+            for (BaseEntity baseEntityApplied : allApplied)
                 dbCortegeGenerate(globalEntityApplied, baseEntityApplied, showcaseHolder);
-            }
         } else {
             dbCortegeGenerate(globalEntityApplied, globalEntityApplied, showcaseHolder);
         }
@@ -523,9 +522,9 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
                 addCustomKeys(entryMap, globalEntity, showcaseHolder);
 
-                KeyData keyData = new KeyData(entryMap);
+                KeyData keyData = new KeyData(entryMap, showcaseHolder.getShowCaseMeta().getKeyFieldsList());
 
-                ValueElement keyValueElement = new ValueElement("_operation", -1L, false, false);
+                ValueElement keyValueElement = new ValueElement("_operation", -1L, false);
 
                 if (entryMap.containsKey(keyValueElement)) {
                     OperationType ot = (OperationType) entryMap.get(keyValueElement);
@@ -653,8 +652,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     public void addCustomKeys(HashMap<ValueElement, Object> entryMap, IBaseEntity globalEntity, ShowcaseHolder showcaseHolder) {
         for (ShowCaseField sf : showcaseHolder.getShowCaseMeta().getCustomFieldsList()) {
             if (sf.getAttributePath().equals("root")) {
-                entryMap.put(new ValueElement(sf.getColumnName(),
-                        globalEntity.getId(), true), globalEntity.getId());
+                entryMap.put(new ValueElement(sf.getColumnName(), globalEntity.getId()), globalEntity.getId());
                 continue;
             }
 
@@ -668,12 +666,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
             try {
                 if (customObject instanceof BaseEntity) {
-                    entryMap.put(new ValueElement(sf.getColumnName(), ((BaseEntity) customObject).getId(), true),
-                            ((BaseEntity) customObject).getId());
+                    entryMap.put(new ValueElement(sf.getColumnName(), ((BaseEntity) customObject).getId()), ((BaseEntity) customObject).getId());
                 } else if (customObject instanceof BaseSet) {
                     throw new UnsupportedOperationException("CustomSet is not supported!");
                 } else {
-                    entryMap.put(new ValueElement(sf.getColumnName(), 0L, false), customObject);
+                    entryMap.put(new ValueElement(sf.getColumnName(), 0L), customObject);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -697,6 +694,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         return newObjectArray;
     }
 
+    /* Generates path for relational tables using showcaseHolder */
     private HashMap<String, HashSet<PathElement>> generatePaths(IBaseEntity entity, ShowcaseHolder showcaseHolder, HashSet<PathElement> keyPaths) {
         HashMap<String, HashSet<PathElement>> paths = new HashMap<>();
 
@@ -713,7 +711,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         tmpSet = new HashSet<>();
                     }
 
-                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName(), false));
+                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName()));
                     paths.put("root." + sf.getAttributePath(), tmpSet);
 
                     String path = sf.getAttributePath().substring(0, sf.getAttributePath().lastIndexOf("."));
@@ -725,7 +723,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         tmpSet = new HashSet<>();
                     }
 
-                    tmpSet.add(new PathElement(name, sf.getAttributePath(), sf.getColumnName(), false));
+                    tmpSet.add(new PathElement(name, sf.getAttributePath(), sf.getColumnName()));
                     paths.put("root." + path, tmpSet);
                 } else {
                     String path = sf.getAttributePath().substring(0, sf.getAttributePath().lastIndexOf("."));
@@ -737,7 +735,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         tmpSet = new HashSet<>();
                     }
 
-                    tmpSet.add(new PathElement(name, sf.getAttributePath(), sf.getColumnName(), false));
+                    tmpSet.add(new PathElement(name, sf.getAttributePath(), sf.getColumnName()));
                     paths.put("root." + path, tmpSet);
                 }
             } else {
@@ -748,27 +746,23 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 }
 
                 if (attributeMetaType.isSet()) {
-                    keyPaths.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
-                            sf.getColumnName(), true));
+                    keyPaths.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName()));
 
-                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
-                            sf.getColumnName(), false));
+                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName()));
                     paths.put("root", tmpSet);
 
                     tmpSet = new HashSet<>();
-                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName(), true));
+                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName()));
                     paths.put("root." + sf.getAttributePath(), tmpSet);
                 } else if (attributeMetaType.isComplex()) {
-                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
-                            sf.getColumnName(), false));
+                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName()));
                     paths.put("root", tmpSet);
 
                     tmpSet = new HashSet<>();
-                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName(), true));
+                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName()));
                     paths.put("root." + sf.getAttributePath(), tmpSet);
                 } else {
-                    tmpSet.add(new PathElement(sf.getAttributePath(), sf.getAttributePath(),
-                            sf.getColumnName(), false));
+                    tmpSet.add(new PathElement(sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName()));
 
                     paths.put("root", tmpSet);
                 }
@@ -785,13 +779,12 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         HashMap<ValueElement, Object> map = new HashMap<>();
 
         if (entity.getOperation() != null)
-            map.put(new ValueElement("_operation", -1L, false, false), entity.getOperation());
+            map.put(new ValueElement("_operation", -1L, false), entity.getOperation());
 
         if (attributes != null) {
             for (PathElement attribute : attributes) {
                 if (attribute.elementPath.equals("root")) {
-                    map.put(new ValueElement(attribute.columnName, entity.getId(), !curPath.contains(".")
-                            || parentIsArray), entity.getId());
+                    map.put(new ValueElement(attribute.columnName, entity.getId()), entity.getId());
                 } else {
                     if (attribute.elementPath.contains("root.")) {
                         Object container = entity.getEl(attribute.elementPath.substring(
@@ -802,8 +795,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                         if (container instanceof BaseEntity) {
                             BaseEntity innerEntity = (BaseEntity) container;
 
-                            map.put(new ValueElement(attribute.columnName, innerEntity.getId(), false),
-                                    readMap(attribute.elementPath, innerEntity, paths, false));
+                            map.put(new ValueElement(attribute.columnName, innerEntity.getId()), readMap(attribute.elementPath, innerEntity, paths, false));
                         } else if (container instanceof BaseSet) {
                             BaseSet innerSet = (BaseSet) container;
 
@@ -812,19 +804,15 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                             if (innerSet.getMemberType().isComplex()) {
                                 for (IBaseValue bValue : innerSet.get()) {
                                     BaseEntity bValueEntity = (BaseEntity) bValue.getValue();
-                                    arrayMap.put(new ValueElement(attribute.elementPath, bValueEntity.getId(), true,
-                                            false), readMap(attribute.elementPath, bValueEntity, paths, true));
+                                    arrayMap.put(new ValueElement(attribute.elementPath, bValueEntity.getId(), false), readMap(attribute.elementPath, bValueEntity, paths, true));
                                 }
 
-                                map.put(new ValueElement(attribute.elementPath, ((BaseSet) container).getId(), false,
-                                        true, false), arrayMap);
+                                map.put(new ValueElement(attribute.elementPath, ((BaseSet) container).getId(), true, false), arrayMap);
                             } else {
                                 for (IBaseValue bValue : innerSet.get())
-                                    arrayMap.put(new ValueElement(attribute.elementPath, bValue.getId(), false, false),
-                                            bValue.getValue());
+                                    arrayMap.put(new ValueElement(attribute.elementPath, bValue.getId(), false), bValue.getValue());
 
-                                map.put(new ValueElement(attribute.elementPath, ((BaseSet) container).getId(), false,
-                                        true, true), arrayMap);
+                                map.put(new ValueElement(attribute.elementPath, ((BaseSet) container).getId(), true, true), arrayMap);
                             }
                         }
                     } else {
@@ -832,9 +820,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
                         if (iBaseValue != null && iBaseValue.getMetaAttribute().getMetaType().isComplex() &&
                                 !iBaseValue.getMetaAttribute().getMetaType().isSet()) {
-                            map.put(new ValueElement(attribute.columnName, iBaseValue.getId(), false)
-                                    , readMap(curPath + "." + attribute.elementPath,
-                                    (BaseEntity) iBaseValue.getValue(), paths, false));
+                            map.put(new ValueElement(attribute.columnName, iBaseValue.getId()), readMap(curPath + "." + attribute.elementPath, (BaseEntity) iBaseValue.getValue(), paths, false));
                         } else if (iBaseValue != null && iBaseValue.getMetaAttribute().getMetaType().isComplex() &&
                                 iBaseValue.getMetaAttribute().getMetaType().isSet()) {
                             throw new UnsupportedOperationException("Complex entity cannot contain complex set");
@@ -844,14 +830,12 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                             HashMap<ValueElement, Object> arrayMap = new HashMap<>();
 
                             for (IBaseValue innerValue : bSet.get())
-                                arrayMap.put(new ValueElement(attribute.elementPath, innerValue.getId(),
-                                        false, false, true), innerValue.getValue());
+                                arrayMap.put(new ValueElement(attribute.elementPath, innerValue.getId(), false, true), innerValue.getValue());
 
-                            map.put(new ValueElement(attribute.elementPath, iBaseValue.getId(), false, true, true),
+                            map.put(new ValueElement(attribute.elementPath, iBaseValue.getId(), true, true),
                                     arrayMap);
                         } else if (iBaseValue != null) {
-                            map.put(new ValueElement(attribute.columnName, iBaseValue.getId(), false),
-                                    iBaseValue.getValue());
+                            map.put(new ValueElement(attribute.columnName, iBaseValue.getId()), iBaseValue.getValue());
                         }
                     }
                 }
@@ -886,8 +870,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                     HashMap<ValueElement, Object> newHashMap = new HashMap<>();
                     newHashMap.put(innerEntry.getKey(), innerEntry.getValue());
 
-                    newHashMap.put(new ValueElement(innerEntry.getKey().columnName + "_id",
-                            innerEntry.getKey().elementId, true), innerEntry.getKey().elementId);
+                    newHashMap.put(new ValueElement(innerEntry.getKey().columnName + "_id", innerEntry.getKey().elementId), innerEntry.getKey().elementId);
 
                     arrayEl.put(new ArrayElement(index++, innerEntry.getKey()), newHashMap);
                 }
@@ -911,7 +894,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 singleMap.put(entry.getKey(), entry.getValue());
             }
 
-            arrayEl.put(new ArrayElement(index, new ValueElement("root", 0L, true)), singleMap);
+            arrayEl.put(new ArrayElement(index, new ValueElement("root", 0L)), singleMap);
         }
 
         return arrayEl;
@@ -948,8 +931,8 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             rootAttributes = paths.get("root");
         }
 
-        rootAttributes.add(new PathElement("root", "root", entity.getMeta().getClassName() + "_id", true));
-        keyPaths.add(new PathElement("root", "root", entity.getMeta().getClassName() + "_id", true));
+        rootAttributes.add(new PathElement("root", "root", entity.getMeta().getClassName() + "_id"));
+        keyPaths.add(new PathElement("root", "root", entity.getMeta().getClassName() + "_id"));
 
         HashMap<ValueElement, Object> dirtyMap = readMap("root", entity, paths, false);
 
@@ -1378,59 +1361,15 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         final Object[] values;
         String queryKeys = "";
 
-        public KeyData(HashMap<ValueElement, Object> map) {
-            int keySize = 0;
+        public KeyData(HashMap<ValueElement, Object> map, List<ShowCaseField> keyFields) {
+            keys = new Object[keyFields.size()];
+            values = new Object[keyFields.size()];
 
-            for (ValueElement valueElement : map.keySet()) if (valueElement.isKey) keySize++;
-
-            keys = new Object[keySize];
-            values = new Object[keySize];
-
-            int keyCounter = 0;
-            for (Map.Entry<ValueElement, Object> entry : map.entrySet()) {
-                if (entry.getKey().isKey) {
-                    keys[keyCounter] = entry.getKey().columnName;
-                    values[keyCounter] = map.get(entry.getKey());
-
-                    queryKeys += entry.getKey().columnName + " = ? ";
-                    if (++keyCounter < keySize) queryKeys += " AND ";
-
-                }
+            int i = 0;
+            for (ShowCaseField sf : keyFields) {
+                keys[i] = sf.getColumnName();
+                values[i] = map.get(sf.getColumnName());
             }
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            KeyData keyData = (KeyData) o;
-
-            if (keys.length != keyData.keys.length) return  false;
-
-            for (int i = 0; i < keys.length; i++) {
-                boolean found  = false;
-
-                for (int j = 0; j < keyData.keys.length; j++) {
-                    if (keys[i].equals(keyData.keys[j]) && values[i].equals(keyData.values[j])) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) return false;
-            }
-
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            return "KeyData{" +
-                    "keys=" + Arrays.toString(keys) +
-                    ", values=" + Arrays.toString(values) +
-                    ", queryKeys='" + queryKeys + '\'' +
-                    '}';
         }
     }
 
@@ -1438,13 +1377,11 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         public final String elementPath;
         public final String attributePath;
         public final String columnName;
-        public boolean isKey = false;
 
-        public PathElement(String elementPath, String attributePath, String columnName, boolean isKey) {
+        public PathElement(String elementPath, String attributePath, String columnName) {
             this.elementPath = elementPath;
             this.attributePath = attributePath;
             this.columnName = columnName;
-            this.isKey = isKey;
         }
 
         @Override
@@ -1453,7 +1390,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                     "elementPath='" + elementPath + '\'' +
                     ", attributePath='" + attributePath + '\'' +
                     ", columnName='" + columnName + '\'' +
-                    ", isKey=" + isKey +
                     '}';
         }
     }
@@ -1461,30 +1397,26 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     class ValueElement {
         public final String columnName;
         public final Long elementId;
-        public final boolean isKey;
         public final boolean isArray;
         public final boolean isSimple;
 
-        public ValueElement(String columnName, Long elementId, boolean isKey) {
+        public ValueElement(String columnName, Long elementId) {
             this.columnName = columnName;
             this.elementId = elementId;
-            this.isKey = isKey;
             this.isArray = false;
             this.isSimple = false;
         }
 
-        public ValueElement(String columnName, Long elementId, boolean isKey, boolean isArray) {
+        public ValueElement(String columnName, Long elementId, boolean isArray) {
             this.columnName = columnName;
             this.elementId = elementId;
-            this.isKey = isKey;
             this.isArray = isArray;
             this.isSimple = false;
         }
 
-        public ValueElement(String columnName, Long elementId, boolean isKey, boolean isArray, boolean isSimple) {
+        public ValueElement(String columnName, Long elementId, boolean isArray, boolean isSimple) {
             this.columnName = columnName;
             this.elementId = elementId;
-            this.isKey = isKey;
             this.isArray = isArray;
             this.isSimple = isSimple;
         }
@@ -1494,7 +1426,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
             return "ValueElement{" +
                     "columnName='" + columnName + '\'' +
                     ", elementId=" + elementId +
-                    ", isKey=" + isKey +
                     ", isArray=" + isArray +
                     ", isSimple=" + isSimple +
                     '}';
@@ -1508,7 +1439,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
             ValueElement that = (ValueElement) o;
 
-            if (isKey != that.isKey) return false;
             if (isArray != that.isArray) return false;
             if (isSimple != that.isSimple) return false;
             if (!columnName.equals(that.columnName)) return false;
@@ -1520,7 +1450,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         public int hashCode() {
             int result = columnName.hashCode();
             result = 31 * result + elementId.hashCode();
-            result = 31 * result + (isKey ? 1 : 0);
             result = 31 * result + (isArray ? 1 : 0);
             result = 31 * result + (isSimple ? 1 : 0);
             return result;
