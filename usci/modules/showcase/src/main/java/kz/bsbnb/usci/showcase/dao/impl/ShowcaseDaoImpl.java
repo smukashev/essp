@@ -493,8 +493,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         Date openDate = null, closeDate = null;
         String sql;
 
-        if (globalEntity == null || entity == null || showcaseHolder == null) return;
-
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(entity, showcaseHolder);
 
         if (savingMap == null || savingMap.size() == 0)
