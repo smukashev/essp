@@ -2265,6 +2265,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
+        /* Обработка накопительных массивов для витрин */
+        if (metaAttribute.isCumulative() && !isBaseSetDeleted) {
+            for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
+                if (processedUUIDSet.contains(childBaseValueLoaded.getUuid()))
+                    continue;
+
+                childBaseSetApplied.put(childBaseValueLoaded);
+            }
+        }
+
         /* Обработка документов по типу */
         if (savedDocTypes.size() > 0 && childBaseSetLoaded != null) {
             for (IBaseValue savedValue : savedDocTypes) {

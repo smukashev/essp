@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 
 public interface ShowcaseDao {
-
     void createTables(ShowcaseHolder showcaseHolder);
 
     void generate(IBaseEntity entity, ShowcaseHolder showcaseHolder);

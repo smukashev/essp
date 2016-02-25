@@ -80,16 +80,28 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     for (ShowcaseHolder holder : holders) {
                         if (holder.getShowCaseMeta().getMeta().getClassName().equals(metaClassName)) {
                             if (scId == null || scId == 0L || scId == holder.getShowCaseMeta().getId()) {
-                                Future future = exec.submit(new CortegeGenerator(queueEntry.getBaseEntityApplied(), holder));
+                                Future future = exec.submit(
+                                        new CortegeGenerator(queueEntry.getBaseEntityApplied(), holder));
 
                                 futures.add(future);
 
                                 found = true;
                             }
+
+                            /*for (ChildShowCase childShowCase : holder.getShowCaseMeta().getChildShowCases()) {
+                                if (childShowCase.getMeta().getClassName().equals(metaClassName)) {
+                                    Future future = exec.submit(
+                                            new CortegeGenerator(queueEntry.getBaseEntityApplied(), holder));
+
+                                    futures.add(future);
+
+                                    found = true;
+                                }
+                            }*/
                         }
                     }
 
-                    if(!found)
+                    if (!found)
                         System.err.println("Для мета класа  " + metaClassName + " нет существующих витрин;");
 
                     for (Future f : futures)
