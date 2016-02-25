@@ -2,6 +2,7 @@ package kz.bsbnb.usci.showcase.consumer;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
+import kz.bsbnb.usci.eav.showcase.ChildShowCase;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
@@ -87,25 +88,29 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
                                 found = true;
                             }
+                        }
+                    }
 
-                            /*for (ChildShowCase childShowCase : holder.getShowCaseMeta().getChildShowCases()) {
+                    if (!found) {
+                        for (ShowcaseHolder holder : holders) {
+                            for (ChildShowCase childShowCase : holder.getShowCaseMeta().getChildShowCases()) {
                                 if (childShowCase.getMeta().getClassName().equals(metaClassName)) {
                                     Future future = exec.submit(
-                                            new CortegeGenerator(queueEntry.getBaseEntityApplied(), holder));
+                                            new ChildCortegeGenerator(queueEntry.getBaseEntityApplied(), childShowCase));
 
                                     futures.add(future);
 
                                     found = true;
                                 }
-                            }*/
+                            }
                         }
                     }
 
-                    if (!found)
+                    if(found) {
+                        for (Future f : futures) f.get();
+                    } else {
                         System.err.println("Для мета класа  " + metaClassName + " нет существующих витрин;");
-
-                    for (Future f : futures)
-                        f.get();
+                    }
 
                     futures.clear();
                 }
@@ -137,6 +142,21 @@ public class ShowcaseMessageConsumer implements MessageListener {
         @Override
         public void run() {
             showcaseDao.generate(entity, holder);
+        }
+    }
+
+    private class ChildCortegeGenerator implements Runnable {
+        private IBaseEntity entity;
+        private ChildShowCase childShowCase;
+
+        public ChildCortegeGenerator(IBaseEntity entity, ChildShowCase childShowCase) {
+            this.entity = entity;
+            this.childShowCase = childShowCase;
+        }
+
+        @Override
+        public void run() {
+
         }
     }
 }
