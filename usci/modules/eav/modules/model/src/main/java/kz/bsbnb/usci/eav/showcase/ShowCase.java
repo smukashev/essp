@@ -22,15 +22,17 @@ public class ShowCase extends Persistable {
 
     private boolean isFinal = false;
 
-    private ArrayList<ShowCaseField> fields = new ArrayList<>();
+    private List<ShowCaseField> fields = new ArrayList<>();
 
-    private ArrayList<ShowCaseField> customFields = new ArrayList<>();
+    private List<ShowCaseField> customFields = new ArrayList<>();
 
-    private ArrayList<ShowCaseField> rootKeyFields = new ArrayList<>();
+    private List<ShowCaseField> rootKeyFields = new ArrayList<>();
 
-    private ArrayList<ShowCaseField> historyKeyFields = new ArrayList<>();
+    private List<ShowCaseField> historyKeyFields = new ArrayList<>();
 
-    private ArrayList<Index> indexes = new ArrayList<>();
+    private List<Index> indexes = new ArrayList<>();
+
+    private List<ChildShowCase> childShowCases = new ArrayList<>();
 
     public ShowCase() {
         super();
@@ -88,7 +90,7 @@ public class ShowCase extends Persistable {
         indexes.add(index);
     }
 
-    public ArrayList<Index> getIndexes() {
+    public List<Index> getIndexes() {
         return indexes;
     }
 
@@ -174,6 +176,14 @@ public class ShowCase extends Persistable {
         addHistoryKeyField(showCaseField);
     }
 
+    public void addChildShowCase(ChildShowCase childShowCase) {
+        childShowCases.add(childShowCase);
+    }
+
+    public List<ChildShowCase> getChildShowCases() {
+        return childShowCases;
+    }
+
     public List<ShowCaseField> getRootKeyFieldsList() {
         return rootKeyFields;
     }
@@ -182,7 +192,7 @@ public class ShowCase extends Persistable {
         return historyKeyFields;
     }
 
-    public ArrayList<ShowCaseField> getCustomFieldsList() {
+    public List<ShowCaseField> getCustomFieldsList() {
         return customFields;
     }
 

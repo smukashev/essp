@@ -16,10 +16,6 @@ public interface ShowcaseDao {
 
     ArrayList<ShowcaseHolder> getHolders();
 
-    long save(ShowCase showCaseForSave);
-
-    void remove(ShowCase showCase);
-
     ShowCase load(String name);
 
     ShowCase load(long id);
@@ -33,4 +29,6 @@ public interface ShowcaseDao {
     Long insertBadEntity(Long entityId, Long scId, Date report_date, String strackTrace, String message);
 
     void closeEntities(Long scId, IBaseEntity entity, List<ShowcaseHolder> holders);
+
+    long insert(ShowCase showCase);
 }

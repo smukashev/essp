@@ -14,6 +14,8 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.showcase.ChildShowCase;
+import kz.bsbnb.usci.eav.showcase.ChildShowCaseField;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -1138,7 +1140,6 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
     public ShowCase load(long id) {
         Select select = context
                 .select(EAV_SC_SHOWCASES.ID,
-                        EAV_SC_SHOWCASES.TITLE,
                         EAV_SC_SHOWCASES.TABLE_NAME,
                         EAV_SC_SHOWCASES.NAME,
                         EAV_SC_SHOWCASES.CLASS_NAME,
@@ -1240,23 +1241,21 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
                 .get(EAV_SC_SHOWCASES.ID.getName())).longValue();
     }
 
-    @Override
-    @Transactional
-    public long save(ShowCase showCaseForSave) {
-        if (showCaseForSave.getId() < 1)
-            showCaseForSave.setId(getIdByName(showCaseForSave.getName()));
+    private long insertChildShowCaseField(ChildShowCaseField childShowCaseField, long childShowCaseId) {
+        Insert insert = context.insertInto(EAV_SC_CHILD_SHOWCASE_FIELDS)
+                .set(EAV_SC_CHILD_SHOWCASE_FIELDS.CHILD_SHOWCASE_ID, childShowCaseId)
+                .set(EAV_SC_CHILD_SHOWCASE_FIELDS.ATTRIBUTE_ID, childShowCaseField.getAttributeId())
+                .set(EAV_SC_CHILD_SHOWCASE_FIELDS.ATTRIBUTE_PATH, childShowCaseField.getAttributePath())
+                .set(EAV_SC_CHILD_SHOWCASE_FIELDS.COLUMN_NAME, childShowCaseField.getColumnName())
+                .set(EAV_SC_CHILD_SHOWCASE_FIELDS.TYPE, childShowCaseField.getType());
 
-        if (showCaseForSave.getId() < 1) {
-            return insert(showCaseForSave);
-        } else {
-            update(showCaseForSave);
-            return showCaseForSave.getId();
-        }
-    }
+        logger.debug(insert.toString());
 
-    @Override
-    public void remove(ShowCase showCase) {
-        throw new RuntimeException("Unimplemented");
+        long childShowCaseFieldId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+
+        childShowCaseField.setId(childShowCaseId);
+
+        return childShowCaseFieldId;
     }
 
     private long insertField(ShowCaseField showCaseField, long showCaseId) {
@@ -1271,15 +1270,14 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         logger.debug(insert.toString());
 
-        long showCaseFieldId = insertWithId(insert.getSQL(),
-                insert.getBindValues().toArray());
+        long showCaseFieldId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
         showCaseField.setId(showCaseFieldId);
 
         return showCaseFieldId;
     }
 
-    private long insert(ShowCase showCase) {
+    public long insert(ShowCase showCase) {
         Insert insert = context
                 .insertInto(EAV_SC_SHOWCASES)
                 .set(EAV_SC_SHOWCASES.NAME, showCase.getName())
@@ -1290,8 +1288,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
         logger.debug(insert.toString());
 
-        long showCaseId = insertWithId(insert.getSQL(),
-                insert.getBindValues().toArray());
+        long showCaseId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
         showCase.setId(showCaseId);
 
@@ -1307,44 +1304,23 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         for (ShowCaseField sf : showCase.getHistoryKeyFieldsList())
             insertField(sf, showCaseId);
 
+        for (ChildShowCase csc : showCase.getChildShowCases()) {
+            Insert childInsert = context.insertInto(EAV_SC_CHILD_SHOWCASES)
+                    .set(EAV_SC_CHILD_SHOWCASES.SHOWCASE_ID, showCaseId)
+                    .set(EAV_SC_CHILD_SHOWCASES.NAME, csc.getName())
+                    .set(EAV_SC_CHILD_SHOWCASES.META_ID, csc.getMeta().getId())
+                    .set(EAV_SC_CHILD_SHOWCASES.CHILD_DOWN_PATH, csc.getChildDownPath());
+
+            long childShowCaseId = insertWithId(childInsert.getSQL(), childInsert.getBindValues().toArray());
+
+            for (ChildShowCaseField childShowCaseField : csc.getFields())
+                insertChildShowCaseField(childShowCaseField, childShowCaseId);
+
+            for (ChildShowCaseField childShowCaseField : csc.getKeyFields())
+                insertChildShowCaseField(childShowCaseField, childShowCaseId);
+        }
+
         return showCaseId;
-    }
-
-    private long deleteFields(long showCaseId) {
-        Delete delete = context
-                .delete(EAV_SC_SHOWCASE_FIELDS)
-                .where(EAV_SC_SHOWCASE_FIELDS.SHOWCASE_ID.equal(showCaseId));
-
-        logger.debug(delete.toString());
-        return jdbcTemplateSC.update(delete.getSQL(), delete.getBindValues().toArray());
-    }
-
-    private void update(ShowCase showCaseSaving) {
-        if (showCaseSaving.getId() < 1)
-            throw new IllegalArgumentException("UPDATE couldn't be done without ID.");
-
-        String tableAlias = "sc";
-        Update update = context
-                .update(EAV_SC_SHOWCASES.as(tableAlias))
-                .set(EAV_SC_SHOWCASES.as(tableAlias).NAME, showCaseSaving.getName())
-                .set(EAV_SC_SHOWCASES.as(tableAlias).TABLE_NAME, showCaseSaving.getTableName())
-                .set(EAV_SC_SHOWCASES.as(tableAlias).DOWN_PATH, showCaseSaving.getDownPath())
-                .set(EAV_SC_SHOWCASES.as(tableAlias).IS_FINAL, showCaseSaving.isFinal() ? 1 : 0)
-                .where(EAV_SC_SHOWCASES.as(tableAlias).as(tableAlias).ID.equal(showCaseSaving.getId()));
-
-        logger.debug(update.toString());
-        int count = jdbcTemplateSC.update(update.getSQL(), update.getBindValues().toArray());
-
-        if (count != 1)
-            throw new RuntimeException("UPDATE operation should be update only one record.");
-
-        deleteFields(showCaseSaving.getId());
-
-        for (ShowCaseField sf : showCaseSaving.getFieldsList())
-            insertField(sf, showCaseSaving.getId());
-
-        for (ShowCaseField sf : showCaseSaving.getCustomFieldsList())
-            insertField(sf, showCaseSaving.getId());
     }
 
     private long insertWithId(String query, Object[] values) {

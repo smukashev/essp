@@ -32,6 +32,7 @@ import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.showcase.ChildShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.showcase.ShowCaseIndex;
@@ -86,7 +87,10 @@ public class CLI {
     protected IMetaClassRepository metaClassRepository;
     RmiProxyFactoryBean serviceFactory = null;
     IEntityService entityServiceCore = null;
+
     ShowCase showCase;
+    ChildShowCase childShowCase;
+
     String line;
     Exception lastException = null;
     private String command;
@@ -2210,16 +2214,6 @@ public class CLI {
     }
 
     public void commandShowCase() {
-        // Fast Init
-        if (showCase == null) {
-            try {
-                showCase = new ShowCase();
-                showCase.setMeta(metaClassRepository.getMetaClass("credit"));
-            } catch (Exception e) {
-                showCase = new ShowCase();
-            }
-        }
-
         if (showcaseServiceFactoryBean == null || showcaseService == null)
             initSC();
 
@@ -2274,8 +2268,34 @@ public class CLI {
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName]");
                 throw new IllegalArgumentException();
             }
+        } else if (args.get(0).equals("child")) {
+            if (args.get(1).equals("init")) {
+                childShowCase = new ChildShowCase();
+            } else if (args.get(1).equals("set")) {
+                if (args.get(2).equals("name")) {
+                    childShowCase.setName(args.get(3));
+                } else if (args.get(2).equals("meta")) {
+                    childShowCase.setMeta(metaClassRepository.getMetaClass(args.get(3)));
+                } else if (args.get(2).equals("child_down_path")) {
+                    childShowCase.setChildDownPath(args.get(3));
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (args.get(1).equals("list")) {
+                if (args.get(2).equals("add")) {
+                    childShowCase.addField(args.get(3));
+                } else if(args.get(2).equals("addKey")) {
+                    childShowCase.addKeyField(args.get(3));
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if(args.get(1).equals("save")) {
+                showCase.addChildShowCase(childShowCase);
+                childShowCase = new ChildShowCase();
+            } else {
+                throw new IllegalArgumentException();
+            }
         } else if (args.get(0).equals("addIndex")) {
-
             if (args.get(1).equals("unique") || args.get(1).equals("nonunique")) {
                 String IndexType = args.get(1);
                 args.remove(0);

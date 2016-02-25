@@ -27,7 +27,7 @@ public class ShowcaseServiceImpl implements ShowcaseService {
     @Override
     public long add(ShowCase showCase) {
         ShowcaseHolder scHolder = new ShowcaseHolder();
-        long id = showcaseDao.save(showCase);
+        long id = showcaseDao.insert(showCase);
         scHolder.setShowCaseMeta(showCase);
         showcaseDao.createTables(scHolder);
         return id;
