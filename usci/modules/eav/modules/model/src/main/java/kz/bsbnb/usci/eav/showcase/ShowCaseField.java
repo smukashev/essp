@@ -4,8 +4,11 @@ import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 
 public class ShowCaseField extends Persistable {
     private Long attributeId;
+
     private Long metaId;
+
     private String columnName;
+
     private String attributePath;
 
     private int type = ShowCaseFieldTypes.DEFAULT;
@@ -61,6 +64,7 @@ public class ShowCaseField extends Persistable {
     public final static class ShowCaseFieldTypes {
         public final static int DEFAULT = 1;
         public final static int CUSTOM = 2;
-        public final static int KEY = 3;
+        public final static int ROOT_KEY = 3;
+        public final static int HISTORY_KEY = 4;
     }
 }

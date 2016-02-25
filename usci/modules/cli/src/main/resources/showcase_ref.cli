@@ -1,32 +1,53 @@
 #=================================================================================
-#  0. REF_CREDITOR_DOC
+# REF_CREDITOR
+#=================================================================================
+showcase set meta ref_creditor
+showcase set name REF_CREDITOR
+showcase set tableName REF_CREDITOR
+
+showcase list add subject_type subject_type_id
+showcase list add code code
+showcase list add name name
+showcase list add nokbdb_code nokbdb_code
+showcase list add short_name short_name
+showcase list add subject_type.code subject_type_code
+
+showcase list addRootKey ref_creditor_id
+
+showcase list addHistoryKey ref_creditor_id
+
+showcase addIndex nonunique ref_creditor_id
+
+showcase save
+
+#=================================================================================
+# REF_CREDITOR_DOC
 #=================================================================================
 
 showcase set meta ref_creditor
-
 showcase set name REF_CREDITOR_DOC
 showcase set tableName REF_CREDITOR_DOC
 
 showcase list add docs doc_id
 showcase list add docs.doc_type doc_type_id
-
 showcase list add docs.no no
 showcase list add docs.doc_type.code doc_type_code
 showcase list add docs.name name
 
-showcase list addKey ref_creditor_id
+showcase list addRootKey ref_creditor_id
+
+showcase list addHistoryKey ref_creditor_id
+showcase list addHistoryKey doc_id
 
 showcase addIndex nonunique ref_creditor_id
+showcase addIndex nonunique ref_creditor_id doc_id
 
 showcase save
-#---------------------------------------------------------------------------------
 
 #=================================================================================
-#  1.REF_BALANCE_ACCOUNT
+# REF_BALANCE_ACCOUNT
 #=================================================================================
- 
 showcase set meta ref_balance_account
- 
 showcase set name REF_BALANCE_ACCOUNT
 showcase set tableName REF_BALANCE_ACCOUNT
  
@@ -40,20 +61,18 @@ showcase list add no_ no_
 showcase list add seventh_sign seventh_sign
 showcase list add sixth_sign sixth_sign
 
-showcase list addKey ref_balance_account_id
+showcase list addRootKey ref_balance_account_id
+
+showcase list addHistoryKey ref_balance_account_id
 
 showcase addIndex nonunique ref_balance_account_id
 
 showcase save
-#---------------------------------------------------------------------------------
-
 
 #=================================================================================
-#  2.REF_BANK_RELATION
+# REF_BANK_RELATION
 #=================================================================================
- 
 showcase set meta ref_bank_relation
- 
 showcase set name REF_BANK_RELATION
 showcase set tableName REF_BANK_RELATION
  
@@ -61,20 +80,18 @@ showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 
-showcase list addKey ref_bank_relation_id
+showcase list addRootKey ref_bank_relation_id
+
+showcase list addHistoryKey ref_bank_relation_id
 
 showcase addIndex nonunique ref_bank_relation_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  3.REF_CLASSIFICATION
+# REF_CLASSIFICATION
 #=================================================================================
- 
 showcase set meta ref_classification
- 
 showcase set name REF_CLASSIFICATION
 showcase set tableName REF_CLASSIFICATION
  
@@ -89,20 +106,18 @@ showcase list add provision_portfolio_max provision_portfolio_max
 showcase list add provision_portfolio_min provision_portfolio_min
 showcase list add value_ value_
 
-showcase list addKey ref_classification_id
+showcase list addRootKey ref_classification_id
+
+showcase list addHistoryKey ref_classification_id
 
 showcase addIndex nonunique ref_classification_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
-#=================================================================================
-#  4.REF_CONTACT_TYPE
-#=================================================================================
 
+#=================================================================================
+# REF_CONTACT_TYPE
+#=================================================================================
 showcase set meta ref_contact_type
- 
 showcase set name REF_CONTACT_TYPE
 showcase set tableName REF_CONTACT_TYPE
  
@@ -110,20 +125,18 @@ showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 
-showcase list addKey ref_contact_type_id
+showcase list addRootKey ref_contact_type_id
+
+showcase list addHistoryKey ref_contact_type_id
 
 showcase addIndex nonunique ref_contact_type_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  5.REF_COUNTRY
+# REF_COUNTRY
 #=================================================================================
- 
 showcase set meta ref_country
- 
 showcase set name REF_COUNTRY
 showcase set tableName REF_COUNTRY
  
@@ -134,20 +147,18 @@ showcase list add name_ru name_ru
 showcase list add short_name_kz short_name_kz
 showcase list add short_name_ru short_name_ru
 
-showcase list addKey ref_country_id
+showcase list addRootKey ref_country_id
+
+showcase list addHistoryKey ref_country_id
 
 showcase addIndex nonunique ref_country_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  6.REF_CREDIT_OBJECT
+# REF_CREDIT_OBJECT
 #=================================================================================
- 
 showcase set meta ref_credit_object
- 
 showcase set name REF_CREDIT_OBJECT
 showcase set tableName REF_CREDIT_OBJECT
  
@@ -155,71 +166,41 @@ showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 
-showcase list addKey ref_credit_object_id
+showcase list addRootKey ref_credit_object_id
+
+showcase list addHistoryKey ref_credit_object_id
 
 showcase addIndex nonunique ref_credit_object_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
  
 #=================================================================================
-#  7.REF_CREDITOR
+# REF_CREDITOR_BRANCH
 #=================================================================================
- 
-showcase set meta ref_creditor
- 
-showcase set name REF_CREDITOR
-showcase set tableName REF_CREDITOR
-
- showcase list add subject_type subject_type_id
-
-showcase list add code code
-showcase list add name name
-showcase list add nokbdb_code nokbdb_code
-showcase list add short_name short_name
-showcase list add subject_type.code subject_type_code
-
-showcase list addKey ref_creditor_id
-
-showcase addIndex nonunique ref_creditor_id
-
-showcase save
-#---------------------------------------------------------------------------------
- 
- 
-#=================================================================================
-#  8.REF_CREDITOR_BRANCH
-#=================================================================================
- 
 showcase set meta ref_creditor_branch
-
 showcase set name REF_CREDITOR_BRANCH
 showcase set tableName REF_CREDITOR_BRANCH
 
 showcase list add main_office main_office_id
 showcase list add region region_id
-
 showcase list add code code
 showcase list add name name
 showcase list add short_name short_name
 showcase list add main_office.code main_office_code
 showcase list add region.code region_code
 
-showcase list addKey ref_creditor_branch_id
+showcase list addRootKey ref_creditor_branch_id
+
+showcase list addHistoryKey ref_creditor_branch_id
 
 showcase addIndex nonunique ref_creditor_branch_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  9.REF_CREDIT_PURPOSE
+# REF_CREDIT_PURPOSE
 #=================================================================================
- 
 showcase set meta ref_credit_purpose
- 
 showcase set name REF_CREDIT_PURPOSE
 showcase set tableName REF_CREDIT_PURPOSE
  
@@ -227,20 +208,18 @@ showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 
-showcase list addKey ref_credit_purpose_id
+showcase list addRootKey ref_credit_purpose_id
+
+showcase list addHistoryKey ref_credit_purpose_id
 
 showcase addIndex nonunique ref_credit_purpose_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  10.REF_CREDIT_TYPE
+# REF_CREDIT_TYPE
 #=================================================================================
- 
 showcase set meta ref_credit_type
- 
 showcase set name REF_CREDIT_TYPE
 showcase set tableName REF_CREDIT_TYPE
  
@@ -249,20 +228,18 @@ showcase list add kind_id kind_id
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 
-showcase list addKey ref_credit_type_id
+showcase list addRootKey ref_credit_type_id
+
+showcase list addHistoryKey ref_credit_type_id
 
 showcase addIndex nonunique ref_credit_type_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  11.REF_CURRENCY
+# REF_CURRENCY
 #=================================================================================
- 
 showcase set meta ref_currency
- 
 showcase set name REF_CURRENCY
 showcase set tableName REF_CURRENCY
  
@@ -273,20 +250,18 @@ showcase list add name_ru name_ru
 showcase list add rating rating
 showcase list add short_name short_name
 
-showcase list addKey ref_currency_id
+showcase list addRootKey ref_currency_id
+
+showcase list addHistoryKey ref_currency_id
 
 showcase addIndex nonunique ref_currency_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  12.REF_DEBTOR_TYPE
+# REF_DEBTOR_TYPE
 #=================================================================================
- 
 showcase set meta ref_debtor_type
- 
 showcase set name REF_DEBTOR_TYPE
 showcase set tableName REF_DEBTOR_TYPE
  
@@ -294,20 +269,18 @@ showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 
-showcase list addKey ref_debtor_type_id
+showcase list addRootKey ref_debtor_type_id
+
+showcase list addHistoryKey ref_debtor_type_id
 
 showcase addIndex nonunique ref_debtor_type_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  13.REF_DOC_TYPE
+# REF_DOC_TYPE
 #=================================================================================
- 
 showcase set meta ref_doc_type
- 
 showcase set name REF_DOC_TYPE
 showcase set tableName REF_DOC_TYPE
  
@@ -322,20 +295,18 @@ showcase list add short_name_ru short_name_ru
 showcase list add sign_count sign_count
 showcase list add weight weight
 
-showcase list addKey ref_doc_type_id
+showcase list addRootKey ref_doc_type_id
+
+showcase list addHistoryKey ref_doc_type_id
 
 showcase addIndex nonunique ref_doc_type_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  14.REF_ECON_TRADE
+# REF_ECON_TRADE
 #=================================================================================
- 
 showcase set meta ref_econ_trade
- 
 showcase set name REF_ECON_TRADE
 showcase set tableName REF_ECON_TRADE
  
@@ -343,20 +314,18 @@ showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 
-showcase list addKey ref_econ_trade_id
+showcase list addRootKey ref_econ_trade_id
+
+showcase list addHistoryKey ref_econ_trade_id
 
 showcase addIndex nonunique ref_econ_trade_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  15.REF_ENTERPRISE_TYPE
+# REF_ENTERPRISE_TYPE
 #=================================================================================
- 
 showcase set meta ref_enterprise_type
- 
 showcase set name REF_ENTERPRISE_TYPE
 showcase set tableName REF_ENTERPRISE_TYPE
  
@@ -366,20 +335,18 @@ showcase list add is_se is_se
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 
-showcase list addKey ref_enterprise_type_id
+showcase list addRootKey ref_enterprise_type_id
+
+showcase list addHistoryKey ref_enterprise_type_id
 
 showcase addIndex nonunique ref_enterprise_type_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
  
 #=================================================================================
-#  16.REF_FINANCE_SOURCE
+# REF_FINANCE_SOURCE
 #=================================================================================
- 
 showcase set meta ref_finance_source
- 
 showcase set name REF_FINANCE_SOURCE
 showcase set tableName REF_FINANCE_SOURCE
  
@@ -387,20 +354,18 @@ showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 
-showcase list addKey ref_finance_source_id
+showcase list addRootKey ref_finance_source_id
+
+showcase list addHistoryKey ref_finance_source_id
 
 showcase addIndex nonunique ref_finance_source_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  17.REF_LEGAL_FORM
+# REF_LEGAL_FORM
 #=================================================================================
- 
 showcase set meta ref_legal_form
- 
 showcase set name REF_LEGAL_FORM
 showcase set tableName REF_LEGAL_FORM
  
@@ -410,44 +375,39 @@ showcase list add name_ru name_ru
 showcase list add short_name_kz short_name_kz
 showcase list add short_name_ru short_name_ru
 
-showcase list addKey ref_legal_form_id
+showcase list addRootKey ref_legal_form_id
+
+showcase list addHistoryKey ref_legal_form_id
 
 showcase addIndex nonunique ref_legal_form_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  18.REF_OFFSHORE*
+# REF_OFFSHORE
 #=================================================================================
- 
 showcase set meta ref_offshore
- 
 showcase set name REF_OFFSHORE
 showcase set tableName REF_OFFSHORE
 
 showcase list add country country_id
-
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 showcase list add country.code country_code
 
-showcase list addKey ref_offshore_id
+showcase list addRootKey ref_offshore_id
+
+showcase list addHistoryKey ref_offshore_id
 
 showcase addIndex nonunique ref_offshore_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  19.REF_PLEDGE_TYPE
+# REF_PLEDGE_TYPE
 #=================================================================================
- 
 showcase set meta ref_pledge_type
- 
 showcase set name REF_PLEDGE_TYPE
 showcase set tableName REF_PLEDGE_TYPE
  
@@ -457,44 +417,39 @@ showcase list add is_liquid_invest is_liquid_invest
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 
-showcase list addKey ref_pledge_type_id
+showcase list addRootKey ref_pledge_type_id
+
+showcase list addHistoryKey ref_pledge_type_id
 
 showcase addIndex nonunique ref_pledge_type_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
  
 #=================================================================================
-#  20.REF_PORTFOLIO
+# REF_PORTFOLIO
 #=================================================================================
- 
 showcase set meta ref_portfolio
- 
 showcase set name REF_PORTFOLIO
 showcase set tableName REF_PORTFOLIO
 
 showcase list add creditor creditor_id
-
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 showcase list add creditor.code creditor_code
 
-showcase list addKey ref_portfolio_id
+showcase list addRootKey ref_portfolio_id
+
+showcase list addHistoryKey ref_portfolio_id
 
 showcase addIndex nonunique ref_portfolio_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  21.REF_REGION
+# REF_REGION
 #=================================================================================
- 
 showcase set meta ref_region
- 
 showcase set name REF_REGION
 showcase set tableName REF_REGION
  
@@ -502,20 +457,18 @@ showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 
-showcase list addKey ref_region_id
+showcase list addRootKey ref_region_id
+
+showcase list addHistoryKey ref_region_id
 
 showcase addIndex nonunique ref_region_id
 
 showcase save
-#---------------------------------------------------------------------------------
- 
- 
+
 #=================================================================================
-#  22.REF_SUBJECT_TYPE
+# REF_SUBJECT_TYPE
 #=================================================================================
- 
 showcase set meta ref_subject_type
- 
 showcase set name REF_SUBJECT_TYPE
 showcase set tableName REF_SUBJECT_TYPE
  
@@ -525,11 +478,12 @@ showcase list add name_kz name_kz
 showcase list add name_ru name_ru
 showcase list add report_period_duration_months report_period_duration_months
 
-showcase list addKey ref_subject_type_id
+showcase list addRootKey ref_subject_type_id
+
+showcase list addHistoryKey ref_subject_type_id
 
 showcase addIndex nonunique ref_subject_type_id
 
 showcase save
-#---------------------------------------------------------------------------------
 
 quit

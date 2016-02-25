@@ -13,14 +13,23 @@ import java.util.List;
 
 public class ShowCase extends Persistable {
     private String name;
+
     private String tableName;
+
     private MetaClass meta;
+
     private String downPath = "";
+
     private boolean isFinal = false;
 
     private ArrayList<ShowCaseField> fields = new ArrayList<>();
+
     private ArrayList<ShowCaseField> customFields = new ArrayList<>();
-    private ArrayList<ShowCaseField> keyFields = new ArrayList<>();
+
+    private ArrayList<ShowCaseField> rootKeyFields = new ArrayList<>();
+
+    private ArrayList<ShowCaseField> historyKeyFields = new ArrayList<>();
+
     private ArrayList<Index> indexes = new ArrayList<>();
 
     public ShowCase() {
@@ -67,8 +76,12 @@ public class ShowCase extends Persistable {
         customFields.add(field);
     }
 
-    public void addKeyField(ShowCaseField field) {
-        keyFields.add(field);
+    public void addRootKeyField(ShowCaseField field) {
+        rootKeyFields.add(field);
+    }
+
+    public void addHistoryKeyField(ShowCaseField field) {
+        historyKeyFields.add(field);
     }
 
     public void addIndex(Index index) {
@@ -139,19 +152,34 @@ public class ShowCase extends Persistable {
         customFields.add(showCaseField);
     }
 
-    public void addKeyField(String columnName) {
+    public void addRootKeyField(String columnName) {
         ShowCaseField showCaseField = new ShowCaseField();
         showCaseField.setAttributeId(0L);
         showCaseField.setMetaId(0L);
         showCaseField.setAttributePath(columnName);
         showCaseField.setColumnName(columnName);
-        showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.KEY);
+        showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.ROOT_KEY);
 
-        addKeyField(showCaseField);
+        addRootKeyField(showCaseField);
     }
 
-    public List<ShowCaseField> getKeyFieldsList() {
-        return keyFields;
+    public void addHistoryKeyField(String columnName) {
+        ShowCaseField showCaseField = new ShowCaseField();
+        showCaseField.setAttributeId(0L);
+        showCaseField.setMetaId(0L);
+        showCaseField.setAttributePath(columnName);
+        showCaseField.setColumnName(columnName);
+        showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.HISTORY_KEY);
+
+        addHistoryKeyField(showCaseField);
+    }
+
+    public List<ShowCaseField> getRootKeyFieldsList() {
+        return rootKeyFields;
+    }
+
+    public List<ShowCaseField> getHistoryKeyFieldsList() {
+        return historyKeyFields;
     }
 
     public ArrayList<ShowCaseField> getCustomFieldsList() {
