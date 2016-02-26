@@ -4,8 +4,8 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
-import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
-import org.apache.log4j.Logger;
+import kz.bsbnb.usci.showcase.dao.impl.CortegeDaoImpl;
+import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +22,13 @@ import java.util.concurrent.Future;
 
 @Component
 public class ShowcaseMessageConsumer implements MessageListener {
-    final static Logger logger = Logger.getLogger(ShowcaseMessageConsumer.class);
+    @Autowired
+    ShowcaseDaoImpl showcaseDao;
 
     @Autowired
-    ShowcaseDao showcaseDao;
+    CortegeDaoImpl cortegeDao;
 
-    private ExecutorService exec = Executors.newCachedThreadPool();
+    private final ExecutorService exec = Executors.newCachedThreadPool();
 
     @Override
     @Transactional
@@ -38,7 +39,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
             try {
                 queueEntry = (QueueEntry) om.getObject();
-            } catch(JMSException jms) {
+            } catch (JMSException jms) {
                 jms.printStackTrace();
                 return;
             }
@@ -69,9 +70,9 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     ShowCase showCase = showcaseDao.getHolderByClassName(
                             queueEntry.getBaseEntityApplied().getMeta().getClassName());
 
-                    showcaseDao.deleteById(showCase, queueEntry.getBaseEntityApplied());
+                    cortegeDao.deleteById(showCase, queueEntry.getBaseEntityApplied());
                 } else if (operationType == OperationType.CLOSE) {
-                    showcaseDao.closeEntities(scId, queueEntry.getBaseEntityApplied(), showCases);
+                    cortegeDao.closeEntities(scId, queueEntry.getBaseEntityApplied(), showCases);
                 } else {
                     boolean found = false;
 
@@ -105,7 +106,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                         }
                     }
 
-                    if(found) {
+                    if (found) {
                         for (Future f : futures) f.get();
                     } else {
                         System.err.println("Для мета класа  " + metaClassName + " нет существующих витрин;");
@@ -115,16 +116,6 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-
-                logger.error(e.getMessage());
-
-                StringBuilder sb = new StringBuilder();
-
-                for(StackTraceElement s : e.getStackTrace())
-                    sb.append(s.toString());
-
-                showcaseDao.insertBadEntity(queueEntry.getBaseEntityApplied().getId(), scId,
-                        queueEntry.getBaseEntityApplied().getReportDate(), sb.toString(), e.getMessage());
             }
         }
     }
@@ -140,7 +131,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
         @Override
         public void run() {
-            showcaseDao.generate(entity, showCase);
+            cortegeDao.generate(entity, showCase);
         }
     }
 

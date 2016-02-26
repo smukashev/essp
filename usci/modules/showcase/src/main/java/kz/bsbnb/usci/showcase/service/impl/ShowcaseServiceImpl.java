@@ -3,7 +3,7 @@ package kz.bsbnb.usci.showcase.service.impl;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
-import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
+import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class ShowcaseServiceImpl implements ShowcaseService {
     SQLQueriesStats stats;
 
     @Autowired
-    private ShowcaseDao showcaseDao;
+    private ShowcaseDaoImpl showcaseDao;
 
     @Override
     public long add(ShowCase showCase) {
