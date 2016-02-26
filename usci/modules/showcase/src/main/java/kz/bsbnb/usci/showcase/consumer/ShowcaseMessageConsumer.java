@@ -134,19 +134,4 @@ public class ShowcaseMessageConsumer implements MessageListener {
             cortegeDao.generate(entity, showCase);
         }
     }
-
-    private class ChildCortegeGenerator implements Runnable {
-        private IBaseEntity entity;
-        private ShowCase childShowCase;
-
-        public ChildCortegeGenerator(IBaseEntity entity, ShowCase childShowCase) {
-            this.entity = entity;
-            this.childShowCase = childShowCase;
-        }
-
-        @Override
-        public void run() {
-
-        }
-    }
 }
