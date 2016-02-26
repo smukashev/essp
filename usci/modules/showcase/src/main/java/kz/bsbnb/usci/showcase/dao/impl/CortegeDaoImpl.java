@@ -30,7 +30,7 @@ import java.util.*;
 public class CortegeDaoImpl extends CommonDao {
     private JdbcTemplate jdbcTemplateSC;
 
-    /* Same showcases could not be processes in parallel */
+    /* Same showcases could not be processed in parallel */
     private static final Set<Long> cortegeElements = Collections.synchronizedSet(new HashSet<Long>());
 
     @Autowired
@@ -210,6 +210,12 @@ public class CortegeDaoImpl extends CommonDao {
                 HashMap<ValueElement, Object> entryMap = entry.getValue();
 
                 KeyElement rootKeyElement = new KeyElement(entryMap, showCase.getRootKeyFieldsList());
+
+                // compare == 0 update
+
+                // compare == 1 go for each put history, insert news to actual
+
+                // update histories, if there is nothing, insert
 
             }
         } finally {
