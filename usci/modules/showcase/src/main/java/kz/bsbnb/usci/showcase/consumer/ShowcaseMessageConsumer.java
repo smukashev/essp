@@ -144,11 +144,11 @@ public class ShowcaseMessageConsumer implements MessageListener {
         }
     }
 
-    /*private class ChildCortegeGenerator implements Runnable {
+    private class ChildCortegeGenerator implements Runnable {
         private IBaseEntity entity;
-        private ChildShowCase childShowCase;
+        private ShowCase childShowCase;
 
-        public ChildCortegeGenerator(IBaseEntity entity, ChildShowCase childShowCase) {
+        public ChildCortegeGenerator(IBaseEntity entity, ShowCase childShowCase) {
             this.entity = entity;
             this.childShowCase = childShowCase;
         }
@@ -157,5 +157,5 @@ public class ShowcaseMessageConsumer implements MessageListener {
         public void run() {
 
         }
-    }*/
+    }
 }
