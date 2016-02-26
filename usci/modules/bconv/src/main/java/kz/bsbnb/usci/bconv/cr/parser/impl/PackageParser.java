@@ -73,9 +73,13 @@ public class PackageParser extends BatchParser {
 
             BaseEntity creditType = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_type"),
                     batch.getRepDate(), creditorId);
-
-            creditType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asStartElement().getAttributeByName(new QName("credit_type")).getValue(), false, true));
+            // fixme!
+            try {
+                creditType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
+                        event.asStartElement().getAttributeByName(new QName("credit_type")).getValue(), false, true));
+            } catch (Exception e) {
+                currentBaseEntity.addValidationError("Тип кредита заполнен не верно;");
+            }
 
             credit.put("credit_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditType,
                     false, true));
