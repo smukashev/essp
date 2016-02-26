@@ -1304,7 +1304,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
         for (ShowCaseField sf : showCase.getHistoryKeyFieldsList())
             insertField(sf, showCaseId);
 
-        for (ChildShowCase csc : showCase.getChildShowCases()) {
+        /*for (ChildShowCase csc : showCase.getChildShowCases()) {
             Insert childInsert = context.insertInto(EAV_SC_CHILD_SHOWCASES)
                     .set(EAV_SC_CHILD_SHOWCASES.SHOWCASE_ID, showCaseId)
                     .set(EAV_SC_CHILD_SHOWCASES.NAME, csc.getName())
@@ -1318,7 +1318,7 @@ public class ShowcaseDaoImpl implements ShowcaseDao, InitializingBean {
 
             for (ChildShowCaseField childShowCaseField : csc.getKeyFields())
                 insertChildShowCaseField(childShowCaseField, childShowCaseId);
-        }
+        }*/
 
         return showCaseId;
     }
