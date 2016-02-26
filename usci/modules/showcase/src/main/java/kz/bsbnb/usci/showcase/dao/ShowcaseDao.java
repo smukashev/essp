@@ -2,18 +2,16 @@ package kz.bsbnb.usci.showcase.dao;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
-import kz.bsbnb.usci.showcase.ShowcaseHolder;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public interface ShowcaseDao {
-    void createTables(ShowcaseHolder showcaseHolder);
+    void createTables(ShowCase ShowCase);
 
-    void generate(IBaseEntity entity, ShowcaseHolder showcaseHolder);
+    void generate(IBaseEntity entity, ShowCase ShowCase);
 
-    ArrayList<ShowcaseHolder> getHolders();
+    List<ShowCase> getShowCases();
 
     ShowCase load(String name);
 
@@ -21,13 +19,13 @@ public interface ShowcaseDao {
 
     void reloadCache();
 
-    int deleteById(ShowcaseHolder holder, IBaseEntity e);
+    int deleteById(ShowCase holder, IBaseEntity e);
 
-    ShowcaseHolder getHolderByClassName(String className);
+    ShowCase getHolderByClassName(String className);
 
-    Long insertBadEntity(Long entityId, Long scId, Date report_date, String strackTrace, String message);
+    Long insertBadEntity(Long entityId, Long scId, Date report_date, String stackTrace, String message);
 
-    void closeEntities(Long scId, IBaseEntity entity, List<ShowcaseHolder> holders);
+    void closeEntities(Long scId, IBaseEntity entity, List<ShowCase> holders);
 
     long insert(ShowCase showCase);
 }

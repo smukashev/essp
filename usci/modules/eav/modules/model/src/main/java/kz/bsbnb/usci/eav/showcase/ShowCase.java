@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShowCase extends Persistable {
+    private Long parenId;
+
     private String name;
 
     private String tableName;
@@ -21,6 +23,8 @@ public class ShowCase extends Persistable {
     private String downPath = "";
 
     private boolean isFinal = false;
+
+    private boolean isChild = false;
 
     private List<ShowCaseField> fields = new ArrayList<>();
 
@@ -32,10 +36,18 @@ public class ShowCase extends Persistable {
 
     private List<Index> indexes = new ArrayList<>();
 
-    private List<ChildShowCase> childShowCases = new ArrayList<>();
+    private List<ShowCase> childShowCases = new ArrayList<>();
 
     public ShowCase() {
         super();
+    }
+
+    public Long getParenId() {
+        return parenId;
+    }
+
+    public void setParenId(Long parenId) {
+        this.parenId = parenId;
     }
 
     public MetaClass getMeta() {
@@ -70,6 +82,14 @@ public class ShowCase extends Persistable {
         this.downPath = downPath;
     }
 
+    public boolean isChild() {
+        return isChild;
+    }
+
+    public void setChild(boolean child) {
+        isChild = child;
+    }
+
     public void addField(ShowCaseField field) {
         fields.add(field);
     }
@@ -100,6 +120,10 @@ public class ShowCase extends Persistable {
 
     public void setFinal(boolean isFinal) {
         this.isFinal = isFinal;
+    }
+
+    public String getRootClassName() {
+        return getActualMeta().getClassName();
     }
 
     public MetaClass getActualMeta() {
@@ -176,11 +200,11 @@ public class ShowCase extends Persistable {
         addHistoryKeyField(showCaseField);
     }
 
-    public void addChildShowCase(ChildShowCase childShowCase) {
+    public void addChildShowCase(ShowCase childShowCase) {
         childShowCases.add(childShowCase);
     }
 
-    public List<ChildShowCase> getChildShowCases() {
+    public List<ShowCase> getChildShowCases() {
         return childShowCases;
     }
 

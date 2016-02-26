@@ -3,18 +3,13 @@ package kz.bsbnb.usci.showcase.service.impl;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
-import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ShowcaseServiceImpl implements ShowcaseService {
@@ -26,16 +21,15 @@ public class ShowcaseServiceImpl implements ShowcaseService {
 
     @Override
     public long add(ShowCase showCase) {
-        ShowcaseHolder scHolder = new ShowcaseHolder();
         long id = showcaseDao.insert(showCase);
-        scHolder.setShowCaseMeta(showCase);
-        showcaseDao.createTables(scHolder);
+        showCase.setId(id);
+        showcaseDao.createTables(showCase);
         return id;
     }
 
     @Override
-    public List<ShowcaseHolder> list() {
-        return showcaseDao.getHolders();
+    public List<ShowCase> list() {
+        return showcaseDao.getShowCases();
     }
 
     @Override
