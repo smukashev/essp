@@ -2,6 +2,7 @@ package kz.bsbnb.usci.showcase.consumer;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
+import kz.bsbnb.usci.eav.showcase.ChildShowCase;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
@@ -80,8 +81,8 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     for (ShowcaseHolder holder : holders) {
                         if (holder.getShowCaseMeta().getMeta().getClassName().equals(metaClassName)) {
                             if (scId == null || scId == 0L || scId == holder.getShowCaseMeta().getId()) {
-                                Future future = exec.submit(new CortegeGenerator(queueEntry.getBaseEntityApplied(),
-                                        queueEntry.getBaseEntityLoaded(), holder));
+                                Future future = exec.submit(
+                                        new CortegeGenerator(queueEntry.getBaseEntityApplied(), holder));
 
                                 futures.add(future);
 
@@ -90,11 +91,26 @@ public class ShowcaseMessageConsumer implements MessageListener {
                         }
                     }
 
-                    if(!found)
-                        System.err.println("Для мета класа  " + metaClassName + " нет существующих витрин;");
+                    /*if (!found) {
+                        for (ShowcaseHolder holder : holders) {
+                            for (ChildShowCase childShowCase : holder.getShowCaseMeta().getChildShowCases()) {
+                                if (childShowCase.getMeta().getClassName().equals(metaClassName)) {
+                                    Future future = exec.submit(
+                                            new ChildCortegeGenerator(queueEntry.getBaseEntityApplied(), childShowCase));
 
-                    for (Future f : futures)
-                        f.get();
+                                    futures.add(future);
+
+                                    found = true;
+                                }
+                            }
+                        }
+                    }*/
+
+                    if(found) {
+                        for (Future f : futures) f.get();
+                    } else {
+                        System.err.println("Для мета класа  " + metaClassName + " нет существующих витрин;");
+                    }
 
                     futures.clear();
                 }
@@ -116,18 +132,31 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
     private class CortegeGenerator implements Runnable {
         private IBaseEntity entity;
-        private IBaseEntity entityLoaded;
         private ShowcaseHolder holder;
 
-        public CortegeGenerator(IBaseEntity entity, IBaseEntity entityLoaded, ShowcaseHolder holder) {
+        public CortegeGenerator(IBaseEntity entity, ShowcaseHolder holder) {
             this.entity = entity;
-            this.entityLoaded = entityLoaded;
             this.holder = holder;
         }
 
         @Override
         public void run() {
-            showcaseDao.generate(entity, entityLoaded, holder);
+            showcaseDao.generate(entity, holder);
         }
     }
+
+    /*private class ChildCortegeGenerator implements Runnable {
+        private IBaseEntity entity;
+        private ChildShowCase childShowCase;
+
+        public ChildCortegeGenerator(IBaseEntity entity, ChildShowCase childShowCase) {
+            this.entity = entity;
+            this.childShowCase = childShowCase;
+        }
+
+        @Override
+        public void run() {
+
+        }
+    }*/
 }

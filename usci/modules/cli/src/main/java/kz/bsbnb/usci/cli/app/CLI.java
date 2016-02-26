@@ -32,6 +32,7 @@ import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.showcase.ChildShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.showcase.ShowCaseIndex;
@@ -81,75 +82,80 @@ import java.util.zip.ZipOutputStream;
 
 @Component
 public class CLI {
-    private static SimpleDateFormat sdfout = new SimpleDateFormat("dd.MM.yyyy");
-    @Autowired
-    protected IMetaClassRepository metaClassRepository;
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
+    @Autowired private IMetaClassRepository metaClassRepository;
+
+    @Autowired private IStorage storage;
+
+    @Autowired private IMetaClassDao metaClassDao;
+
+    @Autowired private IEavGlobalDao eavGlobalDao;
+
+    @Autowired private Xsd2MetaClass xsdConverter;
+
+    @Autowired private XSDGenerator xsdGenerator;
+
+    @Autowired private MainParser crParser;
+
+    @Autowired private IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Autowired private IBaseEntityLoadDao baseEntityLoadDao;
+
+    @Autowired private IBaseEntityMergeDao baseEntityMergeDao;
+
+    @Autowired private ImprovedBaseEntitySearcher searcher;
+
+    @Autowired ApplicationContext context;
+
+    @Autowired EntityExporter entityExporter;
+
     RmiProxyFactoryBean serviceFactory = null;
+
     IEntityService entityServiceCore = null;
+
     ShowCase showCase;
+
+    ChildShowCase childShowCase;
+
     String line;
+
     Exception lastException = null;
+
     private String command;
+
     private ArrayList<String> args = new ArrayList<>();
-    @Autowired
-    private IStorage storage;
-
-    @Autowired
-    private IMetaClassDao metaClassDao;
-
-    @Autowired
-    private IEavGlobalDao eavGlobalDao;
-
-    @Autowired
-    private Xsd2MetaClass xsdConverter;
-
-    @Autowired
-    private XSDGenerator xsdGenerator;
-    @Autowired
-    private MainParser crParser;
-
-    @Autowired
-    private IBaseEntityProcessorDao baseEntityProcessorDao;
-
-    @Autowired
-    private IBaseEntityLoadDao baseEntityLoadDao;
-
-    @Autowired
-    private IBaseEntityMergeDao baseEntityMergeDao;
-
-    @Autowired
-    private IBaseEntityDao baseEntityDao;
-
-    @Autowired
-    private ImprovedBaseEntitySearcher searcher;
-
-    @Autowired
-    ApplicationContext context;
-
-    @Autowired
-    EntityExporter entityExporter;
 
     private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
+
     private InputStream inputStream = null;
+
     private JobDispatcher jobDispatcher = new JobDispatcher();
-    private RmiProxyFactoryBean ruleBatchServiceFactoryBean;
-    private RmiProxyFactoryBean batchServiceFactoryBean;
-    private RmiProxyFactoryBean batchVersionServiceFactoryBean;
-    private RmiProxyFactoryBean ruleServiceFactoryBean;
+
     private RmiProxyFactoryBean showcaseServiceFactoryBean;
-    private RmiProxyFactoryBean entityServiceFactoryBean;
+
     private IRuleService ruleService;
+
     private IBatchService batchService;
+
     private kz.bsbnb.usci.brms.rulemodel.service.IBatchService ruleBatchService;
+
     private IBatchVersionService batchVersionService;
+
     private ShowcaseService showcaseService;
+
     private Rule currentRule;
+
     private String currentPackageName = "credit_parser";
+
     private Date currentDate = new Date();
+
     private boolean started = false;
+
     private BatchVersion currentBatchVersion;
-    private String defaultDumpFile = "c:/rule_dumps/23_06_2015.cli";
+
     private BaseEntity currentBaseEntity;
+
     private Mnt mnt;
 
     public IEntityService getEntityService(String url) {
@@ -172,7 +178,7 @@ public class CLI {
 
     public void initBatchService() {
         if (batchService == null) {
-            batchServiceFactoryBean = new RmiProxyFactoryBean();
+            RmiProxyFactoryBean batchServiceFactoryBean = new RmiProxyFactoryBean();
             batchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/batchService");
             batchServiceFactoryBean.setServiceInterface(IBatchService.class);
             batchServiceFactoryBean.setRefreshStubOnConnectFailure(true);
@@ -188,9 +194,9 @@ public class CLI {
         jobDispatcher.start();
     }
 
-    public void processCRBatch(String fname, int count, int offset, Date repDate)
+    public void processCRBatch(String fileName, int count, int offset, Date repDate)
             throws SAXException, IOException, XMLStreamException {
-        File inFile = new File(fname);
+        File inFile = new File(fileName);
 
         InputStream in;
         in = new FileInputStream(inFile);
@@ -227,7 +233,7 @@ public class CLI {
     public void processXSD(String fname, String metaClassName) throws FileNotFoundException {
         File inFile = new File(fname);
 
-        InputStream in = null;
+        InputStream in;
         in = new FileInputStream(inFile);
 
         System.out.println("Parsing...");
@@ -242,7 +248,7 @@ public class CLI {
     public void listXSD(String fname) throws FileNotFoundException {
         File inFile = new File(fname);
 
-        InputStream in = null;
+        InputStream in;
         in = new FileInputStream(inFile);
 
         System.out.println("Classes: ");
@@ -923,7 +929,7 @@ public class CLI {
 
     public void readEntityFromXMLString(String xml, String repDate) {
         try {
-            Date reportDate = sdfout.parse(repDate);
+            Date reportDate = simpleDateFormat.parse(repDate);
             CLIXMLReader reader = new CLIXMLReader(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))
                     , metaClassRepository, batchService, reportDate, 0);
 
@@ -945,7 +951,7 @@ public class CLI {
 
     public void readEntityFromXML(String fileName, String repDate, long creditorId) {
         try {
-            Date reportDate = sdfout.parse(repDate);
+            Date reportDate = simpleDateFormat.parse(repDate);
             CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate, creditorId);
             BaseEntity entity;
 
@@ -970,13 +976,13 @@ public class CLI {
         } catch (FileNotFoundException e) {
             System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
         } catch (ParseException e) {
-            System.out.println("Can't parse date " + repDate + " must be in format " + sdfout.toString());
+            System.out.println("Can't parse date " + repDate + " must be in format " + simpleDateFormat.toString());
         }
     }
 
     public void findEntityFromXML(String fileName, String repDate) {
         try {
-            Date reportDate = sdfout.parse(repDate);
+            Date reportDate = simpleDateFormat.parse(repDate);
             // checkme!
             CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate, 0);
             BaseEntity entity;
@@ -1001,14 +1007,14 @@ public class CLI {
         } catch (FileNotFoundException e) {
             System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
         } catch (ParseException e) {
-            System.out.println("Can't parse date " + repDate + " must be in format " + sdfout.toString());
+            System.out.println("Can't parse date " + repDate + " must be in format " + simpleDateFormat.toString());
         }
 
     }
 
     public void testEntityFromXML(String fileName, String repDate) {
         try {
-            Date reportDate = sdfout.parse(repDate);
+            Date reportDate = simpleDateFormat.parse(repDate);
             // checkme!
             long creditorId = 0;
             CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate, creditorId);
@@ -1030,7 +1036,7 @@ public class CLI {
         } catch (FileNotFoundException e) {
             System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
         } catch (ParseException e) {
-            System.out.println("Can't parse date " + repDate + " must be in format " + sdfout.toString());
+            System.out.println("Can't parse date " + repDate + " must be in format " + simpleDateFormat.toString());
         }
 
     }
@@ -1156,7 +1162,7 @@ public class CLI {
         if (args.size() > 2) {
             if (args.size() > 3) {
                 processCRBatch(args.get(0), Integer.parseInt(args.get(1)), Integer.parseInt(args.get(2)),
-                        new Date(sdfout.parse(args.get(3)).getTime()));
+                        new Date(simpleDateFormat.parse(args.get(3)).getTime()));
             } else {
                 processCRBatch(args.get(0), Integer.parseInt(args.get(1)), Integer.parseInt(args.get(2)),
                         new Date((new java.util.Date()).getTime()));
@@ -1164,13 +1170,6 @@ public class CLI {
         } else {
             System.out.println("Argument needed: <fileName> <count> <offset>");
         }
-    }
-
-    private void createMetaClass(String metaName, boolean isRef, boolean isImmutable) {
-        MetaClass meta = new MetaClass(metaName);
-        meta.setReference(isRef);
-
-        metaClassRepository.saveMetaClass(meta);
     }
 
     public void removeAttributeFromMeta(String metaName, String attrName) {
@@ -1278,9 +1277,9 @@ public class CLI {
 
     public void commandImport() {
         if (args.size() > 4) {
-            Connection conn = null;
+            Connection conn;
 
-            RmiProxyFactoryBean batchProcessServiceFactoryBean = null;
+            RmiProxyFactoryBean batchProcessServiceFactoryBean;
 
             IBatchProcessService batchProcessService = null;
 
@@ -1346,7 +1345,7 @@ public class CLI {
             while (true) {
                 fileNumber++;
 
-                ResultSet result2 = null;
+                ResultSet result2;
                 try {
                     result2 = preparedStatement.executeQuery();
                 } catch (SQLException e) {
@@ -1903,13 +1902,13 @@ public class CLI {
 
     public void init() {
         try {
-            entityServiceFactoryBean = new RmiProxyFactoryBean();
+            RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
             entityServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1098/entityService");
             entityServiceFactoryBean.setServiceInterface(IBaseEntityProcessorDao.class);
 
             entityServiceFactoryBean.afterPropertiesSet();
 
-            ruleBatchServiceFactoryBean = new RmiProxyFactoryBean();
+            RmiProxyFactoryBean ruleBatchServiceFactoryBean = new RmiProxyFactoryBean();
             ruleBatchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
             ruleBatchServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.brms.rulemodel.service.IBatchService.class);
 
@@ -1918,14 +1917,14 @@ public class CLI {
 
             initBatchService();
 
-            batchVersionServiceFactoryBean = new RmiProxyFactoryBean();
+            RmiProxyFactoryBean batchVersionServiceFactoryBean = new RmiProxyFactoryBean();
             batchVersionServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchVersionService");
             batchVersionServiceFactoryBean.setServiceInterface(IBatchVersionService.class);
 
             batchVersionServiceFactoryBean.afterPropertiesSet();
             batchVersionService = (IBatchVersionService) batchVersionServiceFactoryBean.getObject();
 
-            ruleServiceFactoryBean = new RmiProxyFactoryBean();
+            RmiProxyFactoryBean ruleServiceFactoryBean = new RmiProxyFactoryBean();
             ruleServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/ruleService");
             ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
 
@@ -1963,6 +1962,7 @@ public class CLI {
                     e.printStackTrace();
                 }
             } else if (args.get(0).equals("dump")) {
+                String defaultDumpFile = "c:/rule_dumps/23_06_2015.cli";
                 if (args.size() < 2)
                     System.out.println("using default dump file path " + defaultDumpFile);
                 try {
@@ -2210,16 +2210,6 @@ public class CLI {
     }
 
     public void commandShowCase() {
-        // Fast Init
-        if (showCase == null) {
-            try {
-                showCase = new ShowCase();
-                showCase.setMeta(metaClassRepository.getMetaClass("credit"));
-            } catch (Exception e) {
-                showCase = new ShowCase();
-            }
-        }
-
         if (showcaseServiceFactoryBean == null || showcaseService == null)
             initSC();
 
@@ -2241,8 +2231,6 @@ public class CLI {
                 showCase.setName(args.get(2));
             } else if (args.get(1).equals("tableName")) {
                 showCase.setTableName(args.get(2));
-            } else if (args.get(1).equals("title")) {
-                showCase.setTitle(args.get(2));
             } else if (args.get(1).equals("downPath")) {
                 MetaClass metaClass = showCase.getMeta();
                 if (metaClass.getEl(args.get(2)) == null)
@@ -2267,13 +2255,43 @@ public class CLI {
                     throw new UnsupportedOperationException("MetaClass, attributePath and columnName cannot be empty");
 
                 showCase.addCustomField(args.get(3), args.get(4), metaClassRepository.getMetaClass(args.get(2)));
+            } else if (args.get(1).equals("addRootKey")) {
+                showCase.addRootKeyField(args.get(2));
+            } else if (args.get(1).equals("addHistoryKey")) {
+                showCase.addHistoryKeyField(args.get(2));
             } else {
                 System.err.println("Example: showcase list add [path] [columnName]");
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName]");
                 throw new IllegalArgumentException();
             }
+        } else if (args.get(0).equals("child")) {
+            if (args.get(1).equals("init")) {
+                childShowCase = new ChildShowCase();
+            } else if (args.get(1).equals("set")) {
+                if (args.get(2).equals("name")) {
+                    childShowCase.setName(args.get(3));
+                } else if (args.get(2).equals("meta")) {
+                    childShowCase.setMeta(metaClassRepository.getMetaClass(args.get(3)));
+                } else if (args.get(2).equals("child_down_path")) {
+                    childShowCase.setChildDownPath(args.get(3));
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (args.get(1).equals("list")) {
+                if (args.get(2).equals("add")) {
+                    childShowCase.addField(args.get(3));
+                } else if(args.get(2).equals("addKey")) {
+                    childShowCase.addKeyField(args.get(3));
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if(args.get(1).equals("save")) {
+                showCase.addChildShowCase(childShowCase);
+                childShowCase = new ChildShowCase();
+            } else {
+                throw new IllegalArgumentException();
+            }
         } else if (args.get(0).equals("addIndex")) {
-
             if (args.get(1).equals("unique") || args.get(1).equals("nonunique")) {
                 String IndexType = args.get(1);
                 args.remove(0);
@@ -2601,7 +2619,7 @@ public class CLI {
             String mergeManagerFileName = args.get(2);
             List<IBaseEntity> entityList = new ArrayList<IBaseEntity>();
             try {
-                Date reportDate = sdfout.parse(repDate);
+                Date reportDate = simpleDateFormat.parse(repDate);
                 // checkme!
                 long creditorId = 0L;
                 CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate, creditorId);
@@ -2621,7 +2639,7 @@ public class CLI {
             } catch (FileNotFoundException e) {
                 System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
             } catch (ParseException e) {
-                System.out.println("Can't parse date " + repDate + " must be in format " + sdfout.toString());
+                System.out.println("Can't parse date " + repDate + " must be in format " + simpleDateFormat.toString());
             }
             IBaseEntityMergeManager mergeManager = constructMergeManagerFromJson(mergeManagerFileName);
 

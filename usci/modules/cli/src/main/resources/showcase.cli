@@ -2,9 +2,8 @@
 showcase rc
 
 #=================================================================================
-# Credit
+# CREDIT
 #=================================================================================
-
 showcase set meta credit
 showcase set name CORE_CREDIT
 showcase set tableName CORE_CREDIT
@@ -19,7 +18,6 @@ showcase list add finance_source finance_source_id
 showcase list add portfolio portfolio_id
 showcase list add portfolio.portfolio inner_portfolio_id
 showcase list add portfolio.portfolio_msfo portfolio_msfo_id
-
 showcase list add amount amount
 showcase list add actual_issue_date actual_issue_date
 showcase list add contract_maturity_date contract_maturity_date
@@ -27,7 +25,6 @@ showcase list add has_currency_earn has_currency_earn
 showcase list add interest_rate_yearly interest_rate_yearly
 showcase list add maturity_date maturity_date
 showcase list add prolongation_date prolongation_date
-
 showcase list add creditor creditor_id
 showcase list add creditor_branch creditor_branch_id
 showcase list add creditor.code creditor_code
@@ -44,18 +41,19 @@ showcase list add finance_source.code finance_source_code
 showcase list add portfolio.portfolio.code portfolio_code
 showcase list add portfolio.portfolio_msfo.code portfolio_msfo_code
 
-showcase addIndex nonunique credit_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+
+showcase addIndex nonunique creditor_id credit_id
 
 showcase save
 
 #=================================================================================
-
-
-
+# PERSON
 #=================================================================================
-# Person
-#=================================================================================
-
 showcase set meta credit
 showcase set name CORE_PERSON
 showcase set tableName CORE_PERSON
@@ -63,7 +61,6 @@ showcase set downPath subject.person_info
 
 showcase list add country country_id
 showcase list add offshore offshore_id
-
 showcase list add country.code country_code
 showcase list add offshore.code offshore_code
 
@@ -71,25 +68,27 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique subject_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+showcase list addHistoryKey subject_id
+
 showcase addIndex nonunique creditor_id credit_id subject_id
 
 showcase save
 
-#=================================================================================
-
-
-
 #==================================================================================
-# Organization
+# ORGANIZATION
 #==================================================================================
-
+showcase set meta credit
 showcase set name CORE_ORG
 showcase set tableName CORE_ORG
 showcase set downPath subject.organization_info
 
 showcase list add head head_id
-
 showcase list add is_se is_se
 showcase list add econ_trade econ_trade
 showcase list add legal_form legal_form
@@ -101,52 +100,55 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique subject_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+showcase list addHistoryKey subject_id
+
 showcase addIndex nonunique creditor_id credit_id subject_id
 
 showcase save
 
-#=================================================================================
-
-
-
 #==================================================================================
-# Head names
+# HEAD NAMES
 #==================================================================================
-
+showcase set meta credit
 showcase set name CORE_ORG_HEAD_NAMES
 showcase set tableName CORE_ORG_HEAD_NAMES
-showcase set downPath subject.organization_info
+showcase set downPath subject.organization_info.head
 
-showcase list add head.names name_id
-
-showcase list add head.names.firstname firstname
-showcase list add head.names.lastname lastname
-showcase list add head.names.middlename middlename
-showcase list add head.names.lang lang
-
+showcase list add names name_id
+showcase list add names.firstname firstname
+showcase list add names.lastname lastname
+showcase list add names.middlename middlename
+showcase list add names.lang lang
 
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique subject_id
+showcase list addRootKey creditor_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey subject_id
+showcase list addHistoryKey name_id
+
+showcase addIndex nonunique creditor_id subject_id
 
 showcase save
 
-#=================================================================================
-
-
-
 #==================================================================================
-# Head docs
+# HEAD DOCS
 #==================================================================================
-
+showcase set meta credit
 showcase set name CORE_ORG_HEAD_DOCS
 showcase set tableName CORE_ORG_HEAD_DOCS
 showcase set downPath subject.organization_info.head
 
 showcase list add docs doc_id
-
 showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type_id
 showcase list add docs.name doc_name
@@ -154,18 +156,21 @@ showcase list add docs.name doc_name
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique subject_id
+showcase list addRootKey creditor_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey subject_id
+showcase list addHistoryKey doc_id
+
+showcase addIndex nonunique creditor_id subject_id
 
 showcase save
 
-#==================================================================================
-
-
-
 #=================================================================================
-# Debtor
+# DEBTOR
 #=================================================================================
-
+showcase set meta credit
 showcase set name CORE_DEBTOR
 showcase set tableName CORE_DEBTOR
 showcase set downPath subject
@@ -174,23 +179,23 @@ showcase list add is_person is_person
 showcase list add is_organization is_organization
 showcase list add is_creditor is_creditor
 
-showcase list addCustom credit root credit_id
 showcase list addCustom credit creditor creditor_sender_id
+showcase list addCustom credit root credit_id
 
-showcase addIndex nonunique credit_id
-showcase addIndex nonunique subject_id
-showcase addIndex nonunique creditor_sender_id credit_id subject_id
+showcase list addRootKey creditor_sender_id
+showcase list addRootKey credit_id
+
+showcase list addHistoryKey creditor_sender_id
+showcase list addHistoryKey credit_id
+
+showcase addIndex nonunique creditor_sender_id credit_id
 
 showcase save
 
-#==================================================================================
-
-
-
 #=================================================================================
-# Person address
+# PERSON ADDRESS
 #=================================================================================
-
+showcase set meta credit
 showcase set name CORE_PERSON_ADDRESS
 showcase set tableName CORE_PERSON_ADDRESS
 showcase set downPath subject.person_info
@@ -198,7 +203,6 @@ showcase set downPath subject.person_info
 showcase list add addresses address_id
 showcase list add addresses.region region_id
 showcase list add addresses.details details
-
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
@@ -206,19 +210,24 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique creditor_id credit_id subject_id person_info_id
-showcase addIndex nonunique subject_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+showcase list addHistoryKey subject_id
+showcase list addHistoryKey address_id
+
+showcase addIndex nonunique creditor_id credit_id subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id address_id
 
 showcase save
 
 #=================================================================================
-
-
-
+# ORGANIZATION ADDRESS
 #=================================================================================
-# Organization address
-#=================================================================================
-
+showcase set meta credit
 showcase set name CORE_ORG_ADDRESS
 showcase set tableName CORE_ORG_ADDRESS
 showcase set downPath subject.organization_info
@@ -226,7 +235,6 @@ showcase set downPath subject.organization_info
 showcase list add addresses address_id
 showcase list add addresses.region region_id
 showcase list add addresses.details details
-
 showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
@@ -234,26 +242,30 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique creditor_id credit_id subject_id organization_info_id
-showcase addIndex nonunique subject_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+showcase list addHistoryKey subject_id
+showcase list addHistoryKey address_id
+
+showcase addIndex nonunique creditor_id credit_id subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id address_id
 
 showcase save
 
 #=================================================================================
-
-
-
+# PERSON CONTACT
 #=================================================================================
-# Person contact
-#=================================================================================
-
+showcase set meta credit
 showcase set name CORE_PERSON_CONTACTS
 showcase set tableName CORE_PERSON_CONTACTS
 showcase set downPath subject.person_info
 
 showcase list add contacts contact_id
 showcase list add contacts.contact_type contact_type_id
-
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
 
@@ -261,25 +273,29 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique creditor_id credit_id subject_id person_info_id
-showcase addIndex nonunique subject_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+showcase list addHistoryKey subject_id
+showcase list addHistoryKey contact_id
+
+showcase addIndex nonunique creditor_id credit_id subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id contact_id
 
 showcase save
 
 #=================================================================================
-
-
-#=================================================================================
-# Organization contact
-#=================================================================================
-
+# ORGANIZATION CONTACT
+showcase set meta credit
 showcase set name CORE_ORG_CONTACTS
 showcase set tableName CORE_ORG_CONTACTS
 showcase set downPath subject.organization_info
 
 showcase list add contacts contact_id
 showcase list add contacts.contact_type contact_type_id
-
 showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
 
@@ -287,27 +303,32 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique creditor_id credit_id subject_id organization_info_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+showcase list addHistoryKey subject_id
+showcase list addHistoryKey contact_id
+
+showcase addIndex nonunique creditor_id credit_id subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id contact_id
 
 showcase save
 
-#=================================================================================
-
-
 #==================================================================================
-# Subject doc
+# SUBJECT_DOC
 #==================================================================================
-
+showcase set meta credit
 showcase set name CORE_SUBJECT_DOC
 showcase set tableName CORE_SUBJECT_DOC
 showcase set downPath subject
 
 showcase list add docs doc_id
-
 showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type
 showcase list add docs.name doc_name
-
 showcase list add is_person is_person
 showcase list add is_organization is_organization
 showcase list add is_creditor is_creditor
@@ -315,24 +336,29 @@ showcase list add is_creditor is_creditor
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+showcase list addHistoryKey subject_id
+showcase list addHistoryKey doc_id
+
+showcase addIndex nonunique creditor_id credit_id subject_id
 showcase addIndex nonunique creditor_id credit_id subject_id doc_id
 
 showcase save
 
 #==================================================================================
-
-
-
+# PERSON NAME
 #==================================================================================
-# Person name
-#==================================================================================
-
+showcase set meta credit
 showcase set name CORE_PERSON_NAME
 showcase set tableName CORE_PERSON_NAME
 showcase set downPath subject.person_info
 
 showcase list add names name_id
-
 showcase list add names.firstname firstname
 showcase list add names.lastname lastname
 showcase list add names.middlename middlename
@@ -342,24 +368,29 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique creditor_id credit_id subject_id person_info_id name_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+showcase list addHistoryKey subject_id
+showcase list addHistoryKey name_id
+
+showcase addIndex nonunique creditor_id credit_id subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id name_id
 
 showcase save
 
 #==================================================================================
-
-
-
+# ORGANIZATION_NAME
 #==================================================================================
-# Organization name
-#==================================================================================
-
+showcase set meta credit
 showcase set name CORE_ORG_NAME
 showcase set tableName CORE_ORG_NAME
 showcase set downPath subject.organization_info
 
 showcase list add names name_id
-
 showcase list add names.name name
 showcase list add names.lang lang
 
@@ -367,18 +398,24 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique creditor_id credit_id subject_id organization_info_id name_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+showcase list addHistoryKey subject_id
+showcase list addHistoryKey name_id
+
+showcase addIndex nonunique creditor_id credit_id subject_id
+showcase addIndex nonunique creditor_id credit_id subject_id name_id
 
 showcase save
 
-#==================================================================================
-
-
-
 #=================================================================================
-# Turnover
+# TURNOVER
 #=================================================================================
-
+showcase set meta credit
 showcase set name CORE_TURNOVER
 showcase set tableName CORE_TURNOVER
 showcase set downPath change
@@ -388,7 +425,6 @@ showcase list add turnover turnover_id
 showcase list add turnover.issue issue_id
 showcase list add turnover.issue.debt debt_id
 showcase list add turnover.issue.interest interest_id
-
 showcase list add turnover.issue.debt.amount debt_amount
 showcase list add turnover.issue.debt.amount_currency debt_amount_currency
 showcase list add turnover.issue.interest.amount interest_amount
@@ -397,18 +433,20 @@ showcase list add turnover.issue.interest.amount_currency interest_amount_curren
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
-showcase addIndex nonunique creditor_id credit_id change_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+
+showcase addIndex nonunique creditor_id credit_id
 
 showcase save
 
 #=================================================================================
-
-
-
+# CREDIT_FLOW
 #=================================================================================
-# Credit_flow
-#=================================================================================
-
+showcase set meta credit
 showcase set name CORE_CREDIT_FLOW
 showcase set tableName CORE_CREDIT_FLOW
 showcase set downPath change
@@ -420,31 +458,30 @@ showcase list add credit_flow.provision provision_id
 showcase list add credit_flow.provision.provision_kfn provision_kfn_id
 showcase list add credit_flow.provision.provision_msfo provision_msfo_id
 showcase list add credit_flow.provision.provision_msfo_over_balance provision_msfo_ob_id
-
 showcase list add credit_flow.provision.provision_kfn.balance_account kfn_balance_account_id
 showcase list add credit_flow.provision.provision_kfn.value kfn_value
-
 showcase list add credit_flow.provision.provision_msfo.balance_account msfo_balance_account_id
 showcase list add credit_flow.provision.provision_msfo.value msfo_value
-
 showcase list add credit_flow.provision.provision_msfo_over_balance.balance_account msfo_ob_balance_account_id
 showcase list add credit_flow.provision.provision_msfo_over_balance.value msfo_ob_value
 
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
-showcase addIndex nonunique creditor_id credit_id change_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+
+showcase addIndex nonunique creditor_id credit_id
 
 showcase save
 
-#=================================================================================
-
-
-
 #==================================================================================
-# Pledge
+# PLEDGE
 #==================================================================================
-
+showcase set meta credit
 showcase set name CORE_PLEDGE
 showcase set tableName CORE_PLEDGE
 showcase set downPath pledges
@@ -456,18 +493,20 @@ showcase list add value value
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
-showcase addIndex nonunique creditor_id credit_id pledge_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+
+showcase addIndex nonunique creditor_id credit_id
 
 showcase save
 
-#==================================================================================
-
-
-
 #=================================================================================
-# Remains
+# REMAINS
 #=================================================================================
-
+showcase set meta credit
 showcase set name CORE_REMAINS
 showcase set tableName CORE_REMAINS
 showcase set downPath change
@@ -494,7 +533,6 @@ showcase list add remains.discount.balance_account ba_discount_id
 showcase list add remains.discounted_value discounted_value_id
 showcase list add remains.correction correction_id
 showcase list add remains.correction.balance_account ba_correction_id
-
 showcase list add remains.limit.value limit_value
 showcase list add remains.limit.value_currency limit_cvalue
 showcase list add remains.interest.current.value interest_current_value
@@ -524,18 +562,20 @@ showcase list add remains.correction.value_currency corr_cvalue
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
-showcase addIndex nonunique creditor_id credit_id change_id
+showcase list addRootKey creditor_id
+showcase list addRootKey credit_id
+
+showcase list addHistoryKey creditor_id
+showcase list addHistoryKey credit_id
+
+showcase addIndex nonunique creditor_id credit_id
 
 showcase save
 
 #=================================================================================
-
-
-
+#  DEBTOR_INFO_PERSON
 #=================================================================================
-#  Debtor_info_person
-#=================================================================================
-
+showcase set meta credit
 showcase set name CORE_PERSON_DEBTOR_INFO
 showcase set tableName CORE_PERSON_DEBTOR_INFO
 showcase set downPath subject.person_info
@@ -548,18 +588,24 @@ showcase list addCustom credit creditor creditor_sender_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique creditor_id credit_id subject_id person_info_id person_bank_relation_id
+showcase list addRootKey creditor_sender_id
+showcase list addRootKey credit_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_sender_id
+showcase list addHistoryKey credit_id
+showcase list addHistoryKey subject_id
+showcase list addHistoryKey person_bank_relation_id
+
+showcase addIndex nonunique creditor_sender_id credit_id subject_id
+showcase addIndex nonunique creditor_sender_id credit_id subject_id person_bank_relation_id
 
 showcase save
 
 #=================================================================================
-
-
-
+#  DEBTOR_INFO_ORGANIZATION
 #=================================================================================
-#  Debtor_info_organization
-#=================================================================================
-
+showcase set meta credit
 showcase set name CORE_ORG_DEBTOR_INFO
 showcase set tableName CORE_ORG_DEBTOR_INFO
 showcase set downPath subject.organization_info
@@ -572,18 +618,23 @@ showcase list addCustom credit creditor creditor_sender_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase addIndex nonunique creditor_id credit_id subject_id organization_info_id org_bank_relation_id
+showcase list addRootKey creditor_sender_id
+showcase list addRootKey credit_id
+showcase list addRootKey subject_id
+
+showcase list addHistoryKey creditor_sender_id
+showcase list addHistoryKey credit_id
+showcase list addHistoryKey subject_id
+showcase list addHistoryKey org_bank_relation_id
+
+showcase addIndex nonunique creditor_id credit_id subject_id org_bank_relation_id
 
 showcase save
 
 #=================================================================================
-
-
-
+# PORTFOLIO_FLOW_KFN
 #=================================================================================
-# Portfolio_flow_kfn
-#=================================================================================
-
+showcase set meta credit
 showcase set meta portfolio_data
 showcase set name CORE_PORTFOLIO_FLOW_KFN
 showcase set tableName CORE_PORTFOLIO_FLOW_KFN
@@ -594,24 +645,25 @@ showcase list add portfolio portfolio_id
 showcase list add portfolio.creditor portfolio_creditor_id
 showcase list add details details_id
 showcase list add details.balance_account balance_account_id
-
 showcase list add details.value value
 
 showcase list addCustom portfolio_data root portfolio_data_id
 showcase list addCustom portfolio_data creditor portfolio_data_creditor_id
 
-showcase addIndex nonunique portfolio_flow_kfn_id
+showcase list addRootKey portfolio_data_creditor_id
+showcase list addRootKey portfolio_data_id
+
+showcase list addHistoryKey portfolio_data_creditor_id
+showcase list addHistoryKey portfolio_data_id
+
+showcase addIndex nonunique portfolio_data_creditor_id portfolio_data_id
 
 showcase save
 
 #=================================================================================
-
-
-
+# PORTFOLIO_FLOW_MSFO
 #=================================================================================
-# Portfolio_flow_msfo
-#=================================================================================
-
+showcase set meta credit
 showcase set meta portfolio_data
 showcase set name CORE_PORTFOLIO_FLOW_MSFO
 showcase set tableName CORE_PORTFOLIO_FLOW_MSFO
@@ -622,17 +674,20 @@ showcase list add details details_id
 showcase list add portfolio portfolio_id
 showcase list add details.balance_account balance_account_id
 showcase list add portfolio.creditor portfolio_creditor_id
-
 showcase list add details.value value
 showcase list add discounted_value discounted_value
 
 showcase list addCustom portfolio_data root portfolio_data_id
 showcase list addCustom portfolio_data creditor portfolio_data_creditor_id
 
-showcase addIndex nonunique portfolio_flow_msfo_id
+showcase list addRootKey portfolio_data_creditor_id
+showcase list addRootKey portfolio_data_id
+
+showcase list addHistoryKey portfolio_data_creditor_id
+showcase list addHistoryKey portfolio_data_id
+
+showcase addIndex nonunique portfolio_data_creditor_id portfolio_data_id
 
 showcase save
-
-#=================================================================================
 
 quit

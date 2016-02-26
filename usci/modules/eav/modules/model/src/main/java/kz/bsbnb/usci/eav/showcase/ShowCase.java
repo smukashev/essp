@@ -13,15 +13,26 @@ import java.util.List;
 
 public class ShowCase extends Persistable {
     private String name;
+
     private String tableName;
-    private String title;
+
     private MetaClass meta;
+
     private String downPath = "";
+
     private boolean isFinal = false;
 
-    private ArrayList<ShowCaseField> fields = new ArrayList<ShowCaseField>();
-    private ArrayList<ShowCaseField> customFields = new ArrayList<ShowCaseField>();
-    private ArrayList<Index> Indexes = new ArrayList<Index>();
+    private List<ShowCaseField> fields = new ArrayList<>();
+
+    private List<ShowCaseField> customFields = new ArrayList<>();
+
+    private List<ShowCaseField> rootKeyFields = new ArrayList<>();
+
+    private List<ShowCaseField> historyKeyFields = new ArrayList<>();
+
+    private List<Index> indexes = new ArrayList<>();
+
+    private List<ChildShowCase> childShowCases = new ArrayList<>();
 
     public ShowCase() {
         super();
@@ -51,14 +62,6 @@ public class ShowCase extends Persistable {
         this.tableName = tableName;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getDownPath() {
         return downPath;
     }
@@ -75,12 +78,20 @@ public class ShowCase extends Persistable {
         customFields.add(field);
     }
 
-    public void addIndex(Index index) {
-        Indexes.add(index);
+    public void addRootKeyField(ShowCaseField field) {
+        rootKeyFields.add(field);
     }
 
-    public ArrayList<Index> getIndexes() {
-        return Indexes;
+    public void addHistoryKeyField(ShowCaseField field) {
+        historyKeyFields.add(field);
+    }
+
+    public void addIndex(Index index) {
+        indexes.add(index);
+    }
+
+    public List<Index> getIndexes() {
+        return indexes;
     }
 
     public boolean isFinal() {
@@ -143,7 +154,45 @@ public class ShowCase extends Persistable {
         customFields.add(showCaseField);
     }
 
-    public ArrayList<ShowCaseField> getCustomFieldsList() {
+    public void addRootKeyField(String columnName) {
+        ShowCaseField showCaseField = new ShowCaseField();
+        showCaseField.setAttributeId(0L);
+        showCaseField.setMetaId(0L);
+        showCaseField.setAttributePath(columnName);
+        showCaseField.setColumnName(columnName);
+        showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.ROOT_KEY);
+
+        addRootKeyField(showCaseField);
+    }
+
+    public void addHistoryKeyField(String columnName) {
+        ShowCaseField showCaseField = new ShowCaseField();
+        showCaseField.setAttributeId(0L);
+        showCaseField.setMetaId(0L);
+        showCaseField.setAttributePath(columnName);
+        showCaseField.setColumnName(columnName);
+        showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.HISTORY_KEY);
+
+        addHistoryKeyField(showCaseField);
+    }
+
+    public void addChildShowCase(ChildShowCase childShowCase) {
+        childShowCases.add(childShowCase);
+    }
+
+    public List<ChildShowCase> getChildShowCases() {
+        return childShowCases;
+    }
+
+    public List<ShowCaseField> getRootKeyFieldsList() {
+        return rootKeyFields;
+    }
+
+    public List<ShowCaseField> getHistoryKeyFieldsList() {
+        return historyKeyFields;
+    }
+
+    public List<ShowCaseField> getCustomFieldsList() {
         return customFields;
     }
 
@@ -156,7 +205,6 @@ public class ShowCase extends Persistable {
         return "ShowCase{" +
                 "name='" + name + '\'' +
                 ", tableName='" + tableName + '\'' +
-                ", title='" + title + '\'' +
                 ", downPath='" + downPath + '\'' +
                 ", isFinal=" + isFinal +
                 ", customMeta=" + (meta != null ? meta.getClassName() : null) +

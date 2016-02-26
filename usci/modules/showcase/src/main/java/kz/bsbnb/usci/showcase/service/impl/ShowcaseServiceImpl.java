@@ -27,7 +27,7 @@ public class ShowcaseServiceImpl implements ShowcaseService {
     @Override
     public long add(ShowCase showCase) {
         ShowcaseHolder scHolder = new ShowcaseHolder();
-        long id = showcaseDao.save(showCase);
+        long id = showcaseDao.insert(showCase);
         scHolder.setShowCaseMeta(showCase);
         showcaseDao.createTables(scHolder);
         return id;
@@ -35,14 +35,12 @@ public class ShowcaseServiceImpl implements ShowcaseService {
 
     @Override
     public List<ShowcaseHolder> list() {
-        List<ShowcaseHolder> list = showcaseDao.getHolders();
-        return list;
+        return showcaseDao.getHolders();
     }
 
     @Override
     public ShowCase load(String name) {
-        ShowCase showcase = showcaseDao.load(name);
-        return showcase;
+        return showcaseDao.load(name);
     }
 
     @Override
@@ -58,10 +56,5 @@ public class ShowcaseServiceImpl implements ShowcaseService {
     @Override
     public ShowCase load(Long id) {
         return showcaseDao.load(id);
-    }
-
-    @Override
-    public List<Map<String, Object>> view(Long id, int offset, int limit, Date reportDate) {
-        return showcaseDao.view(id, offset, limit, reportDate);
     }
 }
