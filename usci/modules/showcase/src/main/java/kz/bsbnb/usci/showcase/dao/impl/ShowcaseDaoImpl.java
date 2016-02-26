@@ -10,7 +10,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
-import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.showcase.dao.CommonDao;
 import org.jooq.DSLContext;
 import org.jooq.Insert;
@@ -35,8 +34,6 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
     private final Logger logger = LoggerFactory.getLogger(ShowcaseDaoImpl.class);
 
     private JdbcTemplate jdbcTemplateSC;
-
-
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -247,10 +244,6 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
         Platform platform = PlatformFactory.createNewPlatformInstance(jdbcTemplateSC.getDataSource());
         platform.createModel(model, false, true);
     }
-
-
-
-
 
     private String getDBType(IMetaType type) {
         if (type.isComplex())
@@ -522,24 +515,4 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
         jdbcTemplateSC.update(new GenericInsertPreparedStatementCreator(query, values), keyHolder);
         return keyHolder.getKey().longValue();
     }
-
-    public Long insertBadEntity(Long entityId, Long scId, Date report_date, String stackTrace, String message) {
-        if (scId == null)
-            scId = 0L;
-
-        Insert insert = context
-                .insertInto(EAV_SC_BAD_ENTITIES)
-                .set(EAV_SC_BAD_ENTITIES.ENTITY_ID, entityId)
-                .set(EAV_SC_BAD_ENTITIES.SC_ID, scId)
-                .set(EAV_SC_BAD_ENTITIES.REPORT_DATE, DataUtils.convert(report_date))
-                .set(EAV_SC_BAD_ENTITIES.STACK_TRACE, stackTrace)
-                .set(EAV_SC_BAD_ENTITIES.MESSAGE, message);
-
-        if (logger.isDebugEnabled())
-            logger.debug(insert.toString());
-
-        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
-    }
-
-
 }
