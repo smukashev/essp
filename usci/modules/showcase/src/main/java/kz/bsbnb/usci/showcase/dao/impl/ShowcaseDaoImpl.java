@@ -489,6 +489,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             Insert childInsert = context.insertInto(EAV_SC_SHOWCASES)
                     .set(EAV_SC_SHOWCASES.PARENT_ID, showCaseId)
                     .set(EAV_SC_SHOWCASES.NAME, csc.getName())
+                    .set(EAV_SC_SHOWCASES.TABLE_NAME, csc.getTableName())
                     .set(EAV_SC_SHOWCASES.CLASS_NAME, csc.getMeta().getClassName())
                     .set(EAV_SC_SHOWCASES.DOWN_PATH, csc.getDownPath())
                     .set(EAV_SC_SHOWCASES.IS_FINAL, csc.isFinal() ? 1 : 0)
