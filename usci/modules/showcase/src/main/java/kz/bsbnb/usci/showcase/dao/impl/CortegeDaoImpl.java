@@ -209,6 +209,18 @@ public class CortegeDaoImpl extends CommonDao {
             for (Map.Entry<ArrayElement, HashMap<ValueElement, Object>> entry : savingMap.entrySet()) {
                 HashMap<ValueElement, Object> entryMap = entry.getValue();
 
+                /* Change auto generated MetaClass_ID to ChildTableName_ID */
+                for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
+                    if (innerEntry.getKey().columnName.equals(entity.getMeta().getClassName()+"_id")) {
+                        ValueElement oldKey = innerEntry.getKey();
+
+                        ValueElement newKey = new ValueElement(showCase.getTableName()+"_id", oldKey.elementId,
+                                oldKey.isArray, oldKey.isSimple);
+
+                        entryMap.put(newKey, innerEntry.getKey());
+                    }
+                }
+
                 KeyElement rootKeyElement = new KeyElement(entryMap, showCase.getRootKeyFieldsList());
 
                 // compare == 0 update

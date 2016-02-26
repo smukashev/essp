@@ -405,7 +405,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
 
         for (Map<String, Object> row : rows) {
             ShowCase childShowCase = new ShowCase();
-            Long childShowCaseId = ((BigDecimal) row.get(EAV_SC_SHOWCASES.PARENT_ID.getName())).longValue();
+            Long childShowCaseId = ((BigDecimal) row.get(EAV_SC_SHOWCASES.ID.getName())).longValue();
             childShowCase.setId(childShowCaseId);
             loadShowCase(childShowCase);
 

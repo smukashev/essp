@@ -2271,6 +2271,8 @@ public class CLI {
                     childShowCase.setMeta(metaClassRepository.getMetaClass(args.get(3)));
                 } else if (args.get(2).equals("child_down_path")) {
                     childShowCase.setDownPath(args.get(3));
+                } else if (args.get(2).equals("tableName")) {
+                    childShowCase.setTableName(args.get(3));
                 } else {
                     throw new IllegalArgumentException();
                 }
