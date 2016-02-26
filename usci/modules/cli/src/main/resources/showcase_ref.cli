@@ -44,18 +44,18 @@ showcase addIndex nonunique ref_creditor_id doc_id
 #-----------------------------------------------------------------------------------
 # CHILD DOCUMENT
 #-----------------------------------------------------------------------------------
-showcase child init
-showcase child set name ref_creditor_doc_document
-showcase child set meta document
+#showcase child init
+#showcase child set name ref_creditor_doc_document
+#showcase child set meta document
 
-showcase child list add doc_type doc_type_id
-showcase child list add no no
-showcase child list add doc_type.code doc_type_code
-showcase child list add name name
+#showcase child list add doc_type doc_type_id
+#showcase child list add no no
+#showcase child list add doc_type.code doc_type_code
+#showcase child list add name name
 
-showcase child list addKey doc_id
+#showcase child list addKey doc_id
 
-showcase child save
+#showcase child save
 
 showcase save
 

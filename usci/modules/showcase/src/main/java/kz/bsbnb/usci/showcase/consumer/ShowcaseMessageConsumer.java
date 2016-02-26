@@ -91,7 +91,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                         }
                     }
 
-                    if (!found) {
+                    /*if (!found) {
                         for (ShowcaseHolder holder : holders) {
                             for (ChildShowCase childShowCase : holder.getShowCaseMeta().getChildShowCases()) {
                                 if (childShowCase.getMeta().getClassName().equals(metaClassName)) {
@@ -104,7 +104,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                                 }
                             }
                         }
-                    }
+                    }*/
 
                     if(found) {
                         for (Future f : futures) f.get();
@@ -145,7 +145,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
         }
     }
 
-    private class ChildCortegeGenerator implements Runnable {
+    /*private class ChildCortegeGenerator implements Runnable {
         private IBaseEntity entity;
         private ChildShowCase childShowCase;
 
@@ -158,5 +158,5 @@ public class ShowcaseMessageConsumer implements MessageListener {
         public void run() {
 
         }
-    }
+    }*/
 }
