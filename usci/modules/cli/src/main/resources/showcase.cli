@@ -375,7 +375,7 @@ showcase list addRootKey subject_id
 showcase list addHistoryKey creditor_id
 showcase list addHistoryKey credit_id
 showcase list addHistoryKey subject_id
-showcase list addHistoryKey history_id
+showcase list addHistoryKey name_id
 
 showcase addIndex nonunique creditor_id credit_id subject_id
 showcase addIndex nonunique creditor_id credit_id subject_id name_id
