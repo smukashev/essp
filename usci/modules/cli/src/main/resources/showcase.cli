@@ -83,6 +83,7 @@ showcase save
 #==================================================================================
 # ORGANIZATION
 #==================================================================================
+showcase set meta credit
 showcase set name CORE_ORG
 showcase set tableName CORE_ORG
 showcase set downPath subject.organization_info
@@ -114,6 +115,7 @@ showcase save
 #==================================================================================
 # HEAD NAMES
 #==================================================================================
+showcase set meta credit
 showcase set name CORE_ORG_HEAD_NAMES
 showcase set tableName CORE_ORG_HEAD_NAMES
 showcase set downPath subject.organization_info.head
@@ -141,6 +143,7 @@ showcase save
 #==================================================================================
 # HEAD DOCS
 #==================================================================================
+showcase set meta credit
 showcase set name CORE_ORG_HEAD_DOCS
 showcase set tableName CORE_ORG_HEAD_DOCS
 showcase set downPath subject.organization_info.head
@@ -167,6 +170,7 @@ showcase save
 #=================================================================================
 # DEBTOR
 #=================================================================================
+showcase set meta credit
 showcase set name CORE_DEBTOR
 showcase set tableName CORE_DEBTOR
 showcase set downPath subject
@@ -191,6 +195,7 @@ showcase save
 #=================================================================================
 # PERSON ADDRESS
 #=================================================================================
+showcase set meta credit
 showcase set name CORE_PERSON_ADDRESS
 showcase set tableName CORE_PERSON_ADDRESS
 showcase set downPath subject.person_info
@@ -222,6 +227,7 @@ showcase save
 #=================================================================================
 # ORGANIZATION ADDRESS
 #=================================================================================
+showcase set meta credit
 showcase set name CORE_ORG_ADDRESS
 showcase set tableName CORE_ORG_ADDRESS
 showcase set downPath subject.organization_info
@@ -253,6 +259,7 @@ showcase save
 #=================================================================================
 # PERSON CONTACT
 #=================================================================================
+showcase set meta credit
 showcase set name CORE_PERSON_CONTACTS
 showcase set tableName CORE_PERSON_CONTACTS
 showcase set downPath subject.person_info
@@ -282,7 +289,7 @@ showcase save
 
 #=================================================================================
 # ORGANIZATION CONTACT
-
+showcase set meta credit
 showcase set name CORE_ORG_CONTACTS
 showcase set tableName CORE_ORG_CONTACTS
 showcase set downPath subject.organization_info
@@ -313,6 +320,7 @@ showcase save
 #==================================================================================
 # SUBJECT_DOC
 #==================================================================================
+showcase set meta credit
 showcase set name CORE_SUBJECT_DOC
 showcase set tableName CORE_SUBJECT_DOC
 showcase set downPath subject
@@ -345,6 +353,7 @@ showcase save
 #==================================================================================
 # PERSON NAME
 #==================================================================================
+showcase set meta credit
 showcase set name CORE_PERSON_NAME
 showcase set tableName CORE_PERSON_NAME
 showcase set downPath subject.person_info
@@ -376,6 +385,7 @@ showcase save
 #==================================================================================
 # ORGANIZATION_NAME
 #==================================================================================
+showcase set meta credit
 showcase set name CORE_ORG_NAME
 showcase set tableName CORE_ORG_NAME
 showcase set downPath subject.organization_info
@@ -405,6 +415,7 @@ showcase save
 #=================================================================================
 # TURNOVER
 #=================================================================================
+showcase set meta credit
 showcase set name CORE_TURNOVER
 showcase set tableName CORE_TURNOVER
 showcase set downPath change
@@ -435,6 +446,7 @@ showcase save
 #=================================================================================
 # CREDIT_FLOW
 #=================================================================================
+showcase set meta credit
 showcase set name CORE_CREDIT_FLOW
 showcase set tableName CORE_CREDIT_FLOW
 showcase set downPath change
@@ -469,6 +481,7 @@ showcase save
 #==================================================================================
 # PLEDGE
 #==================================================================================
+showcase set meta credit
 showcase set name CORE_PLEDGE
 showcase set tableName CORE_PLEDGE
 showcase set downPath pledges
@@ -493,6 +506,7 @@ showcase save
 #=================================================================================
 # REMAINS
 #=================================================================================
+showcase set meta credit
 showcase set name CORE_REMAINS
 showcase set tableName CORE_REMAINS
 showcase set downPath change
@@ -561,6 +575,7 @@ showcase save
 #=================================================================================
 #  DEBTOR_INFO_PERSON
 #=================================================================================
+showcase set meta credit
 showcase set name CORE_PERSON_DEBTOR_INFO
 showcase set tableName CORE_PERSON_DEBTOR_INFO
 showcase set downPath subject.person_info
@@ -590,6 +605,7 @@ showcase save
 #=================================================================================
 #  DEBTOR_INFO_ORGANIZATION
 #=================================================================================
+showcase set meta credit
 showcase set name CORE_ORG_DEBTOR_INFO
 showcase set tableName CORE_ORG_DEBTOR_INFO
 showcase set downPath subject.organization_info
@@ -618,6 +634,7 @@ showcase save
 #=================================================================================
 # PORTFOLIO_FLOW_KFN
 #=================================================================================
+showcase set meta credit
 showcase set meta portfolio_data
 showcase set name CORE_PORTFOLIO_FLOW_KFN
 showcase set tableName CORE_PORTFOLIO_FLOW_KFN
@@ -646,6 +663,7 @@ showcase save
 #=================================================================================
 # PORTFOLIO_FLOW_MSFO
 #=================================================================================
+showcase set meta credit
 showcase set meta portfolio_data
 showcase set name CORE_PORTFOLIO_FLOW_MSFO
 showcase set tableName CORE_PORTFOLIO_FLOW_MSFO
