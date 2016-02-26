@@ -47,6 +47,7 @@ showcase addIndex nonunique ref_creditor_id doc_id
 showcase child init
 showcase child set name REF_CREDITOR_DOC_DOCUMENT
 showcase child set meta document
+showcase child set tableName doc_id
 
 showcase child list add doc_type doc_type_id
 showcase child list add no no
