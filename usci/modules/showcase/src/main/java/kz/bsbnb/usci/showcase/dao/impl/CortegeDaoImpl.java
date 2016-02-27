@@ -209,32 +209,22 @@ public class CortegeDaoImpl extends CommonDao {
             for (Map.Entry<ArrayElement, HashMap<ValueElement, Object>> entry : savingMap.entrySet()) {
                 HashMap<ValueElement, Object> entryMap = entry.getValue();
 
-                ValueElement oldKey = null, newKey = null;
+                for (ShowCaseField sf : showCase.getRootKeyFieldsList()) {
+                    ValueElement oldKey = null, newKey = null;
+                    for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
+                        if (innerEntry.getKey().columnName.equals(sf.getAttributePath())) {
+                            oldKey = innerEntry.getKey();
 
-                /* Change auto generated MetaClass_ID to ChildTableName_ID */
-                for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
-                    if (innerEntry.getKey().columnName.equals(entity.getMeta().getClassName() + "_id")) {
-                        oldKey = innerEntry.getKey();
-
-                        newKey = new ValueElement(showCase.getName(), oldKey.elementId, oldKey.isArray, oldKey.isSimple);
+                            newKey = new ValueElement(sf.getColumnName(), oldKey.elementId, oldKey.isArray, oldKey.isSimple);
+                        }
                     }
+                    entryMap.put(newKey, entryMap.remove(oldKey));
                 }
-
-                entryMap.put(newKey, entryMap.remove(oldKey));
 
                 KeyElement rootKeyElement = new KeyElement(entryMap, showCase.getRootKeyFieldsList());
 
-                if (!showCase.isFinal()) {
-                    sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys + " and open_date = ?";
-                } else {
-                    sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys + " and rep_date = ?";
-                }
-
-                sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
-                jdbcTemplateSC.update(sql, getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
-
-
                 // compare == 0 update
+                updateCurrentData(entity, rootKeyElement, entryMap, showCase);
 
                 // compare == 1 go for each put history, insert news to actual
 
@@ -246,8 +236,33 @@ public class CortegeDaoImpl extends CommonDao {
         }
     }
 
-    private HashMap<ArrayElement, HashMap<ValueElement, Object>> generateMap(IBaseEntity entity,
-                                                                             ShowCase ShowCase) {
+    private void updateCurrentData (IBaseEntity entity, KeyElement rootKeyElement, HashMap<ValueElement, Object> entryMap, ShowCase showCase) {
+        String sql = "UPDATE %s SET ";
+
+        Object values[] = new Object[entryMap.size()];
+
+        int valuesIndex = 0;
+
+        for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
+            sql += innerEntry.getKey().columnName + " = ? ";
+            values[valuesIndex++] = innerEntry.getValue();
+            if (valuesIndex < entryMap.size()) sql += ", ";
+        }
+
+        if (!showCase.isFinal()) {
+            sql += "WHERE " + rootKeyElement.queryKeys + " and open_date = ?";
+        } else {
+            sql += "WHERE " + rootKeyElement.queryKeys + " and rep_date = ?";
+        }
+
+        jdbcTemplateSC.update(String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName()),
+                getObjectArray(false, values, getObjectArray(false, rootKeyElement.values, entity.getReportDate())));
+
+        jdbcTemplateSC.update(String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName()),
+                getObjectArray(false, values, getObjectArray(false, rootKeyElement.values, entity.getReportDate())));
+    }
+
+    private HashMap<ArrayElement, HashMap<ValueElement, Object>> generateMap(IBaseEntity entity, ShowCase ShowCase) {
         HashSet<PathElement> keyPaths = new HashSet<>();
         HashMap<String, HashSet<PathElement>> paths = generatePaths(entity, ShowCase, keyPaths);
 

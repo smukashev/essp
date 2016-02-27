@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 public class KeyElement {
-    public final Object[] keys;
+    public final String[] keys;
     public final Object[] values;
     public String queryKeys = "";
 
     public KeyElement(HashMap<ValueElement, Object> map, List<ShowCaseField> keyFields) {
-        keys = new Object[keyFields.size()];
+        keys = new String[keyFields.size()];
         values = new Object[keyFields.size()];
 
         int i = 0;

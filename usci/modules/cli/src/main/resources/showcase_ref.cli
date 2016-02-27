@@ -47,19 +47,18 @@ showcase addIndex nonunique ref_creditor_id doc_id
 showcase child init
 showcase child set name REF_CREDITOR_DOC_DOCUMENT
 showcase child set meta document
-showcase child set tableName doc_id
+showcase child set tableName REF_CREDITOR_DOC
 
 showcase child list add doc_type doc_type_id
 showcase child list add no no
 showcase child list add doc_type.code doc_type_code
 showcase child list add name name
 
-showcase child list addKey doc_id
+showcase child list addRootKey document_id doc_id
 
 showcase child save
 
 showcase save
-
 #=================================================================================
 # REF_BALANCE_ACCOUNT
 #=================================================================================

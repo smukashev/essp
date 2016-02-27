@@ -2252,7 +2252,7 @@ public class CLI {
 
                 showCase.addCustomField(args.get(3), args.get(4), metaClassRepository.getMetaClass(args.get(2)));
             } else if (args.get(1).equals("addRootKey")) {
-                showCase.addRootKeyField(args.get(2));
+                showCase.addRootKeyField(args.get(2), args.get(3));
             } else if (args.get(1).equals("addHistoryKey")) {
                 showCase.addHistoryKeyField(args.get(2));
             } else {
@@ -2279,8 +2279,8 @@ public class CLI {
             } else if (args.get(1).equals("list")) {
                 if (args.get(2).equals("add")) {
                     childShowCase.addField(args.get(3), args.get(4));
-                } else if(args.get(2).equals("addKey")) {
-                    childShowCase.addRootKeyField(args.get(3));
+                } else if(args.get(2).equals("addRootKey")) {
+                    childShowCase.addRootKeyField(args.get(3), args.get(4));
                 } else {
                     throw new IllegalArgumentException();
                 }
