@@ -224,9 +224,11 @@ public class CortegeDaoImpl extends CommonDao {
                 KeyElement rootKeyElement = new KeyElement(entryMap, showCase.getRootKeyFieldsList());
 
                 // compare == 0 update
-                updateCurrentData(entity, rootKeyElement, entryMap, showCase);
+                //updateCurrentData(entity, rootKeyElement, entryMap, showCase);
 
                 // compare == 1 go for each put history, insert news to actual
+                if (!showCase.isFinal())
+                    updateHistoryData(entity, rootKeyElement, entryMap, showCase);
 
                 // update histories, if there is nothing, insert
 
@@ -234,6 +236,83 @@ public class CortegeDaoImpl extends CommonDao {
         } finally {
             removeShowCase(showCase.getId());
         }
+    }
+
+    @Transactional
+    private void updateHistoryData (IBaseEntity entity, KeyElement rootKeyElement, HashMap<ValueElement, Object> newMap, ShowCase showCase) {
+        String sql = "SELECT * FROM %s WHERE " + rootKeyElement.queryKeys + " and open_date < ?"; // todo: fix <=
+        sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
+
+        List<Map<String, Object>> resultList = jdbcTemplateSC.queryForList(sql, getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
+
+        for (Map<String, Object> resultMap : resultList) {
+            boolean equalityFlag = true;
+
+            for (Map.Entry<ValueElement, Object> newEntry : newMap.entrySet()) {
+                Object newValue = newEntry.getValue();
+                Object dbValue = resultMap.get(newEntry.getKey().columnName.toUpperCase());
+
+                if (newValue == null && dbValue == null) continue;
+
+                if (newValue == null || dbValue == null) {
+                    equalityFlag  = false;
+                    break;
+                }
+
+                if (!compareValue(newValue, dbValue)) {
+                    equalityFlag = false;
+                    break;
+                }
+            }
+
+            if (!equalityFlag) {
+                Object actualRecordId = resultMap.remove("ID");
+                resultMap.remove("CDC");
+                resultMap.put("CLOSE_DATE", entity.getReportDate());
+
+                simpleInsert(resultMap, showCase, getHistoryTableName(showCase));
+
+                sql = "DELETE FROM %s WHERE ID = ?";
+                sql = String.format(sql, getActualTableName(showCase));
+                jdbcTemplateSC.update(sql, actualRecordId);
+
+                for (Map.Entry<ValueElement, Object> newEntry : newMap.entrySet())
+                    resultMap.put(newEntry.getKey().columnName.toUpperCase(), newEntry.getValue());
+
+                resultMap.remove("CLOSE_DATE");
+                resultMap.put("OPEN_DATE", entity.getReportDate());
+
+                simpleInsert(resultMap, showCase, getActualTableName(showCase));
+            }
+        }
+    }
+
+    @Transactional
+    private void simpleInsert(Map<String, Object> map, ShowCase showCase, String tableName) {
+        StringBuilder sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
+        StringBuilder values = new StringBuilder("(");
+
+        Object[] valueArray = new Object[map.size()];
+
+        int i = 0;
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            sql.append(COLUMN_PREFIX).append(entry.getKey()).append(", ");
+            values.append("?, ");
+            valueArray[i++] = entry.getValue();
+        }
+
+        if (!showCase.isFinal()) {
+            sql.append("CDC");
+            values.append("SYSDATE)");
+        } else {
+            sql.append("CDC");
+            values.append("SYSDATE)");
+        }
+
+        sql.append(") VALUES ").append(values);
+
+        jdbcTemplateSC.update(sql.toString(), valueArray);
     }
 
     private void updateCurrentData (IBaseEntity entity, KeyElement rootKeyElement, HashMap<ValueElement, Object> entryMap, ShowCase showCase) {
@@ -771,6 +850,43 @@ public class CortegeDaoImpl extends CommonDao {
         return newObjectArray;
     }
 
+    private boolean compareValue (Object newValue, Object dbValue) {
+        if (newValue instanceof Double) {
+            double value = ((BigDecimal) dbValue).doubleValue();
+            if (!newValue.equals(value))
+                return false;
+        } else if (newValue instanceof Integer) {
+            int value = ((BigDecimal) dbValue).intValue();
+            if (!newValue.equals(value)) {
+                return false;
+            }
+        } else if (newValue instanceof Boolean) {
+            boolean value = ((BigDecimal) dbValue).longValue() == 1;
+            if (!newValue.equals(value)) {
+                return false;
+            }
+        } else if (newValue instanceof Long) {
+            if (!newValue.equals(Long.valueOf(dbValue.toString()))) {
+                return false;
+            }
+        } else if (newValue instanceof String) {
+            if (!newValue.toString().equals(dbValue.toString())) {
+                return false;
+            }
+        } else if (newValue instanceof Date) {
+            Date value = DataUtils.convertToSQLDate((Timestamp) dbValue);
+            if (!newValue.equals(value)) {
+                return false;
+            }
+        } else {
+            if (!newValue.equals(dbValue)) {
+             return false;
+            }
+        }
+
+        return true;
+    }
+
     private boolean compareValues(HistoryState state, HashMap<ValueElement, Object> savingMap, IBaseEntity entity, ShowCase showCase, KeyElement keyElement) {
         StringBuilder st = new StringBuilder();
         boolean equalityFlag = true;
@@ -811,45 +927,9 @@ public class CortegeDaoImpl extends CommonDao {
                     break;
                 }
 
-                if (newValue instanceof Double) {
-                    double value = ((BigDecimal) dbValue).doubleValue();
-                    if (!newValue.equals(value)) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else if (newValue instanceof Integer) {
-                    int value = ((BigDecimal) dbValue).intValue();
-                    if (!newValue.equals(value)) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else if (newValue instanceof Boolean) {
-                    boolean value = ((BigDecimal) dbValue).longValue() == 1;
-                    if (!newValue.equals(value)) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else if (newValue instanceof Long) {
-                    if (!newValue.equals(Long.valueOf(dbValue.toString()))) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else if (newValue instanceof String) {
-                    if (!newValue.toString().equals(dbValue.toString())) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else if (newValue instanceof Date) {
-                    Date value = DataUtils.convertToSQLDate((Timestamp) dbValue);
-                    if (!newValue.equals(value)) {
-                        equalityFlag = false;
-                        break;
-                    }
-                } else {
-                    if (!newValue.equals(dbValue)) {
-                        equalityFlag = false;
-                        break;
-                    }
+                if (!compareValue(newValue, dbValue)) {
+                    equalityFlag = false;
+                    break;
                 }
             }
 
