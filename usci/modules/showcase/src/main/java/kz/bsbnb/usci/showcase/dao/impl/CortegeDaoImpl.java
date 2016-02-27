@@ -240,7 +240,7 @@ public class CortegeDaoImpl extends CommonDao {
 
     @Transactional
     private void updateHistoryData (IBaseEntity entity, KeyElement rootKeyElement, HashMap<ValueElement, Object> newMap, ShowCase showCase) {
-        String sql = "SELECT * FROM %s WHERE " + rootKeyElement.queryKeys + " and open_date < ?"; // todo: fix <=
+        String sql = "SELECT * FROM %s WHERE " + rootKeyElement.queryKeys + " and open_date < ?";
         sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
 
         List<Map<String, Object>> resultList = jdbcTemplateSC.queryForList(sql, getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
