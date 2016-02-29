@@ -32,7 +32,6 @@ import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
-import kz.bsbnb.usci.eav.showcase.ChildShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.showcase.ShowCaseIndex;
@@ -42,7 +41,6 @@ import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
-import kz.bsbnb.usci.showcase.ShowcaseHolder;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.CoreStatus;
@@ -110,17 +108,15 @@ public class CLI {
 
     @Autowired EntityExporter entityExporter;
 
-    RmiProxyFactoryBean serviceFactory = null;
+    private IEntityService entityServiceCore = null;
 
-    IEntityService entityServiceCore = null;
+    private ShowCase showCase;
 
-    ShowCase showCase;
+    private ShowCase childShowCase;
 
-    ChildShowCase childShowCase;
+    private String line;
 
-    String line;
-
-    Exception lastException = null;
+    private Exception lastException = null;
 
     private String command;
 
@@ -161,7 +157,7 @@ public class CLI {
     public IEntityService getEntityService(String url) {
         if (entityServiceCore == null) {
             try {
-                serviceFactory = new RmiProxyFactoryBean();
+                RmiProxyFactoryBean serviceFactory = new RmiProxyFactoryBean();
                 serviceFactory.setServiceUrl(url);
                 serviceFactory.setServiceInterface(IEntityService.class);
                 serviceFactory.setRefreshStubOnConnectFailure(true);
@@ -2256,7 +2252,10 @@ public class CLI {
 
                 showCase.addCustomField(args.get(3), args.get(4), metaClassRepository.getMetaClass(args.get(2)));
             } else if (args.get(1).equals("addRootKey")) {
-                showCase.addRootKeyField(args.get(2));
+                if (args.size() == 4)
+                    showCase.addRootKeyField(args.get(2), args.get(3));
+                else
+                    showCase.addRootKeyField(args.get(2),args.get(2));
             } else if (args.get(1).equals("addHistoryKey")) {
                 showCase.addHistoryKeyField(args.get(2));
             } else {
@@ -2266,28 +2265,31 @@ public class CLI {
             }
         } else if (args.get(0).equals("child")) {
             if (args.get(1).equals("init")) {
-                childShowCase = new ChildShowCase();
+                childShowCase = new ShowCase();
+                childShowCase.setChild(true);
             } else if (args.get(1).equals("set")) {
                 if (args.get(2).equals("name")) {
                     childShowCase.setName(args.get(3));
                 } else if (args.get(2).equals("meta")) {
                     childShowCase.setMeta(metaClassRepository.getMetaClass(args.get(3)));
                 } else if (args.get(2).equals("child_down_path")) {
-                    childShowCase.setChildDownPath(args.get(3));
+                    childShowCase.setDownPath(args.get(3));
+                } else if (args.get(2).equals("tableName")) {
+                    childShowCase.setTableName(args.get(3));
                 } else {
                     throw new IllegalArgumentException();
                 }
             } else if (args.get(1).equals("list")) {
                 if (args.get(2).equals("add")) {
-                    childShowCase.addField(args.get(3));
-                } else if(args.get(2).equals("addKey")) {
-                    childShowCase.addKeyField(args.get(3));
+                    childShowCase.addField(args.get(3), args.get(4));
+                } else if(args.get(2).equals("addRootKey")) {
+                    childShowCase.addRootKeyField(args.get(3), args.get(4));
                 } else {
                     throw new IllegalArgumentException();
                 }
             } else if(args.get(1).equals("save")) {
                 showCase.addChildShowCase(childShowCase);
-                childShowCase = new ChildShowCase();
+                childShowCase = new ShowCase();
             } else {
                 throw new IllegalArgumentException();
             }
@@ -2311,14 +2313,14 @@ public class CLI {
                 System.err.println("Couldn't save " + showCase.getName());
             showCase = null;
         } else if (args.get(0).equals("listSC")) {
-            List<ShowcaseHolder> list = showcaseService.list();
-            for (ShowcaseHolder holder : list) {
-                System.out.println(holder.getShowCaseMeta().getName());
+            List<ShowCase> list = showcaseService.list();
+            for (ShowCase showCase : list) {
+                System.out.println(showCase.getName());
 
-                for (ShowCaseField field : holder.getShowCaseMeta().getFieldsList())
+                for (ShowCaseField field : showCase.getFieldsList())
                     System.out.println("\t" + field.getColumnName());
 
-                for (ShowCaseField field : holder.getShowCaseMeta().getCustomFieldsList())
+                for (ShowCaseField field : showCase.getCustomFieldsList())
                     System.out.println("\t* " + field.getColumnName());
             }
         } else if (args.get(0).equals("loadSC")) {
