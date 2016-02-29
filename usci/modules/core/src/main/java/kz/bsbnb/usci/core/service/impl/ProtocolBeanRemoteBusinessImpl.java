@@ -78,8 +78,8 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
             message.setNameKz(entityStatus.getErrorCode());
             message.setNameRu(entityStatus.getErrorCode());
         } else {
-            message.setNameKz(entityStatus.getDescription() + "| " + err);
-            message.setNameRu(entityStatus.getDescription() + "| " +err);
+            message.setNameKz(err);
+            message.setNameRu(err);
         }
 
         Shared type = new Shared();
