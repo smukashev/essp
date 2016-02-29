@@ -196,8 +196,6 @@ public class CortegeDaoImpl extends CommonDao {
 
     @Transactional
     private void childCortegeGenerate(IBaseEntity entity, ShowCase showCase) {
-        String sql;
-
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(entity, showCase);
 
         if (savingMap == null || savingMap.size() == 0)
@@ -211,6 +209,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                 for (ShowCaseField sf : showCase.getRootKeyFieldsList()) {
                     ValueElement oldKey = null, newKey = null;
+
                     for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
                         if (innerEntry.getKey().columnName.equals(sf.getAttributePath())) {
                             oldKey = innerEntry.getKey();
@@ -218,126 +217,42 @@ public class CortegeDaoImpl extends CommonDao {
                             newKey = new ValueElement(sf.getColumnName(), oldKey.elementId, oldKey.isArray, oldKey.isSimple);
                         }
                     }
+
                     entryMap.put(newKey, entryMap.remove(oldKey));
                 }
 
                 KeyElement rootKeyElement = new KeyElement(entryMap, showCase.getRootKeyFieldsList());
 
-                // compare == 0 update
-                //updateCurrentData(entity, rootKeyElement, entryMap, showCase);
-
-                // compare == 1 go for each put history, insert news to actual
-                if (!showCase.isFinal())
-                    updateHistoryData(entity, rootKeyElement, entryMap, showCase);
-
-                // update histories, if there is nothing, insert
-
+                updateCurrentData(entity, rootKeyElement, entryMap, showCase);
             }
         } finally {
             removeShowCase(showCase.getId());
         }
     }
 
-    @Transactional
-    private void updateHistoryData (IBaseEntity entity, KeyElement rootKeyElement, HashMap<ValueElement, Object> newMap, ShowCase showCase) {
-        String sql = "SELECT * FROM %s WHERE " + rootKeyElement.queryKeys + " and open_date < ?";
-        sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
-
-        List<Map<String, Object>> resultList = jdbcTemplateSC.queryForList(sql, getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
-
-        for (Map<String, Object> resultMap : resultList) {
-            boolean equalityFlag = true;
-
-            for (Map.Entry<ValueElement, Object> newEntry : newMap.entrySet()) {
-                Object newValue = newEntry.getValue();
-                Object dbValue = resultMap.get(newEntry.getKey().columnName.toUpperCase());
-
-                if (newValue == null && dbValue == null) continue;
-
-                if (newValue == null || dbValue == null) {
-                    equalityFlag  = false;
-                    break;
-                }
-
-                if (!compareValue(newValue, dbValue)) {
-                    equalityFlag = false;
-                    break;
-                }
-            }
-
-            if (!equalityFlag) {
-                Object actualRecordId = resultMap.remove("ID");
-                resultMap.remove("CDC");
-                resultMap.put("CLOSE_DATE", entity.getReportDate());
-
-                simpleInsert(resultMap, showCase, getHistoryTableName(showCase));
-
-                sql = "DELETE FROM %s WHERE ID = ?";
-                sql = String.format(sql, getActualTableName(showCase));
-                jdbcTemplateSC.update(sql, actualRecordId);
-
-                for (Map.Entry<ValueElement, Object> newEntry : newMap.entrySet())
-                    resultMap.put(newEntry.getKey().columnName.toUpperCase(), newEntry.getValue());
-
-                resultMap.remove("CLOSE_DATE");
-                resultMap.put("OPEN_DATE", entity.getReportDate());
-
-                simpleInsert(resultMap, showCase, getActualTableName(showCase));
-            }
-        }
-    }
-
-    @Transactional
-    private void simpleInsert(Map<String, Object> map, ShowCase showCase, String tableName) {
-        StringBuilder sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
-        StringBuilder values = new StringBuilder("(");
-
-        Object[] valueArray = new Object[map.size()];
-
-        int i = 0;
-
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            sql.append(COLUMN_PREFIX).append(entry.getKey()).append(", ");
-            values.append("?, ");
-            valueArray[i++] = entry.getValue();
-        }
-
-        if (!showCase.isFinal()) {
-            sql.append("CDC");
-            values.append("SYSDATE)");
-        } else {
-            sql.append("CDC");
-            values.append("SYSDATE)");
-        }
-
-        sql.append(") VALUES ").append(values);
-
-        jdbcTemplateSC.update(sql.toString(), valueArray);
-    }
-
-    private void updateCurrentData (IBaseEntity entity, KeyElement rootKeyElement, HashMap<ValueElement, Object> entryMap, ShowCase showCase) {
-        String sql = "UPDATE %s SET ";
+    private void updateCurrentData(IBaseEntity entity, KeyElement rootKeyElement, HashMap<ValueElement, Object> entryMap, ShowCase showCase) {
+        StringBuilder sql = new StringBuilder("UPDATE %s SET ");
 
         Object values[] = new Object[entryMap.size()];
 
         int valuesIndex = 0;
 
         for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
-            sql += innerEntry.getKey().columnName + " = ? ";
+            sql.append(innerEntry.getKey().columnName).append(" = ? ");
             values[valuesIndex++] = innerEntry.getValue();
-            if (valuesIndex < entryMap.size()) sql += ", ";
+            if (valuesIndex < entryMap.size()) sql.append(", ");
         }
 
         if (!showCase.isFinal()) {
-            sql += "WHERE " + rootKeyElement.queryKeys + " and open_date = ?";
+            sql.append("WHERE ").append(rootKeyElement.queryKeys).append(" and open_date = ?");
         } else {
-            sql += "WHERE " + rootKeyElement.queryKeys + " and rep_date = ?";
+            sql.append("WHERE ").append(rootKeyElement.queryKeys).append(" and rep_date = ?");
         }
 
-        jdbcTemplateSC.update(String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName()),
+        jdbcTemplateSC.update(String.format(sql.toString(), getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName()),
                 getObjectArray(false, values, getObjectArray(false, rootKeyElement.values, entity.getReportDate())));
 
-        jdbcTemplateSC.update(String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName()),
+        jdbcTemplateSC.update(String.format(sql.toString(), getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName()),
                 getObjectArray(false, values, getObjectArray(false, rootKeyElement.values, entity.getReportDate())));
     }
 
@@ -850,7 +765,7 @@ public class CortegeDaoImpl extends CommonDao {
         return newObjectArray;
     }
 
-    private boolean compareValue (Object newValue, Object dbValue) {
+    private boolean compareValue(Object newValue, Object dbValue) {
         if (newValue instanceof Double) {
             double value = ((BigDecimal) dbValue).doubleValue();
             if (!newValue.equals(value))
@@ -880,7 +795,7 @@ public class CortegeDaoImpl extends CommonDao {
             }
         } else {
             if (!newValue.equals(dbValue)) {
-             return false;
+                return false;
             }
         }
 
