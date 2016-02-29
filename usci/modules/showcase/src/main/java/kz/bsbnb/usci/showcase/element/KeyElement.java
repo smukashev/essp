@@ -2,6 +2,7 @@ package kz.bsbnb.usci.showcase.element;
 
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,5 +30,28 @@ public class KeyElement {
             queryKeys += sf.getColumnName() + " = ? ";
             if (++i < keyFields.size()) queryKeys += " AND ";
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        KeyElement that = (KeyElement) o;
+
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        if (!Arrays.equals(keys, that.keys)) return false;
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        if (!Arrays.equals(values, that.values)) return false;
+        return queryKeys.equals(that.queryKeys);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(keys);
+        result = 31 * result + Arrays.hashCode(values);
+        result = 31 * result + queryKeys.hashCode();
+        return result;
     }
 }

@@ -2252,7 +2252,10 @@ public class CLI {
 
                 showCase.addCustomField(args.get(3), args.get(4), metaClassRepository.getMetaClass(args.get(2)));
             } else if (args.get(1).equals("addRootKey")) {
-                showCase.addRootKeyField(args.get(2), args.get(3));
+                if (args.size() == 4)
+                    showCase.addRootKeyField(args.get(2), args.get(3));
+                else
+                    showCase.addRootKeyField(args.get(2),args.get(2));
             } else if (args.get(1).equals("addHistoryKey")) {
                 showCase.addHistoryKeyField(args.get(2));
             } else {

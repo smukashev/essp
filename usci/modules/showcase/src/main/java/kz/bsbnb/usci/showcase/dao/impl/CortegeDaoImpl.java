@@ -33,6 +33,10 @@ public class CortegeDaoImpl extends CommonDao {
     /* Same showcases could not be processed in parallel */
     private static final Set<Long> cortegeElements = Collections.synchronizedSet(new HashSet<Long>());
 
+    private static final String ROOT = "root";
+
+    private static final String ROOT_DOT = "root.";
+
     @Autowired
     public void setDataSourceSC(DataSource dataSourceSC) {
         this.jdbcTemplateSC = new JdbcTemplate(dataSourceSC);
@@ -262,16 +266,16 @@ public class CortegeDaoImpl extends CommonDao {
 
         HashSet<PathElement> rootAttributes;
 
-        if (paths.size() == 0 || paths.get("root") == null) {
+        if (paths.size() == 0 || paths.get(ROOT) == null) {
             rootAttributes = new HashSet<>();
         } else {
-            rootAttributes = paths.get("root");
+            rootAttributes = paths.get(ROOT);
         }
 
-        rootAttributes.add(new PathElement("root", "root", entity.getMeta().getClassName() + "_id"));
-        keyPaths.add(new PathElement("root", "root", entity.getMeta().getClassName() + "_id"));
+        rootAttributes.add(new PathElement(ROOT, ROOT, entity.getMeta().getClassName() + "_id"));
+        keyPaths.add(new PathElement(ROOT, ROOT, entity.getMeta().getClassName() + "_id"));
 
-        HashMap<ValueElement, Object> dirtyMap = readMap("root", entity, paths);
+        HashMap<ValueElement, Object> dirtyMap = readMap(ROOT, entity, paths);
 
         if (dirtyMap == null)
             return null;
@@ -494,69 +498,75 @@ public class CortegeDaoImpl extends CommonDao {
 
             if (sf.getAttributePath().contains(".")) {
                 if (attributeMetaType.isComplex()) {
-                    if (paths.get("root." + sf.getAttributePath()) != null) {
-                        tmpSet = paths.get("root." + sf.getAttributePath());
+                    if (paths.get(ROOT_DOT + sf.getAttributePath()) != null) {
+                        tmpSet = paths.get(ROOT_DOT + sf.getAttributePath());
                     } else {
                         tmpSet = new HashSet<>();
                     }
 
-                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName()));
-                    paths.put("root." + sf.getAttributePath(), tmpSet);
+                    tmpSet.add(new PathElement(ROOT, sf.getAttributePath(), sf.getColumnName()));
+                    paths.put(ROOT_DOT + sf.getAttributePath(), tmpSet);
 
                     String path = sf.getAttributePath().substring(0, sf.getAttributePath().lastIndexOf("."));
                     String name = sf.getAttributePath().substring(sf.getAttributePath().lastIndexOf(".") + 1);
 
-                    if (paths.get("root." + path) != null) {
-                        tmpSet = paths.get("root." + path);
+                    if (paths.get(ROOT_DOT + path) != null) {
+                        tmpSet = paths.get(ROOT_DOT + path);
                     } else {
                         tmpSet = new HashSet<>();
                     }
 
                     tmpSet.add(new PathElement(name, sf.getAttributePath(), sf.getColumnName()));
-                    paths.put("root." + path, tmpSet);
+                    paths.put(ROOT_DOT + path, tmpSet);
                 } else {
                     String path = sf.getAttributePath().substring(0, sf.getAttributePath().lastIndexOf("."));
                     String name = sf.getAttributePath().substring(sf.getAttributePath().lastIndexOf(".") + 1);
 
-                    if (paths.get("root." + path) != null) {
-                        tmpSet = paths.get("root." + path);
+                    if (paths.get(ROOT_DOT + path) != null) {
+                        tmpSet = paths.get(ROOT_DOT + path);
                     } else {
                         tmpSet = new HashSet<>();
                     }
 
                     tmpSet.add(new PathElement(name, sf.getAttributePath(), sf.getColumnName()));
-                    paths.put("root." + path, tmpSet);
+                    paths.put(ROOT_DOT + path, tmpSet);
                 }
             } else {
-                if (paths.get("root") != null) {
-                    tmpSet = paths.get("root");
+                if (paths.get(ROOT) != null) {
+                    tmpSet = paths.get(ROOT);
                 } else {
                     tmpSet = new HashSet<>();
                 }
 
                 if (attributeMetaType.isSet()) {
-                    keyPaths.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
-                            sf.getColumnName()));
+                    keyPaths.add(new PathElement(ROOT_DOT + sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName()));
+                    tmpSet.add(new PathElement(ROOT_DOT + sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName()));
+                    paths.put(ROOT, tmpSet);
 
-                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
-                            sf.getColumnName()));
-                    paths.put("root", tmpSet);
+                    if (paths.get(ROOT_DOT + sf.getAttributePath()) != null) {
+                        tmpSet = paths.get(ROOT_DOT + sf.getAttributePath());
+                    } else {
+                        tmpSet = new HashSet<>();
+                    }
 
-                    tmpSet = new HashSet<>();
-                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName()));
-                    paths.put("root." + sf.getAttributePath(), tmpSet);
+                    tmpSet.add(new PathElement(ROOT, sf.getAttributePath(), sf.getColumnName()));
+                    paths.put(ROOT_DOT + sf.getAttributePath(), tmpSet);
                 } else if (attributeMetaType.isComplex()) {
-                    tmpSet.add(new PathElement("root." + sf.getAttributePath(), sf.getAttributePath(),
-                            sf.getColumnName()));
-                    paths.put("root", tmpSet);
+                    tmpSet.add(new PathElement(ROOT_DOT + sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName()));
+                    paths.put(ROOT, tmpSet);
 
-                    tmpSet = new HashSet<>();
-                    tmpSet.add(new PathElement("root", sf.getAttributePath(), sf.getColumnName()));
-                    paths.put("root." + sf.getAttributePath(), tmpSet);
+                    if (paths.get(ROOT_DOT + sf.getAttributePath()) != null) {
+                        tmpSet = paths.get(ROOT_DOT + sf.getAttributePath());
+                    } else {
+                        tmpSet = new HashSet<>();
+                    }
+
+                    tmpSet.add(new PathElement(ROOT, sf.getAttributePath(), sf.getColumnName()));
+                    paths.put(ROOT_DOT + sf.getAttributePath(), tmpSet);
                 } else {
                     tmpSet.add(new PathElement(sf.getAttributePath(), sf.getAttributePath(), sf.getColumnName()));
 
-                    paths.put("root", tmpSet);
+                    paths.put(ROOT, tmpSet);
                 }
             }
         }
@@ -574,10 +584,10 @@ public class CortegeDaoImpl extends CommonDao {
 
         if (attributes != null) {
             for (PathElement attribute : attributes) {
-                if (attribute.elementPath.equals("root")) {
+                if (attribute.elementPath.equals(ROOT)) {
                     map.put(new ValueElement(attribute.columnName, entity.getId()), entity.getId());
                 } else {
-                    if (attribute.elementPath.contains("root.")) {
+                    if (attribute.elementPath.contains(ROOT_DOT)) {
                         Object container = entity.getEl(attribute.elementPath.substring(
                                 attribute.elementPath.indexOf(".") + 1));
 
@@ -694,7 +704,7 @@ public class CortegeDaoImpl extends CommonDao {
                 singleMap.put(entry.getKey(), entry.getValue());
             }
 
-            arrayEl.put(new ArrayElement(index, new ValueElement("root", 0L)), singleMap);
+            arrayEl.put(new ArrayElement(index, new ValueElement(ROOT, 0L)), singleMap);
         }
 
         return arrayEl;
@@ -721,7 +731,7 @@ public class CortegeDaoImpl extends CommonDao {
     /* Adds custom keys to existing map */
     public void addCustomKeys(HashMap<ValueElement, Object> entryMap, IBaseEntity globalEntity, ShowCase showCase) {
         for (ShowCaseField sf : showCase.getCustomFieldsList()) {
-            if (sf.getAttributePath().equals("root")) {
+            if (sf.getAttributePath().equals(ROOT)) {
                 entryMap.put(new ValueElement(sf.getColumnName(), globalEntity.getId()), globalEntity.getId());
                 continue;
             }

@@ -12,6 +12,27 @@ public class PathElement {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PathElement that = (PathElement) o;
+
+        if (!elementPath.equals(that.elementPath)) return false;
+        if (!attributePath.equals(that.attributePath)) return false;
+        return columnName.equals(that.columnName);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = elementPath.hashCode();
+        result = 31 * result + attributePath.hashCode();
+        result = 31 * result + columnName.hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "PathElement{" +
                 "elementPath='" + elementPath + '\'' +
