@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.brms.rulemodel.service;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.eav.util.Pair;
 
 import java.util.List;
@@ -9,8 +9,8 @@ import java.util.List;
  * @author abukabayev
  */
 public interface IBatchService {
-    public long save(Batch batch);
-    public Batch load(long id);
-    public List<Batch> getAllBatches();
+    public long save(RulePackage batch);
+    public RulePackage load(long id);
+    public List<RulePackage> getAllBatches();
     public List<Pair> getBatchVersions(Long batchId);
 }

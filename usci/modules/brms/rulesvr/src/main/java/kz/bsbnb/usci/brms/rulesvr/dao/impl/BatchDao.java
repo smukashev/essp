@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
 import kz.bsbnb.usci.brms.rulemodel.model.IBatchVersion;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.mapper.BatchMapper;
@@ -9,7 +9,6 @@ import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -59,18 +58,18 @@ public class BatchDao implements IBatchDao
     }
 
     @Override
-    public Batch loadBatch(long id) {
+    public RulePackage loadBatch(long id) {
 
         if(id < 1)
             throw new IllegalArgumentException("Does not have id. Can't load.");
 
         String SQL = "SELECT * FROM " + PREFIX_ + "packages WHERE id  = ?";
-        Batch batch = jdbcTemplate.queryForObject(SQL,new Object[]{id},new BatchMapper());
+        RulePackage batch = jdbcTemplate.queryForObject(SQL,new Object[]{id},new BatchMapper());
         return batch;
     }
 
 
-    private long saveBatch(Batch batch){
+    private long saveBatch(RulePackage batch){
 
         if (batch.getRepDate() == null)
         {
@@ -88,7 +87,7 @@ public class BatchDao implements IBatchDao
         return id;
     }
 
-    private void saveBatchVersion(Batch batch,long batchId){
+    private void saveBatchVersion(RulePackage batch, long batchId){
 
         if(batchId < 1)
         {
@@ -101,21 +100,21 @@ public class BatchDao implements IBatchDao
 
 
     @Override
-    public long save(Batch batch) {
+    public long save(RulePackage batch) {
         long batchId = saveBatch(batch);
 //        saveBatchVersion(batch,batchId);
         return batchId;
     }
 
     @Override
-    public List<Batch> getAllBatches() {
+    public List<RulePackage> getAllBatches() {
         Select select = context.selectFrom(LOGIC_PACKAGES);
 
         List<Map<String,Object> > rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
-        List<Batch> batchList = new ArrayList<>();
+        List<RulePackage> batchList = new ArrayList<>();
 
         for(Map<String,Object> row: rows) {
-            Batch b = new Batch();
+            RulePackage b = new RulePackage();
             b.setId(((BigDecimal) row.get(LOGIC_PACKAGES.ID.getName())).longValue());
             b.setName(((String) row.get(LOGIC_PACKAGES.NAME.getName())));
             b.setRepDate(DataUtils.convert((Timestamp) row.get(LOGIC_PACKAGES.REPORT_DATE.getName())));

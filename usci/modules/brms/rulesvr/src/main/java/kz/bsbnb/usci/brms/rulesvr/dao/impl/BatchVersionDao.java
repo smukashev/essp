@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.persistable.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -30,7 +30,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
     @Autowired
     DSLContext context;
 
-    public long saveBatchVersion(final Batch batch){
+    public long saveBatchVersion(final RulePackage batch){
         if(batch.getId() < 1)
         {
             throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
@@ -41,7 +41,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
     }
 
     @Override
-    public long saveBatchVersion(Batch batch, Date date) {
+    public long saveBatchVersion(RulePackage batch, Date date) {
         if(batch.getId() < 1)
         {
             throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
@@ -51,7 +51,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
         return insertWithId(SQL,new Object[]{batch.getId(), DataUtils.convert(date)});
     }
 
-    public BatchVersion getBatchVersion(Batch batch){
+    public BatchVersion getBatchVersion(RulePackage batch){
        List<BatchVersion> batchVersionList = getBatchVersions(batch);
        BatchVersion batchVersion = batchVersionList.get(0);
 
@@ -64,7 +64,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
     }
 
     @Override
-    public BatchVersion getBatchVersion(Batch batch, Date date) {
+    public BatchVersion getBatchVersion(RulePackage batch, Date date) {
         List<BatchVersion> batchVersionList = getBatchVersions(batch);
         if (batchVersionList.size()==0)return null;
         BatchVersion batchVersion = batchVersionList.get(0);
@@ -88,7 +88,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
         return batchVersion;
     }
 
-    public List<BatchVersion> getBatchVersions(Batch batch){
+    public List<BatchVersion> getBatchVersions(RulePackage batch){
 
         if (batch.getId() < 1)
         {
@@ -103,7 +103,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
     }
 
     @Override
-    public void copyRule(Long ruleId, Batch batch, Date versionDate) {
+    public void copyRule(Long ruleId, RulePackage batch, Date versionDate) {
         List<BatchVersion> batchVersionList = getBatchVersions(batch);
         boolean nn=false;
         Long batchVersionId=0L;

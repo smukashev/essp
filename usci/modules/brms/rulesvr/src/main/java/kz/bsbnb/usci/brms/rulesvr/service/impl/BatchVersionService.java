@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.brms.rulesvr.service.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,27 +21,27 @@ public class BatchVersionService implements IBatchVersionService {
     private IBatchVersionDao batchVersionDao;
 
     @Override
-    public BatchVersion load(Batch batch,Date date) {
+    public BatchVersion load(RulePackage batch, Date date) {
         return batchVersionDao.getBatchVersion(batch,date);
     }
 
     @Override
-    public long save(Batch batch) {
+    public long save(RulePackage batch) {
         return batchVersionDao.saveBatchVersion(batch);
     }
 
     @Override
-    public long save(Batch batch, Date date) {
+    public long save(RulePackage batch, Date date) {
         return batchVersionDao.saveBatchVersion(batch,date);
     }
 
     @Override
-    public List<BatchVersion> getBatchVersions(Batch batch) {
+    public List<BatchVersion> getBatchVersions(RulePackage batch) {
         return batchVersionDao.getBatchVersions(batch);
     }
 
     @Override
-    public void copyRule(Long ruleId, Batch batch, Date versionDate) {
+    public void copyRule(Long ruleId, RulePackage batch, Date versionDate) {
         batchVersionDao.copyRule(ruleId,batch,versionDate);
     }
 

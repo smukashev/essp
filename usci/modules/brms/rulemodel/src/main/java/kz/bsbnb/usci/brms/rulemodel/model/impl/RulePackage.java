@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.brms.rulemodel.model.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.IBatch;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import org.springframework.stereotype.Component;
 import java.util.Date;
@@ -10,23 +9,23 @@ import java.util.Date;
  */
 
 @Component
-public class Batch extends Persistable implements IBatch
+public class RulePackage extends Persistable
 {
     private Date repDate;
     private String name;
     private String description;
 
 
-    public Batch(){
+    public RulePackage(){
 
     }
 
-    public Batch(String name,Date repDate){
+    public RulePackage(String name, Date repDate){
         this.name = name;
         this.repDate = repDate;
     }
 
-    public Batch(Date repoDate){
+    public RulePackage(Date repoDate){
         this.repDate = repoDate;
     }
 

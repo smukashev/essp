@@ -1,11 +1,10 @@
 package kz.bsbnb.usci.brms.rulesvr.service.impl;
 
 import kz.bsbnb.usci.brms.rulemodel.model.IBatchVersion;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.service.IBatchService;
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
 import kz.bsbnb.usci.eav.util.Pair;
-import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,20 +26,20 @@ public class BatchService implements IBatchService
     }
 
     @Override
-    public long save(Batch batch) {
+    public long save(RulePackage batch) {
         return batchDao.save(batch);
     }
 
     @Override
-    public Batch load(long id) {
+    public RulePackage load(long id) {
 //        System.out.println(id);
-        Batch batch = batchDao.loadBatch(id);
+        RulePackage batch = batchDao.loadBatch(id);
 //        System.out.println(batch.getName()+" "+batch.getRepoDate());
         return batch;
     }
 
     @Override
-    public List<Batch> getAllBatches() {
+    public List<RulePackage> getAllBatches() {
         return batchDao.getAllBatches();
     }
 

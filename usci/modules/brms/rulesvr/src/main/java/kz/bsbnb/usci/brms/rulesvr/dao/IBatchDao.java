@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.brms.rulesvr.dao;
 
 import kz.bsbnb.usci.brms.rulemodel.model.IBatchVersion;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 
 import java.util.Date;
 import java.util.List;
@@ -9,10 +9,10 @@ import java.util.List;
 /**
  * @author abukabayev
  */
-public interface IBatchDao extends IDao{
-    public Batch loadBatch(long id);
-    public long save(Batch batch);
-    public List<Batch> getAllBatches();
-    public long getBatchVersionId(long batchId, Date repDate);
-    public List<IBatchVersion> getBatchVersions(long batchId);
+public interface IBatchDao extends IDao {
+    RulePackage loadBatch(long id);
+    long save(RulePackage batch);
+    List<RulePackage> getAllBatches();
+    long getBatchVersionId(long batchId, Date repDate);
+    List<IBatchVersion> getBatchVersions(long batchId);
 }

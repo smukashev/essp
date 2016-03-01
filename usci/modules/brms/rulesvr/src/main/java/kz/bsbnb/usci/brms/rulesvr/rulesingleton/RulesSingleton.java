@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.service.IBatchService;
@@ -235,12 +235,12 @@ public class RulesSingleton
 
     synchronized public void fillPackagesCache() {
         kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        List<Batch> allBatches = ruleBatchService.getAllBatches();
+        List<RulePackage> allBatches = ruleBatchService.getAllBatches();
 
         rulePackageErrors.clear();
         ruleCache.clear();
 
-        for (Batch curBatch : allBatches) {
+        for (RulePackage curBatch : allBatches) {
             List<BatchVersion> versions = ruleBatchVersionService.getBatchVersions(curBatch);
 
             ArrayList<RuleCasheEntry> ruleCasheEntries = new ArrayList<RuleCasheEntry>();

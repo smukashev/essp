@@ -2059,12 +2059,12 @@ public class CLI {
                 } catch (IllegalArgumentException e) {
                     throw e;
                 }
-                kz.bsbnb.usci.brms.rulemodel.model.impl.Batch batch =
-                        new kz.bsbnb.usci.brms.rulemodel.model.impl.Batch(args.get(2), currentDate);
+                kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage batch =
+                        new kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage(args.get(2), currentDate);
 
                 boolean exists = false;
                 Long id;
-                for (kz.bsbnb.usci.brms.rulemodel.model.impl.Batch ruleBatch : ruleBatchService.getAllBatches()) {
+                for (kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage ruleBatch : ruleBatchService.getAllBatches()) {
                     if (ruleBatch.getName().equals(batch.getName()) && ruleBatch.getRepDate().equals(batch.getRepDate())) {
                         exists = true;
                         break;
