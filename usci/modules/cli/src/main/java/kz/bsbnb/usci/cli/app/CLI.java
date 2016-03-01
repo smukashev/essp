@@ -2257,7 +2257,7 @@ public class CLI {
                 else
                     showCase.addRootKeyField(args.get(2),args.get(2));
             } else if (args.get(1).equals("addHistoryKey")) {
-                showCase.addHistoryKeyField(args.get(2));
+                showCase.addHistoryKeyField(args.get(2), args.get(3));
             } else {
                 System.err.println("Example: showcase list add [path] [columnName]");
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName]");
@@ -2285,7 +2285,7 @@ public class CLI {
                 } else if(args.get(2).equals("addRootKey")) {
                     childShowCase.addRootKeyField(args.get(3), args.get(4));
                 } else if(args.get(2).equals("addHistoryKey")) {
-                    childShowCase.addRootKeyField(args.get(3), args.get(4));
+                    childShowCase.addHistoryKeyField(args.get(3), args.get(4));
                 } else {
                     throw new IllegalArgumentException();
                 }

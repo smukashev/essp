@@ -341,15 +341,37 @@ public class CortegeDaoImpl extends CommonDao {
                 }
 
                 KeyElement rootKeyElement = new KeyElement(entryMap, showCase.getRootKeyFieldsList());
+                KeyElement historyKeyElement = new KeyElement(entryMap, showCase.getHistoryKeyFieldsList());
 
-                updateCurrentData(entity, rootKeyElement, entryMap, showCase);
+                String sql = "SELECT * FROM %s WHERE " + rootKeyElement.queryKeys;
+                sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                List<Map<String, Object>> dbList = jdbcTemplateSC.queryForList(sql, rootKeyElement.values);
+
+                for (Map<String, Object> dbMap : dbList) {
+                    Date openDate = (Date) dbMap.get("OPEN_DATE");
+
+                    if (entity.getReportDate().compareTo(openDate) == 0) {
+                        updateData(historyKeyElement, entryMap, showCase, entity);
+                    } else if (entity.getReportDate().compareTo(openDate) > 0) {
+                        if (!checkMaps(entryMap, dbMap)) {
+                            updateCloseDate(HistoryState.ACTUAL, historyKeyElement, entity, showCase);
+                            moveActualMapToHistory(historyKeyElement, showCase);
+
+                            entryMap.put(new ValueElement("OPEN_DATE", 0L, 0), entity.getReportDate());
+                            simpleInsert(entryMap, getActualTableName(showCase));
+                        }
+                    } else if (entity.getReportDate().compareTo(openDate) < 0) {
+
+                    }
+                }
             }
         } finally {
             removeShowCase(showCase.getId());
         }
     }
 
-    private void updateCurrentData(IBaseEntity entity, KeyElement rootKeyElement, HashMap<ValueElement, Object> entryMap, ShowCase showCase) {
+    private void updateData (KeyElement keyElement, HashMap<ValueElement, Object> entryMap, ShowCase showCase, IBaseEntity entity) {
         StringBuilder sql = new StringBuilder("UPDATE %s SET ");
 
         Object values[] = new Object[entryMap.size()];
@@ -363,16 +385,14 @@ public class CortegeDaoImpl extends CommonDao {
         }
 
         if (!showCase.isFinal()) {
-            sql.append("WHERE ").append(rootKeyElement.queryKeys).append(" and open_date = ?");
+            sql.append("WHERE ").append(keyElement.queryKeys).append(" and open_date = ?");
         } else {
-            sql.append("WHERE ").append(rootKeyElement.queryKeys).append(" and rep_date = ?");
+            sql.append("WHERE ").append(keyElement.queryKeys).append(" and rep_date = ?");
         }
 
         jdbcTemplateSC.update(String.format(sql.toString(), getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName()),
-                getObjectArray(false, values, getObjectArray(false, rootKeyElement.values, entity.getReportDate())));
+                getObjectArray(false, values, getObjectArray(false, keyElement.values, entity.getReportDate())));
 
-        jdbcTemplateSC.update(String.format(sql.toString(), getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName()),
-                getObjectArray(false, values, getObjectArray(false, rootKeyElement.values, entity.getReportDate())));
     }
 
     private HashMap<ArrayElement, HashMap<ValueElement, Object>> generateMap(IBaseEntity entity, ShowCase ShowCase) {

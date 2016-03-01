@@ -189,11 +189,11 @@ public class ShowCase extends Persistable {
         addRootKeyField(showCaseField);
     }
 
-    public void addHistoryKeyField(String columnName) {
+    public void addHistoryKeyField(String attributePath, String columnName) {
         ShowCaseField showCaseField = new ShowCaseField();
         showCaseField.setAttributeId(0L);
         showCaseField.setMetaId(0L);
-        showCaseField.setAttributePath(columnName);
+        showCaseField.setAttributePath(attributePath);
         showCaseField.setColumnName(columnName);
         showCaseField.setType(ShowCaseField.ShowCaseFieldTypes.HISTORY_KEY);
 
