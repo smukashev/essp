@@ -158,7 +158,11 @@ public class RulesPortlet extends MVCPortlet{
                 case GET_RULE_TITLES:
                     long packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
                     Date date =  df.parse(resourceRequest.getParameter("date"));
-                    writer.write(JsonMaker.getJson(ruleService.getRuleTitles(packageId,date)));
+                    String searchText = resourceRequest.getParameter("searchText");
+                    if(searchText != null && searchText.length() > 0)
+                        writer.write(JsonMaker.getJson(ruleService.getRuleTitles(packageId, date, searchText)));
+                    else
+                        writer.write(JsonMaker.getJson(ruleService.getRuleTitles(packageId,date)));
                     break;
                 case GET_RULE:
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));

@@ -79,6 +79,18 @@ public class RuleService implements IRuleService {
     }
 
     @Override
+    public Map getRuleTitles(Long packageId, Date repDate, String searchText) {
+        if(searchText == null || searchText.length() < 1)
+            throw new IllegalArgumentException("поисковой ключ не задан");
+
+        long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
+        Map m = new HashMap();
+        m.put("batchVersionId", batchVersionId);
+        m.put("data",ruleDao.getRuleTitles(batchVersionId, searchText));
+        return m;
+    }
+
+    @Override
     public Rule getRule(Long ruleId) {
         return ruleDao.getRule(ruleId);
     }

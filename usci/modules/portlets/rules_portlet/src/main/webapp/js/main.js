@@ -346,6 +346,31 @@ function initGrid(){
                 handler: function(){
                     packageControlForm().show();
                 }
+            },{
+                text: 'Поиск',
+                id: 'btnSearch',
+                icon: contextPathUrl + '/pics/search.png',
+                handler: function(){
+                    Ext.getCmp('txtSearch').show();
+                    Ext.getCmp('txtSearch').focus(false,200);
+                }
+            },{
+                xtype: 'textfield',
+                id: 'txtSearch',
+                hidden: true,
+                listeners: {
+                    render: function(cmd) {
+                        cmd.getEl().on('click',function(){Ext.EventObject.stopPropagation();});
+                    },
+                    scope: this,
+                    specialkey: function(f,e) {
+                        if(e.getKey() == e.ENTER) {
+                            updateRules(Ext.getCmp('txtSearch').value);
+                        } else if(e.getKey() == e.ESC) {
+                            Ext.getCmp('txtSearch').hide();
+                        }
+                    }
+                }
             }]
         }],
         height: '75%',
@@ -397,7 +422,7 @@ function reset(){
 
 
 
-function updateRules(){
+function updateRules(searchText){
 
     if(Ext.getCmp('elemComboPackage').value == null || Ext.getCmp('elemPackageVersionCombo').value == null)
         return;
@@ -407,7 +432,8 @@ function updateRules(){
             params: {
                 op: 'GET_RULE_TITLES',
                 packageId:Ext.getCmp('elemComboPackage').value,
-                date: Ext.getCmp('elemPackageVersionCombo').value
+                date: Ext.getCmp('elemPackageVersionCombo').value,
+                searchText: searchText
             },
             callback: function(a,b,success){
                 if(success == false){

@@ -6,6 +6,7 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.SimpleTrack;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Delete;
+import org.jooq.Select;
 import org.jooq.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +107,18 @@ public class RuleDao implements IRuleDao {
         return ret;
     }
 
-    public long save(Rule rule,BatchVersion batchVersion){
+    @Override
+    public List<SimpleTrack> getRuleTitles(Long batchVersionId, String searchText) {
+        searchText = searchText.toLowerCase();
+        Select select = context.select(LOGIC_RULES.ID, LOGIC_RULES.TITLE.as("name"), LOGIC_RULES.IS_ACTIVE, LOGIC_RULES.RULE)
+                .from(LOGIC_RULES)
+                .join(LOGIC_RULE_PACKAGE_VERSIONS).on(LOGIC_RULES.ID.eq(LOGIC_RULE_PACKAGE_VERSIONS.RULE_ID))
+                .where(LOGIC_RULE_PACKAGE_VERSIONS.PACKAGE_VERSIONS_ID.eq(batchVersionId))
+                .and(LOGIC_RULES.RULE.lower().like("%" + searchText + "%").or(LOGIC_RULES.TITLE.lower().like("%" + searchText + "%")));
+        return jdbcTemplate.query(select.getSQL(), select.getBindValues().toArray(), new BeanPropertyRowMapper<SimpleTrack>(SimpleTrack.class));
+    }
+
+    public long save(Rule rule, BatchVersion batchVersion){
         String SQL = "INSERT INTO " + PREFIX_ + "rules(title, rule) VALUES(?, ?)";
         jdbcTemplate.update(SQL,rule.getTitle(),rule.getRule());
 
