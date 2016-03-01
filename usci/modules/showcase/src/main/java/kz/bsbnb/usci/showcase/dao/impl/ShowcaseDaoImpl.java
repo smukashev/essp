@@ -501,11 +501,11 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
 
             for (ShowCaseField sf : csc.getFieldsList()) insertField(sf, childShowCaseId);
 
-            for (ShowCaseField sf : csc.getCustomFieldsList()) insertField(sf, showCaseId);
+            for (ShowCaseField sf : csc.getCustomFieldsList()) insertField(sf, childShowCaseId);
 
             for (ShowCaseField sf : csc.getRootKeyFieldsList()) insertField(sf, childShowCaseId);
 
-            for (ShowCaseField sf : csc.getHistoryKeyFieldsList()) insertField(sf, showCaseId);
+            for (ShowCaseField sf : csc.getHistoryKeyFieldsList()) insertField(sf, childShowCaseId);
         }
 
         return showCaseId;
