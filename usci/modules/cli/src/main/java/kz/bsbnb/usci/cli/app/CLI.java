@@ -2284,6 +2284,8 @@ public class CLI {
                     childShowCase.addField(args.get(3), args.get(4));
                 } else if(args.get(2).equals("addRootKey")) {
                     childShowCase.addRootKeyField(args.get(3), args.get(4));
+                } else if(args.get(2).equals("addHistoryKey")) {
+                    childShowCase.addRootKeyField(args.get(3), args.get(4));
                 } else {
                     throw new IllegalArgumentException();
                 }
