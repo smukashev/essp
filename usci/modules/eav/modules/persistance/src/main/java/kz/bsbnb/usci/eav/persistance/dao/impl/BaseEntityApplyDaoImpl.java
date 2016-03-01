@@ -2053,7 +2053,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             IBaseEntity childBaseEntityLoaded = (IBaseEntity) childBaseValueLoaded.getValue();
 
-                            if (childBaseValueSaving.equals(childBaseValueLoaded)) {
+                            if (childBaseValueSaving.equals(childBaseValueLoaded) || childBaseEntitySaving.getId() == childBaseEntityLoaded.getId()) {
                                 processedUUIDSet.add(childBaseValueLoaded.getUuid());
                                 baseValueFound = true;
 
@@ -2075,8 +2075,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                                 childBaseSetApplied.put(baseValueApplied);
 
-                                int compareValueDates = DataUtils.compareBeginningOfTheDay(
-                                        childBaseValueSaving.getRepDate(), childBaseValueLoaded.getRepDate());
+                                int compareValueDates = DataUtils.compareBeginningOfTheDay(childBaseValueSaving.getRepDate(), childBaseValueLoaded.getRepDate());
 
                                 if (compareValueDates == -1) {
                                     baseValueApplied.setRepDate(new Date(childBaseValueSaving.getRepDate().getTime()));
@@ -2092,7 +2091,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
                 }
 
-                // TODO:  Если значение было закрыто и оно не ключевое, элемент массива не будет идентифицирован.
+                // Если значение было закрыто и оно не ключевое, элемент массива не будет идентифицирован.
                 if (childBaseEntitySaving.getId() > 0) {
                     IBaseSetValueDao setValueDao = persistableDaoPool
                             .getPersistableDao(childBaseValueSaving.getClass(), IBaseSetValueDao.class);
@@ -2266,12 +2265,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
 
         /* Обработка накопительных массивов для витрин */
-        if (metaAttribute.isCumulative() && !isBaseSetDeleted) {
+        if (metaAttribute.isCumulative() && !isBaseSetDeleted && childBaseSetLoaded != null) {
             for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
                 if (processedUUIDSet.contains(childBaseValueLoaded.getUuid()))
                     continue;
 
-                childBaseSetApplied.put(childBaseValueLoaded);
+                if (childBaseSetApplied != null) childBaseSetApplied.put(childBaseValueLoaded);
             }
         }
 
@@ -2304,8 +2303,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseEntityManager.registerAsDeleted(deletedBaseValue);
 
                             /* Для удаления из витрин */
-                            loadedDocument.setOperation(OperationType.DELETE);
-                            childBaseSetApplied.put(deletedBaseValue);
+                            /*loadedDocument.setOperation(OperationType.DELETE);
+                            childBaseSetApplied.put(deletedBaseValue);*/
                         } else if (compare == 1) {
                             IBaseValue closedBaseValue = BaseValueFactory.create(
                                     MetaContainerTypes.META_SET,
@@ -2320,9 +2319,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             closedBaseValue.setBaseContainer(loadedValue.getBaseContainer());
                             baseEntityManager.registerAsInserted(closedBaseValue);
 
-                            /* Для закрытия записи в витринах*/
-                            loadedDocument.setOperation(OperationType.CLOSE);
-                            childBaseSetApplied.put(closedBaseValue);
+                            /* Для закрытия записи в витринах */
+                            /*loadedDocument.setOperation(OperationType.CLOSE);
+                            childBaseSetApplied.put(closedBaseValue);*/
                         } else if (compare == -1) {
                             IBaseValue closedBaseValue = BaseValueFactory.create(
                                     MetaContainerTypes.META_SET,

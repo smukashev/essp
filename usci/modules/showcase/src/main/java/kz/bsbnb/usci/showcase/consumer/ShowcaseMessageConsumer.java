@@ -2,11 +2,10 @@ package kz.bsbnb.usci.showcase.consumer;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
-import kz.bsbnb.usci.eav.showcase.ChildShowCase;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
-import kz.bsbnb.usci.showcase.ShowcaseHolder;
-import kz.bsbnb.usci.showcase.dao.ShowcaseDao;
-import org.apache.log4j.Logger;
+import kz.bsbnb.usci.eav.showcase.ShowCase;
+import kz.bsbnb.usci.showcase.dao.impl.CortegeDaoImpl;
+import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +22,13 @@ import java.util.concurrent.Future;
 
 @Component
 public class ShowcaseMessageConsumer implements MessageListener {
-    final static Logger logger = Logger.getLogger(ShowcaseMessageConsumer.class);
+    @Autowired
+    ShowcaseDaoImpl showcaseDao;
 
     @Autowired
-    ShowcaseDao showcaseDao;
+    CortegeDaoImpl cortegeDao;
 
-    private ExecutorService exec = Executors.newCachedThreadPool();
+    private final ExecutorService exec = Executors.newCachedThreadPool();
 
     @Override
     @Transactional
@@ -39,7 +39,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
             try {
                 queueEntry = (QueueEntry) om.getObject();
-            } catch(JMSException jms) {
+            } catch (JMSException jms) {
                 jms.printStackTrace();
                 return;
             }
@@ -53,9 +53,9 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
             try {
                 ArrayList<Future> futures = new ArrayList<>();
-                List<ShowcaseHolder> holders = showcaseDao.getHolders();
+                List<ShowCase> showCases = showcaseDao.getShowCases();
 
-                if (holders.size() == 0)
+                if (showCases.size() == 0)
                     throw new IllegalStateException("Необходимо создать витрины;");
 
                 OperationType operationType;
@@ -67,22 +67,22 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 }
 
                 if (operationType == OperationType.DELETE) {
-                    ShowcaseHolder h = showcaseDao.getHolderByClassName(
+                    ShowCase showCase = showcaseDao.getHolderByClassName(
                             queueEntry.getBaseEntityApplied().getMeta().getClassName());
 
-                    showcaseDao.deleteById(h, queueEntry.getBaseEntityApplied());
+                    cortegeDao.deleteById(showCase, queueEntry.getBaseEntityApplied());
                 } else if (operationType == OperationType.CLOSE) {
-                    showcaseDao.closeEntities(scId, queueEntry.getBaseEntityApplied(), holders);
+                    cortegeDao.closeEntities(scId, queueEntry.getBaseEntityApplied(), showCases);
                 } else {
                     boolean found = false;
 
                     final String metaClassName = queueEntry.getBaseEntityApplied().getMeta().getClassName();
 
-                    for (ShowcaseHolder holder : holders) {
-                        if (holder.getShowCaseMeta().getMeta().getClassName().equals(metaClassName)) {
-                            if (scId == null || scId == 0L || scId == holder.getShowCaseMeta().getId()) {
+                    for (ShowCase showCase : showCases) {
+                        if (showCase.getMeta().getClassName().equals(metaClassName)) {
+                            if (scId == null || scId == 0L || scId == showCase.getId()) {
                                 Future future = exec.submit(
-                                        new CortegeGenerator(queueEntry.getBaseEntityApplied(), holder));
+                                        new CortegeGenerator(queueEntry.getBaseEntityApplied(), showCase));
 
                                 futures.add(future);
 
@@ -91,12 +91,12 @@ public class ShowcaseMessageConsumer implements MessageListener {
                         }
                     }
 
-                    /*if (!found) {
-                        for (ShowcaseHolder holder : holders) {
-                            for (ChildShowCase childShowCase : holder.getShowCaseMeta().getChildShowCases()) {
+                    if (!found) {
+                        for (ShowCase showCase : showCases) {
+                            for (ShowCase childShowCase : showCase.getChildShowCases()) {
                                 if (childShowCase.getMeta().getClassName().equals(metaClassName)) {
                                     Future future = exec.submit(
-                                            new ChildCortegeGenerator(queueEntry.getBaseEntityApplied(), childShowCase));
+                                            new CortegeGenerator(queueEntry.getBaseEntityApplied(), childShowCase));
 
                                     futures.add(future);
 
@@ -104,9 +104,9 @@ public class ShowcaseMessageConsumer implements MessageListener {
                                 }
                             }
                         }
-                    }*/
+                    }
 
-                    if(found) {
+                    if (found) {
                         for (Future f : futures) f.get();
                     } else {
                         System.err.println("Для мета класа  " + metaClassName + " нет существующих витрин;");
@@ -116,47 +116,22 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-
-                logger.error(e.getMessage());
-
-                StringBuilder sb = new StringBuilder();
-
-                for(StackTraceElement s : e.getStackTrace())
-                    sb.append(s.toString());
-
-                showcaseDao.insertBadEntity(queueEntry.getBaseEntityApplied().getId(), scId,
-                        queueEntry.getBaseEntityApplied().getReportDate(), sb.toString(), e.getMessage());
             }
         }
     }
 
     private class CortegeGenerator implements Runnable {
         private IBaseEntity entity;
-        private ShowcaseHolder holder;
+        private ShowCase showCase;
 
-        public CortegeGenerator(IBaseEntity entity, ShowcaseHolder holder) {
+        public CortegeGenerator(IBaseEntity entity, ShowCase showCase) {
             this.entity = entity;
-            this.holder = holder;
+            this.showCase = showCase;
         }
 
         @Override
         public void run() {
-            showcaseDao.generate(entity, holder);
+            cortegeDao.generate(entity, showCase);
         }
     }
-
-    /*private class ChildCortegeGenerator implements Runnable {
-        private IBaseEntity entity;
-        private ChildShowCase childShowCase;
-
-        public ChildCortegeGenerator(IBaseEntity entity, ChildShowCase childShowCase) {
-            this.entity = entity;
-            this.childShowCase = childShowCase;
-        }
-
-        @Override
-        public void run() {
-
-        }
-    }*/
 }
