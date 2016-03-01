@@ -29,4 +29,5 @@ public interface IRuleDao extends IDao{
     public boolean activateRule(long ruleId);
     public boolean disableRule(long ruleId);
     public void clearAllRules();
+    List<SimpleTrack> getRuleTitles(Long batchVersionId, String searchText);
 }

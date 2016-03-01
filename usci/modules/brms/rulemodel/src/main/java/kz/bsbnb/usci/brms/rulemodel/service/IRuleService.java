@@ -29,6 +29,8 @@ public interface IRuleService {
      */
     public Map getRuleTitles(Long packageId, Date repDate);
 
+    Map getRuleTitles(Long packageId, Date repDate, String searchText);
+
     /**
      * Retrieves single rule by ruleId
      *
