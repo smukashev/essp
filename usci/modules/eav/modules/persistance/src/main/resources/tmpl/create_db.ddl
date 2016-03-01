@@ -797,33 +797,24 @@
 	<table name="logic_packages">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="name" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="name_ru" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="name_kz" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
 		<column name="description" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
-		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 	</table>
 	<table name="logic_rules">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="rule" primaryKey="false" required="false" type="VARCHAR" size="4000" autoIncrement="false"/>
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
-		<column name="is_active" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="1"/>
-	</table>
-	<table name="logic_package_versions">
-		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
-		<column name="package_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="title_ru" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="title_kz" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
 		<column name="open_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
-		<index name="lpv_IN_pi">
-			<index-column name="package_id"/>
-		</index>
+		<column name="close_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
 	</table>
-	<table name="logic_rule_package_versions">
+
+	<table name="logic_rule_package">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="rule_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="package_versions_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<index name="lrpv_IN_ri">
-			<index-column name="rule_id"/>
-		</index>
-		<index name="lrpv_IN_pvi">
-			<index-column name="package_versions_id"/>
-		</index>
+		<column name="package_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 	</table>
 	<!-- MAINTENANCE -->
 	<table name="mnt_operations">
