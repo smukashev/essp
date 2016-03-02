@@ -16,7 +16,7 @@ showcase list addRootKey ref_creditor_id ref_creditor_id
 
 showcase list addHistoryKey ref_creditor_id ref_creditor_id
 
-showcase addIndex unique ref_creditor_id
+showcase addIndex nonunique ref_creditor_id
 
 showcase save
 
@@ -56,8 +56,8 @@ showcase child list addHistoryKey document_id doc_id
 showcase child save
 
 showcase addIndex nonunique ref_creditor_id
-showcase addIndex unique ref_creditor_id doc_id
-showcase addIndex unique doc_id
+showcase addIndex nonunique ref_creditor_id doc_id
+showcase addIndex nonunique doc_id
 
 showcase save
 #=================================================================================
@@ -80,7 +80,7 @@ showcase list add sixth_sign sixth_sign
 showcase list addRootKey ref_balance_account_id ref_balance_account_id
 showcase list addHistoryKey ref_balance_account_id ref_balance_account_id
 
-showcase addIndex unique ref_balance_account_id
+showcase addIndex nonunique ref_balance_account_id
 
 showcase save
 
@@ -98,7 +98,7 @@ showcase list add name_ru name_ru
 showcase list addRootKey ref_bank_relation_id ref_bank_relation_id
 showcase list addHistoryKey ref_bank_relation_id ref_bank_relation_id
 
-showcase addIndex unique ref_bank_relation_id
+showcase addIndex nonunique ref_bank_relation_id
 
 showcase save
 
@@ -123,7 +123,7 @@ showcase list add value_ value_
 showcase list addRootKey ref_classification_id ref_classification_id
 showcase list addHistoryKey ref_classification_id ref_classification_id
 
-showcase addIndex unique ref_classification_id
+showcase addIndex nonunique ref_classification_id
 
 showcase save
 
@@ -141,7 +141,7 @@ showcase list add name_ru name_ru
 showcase list addRootKey ref_contact_type_id ref_contact_type_id
 showcase list addHistoryKey ref_contact_type_id ref_contact_type_id
 
-showcase addIndex unique ref_contact_type_id
+showcase addIndex nonunique ref_contact_type_id
 
 showcase save
 
@@ -162,7 +162,7 @@ showcase list add short_name_ru short_name_ru
 showcase list addRootKey ref_country_id ref_country_id
 showcase list addHistoryKey ref_country_id ref_country_id
 
-showcase addIndex unique ref_country_id
+showcase addIndex nonunique ref_country_id
 
 showcase save
 
@@ -180,7 +180,7 @@ showcase list add name_ru name_ru
 showcase list addRootKey ref_credit_object_id ref_credit_object_id
 showcase list addHistoryKey ref_credit_object_id ref_credit_object_id
 
-showcase addIndex unique ref_credit_object_id
+showcase addIndex nonunique ref_credit_object_id
 
 showcase save
  
@@ -202,7 +202,7 @@ showcase list add region.code region_code
 showcase list addRootKey ref_creditor_branch_id ref_creditor_branch_id
 showcase list addHistoryKey ref_creditor_branch_id ref_creditor_branch_id
 
-showcase addIndex unique ref_creditor_branch_id
+showcase addIndex nonunique ref_creditor_branch_id
 
 showcase save
 
@@ -220,7 +220,7 @@ showcase list add name_ru name_ru
 showcase list addRootKey ref_credit_purpose_id ref_credit_purpose_id
 showcase list addHistoryKey ref_credit_purpose_id ref_credit_purpose_id
 
-showcase addIndex unique ref_credit_purpose_id
+showcase addIndex nonunique ref_credit_purpose_id
 
 showcase save
 
@@ -239,7 +239,7 @@ showcase list add name_ru name_ru
 showcase list addRootKey ref_credit_type_id ref_credit_type_id
 showcase list addHistoryKey ref_credit_type_id ref_credit_type_id
 
-showcase addIndex unique ref_credit_type_id
+showcase addIndex nonunique ref_credit_type_id
 
 showcase save
 
@@ -260,7 +260,7 @@ showcase list add short_name short_name
 showcase list addRootKey ref_currency_id ref_currency_id
 showcase list addHistoryKey ref_currency_id ref_currency_id
 
-showcase addIndex unique ref_currency_id
+showcase addIndex nonunique ref_currency_id
 
 showcase save
 
@@ -278,7 +278,7 @@ showcase list add name_ru name_ru
 showcase list addRootKey ref_debtor_type_id ref_debtor_type_id
 showcase list addHistoryKey ref_debtor_type_id ref_debtor_type_id
 
-showcase addIndex unique ref_debtor_type_id
+showcase addIndex nonunique ref_debtor_type_id
 
 showcase save
 
@@ -303,7 +303,7 @@ showcase list add weight weight
 showcase list addRootKey ref_doc_type_id ref_doc_type_id
 showcase list addHistoryKey ref_doc_type_id ref_doc_type_id
 
-showcase addIndex unique ref_doc_type_id
+showcase addIndex nonunique ref_doc_type_id
 
 showcase save
 
@@ -321,7 +321,7 @@ showcase list add name_ru name_ru
 showcase list addRootKey ref_econ_trade_id ref_econ_trade_id
 showcase list addHistoryKey ref_econ_trade_id ref_econ_trade_id
 
-showcase addIndex unique ref_econ_trade_id
+showcase addIndex nonunique ref_econ_trade_id
 
 showcase save
 
@@ -341,7 +341,7 @@ showcase list add name_ru name_ru
 showcase list addRootKey ref_enterprise_type_id ref_enterprise_type_id
 showcase list addHistoryKey ref_enterprise_type_id ref_enterprise_type_id
 
-showcase addIndex unique ref_enterprise_type_id
+showcase addIndex nonunique ref_enterprise_type_id
 
 showcase save
  
@@ -359,7 +359,7 @@ showcase list add name_ru name_ru
 showcase list addRootKey ref_finance_source_id ref_finance_source_id
 showcase list addHistoryKey ref_finance_source_id ref_finance_source_id
 
-showcase addIndex unique ref_finance_source_id
+showcase addIndex nonunique ref_finance_source_id
 
 showcase save
 
@@ -379,7 +379,7 @@ showcase list add short_name_ru short_name_ru
 showcase list addRootKey ref_legal_form_id ref_legal_form_id
 showcase list addHistoryKey ref_legal_form_id ref_legal_form_id
 
-showcase addIndex unique ref_legal_form_id
+showcase addIndex nonunique ref_legal_form_id
 
 showcase save
 
@@ -399,7 +399,7 @@ showcase list add country.code country_code
 showcase list addRootKey ref_offshore_id ref_offshore_id
 showcase list addHistoryKey ref_offshore_id ref_offshore_id
 
-showcase addIndex unique ref_offshore_id
+showcase addIndex nonunique ref_offshore_id
 
 showcase save
 
@@ -419,7 +419,7 @@ showcase list add name_ru name_ru
 showcase list addRootKey ref_pledge_type_id ref_pledge_type_id
 showcase list addHistoryKey ref_pledge_type_id ref_pledge_type_id
 
-showcase addIndex unique ref_pledge_type_id
+showcase addIndex nonunique ref_pledge_type_id
 
 showcase save
  
@@ -439,7 +439,7 @@ showcase list add creditor.code creditor_code
 showcase list addRootKey ref_portfolio_id ref_portfolio_id
 showcase list addHistoryKey ref_portfolio_id ref_portfolio_id
 
-showcase addIndex unique ref_portfolio_id
+showcase addIndex nonunique ref_portfolio_id
 
 showcase save
 
@@ -457,7 +457,7 @@ showcase list add name_ru name_ru
 showcase list addRootKey ref_region_id ref_region_id
 showcase list addHistoryKey ref_region_id ref_region_id
 
-showcase addIndex unique ref_region_id
+showcase addIndex nonunique ref_region_id
 
 showcase save
 
@@ -477,7 +477,7 @@ showcase list add report_period_duration_months report_period_duration_months
 showcase list addRootKey ref_subject_type_id ref_subject_type_id
 showcase list addHistoryKey ref_subject_type_id ref_subject_type_id
 
-showcase addIndex unique ref_subject_type_id
+showcase addIndex nonunique ref_subject_type_id
 
 showcase save
 

@@ -370,9 +370,9 @@ public class CortegeDaoImpl extends CommonDao {
                         entryMap.put(newKey, entryMap.remove(oldKey));
                 }
 
-                if (globalEntity != null) { //fixme!
+                if (globalEntity != null) { // downPath != null
                     for (ShowCaseField sf : showCase.getRootKeyFieldsList()) {
-                        Long rootElementId = null;
+                        Long rootElementId;
                         if (sf.getAttributePath().equals(ROOT)) {
                             rootElementId = globalEntity.getId();
                         } else {
@@ -403,6 +403,9 @@ public class CortegeDaoImpl extends CommonDao {
                     } else if (entity.getReportDate().compareTo(maxOpenDate) > 0) {
                         if (!checkMaps(entryMap, dbMap)) {
                             dbMap.put("CLOSE_DATE", entity.getReportDate());
+                            for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
+                                dbMap.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
+
                             simpleInsertString(dbMap, getHistoryTableName(showCase));
 
                             sql = "DELETE FROM %s WHERE ID = ? ";
@@ -515,6 +518,10 @@ public class CortegeDaoImpl extends CommonDao {
                                 /* Data's are not same, insert to history table */
                                 dbMapHistory.put("OPEN_DATE", entity.getReportDate());
                                 dbMapHistory.put("CLOSE_DATE", historyMin);
+
+                                for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
+                                    dbMapHistory.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
+
                                 simpleInsertString(dbMapHistory, getHistoryTableName(showCase));
                             }
                         } else  {// if (historyMax != null) {
