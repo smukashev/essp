@@ -780,9 +780,9 @@ showcase list addHistoryKey person_bank_relation_id person_bank_relation_id
 # CHILD BANK_RELATION
 #-----------------------------------------------------------------------------------
 showcase child init
-showcase child set name CORE_PERSON_DEBTOR_INFO
+showcase child set name CORE_PERSON_DEBTOR_INFO_BANK_RELATION
 showcase child set meta subject
-showcase child set tableName CORE_PERSON_DEBTOR
+showcase child set tableName CORE_PERSON_DEBTOR_INFO
 showcase child set downPath person_info
 
 showcase list add bank_relations person_bank_relation_id
@@ -823,13 +823,13 @@ showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey org_bank_relation_id org_bank_relation_id
 
------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------
 # CHILD BANK_RELATION
 #-----------------------------------------------------------------------------------
 showcase child init
-showcase child set name CORE_ORG_DEBTOR_INFO
+showcase child set name CORE_ORG_DEBTOR_INFO_BANK_RELATION
 showcase child set meta subject
-showcase child set tableName CORE_ORG_DEBTOR
+showcase child set tableName CORE_ORG_DEBTOR_INFO
 showcase child set downPath organization_info
 
 showcase list add bank_relations org_bank_relation_id
