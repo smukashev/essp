@@ -78,6 +78,26 @@ showcase list addHistoryKey subject_id
 
 showcase addIndex nonunique creditor_id credit_id subject_id
 
+#-----------------------------------------------------------------------------------
+# CHILD SUBJECT
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_PERSON_SUBJECT
+showcase child set meta subject
+showcase child set tableName CORE_PERSON
+showcase child set downPath person_info
+
+showcase list add country country_id
+showcase list add offshore offshore_id
+showcase list add country.code country_code
+showcase list add offshore.code offshore_code
+
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+
+showcase child save
+
 showcase save
 
 #==================================================================================
@@ -110,6 +130,29 @@ showcase list addHistoryKey subject_id
 
 showcase addIndex nonunique creditor_id credit_id subject_id
 
+#-----------------------------------------------------------------------------------
+# CHILD SUBJECT
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_ORG_SUBJECT
+showcase child set meta subject
+showcase child set tableName CORE_ORG
+showcase child set downPath organization_info
+
+showcase list add head head_id
+showcase list add is_se is_se
+showcase list add econ_trade econ_trade
+showcase list add legal_form legal_form
+showcase list add offshore offshore
+showcase list add enterprise_type enterprise_type
+showcase list add country country
+
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+
+showcase child save
+
 showcase save
 
 #==================================================================================
@@ -137,6 +180,28 @@ showcase list addHistoryKey subject_id
 showcase list addHistoryKey name_id
 
 showcase addIndex nonunique creditor_id subject_id
+
+#-----------------------------------------------------------------------------------
+# CHILD HEAD
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_ORG_HEAD_NAMES_NAME
+showcase child set meta subject
+showcase child set tableName CORE_ORG
+showcase child set downPath organization_info.head
+
+showcase list add names name_id
+showcase list add names.firstname firstname
+showcase list add names.lastname lastname
+showcase list add names.middlename middlename
+showcase list add names.lang lang
+
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey name_id name_id
+
+showcase child save
 
 showcase save
 
@@ -180,7 +245,10 @@ showcase child list add no no
 showcase child list add doc_type.code doc_type_code
 showcase child list add name name
 
-showcase child list addRootKey document_id doc_id
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey document_id doc_id
 
 showcase child save
 
@@ -241,6 +309,28 @@ showcase list addHistoryKey address_id
 showcase addIndex nonunique creditor_id credit_id subject_id
 showcase addIndex nonunique creditor_id credit_id subject_id address_id
 
+#-----------------------------------------------------------------------------------
+# CHILD ADDRESS
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_PERSON_ADDRESS_ADDRESS
+showcase child set meta subject
+showcase child set tableName CORE_PERSON_ADDRESS
+showcase child set downPath person_info
+
+showcase list add addresses address_id
+showcase list add addresses.region region_id
+showcase list add addresses.details details
+showcase list add addresses.region.code region_code
+showcase list add addresses.type address_type
+
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey address_id address_id
+
+showcase child save
+
 showcase save
 
 #=================================================================================
@@ -273,6 +363,28 @@ showcase list addHistoryKey address_id
 showcase addIndex nonunique creditor_id credit_id subject_id
 showcase addIndex nonunique creditor_id credit_id subject_id address_id
 
+#-----------------------------------------------------------------------------------
+# CHILD ADDRESS
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_ORG_ADDRESS_ADDRESS
+showcase child set meta subject
+showcase child set tableName CORE_ORG_ADDRESS
+showcase child set downPath person_info
+
+showcase list add addresses address_id
+showcase list add addresses.region region_id
+showcase list add addresses.details details
+showcase list add addresses.region.code region_code
+showcase list add addresses.type address_type
+
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey address_id address_id
+
+showcase child save
+
 showcase save
 
 #=================================================================================
@@ -304,6 +416,27 @@ showcase list addHistoryKey contact_id
 showcase addIndex nonunique creditor_id credit_id subject_id
 showcase addIndex nonunique creditor_id credit_id subject_id contact_id
 
+#-----------------------------------------------------------------------------------
+# CHILD CONTACT
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_PERSON_CONTACTS_CONTACT
+showcase child set meta subject
+showcase child set tableName CORE_PERSON_CONTACT
+showcase child set downPath person_info
+
+showcase list add contacts contact_id
+showcase list add contacts.contact_type contact_type_id
+showcase list add contacts.details details
+showcase list add contacts.contact_type.code contact_type_code
+
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey contact_id contact_id
+
+showcase child save
+
 showcase save
 
 #=================================================================================
@@ -333,6 +466,27 @@ showcase list addHistoryKey contact_id
 
 showcase addIndex nonunique creditor_id credit_id subject_id
 showcase addIndex nonunique creditor_id credit_id subject_id contact_id
+
+#-----------------------------------------------------------------------------------
+# CHILD CONTACT
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_ORG_CONTACTS_CONTACT
+showcase child set meta subject
+showcase child set tableName CORE_ORG_CONTACT
+showcase child set downPath person_info
+
+showcase list add contacts contact_id
+showcase list add contacts.contact_type contact_type_id
+showcase list add contacts.details details
+showcase list add contacts.contact_type.code contact_type_code
+
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey contact_id contact_id
+
+showcase child save
 
 showcase save
 
@@ -381,7 +535,10 @@ showcase child list add no no
 showcase child list add doc_type.code doc_type_code
 showcase child list add name name
 
-showcase child list addRootKey document_id doc_id
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey document_id doc_id
 
 showcase child save
 
@@ -417,6 +574,28 @@ showcase list addHistoryKey name_id
 showcase addIndex nonunique creditor_id credit_id subject_id
 showcase addIndex nonunique creditor_id credit_id subject_id name_id
 
+#-----------------------------------------------------------------------------------
+# CHILD NAME
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_PERSON_NAME_NAME
+showcase child set meta subject
+showcase child set tableName CORE_PERSON_NAME
+showcase child set downPath person_info
+
+showcase list add names name_id
+showcase list add names.firstname firstname
+showcase list add names.lastname lastname
+showcase list add names.middlename middlename
+showcase list add names.lang lang
+
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey name_id name_id
+
+showcase child save
+
 showcase save
 
 #==================================================================================
@@ -446,6 +625,26 @@ showcase list addHistoryKey name_id
 
 showcase addIndex nonunique creditor_id credit_id subject_id
 showcase addIndex nonunique creditor_id credit_id subject_id name_id
+
+#-----------------------------------------------------------------------------------
+# CHILD NAME
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_ORG_NAME_NAME
+showcase child set meta subject
+showcase child set tableName CORE_ORG_NAME
+showcase child set downPath person_info
+
+showcase list add names name_id
+showcase list add names.name name
+showcase list add names.lang lang
+
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey name_id name_id
+
+showcase child save
 
 showcase save
 
@@ -637,6 +836,26 @@ showcase list addHistoryKey person_bank_relation_id
 showcase addIndex nonunique creditor_sender_id credit_id subject_id
 showcase addIndex nonunique creditor_sender_id credit_id subject_id person_bank_relation_id
 
+-----------------------------------------------------------------------------------
+# CHILD BANK_RELATION
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_PERSON_DEBTOR_INFO
+showcase child set meta subject
+showcase child set tableName CORE_PERSON_DEBTOR
+showcase child set downPath person_info
+
+showcase list add bank_relations person_bank_relation_id
+showcase list add bank_relations.bank_relation ref_bank_relation_id
+showcase list add bank_relations.creditor creditor_id
+
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey bank_relation_id person_bank_relation_id
+
+showcase child save
+
 showcase save
 
 #=================================================================================
@@ -665,6 +884,26 @@ showcase list addHistoryKey subject_id
 showcase list addHistoryKey org_bank_relation_id
 
 showcase addIndex nonunique creditor_id credit_id subject_id org_bank_relation_id
+
+-----------------------------------------------------------------------------------
+# CHILD BANK_RELATION
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_ORG_DEBTOR_INFO
+showcase child set meta subject
+showcase child set tableName CORE_ORG_DEBTOR
+showcase child set downPath organization_info
+
+showcase list add bank_relations org_bank_relation_id
+showcase list add bank_relations.bank_relation ref_bank_relation_id
+showcase list add bank_relations.creditor creditor_id
+
+showcase child list addRootKey subject_id subject_id
+
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey org_bank_relation_id org_bank_relation_id
+
+showcase child save
 
 showcase save
 
