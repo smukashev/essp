@@ -114,10 +114,10 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id
-showcase list addRootKey subject_id
-showcase list addHistoryKey credit_id
-showcase list addHistoryKey subject_id
+showcase list addRootKey credit_id credit_id
+showcase list addRootKey subject_id subject_id
+showcase list addHistoryKey credit_id credit_id
+showcase list addHistoryKey subject_id subject_id
 
 #-----------------------------------------------------------------------------------
 # CHILD SUBJECT
@@ -428,11 +428,11 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id
-showcase list addRootKey subject_id
-showcase list addHistoryKey credit_id
-showcase list addHistoryKey subject_id
-showcase list addHistoryKey contact_id
+showcase list addRootKey credit_id credit_id
+showcase list addRootKey subject_id subject_id
+showcase list addHistoryKey credit_id credit_id
+showcase list addHistoryKey subject_id subject_id
+showcase list addHistoryKey contact_id contact_id
 
 #-----------------------------------------------------------------------------------
 # CHILD CONTACT
@@ -525,12 +525,12 @@ showcase list add names.lang lang
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id
-showcase list addRootKey subject_id
+showcase list addRootKey credit_id credit_id
+showcase list addRootKey subject_id subject_id
 
-showcase list addHistoryKey credit_id
-showcase list addHistoryKey subject_id
-showcase list addHistoryKey name_id
+showcase list addHistoryKey credit_id credit_id
+showcase list addHistoryKey subject_id subject_id
+showcase list addHistoryKey name_id name_id
 
 showcase addIndex nonunique credit_id subject_id name_id
 showcase addIndex nonunique subject_id name_id
@@ -574,11 +574,11 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id
-showcase list addRootKey subject_id
-showcase list addHistoryKey credit_id
-showcase list addHistoryKey subject_id
-showcase list addHistoryKey name_id
+showcase list addRootKey credit_id credit_id
+showcase list addRootKey subject_id subject_id
+showcase list addHistoryKey credit_id credit_id
+showcase list addHistoryKey subject_id subject_id
+showcase list addHistoryKey name_id name_id
 
 #-----------------------------------------------------------------------------------
 # CHILD NAME
@@ -626,8 +626,8 @@ showcase list add turnover.issue.interest.amount_currency interest_amount_curren
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
-showcase list addRootKey credit_id
-showcase list addHistoryKey credit_id
+showcase list addRootKey credit_id credit_id
+showcase list addHistoryKey credit_id credit_id
 
 showcase addIndex nonunique credit_id
 
@@ -658,8 +658,8 @@ showcase list add credit_flow.provision.provision_msfo_over_balance.value msfo_o
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
-showcase list addRootKey credit_id
-showcase list addHistoryKey credit_id
+showcase list addRootKey credit_id credit_id
+showcase list addHistoryKey credit_id credit_id
 
 showcase addIndex nonunique creditor_id credit_id
 
@@ -680,8 +680,8 @@ showcase list add value value
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
-showcase list addRootKey credit_id
-showcase list addHistoryKey credit_id
+showcase list addRootKey credit_id credit_id
+showcase list addHistoryKey credit_id credit_id
 
 showcase addIndex nonunique creditor_id credit_id
 
@@ -746,8 +746,8 @@ showcase list add remains.correction.value_currency corr_cvalue
 showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
-showcase list addRootKey credit_id
-showcase list addHistoryKey credit_id
+showcase list addRootKey credit_id credit_id
+showcase list addHistoryKey credit_id credit_id
 
 showcase addIndex nonunique credit_id
 
@@ -769,12 +769,12 @@ showcase list addCustom credit creditor creditor_sender_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id
-showcase list addRootKey subject_id
+showcase list addRootKey credit_id credit_id
+showcase list addRootKey subject_id subject_id
 
-showcase list addHistoryKey credit_id
-showcase list addHistoryKey subject_id
-showcase list addHistoryKey person_bank_relation_id
+showcase list addHistoryKey credit_id credit_id
+showcase list addHistoryKey subject_id subject_id
+showcase list addHistoryKey person_bank_relation_id person_bank_relation_id
 
 #-----------------------------------------------------------------------------------
 # CHILD BANK_RELATION
@@ -816,12 +816,12 @@ showcase list addCustom credit creditor creditor_sender_id
 showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id
-showcase list addRootKey subject_id
+showcase list addRootKey credit_id credit_id
+showcase list addRootKey subject_id subject_id
 
-showcase list addHistoryKey credit_id
-showcase list addHistoryKey subject_id
-showcase list addHistoryKey org_bank_relation_id
+showcase list addHistoryKey credit_id credit_id
+showcase list addHistoryKey subject_id subject_id
+showcase list addHistoryKey org_bank_relation_id org_bank_relation_id
 
 -----------------------------------------------------------------------------------
 # CHILD BANK_RELATION
