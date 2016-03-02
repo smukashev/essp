@@ -1,0 +1,115 @@
+rule read $$$
+title: функций для проверки рнн
+
+function List getInvalidRNNs(List rnns, Boolean isPerson) {
+    List ret = new ArrayList();
+    for(Object rnn : rnns) {
+        try {
+            rnnCorrect((String) rnn, isPerson);
+        } catch(Exception e) {
+            ret.add(rnn + ": " + e.getMessage());
+        }
+    }
+    return ret;
+}
+
+function void rnnCorrect(String rnn, Boolean isPerson) {
+    int [][] WEIGHTS = new int[][]{
+            {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1},
+            {2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2},
+            {3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3},
+            {4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4},
+            {5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5},
+            {6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6},
+            {7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7},
+            {8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8},
+            {9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+            {10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+        };
+
+    Set<String> rnnRegions = new HashSet<String> (Arrays.asList("03", "06", "09", "15", "18", "21", "24", "27", "30", "33", "36", "39", "43", "45", "48", "51", "53", "55", "58", "60", "62", "63", "67"));
+
+    if(rnn.length() != 12)
+        throw new RuntimeException("Должен содержать 12 символов");
+
+    if(rnn.charAt(4) == '0' && isPerson)
+       throw new RuntimeException("Пятый символ РНН физ. лица должен принимать значения от 1 до 9");
+
+    if (rnn.charAt(4) != '0' && !isPerson)
+       throw new RuntimeException("Пятый символ РНН юр. лица должен принимать значение 0");
+
+    if(!rnnRegions.contains(rnn.substring(0,2)))
+       throw new RuntimeException("Неправильный код области СОАТО по РНН субъекта");
+
+    char c = rnn.charAt(0);
+    for(int i=1;i<12;i++)
+        if(rnn.charAt(i) != rnn.charAt(0))
+           c = rnn.charAt(i);
+
+    if(c == rnn.charAt(0))
+        throw new RuntimeException("Значение всех разрядов РНН не должно быть одинаковым");
+
+    int sum = 10;
+    for(int i=0;i<WEIGHTS.length;i++) {
+       int[] w = WEIGHTS[i];
+       sum = 0;
+
+       for(int j=0;j<w.length;j++)
+         sum+= (rnn.charAt(j) - '0' ) * w[j];
+
+       sum %= 11;
+
+       if(sum != 10)
+         break;
+    }
+
+    if(sum != rnn.charAt(11) - '0')
+       throw new RuntimeException("Не совпадает контрольный символ");
+}
+$$$
+
+rule save
+
+
+rule read $$$
+title: документ физ лица РНН
+rule "документ физ лица РНН"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ($r : getInvalidRNNs((List)getEls("{get}subject[is_person=true]docs[doc_type.code=11]no"), true) && $r.size() > 0))
+then
+	$entity.addValidationError("" + $r);
+end
+$$$
+
+rule save
+
+rule read $$$
+title: документ юр лица РНН
+rule "документ юр лица РНН"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ($r : getInvalidRNNs((List)getEls("{get}subject[is_organization=true][organization_info.is_se=false]docs[doc_type.code=11]no"), false) && $r.size() > 0))
+then
+	$entity.addValidationError("" + $r);
+end
+$$$
+
+rule save
+
+
+rule read $$$
+title: документ рук юр лица РНН
+rule "документ рук юр лица РНН"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ($r : getInvalidRNNs((List)getEls("{get}subject.organization_info.head.docs[doc_type.code=11]no"), false) && $r.size() > 0))
+then
+	$entity.addValidationError("" + $r);
+end
+$$$
+
+rule save
+
+
+quit

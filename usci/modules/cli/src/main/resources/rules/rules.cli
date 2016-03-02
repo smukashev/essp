@@ -14,6 +14,7 @@ rule import usci/modules/cli/src/main/resources/rules/rule_functions.cli
 rule import usci/modules/cli/src/main/resources/rules/rule_functions2.cli
 rule import usci/modules/cli/src/main/resources/rules/docs/rule_functions_iin.cli
 rule import usci/modules/cli/src/main/resources/rules/docs/rule_iins.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/rule_rnn.cli
 rule import usci/modules/cli/src/main/resources/rules/docs/rule_docs_12d.cli
 rule import usci/modules/cli/src/main/resources/rules/docs/rule_docs_12z.cli
 rule import usci/modules/cli/src/main/resources/rules/docs/rule_functions_ain.cli
