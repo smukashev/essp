@@ -7,7 +7,6 @@ import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.cli.app.command.impl.*;
 import kz.bsbnb.usci.cli.app.exporter.EntityExporter;
@@ -136,7 +135,7 @@ public class CLI {
 
     private kz.bsbnb.usci.brms.rulemodel.service.IBatchService ruleBatchService;
 
-    private IBatchVersionService batchVersionService;
+    //private IBatchVersionService batchVersionService;
 
     private ShowcaseService showcaseService;
 
@@ -2043,9 +2042,9 @@ public class CLI {
 
             } else if (args.get(0).equals("set")) {
 
-                if (args.get(1).equals("version")) {
+                /*if (args.get(1).equals("version")) {
                     currentBatchVersion = batchVersionService.getBatchVersion(currentPackageName, currentDate);
-                } else if (args.size() < 3) throw new IllegalArgumentException();
+                } else */if (args.size() < 3) throw new IllegalArgumentException();
                 else if (args.get(1).equals("package")) {
                     ruleService.getRulePackageName(args.get(2), currentDate);
                     currentPackageName = args.get(2);
@@ -2064,7 +2063,7 @@ public class CLI {
 
                 boolean exists = false;
                 Long id;
-                for (kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage ruleBatch : ruleBatchService.getAllBatches()) {
+                for (kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage ruleBatch : ruleBatchService.getAllPackages()) {
                     if (ruleBatch.getName().equals(batch.getName()) && ruleBatch.getRepDate().equals(batch.getRepDate())) {
                         exists = true;
                         break;
@@ -2074,7 +2073,7 @@ public class CLI {
                 if (!exists) {
                     id = ruleBatchService.save(batch);
                     batch.setId(id);
-                    batchVersionService.save(batch);
+                    //batchVersionService.save(batch);
                     System.out.println("ok batch created with id:" + id);
                 }
 

@@ -12,7 +12,7 @@ import java.util.List;
 public interface IBatchDao extends IDao {
     RulePackage loadBatch(long id);
     long save(RulePackage batch);
-    List<RulePackage> getAllBatches();
+    List<RulePackage> getAllPackages();
     long getBatchVersionId(long batchId, Date repDate);
     List<IBatchVersion> getBatchVersions(long batchId);
 }

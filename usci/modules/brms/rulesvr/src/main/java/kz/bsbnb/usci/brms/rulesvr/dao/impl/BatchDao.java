@@ -107,7 +107,7 @@ public class BatchDao implements IBatchDao
     }
 
     @Override
-    public List<RulePackage> getAllBatches() {
+    public List<RulePackage> getAllPackages() {
         Select select = context.selectFrom(LOGIC_PACKAGES);
 
         List<Map<String,Object> > rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
@@ -117,7 +117,6 @@ public class BatchDao implements IBatchDao
             RulePackage b = new RulePackage();
             b.setId(((BigDecimal) row.get(LOGIC_PACKAGES.ID.getName())).longValue());
             b.setName(((String) row.get(LOGIC_PACKAGES.NAME.getName())));
-            b.setRepDate(DataUtils.convert((Timestamp) row.get(LOGIC_PACKAGES.REPORT_DATE.getName())));
             batchList.add(b);
         }
 
@@ -135,7 +134,8 @@ public class BatchDao implements IBatchDao
 
     @Override
     public List<IBatchVersion> getBatchVersions(long batchId) {
-        Select select = context.select(LOGIC_PACKAGE_VERSIONS.ID, LOGIC_PACKAGE_VERSIONS.OPEN_DATE)
+        return new LinkedList<>();
+        /*Select select = context.select(LOGIC_PACKAGE_VERSIONS.ID, LOGIC_PACKAGE_VERSIONS.OPEN_DATE)
                 .from(LOGIC_PACKAGE_VERSIONS)
                 .where(LOGIC_PACKAGE_VERSIONS.PACKAGE_ID.eq(batchId))
                 .orderBy(LOGIC_PACKAGE_VERSIONS.OPEN_DATE.desc());
@@ -151,6 +151,6 @@ public class BatchDao implements IBatchDao
             ret.add(batchVersion);
         }
 
-        return ret;
+        return ret;*/
     }
 }

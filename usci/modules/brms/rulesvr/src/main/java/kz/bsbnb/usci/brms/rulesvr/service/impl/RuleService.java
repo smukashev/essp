@@ -182,17 +182,20 @@ public class RuleService implements IRuleService {
 
     @Override
     public boolean activateRule(String ruleBody, Long ruleId) {
-        return ruleDao.activateRule(ruleBody, ruleId);
+        //return ruleDao.activateRule(ruleBody, ruleId);
+        return true;
     }
 
     @Override
     public boolean activateRule(Long ruleId) {
-        return ruleDao.activateRule(ruleId);
+        //return ruleDao.activateRule(ruleId);
+        return true;
     }
 
     @Override
     public boolean disableRule(Long ruleId) {
-        return ruleDao.disableRule(ruleId);
+        //return ruleDao.disableRule(ruleId);
+        return true;
     }
 
     @Override

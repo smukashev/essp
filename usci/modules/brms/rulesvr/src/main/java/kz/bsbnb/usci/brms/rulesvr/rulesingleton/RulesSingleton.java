@@ -4,7 +4,6 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.service.IBatchService;
-import kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -100,8 +99,8 @@ public class RulesSingleton
     private IBatchService ruleBatchService;
     @Autowired
     private IRuleDao ruleDao;
-    @Autowired
-    private IBatchVersionService ruleBatchVersionService;
+    //@Autowired
+    //private IBatchVersionService ruleBatchVersionService;
 
     public StatelessKnowledgeSession getSession()
     {
@@ -173,11 +172,11 @@ public class RulesSingleton
         //if(!makeActive && ruleEdited)
         //    throw new IllegalArgumentException("non proper method call");
 
-        BatchVersion batchVersion = ruleBatchVersionService.getBatchVersion(pkgName, repDate);
-        if(batchVersion == null)
-            return "Версия пакета правил остутвует на текущую дату";
+        //BatchVersion batchVersion = ruleBatchVersionService.getBatchVersion(pkgName, repDate);
+        //if(batchVersion == null)
+        //    return "Версия пакета правил остутвует на текущую дату";
 
-        List<Rule> rules = ruleDao.load(batchVersion);
+        List<Rule> rules = ruleDao.load(pkgName, repDate);
 
         String packages = "";
 
@@ -235,12 +234,14 @@ public class RulesSingleton
 
     synchronized public void fillPackagesCache() {
         kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        List<RulePackage> allBatches = ruleBatchService.getAllBatches();
+        List<RulePackage> packages = ruleBatchService.getAllPackages();
 
         rulePackageErrors.clear();
         ruleCache.clear();
 
-        for (RulePackage curBatch : allBatches) {
+
+
+        for (RulePackage curBatch : packages) {
             List<BatchVersion> versions = ruleBatchVersionService.getBatchVersions(curBatch);
 
             ArrayList<RuleCasheEntry> ruleCasheEntries = new ArrayList<RuleCasheEntry>();

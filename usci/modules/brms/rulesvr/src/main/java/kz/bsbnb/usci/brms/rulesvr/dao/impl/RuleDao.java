@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -109,13 +110,14 @@ public class RuleDao implements IRuleDao {
 
     @Override
     public List<SimpleTrack> getRuleTitles(Long batchVersionId, String searchText) {
-        searchText = searchText.toLowerCase();
+        return new LinkedList<>();
+        /*searchText = searchText.toLowerCase();
         Select select = context.select(LOGIC_RULES.ID, LOGIC_RULES.TITLE.as("name"), LOGIC_RULES.IS_ACTIVE, LOGIC_RULES.RULE)
                 .from(LOGIC_RULES)
                 .join(LOGIC_RULE_PACKAGE_VERSIONS).on(LOGIC_RULES.ID.eq(LOGIC_RULE_PACKAGE_VERSIONS.RULE_ID))
                 .where(LOGIC_RULE_PACKAGE_VERSIONS.PACKAGE_VERSIONS_ID.eq(batchVersionId))
                 .and(LOGIC_RULES.RULE.lower().like("%" + searchText + "%").or(LOGIC_RULES.TITLE.lower().like("%" + searchText + "%")));
-        return jdbcTemplate.query(select.getSQL(), select.getBindValues().toArray(), new BeanPropertyRowMapper<SimpleTrack>(SimpleTrack.class));
+        return jdbcTemplate.query(select.getSQL(), select.getBindValues().toArray(), new BeanPropertyRowMapper<SimpleTrack>(SimpleTrack.class));*/
     }
 
     public long save(Rule rule, BatchVersion batchVersion){
@@ -224,62 +226,16 @@ public class RuleDao implements IRuleDao {
     }
 
     @Override
-    public boolean activateRule(String ruleBody, long ruleId) {
-        Update update = context.update(LOGIC_RULES)
-                .set(LOGIC_RULES.RULE, ruleBody)
-                .set(LOGIC_RULES.IS_ACTIVE, DataUtils.convert(true))
-                .where(LOGIC_RULES.ID.eq(ruleId));
-
-
-        try{
-            jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean activateRule(long ruleId) {
-        Update update = context.update(LOGIC_RULES)
-                .set(LOGIC_RULES.IS_ACTIVE, DataUtils.convert(true))
-                .where(LOGIC_RULES.ID.eq(ruleId));
-
-
-        try{
-            jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean disableRule(long ruleId) {
-        Update update = context.update(LOGIC_RULES)
-                .set(LOGIC_RULES.IS_ACTIVE, DataUtils.convert(false))
-                .where(LOGIC_RULES.ID.eq(ruleId));
-
-        try{
-            jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
     public void clearAllRules() {
-        Delete delete = context.delete(LOGIC_RULE_PACKAGE_VERSIONS);
+        Delete delete = context.delete(LOGIC_RULE_PACKAGE);
         jdbcTemplate.update(delete.getSQL());
 
         delete = context.delete(LOGIC_RULES);
         jdbcTemplate.update(delete.getSQL());
+    }
+
+    @Override
+    public List<Rule> load(String packageName, Date reportDate) {
+        return null;
     }
 }

@@ -11,6 +11,6 @@ import java.util.List;
 public interface IBatchService {
     public long save(RulePackage batch);
     public RulePackage load(long id);
-    public List<RulePackage> getAllBatches();
+    public List<RulePackage> getAllPackages();
     public List<Pair> getBatchVersions(Long batchId);
 }

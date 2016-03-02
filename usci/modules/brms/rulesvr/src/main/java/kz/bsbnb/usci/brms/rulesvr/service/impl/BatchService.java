@@ -39,8 +39,8 @@ public class BatchService implements IBatchService
     }
 
     @Override
-    public List<RulePackage> getAllBatches() {
-        return batchDao.getAllBatches();
+    public List<RulePackage> getAllPackages() {
+        return batchDao.getAllPackages();
     }
 
     @Override

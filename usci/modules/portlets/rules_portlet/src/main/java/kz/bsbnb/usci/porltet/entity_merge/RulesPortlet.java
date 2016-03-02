@@ -13,7 +13,6 @@ import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.porltet.entity_merge.model.json.JsonMaker;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -149,7 +148,7 @@ public class RulesPortlet extends MVCPortlet{
 
             switch(operationType){
                 case PACKAGE_ALL:
-                       writer.write(JsonMaker.getJson(batchService.getAllBatches()));
+                       writer.write(JsonMaker.getJson(batchService.getAllPackages()));
                     break;
                 case PACKAGE_VERSIONS:
                     batchId = Long.parseLong(resourceRequest.getParameter("packageId"));
