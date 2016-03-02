@@ -18,7 +18,6 @@ import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
-import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityApplyDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityMergeDao;
@@ -396,7 +395,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				baseEntityManager.registerAsUpdated(newBaseValueRight);
 				//delete
 				if (metaType.isComplex()) {
-					baseEntityManager.registerAsDeleted((IPersistable) baseValueRight.getValue());
+//					baseEntityManager.registerAsDeleted((IPersistable) baseValueRight.getValue());
 				}
 
 				if (mergeManager.getChildMap() == null) {
@@ -424,7 +423,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				baseEntityManager.registerAsUpdated(newBaseValueLeft);
 				// delete
 				if (metaType.isComplex()) {
-					baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
+//					baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
 				}
 				if (mergeManager.getChildMap() == null) {
 					if (choice == MergeResultChoice.LEFT) {
@@ -451,7 +450,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				baseEntityManager.registerAsUpdated(newBaseValueLeft);
 
 				if (metaType.isComplex()) {
-					baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
+//					baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
 				}
 
 				childBaseSetApplied = (BaseSet) baseValueRight.getValue();
