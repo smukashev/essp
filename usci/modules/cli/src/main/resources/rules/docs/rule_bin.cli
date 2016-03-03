@@ -1,0 +1,15 @@
+rule read $$$
+title: документ юр лица БИН
+rule "документ юр лица БИН"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ($r : getBinError((List)getEls("{get}subject[is_organization=true]docs[doc_type.code=07]no"),
+			                 (String)getEl("subject.organization_info.enterprise_type.code")) && $r.length() > 0))
+then
+	$entity.addValidationError("" + $r);
+end
+$$$
+
+rule save
+
+quit
