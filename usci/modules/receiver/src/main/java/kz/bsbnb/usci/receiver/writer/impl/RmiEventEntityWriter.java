@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
@@ -102,14 +103,13 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
             }
 
             if(ruleRuntimeException != null) {
-                ruleRuntimeException = "Ошибка при запуске правил: " + ruleRuntimeException;
-
                 EntityStatus entityStatus = new EntityStatus()
                         .setBatchId(entity.getBatchId())
                         .setEntityId(entity.getId())
                         .setStatus(EntityStatuses.ERROR)
-                        .setDescription(StatusProperties.getSpecificParams(entity) + " (" +
-                                ruleRuntimeException + ")")
+                        .setDescription(StatusProperties.getSpecificParams(entity))
+                        .setErrorCode(String.valueOf(Errors.E195))
+                        .setDevDescription(Errors.checkLength(ruleRuntimeException))
                         .setReceiptDate(new Date())
                         .setIndex(entity.getBatchIndex() - 1);
 
@@ -121,8 +121,9 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
                             .setBatchId(entity.getBatchId())
                             .setEntityId(entity.getId())
                             .setStatus(EntityStatuses.ERROR)
-                            .setDescription(StatusProperties.getSpecificParams(entity) + " (" +
-                                    errorMsg + ")")
+                            .setDescription(StatusProperties.getSpecificParams(entity))
+                            .setErrorCode(String.valueOf(Errors.E195))
+                            .setDevDescription(Errors.checkLength(errorMsg))
                             .setReceiptDate(new Date())
                             .setIndex(entity.getBatchIndex() - 1);
 

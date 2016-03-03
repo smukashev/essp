@@ -280,8 +280,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     obj = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
-                    throw new RuntimeException(Errors.E194+"|" + localName + "|"
-                            + (n.getMessage().length() > 255 ? n.getMessage().substring(0, 255) : n.getMessage()));
+                    throw new RuntimeException(Errors.getMessage(Errors.E194, localName, n.getMessage()));
                 } catch (ClassCastException ex) {
                     logger.debug("Empty tag: " + localName);
                     level--;

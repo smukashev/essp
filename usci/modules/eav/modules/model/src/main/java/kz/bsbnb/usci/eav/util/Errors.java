@@ -224,13 +224,13 @@ public enum Errors {
         errors.put("E180", "Неудается найти конфигурационный файл БД #schema");
         errors.put("E181", "Проблемы с очередью: #e.message()");
         errors.put("E182", "ОС не поддерживается");//OS is not support
-        errors.put("E183", "Мета класс для оптимизаций не найден; #iBaseEntity");
-        errors.put("E184", "Документ не содержит обязательные поля; #iBaseEntity ");
-        errors.put("E185", "Кредитор не найден в справочнике; #iBaseEntity");
+        errors.put("E183", "Мета класс для оптимизаций не найден;");
+        errors.put("E184", "Документ не содержит обязательные поля; ");
+        errors.put("E185", "Кредитор не найден в справочнике;");
         errors.put("E186", "Тип документа не найден; #iBaseEntity");
-        errors.put("E187", "Договор не содержит обязательные поля; #iBaseEntity");
+        errors.put("E187", "Договор не содержит обязательные поля;");
         errors.put("E188", "Ключевое поле docs пустое; #iBaseEntity");
-        errors.put("E189", "Субъект должен иметь идентификационные документы; #iBaseEntity");
+        errors.put("E189", "Субъект должен иметь идентификационные документы;");
 
         errors.put("E190", "Тип данных не определён #dataTypes");
         errors.put("E191", "ZIP-файл не содержит каких-либо файлов");//ZIP file does not contain any files
@@ -243,6 +243,7 @@ public enum Errors {
         errors.put("E197", "Кредитор установлен не правильно;");
         errors.put("E198", "Запись не найдена в базе. Обновление не выполнено;");
         errors.put("E199", "Ошибка при обработке описания протокола;");
+
     }
 
     public static String getError(String code) {
@@ -281,5 +282,12 @@ public enum Errors {
             }
         }
         return error;
+    }
+
+    public static String checkLength(String message){
+        if(message != null && message.length()> 255){
+            message = message.substring(0,255);
+        }
+        return message;
     }
 }

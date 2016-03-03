@@ -65,16 +65,18 @@ public class EntityStatus extends Persistable {
         return errorCode;
     }
 
-    public void setErrorCode(String errorCode) {
+    public EntityStatus setErrorCode(String errorCode) {
         this.errorCode = errorCode;
+        return this;
     }
 
     public String getDevDescription() {
         return devDescription;
     }
 
-    public void setDevDescription(String devDescription) {
+    public EntityStatus setDevDescription(String devDescription) {
         this.devDescription = devDescription;
+        return this;
     }
 
     public Date getReceiptDate() {
