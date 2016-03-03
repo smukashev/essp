@@ -722,14 +722,6 @@ meta key --name=ref_exclusive_doc --attribute=doc_type
 #====================================
 rc
 
-#=============================================================================================
-#=Audit
-#=============================================================================================
-#sql insert into audit_event_kind (name,is_always_auditable,is_active,code) values ('error',1,1,'122AA')
-#sql insert into audit_event_kind (name,is_always_auditable,is_active,code) values ('warn',1,1,'126AA')
-#sql insert into audit_event_kind (name,is_always_auditable,is_active,code) values ('debug',1,1,'126AA')
-#---------------------------------------------------------------------------------------------
-
 #==============================================================================================
 #  Maintenance
 #==============================================================================================
