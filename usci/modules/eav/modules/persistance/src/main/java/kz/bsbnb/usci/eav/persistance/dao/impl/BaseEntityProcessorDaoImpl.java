@@ -188,6 +188,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseEntity baseEntityPostPrepared;
         IBaseEntity baseEntityApplied;
 
+        /* Все данные кроме справочников должны иметь кредитора */
+        if (!baseEntity.getMeta().isReference() && baseEntity.getBaseEntityReportDate().getCreditorId() == 0)
+            throw new IllegalStateException(String.valueOf(Errors.E197));
+
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
 

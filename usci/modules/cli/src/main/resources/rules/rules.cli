@@ -14,6 +14,7 @@ rule import usci/modules/cli/src/main/resources/rules/rule_functions.cli
 rule import usci/modules/cli/src/main/resources/rules/rule_functions2.cli
 rule import usci/modules/cli/src/main/resources/rules/docs/rule_functions_iin.cli
 rule import usci/modules/cli/src/main/resources/rules/docs/rule_iins.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/rule_rnn.cli
 rule import usci/modules/cli/src/main/resources/rules/docs/rule_docs_12d.cli
 rule import usci/modules/cli/src/main/resources/rules/docs/rule_docs_12z.cli
 rule import usci/modules/cli/src/main/resources/rules/docs/rule_functions_ain.cli
@@ -25,6 +26,9 @@ rule import usci/modules/cli/src/main/resources/rules/ba/rule_bact.cli
 rule import usci/modules/cli/src/main/resources/rules/ba/rule_badrt.cli
 rule import usci/modules/cli/src/main/resources/rules/ba/rule_noba.cli
 rule import usci/modules/cli/src/main/resources/rules/rule_cr_parser.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/rule_functions_bin.cli
+rule import usci/modules/cli/src/main/resources/rules/docs/rule_bin.cli
+
 
 #===========================================================================================
 # credit_process
