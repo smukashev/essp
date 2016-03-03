@@ -190,7 +190,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         /* Все данные кроме справочников должны иметь кредитора */
         if (!baseEntity.getMeta().isReference() && baseEntity.getBaseEntityReportDate().getCreditorId() == 0)
-            throw new IllegalStateException(String.valueOf(Errors.E197));
+            throw new IllegalStateException(Errors.getMessage(Errors.E197));
 
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
@@ -297,7 +297,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case UPDATE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new KnownException(Errors.getMessage(Errors.E197));
+                        throw new KnownException(Errors.getMessage(Errors.E198));
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);
@@ -377,7 +377,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
 
             if (rows.size() > 0) {
-                throw new IllegalStateException(Errors.getMessage(Errors.E109,), baseEntity.getId(),sbUsages.toString());
+                throw new IllegalStateException(Errors.getMessage(Errors.E109, baseEntity.getId(),sbUsages.toString());
             }
         }
 

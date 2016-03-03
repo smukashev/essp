@@ -18,7 +18,7 @@ public enum Errors {
     E124, E125, E126, E127, E128, E129, E130, E131, E132, E133, E134, E135, E136, E137, E138, E139, E140, E141,
     E142, E143, E144, E145, E146, E147, E148, E149, E150, E151, E152, E153, E154, E155, E156, E157, E158, E159, E160,
     E161, E162, E163, E164, E165, E166, E167, E168, E169, E170, E171, E172, E173, E174, E175, E176, E177, E178, E179,
-    E180, E181, E182, E183, E184, E185, E186, E187, E188, E189, E190, E191, E192, E193, E194, E195, E196, E197;
+    E180, E181, E182, E183, E184, E185, E186, E187, E188, E189, E190, E191, E192, E193, E194, E195, E196, E197, E198;
 
     private static final String LOCALE = "RU";
     private static HashMap<String, String> errors = new HashMap<>();
@@ -240,7 +240,7 @@ public enum Errors {
         errors.put("E195", "Ошибка бизнес правил #e.getMessage");
         errors.put("E196", "Запись найдена в базе( #id ). Вставка не произведена;");
         errors.put("E197", "Кредитор установлен не правильно;");
-        errors.put("E197", "Запись не найдена в базе. Обновление не выполнено;");
+        errors.put("E198", "Запись не найдена в базе. Обновление не выполнено;");
     }
 
     public static String getError(String code) {
