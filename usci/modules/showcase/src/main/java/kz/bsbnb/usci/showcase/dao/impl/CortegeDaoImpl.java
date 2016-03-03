@@ -125,8 +125,9 @@ public class CortegeDaoImpl extends CommonDao {
                             showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
 
                     /* Deletes from history table */
-                    jdbcTemplateSC.update(String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX,
-                            showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
+                    if (!showCase.isFinal())
+                        jdbcTemplateSC.update(String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX,
+                                showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
 
                     /* Execute only ones */
                     rootExecutionFlag = true;
