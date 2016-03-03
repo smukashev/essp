@@ -18,7 +18,7 @@ public enum Errors {
     E124, E125, E126, E127, E128, E129, E130, E131, E132, E133, E134, E135, E136, E137, E138, E139, E140, E141,
     E142, E143, E144, E145, E146, E147, E148, E149, E150, E151, E152, E153, E154, E155, E156, E157, E158, E159, E160,
     E161, E162, E163, E164, E165, E166, E167, E168, E169, E170, E171, E172, E173, E174, E175, E176, E177, E178, E179,
-    E180, E181, E182, E183, E184, E185, E186, E187, E188, E189, E190, E191, E192, E193, E194, E195, E196, E197, E198;
+    E180, E181, E182, E183, E184, E185, E186, E187, E188, E189, E190, E191, E192, E193, E194, E195, E196, E197, E198, E199;
 
     private static final String LOCALE = "RU";
     private static HashMap<String, String> errors = new HashMap<>();
@@ -241,6 +241,7 @@ public enum Errors {
         errors.put("E196", "Запись найдена в базе( #id ). Вставка не произведена;");
         errors.put("E197", "Кредитор установлен не правильно;");
         errors.put("E198", "Запись не найдена в базе. Обновление не выполнено;");
+        errors.put("E199", "Ошибка при обработке описания протокола;");
     }
 
     public static String getError(String code) {
@@ -249,32 +250,34 @@ public enum Errors {
         return errors.get(code + "_" + LOCALE);
     }
 
-    public static String getMessage(Enum error, Object... params){
+    public static String getMessage(Enum error, Object... params) {
         String message = String.valueOf(error);
-        for(Object obj : params){
-            if(obj instanceof String && String.valueOf(obj).length() > 255){
+        for (Object obj : params) {
+            if (obj instanceof String && String.valueOf(obj).length() > 255) {
                 obj = String.valueOf(obj).substring(0, 255);
             }
-            message+="|~~~|"+obj;
+            message += "|~~~|" + obj;
         }
         return message;
     }
 
-    public static String unmarshal(String message){
+    public static String unmarshall(String message) {
         String[] paramArr = message.split("\\|~~~\\|");
         String error = Errors.getError(paramArr[0]);
-        List<String> params = Arrays.asList(Arrays.copyOfRange(paramArr,1,paramArr.length));
+        List<String> params = Arrays.asList(Arrays.copyOfRange(paramArr, 1, paramArr.length));
 
         Matcher matcher = Pattern.compile("#\\s*(\\w+)").matcher(error);
         List<String> matches = new ArrayList<String>();
         while (matcher.find()) {
-            matches.add("#"+matcher.group(1));
+            matches.add("#" + matcher.group(1));
         }
 
-        for(int i=0; i < params.size(); i++){
-            try{
-                error = error.replaceFirst(matches.get(i),params.get(i));
-            }catch(Exception ex){}
+        for (int i = 0; i < params.size(); i++) {
+            try {
+                error = error.replaceFirst(matches.get(i), params.get(i));
+            } catch (Exception ex) {
+                throw new RuntimeException(getMessage(E199));
+            }
         }
         return error;
     }
