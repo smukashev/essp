@@ -20,6 +20,7 @@ public enum Errors {
     E161, E162, E163, E164, E165, E166, E167, E168, E169, E170, E171, E172, E173, E174, E175, E176, E177, E178, E179,
     E180, E181, E182, E183, E184, E185, E186, E187, E188, E189, E190, E191, E192, E193, E194, E195, E196, E197, E198, E199;
 
+    public static final String SEPARATOR = "\\|~~~\\|";
     private static final String LOCALE = "RU";
     private static HashMap<String, String> errors = new HashMap<>();
 
@@ -262,7 +263,7 @@ public enum Errors {
     }
 
     public static String unmarshall(String message) {
-        String[] paramArr = message.split("\\|~~~\\|");
+        String[] paramArr = message.split(Errors.SEPARATOR);
         String error = Errors.getError(paramArr[0]);
         List<String> params = Arrays.asList(Arrays.copyOfRange(paramArr, 1, paramArr.length));
 

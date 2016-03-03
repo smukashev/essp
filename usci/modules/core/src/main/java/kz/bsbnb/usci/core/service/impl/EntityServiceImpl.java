@@ -111,13 +111,13 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
                 entityStatus.setStatus(EntityStatuses.ERROR);
                 entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity));
 
-                String[] params = e.getMessage().split("\\|~~~\\|");
+                String[] params = e.getMessage().split(Errors.SEPARATOR);
                 if (params[0].length() > 4) {
                     entityStatus.setErrorCode(params[0].length() > 255 ? params[0].substring(0, 255) : params[0]);
                 } else {
                     entityStatus.setErrorCode(params[0]);
                     if (params.length > 1)
-                        entityStatus.setDevDescription(StringUtils.join(Arrays.copyOfRange(params, 1, params.length), "\\|~~~\\|"));
+                        entityStatus.setDevDescription(StringUtils.join(Arrays.copyOfRange(params, 1, params.length), Errors.SEPARATOR));
                 }
 
                 entityStatus.setIndex(mockEntity.getBatchIndex() - 1);
