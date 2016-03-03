@@ -377,7 +377,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
 
             if (rows.size() > 0) {
-                throw new IllegalStateException(Errors.getMessage(Errors.E109, baseEntity.getId(),sbUsages.toString());
+                throw new IllegalStateException(Errors.getMessage(Errors.E109, baseEntity.getId(),sbUsages.toString()));
             }
         }
 

@@ -1,13 +1,13 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
-import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
@@ -126,7 +126,7 @@ public class CREntityReader<T> extends CommonReader<T> {
             }
             sleepCounter++;
             if (sleepCounter > WAIT_TIMEOUT) {
-                throw new IllegalStateException(String.valueOf(Errors.E192));
+                throw new IllegalStateException(Errors.getMessage(Errors.E192));
             }
         }
 
