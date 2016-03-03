@@ -1,16 +1,16 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
-import com.google.gson.Gson;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
+import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
-import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
+import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
+import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
-import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.log4j.Logger;
@@ -30,7 +30,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Stack;
 
 /**
  * @author k.tulbassiyev
@@ -47,7 +46,12 @@ public class CREntityReader<T> extends CommonReader<T> {
     private ReportBeanRemoteBusiness reportService;
 
     @Autowired
+    private IServiceRepository serviceFactory;
+
+    @Autowired
     private MainParser crParser;
+
+    private static final long WAIT_TIMEOUT = 3600; // in sec
 
     @PostConstruct
     public void init() {
@@ -75,10 +79,10 @@ public class CREntityReader<T> extends CommonReader<T> {
             logger.error("Batch: " + batchId + " error in entity reader.");
 
             batchService.addBatchStatus(new BatchStatus()
-                            .setBatchId(batchId)
-                            .setStatus(BatchStatuses.ERROR)
-                            .setDescription(e.getMessage())
-                            .setReceiptDate(new Date())
+                    .setBatchId(batchId)
+                    .setStatus(BatchStatuses.ERROR)
+                    .setDescription(e.getMessage())
+                    .setReceiptDate(new Date())
             );
 
             throw new RuntimeException(e);
@@ -89,10 +93,10 @@ public class CREntityReader<T> extends CommonReader<T> {
         } catch (XMLStreamException e) {
 
             batchService.addBatchStatus(new BatchStatus()
-                            .setBatchId(batchId)
-                            .setStatus(BatchStatuses.ERROR)
-                            .setDescription(e.getMessage())
-                            .setReceiptDate(new Date()));
+                    .setBatchId(batchId)
+                    .setStatus(BatchStatuses.ERROR)
+                    .setDescription(e.getMessage())
+                    .setReceiptDate(new Date()));
 
             throw new RuntimeException(e);
         }
@@ -112,16 +116,30 @@ public class CREntityReader<T> extends CommonReader<T> {
 
         long index = crParser.getIndex();
 
+        long sleepCounter = 0;
+
+        while (serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            sleepCounter++;
+            if (sleepCounter > WAIT_TIMEOUT) {
+                throw new IllegalStateException(String.valueOf(Errors.E192));
+            }
+        }
+
         if (crParser.hasMore()) {
             try {
                 crParser.parse(xmlEventReader, batch, index, creditorId);
             } catch (SAXException e) {
                 batchService.addEntityStatus(new EntityStatus()
-                                .setBatchId(batchId)
-                                .setReceiptDate(new Date())
-                                .setDescription("Can't parse")
-                                .setStatus(EntityStatuses.ERROR)
-                                .setIndex(index));
+                        .setBatchId(batchId)
+                        .setReceiptDate(new Date())
+                        .setDescription("Can't parse")
+                        .setStatus(EntityStatuses.ERROR)
+                        .setIndex(index));
 
                 e.printStackTrace();
                 return null;
@@ -142,16 +160,16 @@ public class CREntityReader<T> extends CommonReader<T> {
         reportService.setTotalCount(reportId, crParser.getPackageCount());
 
         batchService.addEntityStatus(new EntityStatus()
-                        .setBatchId(batchId)
-                        .setStatus(EntityStatuses.ACTUAL_COUNT)
-                        .setDescription(String.valueOf(actualCount))
-                        .setReceiptDate(new Date()));
+                .setBatchId(batchId)
+                .setStatus(EntityStatuses.ACTUAL_COUNT)
+                .setDescription(String.valueOf(actualCount))
+                .setReceiptDate(new Date()));
 
         batchService.addEntityStatus(new EntityStatus()
-                        .setBatchId(batchId)
-                        .setStatus(EntityStatuses.TOTAL_COUNT)
-                        .setDescription(String.valueOf(crParser.getPackageCount()))
-                        .setReceiptDate(new Date()));
+                .setBatchId(batchId)
+                .setStatus(EntityStatuses.TOTAL_COUNT)
+                .setDescription(String.valueOf(crParser.getPackageCount()))
+                .setReceiptDate(new Date()));
     }
 
 }
