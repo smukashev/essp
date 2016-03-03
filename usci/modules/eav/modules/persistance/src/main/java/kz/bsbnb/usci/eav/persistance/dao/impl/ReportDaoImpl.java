@@ -2,7 +2,7 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.eav.persistance.generated.tables.records.EavReportRecord;
 import kz.bsbnb.usci.cr.model.*;
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IReportDao;
@@ -282,7 +282,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                 insertWithId(insert.getSQL(), insert.getBindValues().toArray());
             }
         } catch (DuplicateKeyException e) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E171));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E171));
         }
 
 

@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public final class DocumentOptimizer {
         if (noBaseValue == null || docTypeBaseValue == null || noBaseValue.getValue() == null ||
                 docTypeBaseValue.getValue() == null){
             logger.error(Errors.E184+" : \n" + iBaseEntity);
-            throw new IllegalStateException(String.valueOf(Errors.E184));
+            throw new IllegalStateException(Errors.getMessage(Errors.E184));
         }
 
 
@@ -30,7 +30,7 @@ public final class DocumentOptimizer {
 
         if (docTypeEntity.getId() == 0){
             logger.error(Errors.E186+" : \n" + iBaseEntity);
-            throw new IllegalStateException(String.valueOf(Errors.E186));
+            throw new IllegalStateException(Errors.getMessage(Errors.E186));
         }
 
         stringBuilder.append(noBaseValue.getValue());

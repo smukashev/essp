@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
@@ -93,7 +93,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         IMetaAttribute metaAttribute = members.get(name);
 
         if (metaAttribute == null)
-            throw new IllegalArgumentException(Errors.E45 + "|" + name + "|" + this.getClassName());
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E45,name,this.getClassName()));
 
         return metaAttribute.getMetaType();
     }
@@ -374,7 +374,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
                 }
             } else {
                 if (tokenizer.hasMoreTokens()) {
-                    throw new IllegalArgumentException(String.valueOf(Errors.E44));
+                    throw new IllegalArgumentException(Errors.getMessage(Errors.E44));
                 }
             }
         }
@@ -416,7 +416,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
                 }
             } else {
                 if (tokenizer.hasMoreTokens())
-                    throw new IllegalArgumentException(String.valueOf(Errors.E44));
+                    throw new IllegalArgumentException(Errors.getMessage(Errors.E44));
             }
         }
 
@@ -456,7 +456,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
             if (metaType.isComplex()) {
                 if (metaType.isSet()) {
                     if (metaType.isSetOfSets())
-                        throw new UnsupportedOperationException(String.valueOf(Errors.E2));
+                        throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
 
                     IMetaSet childMetaSet = (IMetaSet) metaType;
                     IMetaClass childMetaClass = (IMetaClass) childMetaSet.getMemberType();

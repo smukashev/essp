@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
@@ -101,14 +101,14 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
             long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("creditor")).getId();
 
             if (creditorIdLeft != creditorIdRight)
-                throw new IllegalStateException(String.valueOf(Errors.E104));
+                throw new IllegalStateException(Errors.getMessage(Errors.E104));
 
             creditorId = creditorIdLeft;
         }
 
         // although it is safe to assume that both entities exist in DB, it is still worth checking
         if (baseEntityLeft.getId() < 1 && baseEntityRight.getId() < 1) {
-            throw new RuntimeException(String.valueOf(Errors.E105));
+            throw new RuntimeException(Errors.getMessage(Errors.E105));
         }
 
         IMetaClass metaClass = baseEntityLeft.getMeta();
@@ -132,7 +132,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                 // since there is no child map - there is need to look for child merge manager
                 if (mergeManager.getChildMap() == null) {
                     if (metaType.isSetOfSets()) {
-                        throw new UnsupportedOperationException(String.valueOf(Errors.E2));
+                        throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
                     }
 
                     if (metaType.isSet()) {
@@ -149,7 +149,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                     if (mergeManager.containsKey(attrKey)) {
 
                         if (metaType.isSetOfSets()) {
-                            throw new UnsupportedOperationException(String.valueOf(Errors.E2));
+                            throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
                         }
 
                         if (metaType.isSet()) {
@@ -244,7 +244,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
             long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("creditor")).getId();
 
             if (creditorIdLeft != creditorIdRight)
-                throw new IllegalStateException(String.valueOf(Errors.E104));
+                throw new IllegalStateException(Errors.getMessage(Errors.E104));
 
             creditorId = creditorIdLeft;
         }
@@ -495,7 +495,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
         // we haven't reached the base case
         if (mergeManager.getChildMap() != null) {
             if (mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE) {
-                throw new UnsupportedOperationException(String.valueOf(Errors.E106));
+                throw new UnsupportedOperationException(Errors.getMessage(Errors.E106));
             }
 
             Set<UUID> processedUuidsLeft = new HashSet<UUID>();
@@ -515,7 +515,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
                     if (mergeManager.containsKey(idKey) && (mergeManager.getChildManager(idKey) != null)) {
                         if (processedUuidsLeft.contains(childBaseValueLeft.getUuid()) ||
                                 processedUuidsRight.contains(childBaseValueRight.getUuid())) {
-                            throw new RuntimeException(String.valueOf(Errors.E107));
+                            throw new RuntimeException(Errors.getMessage(Errors.E107));
                         } else {
                             processedUuidsLeft.add(childBaseValueLeft.getUuid());
                             processedUuidsRight.add(childBaseValueRight.getUuid());
@@ -680,7 +680,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
             }
             if (mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE) {
-                throw new RuntimeException(String.valueOf(Errors.E108));
+                throw new RuntimeException(Errors.getMessage(Errors.E108));
             }
         }
 

@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
@@ -33,10 +33,10 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
     @Override
     public IBaseEntityReportDate load(long baseEntityId, Date reportDate) {
         if (baseEntityId < 1)
-            throw new IllegalArgumentException(String.valueOf(Errors.E120));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E120));
 
         if (reportDate == null)
-            throw new IllegalArgumentException(String.valueOf(Errors.E121));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E121));
 
         String tableAlias = "rd";
         Select select = context
@@ -58,10 +58,10 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException(String.valueOf(Errors.E122));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E122));
 
         if (rows.size() < 1)
-            throw new IllegalStateException(Errors.E123 + "|" + baseEntityId + "|" + reportDate);
+            throw new IllegalStateException(Errors.getMessage(Errors.E123, baseEntityId, reportDate));
 
         Map<String, Object> row = rows.get(0);
 
@@ -138,7 +138,7 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
     @Override
     public void update(IPersistable persistable) {
         if (persistable.getId() < 1)
-            throw new RuntimeException(String.valueOf(Errors.E124));
+            throw new RuntimeException(Errors.getMessage(Errors.E124));
 
         IBaseEntityReportDate baseEntityReportDate = (IBaseEntityReportDate) persistable;
 
@@ -169,7 +169,7 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException(String.valueOf(Errors.E125));
+            throw new RuntimeException(Errors.getMessage(Errors.E125));
     }
 
     @Override
@@ -183,7 +183,7 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException(String.valueOf(Errors.E119));
+            throw new RuntimeException(Errors.getMessage(Errors.E119));
     }
 
     @Override

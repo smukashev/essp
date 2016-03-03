@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -124,7 +124,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.E128 + "|" + count + "|" + id);
+            throw new IllegalStateException(Errors.getMessage(Errors.E128, count, id));
     }
 
     @Override
@@ -143,14 +143,14 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.E126 + "|" + count + "|" + id);
+            throw new IllegalStateException(Errors.getMessage(Errors.E126, count, id));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -197,7 +197,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E83 + "|" + subqueryTable.toString());
+            throw new IllegalStateException(Errors.getMessage(Errors.E83, subqueryTable.toString()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -238,7 +238,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -285,7 +285,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E83 + "|" + subqueryTable.toString());
+            throw new IllegalStateException(Errors.getMessage(Errors.E83, subqueryTable.toString()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -326,7 +326,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -355,7 +355,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E83 + "|" + select.toString());
+            throw new IllegalStateException(Errors.getMessage(Errors.E83, select.toString()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -393,7 +393,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -420,7 +420,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E83 + "|" + select.toString());
+            throw new IllegalStateException(Errors.getMessage(Errors.E83, select.toString()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -537,7 +537,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         IMetaType metaType = baseSet.getMemberType();
 
         if (metaType.isSet())
-            throw new UnsupportedOperationException(String.valueOf(Errors.E2));
+            throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
 
         IMetaValue metaValue = (IMetaValue) metaType;
         DataTypes dataType = metaValue.getTypeCode();
@@ -564,7 +564,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                 break;
             }
             default:
-                throw new IllegalArgumentException(String.valueOf(Errors.E127));
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E127));
         }
     }
 

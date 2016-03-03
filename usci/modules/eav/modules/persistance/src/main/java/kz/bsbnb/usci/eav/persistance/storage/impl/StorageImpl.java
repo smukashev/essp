@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.storage.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.persistance.db.JDBCConfig;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
@@ -26,7 +26,7 @@ public class StorageImpl extends JDBCSupport implements IStorage {
         URL dbConfigFileUrl = this.getClass().getClassLoader().getResource(getConfig().getSchema());
 
         if (dbConfigFileUrl == null) {
-            throw new IllegalStateException(Errors.E180+"|" + getConfig().getSchema());
+            throw new IllegalStateException(Errors.getMessage(Errors.E180, getConfig().getSchema()));
         }
 
         DDLHelper.changeDatabase(jdbcTemplate.getDataSource(),
@@ -40,7 +40,7 @@ public class StorageImpl extends JDBCSupport implements IStorage {
 
         if (dbConfigFileUrl == null) {
             logger.error("Can't find db config file: " + getConfig().getSchema());
-            throw new IllegalStateException(Errors.E180 + "|" + getConfig().getSchema());
+            throw new IllegalStateException(Errors.getMessage(Errors.E180, getConfig().getSchema()));
         }
 
         DDLHelper.dropDatabase(jdbcTemplate.getDataSource(),

@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.eav.comparator.impl;
 
-import kz.bsbnb.usci.eav.Errors;
-import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.comparator.IBaseEntityComparator;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -14,7 +13,6 @@ import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
 import java.util.*;
 
 @Component
@@ -114,7 +112,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
             IBaseValue value2 = c2.safeGetValue(name);
 
             if (value1 == null || value2 == null)
-                throw new IllegalArgumentException(Errors.E1 + "|" + name);
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E1,name));
 
             if (meta.getComplexKeyType() == ComplexKeyTypes.ALL) {
                 if (!type.isSet())
@@ -191,7 +189,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
 
                         //paths.addAll(intersect(entity1, c2));
                     } else {
-                        throw new IllegalStateException(String.valueOf(Errors.E2));
+                        throw new IllegalStateException(Errors.getMessage(Errors.E2));
                     }
                 }
             }
@@ -254,7 +252,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
                         }
                     }
                 } else {
-                    throw new IllegalStateException(String.valueOf(Errors.E2));
+                    throw new IllegalStateException(Errors.getMessage(Errors.E2));
                 }
             }
         }
@@ -318,7 +316,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
 
                         //paths.addAll(intersect(entity1, c2));
                     } else {
-                        throw new IllegalStateException(String.valueOf(Errors.E2));
+                        throw new IllegalStateException(Errors.getMessage(Errors.E2));
                     }
                 }
             }
@@ -387,7 +385,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
                         }
                     }
                 } else {
-                    throw new IllegalStateException(String.valueOf(Errors.E2));
+                    throw new IllegalStateException(Errors.getMessage(Errors.E2));
                 }
             }
         }

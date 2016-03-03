@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
-import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -102,7 +101,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.E142+"|" + count + "|" + id);
+            throw new IllegalStateException(Errors.getMessage(Errors.E142, count, id));
 
     }
 
@@ -122,14 +121,14 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.E141 + "|" + count + "|" + id);
+            throw new IllegalStateException(Errors.getMessage(Errors.E141, count, id));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -172,7 +171,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException(Errors.E83+"|" + baseValue.getMetaAttribute().getName());
+            throw new RuntimeException(Errors.getMessage(Errors.E83, baseValue.getMetaAttribute().getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -210,7 +209,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -253,7 +252,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException(Errors.E83+"|" + baseValue.getMetaAttribute().getName());
+            throw new RuntimeException(Errors.getMessage(Errors.E83, baseValue.getMetaAttribute().getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -291,7 +290,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
     @SuppressWarnings("unchecked")
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName() );
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -320,7 +319,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException(Errors.E83+"|" + baseValue.getMetaAttribute().getName());
+            throw new RuntimeException(Errors.getMessage(Errors.E83, baseValue.getMetaAttribute().getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -354,7 +353,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -381,7 +380,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException(Errors.E83+"|" + baseValue.getMetaAttribute().getName());
+            throw new RuntimeException(Errors.getMessage(Errors.E83, baseValue.getMetaAttribute().getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();

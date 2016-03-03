@@ -1,12 +1,12 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import org.apache.commons.lang.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ public class MetaSet extends MetaContainer implements IMetaSet
 
         if (metaType == null)
         {
-            throw new IllegalArgumentException(String.valueOf(Errors.E46));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E46));
         }
         this.metaType = metaType;
     }
@@ -73,7 +73,7 @@ public class MetaSet extends MetaContainer implements IMetaSet
     {
         if (metaType == null)
         {
-            throw new IllegalArgumentException(String.valueOf(Errors.E46));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E46));
         }
         this.metaType = metaType;
     }
@@ -81,10 +81,10 @@ public class MetaSet extends MetaContainer implements IMetaSet
     public DataTypes getTypeCode()
     {
         if(isComplex())
-            throw new IllegalStateException("");
+            throw new NotImplementedException(Errors.getMessage(Errors.E2));
 
         if(metaType.isSet())
-            throw new IllegalStateException("");
+            throw new NotImplementedException(Errors.getMessage(Errors.E2));
 
         return ((MetaValue) metaType).getTypeCode();
     }
@@ -121,7 +121,7 @@ public class MetaSet extends MetaContainer implements IMetaSet
     {
         if (metaAttribute.getMetaType() == null)
         {
-            throw new IllegalArgumentException(String.valueOf(Errors.E46));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E46));
         }
         setMetaType(metaAttribute.getMetaType());
     }

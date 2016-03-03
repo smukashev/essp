@@ -2,8 +2,7 @@ package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.IBatchService;
 import kz.bsbnb.usci.core.service.IEntityService;
-import kz.bsbnb.usci.eav.Errors;
-import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
@@ -98,7 +97,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
                     entityStatus.setEntityId(-1);
                     entityStatus.setStatus(EntityStatuses.ERROR);
                     entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity));
-                    entityStatus.setErrorCode(String.valueOf(Errors.E195));
+                    entityStatus.setErrorCode(Errors.getMessage(Errors.E195));
                     entityStatus.setDevDescription(error.length() > 255 ? error.substring(0, 255) : error);
                     entityStatus.setIndex(mockEntity.getBatchIndex() - 1);
                     entityStatus.setReceiptDate(new Date());

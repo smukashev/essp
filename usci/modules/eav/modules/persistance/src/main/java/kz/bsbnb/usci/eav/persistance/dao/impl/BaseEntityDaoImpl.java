@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -63,7 +63,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Override
     public void update(IPersistable persistable) {
-        throw new UnsupportedOperationException(String.valueOf(Errors.E2));
+        throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
     }
 
     @Override
@@ -79,10 +79,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
             int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
             if (count > 1)
-                throw new IllegalStateException(Errors.E89 + "|" + baseEntity.getId());
+                throw new IllegalStateException(Errors.getMessage(Errors.E89, baseEntity.getId()));
 
             if (count < 1)
-                throw new IllegalStateException(Errors.E90 + "|" + baseEntity.getId());
+                throw new IllegalStateException(Errors.getMessage(Errors.E90, baseEntity.getId()));
         } else {
             delete(persistable.getId());
         }
@@ -98,10 +98,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count > 1)
-            throw new IllegalStateException(Errors.E89 + "|" + id);
+            throw new IllegalStateException(Errors.getMessage(Errors.E89,id));
 
         if (count < 1)
-            throw new IllegalStateException(Errors.E90 + "|" + id);
+            throw new IllegalStateException(Errors.getMessage(Errors.E90,id));
     }
 
     @Override
@@ -123,10 +123,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Override
     public IBaseEntity load(long id, Date reportDate, Date savingReportDate) {
         if (id < 1)
-            throw new IllegalArgumentException(String.valueOf(Errors.E93));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E93));
 
         if (reportDate == null)
-            throw new IllegalArgumentException(String.valueOf(Errors.E94));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E94));
 
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
@@ -175,10 +175,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException(Errors.E91 + "|" + baseEntityId);
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E91, baseEntityId));
 
         if (rows.size() < 1)
-            throw new IllegalStateException(Errors.E92 + "|" + baseEntityId);
+            throw new IllegalStateException(Errors.getMessage(Errors.E92, baseEntityId));
 
         Map<String, Object> row = rows.get(0);
 

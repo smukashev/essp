@@ -6,7 +6,7 @@ import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Message;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.Shared;
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import org.apache.commons.lang.StringUtils;

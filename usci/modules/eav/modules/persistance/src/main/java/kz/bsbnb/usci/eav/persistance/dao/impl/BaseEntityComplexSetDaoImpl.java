@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -96,7 +96,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.E86 + "|" + count + "|" + baseValue.getId());
+            throw new IllegalStateException(Errors.getMessage(Errors.E86, count, baseValue.getId()));
     }
 
     @Override
@@ -111,7 +111,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.E85 + "|" + count + "|" + persistable.getId());
+            throw new IllegalStateException(Errors.getMessage(Errors.E85 , count, persistable.getId()));
     }
 
     @Override
@@ -121,13 +121,13 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(String.valueOf(Errors.E80));
+            throw new IllegalStateException(Errors.getMessage(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(String.valueOf(Errors.E81));
+            throw new IllegalStateException(Errors.getMessage(Errors.E81));
 
         if (baseContainer == null)
-            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseContainer.getId() < 1)
             return null;
@@ -173,7 +173,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -218,13 +218,13 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(String.valueOf(Errors.E80));
+            throw new IllegalStateException(Errors.getMessage(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(String.valueOf(Errors.E81));
+            throw new IllegalStateException(Errors.getMessage(Errors.E81));
 
         if (baseContainer == null)
-            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseContainer.getId() < 1)
             return null;
@@ -270,7 +270,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() >= 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -313,13 +313,13 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(String.valueOf(Errors.E80));
+            throw new IllegalStateException(Errors.getMessage(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(String.valueOf(Errors.E81));
+            throw new IllegalStateException(Errors.getMessage(Errors.E81));
 
         if (baseContainer == null)
-            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseContainer.getId() < 1)
             return null;
@@ -347,7 +347,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -388,13 +388,13 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
         if (metaAttribute == null)
-            throw new IllegalStateException(String.valueOf(Errors.E80));
+            throw new IllegalStateException(Errors.getMessage(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(String.valueOf(Errors.E81));
+            throw new IllegalStateException(Errors.getMessage(Errors.E81));
 
         if (baseContainer == null)
-            throw new IllegalStateException(Errors.E82 + "|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseContainer.getId() < 1)
             return null;
@@ -420,7 +420,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E83 + "|" + metaAttribute.getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -518,7 +518,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             IBaseSet baseSet = new BaseSet(setId, metaSetMemberType);
 
             if (metaSetMemberType.isSet())
-                throw new UnsupportedOperationException(String.valueOf(Errors.E2));
+                throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
 
             baseSetComplexValueDao.loadBaseValues(baseSet, actualReportDate);
 

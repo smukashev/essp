@@ -1,10 +1,9 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IEavGlobalDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.util.IGlobal;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,7 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException(Errors.E156+"|" + count );
+            throw new RuntimeException(Errors.getMessage(Errors.E156, count));
     }
 
     @Override
@@ -70,7 +69,7 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException(Errors.E154+"|" + count);
+            throw new RuntimeException(Errors.getMessage(Errors.E154, count));
     }
 
     @Override
@@ -159,6 +158,6 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
             return (String)row.get("VALUE");
         }
 
-        throw new RuntimeException(String.valueOf(Errors.E155));
+        throw new RuntimeException(Errors.getMessage(Errors.E155));
     }
 }

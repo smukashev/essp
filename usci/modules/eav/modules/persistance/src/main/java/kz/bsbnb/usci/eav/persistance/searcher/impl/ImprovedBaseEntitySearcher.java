@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.searcher.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -12,7 +12,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
-import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
@@ -28,8 +27,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.Struct;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
@@ -69,7 +66,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     select.getBindValues().toArray());
 
             if (rows.size() > 1)
-                throw new IllegalStateException(Errors.E83+"|" +entity.getMeta().getClassName());
+                throw new IllegalStateException(Errors.getMessage(Errors.E83,entity.getMeta().getClassName()));
 
             if (rows.size() < 1)
                 return null;
@@ -94,7 +91,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 .from(EAV_BE_ENTITIES.as(entityAlias));
 
         if (metaClass == null)
-            throw new IllegalArgumentException(String.valueOf(Errors.E176));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E176));
 
         Condition condition = null;
         for (String name : metaClass.getMemberNames()) {
@@ -106,8 +103,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 if ((baseValue == null || baseValue.getValue() == null)
                         && metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
-                    throw new KnownException(Errors.E177+"|" + name + "|" +
-                            "|" + entity.getMeta().getClassName());
+                    throw new KnownException(Errors.getMessage(Errors.E177, name, entity.getMeta().getClassName()));
 
 
                 if ((baseValue == null || baseValue.getValue() == null) &&
@@ -182,12 +178,10 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
 
                     if (baseSet.get().size() == 0)
-                        throw new UnsupportedOperationException(Errors.E178+"|" +
-                                (childMetaClass).getClassName());
+                        throw new UnsupportedOperationException(Errors.getMessage(Errors.E178, (childMetaClass).getClassName()));
 
                     if (!memberType.isComplex())
-                        throw new UnsupportedOperationException(Errors.E179+"|" +
-                                childMetaClass.getClassName());
+                        throw new UnsupportedOperationException(Errors.getMessage(Errors.E179, childMetaClass.getClassName()));
 
                     List<Long> childBaseEntityIds = new ArrayList<>();
 

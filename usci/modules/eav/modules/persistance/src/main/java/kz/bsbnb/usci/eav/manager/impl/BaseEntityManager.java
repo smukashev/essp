@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.manager.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -53,7 +53,7 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public void registerAsInserted(IPersistable insertedObject) {
         if (insertedObject == null)
-            throw new RuntimeException(String.valueOf(Errors.E54));
+            throw new RuntimeException(Errors.getMessage(Errors.E54));
 
         Class objectClass = insertedObject.getClass();
         if (insertedObjects.containsKey(objectClass)) {
@@ -69,7 +69,7 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public void registerAsUpdated(IPersistable updatedObject) {
         if (updatedObject == null)
-            throw new RuntimeException(String.valueOf(Errors.E55));
+            throw new RuntimeException(Errors.getMessage(Errors.E55));
 
         Class objectClass = updatedObject.getClass();
         if (updatedObjects.containsKey(objectClass)) {
@@ -85,7 +85,7 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public void registerAsDeleted(IPersistable deletedObject) {
         if (deletedObject == null)
-            throw new RuntimeException(String.valueOf(Errors.E53));
+            throw new RuntimeException(Errors.getMessage(Errors.E53));
 
         Class objectClass = deletedObject.getClass();
         if (deletedObjects.containsKey(objectClass)) {

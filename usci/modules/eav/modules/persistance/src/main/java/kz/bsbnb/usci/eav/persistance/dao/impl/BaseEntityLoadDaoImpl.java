@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
@@ -39,14 +39,14 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
 
     public IBaseEntity loadByMaxReportDate(long id, Date savingReportDate) {
         if (id == 0L || savingReportDate == null)
-            throw new IllegalStateException(String.valueOf(Errors.E102));
+            throw new IllegalStateException(Errors.getMessage(Errors.E102));
 
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id, savingReportDate);
         if (maxReportDate == null)
-            throw new RuntimeException(Errors.E103 + "|" + id + "|" + df.format(savingReportDate));
+            throw new RuntimeException(Errors.getMessage(Errors.E103, id, df.format(savingReportDate)));
 
         return load(id, maxReportDate, savingReportDate);
     }
@@ -54,14 +54,14 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
     @Override
     public IBaseEntity loadByMinReportDate(long id, Date savingReportDate) {
         if (id == 0L || savingReportDate == null)
-            throw new IllegalStateException(String.valueOf(Errors.E102));
+            throw new IllegalStateException(Errors.getMessage(Errors.E102));
 
         IBaseEntityReportDateDao baseEntityReportDateDao =
                 persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
         Date minReportDate = baseEntityReportDateDao.getMinReportDate(id, savingReportDate);
         if (minReportDate == null)
-            throw new RuntimeException(Errors.E103 + "|" + id + "|" + df.format(savingReportDate));
+            throw new RuntimeException(Errors.getMessage(Errors.E103, id, df.format(savingReportDate)));
 
         return load(id, minReportDate, savingReportDate);
     }
@@ -73,7 +73,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao, InitializingBe
 
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id);
         if (maxReportDate == null)
-            throw new UnsupportedOperationException(Errors.E101 + "|" + id);
+            throw new UnsupportedOperationException(Errors.getMessage(Errors.E101, id));
 
         IBaseEntityDao baseEntityDao = persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
         if (baseEntityDao.isDeleted(id))

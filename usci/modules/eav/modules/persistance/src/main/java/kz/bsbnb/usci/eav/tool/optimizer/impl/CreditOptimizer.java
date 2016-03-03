@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import org.slf4j.Logger;
@@ -21,8 +21,8 @@ public final class CreditOptimizer {
 
         if (primaryContractBaseValue == null || creditorBaseValue == null ||
                 primaryContractBaseValue.getValue() == null || creditorBaseValue.getValue() == null){
-            logger.error(Errors.getError(String.valueOf(Errors.E184))+" : \n"+iBaseEntity);
-            throw new IllegalStateException(String.valueOf(Errors.E184));
+            logger.error(Errors.getError(Errors.getMessage(Errors.E184))+" : \n"+iBaseEntity);
+            throw new IllegalStateException(Errors.getMessage(Errors.E184));
         }
 
 
@@ -31,8 +31,8 @@ public final class CreditOptimizer {
         IBaseEntity creditorEntity = (IBaseEntity) creditorBaseValue.getValue();
 
         if (creditorEntity.getId() == 0){
-            logger.error(Errors.getError(String.valueOf(Errors.E185))+" : \n"+iBaseEntity);
-            throw new IllegalStateException(String.valueOf(Errors.E185));
+            logger.error(Errors.getError(Errors.getMessage(Errors.E185))+" : \n"+iBaseEntity);
+            throw new IllegalStateException(Errors.getMessage(Errors.E185));
         }
 
         if (primaryContractEntity.getId() == 0)

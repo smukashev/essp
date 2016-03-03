@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.model.type;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,7 +50,7 @@ public enum DataTypes
             case DOUBLE:
                 return Double.class;
             default:
-                throw new IllegalArgumentException(String.valueOf(Errors.E49));
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E49));
         }
     }
 
@@ -91,7 +91,7 @@ public enum DataTypes
 
                 return date;
             default:
-                throw new IllegalArgumentException(String.valueOf(Errors.E49));
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E49));
         }
     }
 }

@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.EntityHolder;
@@ -13,7 +13,6 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.model.exceptions.KnownIterativeException;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
-import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.*;
@@ -27,7 +26,6 @@ import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import kz.bsbnb.usci.eav.util.DataUtils;
-import oracle.sql.REF;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.slf4j.Logger;
@@ -198,12 +196,17 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
                 case DELETE:
-                    if (baseEntityPostPrepared.getId() <= 0)
-                        throw new KnownException("Сущность для удаления не найдена; \n" + baseEntityPostPrepared);
+                    if (baseEntityPostPrepared.getId() <= 0){
+                        logger.error("Сущность для удаления не найдена; \n" + baseEntityPostPrepared);
+                        throw new KnownException(Errors.getMessage(Errors.E112));
+                    }
+
 
                     if (baseEntity.getMeta().isReference() && refProcessorDao.historyExists(
-                            baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId()))
-                        throw new KnownException("Справочник с историей не может быть удалена; \n " + baseEntity);
+                            baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId())){
+                        logger.error("Справочник с историей не может быть удалена; \n " + baseEntity);
+                        throw new KnownException(Errors.getMessage(Errors.E113));
+                    }
 
                     if (baseEntity.getMeta().isReference())
                         failIfHasUsages(baseEntityPostPrepared);
@@ -215,16 +218,22 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
                 case CLOSE:
-                    if (baseEntityPostPrepared.getId() <= 0)
-                        throw new KnownException("Сущность для закрытия не найдена; \n" + baseEntityPostPrepared);
+                    if (baseEntityPostPrepared.getId() <= 0){
+                        logger.error("Сущность для закрытия не найдена; \n" + baseEntityPostPrepared);
+                        throw new KnownException(Errors.getMessage(Errors.E114));
+                    }
+
 
                     IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool.getPersistableDao(
                             BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
                     if (baseEntityReportDateDao.getMinReportDate(baseEntityPostPrepared.getId()).equals(
-                            baseEntityPostPrepared.getReportDate()))
-                        throw new IllegalStateException("Дата закрытия не может быть одинаковой с датой открытия; \n"
-                            + baseEntityPostPrepared);
+                            baseEntityPostPrepared.getReportDate())){
+                        logger.error("Дата закрытия не может быть одинаковой с датой открытия; \n"
+                                + baseEntityPostPrepared);
+                        throw new IllegalStateException(Errors.getMessage(Errors.E115));
+                    }
+
 
 
                     boolean reportDateExists = baseEntityReportDateDao.exists(baseEntityPostPrepared.getId(),
@@ -264,7 +273,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case INSERT:
                     if (baseEntityPostPrepared.getId() > 0)
-                        throw new KnownException(Errors.E196 + "|" + baseEntityPostPrepared.getId());
+                        throw new KnownException(Errors.getMessage(Errors.E196, baseEntityPostPrepared.getId()));
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);
@@ -284,7 +293,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case UPDATE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new KnownException("Запись не найдена в базе. Обновление не выполнено;");
+                        throw new KnownException(Errors.getMessage(Errors.E197));
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);
@@ -303,8 +312,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     }
                     break;
                 default:
-                    throw new UnsupportedOperationException("Операция не поддерживается: "
-                            + baseEntityPostPrepared.getOperation() + ";");
+                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E118, baseEntityPostPrepared.getOperation()));
             }
         } else {
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
@@ -365,8 +373,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
 
             if (rows.size() > 0) {
-                throw new IllegalStateException("Невозможно удалить сущность " + metaClassOfDeleting.getClassName()
-                        + "(id: " + baseEntity.getId() + ") используется в классах: " + sbUsages.toString());
+                throw new IllegalStateException(Errors.getMessage(Errors.E109,), baseEntity.getId(),sbUsages.toString());
             }
         }
 
@@ -379,8 +386,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         select.getBindValues().toArray());
 
                 if (rows.size() > 0) {
-                    throw new RuntimeException("Невозмозжно удалить кредитор у которго есть связки с пользователями "
-                            + "(id: " + baseEntity.getId() + ")");
+                    throw new RuntimeException(Errors.getMessage(Errors.E110,baseEntity.getId()));
                 }
             }
         }

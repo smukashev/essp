@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.slf4j.Logger;
@@ -37,8 +37,8 @@ public final class BasicOptimizer {
             case "credit":
                 return CreditOptimizer.getKeyString(iBaseEntity);
             default:
-                logger.error(Errors.getError(String.valueOf(Errors.E183))+ " : \n"+iBaseEntity);
-                throw new IllegalStateException(String.valueOf(Errors.E183));
+                logger.error(Errors.getError(Errors.getMessage(Errors.E183))+ " : \n"+iBaseEntity);
+                throw new IllegalStateException(Errors.getMessage(Errors.E183));
         }
     }
 }

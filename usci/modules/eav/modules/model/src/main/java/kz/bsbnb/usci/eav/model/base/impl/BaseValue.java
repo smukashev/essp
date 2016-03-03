@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-import kz.bsbnb.usci.eav.Errors;
-import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -67,7 +66,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         super(id);
 
         if (reportDate == null)
-            throw new IllegalArgumentException(String.valueOf(Errors.E36));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E36));
 
         Date newReportDate = (Date) reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
@@ -194,7 +193,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         IMetaAttribute thatMetaAttribute = baseValue.getMetaAttribute();
 
         if (thisMetaAttribute == null || thatMetaAttribute == null)
-            throw new IllegalStateException(String.valueOf(Errors.E38));
+            throw new IllegalStateException(Errors.getMessage(Errors.E38));
 
         return thisMetaAttribute.getId() == thatMetaAttribute.getId() &&
                 this.equalsByValue(thisMetaAttribute.getMetaType(), baseValue);
@@ -206,10 +205,10 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         Object thatValue = baseValue.getValue();
 
         if (thisValue == null || thatValue == null)
-            throw new RuntimeException(String.valueOf(Errors.E39));
+            throw new RuntimeException(Errors.getMessage(Errors.E39));
 
         if (metaType.isSetOfSets())
-            throw new UnsupportedOperationException(String.valueOf(Errors.E2));
+            throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
 
         if (metaType.isComplex()) {
             if (metaType.isSet()) {
@@ -238,7 +237,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
             }
         } else {
             if (metaType.isSetOfSets()) {
-                throw new UnsupportedOperationException(String.valueOf(Errors.E2));
+                throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
             }
 
             if (metaType.isSet()) {
@@ -287,7 +286,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                 break;
             case DATE:
                 //TODO: add date format
-                throw new UnsupportedOperationException(String.valueOf(Errors.E41));
+                throw new UnsupportedOperationException(Errors.getMessage(Errors.E41));
             case STRING:
                 if (value.equals(str))
                     return true;
@@ -326,7 +325,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                 }
             }
         } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException(String.valueOf(Errors.E37));
+            throw new RuntimeException(Errors.getMessage(Errors.E37));
         }
         return baseValue;
     }

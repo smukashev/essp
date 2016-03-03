@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -206,11 +205,11 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E149));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E149));
         }
 
         if (rows.size() < 1) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E150));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E150));
         }
 
         Map<String, Object> row = rows.get(0);

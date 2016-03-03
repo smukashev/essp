@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -26,8 +26,8 @@ public class SubjectOptimizer {
         IBaseValue docsBaseValue = iBaseEntity.getBaseValue("docs");
 
         if (docsBaseValue == null || docsBaseValue.getValue() == null){
-            logger.error(Errors.getError(String.valueOf(Errors.E188)) +" : "+iBaseEntity);
-            throw new IllegalStateException(String.valueOf(Errors.E188));
+            logger.error(Errors.getError(Errors.getMessage(Errors.E188)) +" : "+iBaseEntity);
+            throw new IllegalStateException(Errors.getMessage(Errors.E188));
         }
 
         BaseSet docSet = (BaseSet) docsBaseValue.getValue();
@@ -49,8 +49,8 @@ public class SubjectOptimizer {
         }
 
         if (documents.size() == 0){
-            logger.error(Errors.getError(String.valueOf(Errors.E189)) +" : "+iBaseEntity);
-            throw new IllegalStateException(String.valueOf(Errors.E189));
+            logger.error(Errors.getError(Errors.getMessage(Errors.E189)) +" : "+iBaseEntity);
+            throw new IllegalStateException(Errors.getMessage(Errors.E189));
         }
 
 
