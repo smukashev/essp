@@ -6,6 +6,8 @@ import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.showcase.dao.impl.CortegeDaoImpl;
 import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +25,14 @@ import java.util.concurrent.Future;
 @Component
 public class ShowcaseMessageConsumer implements MessageListener {
     @Autowired
-    ShowcaseDaoImpl showcaseDao;
+    private ShowcaseDaoImpl showcaseDao;
 
     @Autowired
-    CortegeDaoImpl cortegeDao;
+    private CortegeDaoImpl cortegeDao;
 
     private final ExecutorService exec = Executors.newCachedThreadPool();
+
+    private final Logger logger = LoggerFactory.getLogger(ShowcaseDaoImpl.class);
 
     @Override
     @Transactional
@@ -45,7 +49,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
             }
 
             if (queueEntry.getBaseEntityApplied() == null) {
-                System.err.println("Переданный объект пустой;");
+                logger.error("Переданный объект пустой;");
                 return;
             }
 
@@ -109,13 +113,15 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     if (found) {
                         for (Future f : futures) f.get();
                     } else {
-                        System.err.println("Для мета класа  " + metaClassName + " нет существующих витрин;");
+                        logger.error("Для мета класа  " + metaClassName + " нет существующих витрин;");
                     }
 
                     futures.clear();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                logger.error(e.getMessage());
+                throw new RuntimeException(e.getMessage());
             }
         }
     }

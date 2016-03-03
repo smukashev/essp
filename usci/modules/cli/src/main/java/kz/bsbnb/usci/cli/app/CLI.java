@@ -2272,7 +2272,7 @@ public class CLI {
                     childShowCase.setName(args.get(3));
                 } else if (args.get(2).equals("meta")) {
                     childShowCase.setMeta(metaClassRepository.getMetaClass(args.get(3)));
-                } else if (args.get(2).equals("child_down_path")) {
+                } else if (args.get(2).equals("downPath")) {
                     childShowCase.setDownPath(args.get(3));
                 } else if (args.get(2).equals("tableName")) {
                     childShowCase.setTableName(args.get(3));
