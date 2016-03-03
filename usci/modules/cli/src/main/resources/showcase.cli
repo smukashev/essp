@@ -128,13 +128,13 @@ showcase child set meta subject
 showcase child set tableName CORE_ORG
 showcase child set downPath organization_info
 
-showcase list add head head_id
-showcase list add is_se is_se
-showcase list add econ_trade econ_trade
-showcase list add legal_form legal_form
-showcase list add offshore offshore
-showcase list add enterprise_type enterprise_type
-showcase list add country country
+showcase child list add head head_id
+showcase child list add is_se is_se
+showcase child list add econ_trade econ_trade
+showcase child list add legal_form legal_form
+showcase child list add offshore offshore
+showcase child list add enterprise_type enterprise_type
+showcase child list add country country
 
 showcase child list addRootKey root subject_id
 showcase child list addHistoryKey subject_id subject_id
@@ -176,11 +176,11 @@ showcase child set meta subject
 showcase child set tableName CORE_ORG
 showcase child set downPath organization_info.head
 
-showcase list add names name_id
-showcase list add names.firstname firstname
-showcase list add names.lastname lastname
-showcase list add names.middlename middlename
-showcase list add names.lang lang
+showcase child list add names name_id
+showcase child list add names.firstname firstname
+showcase child list add names.lastname lastname
+showcase child list add names.middlename middlename
+showcase child list add names.lang lang
 
 showcase child list addRootKey root subject_id
 showcase child list addHistoryKey subject_id subject_id
@@ -295,11 +295,11 @@ showcase child set meta subject
 showcase child set tableName CORE_PERSON_ADDRESS
 showcase child set downPath person_info
 
-showcase list add addresses address_id
-showcase list add addresses.region region_id
-showcase list add addresses.details details
-showcase list add addresses.region.code region_code
-showcase list add addresses.type address_type
+showcase child list add addresses address_id
+showcase child list add addresses.region region_id
+showcase child list add addresses.details details
+showcase child list add addresses.region.code region_code
+showcase child list add addresses.type address_type
 
 showcase child list addRootKey root subject_id
 showcase child list addHistoryKey subject_id subject_id
@@ -346,11 +346,11 @@ showcase child set meta subject
 showcase child set tableName CORE_ORG_ADDRESS
 showcase child set downPath person_info
 
-showcase list add addresses address_id
-showcase list add addresses.region region_id
-showcase list add addresses.details details
-showcase list add addresses.region.code region_code
-showcase list add addresses.type address_type
+showcase child list add addresses address_id
+showcase child list add addresses.region region_id
+showcase child list add addresses.details details
+showcase child list add addresses.region.code region_code
+showcase child list add addresses.type address_type
 
 showcase child list addRootKey root subject_id
 showcase child list addHistoryKey subject_id subject_id
@@ -395,10 +395,10 @@ showcase child set meta subject
 showcase child set tableName CORE_PERSON_CONTACT
 showcase child set downPath person_info
 
-showcase list add contacts contact_id
-showcase list add contacts.contact_type contact_type_id
-showcase list add contacts.details details
-showcase list add contacts.contact_type.code contact_type_code
+showcase child list add contacts contact_id
+showcase child list add contacts.contact_type contact_type_id
+showcase child list add contacts.details details
+showcase child list add contacts.contact_type.code contact_type_code
 
 showcase child list addRootKey root subject_id
 showcase child list addHistoryKey subject_id subject_id
@@ -443,10 +443,10 @@ showcase child set meta subject
 showcase child set tableName CORE_ORG_CONTACT
 showcase child set downPath person_info
 
-showcase list add contacts contact_id
-showcase list add contacts.contact_type contact_type_id
-showcase list add contacts.details details
-showcase list add contacts.contact_type.code contact_type_code
+showcase child list add contacts contact_id
+showcase child list add contacts.contact_type contact_type_id
+showcase child list add contacts.details details
+showcase child list add contacts.contact_type.code contact_type_code
 
 showcase child list addRootKey root subject_id
 showcase child list addHistoryKey subject_id subject_id
@@ -544,11 +544,11 @@ showcase child set meta subject
 showcase child set tableName CORE_PERSON_NAME
 showcase child set downPath person_info
 
-showcase list add names name_id
-showcase list add names.firstname firstname
-showcase list add names.lastname lastname
-showcase list add names.middlename middlename
-showcase list add names.lang lang
+showcase child list add names name_id
+showcase child list add names.firstname firstname
+showcase child list add names.lastname lastname
+showcase child list add names.middlename middlename
+showcase child list add names.lang lang
 
 showcase child list addRootKey root subject_id
 showcase child list addHistoryKey subject_id subject_id
@@ -587,11 +587,11 @@ showcase child init
 showcase child set name CORE_ORG_NAME_NAME
 showcase child set meta subject
 showcase child set tableName CORE_ORG_NAME
-showcase child set downPath person_info
+showcase child set downPath organization_info
 
-showcase list add names name_id
-showcase list add names.name name
-showcase list add names.lang lang
+showcase child list add names name_id
+showcase child list add names.name name
+showcase child list add names.lang lang
 
 showcase child list addRootKey subject_id subject_id
 
@@ -785,9 +785,9 @@ showcase child set meta subject
 showcase child set tableName CORE_PERSON_DEBTOR_INFO
 showcase child set downPath person_info
 
-showcase list add bank_relations person_bank_relation_id
-showcase list add bank_relations.bank_relation ref_bank_relation_id
-showcase list add bank_relations.creditor creditor_id
+showcase child list add bank_relations person_bank_relation_id
+showcase child list add bank_relations.bank_relation ref_bank_relation_id
+showcase child list add bank_relations.creditor creditor_id
 
 showcase child list addRootKey root subject_id
 showcase child list addHistoryKey subject_id subject_id
@@ -832,9 +832,9 @@ showcase child set meta subject
 showcase child set tableName CORE_ORG_DEBTOR_INFO
 showcase child set downPath organization_info
 
-showcase list add bank_relations org_bank_relation_id
-showcase list add bank_relations.bank_relation ref_bank_relation_id
-showcase list add bank_relations.creditor creditor_id
+showcase child list add bank_relations org_bank_relation_id
+showcase child list add bank_relations.bank_relation ref_bank_relation_id
+showcase child list add bank_relations.creditor creditor_id
 
 showcase child list addRootKey root subject_id
 showcase child list addHistoryKey subject_id subject_id

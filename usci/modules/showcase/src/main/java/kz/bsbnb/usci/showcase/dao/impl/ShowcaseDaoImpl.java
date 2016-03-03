@@ -206,22 +206,12 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             column.setType("DATE");
             table.addColumn(column);
 
-            Index indexOD = new NonUniqueIndex();
-            indexOD.setName("ind_" + tableName + "_OPEN_DATE");
-            indexOD.addColumn(new IndexColumn("OPEN_DATE"));
-            table.addIndex(indexOD);
-
             column = new Column();
             column.setName("CLOSE_DATE");
             column.setPrimaryKey(false);
             column.setRequired(false);
             column.setType("DATE");
             table.addColumn(column);
-
-            Index indexCD = new NonUniqueIndex();
-            indexCD.setName("ind_" + tableName + "_CLOSE_DATE");
-            indexCD.addColumn(new IndexColumn("CLOSE_DATE"));
-            table.addIndex(indexCD);
         } else {
             column = new Column();
             column.setName("REP_DATE");
@@ -229,11 +219,6 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             column.setRequired(false);
             column.setType("DATE");
             table.addColumn(column);
-
-            Index indexRD = new NonUniqueIndex();
-            indexRD.setName("ind_" + tableName + "_REP_DATE");
-            indexRD.addColumn(new IndexColumn("REP_DATE"));
-            table.addIndex(indexRD);
         }
 
         for (Index index : showCase.getIndexes())
