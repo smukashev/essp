@@ -91,12 +91,14 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 										IBaseEntityManager baseEntityManager, MergeResultChoice choice, boolean deleteUnused) {
 
 		long creditorId = 0;
-		long creditorIdLeft = baseEntityLeft.getBaseEntityReportDate().getCreditorId();
-		long creditorIdRight = baseEntityRight.getBaseEntityReportDate().getCreditorId();
-		if (creditorIdLeft != creditorIdRight)
-			throw new IllegalStateException(String.valueOf(Errors.E104));
+		if (baseEntityLeft.getMeta().getClassName().equals("credit")) {
+			long creditorIdLeft = baseEntityLeft.getBaseEntityReportDate().getCreditorId();
+			long creditorIdRight = baseEntityRight.getBaseEntityReportDate().getCreditorId();
+			if (creditorIdLeft != creditorIdRight)
+				throw new IllegalStateException(String.valueOf(Errors.E104));
 
-		creditorId = creditorIdLeft;
+			creditorId = creditorIdLeft;
+		}
 
 		// although it is safe to assume that both entities exist in DB, it is still worth checking
 		if (baseEntityLeft.getId() < 1 && baseEntityRight.getId() < 1) {
@@ -232,8 +234,8 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 								IBaseEntityManager baseEntityManager, MergeResultChoice choice, String attribute) {
 		long creditorId = 0;
 		if (baseEntityLeft.getMeta().getClassName().equals("credit")) {
-			long creditorIdLeft = ((BaseEntity) baseEntityLeft.getEl("creditor")).getId();
-			long creditorIdRight = ((BaseEntity) baseEntityRight.getEl("creditor")).getId();
+			long creditorIdLeft = baseEntityLeft.getBaseEntityReportDate().getCreditorId();
+			long creditorIdRight = baseEntityRight.getBaseEntityReportDate().getCreditorId();
 
 			if (creditorIdLeft != creditorIdRight)
 				throw new IllegalStateException(String.valueOf(Errors.E104));
