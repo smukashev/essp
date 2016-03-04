@@ -8,7 +8,7 @@ public final class StaticRouter {
     }
 
     /* Set up before compiling */
-    private static final MODE mode = MODE.PROD;
+    private static final MODE mode = MODE.DEV;
 
     /* Application Server IP */
     private final static String stendAsIP = "10.10.20.28";
@@ -42,12 +42,12 @@ public final class StaticRouter {
 
     /* Core Schema name */
     private final static String stendCoreSchemaName = "C##CORE";
-    private final static String devCoreSchemaName = "C##CORE";
+    private final static String devCoreSchemaName = "CORE";
     private final static String prodCoreSchemaName = "CORE";
 
     /* Showcase Schema name */
     private final static String stendShowcaseSchemaName = "C##SHOWCASE";
-    private final static String devShowcaseSchemaName = "C##SHOWCASE";
+    private final static String devShowcaseSchemaName = "SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHOWCASE3";
 
     /* Credit Registry DB IP */
@@ -67,12 +67,12 @@ public final class StaticRouter {
 
     /* Report files catalog */
     private final static String stendReportFilesCatalog = "/home/essp/Portal_afn/Report/";
-    private final static String devReportFilesCatalog = "/home/essp/Portal_afn/Report/";
+    private final static String devReportFilesCatalog = "/home/sadmin/Portal_afn/Report/";
     private final static String prodReportFilesCatalog = "C:\\Portal_afn\\Report\\";
 
     /* Report files folder */
     private final static String stendReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
-    private final static String devReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
+    private final static String devReportFilesFolder = "/home/sadmin/Portal_afn/generated_reports/";
     private final static String prodReportFilesFolder = "C:\\Portal_afn\\generated_reports\\";
 
     public static String getAsIP() {
