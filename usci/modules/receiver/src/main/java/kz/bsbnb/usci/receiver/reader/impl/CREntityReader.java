@@ -76,9 +76,12 @@ public class CREntityReader<T> extends CommonReader<T> {
         }
 
         try {
-            xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
-        } catch (XMLStreamException e) {
-
+            if (validateSchema(false, new ByteArrayInputStream(out.toByteArray()))) {
+                xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
+            } else {
+                throw new RuntimeException(Errors.getMessage(Errors.E193));
+            }
+        } catch (XMLStreamException | SAXException | IOException e) {
             batchService.addBatchStatus(new BatchStatus()
                     .setBatchId(batchId)
                     .setStatus(BatchStatuses.ERROR)

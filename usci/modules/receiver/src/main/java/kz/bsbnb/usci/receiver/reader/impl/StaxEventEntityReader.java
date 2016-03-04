@@ -122,18 +122,16 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     .setBatchId(batchId)
                     .setStatus(BatchStatuses.ERROR)
                     .setDescription(e.getMessage())
-                    .setReceiptDate(new Date())
-            );
+                    .setReceiptDate(new Date()));
 
             throw new IllegalStateException(e);
         }
 
         try {
             if (out != null) {
-                if (validateSchema(new ByteArrayInputStream(out.toByteArray()))) {
+                if (validateSchema(true, new ByteArrayInputStream(out.toByteArray()))) {
                     xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
                 } else {
-
                     throw new RuntimeException(Errors.getMessage(Errors.E193));
                 }
             }

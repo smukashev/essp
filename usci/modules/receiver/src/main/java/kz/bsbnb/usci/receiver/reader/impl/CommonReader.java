@@ -78,7 +78,7 @@ public abstract class CommonReader<T> implements IReader<T> {
     public abstract T read() throws UnexpectedInputException, ParseException, NonTransientResourceException;
 
     protected class ErrorHandlerImpl implements ErrorHandler {
-        private boolean fatalError = false;
+        private boolean isValid = true;
 
         @Override
         public void warning(SAXParseException exception) throws SAXException {
@@ -87,7 +87,7 @@ public abstract class CommonReader<T> implements IReader<T> {
 
         @Override
         public void error(SAXParseException exception) throws SAXException {
-            fatalError = true;
+            isValid = false;
             batchService.addBatchStatus(new BatchStatus()
                     .setBatchId(batchId)
                     .setStatus(BatchStatuses.ERROR)
@@ -97,7 +97,7 @@ public abstract class CommonReader<T> implements IReader<T> {
 
         @Override
         public void fatalError(SAXParseException exception) throws SAXException {
-            fatalError = true;
+            isValid = false;
             batchService.addBatchStatus(new BatchStatus()
                     .setBatchId(batchId)
                     .setStatus(BatchStatuses.ERROR)
@@ -106,8 +106,15 @@ public abstract class CommonReader<T> implements IReader<T> {
         }
     }
 
-    protected boolean validateSchema(ByteArrayInputStream xmlInputStream) throws IOException, SAXException {
-        URL schemaURL = getClass().getClassLoader().getResource("usci.xsd");
+    protected boolean validateSchema(boolean isOriginal, ByteArrayInputStream xmlInputStream) throws IOException, SAXException {
+        URL schemaURL;
+
+        if (isOriginal) {
+            schemaURL = getClass().getClassLoader().getResource("usci.xsd");
+        } else {
+            schemaURL = getClass().getClassLoader().getResource("credit-registry.xsd");
+        }
+
         Source xml = new StreamSource(xmlInputStream);
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
@@ -122,7 +129,7 @@ public abstract class CommonReader<T> implements IReader<T> {
         validator.setErrorHandler(errorHandlerImpl);
 
         validator.validate(xml);
-        return errorHandlerImpl.fatalError;
+        return errorHandlerImpl.isValid;
     }
 
     public void waitSync(IServiceRepository serviceFactory) {
