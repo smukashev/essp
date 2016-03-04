@@ -5,6 +5,7 @@ import com.bsbnb.usci.portlets.crosscheck.dm.*;
 import com.bsbnb.usci.portlets.crosscheck.helper.DbHelper;
 import com.bsbnb.usci.portlets.crosscheck.helper.ModelHelper;
 import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.util.Errors;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -303,7 +304,7 @@ public class BeanDataProvider implements DataProvider {
                 Creditor targetCreditor = DbHelper.getCreditor(conn, creditorId);
 
                 if (targetCreditor == null)
-                    throw new RuntimeException("No creditor");
+                    throw new RuntimeException(Errors.getMessage(Errors.E236));
 
                 if (targetCreditor.getSubjectType() == null)
                     throw new RuntimeException(String.format("Subject type of the creditor with ID {0} is null",

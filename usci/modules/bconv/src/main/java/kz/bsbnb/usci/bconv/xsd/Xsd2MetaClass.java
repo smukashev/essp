@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,7 @@ public class Xsd2MetaClass
         XSSchema xsSchema;
 
         if (schema == null) {
-            throw new IllegalArgumentException("Schema stream can't be null");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E207));
         }
 
         try {
@@ -43,7 +44,7 @@ public class Xsd2MetaClass
         }
         catch (Exception exp) {
             logger.error("Can't open schema");
-            throw new IllegalArgumentException("Can't open schema");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E208));
         }
 
         Map<String, XSComplexType> types = xsSchema.getComplexTypes();
@@ -61,7 +62,7 @@ public class Xsd2MetaClass
         XSSchema xsSchema;
 
         if (schema == null) {
-            throw new IllegalArgumentException("Schema stream can't be null");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E207));
         }
 
         try {
@@ -72,7 +73,7 @@ public class Xsd2MetaClass
         }
         catch (Exception exp) {
             logger.error("Can't open schema");
-            throw new IllegalArgumentException("Can't open schema");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E208));
         }
 
         usedClassesNames.clear();
@@ -80,7 +81,7 @@ public class Xsd2MetaClass
         XSComplexType ct = xsSchema.getComplexType(metaClassName);
 
         if (ct == null) {
-            throw new IllegalArgumentException("No such class: " + metaClassName);
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E282, metaClassName));
         }
 
         return (MetaClass)processComplexType(metaClassName, ct, 1, "");
@@ -110,9 +111,8 @@ public class Xsd2MetaClass
                 else if(attributes.getDecl().getType().getPrimitiveType().getName().equals("integer"))
                     members.put(attributes.getDecl().getName(), new MetaValue(DataTypes.INTEGER));
                 else
-                    throw new IllegalStateException("Can't convert \"" +
-                            attributes.getDecl().getType().getPrimitiveType().getName() + "\" to " +
-                            "MetaValue: unknown simple type");
+                    throw new IllegalStateException(Errors.getMessage(Errors.E209,
+                            attributes.getDecl().getType().getPrimitiveType().getName()));
 
                 if(first) {
                     attributeStr += attributes.getDecl().getName() + " : " + attributes.getDecl().getType().
@@ -222,7 +222,7 @@ public class Xsd2MetaClass
                 return new MetaSet(metaClass);
         } else {
             if (members.size() < 1)
-                throw new IllegalStateException("MetaClass with no members: " + name);
+                throw new IllegalStateException(Errors.getMessage(Errors.E283, name));
             if (itIsArray) {
                 return new MetaSet(members.get(members.keySet().toArray()[0]));
             } else {
@@ -290,8 +290,7 @@ public class Xsd2MetaClass
             else if(ct.getPrimitiveType().getName().equals("integer"))
                 return new MetaValue(DataTypes.INTEGER);
             else
-                throw new IllegalStateException("Can't convert \"" + ct.getPrimitiveType().getName() + "\" to " +
-                    "MetaValue: unknown simple type");
+                throw new IllegalStateException(Errors.getMessage(Errors.E209, ct.getPrimitiveType().getName()));
         } else {
             if (maxOccurs == -1) {
                 System.out.println(prefix + name + "[] : " + ct.getPrimitiveType().getName());
@@ -310,8 +309,7 @@ public class Xsd2MetaClass
             else if(ct.getPrimitiveType().getName().equals("integer"))
                 return new MetaSet(new MetaValue(DataTypes.INTEGER));
             else
-                throw new IllegalStateException("Can't convert \"" + ct.getPrimitiveType().getName() + "\" to " +
-                        "MetaValue: unknown simple type");
+                throw new IllegalStateException(Errors.getMessage(Errors.E209,ct.getPrimitiveType().getName()));
         }
     }
 
@@ -334,7 +332,7 @@ public class Xsd2MetaClass
             return processSimpleType(name, type.asSimpleType(), maxOccurs, prefix);
         }
 
-        throw new IllegalStateException("Type is not complex or simple.");
+        throw new IllegalStateException(Errors.getMessage(Errors.E210));
     }
 
     private XSParticle[] getParticles(XSParticle particle)

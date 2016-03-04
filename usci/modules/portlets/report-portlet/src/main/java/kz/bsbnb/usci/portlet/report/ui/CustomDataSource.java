@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
+
+import kz.bsbnb.usci.eav.util.Errors;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRField;
@@ -84,13 +86,13 @@ public class CustomDataSource extends IndexedContainer implements JRDataSource {
     @Override
     public Object getFieldValue(JRField jrf) throws JRException {
         if (currentRecordIndex >= dataSet.size()) {
-            throw new JRException("No more records");
+            throw new JRException(Errors.getMessage(Errors.E256));
         }
         String name = jrf.getName();
         try {
             return getFieldValue(name);
         } catch (NoSuchFieldException nsfe) {
-            throw new JRException("No such field: " + name);
+            throw new JRException(Errors.getMessage(Errors.E257, name));
         }
     }
 

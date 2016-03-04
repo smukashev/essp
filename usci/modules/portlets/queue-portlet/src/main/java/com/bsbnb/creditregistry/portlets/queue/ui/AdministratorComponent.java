@@ -20,6 +20,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
 
 import java.util.ArrayList;
@@ -167,12 +168,12 @@ public class AdministratorComponent extends VerticalLayout {
 
             @Override
             public void setOrderType(QueueOrderType orderType) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
             }
 
             @Override
             public void setPriorityCreditorIds(List<Integer> ids) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
             }
         };
         List<Creditor> creditors = dataProvider.getCreditors(environment.getUserId(), environment.isUserAdmin());

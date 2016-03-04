@@ -1,5 +1,6 @@
 package com.bsbnb.creditregistry.portlets.approval.bpm;
 
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
@@ -99,7 +100,7 @@ public class ApprovalBusiness {
             HttpResponse response = httpClient.execute(postRequest, httpContext);
             return consumeResponse(response, true);
         } catch (HttpHostConnectException e) {
-            throw new RuntimeException("Bonita bundle may not have been started, or the URL is invalid. Please verify hostname and port number. URL used is: " + BONITA_URI,e);
+            throw new RuntimeException(Errors.getMessage(Errors.E203,BONITA_URI,e));
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -140,7 +141,7 @@ public class ApprovalBusiness {
                 }
                 return result.toString();
             } catch (Exception e) {
-                throw new RuntimeException("Failed to consume response.", e);
+                throw new RuntimeException(Errors.getMessage(Errors.E201), e);
             }
         } else {
             return "";
@@ -149,8 +150,8 @@ public class ApprovalBusiness {
 
     private int ensureStatusOk(HttpResponse response) {
         if (response.getStatusLine().getStatusCode() != 201 && response.getStatusLine().getStatusCode() != 200) {
-            throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode() + " : "
-                    + response.getStatusLine().getReasonPhrase());
+            throw new RuntimeException(Errors.getMessage(Errors.E202,response.getStatusLine().getStatusCode(),
+                    response.getStatusLine().getReasonPhrase()));
         }
         return response.getStatusLine().getStatusCode();
     }

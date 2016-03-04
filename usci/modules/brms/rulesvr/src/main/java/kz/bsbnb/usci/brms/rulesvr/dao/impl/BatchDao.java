@@ -6,6 +6,7 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.mapper.BatchMapper;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class BatchDao implements IBatchDao
     public Batch loadBatch(long id) {
 
         if(id < 1)
-            throw new IllegalArgumentException("Does not have id. Can't load.");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E259));
 
         String SQL = "SELECT * FROM " + PREFIX_ + "packages WHERE id  = ?";
         Batch batch = jdbcTemplate.queryForObject(SQL,new Object[]{id},new BatchMapper());
@@ -74,8 +75,7 @@ public class BatchDao implements IBatchDao
 
         if (batch.getRepDate() == null)
         {
-            throw new IllegalArgumentException("Report date must be set before instance " +
-                    "of Batch saving to the DB.");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E260));
         }
 
         String SQL = "INSERT INTO " + PREFIX_ + "packages(NAME, REPORT_DATE) VALUES (?, ?)";
@@ -92,7 +92,7 @@ public class BatchDao implements IBatchDao
 
         if(batchId < 1)
         {
-            throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E261));
         }
 
        String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";

@@ -8,6 +8,7 @@ import kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -168,7 +169,7 @@ public class RulesSingleton
     {
 
         if(makeActive && makeInActive)
-            throw new IllegalArgumentException("non proper method call");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E267));
 
         //if(!makeActive && ruleEdited)
         //    throw new IllegalArgumentException("non proper method call");
@@ -284,9 +285,9 @@ public class RulesSingleton
         List<RuleCasheEntry> versions = ruleCache.get(pkgName);
 
         if (versions == null)
-            throw new IllegalArgumentException("No such package " + pkgName);
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E268, pkgName));
         if (versions.size() < 1)
-            throw new IllegalArgumentException("Package " + pkgName + " has no versions information!");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E269, pkgName));
 
         RuleCasheEntry result = versions.get(0);
         for (RuleCasheEntry entry : versions)

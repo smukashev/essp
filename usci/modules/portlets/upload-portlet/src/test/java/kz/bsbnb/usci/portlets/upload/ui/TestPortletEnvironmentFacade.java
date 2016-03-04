@@ -4,6 +4,7 @@
  */
 package kz.bsbnb.usci.portlets.upload.ui;
 
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -33,11 +34,11 @@ public class TestPortletEnvironmentFacade implements PortletEnvironmentFacade {
     }
 
     public boolean isUsingDigitalSign() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
     }
 
     public void setUsingDigitalSign(boolean value) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
     }
 
     @Override

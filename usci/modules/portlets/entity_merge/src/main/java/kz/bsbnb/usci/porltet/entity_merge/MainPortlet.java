@@ -21,6 +21,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.commons.lang.StringUtils;
@@ -168,7 +169,7 @@ public class MainPortlet extends MVCPortlet {
             title = code;
 
         if (meta == null)
-            throw new NullPointerException("Meta is null");
+            throw new NullPointerException(Errors.getMessage(Errors.E243));
 
         String str = "{";
 
@@ -374,7 +375,7 @@ public class MainPortlet extends MVCPortlet {
             title = code;
 
         if (type == null)
-            throw new NullPointerException("Type is null");
+            throw new NullPointerException(Errors.getMessage(Errors.E245));
 
         String str = "{";
 
@@ -547,7 +548,7 @@ public class MainPortlet extends MVCPortlet {
     public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException {
 
         if (metaFactoryService == null || entityService == null || entityMergeService == null)
-            throw new NullPointerException("Services are null");
+            throw new NullPointerException(Errors.getMessage(Errors.E244));
 
 
         PrintWriter writer = resourceResponse.getWriter();
@@ -628,7 +629,7 @@ public class MainPortlet extends MVCPortlet {
                     ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, prefix, creditorId);
 
                     if (searchResult.getData() == null)
-                        throw new RuntimeException("ошибка сериализации");
+                        throw new RuntimeException(Errors.getMessage(Errors.E242));
 
                     Iterator<BaseEntity> cursor = searchResult.iterator();
 
@@ -652,7 +653,7 @@ public class MainPortlet extends MVCPortlet {
                     List<String[]> classes = searcherFormService.getMetaClasses(userId);
 
                     if (classes.size() < 1)
-                        throw new RuntimeException("no.any.rights");
+                        throw new RuntimeException(Errors.getMessage(Errors.E239));
 
                     List<String[]> afterFilter = new LinkedList<>();
 

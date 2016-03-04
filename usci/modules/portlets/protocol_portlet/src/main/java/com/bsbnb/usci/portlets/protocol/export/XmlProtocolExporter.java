@@ -6,6 +6,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import com.bsbnb.usci.portlets.protocol.data.ProtocolDisplayBean;
+import kz.bsbnb.usci.eav.util.Errors;
+
 import java.text.SimpleDateFormat;
 
 /**
@@ -48,7 +50,7 @@ public class XmlProtocolExporter extends ProtocolExporter {
             ps.close();
             return baos.toByteArray();
         } catch (UnsupportedEncodingException uee) {
-            throw new ExportException("Couldn't find encoding", uee);
+            throw new ExportException(Errors.getMessage(Errors.E248, uee));
         }
     }
 

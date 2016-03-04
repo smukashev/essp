@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
@@ -137,7 +138,7 @@ public class CLIXMLReader {
             case DOUBLE:
                 return Double.parseDouble(value);
             default:
-                throw new IllegalArgumentException("Unknown type");
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E127));
         }
     }
 

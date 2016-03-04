@@ -8,6 +8,7 @@ import kz.bsbnb.usci.core.service.RemoteCreditorBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.ArrayList;
@@ -81,7 +82,7 @@ public class BeanDataProvider implements DataProvider {
 
     private PortalUser convert(User liferayUser) throws IllegalArgumentException {
         if (liferayUser == null)
-            throw new IllegalArgumentException("Parameter <liferayUser> can not be null");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E200));
 
         PortalUser portalUser = new PortalUser();
         portalUser.setUserId(liferayUser.getUserId());

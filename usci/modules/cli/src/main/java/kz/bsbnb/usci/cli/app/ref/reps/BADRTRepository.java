@@ -2,6 +2,7 @@ package kz.bsbnb.usci.cli.app.ref.reps;
 
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.cli.app.ref.refs.BADRT;
+import kz.bsbnb.usci.eav.util.Errors;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -75,7 +76,7 @@ public class BADRTRepository extends BaseRepository {
     }
 
     public BADRT getById(String id){
-        throw new RuntimeException("badrt not searchable!!!");
+        throw new RuntimeException(Errors.getMessage(Errors.E227));
     }
 
     public void rc(){

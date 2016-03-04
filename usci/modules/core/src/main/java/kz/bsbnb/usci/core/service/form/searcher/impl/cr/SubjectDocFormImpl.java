@@ -14,6 +14,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.IBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,7 +52,7 @@ public class SubjectDocFormImpl extends JDBCSupport implements ISearcherForm {
     @Override
     public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix, long creditorId) {
         if( !"subject".equals(metaClass.getClassName()))
-            throw new RuntimeException("incorrect use");
+            throw new RuntimeException(Errors.getMessage(Errors.E231));
 
         long numDocs = Long.parseLong(parameters.get("childCnt"));
         Date reportDate = reportDate = (Date) DataTypes.fromString(DataTypes.DATE, parameters.get("date"));

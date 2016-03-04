@@ -23,6 +23,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,7 +167,7 @@ public class KeySearcherForm implements ISearcherForm {
             IMetaType metaType = metaAttribute.getMetaType();
 
             if(metaType.isSetOfSets())
-                throw new UnsupportedOperationException("Not yet implemented");
+                throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
 
             if(metaType.isSet()) {
                 BaseSet childBaseSet = new BaseSet(metaType);

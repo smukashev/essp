@@ -12,6 +12,7 @@ import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.porltet.entity_merge.model.json.JsonMaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -128,7 +129,7 @@ public class RulesPortlet extends MVCPortlet{
         } catch (Exception e) {}
 
         if(!writeAccessGranted)
-            throw new RuntimeException("нет прав");
+            throw new RuntimeException(Errors.getMessage(Errors.E238));
     }
 
     @Override
@@ -145,7 +146,7 @@ public class RulesPortlet extends MVCPortlet{
             long baseEntityId;
 
             if(resourceRequest.getParameterMap().containsKey("fail"))
-               throw new RuntimeException("some error Message");
+               throw new RuntimeException(Errors.getMessage(Errors.E258));
 
             switch(operationType){
                 case PACKAGE_ALL:
@@ -270,7 +271,7 @@ public class RulesPortlet extends MVCPortlet{
                     ruleService.insertBatchVersion(packageId, date);
                     break;
                 default:
-                    throw new UnsupportedOperationException("Операция не поддерживается(" + operationType + ");");
+                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E118, operationType));
             }
 
         } catch (Exception e) {

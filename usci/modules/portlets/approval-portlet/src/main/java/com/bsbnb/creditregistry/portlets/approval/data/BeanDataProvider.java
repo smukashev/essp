@@ -7,6 +7,7 @@ import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.EavGlobal;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.ReportStatus;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
@@ -100,7 +101,7 @@ public class BeanDataProvider implements DataProvider {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             return dateFormat.parse(Report.INITIAL_REPORT_DATE_STR);
         } catch (ParseException pe) {
-            throw new RuntimeException("Initial report date is incorrectly formatted");
+            throw new RuntimeException(Errors.getMessage(Errors.E205));
         }
     }
 
@@ -110,7 +111,7 @@ public class BeanDataProvider implements DataProvider {
         creditors.add(creditor);
         List<Report> reports = reportBusiness.getReportsByReportDateAndCreditors(reportDate, creditors);
         if (reports.size() > 1) {
-            throw new RuntimeException("Reports size > 1");
+            throw new RuntimeException(Errors.getMessage(Errors.E205));
         }
         if (reports.isEmpty()) {
             return null;

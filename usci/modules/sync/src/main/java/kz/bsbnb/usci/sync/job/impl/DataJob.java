@@ -2,6 +2,7 @@ package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.sync.job.AbstractDataJob;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.SyncStatusSingleton;
@@ -150,7 +151,7 @@ public final class DataJob extends AbstractDataJob {
                 }
 
                 if (!found)
-                    throw new IllegalStateException("CRITICAL: Entity not found.");
+                    throw new IllegalStateException(Errors.getMessage(Errors.E280));
 
                 processJobIterator.remove();
             }

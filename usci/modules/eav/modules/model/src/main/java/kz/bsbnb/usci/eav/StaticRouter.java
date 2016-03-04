@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav;
 
+import kz.bsbnb.usci.eav.util.Errors;
+
 public final class StaticRouter {
     private enum MODE {
         STEND,
@@ -8,7 +10,7 @@ public final class StaticRouter {
     }
 
     /* Set up before compiling */
-    private static final MODE mode = MODE.DEV;
+    private static final MODE mode = MODE.PROD;
 
     /* Application Server IP */
     private final static String stendAsIP = "10.10.20.28";
@@ -42,12 +44,12 @@ public final class StaticRouter {
 
     /* Core Schema name */
     private final static String stendCoreSchemaName = "C##CORE";
-    private final static String devCoreSchemaName = "CORE";
+    private final static String devCoreSchemaName = "C##CORE";
     private final static String prodCoreSchemaName = "CORE";
 
     /* Showcase Schema name */
     private final static String stendShowcaseSchemaName = "C##SHOWCASE";
-    private final static String devShowcaseSchemaName = "SHOWCASE";
+    private final static String devShowcaseSchemaName = "C##SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHOWCASE3";
 
     /* Credit Registry DB IP */
@@ -67,12 +69,12 @@ public final class StaticRouter {
 
     /* Report files catalog */
     private final static String stendReportFilesCatalog = "/home/essp/Portal_afn/Report/";
-    private final static String devReportFilesCatalog = "/home/sadmin/Portal_afn/Report/";
+    private final static String devReportFilesCatalog = "/home/essp/Portal_afn/Report/";
     private final static String prodReportFilesCatalog = "C:\\Portal_afn\\Report\\";
 
     /* Report files folder */
     private final static String stendReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
-    private final static String devReportFilesFolder = "/home/sadmin/Portal_afn/generated_reports/";
+    private final static String devReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
     private final static String prodReportFilesFolder = "C:\\Portal_afn\\generated_reports\\";
 
     public static String getAsIP() {
@@ -84,7 +86,7 @@ public final class StaticRouter {
             case PROD:
                 return prodAsIP;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -97,7 +99,7 @@ public final class StaticRouter {
             case PROD:
                 return prodDBCoreIp;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -110,7 +112,7 @@ public final class StaticRouter {
             case PROD:
                 return prodDBShowcaseIP;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -123,7 +125,7 @@ public final class StaticRouter {
             case PROD:
                 return prodDBReporterIP;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -136,7 +138,7 @@ public final class StaticRouter {
             case PROD:
                 return prodPortalUrl;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -149,7 +151,7 @@ public final class StaticRouter {
             case PROD:
                 return prodPortalPort;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -162,7 +164,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCoreSchemaName;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -175,7 +177,7 @@ public final class StaticRouter {
             case PROD:
                 return prodShowcaseSchemaName;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -188,7 +190,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCRDBIP;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -201,7 +203,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCRDBUsername;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -214,7 +216,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCRDBPassword;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -227,7 +229,7 @@ public final class StaticRouter {
             case PROD:
                 return prodReportFilesCatalog;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -240,7 +242,7 @@ public final class StaticRouter {
             case PROD:
                 return prodReportFilesFolder;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 }

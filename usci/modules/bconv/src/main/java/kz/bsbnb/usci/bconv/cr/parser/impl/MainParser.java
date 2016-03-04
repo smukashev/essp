@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -93,7 +94,7 @@ public class MainParser extends BatchParser {
             } else if (strOperationType.equals("update")) {
                 pkg.setOperation(OperationType.UPDATE);
             } else {
-                throw new IllegalStateException("Операция не поддерживается(" + strOperationType + ");");
+                throw new IllegalStateException(Errors.getMessage(Errors.E118, strOperationType));
             }
 
             packageParser.setCurrentBaseEntity(pkg);

@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -119,7 +120,7 @@ public class CreditUtilsImpl implements ICreditUtils {
         if (crCreditors.containsKey(creditorId))
             return crCreditors.get(creditorId);
 
-        throw new IllegalArgumentException("Not yet implemented");
+        throw new IllegalArgumentException(Errors.getMessage(Errors.E2));
     }
 
     @Override
@@ -206,7 +207,7 @@ public class CreditUtilsImpl implements ICreditUtils {
                 result = preparedStatement.executeQuery();
                 tryCount++;
                 if (tryCount > 2400) {//20 minutes
-                    throw new TimeoutException("Procedure call timeout exception");
+                    throw new TimeoutException(Errors.getMessage(Errors.E222));
                 }
             }
 

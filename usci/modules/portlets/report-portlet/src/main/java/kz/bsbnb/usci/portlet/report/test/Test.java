@@ -2,6 +2,7 @@ package kz.bsbnb.usci.portlet.report.test;
 
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.Protocol;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlet.report.data.*;
 import com.mockrunner.mock.jdbc.MockResultSet;
 
@@ -77,7 +78,7 @@ public class Test {
 
         // validation
         if (headers == null || data == null) {
-            throw new Exception("null parameters");
+            throw new Exception(Errors.getMessage(Errors.E255));
         }
 
       //  if (headers.size() != data.size()) {

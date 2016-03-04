@@ -1,5 +1,7 @@
 package com.bsbnb.usci.portlets.crosscheck.dm;
 
+import kz.bsbnb.usci.eav.util.Errors;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -66,7 +68,7 @@ public class DataTypeUtil {
         fromDate = convertDateToFirstDay(fromDate, 0);
         toDate = convertDateToFirstDay(toDate, 0);
         if(fromDate.after(toDate)) {
-            throw new IllegalArgumentException("First date should be less than the second");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E237));
         }
         List<Date> dates = new ArrayList<Date>();
         while(fromDate.compareTo(toDate)<=0) {
