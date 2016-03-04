@@ -42,42 +42,41 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Repository
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
-    public static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
-    public static final String LOGIC_RULE_META = "LOGIC_RULE_META";
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
-    @Autowired
-    IBatchRepository batchRepository;
+    public static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
+    public static final String LOGIC_RULE_META = "LOGIC_RULE_META";
 
     @Autowired
-    IMetaClassRepository metaClassRepository;
+    private IMetaClassRepository metaClassRepository;
 
     @Autowired
-    IPersistableDaoPool persistableDaoPool;
+    private IPersistableDaoPool persistableDaoPool;
 
     @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
+    private IBaseEntityLoadDao baseEntityLoadDao;
 
     @Autowired
-    IBaseEntityApplyDao baseEntityApplyDao;
+    private IBaseEntityApplyDao baseEntityApplyDao;
 
     @Autowired
-    IRefProcessorDao refProcessorDao;
+    private IRefProcessorDao refProcessorDao;
 
     @Autowired
-    IEavOptimizerDao eavOptimizerDao;
+    private IEavOptimizerDao eavOptimizerDao;
+
+    @Autowired
+    private BasicBaseEntitySearcherPool searcherPool;
+
+    @Autowired
+    private IRuleServicePool ruleServicePool;
+
+    private IDaoListener applyListener;
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
 
-    @Autowired
-    private BasicBaseEntitySearcherPool searcherPool;
-
-    private IDaoListener applyListener;
-
-    @Autowired
-    private IRuleServicePool ruleServicePool;
     private Set<String> metaRules;
 
     @Autowired
@@ -95,7 +94,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private boolean rulesEnabled;
 
     @Autowired
-    IEavGlobalDao globalDao;
+    private IEavGlobalDao globalDao;
 
     @Override
     public long search(IBaseEntity baseEntity, long creditorId) {
@@ -442,8 +441,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     @Transactional
     public boolean remove(long baseEntityId) {
-        IBaseEntityDao baseEntityDao = persistableDaoPool
-                .getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
+        IBaseEntityDao baseEntityDao = persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
         return baseEntityDao.deleteRecursive(baseEntityId);
     }
 
