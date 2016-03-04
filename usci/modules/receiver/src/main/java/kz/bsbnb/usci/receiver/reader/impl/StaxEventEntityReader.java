@@ -76,15 +76,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     private IBaseContainer currentContainer;
 
-    private Batch batch;
-
     private Long index = 1L, level = 0L;
-
-    private IBatchService batchService;
-
-    private IMetaFactoryService metaFactoryService;
-
-    private ReportBeanRemoteBusiness reportService;
 
     private boolean hasMembers = false;
 
@@ -141,6 +133,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 if (validateSchema(new ByteArrayInputStream(out.toByteArray()))) {
                     xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
                 } else {
+
                     throw new RuntimeException(Errors.getMessage(Errors.E193));
                 }
             }
@@ -154,51 +147,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             throw new RuntimeException(e);
         }
     }
-
-    private class ErrorHandlerImpl implements ErrorHandler {
-        private boolean fatalError = false;
-
-        @Override
-        public void warning(SAXParseException exception) throws SAXException {
-            System.err.println("Предпреждение: " + exception.getException());
-        }
-
-        @Override
-        public void error(SAXParseException exception) throws SAXException {
-            fatalError = true;
-            batchService.addBatchStatus(new BatchStatus()
-                    .setBatchId(batchId)
-                    .setStatus(BatchStatuses.ERROR)
-                    .setDescription(exception.getMessage())
-                    .setReceiptDate(new Date()));
-        }
-
-        @Override
-        public void fatalError(SAXParseException exception) throws SAXException {
-            throw exception;
-        }
-    }
-
-    private boolean validateSchema(ByteArrayInputStream xmlInputStream) throws IOException, SAXException {
-        URL schemaURL = getClass().getClassLoader().getResource("usci.xsd");
-        Source xml = new StreamSource(xmlInputStream);
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-        if (schemaURL == null)
-            throw new IllegalStateException();
-
-        Schema schema = schemaFactory.newSchema(schemaURL);
-
-        Validator validator = schema.newValidator();
-
-        ErrorHandlerImpl errorHandlerImpl = new ErrorHandlerImpl();
-        validator.setErrorHandler(errorHandlerImpl);
-
-        validator.validate(xml);
-        return errorHandlerImpl.fatalError;
-    }
-
-
 
     private HashMap<String, MetaClass> metaCache = new HashMap<>();
 

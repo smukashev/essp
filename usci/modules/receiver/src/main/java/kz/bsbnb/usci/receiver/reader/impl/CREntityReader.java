@@ -36,12 +36,6 @@ import java.util.Date;
 public class CREntityReader<T> extends CommonReader<T> {
     private Logger logger = Logger.getLogger(CREntityReader.class);
 
-    private Batch batch;
-
-    private IBatchService batchService;
-
-    private ReportBeanRemoteBusiness reportService;
-
     @Autowired
     private IServiceRepository serviceFactory;
 
