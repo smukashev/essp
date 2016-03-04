@@ -31,9 +31,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-/**
- * @author k.tulbassiyev
- */
 @Component
 @Scope("step")
 public class CREntityReader<T> extends CommonReader<T> {
@@ -51,11 +48,8 @@ public class CREntityReader<T> extends CommonReader<T> {
     @Autowired
     private MainParser crParser;
 
-    private static final long WAIT_TIMEOUT = 3600; // in sec
-
     @PostConstruct
     public void init() {
-        logger.info("Reader init.");
         batchService = serviceRepository.getBatchService();
         reportService = serviceRepository.getReportBeanRemoteBusinessService();
 
@@ -82,8 +76,7 @@ public class CREntityReader<T> extends CommonReader<T> {
                     .setBatchId(batchId)
                     .setStatus(BatchStatuses.ERROR)
                     .setDescription(e.getMessage())
-                    .setReceiptDate(new Date())
-            );
+                    .setReceiptDate(new Date()));
 
             throw new RuntimeException(e);
         }
@@ -110,25 +103,11 @@ public class CREntityReader<T> extends CommonReader<T> {
 
     @Override
     public T read() throws UnexpectedInputException, ParseException, NonTransientResourceException {
-        logger.info("Read called");
-
         T entity = (T) crParser.getCurrentBaseEntity();
 
         long index = crParser.getIndex();
 
-        long sleepCounter = 0;
-
-        while (serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            sleepCounter++;
-            if (sleepCounter > WAIT_TIMEOUT) {
-                throw new IllegalStateException(Errors.getMessage(Errors.E192));
-            }
-        }
+        waitSync(serviceFactory);
 
         if (crParser.hasMore()) {
             try {
@@ -171,5 +150,4 @@ public class CREntityReader<T> extends CommonReader<T> {
                 .setDescription(String.valueOf(crParser.getPackageCount()))
                 .setReceiptDate(new Date()));
     }
-
 }
