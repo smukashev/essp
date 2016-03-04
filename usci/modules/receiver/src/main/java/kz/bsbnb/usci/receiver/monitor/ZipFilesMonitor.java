@@ -157,7 +157,7 @@ public class ZipFilesMonitor {
 
 				if (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
 					try {
-						sleep(10000L);
+						sleep(1000L);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -175,20 +175,15 @@ public class ZipFilesMonitor {
 					try {
 						JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
 
-                        jobParametersBuilder.addParameter("creditorId",
-                                new JobParameter(nextJob.getBatchInfo().getCreditorId()));
+                        jobParametersBuilder.addParameter("creditorId",new JobParameter(nextJob.getBatchInfo().getCreditorId()));
 
-                        jobParametersBuilder.addParameter("batchId",
-                                new JobParameter(nextJob.getBatchId()));
+                        jobParametersBuilder.addParameter("batchId", new JobParameter(nextJob.getBatchId()));
 
-						jobParametersBuilder.addParameter("userId",
-								new JobParameter(nextJob.getBatchInfo().getUserId()));
+						jobParametersBuilder.addParameter("userId", new JobParameter(nextJob.getBatchInfo().getUserId()));
 
-						jobParametersBuilder.addParameter("reportId",
-								new JobParameter(nextJob.getBatchInfo().getReportId()));
+						jobParametersBuilder.addParameter("reportId", new JobParameter(nextJob.getBatchInfo().getReportId()));
 
-						jobParametersBuilder.addParameter("actualCount",
-								new JobParameter(nextJob.getBatchInfo().getActualCount()));
+						jobParametersBuilder.addParameter("actualCount", new JobParameter(nextJob.getBatchInfo().getActualCount()));
 
 						Job job = jobs.get(nextJob.getBatchInfo().getBatchType());
 
@@ -212,7 +207,7 @@ public class ZipFilesMonitor {
 									.setReceiptDate(new Date()));
 						}
 
-						sleep(10000);
+						sleep(1000);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
