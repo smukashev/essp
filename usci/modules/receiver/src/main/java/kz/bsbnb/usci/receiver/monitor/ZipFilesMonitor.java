@@ -152,7 +152,8 @@ public class ZipFilesMonitor {
 
 		public void run() {
 			long sleepCounter = 0;
-			while (true) {
+            //noinspection InfiniteLoopStatement
+            while (true) {
 				JobInfo nextJob;
 
 				if (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
