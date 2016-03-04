@@ -264,8 +264,7 @@ public class ZipFilesMonitor {
 					if (docType == null) docType = "";
 					if (docValue == null) docValue = "";
 
-					logger.error("Несоответствие кредитора пользователю портала: " + docType +
-							", " + docValue);
+					logger.error("Несоответствие кредитора пользователю портала: " + docType + ", " + docValue);
 
 					failFast(batchId, "Несоответствие кредитора пользователю портала");
 					haveError = true;
@@ -279,8 +278,7 @@ public class ZipFilesMonitor {
 								.setBatchId(batchId)
 								.setStatus(BatchStatuses.ERROR)
 								.setDescription("Can't find creditor for user with id: " + batchInfo.getUserId())
-								.setReceiptDate(new Date())
-				);
+								.setReceiptDate(new Date()));
 
 				haveError = true;
 			}
@@ -300,8 +298,7 @@ public class ZipFilesMonitor {
 								.setBatchId(batchId)
 								.setStatus(BatchStatuses.ERROR)
 								.setDescription("Кредитор не найден")
-								.setReceiptDate(new Date())
-				);
+								.setReceiptDate(new Date()));
 				haveError = true;
 			}
 		}
@@ -325,7 +322,7 @@ public class ZipFilesMonitor {
 				batchInfo.setContentSize(batch.getContent().length);
 				batchInfo.setCreditorId(batch.getCreditorId());
 				batchInfo.setReceiptDate(batch.getReceiptDate());
-				//sender.addJob(batchId, batchInfo);
+
 				jobLauncherQueue.addJob(batchId, batchInfo);
 			}
 		}
@@ -368,14 +365,7 @@ public class ZipFilesMonitor {
 						.setBatchId(batchId)
 						.setStatus(BatchStatuses.ERROR)
 						.setDescription(error)
-						.setReceiptDate(new Date())
-		);
-
-		batchService.addBatchStatus(new BatchStatus()
-						.setBatchId(batchId)
-						.setStatus(BatchStatuses.PROCESSING)
-						.setReceiptDate(new Date())
-		);
+						.setReceiptDate(new Date()));
 
 		batchService.endBatch(batchId);
 
