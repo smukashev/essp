@@ -3,6 +3,7 @@ package kz.bsbnb.usci.portlet.report.export;
 import com.mockrunner.mock.jdbc.MockResultSet;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.Protocol;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlet.report.data.BeanDataProvider;
 import kz.bsbnb.usci.portlet.report.data.DataProvider;
 import kz.bsbnb.usci.portlet.report.data.InputInfoDisplayBean;
@@ -152,7 +153,7 @@ public class ProtocolsTableReportExporter {
 
         // validation
         if (headers == null || data == null) {
-            throw new Exception("null parameters");
+            throw new Exception(Errors.getMessage(Errors.E255));
         }
 
         //  if (headers.size() != data.size()) {

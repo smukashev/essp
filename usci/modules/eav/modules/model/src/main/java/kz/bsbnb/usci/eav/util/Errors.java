@@ -18,7 +18,16 @@ public enum Errors {
     E124, E125, E126, E127, E128, E129, E130, E131, E132, E133, E134, E135, E136, E137, E138, E139, E140, E141,
     E142, E143, E144, E145, E146, E147, E148, E149, E150, E151, E152, E153, E154, E155, E156, E157, E158, E159, E160,
     E161, E162, E163, E164, E165, E166, E167, E168, E169, E170, E171, E172, E173, E174, E175, E176, E177, E178, E179,
-    E180, E181, E182, E183, E184, E185, E186, E187, E188, E189, E190, E191, E192, E193, E194, E195, E196, E197, E198, E199;
+    E180, E181, E182, E183, E184, E185, E186, E187, E188, E189, E190, E191, E192, E193, E194, E195, E196, E197, E198, E199,
+    E200, E201, E202, E203, E204, E205, E206, E207, E208, E209, E210, E211, E212, E213, E214, E215, E216, E217, E218, E219,
+    E220, E221, E222, E223, E224, E225, E226, E227, E228, E229, E230, E231, E232, E233, E234, E235, E236, E237, E238, E239,
+    E240, E241, E242, E243, E244, E245, E246, E247, E248, E249, E250, E251, E252, E253, E254, E255, E256, E257, E258, E259,
+    E260, E261, E262, E263, E264, E265, E266, E267, E268, E269, E270, E271, E272, E273, E274, E275, E276, E277, E278, E279,
+    E280, E281, E282, E283, E284, E285, E286, E287, E288, E289, E290, E291, E292, E293, E294, E295, E296, E297, E298, E299,
+    E300, E301, E302, E303, E304, E305, E306, E307, E308, E309, E310, E311, E312, E313, E314, E315, E316, E317, E318, E319,
+    E320, E321, E322, E323, E324, E325, E326, E327, E328, E329, E330, E331, E332, E333, E334, E335, E336, E337, E338, E339,
+    E340, E341, E342, E343, E344, E345, E346, E347, E348, E349, E350, E351, E352, E353, E354, E355, E356, E357, E358, E359,
+    ;
 
     public static final String SEPARATOR = "\\|~~~\\|";
     private static final String LOCALE = "RU";
@@ -243,6 +252,160 @@ public enum Errors {
         errors.put("E197", "Кредитор установлен не правильно;");
         errors.put("E198", "Запись не найдена в базе. Обновление не выполнено;");
         errors.put("E199", "Ошибка при обработке описания протокола;");
+        errors.put("E200", "Параметр <Liferay пользователя> не может быть null;");//Parameter <liferayUser> can not be null;
+        errors.put("E201", "Не удалось получить ответ. #e.getMessage"); //Failed to consume response. #e.getMessage
+        errors.put("E202", "Ошибка : HTTP код ошибки : #statusCode : #reasonPhrase");//Failed : HTTP error code : #statusCode : #reasonPhrase
+        errors.put("E203", "Возможно Bonita не запущен, или URL является недействительным. Пожалуйста, проверьте имя хоста и номер порта. Используемый URL : #BONITA_URI , #e.getMessage"); //Bonita bundle may not have been started, or the URL is invalid. Please verify hostname and port number. URL used is: #BONITA_URI , #e.getMessage
+        errors.put("E204", "Первичная отчетнная дата неправильно отформатирована");//Initial report date is incorrectly formatted
+        errors.put("E205", "Количество Отчет > 1");//Reports size > 1
+        errors.put("E206", "Пока не поддерживается.");//Not supported yet.
+        errors.put("E207", "Поток схемы не может быть пустым");//Schema stream can't be null
+        errors.put("E208", "Невозможно открыть схему");//Can't open schema
+        errors.put("E209", "Не удается преобразовать #attribute в Meta Value: неизвестный simple type"); //Can't convert #attribute to MetaValue: unknown simple type
+        errors.put("E210", "Тип не сложный или простой"); //Type is not complex or simple
+        errors.put("E211", "Не удалось проверить последнюю ошибку"); //Failed last exception check
+        errors.put("E212", "Разрешенные операции рефов [import] [filename]"); //Allowed operations refs [import] [filename]
+        errors.put("E213", "Заглавие должно соответствовать формату: <name>");//Title must be specified format title: <name>
+        errors.put("E214", "Правило не должно быть пустым");//Rule must not be empty
+        errors.put("E215", "Набор витрин [meta,name,tableName,downPath] {value}");//showcase set [meta,name,tableName,downPath] {value}"
+        errors.put("E216", "Не сушествунет путь для downPath: #path"); //No such path for downPath: #path
+        errors.put("E217", "Путь аттрибута м имя столбца не может быть пустым");//AttributePath and columnName cannot be empty
+        errors.put("E218", "Метакласс, путь аттрибута м имя столбца не может быть пустым");//MetaClass, attributePath and columnName cannot be empty
+        errors.put("E219", "Аргументы: витрина [status, set]"); //Arguments: showcase [status, set]
+        errors.put("E220", "Неподготовленный поток");//Unprepared thread
+        errors.put("E221", "IMetaClassRepository не может быть null.");//Instance of IMetaClassRepository can not be null
+        errors.put("E222", "Вызов процедуры тайм-аута исключения");//Вызов процедуры тайм-аута исключения
+        errors.put("E223", "Должен быть каталог");//Must be directory
+        errors.put("E224", "Начало формата не правильный");//Start format not correct
+        errors.put("E225", "Конец формата не правильный");//End format not correct
+        errors.put("E226", "Дан слишком длительный период");//Too long period given
+        errors.put("E227", "Badrt not searchable!!!");//Badrt not searchable!!!
+        errors.put("E228", "DocType с кодом #code не найдены");//DocType with code #code not found
+        errors.put("E229", "Поиск не найден");//SearcherNotFound
+        errors.put("E230", "Форма поиска не найдена");//Searcher form not found
+        errors.put("E231", "Неправильное использование");//Incorrect use
+        errors.put("E232", "RepDate, creditorId необходимы для пути кредитор!");//repDate, creditorId are required for creditor dir path!
+        errors.put("E233", "RepDate, creditorId и хэш необходимы для пути к файлу!");//repDate, creditorId and hash are required for file path!
+        errors.put("E234", "Запись не была найдена в базе");
+        errors.put("E235", "Невозможно разобрать начальную дату отчета.");//Unable to parse the initial report date.
+        errors.put("E236", "Нет кредитор");//No creditor
+        errors.put("E237", "Первая дата должна быть меньше, чем вторая");//First date should be less than the second
+        errors.put("E238", "Нет прав для просмотра");
+        errors.put("E239", "Нет прав");//no.any.rights
+        errors.put("E240", "Доступ к более одному банку");
+        errors.put("E241", "Нет доступа к кредиторам");
+        errors.put("E242", "Ошибка сериализации");
+        errors.put("E243", "Мета является null");//Meta is null
+        errors.put("E244", "Услуги является null");//Services are null
+        errors.put("E245", "Тип является null");//Type is null
+        errors.put("E246", "Невозможно разобрать значение конфигурации #LAST_MAIL_HANDLER_LAUNCH_TIME_CODE # e.getMessage");//Couldn't parse #LAST_MAIL_HANDLER_LAUNCH_TIME_CODE configuration value #e.getMessage
+        errors.put("E247", "Shared не может быть null");//Shared can not be null
+        errors.put("E248", "Не удалось найти кодировку # e.getMessage");//Couldn't find encoding #e.getMessage
+        errors.put("E249", "Null неправильное значение для свойств массива"); //Null is illegal value for properties array
+        errors.put("E250", "Null неправильное значение длины имен свойств");//Null is illegal value for property names length
+        errors.put("E251", "Свойства и имена свойств должны содержать одинаковое количество элементов");//Properties and property names should contain equal number of elements
+        errors.put("E252", "I/O exception #e.getMessage");
+        errors.put("E253", "Parse error #e.getMessage");
+        errors.put("E254", "Коллекции должны быть одинакового размера");//Collections should be of equal size
+        errors.put("E255", "Null параметры");//null parameters
+        errors.put("E256", "Нет больше записей");//No more records
+        errors.put("E257", "Нет такого поля #filed");//No such field #filed
+        errors.put("E258", "Сообщение об ошибке");//some error Message
+        errors.put("E259", "Не имеет id. Не возможно загружать.");//Does not have id. Can't load.
+        errors.put("E260", "Дата отчета должна быть присвоена до сохранени Batch-а в базу данных");//Report date must be set before instance of Batch saving to the DB.
+        errors.put("E261", "Batch не имеет id. Невозможно создать batch версию");//Batch does not have id. Can't create batch version
+        errors.put("E262", "Batch id не может быть null");//Пакетная идентификатор не может быть пустым
+        errors.put("E263", "Версия пакета должна быть датой позднее");
+        errors.put("E264", "Несколько правил с одимаковым id");//Several rules with same id
+        errors.put("E265", "Batch версия не имеет id.");//Batchversion has no id
+        errors.put("E266", "Правило не имеет id.");//Rule has no id.
+        errors.put("E267", "Неправильный вызов метода");//Non proper method call
+        errors.put("E268", "Нет такой пакет : #pkgName");//No such package : #pkgName
+        errors.put("E269", "Пакет #pkgName не имеет информации версии!");//Package #pkgName has no versions information
+        errors.put("E270", "поисковой ключ не задан");
+        errors.put("E271", "Необходимо создать витрины;");
+        errors.put("E272", "CustomSet не поддерживается!");//CustomSet is not supported
+        errors.put("E273", "Ключи являются null!");//Keys are null
+        errors.put("E274", "Complex entity cannot contain complex set");//Complex entity cannot contain complex set
+        errors.put("E275", "Витрина не может содержать множество столбцов");//showCase can't contain set columns
+        errors.put("E276", "Неизвестный simple тип кода");//Неизвестно простой код типа
+        errors.put("E277", "Витрина не может содержать набор столбцов: #type");//showCase can't contain set columns:  #type
+        errors.put("E278", "Query for showCase return more than one row.");
+        errors.put("E279", "Витрина не найден.");//showCase not found.
+        errors.put("E280", "ВАЖНЫЙ: Entity не найден.");//CRITICAL: Entity not found.
+        errors.put("E281", "Тип не поддерживается #type");
+        errors.put("E282", "Класс не найден : #metaClassName");//No such class : #metaClassName
+        errors.put("E283", "MetaClass with no members");//MetaClass with no members
+        errors.put("E284", "Неизвестный мод;");
+        errors.put("E285", "");
+        errors.put("E286", "");
+        errors.put("E287", "");
+        errors.put("E288", "");
+        errors.put("E289", "");
+        errors.put("E290", "");
+        errors.put("E291", "");
+        errors.put("E292", "");
+        errors.put("E293", "");
+        errors.put("E294", "");
+        errors.put("E295", "");
+        errors.put("E296", "");
+        errors.put("E297", "");
+        errors.put("E298", "");
+        errors.put("E299", "");
+        errors.put("E300", "");
+        errors.put("E301", "");
+        errors.put("E302", "");
+        errors.put("E303", "");
+        errors.put("E304", "");
+        errors.put("E305", "");
+        errors.put("E306", "");
+        errors.put("E307", "");
+        errors.put("E308", "");
+        errors.put("E309", "");
+        errors.put("E310", "");
+        errors.put("E311", "");
+        errors.put("E312", "");
+        errors.put("E313", "");
+        errors.put("E314", "");
+        errors.put("E315", "");
+        errors.put("E316", "");
+        errors.put("E317", "");
+        errors.put("E318", "");
+        errors.put("E319", "");
+        errors.put("E320", "");
+        errors.put("E321", "");
+        errors.put("E322", "");
+        errors.put("E323", "");
+        errors.put("E324", "");
+        errors.put("E325", "");
+        errors.put("E326", "");
+        errors.put("E327", "");
+        errors.put("E328", "");
+        errors.put("E329", "");
+        errors.put("E330", "");
+        errors.put("E331", "");
+        errors.put("E332", "");
+        errors.put("E333", "");
+        errors.put("E334", "");
+        errors.put("E335", "");
+        errors.put("E336", "");
+        errors.put("E337", "");
+        errors.put("E338", "");
+        errors.put("E339", "");
+        errors.put("E300", "");
+        errors.put("E340", "");
+        errors.put("E341", "");
+        errors.put("E342", "");
+        errors.put("E343", "");
+        errors.put("E344", "");
+        errors.put("E345", "");
+        errors.put("E346", "");
+        errors.put("E347", "");
+        errors.put("E348", "");
+        errors.put("E349", "");
+        errors.put("E350", "");
+
+
 
     }
 

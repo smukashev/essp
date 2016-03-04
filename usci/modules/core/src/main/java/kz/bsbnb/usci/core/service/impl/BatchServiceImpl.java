@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBatchStatusDao;
 import kz.bsbnb.usci.eav.persistance.dao.IEntityStatusDao;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +108,7 @@ public class BatchServiceImpl implements IBatchService {
 
     private String getFullFilePath(Batch batch) {
         if (batch.getRepDate() == null || batch.getCreditorId() == null || batch.getHash() == null) {
-            throw new RuntimeException("repDate, creditorId and hash are required for file path!");
+            throw new RuntimeException(Errors.getMessage(Errors.E233));
         }
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         return batchSaveDir + "/" + df.format(batch.getRepDate())
@@ -116,7 +117,7 @@ public class BatchServiceImpl implements IBatchService {
 
     private String getCreditorDirPath(Batch batch) {
         if (batch.getRepDate() == null || batch.getCreditorId() == null) {
-            throw new RuntimeException("repDate, creditorId are required for creditor dir path!");
+            throw new RuntimeException(Errors.getMessage(Errors.E232));
         }
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         return batchSaveDir + "/" + df.format(batch.getRepDate())

@@ -4,6 +4,7 @@ import kz.bsbnb.usci.cli.app.command.IMetaCommand;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -102,7 +103,7 @@ public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
         }
 
         if (metaClassRepository == null)
-            throw new RuntimeException("Instance of IMetaClassRepository can not be null.");
+            throw new RuntimeException(Errors.getMessage(Errors.E221));
 
         MetaClass meta = new MetaClass(name);
         meta.setReference(isReference);

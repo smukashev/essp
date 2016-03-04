@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.showcase.dao.impl.CortegeDaoImpl;
 import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;
 import org.slf4j.Logger;
@@ -60,7 +61,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 List<ShowCase> showCases = showcaseDao.getShowCases();
 
                 if (showCases.size() == 0)
-                    throw new IllegalStateException("Необходимо создать витрины;");
+                    throw new IllegalStateException(Errors.getMessage(Errors.E271));
 
                 OperationType operationType;
 

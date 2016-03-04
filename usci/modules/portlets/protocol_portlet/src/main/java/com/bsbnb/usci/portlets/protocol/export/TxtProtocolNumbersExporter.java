@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.bsbnb.usci.portlets.protocol.data.ProtocolDisplayBean;
+import kz.bsbnb.usci.eav.util.Errors;
 
 /**
  *
@@ -37,7 +38,7 @@ public class TxtProtocolNumbersExporter extends ProtocolExporter {
             ps.close();
             return baos.toByteArray();
         } catch (UnsupportedEncodingException uee) {
-            throw new ExportException("Couldn't find encoding", uee);
+            throw new ExportException(Errors.getMessage(Errors.E248, uee));
         }
     }
 

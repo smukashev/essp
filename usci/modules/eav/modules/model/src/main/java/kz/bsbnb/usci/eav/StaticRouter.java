@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav;
 
+import kz.bsbnb.usci.eav.util.Errors;
+
 public final class StaticRouter {
     private enum MODE {
         STEND,
@@ -84,7 +86,7 @@ public final class StaticRouter {
             case PROD:
                 return prodAsIP;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -97,7 +99,7 @@ public final class StaticRouter {
             case PROD:
                 return prodDBCoreIp;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -110,7 +112,7 @@ public final class StaticRouter {
             case PROD:
                 return prodDBShowcaseIP;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -123,7 +125,7 @@ public final class StaticRouter {
             case PROD:
                 return prodDBReporterIP;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -136,7 +138,7 @@ public final class StaticRouter {
             case PROD:
                 return prodPortalUrl;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -149,7 +151,7 @@ public final class StaticRouter {
             case PROD:
                 return prodPortalPort;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -162,7 +164,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCoreSchemaName;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -175,7 +177,7 @@ public final class StaticRouter {
             case PROD:
                 return prodShowcaseSchemaName;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -188,7 +190,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCRDBIP;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -201,7 +203,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCRDBUsername;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -214,7 +216,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCRDBPassword;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -227,7 +229,7 @@ public final class StaticRouter {
             case PROD:
                 return prodReportFilesCatalog;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 
@@ -240,7 +242,7 @@ public final class StaticRouter {
             case PROD:
                 return prodReportFilesFolder;
             default:
-                throw new IllegalStateException("Неизвестный мод;");
+                throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
     }
 }

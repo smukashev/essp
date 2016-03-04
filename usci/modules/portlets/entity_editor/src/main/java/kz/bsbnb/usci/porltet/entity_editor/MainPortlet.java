@@ -22,6 +22,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.commons.lang.StringUtils;
@@ -177,7 +178,7 @@ public class MainPortlet extends MVCPortlet {
         if(meta.getClassName().equals("credit") && !isNb) {
             BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
             if(creditor.getId() != creditorId)
-                throw new RuntimeException("нет прав для просмотра");
+                throw new RuntimeException(Errors.getMessage(Errors.E238));
         }
 
         if (title == null) {
@@ -452,7 +453,7 @@ public class MainPortlet extends MVCPortlet {
                     List<String[]> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
 
                     if(classes.size() < 1)
-                        throw new RuntimeException("no.any.rights");
+                        throw new RuntimeException(Errors.getMessage(Errors.E239));
                     //List<Pair> afterFilter = new LinkedList<>();
                     List<String[]> afterFilter = new LinkedList<>();
                     /*for(Pair c : classes)
@@ -485,7 +486,7 @@ public class MainPortlet extends MVCPortlet {
                     long creditorId;
 
                     if(creditors.size() == 0)
-                        throw new RuntimeException("нет доступа к кредиторам");
+                        throw new RuntimeException(Errors.getMessage(Errors.E241));
                     else
                     if(creditors.size() > 0) {
                         logger.warn("доступ к более одному банку");
@@ -571,10 +572,10 @@ public class MainPortlet extends MVCPortlet {
 
                     if(!isNb) {
                         if(creditors.size() > 1)
-                            throw new RuntimeException("доступ к более одному банку");
+                            throw new RuntimeException(Errors.getMessage(Errors.E240));
 
                         if(creditors.size() == 0)
-                            throw new RuntimeException("нет доступа к кредиторам");
+                            throw new RuntimeException(Errors.getMessage(Errors.E241));
 
                         creditorId = creditors.get(0).getId();
                     }
@@ -659,7 +660,7 @@ public class MainPortlet extends MVCPortlet {
 
                         searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "", creditorId);
                         if(searchResult.getData() == null)
-                            throw new IllegalArgumentException("ошибка сериализации");
+                            throw new IllegalArgumentException(Errors.getMessage(Errors.E242));
                         /*
                         StringBuilder sb = new StringBuilder("{\"text\":\".\",\"children\": [\n");
                         Iterator<BaseEntity> it = searchResult.iterator();

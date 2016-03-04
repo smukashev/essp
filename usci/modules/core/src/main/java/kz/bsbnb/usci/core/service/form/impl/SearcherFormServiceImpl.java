@@ -6,6 +6,7 @@ import kz.bsbnb.usci.core.service.form.searcher.ISearcherForm;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
                 return sf;
         }
 
-        throw new RuntimeException("searcherNotFound");
+        throw new RuntimeException(Errors.getMessage(Errors.E229));
     }
 
     @Override

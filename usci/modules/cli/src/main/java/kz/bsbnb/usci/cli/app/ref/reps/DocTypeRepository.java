@@ -2,6 +2,7 @@ package kz.bsbnb.usci.cli.app.ref.reps;
 
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.cli.app.ref.refs.DocType;
+import kz.bsbnb.usci.eav.util.Errors;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -73,7 +74,7 @@ public class DocTypeRepository extends BaseRepository {
                 return dt;
         }
 
-        throw new RuntimeException("docType with code" + code + " not found");
+        throw new RuntimeException(Errors.getMessage(Errors.E228,code));
     }
 
     public void rc(){

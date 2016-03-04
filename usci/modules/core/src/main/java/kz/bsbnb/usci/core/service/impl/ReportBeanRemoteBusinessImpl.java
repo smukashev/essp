@@ -6,6 +6,7 @@ import kz.bsbnb.usci.cr.model.Report;
 import kz.bsbnb.usci.cr.model.ReportMessage;
 import kz.bsbnb.usci.cr.model.ReportMessageAttachment;
 import kz.bsbnb.usci.eav.persistance.dao.IReportDao;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,7 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             return dateFormat.parse(Report.INITIAL_REPORT_DATE_STR);
         } catch (ParseException pe) {
-            throw new RuntimeException("Unable to parse the initial report date.");
+            throw new RuntimeException(Errors.getMessage(Errors.E235));
         }
     }
 

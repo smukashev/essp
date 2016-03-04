@@ -2,6 +2,7 @@ package kz.bsbnb.usci.core.service.form.pool.impl;
 
 import kz.bsbnb.usci.core.service.form.pool.ISearcherFormPool;
 import kz.bsbnb.usci.core.service.form.searcher.ISearcherForm;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,6 @@ public class SearcherFormPool implements ISearcherFormPool {
             if(sf.getClass().getName().equals(className))
                 return sf;
 
-        throw new RuntimeException("searcher form not found");
+        throw new RuntimeException(Errors.getMessage(Errors.E230));
     }
 }

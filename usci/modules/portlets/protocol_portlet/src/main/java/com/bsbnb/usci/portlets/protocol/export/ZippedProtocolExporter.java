@@ -6,6 +6,8 @@ package com.bsbnb.usci.portlets.protocol.export;
 
 import com.bsbnb.usci.portlets.protocol.data.ProtocolDisplayBean;
 import com.vaadin.Application;
+import kz.bsbnb.usci.eav.util.Errors;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -45,7 +47,7 @@ public class ZippedProtocolExporter extends ProtocolExporter {
             zos.write(unzippedExporter.export());
             zos.closeEntry();
         } catch (IOException ioe) {
-            throw new ExportException("I/O exception", ioe);
+            throw new ExportException(Errors.getMessage(Errors.E252, ioe));
         } finally {
             try {
                 zos.close();

@@ -39,6 +39,7 @@ import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
@@ -1893,7 +1894,7 @@ public class CLI {
                 System.out.println("using default file " + BaseCrawler.fileName);
             }
             new BaseRepository().run();
-        } else throw new IllegalArgumentException("allowed operations refs [import] [filename]");
+        } else throw new IllegalArgumentException(Errors.getMessage(Errors.E212));
     }
 
     public void init() {
@@ -1990,11 +1991,11 @@ public class CLI {
                     StringBuilder sb = new StringBuilder();
                     line = in.nextLine();
                     if (!line.startsWith("title: "))
-                        throw new IllegalArgumentException("title must be specified format title: <name>");
+                        throw new IllegalArgumentException(Errors.getMessage(Errors.E213));
                     String title = line.split("title: ")[1];
                     line = in.nextLine();
                     if (line.startsWith(args.get(1)))
-                        throw new IllegalArgumentException("rule must not be empty");
+                        throw new IllegalArgumentException(Errors.getMessage(Errors.E214));
                     sb.append(line);
                     do {
                         line = in.nextLine();
@@ -2219,7 +2220,7 @@ public class CLI {
                 System.out.println("* " + sf.getAttributePath() + ", " + sf.getColumnName());
         } else if (args.get(0).equals("set")) {
             if (args.size() != 3)
-                throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E215));
             if (args.get(1).equals("meta")) {
                 showCase = new ShowCase();
                 showCase.setMeta(metaClassRepository.getMetaClass(args.get(2)));
@@ -2230,25 +2231,25 @@ public class CLI {
             } else if (args.get(1).equals("downPath")) {
                 MetaClass metaClass = showCase.getMeta();
                 if (metaClass.getEl(args.get(2)) == null)
-                    throw new IllegalArgumentException("no such path for downPath:" + args.get(2));
+                    throw new IllegalArgumentException(Errors.getMessage(Errors.E215, args.get(2)));
 
                 showCase.setDownPath(args.get(2));
             } else if (args.get(1).equals("final")) {
                 showCase.setFinal(Boolean.parseBoolean(args.get(2)));
             } else
-                throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E215));
 
         } else if (args.get(0).equals("list")) {
             if (args.get(1).equals("reset")) {
                 showCase.getFieldsList().clear();
             } else if (args.get(1).equals("add")) {
                 if (args.get(2) == null || args.get(3) == null)
-                    throw new UnsupportedOperationException("AttributePath and columnName cannot be empty");
+                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E217));
 
                 showCase.addField(args.get(2), args.get(3));
             } else if (args.get(1).equals("addCustom")) {
                 if (args.get(2) == null || args.get(3) == null || args.get(4) == null)
-                    throw new UnsupportedOperationException("MetaClass, attributePath and columnName cannot be empty");
+                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E218));
 
                 showCase.addCustomField(args.get(3), args.get(4), metaClassRepository.getMetaClass(args.get(2)));
             } else if (args.get(1).equals("addRootKey")) {
@@ -2344,7 +2345,7 @@ public class CLI {
         } else if (args.get(0).equals("stats")) {
             showcaseStat();
         } else {
-            throw new IllegalArgumentException("Arguments: showcase [status, set]");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E219));
         }
     }
 
@@ -2446,7 +2447,7 @@ public class CLI {
                 System.out.println("No such command: " + command);
             }
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println(Errors.unmarshall(e.getMessage()));
             lastException = e;
         }
     }
@@ -2929,7 +2930,7 @@ public class CLI {
         public boolean intersects(DispatcherJob job) {
             if (job instanceof DeleteJob) {
                 if (ids == null || ((DeleteJob) job).ids == null)
-                    throw new RuntimeException("Unprepared thread");
+                    throw new RuntimeException(Errors.getMessage(Errors.E210));
 
                 Set<Long> inter = SetUtils.intersection(ids, ((DeleteJob) job).ids);
 

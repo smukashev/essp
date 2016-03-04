@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlet.report.dm.DatabaseConnect;
 import kz.bsbnb.usci.portlet.report.ReportApplication;
 import kz.bsbnb.usci.portlet.report.dm.Report;
@@ -92,7 +93,7 @@ public class ParametersComponent extends VerticalLayout {
                             }
 
                             public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
-                                throw new UnsupportedOperationException("Not supported yet.");
+                                throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
                             }
 
                             public Class<?> getType() {

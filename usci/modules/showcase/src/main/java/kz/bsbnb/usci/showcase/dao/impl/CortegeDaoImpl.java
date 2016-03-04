@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.showcase.dao.CommonDao;
 import kz.bsbnb.usci.showcase.element.ArrayElement;
 import kz.bsbnb.usci.showcase.element.KeyElement;
@@ -107,7 +108,7 @@ public class CortegeDaoImpl extends CommonDao {
                             moveActualMapToHistory(rootKeyElement, showCase);
                             break;
                         default:
-                            throw new IllegalStateException("Операция не поддерживается(" + ot + ")!;");
+                            throw new IllegalStateException(Errors.getMessage(Errors.E118, ot));
                     }
                     continue;
                 }
@@ -365,7 +366,7 @@ public class CortegeDaoImpl extends CommonDao {
                     }
 
                     if (globalEntity == null && (newKey == null || entryMap.get(oldKey) == null))
-                        throw new IllegalStateException("Keys are null!");
+                        throw new IllegalStateException(Errors.getMessage(Errors.E273));
 
                     if (newKey != null && entryMap.get(oldKey) != null)
                         entryMap.put(newKey, entryMap.remove(oldKey));
@@ -901,7 +902,7 @@ public class CortegeDaoImpl extends CommonDao {
                             map.put(new ValueElement(attribute.columnName, iBaseValue.getId(), 0), readMap(curPath + "." + attribute.elementPath, (BaseEntity) iBaseValue.getValue(), paths));
                         } else if (iBaseValue != null && iBaseValue.getMetaAttribute().getMetaType().isComplex() &&
                                 iBaseValue.getMetaAttribute().getMetaType().isSet()) {
-                            throw new UnsupportedOperationException("Complex entity cannot contain complex set");
+                            throw new UnsupportedOperationException(Errors.getMessage(Errors.E274));
                         } else if (iBaseValue != null && iBaseValue.getValue() instanceof BaseSet) {
                             BaseSet bSet = (BaseSet) iBaseValue.getValue();
 
@@ -1016,7 +1017,7 @@ public class CortegeDaoImpl extends CommonDao {
                 if (customObject instanceof BaseEntity) {
                     entryMap.put(new ValueElement(sf.getColumnName(), ((BaseEntity) customObject).getId(), 0), ((BaseEntity) customObject).getId());
                 } else if (customObject instanceof BaseSet) {
-                    throw new UnsupportedOperationException("CustomSet is not supported!");
+                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E272));
                 } else {
                     entryMap.put(new ValueElement(sf.getColumnName(), 0L, 0), customObject);
                 }

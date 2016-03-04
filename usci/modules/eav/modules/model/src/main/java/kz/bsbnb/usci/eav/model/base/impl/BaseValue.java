@@ -300,7 +300,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                     return true;
                 break;
             default:
-                throw new IllegalStateException(Errors.E7+"|" + type);
+                throw new IllegalStateException(Errors.getMessage(Errors.E7, type));
         }
 
         return false;

@@ -16,6 +16,7 @@ import jxl.WorkbookSettings;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
 import jxl.write.*;
+import kz.bsbnb.usci.eav.util.Errors;
 
 /**
  *
@@ -29,13 +30,13 @@ public class XlsProtocolExporter extends ProtocolExporter {
     public XlsProtocolExporter(final String[] properties, final String[] propertyNames) {
         super();
         if (properties == null) {
-            throw new IllegalArgumentException("Null is illegal value for properties array");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E249));
         }
         if (propertyNames == null) {
-            throw new IllegalArgumentException("Null is illegal value for property names length");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E250));
         }
         if (properties.length != propertyNames.length) {
-            throw new IllegalArgumentException("Properties and property names should contain equal number of elements");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E251));
         }
         this.properties = properties;
         this.propertyNames = propertyNames;

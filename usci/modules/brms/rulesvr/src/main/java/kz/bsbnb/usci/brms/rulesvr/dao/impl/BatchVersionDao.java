@@ -4,6 +4,7 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulesvr.persistable.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.commons.lang.time.DateUtils;
 import org.jooq.DSLContext;
 import org.jooq.Insert;
@@ -33,7 +34,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
     public long saveBatchVersion(final Batch batch){
         if(batch.getId() < 1)
         {
-            throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E261));
         }
 
         String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, OPEN_DATE) VALUES(?, ?)";
@@ -44,7 +45,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
     public long saveBatchVersion(Batch batch, Date date) {
         if(batch.getId() < 1)
         {
-            throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E261));
         }
 
         String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";
@@ -92,7 +93,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
 
         if (batch.getId() < 1)
         {
-            throw new IllegalArgumentException("Batch id can not be null");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E262));
         }
 
         String SQL = "SELECT * FROM " + PREFIX_ + "package_versions WHERE package_id  = ?";
@@ -150,7 +151,7 @@ public class BatchVersionDao extends JDBCSupport implements IBatchVersionDao  {
                 jdbcTemplate.queryForList(controlSelect.getSQL(), controlSelect.getBindValues().toArray());
 
         if(rows.size() > 0)
-            throw new RuntimeException("Версия пакета должна быть датой позднее");
+            throw new RuntimeException(Errors.getMessage(Errors.E263));
 
         Insert insert = context.insertInto(LOGIC_PACKAGE_VERSIONS)
                 .set(LOGIC_PACKAGE_VERSIONS.OPEN_DATE, DataUtils.convert(date))

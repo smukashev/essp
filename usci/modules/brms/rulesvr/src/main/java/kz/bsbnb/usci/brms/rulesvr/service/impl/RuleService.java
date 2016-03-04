@@ -8,6 +8,7 @@ import kz.bsbnb.usci.brms.rulesvr.dao.IBatchVersionDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.brms.rulesvr.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -81,7 +82,7 @@ public class RuleService implements IRuleService {
     @Override
     public Map getRuleTitles(Long packageId, Date repDate, String searchText) {
         if(searchText == null || searchText.length() < 1)
-            throw new IllegalArgumentException("поисковой ключ не задан");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E270));
 
         long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
         Map m = new HashMap();

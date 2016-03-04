@@ -4,6 +4,7 @@ import static com.bsbnb.creditregistry.portlets.queue.QueueApplication.log;
 
 import com.bsbnb.creditregistry.portlets.queue.data.DataProvider;
 import kz.bsbnb.usci.eav.model.EavGlobal;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
 
 import java.util.ArrayList;
@@ -103,7 +104,7 @@ public class DatabaseQueueConfiguration implements QueueConfiguration {
                 try {
                     ids.add(Integer.parseInt(idValue));
                 }catch (NumberFormatException nfe) {
-                    throw new ConfigurationException("Parse error", nfe);
+                    throw new ConfigurationException(Errors.getMessage(Errors.E253, nfe));
                 }
             }
             return ids;

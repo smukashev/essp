@@ -4,6 +4,7 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.SimpleTrack;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.DSLContext;
 import org.jooq.Delete;
 import org.jooq.Select;
@@ -62,7 +63,7 @@ public class RuleDao implements IRuleDao {
 
     public List<Rule> load(BatchVersion batchVersion){
         if (batchVersion.getId() < 1)
-            throw new IllegalArgumentException("Batchversion has no id.");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E265));
 
         String SQL = "SELECT * FROM " + PREFIX_ + "rules WHERE id IN(SELECT rule_id FROM " + PREFIX_ +
                 "rule_package_versions WHERE package_versions_id = ?)";
@@ -76,7 +77,7 @@ public class RuleDao implements IRuleDao {
     @Override
     public long update(Rule rule) {
         if (rule.getId() < 1){
-            throw new IllegalArgumentException("Rule has no id.");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E266));
         }
         String SQL = "UPDATE " + PREFIX_ + "rules SET title=?, rule=? WHERE id=?";
         jdbcTemplate.update(SQL,rule.getTitle(),rule.getRule(),rule.getId());
@@ -138,7 +139,7 @@ public class RuleDao implements IRuleDao {
         String SQL = "SELECT * FROM " + PREFIX_ + "rules WHERE id = ?";
         List<Rule> rules = jdbcTemplate.query(SQL, new Object[]{ruleId}, new BeanPropertyRowMapper<Rule>(Rule.class));
         if(rules.size() > 1)
-            throw new RuntimeException("several rules with same id");
+            throw new RuntimeException(Errors.getMessage(Errors.E264));
         return rules.get(0);
     }
 

@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlet.report.ReportApplication;
 import kz.bsbnb.usci.portlet.report.ReportPortletResource;
 import kz.bsbnb.usci.portlet.report.dm.ReportLoadFile;
@@ -120,7 +121,7 @@ public class FileDownloadComponent extends Button {
 
     public void addAllFiles(Collection<String> filenames, Collection<File> files) {
         if (filenames.size() != files.size()) {
-            throw new IllegalArgumentException("Collections should be of equal size");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E254));
         }
         this.entryNames.addAll(filenames);
         this.files.addAll(files);
