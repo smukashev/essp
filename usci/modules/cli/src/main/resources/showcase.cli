@@ -484,10 +484,6 @@ showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey doc_id doc_id
 
-showcase addIndex nonunique credit_id subject_id
-showcase addIndex nonunique credit_id subject_id doc_id
-showcase addIndex nonunique doc_id
-
 #-----------------------------------------------------------------------------------
 # CHILD SUBJECT
 #-----------------------------------------------------------------------------------
@@ -509,8 +505,6 @@ showcase child list addHistoryKey subject_id subject_id
 
 showcase child save
 
-showcase save
-
 #-----------------------------------------------------------------------------------
 # CHILD DOCUMENT
 #-----------------------------------------------------------------------------------
@@ -528,6 +522,10 @@ showcase child list addRootKey document_id doc_id
 showcase child list addHistoryKey document_id doc_id
 
 showcase child save
+
+showcase addIndex nonunique credit_id subject_id
+showcase addIndex nonunique credit_id subject_id doc_id
+showcase addIndex nonunique doc_id
 
 showcase save
 
