@@ -18,6 +18,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
+import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityApplyDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityMergeDao;
@@ -26,10 +27,7 @@ import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
@@ -266,7 +264,10 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				}
 				// delete old baseValueRight
 				oldBaseValueRight.setMetaAttribute(metaAttribute);
-				baseEntityManager.registerAsDeleted(oldBaseValueRight);
+				if (metaType.isSet())
+					baseEntityManager.registerAsDeleted((IPersistable) new ArrayList(((BaseSet) oldBaseValueRight.getValue()).get()).get(0));
+				else
+					baseEntityManager.registerAsDeleted((IPersistable) oldBaseValueRight.getValue());
 			}
 			if (mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_RIGHT ||
 					mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE) {
@@ -315,7 +316,10 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 					oldBaseValueLeft.setBaseContainer(baseEntity);
 				}
 				oldBaseValueLeft.setMetaAttribute(metaAttribute);
-				baseEntityManager.registerAsDeleted(oldBaseValueLeft);
+				if (metaType.isSet())
+					baseEntityManager.registerAsDeleted((IPersistable) new ArrayList(((BaseSet) oldBaseValueLeft.getValue()).get()).get(0));
+				else
+					baseEntityManager.registerAsDeleted((IPersistable) oldBaseValueLeft.getValue());
 			}
 			if (mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_LEFT ||
 					mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE) {
@@ -395,7 +399,10 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				baseEntityManager.registerAsUpdated(newBaseValueRight);
 				//delete
 				if (metaType.isComplex()) {
-//					baseEntityManager.registerAsDeleted((IPersistable) baseValueRight.getValue());
+					if (metaType.isSet())
+						baseEntityManager.registerAsDeleted((IPersistable) new ArrayList(((BaseSet) baseValueRight.getValue()).get()).get(0));
+					else
+						baseEntityManager.registerAsDeleted((IPersistable) baseValueRight.getValue());
 				}
 
 				if (mergeManager.getChildMap() == null) {
@@ -423,7 +430,10 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				baseEntityManager.registerAsUpdated(newBaseValueLeft);
 				// delete
 				if (metaType.isComplex()) {
-//					baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
+					if (metaType.isSet())
+						baseEntityManager.registerAsDeleted((IPersistable) new ArrayList(((BaseSet) baseValueLeft.getValue()).get()).get(0));
+					else
+						baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
 				}
 				if (mergeManager.getChildMap() == null) {
 					if (choice == MergeResultChoice.LEFT) {
@@ -450,7 +460,10 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				baseEntityManager.registerAsUpdated(newBaseValueLeft);
 
 				if (metaType.isComplex()) {
-//					baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
+					if (metaType.isSet())
+						baseEntityManager.registerAsDeleted((IPersistable) new ArrayList(((BaseSet) baseValueLeft.getValue()).get()).get(0));
+					else
+						baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
 				}
 
 				childBaseSetApplied = (BaseSet) baseValueRight.getValue();
