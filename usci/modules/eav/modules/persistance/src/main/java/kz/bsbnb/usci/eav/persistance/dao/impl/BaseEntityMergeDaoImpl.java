@@ -264,10 +264,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				}
 				// delete old baseValueRight
 				oldBaseValueRight.setMetaAttribute(metaAttribute);
-				if (metaType.isSet())
-					baseEntityManager.registerAsDeleted((IPersistable) new ArrayList(((BaseSet) oldBaseValueRight.getValue()).get()).get(0));
-				else
-					baseEntityManager.registerAsDeleted((IPersistable) oldBaseValueRight.getValue());
+				registerAsDeleted(baseEntityManager, metaType, oldBaseValueRight);
 			}
 			if (mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_RIGHT ||
 					mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE) {
@@ -316,10 +313,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 					oldBaseValueLeft.setBaseContainer(baseEntity);
 				}
 				oldBaseValueLeft.setMetaAttribute(metaAttribute);
-				if (metaType.isSet())
-					baseEntityManager.registerAsDeleted((IPersistable) new ArrayList(((BaseSet) oldBaseValueLeft.getValue()).get()).get(0));
-				else
-					baseEntityManager.registerAsDeleted((IPersistable) oldBaseValueLeft.getValue());
+				registerAsDeleted(baseEntityManager, metaType, oldBaseValueLeft);
 			}
 			if (mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_LEFT ||
 					mergeManager.getAction() == IBaseEntityMergeManager.Action.TO_MERGE) {
@@ -346,6 +340,16 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				}
 			}
 		}
+	}
+
+	private void registerAsDeleted(IBaseEntityManager baseEntityManager, IMetaType metaType, IBaseValue baseValue) {
+		if (!metaType.isReference())
+			if (metaType.isSet())
+				for (IPersistable persistable : new ArrayList<IPersistable>(((BaseSet) baseValue.getValue()).get())) {
+					baseEntityManager.registerAsDeleted(persistable);
+				}
+			else
+				baseEntityManager.registerAsDeleted((IPersistable) baseValue.getValue());
 	}
 
 	/**
@@ -398,12 +402,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
 				baseEntityManager.registerAsUpdated(newBaseValueRight);
 				//delete
-				if (metaType.isComplex()) {
-					if (metaType.isSet())
-						baseEntityManager.registerAsDeleted((IPersistable) new ArrayList(((BaseSet) baseValueRight.getValue()).get()).get(0));
-					else
-						baseEntityManager.registerAsDeleted((IPersistable) baseValueRight.getValue());
-				}
+				registerAsDeleted(baseEntityManager, metaType, baseValueRight);
 
 				if (mergeManager.getChildMap() == null) {
 					if (choice == MergeResultChoice.LEFT) {
@@ -429,12 +428,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
 				baseEntityManager.registerAsUpdated(newBaseValueLeft);
 				// delete
-				if (metaType.isComplex()) {
-					if (metaType.isSet())
-						baseEntityManager.registerAsDeleted((IPersistable) new ArrayList(((BaseSet) baseValueLeft.getValue()).get()).get(0));
-					else
-						baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
-				}
+				registerAsDeleted(baseEntityManager, metaType, baseValueLeft);
 				if (mergeManager.getChildMap() == null) {
 					if (choice == MergeResultChoice.LEFT) {
 						baseEntity.put(baseEntity.isSet() ? null : metaAttribute.getName(), newBaseValueLeft);
@@ -459,12 +453,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
 				baseEntityManager.registerAsUpdated(newBaseValueLeft);
 
-				if (metaType.isComplex()) {
-					if (metaType.isSet())
-						baseEntityManager.registerAsDeleted((IPersistable) new ArrayList(((BaseSet) baseValueLeft.getValue()).get()).get(0));
-					else
-						baseEntityManager.registerAsDeleted((IPersistable) baseValueLeft.getValue());
-				}
+				registerAsDeleted(baseEntityManager, metaType, baseValueLeft);
 
 				childBaseSetApplied = (BaseSet) baseValueRight.getValue();
 
@@ -646,7 +635,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
 						if (!isEntityUsedElse(be.getId(), baseValueRight.getBaseContainer().getId())) {
 							be.setOperation(OperationType.DELETE);
-							baseEntityManager.registerAsDeleted(be);
+							registerAsDeleted(baseEntityManager, metaType, baseValueRight);
 						}
 					}
 				}
@@ -680,7 +669,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
 						if (!isEntityUsedElse(be.getId(), baseValueLeft.getBaseContainer().getId())) {
 							be.setOperation(OperationType.DELETE);
-							baseEntityManager.registerAsDeleted(be);
+							registerAsDeleted(baseEntityManager, metaType, baseValueLeft);
 						}
 					}
 				}
