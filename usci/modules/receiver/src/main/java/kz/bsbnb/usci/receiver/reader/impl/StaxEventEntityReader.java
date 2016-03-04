@@ -70,23 +70,13 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     private Logger logger = Logger.getLogger(StaxEventEntityReader.class);
 
-    private static final long WAIT_TIMEOUT = 3600; // in sec
-
     private Stack<IBaseContainer> stack = new Stack<>();
 
     private Stack<Boolean> flagsStack = new Stack<>();
 
     private IBaseContainer currentContainer;
 
-    private Batch batch;
-
     private Long index = 1L, level = 0L;
-
-    private IBatchService batchService;
-
-    private IMetaFactoryService metaFactoryService;
-
-    private ReportBeanRemoteBusiness reportService;
 
     private boolean hasMembers = false;
 
@@ -132,15 +122,14 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     .setBatchId(batchId)
                     .setStatus(BatchStatuses.ERROR)
                     .setDescription(e.getMessage())
-                    .setReceiptDate(new Date())
-            );
+                    .setReceiptDate(new Date()));
 
             throw new IllegalStateException(e);
         }
 
         try {
             if (out != null) {
-                if (validateSchema(new ByteArrayInputStream(out.toByteArray()))) {
+                if (validateSchema(true, new ByteArrayInputStream(out.toByteArray()))) {
                     xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
                 } else {
                     throw new RuntimeException(Errors.getMessage(Errors.E193));
@@ -155,70 +144,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
             throw new RuntimeException(e);
         }
-    }
-
-    private boolean validateSchema(ByteArrayInputStream xmlInputStream) throws IOException, SAXException {
-        URL schemaURL = getClass().getClassLoader().getResource("usci.xsd");
-        Source xml = new StreamSource(xmlInputStream);
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-        if (schemaURL == null)
-            throw new IllegalStateException();
-
-        Schema schema = schemaFactory.newSchema(schemaURL);
-
-        Validator validator = schema.newValidator();
-
-        final boolean[] success = {true};
-
-        // fixme!
-        validator.setErrorHandler(new ErrorHandler() {
-            @Override
-            public void warning(SAXParseException exception) throws SAXException {
-            }
-
-            @Override
-            public void error(SAXParseException exception) throws SAXException {
-                success[0] = false;
-                batchService.addBatchStatus(new BatchStatus()
-                                .setBatchId(batchId)
-                                .setStatus(BatchStatuses.ERROR)
-                                .setDescription(exception.getMessage())
-                                .setReceiptDate(new Date()));
-            }
-
-            @Override
-            public void fatalError(SAXParseException exception) throws SAXException {
-                throw exception;
-            }
-        });
-
-        validator.validate(xml);
-        return success[0];
-    }
-
-    private boolean hasOperationDelete(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
-                        .equalsIgnoreCase(OperationType.DELETE.toString());
-    }
-
-    private boolean hasOperationClose(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
-                        .equalsIgnoreCase(OperationType.CLOSE.toString());
-    }
-
-    private boolean hasOperationNew(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
-                        .equalsIgnoreCase(OperationType.NEW.toString());
-    }
-
-    private boolean hasOperationInsert(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
-                        .equalsIgnoreCase(OperationType.INSERT.toString());
     }
 
     private HashMap<String, MetaClass> metaCache = new HashMap<>();
@@ -294,14 +219,12 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     memberName += "_" + currentContainer.getValueCount();
 
 
-                IBaseValue baseValue = BaseValueFactory
-                        .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId,
-                                batch.getRepDate(), obj, false, true);
+                IBaseValue baseValue = BaseValueFactory.create(currentContainer.getBaseContainerType(), metaType, 0,
+                        creditorId, batch.getRepDate(), obj, false, true);
 
                 if (hasOperationNew(startElement)) {
-                    IBaseValue newBaseValue = BaseValueFactory
-                            .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId,
-                                    batch.getRepDate(), parserHelper.getCastObject(metaValue.getTypeCode(),
+                    IBaseValue newBaseValue = BaseValueFactory.create(currentContainer.getBaseContainerType(), metaType,
+                            0, creditorId, batch.getRepDate(), parserHelper.getCastObject(metaValue.getTypeCode(),
                                         startElement.getAttributeByName(new QName("data")).getValue()), false, true);
 
                     baseValue.setNewBaseValue(newBaseValue);
@@ -326,27 +249,15 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     .setBatchId(batchId)
                     .setStatus(EntityStatuses.ERROR)
                     .setDescription(e.getLocalizedMessage())
-                    .setReceiptDate(new Date())
-            );
+                    .setReceiptDate(new Date()));
             
             return null;
         }
     }
 
     private T readInner() {
-        long sleepCounter = 0;
+        waitSync(serviceFactory);
 
-        while (serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            sleepCounter++;
-            if (sleepCounter > WAIT_TIMEOUT) {
-                throw new IllegalStateException(Errors.getMessage(Errors.E192));
-            }
-        }
         while (xmlEventReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlEventReader.next();
 
@@ -383,24 +294,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         return null;
     }
 
-    private void saveTotalCounts() {
-        reportService.setTotalCount(reportId, totalCount);
-
-        batchService.addEntityStatus(new EntityStatus()
-                .setBatchId(batchId)
-                        .setStatus(EntityStatuses.ACTUAL_COUNT)
-                        .setDescription(String.valueOf(actualCount))
-                        .setReceiptDate(new Date())
-        );
-
-        batchService.addEntityStatus(new EntityStatus()
-                .setBatchId(batchId)
-                        .setStatus(EntityStatuses.TOTAL_COUNT)
-                        .setDescription(String.valueOf(totalCount))
-                        .setReceiptDate(new Date())
-        );
-    }
-
     public boolean endElement(String localName) {
         if (localName.equals("batch")) {
             logger.debug("batch");
@@ -426,9 +319,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
-                        ((BaseSet) currentContainer).put(BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId,
-                                    batch.getRepDate(), obj, false, true));
+                        ((BaseSet) currentContainer).put(BaseValueFactory.create(currentContainer.getBaseContainerType(),
+                                metaType, 0, creditorId, batch.getRepDate(), obj, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
@@ -460,5 +352,45 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         }
 
         return false;
+    }
+
+    private void saveTotalCounts() {
+        reportService.setTotalCount(reportId, totalCount);
+
+        batchService.addEntityStatus(new EntityStatus()
+                .setBatchId(batchId)
+                .setStatus(EntityStatuses.ACTUAL_COUNT)
+                .setDescription(String.valueOf(actualCount))
+                .setReceiptDate(new Date()));
+
+        batchService.addEntityStatus(new EntityStatus()
+                .setBatchId(batchId)
+                .setStatus(EntityStatuses.TOTAL_COUNT)
+                .setDescription(String.valueOf(totalCount))
+                .setReceiptDate(new Date()));
+    }
+
+    private boolean hasOperationDelete(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation")) != null &&
+                startElement.getAttributeByName(new QName("operation")).getValue()
+                        .equalsIgnoreCase(OperationType.DELETE.toString());
+    }
+
+    private boolean hasOperationClose(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation")) != null &&
+                startElement.getAttributeByName(new QName("operation")).getValue()
+                        .equalsIgnoreCase(OperationType.CLOSE.toString());
+    }
+
+    private boolean hasOperationNew(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation")) != null &&
+                startElement.getAttributeByName(new QName("operation")).getValue()
+                        .equalsIgnoreCase(OperationType.NEW.toString());
+    }
+
+    private boolean hasOperationInsert(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation")) != null &&
+                startElement.getAttributeByName(new QName("operation")).getValue()
+                        .equalsIgnoreCase(OperationType.INSERT.toString());
     }
 }

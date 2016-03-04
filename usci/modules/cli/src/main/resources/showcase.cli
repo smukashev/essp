@@ -484,9 +484,26 @@ showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey doc_id doc_id
 
-showcase addIndex nonunique credit_id subject_id
-showcase addIndex nonunique credit_id subject_id doc_id
-showcase addIndex nonunique doc_id
+#-----------------------------------------------------------------------------------
+# CHILD SUBJECT
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_SUBJECT_DOC_SUBJECT
+showcase child set meta subject
+showcase child set tableName CORE_SUBJECT_DOC
+
+showcase child list add docs doc_id
+showcase child list add docs.no doc_no
+showcase child list add docs.doc_type doc_type
+showcase child list add docs.name doc_name
+showcase child list add is_person is_person
+showcase child list add is_organization is_organization
+showcase child list add is_creditor is_creditor
+
+showcase child list addRootKey subject_id subject_id
+showcase child list addHistoryKey subject_id subject_id
+
+showcase child save
 
 #-----------------------------------------------------------------------------------
 # CHILD DOCUMENT
@@ -505,6 +522,10 @@ showcase child list addRootKey document_id doc_id
 showcase child list addHistoryKey document_id doc_id
 
 showcase child save
+
+showcase addIndex nonunique credit_id subject_id
+showcase addIndex nonunique credit_id subject_id doc_id
+showcase addIndex nonunique doc_id
 
 showcase save
 

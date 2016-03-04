@@ -659,7 +659,7 @@ public class MainPortlet extends MVCPortlet {
 
                     //portlet props + remove cr implementations
                     for (String[] c : classes)
-                        if (classesFilter.contains(c[1]) && !c[0].contains("cr"))
+//                        if (classesFilter.contains(c[1]) && !c[0].contains("cr"))
                             afterFilter.add(c);
 
                     writer.write(JsonMaker.getCaptionedArray(afterFilter,

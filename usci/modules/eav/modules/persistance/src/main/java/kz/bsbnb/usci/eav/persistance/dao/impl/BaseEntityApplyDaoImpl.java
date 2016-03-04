@@ -49,10 +49,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
     private final Logger logger = LoggerFactory.getLogger(BaseEntityApplyDaoImpl.class);
 
-    public RuntimeException getEx() {
-        return new RuntimeException();
-    }
-
     @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded,
                              IBaseEntityManager baseEntityManager, EntityHolder entityHolder) {
@@ -101,7 +97,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
 
         if (entityHolder != null) {
-            // entityHolder.setSaving(baseEntitySaving);
+            entityHolder.setSaving(baseEntitySaving);
             entityHolder.setLoaded(baseEntityLoaded);
             entityHolder.setApplied(baseEntityApplied);
         }
@@ -334,6 +330,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         for (String attribute : metaClass.getAttributeNames()) {
             IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attribute);
             IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
+
+            if (baseValueSaving == null && baseValueLoaded != null)
+                baseEntityApplied.put(attribute, baseValueLoaded);
 
             if (baseValueSaving == null)
                 continue;
@@ -1105,23 +1104,22 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
             }
 
-            IBaseValueDao valueDao = persistableDaoPool
-                    .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
+            IBaseValueDao valueDao = persistableDaoPool.getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
             // case#6
             if (!metaAttribute.isFinal()) {
-                IBaseValue baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
+                IBaseValue<IBaseEntity> baseValueClosed = valueDao.getClosedBaseValue(baseValueSaving);
 
                 if (baseValueClosed != null) {
                     baseValueClosed.setBaseContainer(baseEntity);
                     baseValueClosed.setMetaAttribute(metaAttribute);
 
-                    IBaseEntity baseEntityClosed = (IBaseEntity) baseValueClosed.getValue();
+                    IBaseEntity baseEntityClosed = baseValueClosed.getValue();
 
                     if (baseValueClosed.equalsByValue(baseValueSaving)) {
                         baseEntityManager.registerAsDeleted(baseValueClosed);
 
-                        IBaseValue baseValuePrevious = valueDao.getPreviousBaseValue(baseValueClosed);
+                        IBaseValue<IBaseEntity> baseValuePrevious = valueDao.getPreviousBaseValue(baseValueClosed);
 
                         if (baseValuePrevious == null)
                             throw new IllegalStateException(Errors.getMessage(Errors.E70,baseValueClosed.getMetaAttribute().getName()));
@@ -1182,7 +1180,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         baseEntityManager.registerAsUpdated(baseValueClosed);
                     }
                 } else {
-                    IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueSaving);
+                    IBaseValue<IBaseEntity> baseValueNext = valueDao.getNextBaseValue(baseValueSaving);
 
                     if (metaAttribute.isImmutable() && baseEntitySaving.getId() == 0)
                         throw new IllegalStateException(Errors.getMessage(Errors.E71,metaAttribute.getName()));

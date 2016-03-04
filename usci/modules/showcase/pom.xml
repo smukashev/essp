@@ -192,26 +192,11 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${com.google.gson.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
+            <artifactId>activemq-all</artifactId>
             <version>5.2.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.xbean</groupId>
-            <artifactId>xbean-spring</artifactId>
-            <version>3.7</version>
-        </dependency>
     </dependencies>
-
-    <organization>
-        <name>BSBNB</name>
-    </organization>
-    <inceptionYear>2013</inceptionYear>
 
     <distributionManagement>
         <repository>
@@ -225,6 +210,5 @@
             <url>http://cigit.bsbnb.kz:8080/nexus-2.3.1-01/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-
 
 </project>
