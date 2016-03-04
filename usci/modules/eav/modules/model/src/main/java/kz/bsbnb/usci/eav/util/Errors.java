@@ -324,19 +324,19 @@ public enum Errors {
         errors.put("E269", "Пакет #pkgName не имеет информации версии!");//Package #pkgName has no versions information
         errors.put("E270", "поисковой ключ не задан");
         errors.put("E271", "Необходимо создать витрины;");
-        errors.put("E272", "CustomSet не поддерживается!");//CustomSet is not supported
+        errors.put("E272", "Произвольный массив не поддерживается!");
         errors.put("E273", "Ключи являются null!");//Keys are null
-        errors.put("E274", "Complex entity cannot contain complex set");//Complex entity cannot contain complex set
+        errors.put("E274", "Комплексный элемент не может содержать комплексный массив");
         errors.put("E275", "Витрина не может содержать множество столбцов");//showCase can't contain set columns
         errors.put("E276", "Неизвестный simple тип кода");//Неизвестно простой код типа
         errors.put("E277", "Витрина не может содержать набор столбцов: #type");//showCase can't contain set columns:  #type
-        errors.put("E278", "Query for showCase return more than one row.");
+        errors.put("E278", "Запрос в витрины возвратил больше одной записи");
         errors.put("E279", "Витрина не найден.");//showCase not found.
-        errors.put("E280", "ВАЖНЫЙ: Entity не найден.");//CRITICAL: Entity not found.
+        errors.put("E280", "ВАЖНЫЙ: Запись не найдена.");//CRITICAL: Entity not found.
         errors.put("E281", "Тип не поддерживается #type");
         errors.put("E282", "Класс не найден : #metaClassName");//No such class : #metaClassName
-        errors.put("E283", "MetaClass with no members");//MetaClass with no members
-        errors.put("E284", "Неизвестный мод;");
+        errors.put("E283", "Метакласс не содержит атрибутов");//MetaClass with no members
+        errors.put("E284", "Неизвестный тип;");
         errors.put("E285", "");
         errors.put("E286", "");
         errors.put("E287", "");
