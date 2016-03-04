@@ -331,6 +331,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attribute);
             IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
 
+            if (baseValueSaving == null && baseValueLoaded != null)
+                baseEntityApplied.put(attribute, baseValueLoaded);
+
             if (baseValueSaving == null)
                 continue;
 
