@@ -38,19 +38,25 @@ public class SubjectsParser extends BatchParser {
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if(localName.equals("subjects")) {
-        } else if(localName.equals("subject")) {
-        } else if(localName.equals("person")) {
-            subjectPersonParser.parse(xmlReader, batch, index, creditorId);
-            currentBaseEntity = subjectPersonParser.getCurrentBaseEntity();
-        } else if(localName.equals("organization")) {
-            subjectOrganizationParser.parse(xmlReader, batch, index, creditorId);
-            currentBaseEntity = subjectOrganizationParser.getCurrentBaseEntity();
-        } else if(localName.equals("creditor")) {
-            subjectCreditorParser.parse(xmlReader, batch, index, creditorId);
-            currentBaseEntity = subjectCreditorParser.getCurrentBaseEntity();
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "subjects":
+                break;
+            case "subject":
+                break;
+            case "person":
+                subjectPersonParser.parse(xmlReader, batch, index, creditorId);
+                currentBaseEntity = subjectPersonParser.getCurrentBaseEntity();
+                break;
+            case "organization":
+                subjectOrganizationParser.parse(xmlReader, batch, index, creditorId);
+                currentBaseEntity = subjectOrganizationParser.getCurrentBaseEntity();
+                break;
+            case "creditor":
+                subjectCreditorParser.parse(xmlReader, batch, index, creditorId);
+                currentBaseEntity = subjectCreditorParser.getCurrentBaseEntity();
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -58,12 +64,15 @@ public class SubjectsParser extends BatchParser {
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("subjects")) {
-            hasMore = false;
-        } else if(localName.equals("subject")) {
-            hasMore = true;
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "subjects":
+                hasMore = false;
+                break;
+            case "subject":
+                hasMore = true;
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return true;

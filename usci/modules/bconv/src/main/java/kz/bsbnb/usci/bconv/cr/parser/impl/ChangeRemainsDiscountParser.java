@@ -27,26 +27,36 @@ public class ChangeRemainsDiscountParser extends BatchParser {
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if (localName.equals("discount")) {
-        } else if (localName.equals("value")) {
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                    new Double(event.asCharacters().getData()), false, true));
-        } else if (localName.equals("value_currency")) {
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value_currency", new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                    new Double(event.asCharacters().getData()), false, true));
-        } else if (localName.equals("balance_account")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
-                    batch.getRepDate(), creditorId);
+        switch (localName) {
+            case "discount":
+                break;
+            case "value":
+                event = (XMLEvent) xmlReader.next();
+                currentBaseEntity.put("value",
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
+                                new Double(event.asCharacters().getData()), false, true));
+                break;
+            case "value_currency":
+                event = (XMLEvent) xmlReader.next();
+                currentBaseEntity.put("value_currency",
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
+                                new Double(event.asCharacters().getData()), false, true));
+                break;
+            case "balance_account":
+                event = (XMLEvent) xmlReader.next();
 
-            balanceAccount.put("no_", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-            currentBaseEntity.put("balance_account", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    balanceAccount, false, true));
-        } else {
-            throw new UnknownTagException(localName);
+                BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
+                        batch.getRepDate(), creditorId);
+
+                balanceAccount.put("no_",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
+                                event.asCharacters().getData(), false, true));
+
+                currentBaseEntity.put("balance_account",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), balanceAccount, false, true));
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -54,13 +64,17 @@ public class ChangeRemainsDiscountParser extends BatchParser {
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("discount")) {
-            return true;
-        } else if (localName.equals("value")) {
-        } else if (localName.equals("value_currency")) {
-        } else if (localName.equals("balance_account")) {
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "discount":
+                return true;
+            case "value":
+                break;
+            case "value_currency":
+                break;
+            case "balance_account":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;

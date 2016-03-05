@@ -43,8 +43,11 @@ public class SubjectOrganizationParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("subject"), batch.getRepDate(), creditorId);
-        organizationInfo = new BaseEntity(metaClassRepository.getMetaClass("organization_info"), batch.getRepDate(), creditorId);
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("subject"),
+                batch.getRepDate(), creditorId);
+
+        organizationInfo = new BaseEntity(metaClassRepository.getMetaClass("organization_info"),
+                batch.getRepDate(), creditorId);
 
         bankRelations = null;
         addresses = null;
@@ -54,147 +57,183 @@ public class SubjectOrganizationParser extends BatchParser {
     }
 
     @Override
-    public boolean startElement(XMLEvent event, StartElement startElement, String localName)
-            throws SAXException {
-        if (localName.equals("organization")) {
-        } else if (localName.equals("country")) {
-            event = (XMLEvent) xmlReader.next();
+    public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
+        switch (localName) {
+            case "organization":
+                break;
+            case "country":
+                event = (XMLEvent) xmlReader.next();
 
-            BaseEntity country = new BaseEntity(metaClassRepository.getMetaClass("ref_country"), batch.getRepDate(), creditorId);
+                BaseEntity country = new BaseEntity(metaClassRepository.getMetaClass("ref_country"),
+                        batch.getRepDate(), creditorId);
 
-            country.put("code_numeric", new BaseEntityIntegerValue(0, creditorId, batch.getRepDate(),
-                    new Integer(event.asCharacters().getData()), false, true));
+                country.put("code_numeric",
+                        new BaseEntityIntegerValue(0, creditorId, batch.getRepDate(),
+                                new Integer(event.asCharacters().getData()), false, true));
 
-            organizationInfo.put("country", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), country,
-                    false, true));
-        } else if (localName.equals("offshore")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity offshore = new BaseEntity(metaClassRepository.getMetaClass("ref_offshore"), batch.getRepDate(), creditorId);
+                organizationInfo.put("country",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), country, false, true));
+                break;
+            case "offshore":
+                event = (XMLEvent) xmlReader.next();
+                BaseEntity offshore = new BaseEntity(metaClassRepository.getMetaClass("ref_offshore"),
+                        batch.getRepDate(), creditorId);
 
-            offshore.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(),
-                    false, true));
+                offshore.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
 
-            organizationInfo.put("offshore", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), offshore,
-                    false, true));
-        } else if (localName.equals("bank_relations")) {
-            bankRelations = new BaseSet(metaClassRepository.getMetaClass("bank_relation"));
-        } else if (localName.equals("bank_relation")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("bank_relation"),
-                    batch.getRepDate(), creditorId);
+                organizationInfo.put("offshore",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), offshore, false, true));
+                break;
+            case "bank_relations":
+                bankRelations = new BaseSet(metaClassRepository.getMetaClass("bank_relation"));
+                break;
+            case "bank_relation":
+                event = (XMLEvent) xmlReader.next();
 
-            BaseEntity refBankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"),
-                    batch.getRepDate(), creditorId);
+                BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("bank_relation"),
+                        batch.getRepDate(), creditorId);
 
-            refBankRelation.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-            bankRelation.put("bank_relation", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), refBankRelation,
-                    false, true));
-            bankRelations.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), bankRelation,
-                    false, true));
-        } else if (localName.equals("addresses")) {
-            addresses = new BaseSet(metaClassRepository.getMetaClass("address"));
+                BaseEntity refBankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"),
+                        batch.getRepDate(), creditorId);
 
-        } else if (localName.equals("address")) {
-            currentAddress = new BaseEntity(metaClassRepository.getMetaClass("address"), batch.getRepDate(), creditorId);
-            currentAddress.put("type", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asStartElement().getAttributeByName(new QName("type")).getValue(), false, true));
+                refBankRelation.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
 
-        } else if (localName.equals("region")) {
-            BaseEntity region = new BaseEntity(metaClassRepository.getMetaClass("ref_region"), batch.getRepDate(), creditorId);
-            event = (XMLEvent) xmlReader.next();
-            region.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(),
-                    false, true));
-            currentAddress.put("region", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), region, false, true));
-        } else if (localName.equals("details")) {
-            event = (XMLEvent) xmlReader.next();
-            currentAddress.put("details", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-        } else if (localName.equals("contacts")) {
-            contacts = new BaseSet(metaClassRepository.getMetaClass("contact"));
-        } else if (localName.equals("contact")) {
-            currentContact = new BaseEntity(metaClassRepository.getMetaClass("contact"), batch.getRepDate(), creditorId);
+                bankRelation.put("bank_relation",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), refBankRelation, false, true));
 
-            BaseEntity contactType = new BaseEntity(metaClassRepository.getMetaClass("ref_contact_type"), new Date(), creditorId);
+                bankRelations.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), bankRelation, false, true));
+                break;
+            case "addresses":
+                addresses = new BaseSet(metaClassRepository.getMetaClass("address"));
 
-            contactType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asStartElement().getAttributeByName(new QName("contact_type")).getValue(), false, true));
+                break;
+            case "address":
+                currentAddress = new BaseEntity(metaClassRepository.getMetaClass("address"), batch.getRepDate(), creditorId);
 
-            currentContact.put("contact_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), contactType,
-                    false, true));
+                currentAddress.put("type",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
+                                event.asStartElement().getAttributeByName(new QName("type")).getValue(), false, true));
+                break;
+            case "region":
+                BaseEntity region = new BaseEntity(metaClassRepository.getMetaClass("ref_region"), batch.getRepDate(), creditorId);
 
-            BaseSet contactDetails = new BaseSet(new MetaValue(DataTypes.STRING));
+                event = (XMLEvent) xmlReader.next();
 
-            event = (XMLEvent) xmlReader.next();
-            contactDetails.put(new BaseSetStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(),
-                    false, true));
-            currentContact.put("details", new BaseEntitySimpleSet(0, creditorId, batch.getRepDate(), contactDetails,
-                    false, true));
+                region.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
 
-            contacts.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentContact, false, true));
-        } else if (localName.equals("names")) {
-            BaseSet organizationNames = new BaseSet(metaClassRepository.getMetaClass("organization_name"));
+                currentAddress.put("region", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), region, false, true));
+                break;
+            case "details":
+                event = (XMLEvent) xmlReader.next();
+                currentAddress.put("details",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                break;
+            case "contacts":
+                contacts = new BaseSet(metaClassRepository.getMetaClass("contact"));
+                break;
+            case "contact":
+                currentContact = new BaseEntity(metaClassRepository.getMetaClass("contact"), batch.getRepDate(), creditorId);
 
-            while (true) {
-                subjectOrganizationNamesParser.parse(xmlReader, batch, index, creditorId);
-                if (subjectOrganizationNamesParser.hasMore()) {
-                    organizationNames.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
-                            subjectOrganizationNamesParser.getCurrentBaseEntity(), false, true));
-                } else break;
-            }
-            organizationInfo.put("names", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), organizationNames,
-                    false, true));
-        } else if (localName.equals("head")) {
-            subjectOrganizationHeadParser.parse(xmlReader, batch, index, creditorId);
+                BaseEntity contactType = new BaseEntity(metaClassRepository.getMetaClass("ref_contact_type"), new Date(), creditorId);
 
-            organizationInfo.put("head", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    subjectOrganizationHeadParser.getCurrentBaseEntity(), false, true));
-        } else if (localName.equals("legal_form")) {
-            BaseEntity legalForm = new BaseEntity(metaClassRepository.getMetaClass("ref_legal_form"),
-                    batch.getRepDate(), creditorId);
-            event = (XMLEvent) xmlReader.next();
-            legalForm.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(),
-                    false, true));
-            organizationInfo.put("legal_form", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), legalForm,
-                    false, true));
-        } else if (localName.equals("enterprise_type")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity enterpriseType = new BaseEntity(metaClassRepository.getMetaClass("ref_enterprise_type"),
-                    batch.getRepDate(), creditorId);
-            enterpriseType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
+                contactType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
+                        event.asStartElement().getAttributeByName(new QName("contact_type")).getValue(), false, true));
 
-            organizationInfo.put("enterprise_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    enterpriseType, false, true));
-        } else if (localName.equals("econ_trade")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity econTrade = new BaseEntity(metaClassRepository.getMetaClass("ref_econ_trade"),
-                    batch.getRepDate(), creditorId);
-            econTrade.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(),
-                    false, true));
-            organizationInfo.put("econ_trade", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), econTrade,
-                    false, true));
-        } else if (localName.equals("is_se")) {
-            event = (XMLEvent) xmlReader.next();
-            organizationInfo.put("is_se", new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(),
-                    new Boolean(event.asCharacters().getData()), false, true));
-        } else if (localName.equals("docs")) {
-            BaseSet organizationDocs = new BaseSet(metaClassRepository.getMetaClass("document"));
+                currentContact.put("contact_type",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), contactType, false, true));
 
-            while (true) {
-                subjectOrganizationDocsParser.parse(xmlReader, batch, index, creditorId);
-                if (subjectOrganizationDocsParser.hasMore()) {
-                    organizationDocs.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
-                            subjectOrganizationDocsParser.getCurrentBaseEntity(), false, true));
-                } else break;
-            }
+                BaseSet contactDetails = new BaseSet(new MetaValue(DataTypes.STRING));
+
+                event = (XMLEvent) xmlReader.next();
+
+                contactDetails.put(new BaseSetStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+
+                currentContact.put("details",
+                        new BaseEntitySimpleSet(0, creditorId, batch.getRepDate(), contactDetails, false, true));
+
+                contacts.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentContact, false, true));
+                break;
+            case "names":
+                BaseSet organizationNames = new BaseSet(metaClassRepository.getMetaClass("organization_name"));
+
+                while (true) {
+                    subjectOrganizationNamesParser.parse(xmlReader, batch, index, creditorId);
+                    if (subjectOrganizationNamesParser.hasMore()) {
+                        organizationNames.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
+                                subjectOrganizationNamesParser.getCurrentBaseEntity(), false, true));
+                    } else break;
+                }
+                organizationInfo.put("names",
+                         new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), organizationNames, false, true));
+                break;
+            case "head":
+                subjectOrganizationHeadParser.parse(xmlReader, batch, index, creditorId);
+
+                organizationInfo.put("head", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
+                        subjectOrganizationHeadParser.getCurrentBaseEntity(), false, true));
+                break;
+            case "legal_form":
+                BaseEntity legalForm = new BaseEntity(metaClassRepository.getMetaClass("ref_legal_form"),
+                        batch.getRepDate(), creditorId);
+
+                event = (XMLEvent) xmlReader.next();
+
+                legalForm.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+
+                organizationInfo.put("legal_form",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), legalForm, false, true));
+                break;
+            case "enterprise_type":
+                event = (XMLEvent) xmlReader.next();
+
+                BaseEntity enterpriseType = new BaseEntity(metaClassRepository.getMetaClass("ref_enterprise_type"),
+                        batch.getRepDate(), creditorId);
+
+                enterpriseType.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+
+                organizationInfo.put("enterprise_type",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), enterpriseType, false, true));
+                break;
+            case "econ_trade":
+                event = (XMLEvent) xmlReader.next();
+
+                BaseEntity econTrade = new BaseEntity(metaClassRepository.getMetaClass("ref_econ_trade"),
+                        batch.getRepDate(), creditorId);
+
+                econTrade.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+
+                organizationInfo.put("econ_trade", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), econTrade, false, true));
+                break;
+            case "is_se":
+                event = (XMLEvent) xmlReader.next();
+
+                organizationInfo.put("is_se",
+                        new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(),
+                                Boolean.valueOf(event.asCharacters().getData()), false, true));
+                break;
+            case "docs":
+                BaseSet organizationDocs = new BaseSet(metaClassRepository.getMetaClass("document"));
+
+                while (true) {
+                    subjectOrganizationDocsParser.parse(xmlReader, batch, index, creditorId);
+                    if (subjectOrganizationDocsParser.hasMore()) {
+                        organizationDocs.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
+                                subjectOrganizationDocsParser.getCurrentBaseEntity(), false, true));
+                    } else break;
+                }
 
 
-            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), organizationDocs,
-                    false, true));
+                currentBaseEntity.put("docs", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), organizationDocs, false, true));
 
-        } else {
-            throw new UnknownTagException(localName);
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -202,42 +241,64 @@ public class SubjectOrganizationParser extends BatchParser {
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("organization")) {
-            currentBaseEntity.put("organization_info", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    organizationInfo, false, true));
-            currentBaseEntity.put("is_person", new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(), false, true,
-                    false));
-            currentBaseEntity.put("is_organization", new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(), true, true,
-                    false));
-            currentBaseEntity.put("is_creditor", new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(), false, true,
-                    false));
-            return true;
-        } else if (localName.equals("country")) {
-        } else if (localName.equals("offshore")) {
-        } else if (localName.equals("bank_relations")) {
-            organizationInfo.put("bank_relations", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), bankRelations,
-                    false, true));
-        } else if (localName.equals("bank_relation")) {
-        } else if (localName.equals("addresses")) {
-            organizationInfo.put("addresses", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), addresses,
-                    false, true));
-        } else if (localName.equals("address")) {
-            addresses.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentAddress, false, true));
-        } else if (localName.equals("region")) {
-        } else if (localName.equals("details")) {
-        } else if (localName.equals("contacts")) {
-        } else if (localName.equals("contact")) {
-            organizationInfo.put("contacts", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), contacts,
-                    false, true));
-        } else if (localName.equals("names")) {
-        } else if (localName.equals("head")) {
-        } else if (localName.equals("legal_form")) {
-        } else if (localName.equals("enterprise_type")) {
-        } else if (localName.equals("econ_trade")) {
-        } else if (localName.equals("is_se")) {
-        } else if (localName.equals("docs")) {
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "organization":
+                currentBaseEntity.put("organization_info",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), organizationInfo, false, true));
+
+                currentBaseEntity.put("is_person",
+                        new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(), false, true, false));
+
+                currentBaseEntity.put("is_organization",
+                        new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(), true, true, false));
+
+                currentBaseEntity.put("is_creditor",
+                        new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(), false, true, false));
+                return true;
+            case "country":
+                break;
+            case "offshore":
+                break;
+            case "bank_relations":
+                organizationInfo.put("bank_relations",
+                        new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), bankRelations,
+                        false, true));
+                break;
+            case "bank_relation":
+                break;
+            case "addresses":
+                organizationInfo.put("addresses",
+                        new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), addresses, false, true));
+                break;
+            case "address":
+                addresses.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentAddress, false, true));
+                break;
+            case "region":
+                break;
+            case "details":
+                break;
+            case "contacts":
+                break;
+            case "contact":
+                organizationInfo.put("contacts",
+                        new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), contacts, false, true));
+                break;
+            case "names":
+                break;
+            case "head":
+                break;
+            case "legal_form":
+                break;
+            case "enterprise_type":
+                break;
+            case "econ_trade":
+                break;
+            case "is_se":
+                break;
+            case "docs":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;

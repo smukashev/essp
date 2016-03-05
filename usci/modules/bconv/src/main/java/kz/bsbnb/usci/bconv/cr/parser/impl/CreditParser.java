@@ -42,121 +42,151 @@ public class CreditParser extends BatchParser {
 
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
 
-        if (localName.equals("credit")) {
-        } else if (localName.equals("contract")) {
-            creditContractParser.parse(xmlReader, batch, index, creditorId);
-            BaseEntity creditContract = creditContractParser.getCurrentBaseEntity();
-            currentBaseEntity.put("contract", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditContract,
-                    false, true));
-        } else if (localName.equals("currency")) {
+        switch (localName) {
+            case "credit":
+                break;
+            case "contract":
+                creditContractParser.parse(xmlReader, batch, index, creditorId);
 
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity currency = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"),
-                    batch.getRepDate(), creditorId);
-            currency.put("short_name", new BaseValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData()));
+                BaseEntity creditContract = creditContractParser.getCurrentBaseEntity();
 
-            currentBaseEntity.put("currency", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    currency, false, true));
-        } else if (localName.equals("interest_rate_yearly")) {
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("interest_rate_yearly", new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                    new Double(event.asCharacters().getData()), false, true));
-        } else if (localName.equals("contract_maturity_date")) {
-            event = (XMLEvent) xmlReader.next();
-            String dateRaw = event.asCharacters().getData();
-            try {
-                currentBaseEntity.put("contract_maturity_date", new BaseEntityDateValue(0, creditorId, batch.getRepDate(),
-                        dateFormat.parse(dateRaw), false, true));
-            } catch (ParseException e) {
-                getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
+                currentBaseEntity.put("contract",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditContract, false, true));
+                break;
+            case "currency":
+                event = (XMLEvent) xmlReader.next();
+                BaseEntity currency = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"),
+                        batch.getRepDate(), creditorId);
+
+                currency.put("short_name",
+                        new BaseValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData()));
+
+                currentBaseEntity.put("currency",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), currency, false, true));
+                break;
+            case "interest_rate_yearly":
+                event = (XMLEvent) xmlReader.next();
+                currentBaseEntity.put("interest_rate_yearly",
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                break;
+            case "contract_maturity_date": {
+                event = (XMLEvent) xmlReader.next();
+
+                String dateRaw = event.asCharacters().getData();
+
+                try {
+                    currentBaseEntity.put("contract_maturity_date",
+                            new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw), false, true));
+                } catch (ParseException e) {
+                    getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
+                }
+                break;
             }
-        } else if (localName.equals("actual_issue_date")) {
-            event = (XMLEvent) xmlReader.next();
-            String dateRaw = event.asCharacters().getData();
-            try {
-                currentBaseEntity.put("actual_issue_date", new BaseEntityDateValue(0, creditorId, batch.getRepDate(),
-                        dateFormat.parse(event.asCharacters().getData()), false, true));
-            } catch (ParseException e) {
-                getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
+            case "actual_issue_date": {
+                event = (XMLEvent) xmlReader.next();
+                String dateRaw = event.asCharacters().getData();
+                try {
+                    currentBaseEntity.put("actual_issue_date",
+                            new BaseEntityDateValue(0, creditorId, batch.getRepDate(),
+                                    dateFormat.parse(event.asCharacters().getData()), false, true));
+                } catch (ParseException e) {
+                    getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
+                }
+                break;
             }
-        } else if (localName.equals("credit_purpose")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity creditPurpose = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_purpose"),
-                    batch.getRepDate(), creditorId);
+            case "credit_purpose":
+                event = (XMLEvent) xmlReader.next();
+                BaseEntity creditPurpose = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_purpose"),
+                        batch.getRepDate(), creditorId);
 
-            creditPurpose.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
+                creditPurpose.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
 
-            currentBaseEntity.put("credit_purpose", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    creditPurpose, false, true));
-        } else if (localName.equals("credit_object")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity creditObject = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_object"),
-                    batch.getRepDate(), creditorId);
+                currentBaseEntity.put("credit_purpose",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditPurpose, false, true));
+                break;
+            case "credit_object":
+                event = (XMLEvent) xmlReader.next();
+                BaseEntity creditObject = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_object"),
+                        batch.getRepDate(), creditorId);
 
-            creditObject.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
+                creditObject.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
 
-            currentBaseEntity.put("credit_object", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    creditObject, false, true));
-        } else if (localName.equals("amount")) {
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("amount", new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                    new Double(event.asCharacters().getData()), false, true));
-        } else if (localName.equals("finance_source")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity financeSource = new BaseEntity(metaClassRepository.getMetaClass("ref_finance_source"),
-                    batch.getRepDate(), creditorId);
+                currentBaseEntity.put("credit_object",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditObject, false, true));
+                break;
+            case "amount":
+                event = (XMLEvent) xmlReader.next();
+                currentBaseEntity.put("amount",
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                break;
+            case "finance_source":
+                event = (XMLEvent) xmlReader.next();
+                BaseEntity financeSource = new BaseEntity(metaClassRepository.getMetaClass("ref_finance_source"),
+                        batch.getRepDate(), creditorId);
 
-            financeSource.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
+                financeSource.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
 
-            currentBaseEntity.put("finance_source", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    financeSource, false, true));
-        } else if (localName.equals("has_currency_earn")) {
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("has_currency_earn", new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(),
-                    new Boolean(event.asCharacters().getData()), false, true));
-        } else if (localName.equals("creditor_branch")) {
-            creditorBranchParser.parse(xmlReader, batch, index, creditorId);
-            BaseEntity creditorBranch = creditorBranchParser.getCurrentBaseEntity();
-            currentBaseEntity.put("creditor_branch", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    creditorBranch, false, true));
-        } else if (localName.equals("portfolio")) {
-            portfolioCount++;
+                currentBaseEntity.put("finance_source",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), financeSource, false, true));
+                break;
+            case "has_currency_earn":
+                event = (XMLEvent) xmlReader.next();
+                currentBaseEntity.put("has_currency_earn",
+                        new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(),
+                                Boolean.valueOf(event.asCharacters().getData()), false, true));
+                break;
+            case "creditor_branch":
+                creditorBranchParser.parse(xmlReader, batch, index, creditorId);
+                BaseEntity creditorBranch = creditorBranchParser.getCurrentBaseEntity();
 
-            if (portfolioCount == 2) {
+                currentBaseEntity.put("creditor_branch",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditorBranch, false, true));
+                break;
+            case "portfolio":
+                portfolioCount++;
+
+                if (portfolioCount == 2) {
+                    String value = getNullableTagValue(localName, event, xmlReader);
+
+                    if (value != null) {
+                        BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),
+                                batch.getRepDate(), creditorId);
+
+                        portfolio.put("code",
+                                new BaseEntityStringValue(0, creditorId, batch.getRepDate(), value, false, true));
+
+                        currentPortfolio.put("portfolio",
+                                new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), portfolio, false, true));
+                    } else {
+                        currentPortfolio.put("portfolio",
+                                new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), null, false, true));
+                    }
+                } else {
+                    currentPortfolio = new BaseEntity(metaClassRepository.getMetaClass("portfolio"), batch.getRepDate(), creditorId);
+                }
+                break;
+            case "portfolio_msfo":
                 String value = getNullableTagValue(localName, event, xmlReader);
 
                 if (value != null) {
-                    BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),
+                    BaseEntity portfolioMSFO = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),
                             batch.getRepDate(), creditorId);
-                    portfolio.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), value, false, true));
-                    currentPortfolio.put("portfolio", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                            portfolio, false, true));
+
+                    portfolioMSFO.put("code",
+                            new BaseEntityStringValue(0, creditorId, batch.getRepDate(), value, false, true));
+
+                    currentPortfolio.put("portfolio_msfo",
+                            new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), portfolioMSFO, false, true));
                 } else {
-                    currentPortfolio.put("portfolio",new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                            null, false, true));
+                    currentPortfolio.put("portfolio_msfo",
+                            new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), null, false, true));
                 }
-            } else{
-                currentPortfolio = new BaseEntity(metaClassRepository.getMetaClass("portfolio"), batch.getRepDate(), creditorId);
-            }
-
-        } else if (localName.equals("portfolio_msfo")) {
-            String value = getNullableTagValue(localName, event, xmlReader);
-
-            if (value != null) {
-                BaseEntity portfolioMSFO = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),
-                        batch.getRepDate(), creditorId);
-                portfolioMSFO.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), value, false, true));
-                currentPortfolio.put("portfolio_msfo", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                        portfolioMSFO, false, true));
-            } else {
-                currentPortfolio.put("portfolio_msfo", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                        null, false, true));
-            }
-        } else {
-            throw new UnknownTagException(localName);
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -174,28 +204,42 @@ public class CreditParser extends BatchParser {
     }
 
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("credit")) {
-            return true;
-        } else if (localName.equals("contract")) {
-        } else if (localName.equals("currency")) {
-        } else if (localName.equals("interest_rate_yearly")) {
-        } else if (localName.equals("contract_maturity_date")) {
-        } else if (localName.equals("actual_issue_date")) {
-        } else if (localName.equals("credit_purpose")) {
-        } else if (localName.equals("credit_object")) {
-        } else if (localName.equals("amount")) {
-        } else if (localName.equals("finance_source")) {
-        } else if (localName.equals("has_currency_earn")) {
-        } else if (localName.equals("creditor_branch")) {
-        } else if (localName.equals("portfolio")) {
-            portfolioCount--;
-            if (portfolioCount == 0)
-                currentBaseEntity.put("portfolio", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                        currentPortfolio, false, true));
+        switch (localName) {
+            case "credit":
+                return true;
+            case "contract":
+                break;
+            case "currency":
+                break;
+            case "interest_rate_yearly":
+                break;
+            case "contract_maturity_date":
+                break;
+            case "actual_issue_date":
+                break;
+            case "credit_purpose":
+                break;
+            case "credit_object":
+                break;
+            case "amount":
+                break;
+            case "finance_source":
+                break;
+            case "has_currency_earn":
+                break;
+            case "creditor_branch":
+                break;
+            case "portfolio":
+                portfolioCount--;
+                if (portfolioCount == 0)
+                    currentBaseEntity.put("portfolio",
+                            new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), currentPortfolio, false, true));
 
-        } else if (localName.equals("portfolio_msfo")) {
-        } else {
-            throw new UnknownTagException(localName);
+                break;
+            case "portfolio_msfo":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;

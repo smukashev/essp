@@ -21,17 +21,25 @@ public class SubjectOrganizationNamesParser extends BatchParser {
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if (localName.equals("names")) {
-        } else if (localName.equals("name")) {
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("organization_name"),
-                    batch.getRepDate(), creditorId);
-            currentBaseEntity.put("lang", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asStartElement().getAttributeByName(new QName("lang")).getValue(), false, true));
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("name", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "names":
+                break;
+            case "name":
+                currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("organization_name"),
+                        batch.getRepDate(), creditorId);
+
+                currentBaseEntity.put("lang",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
+                                event.asStartElement().getAttributeByName(new QName("lang")).getValue(), false, true));
+
+                event = (XMLEvent) xmlReader.next();
+
+                currentBaseEntity.put("name",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
+                                event.asCharacters().getData(), false, true));
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -39,14 +47,15 @@ public class SubjectOrganizationNamesParser extends BatchParser {
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("names")) {
-            hasMore = false;
-            return true;
-        } else if (localName.equals("name")) {
-            hasMore = true;
-            return true;
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "names":
+                hasMore = false;
+                return true;
+            case "name":
+                hasMore = true;
+                return true;
+            default:
+                throw new UnknownTagException(localName);
         }
     }
 }

@@ -22,28 +22,40 @@ public class PledgesParser extends BatchParser {
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if (localName.equals("pledges")) {
-        } else if (localName.equals("pledge")) {
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("pledge"), batch.getRepDate(), creditorId);
-        } else if (localName.equals("pledge_type")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity pledgeType = new BaseEntity(metaClassRepository.getMetaClass("ref_pledge_type"),
-                    batch.getRepDate(), creditorId);
-            pledgeType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-            currentBaseEntity.put("pledge_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),pledgeType,
-                    false, true));
-        } else if (localName.equals("contract")) {
-        } else if (localName.equals("no")) {
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("contract", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-        } else if (localName.equals("value")) {
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                    new Double(event.asCharacters().getData()), false, true));
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "pledges":
+                break;
+            case "pledge":
+                currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("pledge"),
+                        batch.getRepDate(), creditorId);
+                break;
+            case "pledge_type":
+                event = (XMLEvent) xmlReader.next();
+
+                BaseEntity pledgeType = new BaseEntity(metaClassRepository.getMetaClass("ref_pledge_type"),
+                        batch.getRepDate(), creditorId);
+
+                pledgeType.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+
+                currentBaseEntity.put("pledge_type",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), pledgeType, false, true));
+                break;
+            case "contract":
+                break;
+            case "no":
+                event = (XMLEvent) xmlReader.next();
+                currentBaseEntity.put("contract",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                break;
+            case "value":
+                event = (XMLEvent) xmlReader.next();
+                currentBaseEntity.put("value",
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
+                                new Double(event.asCharacters().getData()), false, true));
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -51,18 +63,23 @@ public class PledgesParser extends BatchParser {
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("pledges")) {
-            hasMore = false;
-            return true;
-        } else if (localName.equals("pledge")) {
-            hasMore = true;
-            return true;
-        } else if (localName.equals("pledge_type")) {
-        } else if (localName.equals("contract")) {
-        } else if (localName.equals("no")) {
-        } else if (localName.equals("value")) {
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "pledges":
+                hasMore = false;
+                return true;
+            case "pledge":
+                hasMore = true;
+                return true;
+            case "pledge_type":
+                break;
+            case "contract":
+                break;
+            case "no":
+                break;
+            case "value":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;

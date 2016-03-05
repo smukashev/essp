@@ -29,17 +29,22 @@ public class CreditContractParser extends BatchParser {
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         try {
-            if (localName.equals("contract")) {
-            } else if (localName.equals("no")) {
-                event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("no", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                        event.asCharacters().getData(), false, true));
-            } else if (localName.equals("date")) {
-                event = (XMLEvent) xmlReader.next();
-                currentBaseEntity.put("date", new BaseEntityDateValue(0, creditorId, batch.getRepDate(),
-                        dateFormat.parse(event.asCharacters().getData()), false, true));
-            } else {
-                throw new UnknownTagException(localName);
+            switch (localName) {
+                case "contract":
+                    break;
+                case "no":
+                    event = (XMLEvent) xmlReader.next();
+                    currentBaseEntity.put("no",
+                            new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                    break;
+                case "date":
+                    event = (XMLEvent) xmlReader.next();
+                    currentBaseEntity.put("date",
+                            new BaseEntityDateValue(0, creditorId, batch.getRepDate(),
+                                    dateFormat.parse(event.asCharacters().getData()), false, true));
+                    break;
+                default:
+                    throw new UnknownTagException(localName);
             }
         } catch (ParseException parseException) {
             throw new UnknownValException(localName, event.asCharacters().getData());
@@ -50,12 +55,15 @@ public class CreditContractParser extends BatchParser {
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("contract")) {
-            return true;
-        } else if (localName.equals("no")) {
-        } else if (localName.equals("date")) {
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "contract":
+                return true;
+            case "no":
+                break;
+            case "date":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
         return false;
     }

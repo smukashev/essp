@@ -522,32 +522,28 @@ public class ZipFilesMonitor {
 			ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
 
 			if (manifestEntry == null) { // credit-registry
-				// this is fix for zip extract for file names with non latin chars
-				String batchName = null;
 				ZipArchiveInputStream zis = null;
 				byte[] extractedBytes = null;
 
 				try {
 					zis = new ZipArchiveInputStream(new FileInputStream(filename));
-					ZipArchiveEntry zipArchiveEntry = null;
 
-					while ((zipArchiveEntry = zis.getNextZipEntry()) != null) {
-						ByteArrayOutputStream baos = null;
+					while (zis.getNextZipEntry() != null) {
+						ByteArrayOutputStream byteArrayOutputStream = null;
 						try {
 							int size;
 							byte[] buffer = new byte[ZIP_BUFFER_SIZE];
 
-							baos = new ByteArrayOutputStream();
+							byteArrayOutputStream = new ByteArrayOutputStream();
 
 							while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
-								baos.write(buffer, 0, size);
+								byteArrayOutputStream.write(buffer, 0, size);
 							}
-							batchName = zipArchiveEntry.getName();
-							extractedBytes = baos.toByteArray();
+							extractedBytes = byteArrayOutputStream.toByteArray();
 						} finally {
-							if (baos != null) {
-								baos.flush();
-								baos.close();
+							if (byteArrayOutputStream != null) {
+								byteArrayOutputStream.flush();
+								byteArrayOutputStream.close();
 							}
 						}
 					}
@@ -633,7 +629,7 @@ public class ZipFilesMonitor {
 
 				zipFile.close();
 				saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
-			} else {
+			} else { // usci
 				InputStream inManifest = zipFile.getInputStream(manifestEntry);
 				DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder documentBuilder = null;
@@ -813,24 +809,22 @@ public class ZipFilesMonitor {
 
 		IEntityService entityService = serviceFactory.getEntityService();
 
-		boolean valid = true;
+		boolean valid;
 		long sleepCounter = 0;
 		do {
 			while (entityService.getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
 				Thread.sleep(1000);
 
 				sleepCounter++;
-				if (sleepCounter > WAIT_TIMEOUT) {
+
+				if (sleepCounter > WAIT_TIMEOUT)
 					logger.error("Sync timeout in reader.");
-					// throw new IllegalStateException("Sync timeout in reader.");
-				}
 			}
 			sleepCounter = 0;
 
 			WatchKey watchKey = watchService.take();
 
 			for (WatchEvent<?> event : watchKey.pollEvents()) {
-				WatchEvent.Kind kind = event.kind();
 				if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
 					String fileName = event.context().toString();
 					System.out.println("Поступил батч : " + fileName);
