@@ -13,12 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class SubjectOptimizer {
-
     private static Logger logger = LoggerFactory.getLogger(SubjectOptimizer.class);
-
-    private SubjectOptimizer() {
-        super();
-    }
 
     public static String getKeyString(final IBaseEntity iBaseEntity) {
         StringBuilder stringBuilder = new StringBuilder();
