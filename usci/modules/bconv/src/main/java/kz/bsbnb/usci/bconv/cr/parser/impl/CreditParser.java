@@ -55,19 +55,22 @@ public class CreditParser extends BatchParser {
                 break;
             case "currency":
                 event = (XMLEvent) xmlReader.next();
+
                 BaseEntity currency = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"),
                         batch.getRepDate(), creditorId);
 
                 currency.put("short_name",
-                        new BaseValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData()));
+                        new BaseValue<>(0, creditorId, batch.getRepDate(), event.asCharacters().getData()));
 
                 currentBaseEntity.put("currency",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), currency, false, true));
                 break;
             case "interest_rate_yearly":
                 event = (XMLEvent) xmlReader.next();
+
                 currentBaseEntity.put("interest_rate_yearly",
-                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
+                                new Double(event.asCharacters().getData()), false, true));
                 break;
             case "contract_maturity_date": {
                 event = (XMLEvent) xmlReader.next();
