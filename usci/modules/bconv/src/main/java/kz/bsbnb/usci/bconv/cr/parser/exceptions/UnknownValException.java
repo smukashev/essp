@@ -9,6 +9,6 @@ public class UnknownValException extends SAXException {
     private static final long serialVersionUID = 1L;
 
     public UnknownValException(String tagName, String value) {
-        super("Unknown value: " + value + " for " + tagName);
+        super("Неизвестное значение: " + value + " для " + tagName);
     }
 }

@@ -9,6 +9,6 @@ public class UnknownTagException extends SAXException {
     private static final long serialVersionUID = 1L;
 
     public UnknownTagException(String tagName) {
-        super("Unknown tag: " + tagName);
+        super("Неизвестный тэг: " + tagName);
     }
 }
