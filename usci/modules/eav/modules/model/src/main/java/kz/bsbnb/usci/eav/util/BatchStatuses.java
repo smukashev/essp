@@ -1,8 +1,5 @@
 package kz.bsbnb.usci.eav.util;
 
-/**
- * Created by maksat on 8/4/15.
- */
 public enum BatchStatuses implements IGlobal {
     WAITING,
     PROCESSING,
