@@ -79,6 +79,7 @@ public abstract class CommonReader<T> implements IReader<T> {
 
     protected class ErrorHandlerImpl implements ErrorHandler {
         private boolean isValid = true;
+        private String errMessage;
 
         @Override
         public void warning(SAXParseException exception) throws SAXException {
@@ -88,21 +89,13 @@ public abstract class CommonReader<T> implements IReader<T> {
         @Override
         public void error(SAXParseException exception) throws SAXException {
             isValid = false;
-            batchService.addBatchStatus(new BatchStatus()
-                    .setBatchId(batchId)
-                    .setStatus(BatchStatuses.ERROR)
-                    .setDescription(exception.getMessage())
-                    .setReceiptDate(new Date()));
+            errMessage = exception.getMessage();
         }
 
         @Override
         public void fatalError(SAXParseException exception) throws SAXException {
             isValid = false;
-            batchService.addBatchStatus(new BatchStatus()
-                    .setBatchId(batchId)
-                    .setStatus(BatchStatuses.ERROR)
-                    .setDescription(exception.getMessage())
-                    .setReceiptDate(new Date()));
+            errMessage = exception.getMessage();
         }
     }
 
@@ -129,6 +122,15 @@ public abstract class CommonReader<T> implements IReader<T> {
         validator.setErrorHandler(errorHandlerImpl);
 
         validator.validate(xml);
+
+        if (!errorHandlerImpl.isValid) {
+            batchService.addBatchStatus(new BatchStatus()
+                    .setBatchId(batchId)
+                    .setStatus(BatchStatuses.ERROR)
+                    .setDescription("XML не прошёл проверку XSD: " + errorHandlerImpl.errMessage)
+                    .setReceiptDate(new Date()));
+        }
+
         return errorHandlerImpl.isValid;
     }
 
