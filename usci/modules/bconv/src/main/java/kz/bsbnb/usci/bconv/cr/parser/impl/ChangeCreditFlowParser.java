@@ -28,7 +28,9 @@ public class ChangeCreditFlowParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit_flow"), batch.getRepDate(), creditorId);
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit_flow"),
+                batch.getRepDate(), creditorId);
+
         currentProvisionGroup = null;
         currentProvisionKfn = null;
         currentProvisionMsfo = null;
@@ -38,64 +40,84 @@ public class ChangeCreditFlowParser extends BatchParser {
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
-        if (localName.equals("credit_flow")) {
-        } else if (localName.equals("classification")) {
-            BaseEntity classification = new BaseEntity(metaClassRepository.getMetaClass("ref_classification"),
-                    batch.getRepDate(), creditorId);
-            event = (XMLEvent) xmlReader.next();
-            classification.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-            currentBaseEntity.put("classification", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    classification, false, true));
-        } else if (localName.equals("provision")) {
-            currentProvisionGroup = new BaseEntity(metaClassRepository.getMetaClass("provision_group"),
-                    batch.getRepDate(), creditorId);
+        switch (localName) {
+            case "credit_flow":
+                break;
+            case "classification":
+                BaseEntity classification = new BaseEntity(metaClassRepository.getMetaClass("ref_classification"),
+                        batch.getRepDate(), creditorId);
 
-            currentProvisionKfn = null;
-            currentProvisionMsfo = null;
-            currentProvisionMsfoOverB = null;
-        } else if (localName.equals("value")) {
-            event = (XMLEvent) xmlReader.next();
-            getCurrentProvisionKfn().put("value",
-                    new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()),
-                            false, true));
-        } else if (localName.equals("balance_account")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
-                    batch.getRepDate(), creditorId);
+                event = (XMLEvent) xmlReader.next();
 
-            balanceAccount.put("no_", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-            getCurrentProvisionKfn().put("balance_account", new BaseEntityComplexValue(0, creditorId,
-                    batch.getRepDate(), balanceAccount, false, true));
-        } else if (localName.equals("value_msfo")) {
-            event = (XMLEvent) xmlReader.next();
-            getCurrentProvisionMsfo().put("value",
-                    new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()),
-                            false, true));
-        } else if (localName.equals("balance_account_msfo")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
-                    batch.getRepDate(), creditorId);
-            balanceAccount.put("no_", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-            getCurrentProvisionMsfo().put("balance_account", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    balanceAccount, false, true));
-        } else if (localName.equals("value_msfo_over_balance")) {
-            event = (XMLEvent) xmlReader.next();
-            getCurrentProvisionMsfoOverB().put("value",
-                    new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()),
-                            false, true));
-        } else if (localName.equals("balance_account_msfo_over_balance")) {
-            event = (XMLEvent) xmlReader.next();
-            BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
-                    batch.getRepDate(), creditorId);
-            balanceAccount.put("no_", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-            getCurrentProvisionMsfoOverB().put("balance_account", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    balanceAccount, false, true));
-        } else {
-            throw new UnknownTagException(localName);
+                classification.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+
+                currentBaseEntity.put("classification",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), classification, false, true));
+                break;
+            case "provision":
+                currentProvisionGroup = new BaseEntity(metaClassRepository.getMetaClass("provision_group"),
+                        batch.getRepDate(), creditorId);
+
+                currentProvisionKfn = null;
+                currentProvisionMsfo = null;
+                currentProvisionMsfoOverB = null;
+                break;
+            case "value":
+                event = (XMLEvent) xmlReader.next();
+                getCurrentProvisionKfn().put("value",
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                break;
+            case "balance_account": {
+                event = (XMLEvent) xmlReader.next();
+                BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
+                        batch.getRepDate(), creditorId);
+
+                balanceAccount.put("no_",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+
+                getCurrentProvisionKfn().put("balance_account",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), balanceAccount, false, true));
+                break;
+            }
+            case "value_msfo":
+                event = (XMLEvent) xmlReader.next();
+                getCurrentProvisionMsfo().put("value",
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()),
+                                false, true));
+                break;
+            case "balance_account_msfo": {
+                event = (XMLEvent) xmlReader.next();
+
+                BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
+                        batch.getRepDate(), creditorId);
+
+                balanceAccount.put("no_",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+
+                getCurrentProvisionMsfo().put("balance_account",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), balanceAccount, false, true));
+                break;
+            }
+            case "value_msfo_over_balance":
+                event = (XMLEvent) xmlReader.next();
+                getCurrentProvisionMsfoOverB().put("value",
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                break;
+            case "balance_account_msfo_over_balance": {
+                event = (XMLEvent) xmlReader.next();
+                BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
+                        batch.getRepDate(), creditorId);
+
+                balanceAccount.put("no_",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+
+                getCurrentProvisionMsfoOverB().put("balance_account",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), balanceAccount, false, true));
+                break;
+            }
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -103,33 +125,42 @@ public class ChangeCreditFlowParser extends BatchParser {
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("credit_flow")) {
-            return true;
-        } else if (localName.equals("classification")) {
-        } else if (localName.equals("provision")) {
-            if (currentProvisionKfn != null)
-                currentProvisionGroup.put("provision_kfn", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                        currentProvisionKfn, false, true));
+        switch (localName) {
+            case "credit_flow":
+                return true;
+            case "classification":
+                break;
+            case "provision":
+                if (currentProvisionKfn != null)
+                    currentProvisionGroup.put("provision_kfn",
+                            new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), currentProvisionKfn, false, true));
 
-            if (currentProvisionMsfo != null)
-                currentProvisionGroup.put("provision_msfo", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                        currentProvisionMsfo, false, true));
+                if (currentProvisionMsfo != null)
+                    currentProvisionGroup.put("provision_msfo",
+                            new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), currentProvisionMsfo, false, true));
 
-            if (currentProvisionMsfoOverB != null)
-                currentProvisionGroup.put("provision_msfo_over_balance", new BaseEntityComplexValue(0, creditorId,
-                        batch.getRepDate(), currentProvisionMsfoOverB, false, true));
+                if (currentProvisionMsfoOverB != null)
+                    currentProvisionGroup.put("provision_msfo_over_balance",
+                            new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), currentProvisionMsfoOverB, false, true));
 
-            currentBaseEntity.put("provision", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    currentProvisionGroup, false, true));
+                currentBaseEntity.put("provision",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), currentProvisionGroup, false, true));
 
-        } else if (localName.equals("balance_account")) {
-        } else if (localName.equals("balance_account_msfo")) {
-        } else if (localName.equals("balance_account_msfo_over_balance")) {
-        } else if (localName.equals("value")) {
-        } else if (localName.equals("value_msfo")) {
-        } else if (localName.equals("value_msfo_over_balance")) {
-        } else {
-            throw new UnknownTagException(localName);
+                break;
+            case "balance_account":
+                break;
+            case "balance_account_msfo":
+                break;
+            case "balance_account_msfo_over_balance":
+                break;
+            case "value":
+                break;
+            case "value_msfo":
+                break;
+            case "value_msfo_over_balance":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;

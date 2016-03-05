@@ -79,50 +79,61 @@ public class MainParser extends BatchParser {
     }
 
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if (localName.equals("batch")) {
-        } else if (localName.equals("info")) {
-            infoParser.parse(xmlReader, batch, index, creditorId);
-        } else if (localName.equals("packages")) {
-        } else if (localName.equals("package")) {
-            BaseEntity pkg = new BaseEntity(metaClassRepository.getMetaClass("credit"), batch.getRepDate(), creditorId);
+        switch (localName) {
+            case "batch":
+                break;
+            case "info":
+                infoParser.parse(xmlReader, batch, index, creditorId);
+                break;
+            case "packages":
+                break;
+            case "package":
+                BaseEntity pkg = new BaseEntity(metaClassRepository.getMetaClass("credit"),
+                        batch.getRepDate(), creditorId);
 
-            String strOperationType = event.asStartElement().getAttributeByName(
-                    new QName("operation_type")).getValue();
+                String strOperationType = event.asStartElement().getAttributeByName(
+                        new QName("operation_type")).getValue();
 
-            if (strOperationType.equals("insert")) {
-                pkg.setOperation(OperationType.INSERT);
-            } else if (strOperationType.equals("update")) {
-                pkg.setOperation(OperationType.UPDATE);
-            } else {
-                throw new IllegalStateException(Errors.getMessage(Errors.E118, strOperationType));
-            }
+                switch (strOperationType) {
+                    case "insert":
+                        pkg.setOperation(OperationType.INSERT);
+                        break;
+                    case "update":
+                        pkg.setOperation(OperationType.UPDATE);
+                        break;
+                    default:
+                        throw new IllegalStateException(Errors.getMessage(Errors.E118, strOperationType));
+                }
 
-            packageParser.setCurrentBaseEntity(pkg);
-            hasMore = true;
-            parseNextPackage();
-            return true;
-        } else if (localName.equals("portfolio_data")) {
-            hasMore = true;
-            portfolioDataParser.parse(xmlReader, batch, index, creditorId);
-            currentBaseEntity = portfolioDataParser.getCurrentBaseEntity();
-            currentBaseEntity.put("creditor", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    infoParser.getCurrentBaseEntity(), false, true));
-            return true;
-        } else {
-            throw new UnknownTagException(localName);
+                packageParser.setCurrentBaseEntity(pkg);
+                hasMore = true;
+                parseNextPackage();
+                return true;
+            case "portfolio_data":
+                hasMore = true;
+                portfolioDataParser.parse(xmlReader, batch, index, creditorId);
+                currentBaseEntity = portfolioDataParser.getCurrentBaseEntity();
+                currentBaseEntity.put("creditor", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
+                        infoParser.getCurrentBaseEntity(), false, true));
+                return true;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
     }
 
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("batch")) {
-            hasMore = false;
-            return true;
-        } else if (localName.equals("info")) {
-        } else if (localName.equals("packages")) {
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "batch":
+                hasMore = false;
+                return true;
+            case "info":
+                break;
+            case "packages":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;

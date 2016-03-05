@@ -27,27 +27,33 @@ public class SubjectOrganizationDocsParser extends BatchParser {
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if (localName.equals("docs")) {
-        } else if (localName.equals("doc")) {
-            BaseEntity organizationDoc = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
-                    batch.getRepDate(), creditorId);
+        switch (localName) {
+            case "docs":
+                break;
+            case "doc":
+                BaseEntity organizationDoc = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
+                        batch.getRepDate(), creditorId);
 
-            organizationDoc.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
+                organizationDoc.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
+                                event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
 
-            currentBaseEntity.put("doc_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), organizationDoc,
-                    false, true));
+                currentBaseEntity.put("doc_type",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), organizationDoc, false, true));
 
-        } else if (localName.equals("name")) {
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("name", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-        } else if (localName.equals("no")) {
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("no", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-        } else {
-            throw new UnknownTagException(localName);
+                break;
+            case "name":
+                event = (XMLEvent) xmlReader.next();
+                currentBaseEntity.put("name",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                break;
+            case "no":
+                event = (XMLEvent) xmlReader.next();
+                currentBaseEntity.put("no",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -55,16 +61,19 @@ public class SubjectOrganizationDocsParser extends BatchParser {
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("docs")) {
-            hasMore = false;
-            return true;
-        } else if (localName.equals("doc")) {
-            hasMore = true;
-            return true;
-        } else if (localName.equals("name")) {
-        } else if (localName.equals("no")) {
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "docs":
+                hasMore = false;
+                return true;
+            case "doc":
+                hasMore = true;
+                return true;
+            case "name":
+                break;
+            case "no":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;

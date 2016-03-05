@@ -32,25 +32,30 @@ public class PortfolioDataParser extends BatchParser {
 
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_data"), batch.getRepDate(), creditorId);
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_data"),
+                batch.getRepDate(), creditorId);
     }
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if (localName.equals("portfolio_data")) {
-            // do nothing
-        } else if (localName.equals("portfolio_flow")) {
-            portfolioFlowParser.parse(xmlReader, batch, index, creditorId);
-            getPortfolioFlow().put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
-                    portfolioFlowParser.getCurrentBaseEntity(), false, true));
+        switch (localName) {
+            case "portfolio_data":
+                // do nothing
+                break;
+            case "portfolio_flow":
+                portfolioFlowParser.parse(xmlReader, batch, index, creditorId);
+                getPortfolioFlow().put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
+                        portfolioFlowParser.getCurrentBaseEntity(), false, true));
 
-        } else if (localName.equals("portfolio_flow_msfo")) {
-            portfolioFlowMsfoParser.parse(xmlReader, batch, index, creditorId);
-            getPortfolioFlowMsfo().put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
-                    portfolioFlowMsfoParser.getCurrentBaseEntity(), false, true));
+                break;
+            case "portfolio_flow_msfo":
+                portfolioFlowMsfoParser.parse(xmlReader, batch, index, creditorId);
+                getPortfolioFlowMsfo().put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
+                        portfolioFlowMsfoParser.getCurrentBaseEntity(), false, true));
 
-        } else {
-            throw new UnknownTagException(localName);
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -59,14 +64,14 @@ public class PortfolioDataParser extends BatchParser {
     @Override
     public boolean endElement(String localName) throws SAXException {
         if (localName.equals("portfolio_data")) {
-            if (portfolioFlow != null) {
-                currentBaseEntity.put("portfolio_flows_kfn", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(),
-                        portfolioFlow, false, true));
-            }
-            if (portfolioFlowMsfo != null) {
-                currentBaseEntity.put("portfolio_flows_msfo", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(),
-                        portfolioFlowMsfo, false, true));
-            }
+            if (portfolioFlow != null)
+                currentBaseEntity.put("portfolio_flows_kfn",
+                        new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), portfolioFlow, false, true));
+
+            if (portfolioFlowMsfo != null)
+                currentBaseEntity.put("portfolio_flows_msfo",
+                        new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), portfolioFlowMsfo, false, true));
+
             return true;
         } else {
             throw new UnknownTagException(localName);
@@ -74,16 +79,14 @@ public class PortfolioDataParser extends BatchParser {
     }
 
     private BaseSet getPortfolioFlow() {
-        if (portfolioFlow == null) {
+        if (portfolioFlow == null)
             portfolioFlow = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_kfn"));
-        }
         return portfolioFlow;
     }
 
     private BaseSet getPortfolioFlowMsfo() {
-        if (portfolioFlowMsfo == null) {
+        if (portfolioFlowMsfo == null)
             portfolioFlowMsfo = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_msfo"));
-        }
         return portfolioFlowMsfo;
     }
 }
