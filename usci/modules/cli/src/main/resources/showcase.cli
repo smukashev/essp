@@ -173,7 +173,7 @@ showcase list addHistoryKey name_id name_id
 showcase child init
 showcase child set name CORE_ORG_HEAD_NAMES_NAME
 showcase child set meta subject
-showcase child set tableName CORE_ORG
+showcase child set tableName CORE_ORG_HEAD_NAMES
 showcase child set downPath organization_info.head
 
 showcase child list add names name_id
@@ -219,6 +219,26 @@ showcase addIndex nonunique subject_id doc_id
 showcase addIndex nonunique doc_id
 
 #-----------------------------------------------------------------------------------
+# CHILD SUBJECT
+#-----------------------------------------------------------------------------------
+showcase child init
+showcase child set name CORE_ORG_HEAD_DOCS_SUBJECT
+showcase child set meta subject
+showcase child set tableName CORE_ORG_HEAD_DOCS
+showcase child set downPath organization_info.head
+
+showcase child list add docs doc_id
+showcase child list add docs.no doc_no
+showcase child list add docs.doc_type doc_type_id
+showcase child list add docs.name doc_name
+
+showcase child list addRootKey root subject_id
+showcase child list addHistoryKey subject_id subject_id
+showcase child list addHistoryKey document_id doc_id
+
+showcase child save
+
+#-----------------------------------------------------------------------------------
 # CHILD DOCUMENT
 #-----------------------------------------------------------------------------------
 showcase child init
@@ -231,8 +251,7 @@ showcase child list add no no
 showcase child list add doc_type.code doc_type_code
 showcase child list add name name
 
-showcase child list addRootKey subject_id subject_id
-showcase child list addHistoryKey subject_id subject_id
+showcase child list addRootKey document_id doc_id
 showcase child list addHistoryKey document_id doc_id
 
 showcase child save
