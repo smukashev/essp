@@ -11,11 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public final class PrimaryContractOptimizer {
-
     private static final Logger logger = LoggerFactory.getLogger(PrimaryContractOptimizer.class);
-
-    private PrimaryContractOptimizer() {
-    }
 
     public static String getKeyString(IBaseEntity iBaseEntity) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -24,8 +20,8 @@ public final class PrimaryContractOptimizer {
         IBaseValue dateBaseValue = iBaseEntity.getBaseValue("date");
 
         if (noBaseValue == null || dateBaseValue == null ||
-                noBaseValue.getValue() == null || dateBaseValue.getValue() == null){
-            logger.error(Errors.getError(Errors.getMessage(Errors.E187))+" : \n"+iBaseEntity);
+                noBaseValue.getValue() == null || dateBaseValue.getValue() == null) {
+            logger.error(Errors.getError(Errors.getMessage(Errors.E187)) + " : \n" + iBaseEntity);
             throw new IllegalStateException(Errors.getMessage(Errors.E187));
         }
 
@@ -33,7 +29,7 @@ public final class PrimaryContractOptimizer {
 
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 
-        stringBuilder.append("|").append(df.format((Date) dateBaseValue.getValue()));
+        stringBuilder.append(Errors.SEPARATOR).append(df.format((Date) dateBaseValue.getValue()));
 
         return stringBuilder.toString();
     }
