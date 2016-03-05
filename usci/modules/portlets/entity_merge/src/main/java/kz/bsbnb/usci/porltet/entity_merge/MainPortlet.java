@@ -268,6 +268,46 @@ public class MainPortlet extends MVCPortlet {
             }
         }
 
+        for (String innerClassesNames : meta.getSimpleArrayAttributesNames()) {
+            String attrTitle = innerClassesNames;
+            if (meta.getMetaAttribute(innerClassesNames).getTitle() != null &&
+                    meta.getMetaAttribute(innerClassesNames).getTitle().trim().length() > 0)
+                attrTitle = meta.getMetaAttribute(innerClassesNames).getTitle();
+
+            IBaseValue valueLeft = null;
+            IBaseValue valueRight = null;
+            BaseSet valueLeftSubSet = null;
+            BaseSet valueRightSubSet = null;
+
+            if (entityLeft != null) {
+                valueLeft = entityLeft.getBaseValue(innerClassesNames);
+            }
+
+            if (entityRight != null) {
+                valueRight = entityRight.getBaseValue(innerClassesNames);
+            }
+
+            if (valueLeft != null) {
+                valueLeftSubSet = (BaseSet) valueLeft.getValue();
+            }
+
+            if (valueRight != null) {
+                valueRightSubSet = (BaseSet) valueRight.getValue();
+            }
+
+            if ((valueLeft != null && valueLeftSubSet != null) ||
+                    (valueRight != null && valueRightSubSet != null)) {
+                if (!first) {
+                    str += ",";
+                } else {
+                    first = false;
+                }
+
+                str += setToJson(valueLeftSubSet, valueRightSubSet,
+                        attrTitle, innerClassesNames);
+            }
+        }
+
         for (String innerClassesNames : meta.getSimpleAttributesNames()) {
             String attrTitle = innerClassesNames;
             if (meta.getMetaAttribute(innerClassesNames).getTitle() != null &&

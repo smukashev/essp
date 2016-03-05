@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
@@ -8,6 +7,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 
 import java.util.*;
 
@@ -566,6 +566,20 @@ public class MetaClass extends MetaContainer implements IMetaClass {
             IMetaType type = this.getMemberType(attributeName);
 
             if (type.isSet() && type.isComplex())
+                filteredAttributeNames.add(attributeName);
+        }
+
+        return filteredAttributeNames;
+    }
+
+    public Set<String> getSimpleArrayAttributesNames() {
+        Set<String> allAttributeNames = this.members.keySet();
+        Set<String> filteredAttributeNames = new HashSet<>();
+
+        for (String attributeName : allAttributeNames) {
+            IMetaType type = this.getMemberType(attributeName);
+
+            if (type.isSet() && !type.isComplex())
                 filteredAttributeNames.add(attributeName);
         }
 
