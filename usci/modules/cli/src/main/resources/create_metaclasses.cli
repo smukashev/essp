@@ -104,6 +104,7 @@ meta add --name=ref_creditor --attribute=short_name --type=string --required
 meta add --name=ref_creditor --attribute=subject_type --type=meta_class --childname=ref_subject_type --keytype=any --immutable
 meta add --name=ref_creditor --attribute=docs --type=meta_class --childname=document --array --keytype=any --cumulative
 meta key --name=ref_creditor --attribute=docs
+meta key --name=ref_creditor --attribute=code --optional
 
 #====================================
 #= REF_REGION
