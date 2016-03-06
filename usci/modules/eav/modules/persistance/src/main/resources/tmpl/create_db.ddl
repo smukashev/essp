@@ -33,6 +33,7 @@
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
 		<column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+		<column name="is_optional_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_required" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
@@ -74,6 +75,7 @@
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
 		<column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+		<column name="is_optional_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_required" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_immutable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>

@@ -431,8 +431,11 @@ public enum Errors {
         String error = Errors.getError(paramArr[0]);
         List<String> params = Arrays.asList(Arrays.copyOfRange(paramArr, 1, paramArr.length));
 
+        if (error == null) // DT:checkme!
+            return message;
+
         Matcher matcher = Pattern.compile("#\\s*(\\w+)").matcher(error);
-        List<String> matches = new ArrayList<String>();
+        List<String> matches = new ArrayList<>();
         while (matcher.find()) {
             matches.add("#" + matcher.group(1));
         }
