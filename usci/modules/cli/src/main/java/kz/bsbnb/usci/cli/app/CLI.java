@@ -963,7 +963,7 @@ public class CLI {
                     actualCount++;
                 } catch (Exception ex) {
                     lastException = ex;
-                    System.out.println("Ошибка: " + ex.getMessage());
+                    System.out.println("Ошибка: " + Errors.unmarshall(ex.getMessage()));
                 }
             }
             Batch batch = reader.getBatch();
