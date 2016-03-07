@@ -10,17 +10,12 @@
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<column name="parent_is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
-		<unique name ="emc_UN_n_bd">
+		<unique name ="emc_UN_n">
 			<unique-column name="name"/>
-			<unique-column name="begin_date"/>
 		</unique>
-		<index name="emc_IN_bd_n_id">
-			<index-column name="begin_date"/>
+		<index name="emc_IN_n_id">
 			<index-column name="name"/>
 			<index-column name="is_disabled"/>
-		</index>
-		<index name="emc_IN_bd">
-			<index-column name="begin_date"/>
 		</index>
 		<index name="emc_IN_ir">
 			<index-column name="is_reference"/>

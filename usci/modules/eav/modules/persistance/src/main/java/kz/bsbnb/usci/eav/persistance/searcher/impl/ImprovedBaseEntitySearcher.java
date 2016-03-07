@@ -62,8 +62,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
         if (select != null) {
             logger.debug(select.toString());
-            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
-                    select.getBindValues().toArray());
+            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
             if (rows.size() > 1)
                 throw new IllegalStateException(Errors.getMessage(Errors.E83,entity.getMeta().getClassName()));
@@ -78,12 +77,6 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
     }
 
     public SelectConditionStep generateSQL(IBaseEntity entity, Long creditorId, String entityName) {
-        return generateSQL(entity, creditorId, entityName, null);
-    }
-
-    @SuppressWarnings("unchecked")
-    public SelectConditionStep generateSQL(IBaseEntity entity, Long creditorId, String entityName,
-                                           HashMap<String, ArrayList<String>> arrayKeyFilter) {
         MetaClass metaClass = entity.getMeta();
         String entityAlias = (entityName == null ? "root" : "e_" + entityName);
 
@@ -98,9 +91,25 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             IMetaAttribute metaAttribute = metaClass.getMetaAttribute(name);
             IMetaType memberType = metaClass.getMemberType(name);
 
-            if (metaAttribute.isKey()) {
-                IBaseValue baseValue = entity.safeGetValue(name);
+            IBaseValue baseValue = entity.getBaseValue(name);
 
+            if (metaAttribute.isOptionalKey()) {
+                generateJoins(joins, entityAlias, name, memberType, creditorId, metaAttribute);
+
+                MetaValue metaValue = (MetaValue) memberType;
+                Table simpleTable = StructType.getSimpleTableName(metaValue.getTypeCode());
+                Object simpleValue = StructType.getSimpleValue(metaValue.getTypeCode(), baseValue.getValue());
+
+                String valueAlias = "v_" + name;
+
+                condition = simpleTable.as(valueAlias).field("VALUE").equal(simpleValue)
+                        .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
+                        .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true)));
+
+                break;
+            }
+
+            if (metaAttribute.isKey()) {
                 if ((baseValue == null || baseValue.getValue() == null)
                         && metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
                     throw new KnownException(Errors.getMessage(Errors.E177, name, entity.getMeta().getClassName()));
@@ -279,13 +288,13 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 MetaValue metaValue = (MetaValue) type;
                 Table simpleTable = StructType.getSimpleTableName(metaValue.getTypeCode());
 
-                joins = joins.join(simpleTable.as(valueAlias)).
-                        on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(simpleTable.as(valueAlias).field("ENTITY_ID"))
+                joins = joins.join(simpleTable.as(valueAlias))
+                        .on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(simpleTable.as(valueAlias).field("ENTITY_ID"))
                         .and(simpleTable.as(valueAlias).field("CREDITOR_ID").equal(creditorId)
                         .and(simpleTable.as(valueAlias).field("ATTRIBUTE_ID").equal(attribute.getId()))));
             } else {
-                joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias)).
-                        on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID)
+                joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias))
+                        .on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID)
                         .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ATTRIBUTE_ID.equal(attribute.getId())));
             }
         }

@@ -98,11 +98,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     public long search(IBaseEntity baseEntity, long creditorId) {
-        IMetaClass metaClass = baseEntity.getMeta();
-
-        Long baseEntityId = searcherPool.getSearcher(metaClass.getClassName()).
-                findSingle((BaseEntity) baseEntity, creditorId);
-
+        Long baseEntityId = searcherPool.getSearcher(baseEntity.getMeta().getClassName()).findSingle((BaseEntity) baseEntity, creditorId);
         return baseEntityId == null ? 0 : baseEntityId;
     }
 
@@ -160,8 +156,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             } else {
                 baseEntityId = search(baseEntity, creditorId);
             }
-
-
 
             if (baseEntityId > 0)
                 baseEntity.setId(baseEntityId);
