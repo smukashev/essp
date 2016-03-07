@@ -15,6 +15,14 @@ import java.util.List;
 public class SubjectOptimizer {
     private static Logger logger = LoggerFactory.getLogger(SubjectOptimizer.class);
 
+    private static List<String> identificationCodes = new ArrayList<>();
+
+    static {
+        identificationCodes.add("06"); // ИНН
+        identificationCodes.add("07"); // РНН
+        identificationCodes.add("11"); // БИН
+    }
+
     public static String getKeyString(final IBaseEntity iBaseEntity) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -33,9 +41,9 @@ public class SubjectOptimizer {
             IBaseEntity document = (IBaseEntity) docValue.getValue();
 
             IBaseEntity docType = (IBaseEntity) document.getBaseValue("doc_type").getValue();
-            boolean isIdentification = (boolean) docType.getBaseValue("is_identification").getValue();
+            String docTypeCode = (String) docType.getBaseValue("code").getValue();
 
-            if (isIdentification) {
+            if (identificationCodes.contains(docTypeCode)) {
                 if (document.getId() == 0)
                     return null;
 

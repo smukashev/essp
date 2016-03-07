@@ -116,8 +116,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         final boolean isReference = metaClass.isReference();
         creditorId =  isReference ? 0 : creditorId;
 
-        final String REF_DOC_TYPE = "ref_doc_type";
-
         for (String attribute : baseEntity.getAttributes()) {
             IMetaType metaType = baseEntity.getMemberType(attribute);
             IBaseValue baseValue = baseEntity.getBaseValue(attribute);
@@ -135,12 +133,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     } else {
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
-                        if (childBaseEntity.getValueCount() != 0) {
-                            if (childBaseEntity.getMeta().getClassName().equals(REF_DOC_TYPE))
-                                baseValue.setValue(prepare(childBaseEntity, creditorId));
-                            else
-                                prepare(childBaseEntity, creditorId);
-                        }
+                        if (childBaseEntity.getValueCount() != 0)
+                            prepare(childBaseEntity, creditorId);
                     }
                 }
             }
@@ -163,11 +157,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         if (isReference)
             baseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
-
-        // fixme!
-        if (metaClass.getClassName().equals(REF_DOC_TYPE) && baseEntity.getId() > 0) {
-            baseEntity = baseEntityLoadDao.load(baseEntity.getId());
-        }
 
         return baseEntity;
     }
