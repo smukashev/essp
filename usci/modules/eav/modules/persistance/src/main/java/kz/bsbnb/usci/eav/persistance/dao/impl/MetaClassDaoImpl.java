@@ -38,13 +38,13 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         SelectForUpdateStep select;
 
         select = context.select(
-                EAV_M_CLASSES.IS_DISABLED,
-                EAV_M_CLASSES.BEGIN_DATE,
                 EAV_M_CLASSES.ID,
+                EAV_M_CLASSES.BEGIN_DATE,
                 EAV_M_CLASSES.NAME,
                 EAV_M_CLASSES.TITLE,
                 EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                 EAV_M_CLASSES.PARENT_IS_KEY,
+                EAV_M_CLASSES.IS_DISABLED,
                 EAV_M_CLASSES.IS_REFERENCE)
                 .from(EAV_M_CLASSES)
                 .orderBy(EAV_M_CLASSES.BEGIN_DATE.desc());
@@ -569,7 +569,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     ((BigDecimal) row.get("is_key")).longValue() == 1,
                     ((BigDecimal) row.get("is_nullable")).longValue() == 1);
 
-            metaAttribute.setOptionalKey(((BigDecimal) row.get("is_key")).longValue() == 1);
+            metaAttribute.setOptionalKey(((BigDecimal) row.get("is_optional_key")).longValue() == 1);
             metaAttribute.setFinal(((BigDecimal) row.get("is_final")).longValue() == 1);
             metaAttribute.setRequired(((BigDecimal) row.get("is_required")).longValue() == 1);
             metaAttribute.setImmutable(((BigDecimal) row.get("is_immutable")).longValue() == 1);
@@ -676,7 +676,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     ((BigDecimal) row.get("is_key")).longValue() == 1,
                     ((BigDecimal) row.get("is_nullable")).longValue() == 1);
 
-            metaAttribute.setOptionalKey(((BigDecimal) row.get("is_key")).longValue() == 1);
+            metaAttribute.setOptionalKey(((BigDecimal) row.get("is_optional_key")).longValue() == 1);
             metaAttribute.setImmutable(((BigDecimal) row.get("is_immutable")).longValue() == 1);
             metaAttribute.setFinal(((BigDecimal) row.get("is_final")).longValue() == 1);
             metaAttribute.setRequired(((BigDecimal) row.get("is_required")).longValue() == 1);
