@@ -105,7 +105,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
+                <version>1.0.0</version>
                 <executions>
                     <execution>
                         <phase>initialize</phase>
@@ -150,7 +150,7 @@
                         <database>
                             <name>${jooq.db.name}</name>
                             <includes>(SC_.*)|(EAV_.*)|(BATCH_.*)|(LOGIC_.*)|(MNT_.*)|(MAIL_.*)</includes>
-                            <excludes></excludes>
+                            <excludes>(SYS*)</excludes>
                             <inputSchema>${jooq.db.schema}</inputSchema>
                             <customTypes>
                                 <!--<customType>
@@ -204,7 +204,7 @@
                     </generator>
                 </configuration>
             </plugin>
-             <!--<plugin>
+             <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <version>1.2.1</version>
@@ -239,7 +239,7 @@
                     </systemProperty>
                 </systemProperties>
             </configuration>
-        </plugin>-->
+        </plugin>
         </plugins>
     </build>
 

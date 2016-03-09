@@ -94,8 +94,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             IBaseValue baseValue = entity.getBaseValue(name);
 
             if (metaAttribute.isOptionalKey()) {
-                if (baseValue == null) continue;
-
+                if (baseValue == null || baseValue.getValue() == null) continue;
                 generateJoins(joins, entityAlias, name, memberType, creditorId, metaAttribute);
 
                 MetaValue metaValue = (MetaValue) memberType;
