@@ -9,9 +9,9 @@ import java.util.Date;
  */
 public interface IPackageVersion extends IPersistable
 {
-    public Date getOpenDate();
+    public Date getReportDate();
 
-    public void setOpenDate(Date reportDate);
+    public void setReportDate(Date reportDate);
 
     public long getPackageId();
 

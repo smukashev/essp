@@ -2,6 +2,7 @@ package kz.bsbnb.usci.brms.rulesvr.dao;
 
 import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.SimpleTrack;
 
 import java.util.Date;
@@ -12,8 +13,8 @@ import java.util.List;
  */
 public interface IRuleDao extends IDao{
     long save(Rule rule,PackageVersion packageVersion);
-    //List<Rule> load(BatchVersion batchVersion);
-    List<Rule> load(String packageName, Date reportDate);
+    List<Rule> load(PackageVersion packageVersion);
+    //List<Rule> load(String packageName, Date reportDate);
     long update(Rule rule);
     List<Rule> getAllRules();
     List<SimpleTrack> getRuleTitles(Long packageId, Date repDate);
@@ -28,4 +29,5 @@ public interface IRuleDao extends IDao{
     void renameRule(long ruleId, String title);
     void clearAllRules();
     List<SimpleTrack> getRuleTitles(Long batchVersionId, String searchText);
+    List<PackageVersion> getPackageVersions(RulePackage rulePackage);
 }

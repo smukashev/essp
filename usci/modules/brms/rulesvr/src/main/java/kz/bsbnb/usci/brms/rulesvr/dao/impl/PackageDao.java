@@ -144,7 +144,7 @@ public class PackageDao implements IPackageDao
             IBatchVersion batchVersion = new BatchVersion();
             batchVersion.setId(((BigDecimal)row.get(LOGIC_PACKAGE_VERSIONS.ID.getName())).longValue());
             batchVersion.setPackageId(batchId);
-            batchVersion.setOpenDate((Date)row.get(LOGIC_PACKAGE_VERSIONS.OPEN_DATE.getName()));
+            batchVersion.setReportDate((Date)row.get(LOGIC_PACKAGE_VERSIONS.OPEN_DATE.getName()));
             ret.add(batchVersion);
         }
 

@@ -2,9 +2,12 @@ package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
 import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.SimpleTrack;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Delete;
+import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +22,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static kz.bsbnb.usci.brms.rulesvr.generated.Tables.*;
 
@@ -58,14 +58,19 @@ public class RuleDao implements IRuleDao {
     }
 
 
-    public List<Rule> load(PackageVersion packageVersion){
-        if (packageVersion.getId() < 1)
-            throw new IllegalArgumentException("Batchversion has no id.");
+    public List<Rule> load(PackageVersion packageVersion) {
+        //if (packageVersion.getId() < 1)
+        //    throw new IllegalArgumentException("Batchversion has no id.");
 
-        String SQL = "SELECT * FROM " + PREFIX_ + "rules WHERE id IN(SELECT rule_id FROM " + PREFIX_ +
-                "rule_package_versions WHERE package_versions_id = ?)";
+        Select select = context.select(LOGIC_RULES.ID,
+                LOGIC_RULES.RULE,LOGIC_RULES.TITLE, LOGIC_RULES.OPEN_DATE)
+                .from(LOGIC_RULES).join(LOGIC_RULE_PACKAGE)
+                .on(LOGIC_RULE_PACKAGE.RULE_ID.eq(LOGIC_RULES.ID))
+                .where(LOGIC_RULES.OPEN_DATE.lessOrEqual(DataUtils.convert(packageVersion.getReportDate())))
+                .and(LOGIC_RULES.CLOSE_DATE.greaterThan(DataUtils.convert(packageVersion.getReportDate()))
+                        .or(LOGIC_RULES.CLOSE_DATE.isNull()));
 
-        List<Rule> ruleList = jdbcTemplate.query(SQL,new Object[]{packageVersion.getId()},
+        List<Rule> ruleList = jdbcTemplate.query(select.getSQL(),select.getBindValues().toArray(),
                 new BeanPropertyRowMapper(Rule.class));
 
         return ruleList;
@@ -232,7 +237,36 @@ public class RuleDao implements IRuleDao {
     }
 
     @Override
-    public List<Rule> load(String packageName, Date reportDate) {
-        return null;
+    public List<PackageVersion> getPackageVersions(RulePackage rulePackage) {
+        Select select = context.select(LOGIC_RULES.OPEN_DATE)
+                .from(LOGIC_RULES)
+                .join(LOGIC_RULE_PACKAGE).on(LOGIC_RULES.ID.eq(LOGIC_RULE_PACKAGE.RULE_ID))
+                .and(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(rulePackage.getId()));
+
+        List<Map<String,Object>> rows
+                = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
+
+        Set<Date> dates = new HashSet<>();
+
+        for(Map<String,Object> row: rows) {
+            dates.add((Date)row.get(LOGIC_RULES.OPEN_DATE.getName()));
+        }
+
+        select = context.select(LOGIC_RULES.CLOSE_DATE)
+                .from(LOGIC_RULES)
+                .join(LOGIC_RULE_PACKAGE).on(LOGIC_RULES.ID.eq(LOGIC_RULE_PACKAGE.RULE_ID))
+                .and(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(rulePackage.getId()));
+
+        for(Map<String,Object> row: rows) {
+            dates.add((Date)row.get(LOGIC_RULES.CLOSE_DATE.getName()));
+        }
+
+        List<PackageVersion> ret = new LinkedList<>();
+
+        for(Date date: dates) {
+            ret.add(new PackageVersion(rulePackage.getName(), date));
+        }
+
+        return ret;
     }
 }

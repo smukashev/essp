@@ -9,25 +9,30 @@ import java.util.Date;
  * @author abukabayev
  */
 public class PackageVersion extends Persistable implements IPackageVersion {
-    private Date openDate;
+    private Date reportDate;
     private long packageId;
-    private String name;
+    private String packageName;
 
-    public PackageVersion(){
+    public PackageVersion() {
 
+    }
+
+    public PackageVersion(String packageName, Date date) {
+        this.reportDate = date;
+        this.packageName = packageName;
     }
 
     public PackageVersion(Date repDate, long package_id){
-       this.openDate = repDate;
+       this.reportDate = repDate;
        this.packageId = package_id;
     }
 
-    public Date getOpenDate() {
-        return openDate;
+    public Date getReportDate() {
+        return reportDate;
     }
 
-    public void setOpenDate(Date openDate) {
-        this.openDate = openDate;
+    public void setReportDate(Date reportDate) {
+        this.reportDate = reportDate;
     }
 
     public long getPackageId() {
@@ -39,15 +44,15 @@ public class PackageVersion extends Persistable implements IPackageVersion {
     }
 
     public String getName() {
-        return name;
+        return packageName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.packageName = name;
     }
 
     @Override
     public String toString() {
-        return "id: " + id + ", name: " + name + ", package_id: " + packageId;
+        return "id: " + id + ", packageName: " + packageName + ", package_id: " + packageId;
     }
 }

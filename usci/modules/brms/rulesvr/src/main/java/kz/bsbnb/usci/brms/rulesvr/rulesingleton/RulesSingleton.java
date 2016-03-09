@@ -91,7 +91,7 @@ public class RulesSingleton
         }
     }
 
-    private HashMap<String, ArrayList<RuleCasheEntry>> ruleCache = new HashMap<String, ArrayList<RuleCasheEntry>>();
+    //private HashMap<String, ArrayList<RuleCasheEntry>> ruleCache = new HashMap<String, ArrayList<RuleCasheEntry>>();
 
     private ArrayList<RulePackageError> rulePackageErrors = new ArrayList<RulePackageError>();
 
@@ -176,7 +176,7 @@ public class RulesSingleton
         //if(batchVersion == null)
         //    return "Версия пакета правил остутвует на текущую дату";
 
-        List<Rule> rules = ruleDao.load(pkgName, repDate);
+        List<Rule> rules = ruleDao.load(new PackageVersion(pkgName, repDate));
 
         String packages = "";
 
@@ -237,7 +237,7 @@ public class RulesSingleton
         List<RulePackage> packages = ruleBatchService.getAllPackages();
 
         rulePackageErrors.clear();
-        ruleCache.clear();
+        //ruleCache.clear();
 
 
 
@@ -246,43 +246,44 @@ public class RulesSingleton
 
             ArrayList<RuleCasheEntry> ruleCasheEntries = new ArrayList<RuleCasheEntry>();
 
-            for (PackageVersion curVersion : versions) {
-                List<Rule> rules = ruleDao.load(curVersion);
+            for (PackageVersion version : versions) {
+                List<Rule> rules = ruleDao.load(version);
 
-                String packages = "";
+                StringBuilder droolPackage = new StringBuilder();
 
-                packages += "package " + curPackage.getName() + "_" + curVersion.getId() + "\n";
-                packages += "dialect \"mvel\"\n";
-                packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
-                packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+                droolPackage.append("package " + curPackage.getName() + "_" + version.getReportDate() + "\n");
+                droolPackage.append("dialect \"mvel\"\n");
+                droolPackage.append("import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n");
+                droolPackage.append("import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n");
 
                 for (Rule r : rules)
                 {
                     if(r.isActive())
-                        packages += r.getRule() + "\n";
+                        droolPackage.append(r.getRule() + "\n");
                 }
 
-                logger.debug(packages);
+                logger.debug(droolPackage.toString());
                 //System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
                 try {
-                    setRules(packages);
+                    setRules(droolPackage.toString());
                 } catch (Exception e) {
-                    rulePackageErrors.add(new RulePackageError(curPackage.getName() + "_" + curVersion.getId(),
+                    rulePackageErrors.add(new RulePackageError(curPackage.getName() + "_" + version,
                             e.getMessage()));
                 }
 
-                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getOpenDate(),
-                        curPackage.getName() + "_" + curVersion.getId()));
+                ruleCasheEntries.add(new RuleCasheEntry(version.getReportDate(),
+                        curPackage.getName() + "_" + version));
             }
 
             Collections.sort(ruleCasheEntries);
-            ruleCache.put(curPackage.getName(), ruleCasheEntries);
+            //ruleCache.put(curPackage.getName(), ruleCasheEntries);
         }
     }
 
     public String getRulePackageName(String pkgName, Date repDate)
     {
-        List<RuleCasheEntry> versions = ruleCache.get(pkgName);
+        return "";
+        /*List<RuleCasheEntry> versions = ruleCache.get(pkgName);
 
         if (versions == null)
             throw new IllegalArgumentException("No such package " + pkgName);
@@ -297,7 +298,7 @@ public class RulesSingleton
             result = entry;
         }
 
-        return result.getRules();
+        return result.getRules();*/
     }
 
     public void runRules(BaseEntity entity, String pkgName, Date repDate)

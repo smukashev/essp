@@ -50,7 +50,7 @@ public class PackageService implements IPackageService
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 
         for(IPackageVersion packageVersion: list) {
-            Pair p = new Pair(packageVersion.getId(), sdf.format(packageVersion.getOpenDate()));
+            Pair p = new Pair(packageVersion.getId(), sdf.format(packageVersion.getReportDate()));
             ret.add(p);
         }
 
