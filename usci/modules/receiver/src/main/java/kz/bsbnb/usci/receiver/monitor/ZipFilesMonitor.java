@@ -279,10 +279,10 @@ public class ZipFilesMonitor {
 				cId = -1L;
 
 				batchService.addBatchStatus(new BatchStatus()
-								.setBatchId(batchId)
-								.setStatus(BatchStatuses.ERROR)
-								.setDescription("Can't find creditor for user with id: " + batchInfo.getUserId())
-								.setReceiptDate(new Date()));
+						.setBatchId(batchId)
+						.setStatus(BatchStatuses.ERROR)
+						.setDescription("Can't find creditor for user with id: " + batchInfo.getUserId())
+						.setReceiptDate(new Date()));
 
 				haveError = true;
 			}
