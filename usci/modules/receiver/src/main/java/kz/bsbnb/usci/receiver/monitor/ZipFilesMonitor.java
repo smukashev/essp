@@ -43,10 +43,6 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-/**
- * @author abukabayev
- */
-
 public class ZipFilesMonitor {
 	private final Logger logger = LoggerFactory.getLogger(ZipFilesMonitor.class);
 
@@ -78,6 +74,8 @@ public class ZipFilesMonitor {
 
 	private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
 	public ZipFilesMonitor(Map<String, Job> jobs) {
 		this.jobs = jobs;
 	}
@@ -86,8 +84,9 @@ public class ZipFilesMonitor {
 		try {
 			Batch batch = batchService.getBatch(batchId);
 			BatchInfo batchInfo = new BatchInfo(batch);
-			System.out.println(batchId + " - restarted");
-			//sender.addJob(batchId, batchInfo);
+
+            System.out.println(batchId + " - restarted");
+
 			jobLauncherQueue.addJob(batchId, batchInfo);
 			receiverStatusSingleton.batchReceived();
 			return true;
@@ -97,8 +96,6 @@ public class ZipFilesMonitor {
 
 		return false;
 	}
-
-	SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
 	@PostConstruct
 	public void init() {
@@ -121,8 +118,7 @@ public class ZipFilesMonitor {
 			System.out.println("-------------------------------------------------------------------------");
 
 			for (Batch b : pendingBatchList)
-				System.out.println(b.getId() + ", " + b.getFileName() + ", " +
-						dateFormat.format(b.getRepDate()));
+				System.out.println(b.getId() + ", " + b.getFileName() + ", " + dateFormat.format(b.getRepDate()));
 
 			System.out.println("-------------------------------------------------------------------------");
 
@@ -225,7 +221,6 @@ public class ZipFilesMonitor {
 	}
 
 	public void saveData(BatchInfo batchInfo, String filename, byte[] bytes, boolean isNB) {
-		// TODO: fix hardcoded settings
 		receiverStatusSingleton.batchReceived();
 
 		IBatchService batchService = serviceFactory.getBatchService();
@@ -242,7 +237,7 @@ public class ZipFilesMonitor {
 		long batchId = batchService.save(batch);
 		batch.setId(batchId);
 
-		Long cId = -1L;
+		Long cId;
 		boolean haveError = false;
 
 		if (batchInfo.getUserId() != 100500L) {
@@ -287,8 +282,7 @@ public class ZipFilesMonitor {
 				if (docType == null) docType = "";
 				if (docValue == null) docValue = "";
 
-				logger.error("Кредитор не найден: " + docType +
-						", " + docValue);
+				logger.error("Кредитор не найден: " + docType + ", " + docValue);
 
 				batchService.addBatchStatus(new BatchStatus()
 								.setBatchId(batchId)
@@ -300,9 +294,8 @@ public class ZipFilesMonitor {
 		}
 
 
-		if (!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
+		if (!haveError && !checkAndFillEavReport(cId, batchInfo, batchId))
 			haveError = true;
-		}
 
 		batch.setCreditorId(cId);
 		batch.setReportId(batchInfo.getReportId());
@@ -325,9 +318,10 @@ public class ZipFilesMonitor {
 	}
 
 	boolean waitForSignature(Batch batch, BatchInfo batchInfo) {
-		String digitalSignOrgs = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,
+		String digitalSignArguments = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,
                 DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
-		String[] orgIds = digitalSignOrgs.split(",");
+
+		String[] orgIds = digitalSignArguments.split(",");
 		if(batch.getCreditorId() > 0 && Arrays.asList(orgIds).contains(batch.getCreditorId() + "")) {
 			batchService.addBatchStatus(new BatchStatus()
 					.setBatchId(batch.getId())
@@ -346,6 +340,7 @@ public class ZipFilesMonitor {
 	private void filterUnsignedBatches(List<Batch> pendingBatchList) {
 		String digitalSignOrgs = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,
                 DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
+
 		String[] orgIds = digitalSignOrgs.split(",");
 		Iterator<Batch> it = pendingBatchList.iterator();
 		while(it.hasNext()) {

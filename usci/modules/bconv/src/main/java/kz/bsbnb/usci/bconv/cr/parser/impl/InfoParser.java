@@ -48,48 +48,7 @@ public class InfoParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
                 String crCode = event.asCharacters().getData();
 
-                RefListResponse refListResponse = refProcessorDao.getRefListResponse(metaClassRepository.getMetaClass("ref_creditor").getId(), batch.getRepDate(), false);
-
-                boolean found = false;
-
-                for (Map<String, Object> m : refListResponse.getData()) {
-                    if (m.get("CODE") != null && m.get("CODE").equals(crCode)) {
-                        long creditorId = ((BigDecimal) m.get("ID")).longValue();
-
-                        IBaseEntity loadedCreditor = baseEntityLoadDao.load(creditorId);
-                        BaseSet creditorDocsLoaded = (BaseSet) loadedCreditor.getEl("docs");
-                        BaseSet creditorDocs = new BaseSet(metaClassRepository.getMetaClass("document"));
-
-                        for (IBaseValue bv : creditorDocsLoaded.get()) {
-                            BaseEntity docLoaded = (BaseEntity) bv.getValue();
-
-                            BaseEntity doc = new BaseEntity(metaClassRepository.getMetaClass("document"),
-                                    batch.getRepDate(), creditorId);
-
-                            doc.put("no", new BaseValue<>(0, creditorId, batch.getRepDate(), docLoaded.getEl("no")));
-
-                            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
-                                    batch.getRepDate(), creditorId);
-
-                            docType.put("code",
-                                    new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                                            (String) docLoaded.getEl("doc_type.code"), false, true));
-
-                            doc.put("doc_type",
-                                    new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), docType, false, true));
-
-                            creditorDocs.put(new BaseValue<>(0, creditorId, batch.getRepDate(), doc));
-                        }
-
-                        currentBaseEntity.put("docs",
-                                new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), creditorDocs, false, true));
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found)
-                    currentBaseEntity.addValidationError(String.format("Кредитор с кодом %s не найден", crCode));
+                currentBaseEntity.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), crCode, false, true));
                 break;
             case "docs":
                 docs = new BaseSet(metaClassRepository.getMetaClass("document"));
