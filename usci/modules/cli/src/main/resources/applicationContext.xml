@@ -36,12 +36,14 @@
 
     <bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchService"/>
-        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IBatchService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IPackageService"/>
     </bean>
+    <!--
     <bean id="remoteBatchVersionService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchVersionService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService"/>
     </bean>
+    -->
     <bean id="remoteRuleService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1097/ruleService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IRuleService"/>

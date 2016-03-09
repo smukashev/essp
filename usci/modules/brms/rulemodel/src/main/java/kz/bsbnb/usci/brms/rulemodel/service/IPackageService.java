@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author abukabayev
  */
-public interface IBatchService {
+public interface IPackageService {
     public long save(RulePackage batch);
     public RulePackage load(long id);
     public List<RulePackage> getAllPackages();

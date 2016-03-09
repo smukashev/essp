@@ -1,9 +1,9 @@
 package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
 import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulemodel.service.IBatchService;
+import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -96,7 +96,7 @@ public class RulesSingleton
     private ArrayList<RulePackageError> rulePackageErrors = new ArrayList<RulePackageError>();
 
     @Autowired
-    private IBatchService ruleBatchService;
+    private IPackageService ruleBatchService;
     @Autowired
     private IRuleDao ruleDao;
     //@Autowired
@@ -241,17 +241,17 @@ public class RulesSingleton
 
 
 
-        for (RulePackage curBatch : packages) {
-            List<BatchVersion> versions = ruleBatchVersionService.getBatchVersions(curBatch);
+        for (RulePackage curPackage : packages) {
+            List<PackageVersion> versions = ruleDao.getPackageVersions(curPackage);
 
             ArrayList<RuleCasheEntry> ruleCasheEntries = new ArrayList<RuleCasheEntry>();
 
-            for (BatchVersion curVersion : versions) {
+            for (PackageVersion curVersion : versions) {
                 List<Rule> rules = ruleDao.load(curVersion);
 
                 String packages = "";
 
-                packages += "package " + curBatch.getName() + "_" + curVersion.getId() + "\n";
+                packages += "package " + curPackage.getName() + "_" + curVersion.getId() + "\n";
                 packages += "dialect \"mvel\"\n";
                 packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
                 packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
@@ -267,16 +267,16 @@ public class RulesSingleton
                 try {
                     setRules(packages);
                 } catch (Exception e) {
-                    rulePackageErrors.add(new RulePackageError(curBatch.getName() + "_" + curVersion.getId(),
+                    rulePackageErrors.add(new RulePackageError(curPackage.getName() + "_" + curVersion.getId(),
                             e.getMessage()));
                 }
 
                 ruleCasheEntries.add(new RuleCasheEntry(curVersion.getOpenDate(),
-                        curBatch.getName() + "_" + curVersion.getId()));
+                        curPackage.getName() + "_" + curVersion.getId()));
             }
 
             Collections.sort(ruleCasheEntries);
-            ruleCache.put(curBatch.getName(), ruleCasheEntries);
+            ruleCache.put(curPackage.getName(), ruleCasheEntries);
         }
     }
 

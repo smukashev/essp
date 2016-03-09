@@ -1,9 +1,9 @@
 package kz.bsbnb.usci.brms.rulesvr.service.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.IBatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.IPackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
-import kz.bsbnb.usci.brms.rulemodel.service.IBatchService;
-import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
+import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
+import kz.bsbnb.usci.brms.rulesvr.dao.IPackageDao;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +16,10 @@ import java.util.List;
  * @author abukabayev
  */
 @Service
-public class BatchService implements IBatchService
+public class BatchService implements IPackageService
 {
     @Autowired
-    private IBatchDao batchDao;
+    private IPackageDao batchDao;
 
     public BatchService() {
         super();
@@ -45,12 +45,12 @@ public class BatchService implements IBatchService
 
     @Override
     public List<Pair> getBatchVersions(Long batchId) {
-        List<IBatchVersion> list = batchDao.getBatchVersions(batchId);
+        List<IPackageVersion> list = batchDao.getBatchVersions(batchId);
         List<Pair> ret = new LinkedList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 
-        for(IBatchVersion batchVersion: list) {
-            Pair p = new Pair(batchVersion.getId(), sdf.format(batchVersion.getOpenDate()));
+        for(IPackageVersion packageVersion: list) {
+            Pair p = new Pair(packageVersion.getId(), sdf.format(packageVersion.getOpenDate()));
             ret.add(p);
         }
 

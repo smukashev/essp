@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.brms.rulesvr.dao.mapper;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -9,12 +9,12 @@ import java.sql.SQLException;
 /**
  * @author abukabayev
  */
-public class BatchVersionMapper implements RowMapper<BatchVersion> {
+public class BatchVersionMapper implements RowMapper<PackageVersion> {
     @Override
-    public BatchVersion mapRow(ResultSet resultSet, int i) throws SQLException {
-        BatchVersion batchVersion = new BatchVersion();
-        batchVersion.setId(resultSet.getLong("id"));
-        batchVersion.setOpenDate(resultSet.getTimestamp("report_date"));
-        return batchVersion;
+    public PackageVersion mapRow(ResultSet resultSet, int i) throws SQLException {
+        PackageVersion packageVersion = new PackageVersion();
+        packageVersion.setId(resultSet.getLong("id"));
+        packageVersion.setOpenDate(resultSet.getTimestamp("report_date"));
+        return packageVersion;
     }
 }

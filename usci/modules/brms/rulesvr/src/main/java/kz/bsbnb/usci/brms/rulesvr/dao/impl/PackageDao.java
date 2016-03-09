@@ -1,11 +1,9 @@
 package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.IBatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.IPackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
-import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
+import kz.bsbnb.usci.brms.rulesvr.dao.IPackageDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.mapper.BatchMapper;
-import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -27,7 +24,7 @@ import static kz.bsbnb.usci.brms.rulesvr.generated.Tables.*;
  */
 
 
-public class BatchDao implements IBatchDao
+public class PackageDao implements IPackageDao
 {
     private JdbcTemplate jdbcTemplate;
 
@@ -37,7 +34,7 @@ public class BatchDao implements IBatchDao
     @Autowired
     private DSLContext context;
 
-    public BatchDao() {
+    public PackageDao() {
     }
 
     public boolean testConnection()
@@ -133,7 +130,7 @@ public class BatchDao implements IBatchDao
     }
 
     @Override
-    public List<IBatchVersion> getBatchVersions(long batchId) {
+    public List<IPackageVersion> getBatchVersions(long batchId) {
         return new LinkedList<>();
         /*Select select = context.select(LOGIC_PACKAGE_VERSIONS.ID, LOGIC_PACKAGE_VERSIONS.OPEN_DATE)
                 .from(LOGIC_PACKAGE_VERSIONS)

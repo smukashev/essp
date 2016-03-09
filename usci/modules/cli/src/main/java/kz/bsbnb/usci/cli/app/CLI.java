@@ -5,8 +5,9 @@ import com.google.gson.stream.JsonReader;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.cli.app.command.impl.*;
 import kz.bsbnb.usci.cli.app.exporter.EntityExporter;
@@ -133,7 +134,7 @@ public class CLI {
 
     private IBatchService batchService;
 
-    private kz.bsbnb.usci.brms.rulemodel.service.IBatchService ruleBatchService;
+    private IPackageService ruleBatchService;
 
     //private IBatchVersionService batchVersionService;
 
@@ -147,7 +148,7 @@ public class CLI {
 
     private boolean started = false;
 
-    private BatchVersion currentBatchVersion;
+    private PackageVersion currentPackageVersion;
 
     private BaseEntity currentBaseEntity;
 
@@ -1905,10 +1906,10 @@ public class CLI {
 
             RmiProxyFactoryBean ruleBatchServiceFactoryBean = new RmiProxyFactoryBean();
             ruleBatchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
-            ruleBatchServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.brms.rulemodel.service.IBatchService.class);
+            ruleBatchServiceFactoryBean.setServiceInterface(IPackageService.class);
 
             ruleBatchServiceFactoryBean.afterPropertiesSet();
-            ruleBatchService = (kz.bsbnb.usci.brms.rulemodel.service.IBatchService) ruleBatchServiceFactoryBean.getObject();
+            ruleBatchService = (IPackageService) ruleBatchServiceFactoryBean.getObject();
 
             initBatchService();
 
@@ -2008,7 +2009,7 @@ public class CLI {
                 if (args.size() == 1)
                     System.out.println(currentRule == null ? null : currentRule.getRule());
                 else if (args.get(1).equals("version"))
-                    System.out.println(currentBatchVersion);
+                    System.out.println(currentPackageVersion);
                 else if (args.get(1).equals("package"))
                     System.out.println(currentPackageName);
                 else if (args.get(1).equals("date"))
@@ -2017,7 +2018,7 @@ public class CLI {
                     System.out.println(currentBaseEntity);
                 else throw new IllegalArgumentException();
             } else if (args.get(0).equals("save")) {
-                long ruleId = ruleService.createNewRuleInBatch(currentRule, currentBatchVersion);
+                long ruleId = ruleService.createNewRuleInBatch(currentRule, currentPackageVersion);
                 System.out.println("ok saved: ruleId = " + ruleId);
             } else if (args.get(0).equals("run")) {
 
@@ -2074,7 +2075,7 @@ public class CLI {
                     id = ruleBatchService.save(batch);
                     batch.setId(id);
                     //batchVersionService.save(batch);
-                    System.out.println("ok batch created with id:" + id);
+                    System.out.println("ok package created with id:" + id);
                 }
 
             } else if (args.get(0).equals("rc")) {

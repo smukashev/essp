@@ -1,9 +1,9 @@
 package kz.bsbnb.usci.brms.rulesvr.service.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
-import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
+import kz.bsbnb.usci.brms.rulesvr.dao.IPackageDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchVersionDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.brms.rulesvr.rulesingleton.RulesSingleton;
@@ -29,7 +29,7 @@ public class RuleService implements IRuleService {
     private IRuleDao ruleDao;
 
     @Autowired
-    private IBatchDao batchDao;
+    private IPackageDao batchDao;
 
     @Autowired
     private IBatchVersionDao batchVersionDao;
@@ -42,12 +42,12 @@ public class RuleService implements IRuleService {
     private RulesSingleton rulesSingleton;
 
     @Override
-    public long save(Rule rule, BatchVersion batchVersion) {
+    public long save(Rule rule, PackageVersion packageVersion) {
 
 //        Batch batch = batchDao.loadBatch(batchVersion.getPackageId());
 //
 //        listenerSingleton.callListeners(batchVersion.getId(),batchVersion.getReport_date(), batch.getName());
-        long id = ruleDao.save(rule,batchVersion);
+        long id = ruleDao.save(rule, packageVersion);
 
 //        listenerSingleton.callListeners(batchVersion.getId(), batchVersion.getReport_date(), batch.getName());
 
@@ -55,8 +55,8 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public List<Rule> load(BatchVersion batchVersion) {
-        return ruleDao.load(batchVersion);
+    public List<Rule> load(PackageVersion packageVersion) {
+        return ruleDao.load(packageVersion);
     }
 
     @Override
@@ -125,9 +125,9 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public long createNewRuleInBatch(Rule rule, BatchVersion batchVersion) {
+    public long createNewRuleInBatch(Rule rule, PackageVersion packageVersion) {
           long ruleId = ruleDao.createRule(rule);
-          ruleDao.save(ruleId, batchVersion.getId());
+          ruleDao.save(ruleId, packageVersion.getId());
           return ruleId;
     }
 

@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.brms.rulesvr.dao;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.SimpleTrack;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * @author abukabayev
  */
 public interface IRuleDao extends IDao{
-    long save(Rule rule,BatchVersion batchVersion);
+    long save(Rule rule,PackageVersion packageVersion);
     //List<Rule> load(BatchVersion batchVersion);
     List<Rule> load(String packageName, Date reportDate);
     long update(Rule rule);

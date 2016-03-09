@@ -7,7 +7,7 @@ import java.util.Date;
 /**
  * @author abukabayev
  */
-public interface IBatchVersion  extends IPersistable
+public interface IPackageVersion extends IPersistable
 {
     public Date getOpenDate();
 

@@ -1,13 +1,10 @@
 package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.SimpleTrack;
-import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Delete;
-import org.jooq.Select;
-import org.jooq.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,14 +58,14 @@ public class RuleDao implements IRuleDao {
     }
 
 
-    public List<Rule> load(BatchVersion batchVersion){
-        if (batchVersion.getId() < 1)
+    public List<Rule> load(PackageVersion packageVersion){
+        if (packageVersion.getId() < 1)
             throw new IllegalArgumentException("Batchversion has no id.");
 
         String SQL = "SELECT * FROM " + PREFIX_ + "rules WHERE id IN(SELECT rule_id FROM " + PREFIX_ +
                 "rule_package_versions WHERE package_versions_id = ?)";
 
-        List<Rule> ruleList = jdbcTemplate.query(SQL,new Object[]{batchVersion.getId()},
+        List<Rule> ruleList = jdbcTemplate.query(SQL,new Object[]{packageVersion.getId()},
                 new BeanPropertyRowMapper(Rule.class));
 
         return ruleList;
@@ -120,7 +117,7 @@ public class RuleDao implements IRuleDao {
         return jdbcTemplate.query(select.getSQL(), select.getBindValues().toArray(), new BeanPropertyRowMapper<SimpleTrack>(SimpleTrack.class));*/
     }
 
-    public long save(Rule rule, BatchVersion batchVersion){
+    public long save(Rule rule, PackageVersion packageVersion){
         String SQL = "INSERT INTO " + PREFIX_ + "rules(title, rule) VALUES(?, ?)";
         jdbcTemplate.update(SQL,rule.getTitle(),rule.getRule());
 

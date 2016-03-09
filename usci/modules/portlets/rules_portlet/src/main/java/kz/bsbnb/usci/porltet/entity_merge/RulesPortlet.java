@@ -6,7 +6,7 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
-import kz.bsbnb.usci.brms.rulemodel.service.IBatchService;
+import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.StaticRouter;
@@ -26,7 +26,7 @@ import java.util.*;
 
 public class RulesPortlet extends MVCPortlet{
     private IRuleService ruleService;
-    private IBatchService batchService;
+    private IPackageService batchService;
     private IEntityService entityService;
     private boolean retry;
 
@@ -52,11 +52,11 @@ public class RulesPortlet extends MVCPortlet{
 
         RmiProxyFactoryBean batchServiceFactoryBean = new RmiProxyFactoryBean();
         batchServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchService");
-        batchServiceFactoryBean.setServiceInterface(IBatchService.class);
+        batchServiceFactoryBean.setServiceInterface(IPackageService.class);
 
         batchServiceFactoryBean.afterPropertiesSet();
 
-        batchService = (IBatchService) batchServiceFactoryBean.getObject();
+        batchService = (IPackageService) batchServiceFactoryBean.getObject();
         super.init();
     }
 
