@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
 import kz.bsbnb.usci.bconv.cr.parser.Const;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.stream.XMLEventReader;
@@ -11,6 +13,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 public abstract class MainReader {
+    private final Logger logger = LoggerFactory.getLogger(MainReader.class);
 
     protected XMLEventReader xmlReader;
     protected StringBuilder data = new StringBuilder();
@@ -23,7 +26,7 @@ public abstract class MainReader {
             XMLEvent event = (XMLEvent) xmlReader.next();
 
             if (event.isStartDocument()) {
-                System.out.println("start document");
+                logger.debug("start document");
             } else if (event.isStartElement()) {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
@@ -37,10 +40,10 @@ public abstract class MainReader {
             } else if (event.isCharacters()) {
                 data.append(event.asCharacters().getData().replaceAll("\\s+", ""));
             } else if (event.isEndDocument()) {
-                System.out.println("end document");
+                logger.debug("end document");
                 data.append(event.asCharacters().getData().replaceAll("\\s+", ""));
             } else {
-                System.out.println(event.toString());
+                logger.debug(event.toString());
             }
         }
     }
