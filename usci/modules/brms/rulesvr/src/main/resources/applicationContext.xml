@@ -57,7 +57,7 @@
 
     <bean id="batchRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
         <property name="serviceName" value="batchService"/>
-        <property name="service" ref="batchService"/>
+        <property name="service" ref="packageService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IPackageService"/>
         <property name="registryPort" value="1097"/>
     </bean>

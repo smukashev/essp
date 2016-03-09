@@ -16,12 +16,12 @@ import java.util.List;
  * @author abukabayev
  */
 @Service
-public class BatchService implements IPackageService
+public class PackageService implements IPackageService
 {
     @Autowired
     private IPackageDao batchDao;
 
-    public BatchService() {
+    public PackageService() {
         super();
     }
 
