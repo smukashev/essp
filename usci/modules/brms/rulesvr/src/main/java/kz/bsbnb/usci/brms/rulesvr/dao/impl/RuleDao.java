@@ -4,9 +4,11 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.SimpleTrack;
+import kz.bsbnb.usci.brms.rulesvr.persistable.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Delete;
+import org.jooq.Insert;
 import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +31,8 @@ import static kz.bsbnb.usci.brms.rulesvr.generated.Tables.*;
 /**
  * @author abukabayev
  */
-public class RuleDao implements IRuleDao {
+public class RuleDao extends JDBCSupport implements IRuleDao {
 
-    private JdbcTemplate jdbcTemplate;
     private final String PREFIX_ = "LOGIC_";
 
     private final Logger logger = LoggerFactory.getLogger(RuleDao.class);
@@ -177,6 +178,15 @@ public class RuleDao implements IRuleDao {
     }
 
     @Override
+    public void saveInPackage(Rule rule, RulePackage rulePackage) {
+        Insert insert = context.insertInto(LOGIC_RULE_PACKAGE)
+                .set(LOGIC_RULE_PACKAGE.RULE_ID, rule.getId())
+                .set(LOGIC_RULE_PACKAGE.PACKAGE_ID, rulePackage.getId());
+
+        insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    @Override
     public void updateBody(Long ruleId, String body) {
         String sql = "UPDATE " + PREFIX_ + "rules SET rule = ? WHERE id=?";
         jdbcTemplate.update(sql, new Object[]{body, ruleId});
@@ -206,8 +216,15 @@ public class RuleDao implements IRuleDao {
     }
 
     @Override
-    public long createRule(final Rule rule) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+    public long createRule(Rule rule) {
+        Insert insert = context.insertInto(LOGIC_RULES)
+                .set(LOGIC_RULES.TITLE, rule.getTitle())
+                .set(LOGIC_RULES.RULE, rule.getRule())
+                .set(LOGIC_RULES.OPEN_DATE, DataUtils.convert(rule.getOpenDate()));
+
+        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+
+        /*KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
@@ -218,7 +235,7 @@ public class RuleDao implements IRuleDao {
                 return ps;
             }
         }, keyHolder);
-        return keyHolder.getKey().longValue();
+        return keyHolder.getKey().longValue();*/
     }
 
     @Override

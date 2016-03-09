@@ -7,6 +7,7 @@ import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.cli.app.command.impl.*;
@@ -1913,12 +1914,12 @@ public class CLI {
 
             initBatchService();
 
-            RmiProxyFactoryBean batchVersionServiceFactoryBean = new RmiProxyFactoryBean();
+            /*RmiProxyFactoryBean batchVersionServiceFactoryBean = new RmiProxyFactoryBean();
             batchVersionServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchVersionService");
             batchVersionServiceFactoryBean.setServiceInterface(IBatchVersionService.class);
 
             batchVersionServiceFactoryBean.afterPropertiesSet();
-            batchVersionService = (IBatchVersionService) batchVersionServiceFactoryBean.getObject();
+            batchVersionService = (IBatchVersionService) batchVersionServiceFactoryBean.getObject();*/
 
             RmiProxyFactoryBean ruleServiceFactoryBean = new RmiProxyFactoryBean();
             ruleServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/ruleService");
@@ -2002,6 +2003,7 @@ public class CLI {
                         sb.append("\n" + line);
                     } while (true);
                     currentRule = new Rule();
+                    currentRule.setOpenDate(currentDate);
                     currentRule.setRule(sb.toString());
                     currentRule.setTitle(title);
                 }
@@ -2018,7 +2020,7 @@ public class CLI {
                     System.out.println(currentBaseEntity);
                 else throw new IllegalArgumentException();
             } else if (args.get(0).equals("save")) {
-                long ruleId = ruleService.createNewRuleInBatch(currentRule, currentPackageVersion);
+                long ruleId = ruleService.createNewRuleInBatch(currentRule, new RulePackage(currentPackageName));
                 System.out.println("ok saved: ruleId = " + ruleId);
             } else if (args.get(0).equals("run")) {
 
@@ -2059,13 +2061,12 @@ public class CLI {
                 } catch (IllegalArgumentException e) {
                     throw e;
                 }
-                kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage batch =
-                        new kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage(args.get(2), currentDate);
+                RulePackage batch = new RulePackage(args.get(2));
 
                 boolean exists = false;
                 Long id;
-                for (kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage ruleBatch : ruleBatchService.getAllPackages()) {
-                    if (ruleBatch.getName().equals(batch.getName()) && ruleBatch.getRepDate().equals(batch.getRepDate())) {
+                for (RulePackage ruleBatch : ruleBatchService.getAllPackages()) {
+                    if (ruleBatch.getName().equals(batch.getName())) {
                         exists = true;
                         break;
                     }

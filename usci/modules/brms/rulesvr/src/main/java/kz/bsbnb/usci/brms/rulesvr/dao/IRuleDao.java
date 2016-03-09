@@ -30,4 +30,5 @@ public interface IRuleDao extends IDao{
     void clearAllRules();
     List<SimpleTrack> getRuleTitles(Long batchVersionId, String searchText);
     List<PackageVersion> getPackageVersions(RulePackage rulePackage);
+    void saveInPackage(Rule rule, RulePackage rulePackage);
 }

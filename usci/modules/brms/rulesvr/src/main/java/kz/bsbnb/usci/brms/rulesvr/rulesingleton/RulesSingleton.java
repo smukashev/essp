@@ -293,7 +293,7 @@ public class RulesSingleton
         RuleCasheEntry result = versions.get(0);
         for (RuleCasheEntry entry : versions)
         {
-            if (entry.getRepDate().compareTo(repDate) <= 0)
+            if (entry.getReportDate().compareTo(repDate) <= 0)
                 return entry.getRules();
             result = entry;
         }

@@ -17,7 +17,7 @@ public interface IPackageVersion extends IPersistable
 
     public void setPackageId(long packageId);
 
-    public String getName();
+    public String getPackageName();
 
     public void setName(String name);
 }

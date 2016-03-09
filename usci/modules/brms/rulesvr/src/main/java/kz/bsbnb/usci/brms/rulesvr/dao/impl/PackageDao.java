@@ -4,7 +4,9 @@ import kz.bsbnb.usci.brms.rulemodel.model.IPackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulesvr.dao.IPackageDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.mapper.BatchMapper;
+import kz.bsbnb.usci.brms.rulesvr.persistable.JDBCSupport;
 import org.jooq.DSLContext;
+import org.jooq.Insert;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,10 +26,8 @@ import static kz.bsbnb.usci.brms.rulesvr.generated.Tables.*;
  */
 
 
-public class PackageDao implements IPackageDao
+public class PackageDao extends JDBCSupport implements IPackageDao
 {
-    private JdbcTemplate jdbcTemplate;
-
     private final String PREFIX_ = "LOGIC_";
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -49,11 +49,6 @@ public class PackageDao implements IPackageDao
         }
     }
 
-
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
-
     @Override
     public RulePackage loadBatch(long id) {
 
@@ -66,39 +61,44 @@ public class PackageDao implements IPackageDao
     }
 
 
-    private long saveBatch(RulePackage batch){
-
-        if (batch.getRepDate() == null)
+    private long savePackage(RulePackage rulePackage){
+        /*
+        if (rulePackage.getReportDate() == null)
         {
             throw new IllegalArgumentException("Report date must be set before instance " +
                     "of Batch saving to the DB.");
-        }
+        }*/
 
-        String SQL = "INSERT INTO " + PREFIX_ + "packages(NAME, REPORT_DATE) VALUES (?, ?)";
-        jdbcTemplate.update(SQL,batch.getName(),batch.getRepDate());
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        System.out.println("Created batch with repdate "+dateFormat.format(batch.getRepDate())+" called "+batch.getName());
+        Insert insert = context.insertInto(LOGIC_PACKAGES)
+                .set(LOGIC_PACKAGES.NAME, rulePackage.getName());
+
+
+        //jdbcTemplate.update(insert.getSQL(),insert.getBindValues().toArray());
+        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        /*DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        System.out.println("Created batch with repdate "+dateFormat.format(rulePackage.getReportDate())+" called "+rulePackage.getName());
 
         SQL = "SELECT id FROM " + PREFIX_ + "packages WHERE NAME = ?";
-        long id = jdbcTemplate.queryForLong(SQL,batch.getName());
-        return id;
+        long id = jdbcTemplate.queryForLong(SQL,rulePackage.getName());
+        return id;*/
     }
 
     private void saveBatchVersion(RulePackage batch, long batchId){
 
+        /*
         if(batchId < 1)
         {
             throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
         }
 
        String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";
-        jdbcTemplate.update(SQL,batchId,batch.getRepDate());
+        jdbcTemplate.update(SQL,batchId,batch.getReportDate());*/
     }
 
 
     @Override
-    public long save(RulePackage batch) {
-        long batchId = saveBatch(batch);
+    public long save(RulePackage rulePackage) {
+        long batchId = savePackage(rulePackage);
 //        saveBatchVersion(batch,batchId);
         return batchId;
     }

@@ -43,7 +43,7 @@ public class PackageVersion extends Persistable implements IPackageVersion {
         this.packageId = packageId;
     }
 
-    public String getName() {
+    public String getPackageName() {
         return packageName;
     }
 

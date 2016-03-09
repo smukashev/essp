@@ -2,6 +2,7 @@ package kz.bsbnb.usci.brms.rulesvr.service.impl;
 
 import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.brms.rulesvr.dao.IPackageDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.IBatchVersionDao;
@@ -31,8 +32,8 @@ public class RuleService implements IRuleService {
     @Autowired
     private IPackageDao batchDao;
 
-    @Autowired
-    private IBatchVersionDao batchVersionDao;
+    //@Autowired
+    //private IBatchVersionDao batchVersionDao;
 
 //    @Autowired
 //    private ListenerSingleton listenerSingleton;
@@ -125,10 +126,12 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public long createNewRuleInBatch(Rule rule, PackageVersion packageVersion) {
-          long ruleId = ruleDao.createRule(rule);
-          ruleDao.save(ruleId, packageVersion.getId());
-          return ruleId;
+    public long createNewRuleInBatch(Rule rule, RulePackage rulePackage) {
+        long ruleId = ruleDao.createRule(rule);
+        rule.setId(ruleId);
+        //ruleDao.save(ruleId, packageVersion.getId());
+        ruleDao.saveInPackage(rule, rulePackage);
+        return ruleId;
     }
 
     @Override
@@ -138,7 +141,8 @@ public class RuleService implements IRuleService {
 
     @Override
     public long insertBatchVersion(long packageId, Date date) {
-        return batchVersionDao.insertBatchVersion(packageId, date);
+        //return batchVersionDao.insertBatchVersion(packageId, date);
+        return -1L;
     }
 
     @Override

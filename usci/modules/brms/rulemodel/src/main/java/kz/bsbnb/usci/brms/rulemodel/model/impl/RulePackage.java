@@ -11,22 +11,15 @@ import java.util.Date;
 @Component
 public class RulePackage extends Persistable
 {
-    private Date repDate;
     private String name;
     private String description;
 
 
-    public RulePackage(){
-
-    }
-
-    public RulePackage(String name, Date repDate){
+    public RulePackage(String name){
         this.name = name;
-        this.repDate = repDate;
     }
 
-    public RulePackage(Date repoDate){
-        this.repDate = repoDate;
+    public RulePackage() {
     }
 
     public String getName() {
@@ -35,14 +28,6 @@ public class RulePackage extends Persistable
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setRepDate(Date repoDate) {
-        this.repDate = repoDate;
-    }
-
-    public Date getRepDate() {
-        return repDate;
     }
 
     public String getDescription() {

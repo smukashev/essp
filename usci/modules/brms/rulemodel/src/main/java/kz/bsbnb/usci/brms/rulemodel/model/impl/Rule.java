@@ -3,6 +3,8 @@ package kz.bsbnb.usci.brms.rulemodel.model.impl;
 import kz.bsbnb.usci.brms.rulemodel.model.IRule;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 
+import java.util.Date;
+
 /**
  * @author abukabayev
  */
@@ -10,6 +12,7 @@ public class Rule extends Persistable implements IRule {
     private String rule;
     private String title;
     private boolean isActive;
+    protected Date openDate;
 
     public Rule(){
 
@@ -41,5 +44,13 @@ public class Rule extends Persistable implements IRule {
 
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public Date getOpenDate() {
+        return openDate;
+    }
+
+    public void setOpenDate(Date openDate) {
+        this.openDate = openDate;
     }
 }

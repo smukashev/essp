@@ -15,7 +15,7 @@ public class BatchMapper implements RowMapper<RulePackage> {
         RulePackage batch = new RulePackage();
         batch.setId(resultSet.getLong("id"));
         batch.setName(resultSet.getString("name"));
-        batch.setRepDate(resultSet.getDate("report_date"));
+        //batch.setReportDate(resultSet.getDate("report_date"));
         batch.setDescription(resultSet.getString("description"));
         return batch;
     }

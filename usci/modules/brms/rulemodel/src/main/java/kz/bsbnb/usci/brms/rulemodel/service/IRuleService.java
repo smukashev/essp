@@ -2,6 +2,7 @@ package kz.bsbnb.usci.brms.rulemodel.service;
 
 import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import java.util.Date;
 import java.util.List;
@@ -78,7 +79,7 @@ public interface IRuleService {
      * Create new rule with given title and body into batchVersion
      * @return id of created rule
      */
-    public long createNewRuleInBatch(Rule rule, PackageVersion packageVersion);
+    public long createNewRuleInBatch(Rule rule, RulePackage rulePackage);
 
     public void renameRule(long ruleId, String title);
 
