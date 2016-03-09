@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -145,6 +147,11 @@ public class StorageImpl extends JDBCSupport implements IStorage {
         }
 
         return res;
+    }
+
+    @Override
+    public Connection getConnection() throws SQLException {
+        return jdbcTemplate.getDataSource().getConnection();
     }
 
     @Override

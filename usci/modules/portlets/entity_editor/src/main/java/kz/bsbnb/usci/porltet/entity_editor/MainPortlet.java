@@ -683,7 +683,7 @@ public class MainPortlet extends MVCPortlet {
             }
         } catch (Exception e) {
             //e.printStackTrace();
-            String originalError = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
+            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
             if(originalError.contains("connect") || originalError.contains("rmi"))
                 if(!retry) {
                     retry = true;
