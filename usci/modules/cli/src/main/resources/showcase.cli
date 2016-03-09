@@ -939,4 +939,6 @@ showcase addIndex nonunique portfolio_data_id
 
 showcase save
 
+showcase sql run usci/db_oracle_scripts/showcase/showcase_table_range_partitioning.sql
+
 quit

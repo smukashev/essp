@@ -60,12 +60,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -155,6 +157,13 @@ public class CLI {
     private BaseEntity currentBaseEntity;
 
     private Mnt mnt;
+
+    private JdbcTemplate jdbcTemplateSC;
+
+    @Autowired
+    public void setDataSourceSC(DataSource dataSourceSC) {
+        this.jdbcTemplateSC = new JdbcTemplate(dataSourceSC);
+    }
 
     public IEntityService getEntityService(String url) {
         if (entityServiceCore == null) {
@@ -2212,7 +2221,7 @@ public class CLI {
 
     }
 
-    public void commandShowCase() {
+    public void commandShowCase() throws SQLException {
         if (showcaseServiceFactoryBean == null || showcaseService == null)
             initSC();
 
@@ -2350,6 +2359,11 @@ public class CLI {
             showcaseService.reloadCash();
         } else if (args.get(0).equals("stats")) {
             showcaseStat();
+        } else if(args.get(0).equals("sql")) {
+          if(args.get(1).equals("run")) {
+              SqlRunner runner = new SqlRunner(jdbcTemplateSC.getDataSource().getConnection(),  true);
+              runner.runScript(args.get(2));
+          }
         } else {
             throw new IllegalArgumentException(Errors.getMessage(Errors.E219));
         }
