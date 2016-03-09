@@ -14,11 +14,16 @@ import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.ReportStatus;
 import kz.bsbnb.usci.receiver.queue.JobInfo;
 import kz.bsbnb.usci.receiver.queue.JobLauncherQueue;
+import kz.bsbnb.usci.receiver.reader.impl.InfoReader;
+import kz.bsbnb.usci.receiver.reader.impl.ManifestReader;
+import kz.bsbnb.usci.receiver.reader.impl.beans.InfoData;
+import kz.bsbnb.usci.receiver.reader.impl.beans.ManifestData;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
+import org.antlr.tool.ErrorManager;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
@@ -35,6 +40,8 @@ import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
 import java.io.*;
 import java.nio.file.*;
 import java.text.ParseException;
@@ -57,6 +64,12 @@ public class ZipFilesMonitor {
 
 	@Autowired
 	private JobLauncherQueue jobLauncherQueue;
+
+	@Autowired
+	private InfoReader infoReader;
+
+	@Autowired
+	private ManifestReader manifestReader;
 
 	private IBatchService batchService;
 
@@ -558,147 +571,66 @@ public class ZipFilesMonitor {
 				batchInfo.setBatchName(parseFileNameFromPath(filename));
 				batchInfo.setUserId(userId);
 
-				DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder documentBuilder = null;
+				XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+				XMLEventReader eventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(extractedBytes));
 
-				try {
-					documentBuilder = documentBuilderFactory.newDocumentBuilder();
-				} catch (ParserConfigurationException e) {
-					e.printStackTrace();
-				}
+				infoReader.parse(eventReader);
+				InfoData infoData = infoReader.getInfoData();
 
-				Document document = null;
+				Date repDate = infoData.getReportDate();
+				DataUtils.toBeginningOfTheMonth(repDate);
+				DataUtils.toBeginningOfTheDay(repDate);
+				batchInfo.setRepDate(repDate);
 
-				try {
-					// TODO: fix OutOfMemory
-					document = documentBuilder.parse(new ByteArrayInputStream(extractedBytes));
-				} catch (SAXException e) {
-					e.printStackTrace();
-				}
-
-				Date date = new Date();
-
-				String reportDate = document.getElementsByTagName("report_date").item(0).getTextContent();
-				if (isValidFormat("yyyy-MM-dd", reportDate)) {
-					date = new SimpleDateFormat("yyyy-MM-dd").parse(reportDate);
-				}
-
-                DataUtils.toBeginningOfTheMonth(date);
-				DataUtils.toBeginningOfTheDay(date);
-				batchInfo.setRepDate(date);
-
-				String actualCreditCount = document.getElementsByTagName("actual_credit_count").item(0).
-						getTextContent();
-
-				batchInfo.setSize(Long.parseLong(actualCreditCount));
-				batchInfo.setActualCount(Integer.parseInt(actualCreditCount));
+				batchInfo.setSize(infoData.getActualCreditCount());
+				batchInfo.setActualCount(infoData.getActualCreditCount());
 				batchInfo.setTotalCount(0);
 
-				try {
-					Element infoElement = (Element) document.getElementsByTagName("info").item(0);
-					Element creditorElement = (Element) infoElement.getElementsByTagName("creditor").item(0);
-					Element codeElement = (Element) creditorElement.getElementsByTagName("code").item(0);
-					String code = null;
+                String code = infoData.getCode();
+                if (code != null && code.length() > 0) {
+                    batchInfo.addParam("CODE", code.replaceAll("\\s+", ""));
+                } else {
+                    String docType = infoData.getDocType();
+                    String docValue = infoData.getDocValue();
 
-					if (codeElement != null)
-						code = codeElement.getTextContent();
+                    if (docType != null && docValue != null &&
+                            docType.length() > 0 && docValue.length() > 0) {
+                        batchInfo.addParam("DOC_TYPE", docType.replaceAll("\\s+", ""));
+                        batchInfo.addParam("DOC_VALUE", docValue.replaceAll("\\s+", ""));
+                    }
+                }
 
-					if (code != null && code.length() > 0) {
-						batchInfo.addParam("CODE", code.replaceAll("\\s+", ""));
-					} else {
-						NamedNodeMap map = document.getElementsByTagName("doc").item(0).getAttributes();
-						Node n = map.getNamedItem("doc_type");
-						String docType = n.getTextContent();
-
-						String docValue = document.getElementsByTagName("doc").item(0).getTextContent();
-
-						if (docType != null && docValue != null &&
-								docType.length() > 0 && docValue.length() > 0) {
-							batchInfo.addParam("DOC_TYPE", docType.replaceAll("\\s+", ""));
-							batchInfo.addParam("DOC_VALUE", docValue.replaceAll("\\s+", ""));
-						}
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
 
 				zipFile.close();
 				saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
 			} else { // usci
 				InputStream inManifest = zipFile.getInputStream(manifestEntry);
-				DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder documentBuilder = null;
 
-				try {
-					documentBuilder = documentBuilderFactory.newDocumentBuilder();
-				} catch (ParserConfigurationException e) {
-					e.printStackTrace();
-				}
+				XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+				XMLEventReader eventReader = inputFactory.createXMLEventReader(inManifest);
 
-				Document document = null;
-				try {
-					document = documentBuilder.parse(inManifest);
-				} catch (SAXException e) {
-					e.printStackTrace();
-				}
+				manifestReader.parse(eventReader);
+				ManifestData manifestData = manifestReader.getManifestData();
 
-
-				batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent().
-						replaceAll("\\s+", ""));
+				batchInfo.setBatchType(manifestData.getType().replaceAll("\\s+", ""));
 
 				batchInfo.setBatchName(parseFileNameFromPath(filename));
 
-				batchInfo.setUserId(userId == null ?
-						Long.parseLong(document.getElementsByTagName("userid").item(0).getTextContent().
-								replaceAll("\\s+", "")) : userId);
+				batchInfo.setUserId(userId == null ? manifestData.getUserId() : userId);
 
-				int actualCreditCount = Integer.parseInt(document.getElementsByTagName("size").item(0).
-						getTextContent().replaceAll("\\s+", ""));
+				int actualCreditCount = manifestData.getSize();
 
 				batchInfo.setSize((long) actualCreditCount);
 				batchInfo.setActualCount(actualCreditCount);
 				batchInfo.setTotalCount(0);
 
-				Date date = null;
-
-				try {
-					date = new SimpleDateFormat("dd.MM.yyyy").parse(
-							document.getElementsByTagName("date").item(0).getTextContent().replaceAll("\\s+", ""));
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
+				Date date = manifestData.getReportDate();
 
                 DataUtils.toBeginningOfTheMonth(date);
 				DataUtils.toBeginningOfTheDay(date);
 				batchInfo.setRepDate(date);
 
-				NodeList propertiesList = document.getElementsByTagName("properties");
-
-				for (int i = 0; i < propertiesList.getLength(); i++) {
-					Node propertiesNode = propertiesList.item(i);
-
-					if (propertiesNode.getNodeType() == Node.ELEMENT_NODE) {
-						Element propertiesElement = (Element) propertiesNode;
-
-						NodeList propertyList = propertiesElement.getElementsByTagName("property");
-
-						for (int j = 0; j < propertyList.getLength(); j++) {
-							Node propertyNode = propertyList.item(j);
-
-							if (propertyNode.getNodeType() == Node.ELEMENT_NODE) {
-								Element propertyElement = (Element) propertyNode;
-
-								String name = propertyElement.getElementsByTagName("name").item(0).getTextContent()
-										.replaceAll("\\s+", "");
-								String value = propertyElement.getElementsByTagName("value").item(0).getTextContent()
-										.replaceAll("\\s+", "");
-
-								batchInfo.addParam(name, value);
-							}
-						}
-					}
-				}
-
+				batchInfo.setAdditionalParams(manifestData.getAdditionalParams());
 
 				zipFile.close();
 				saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);

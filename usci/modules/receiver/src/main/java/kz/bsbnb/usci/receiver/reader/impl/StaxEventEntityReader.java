@@ -59,15 +59,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     @Autowired
     private IServiceRepository serviceFactory;
 
-    @Value("#{jobParameters['reportId']}")
-    private Long reportId;
-
-    @Value("#{jobParameters['actualCount']}")
-    private Long actualCount;
-
-    @Value("#{jobParameters['creditorId']}")
-    private Long creditorId;
-
     private Logger logger = Logger.getLogger(StaxEventEntityReader.class);
 
     private Stack<IBaseContainer> stack = new Stack<>();
@@ -370,27 +361,29 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 .setReceiptDate(new Date()));
     }
 
+    private static final String OPERATION_STR = "operation";
+
     private boolean hasOperationDelete(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
+        return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
+                startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
                         .equalsIgnoreCase(OperationType.DELETE.toString());
     }
 
     private boolean hasOperationClose(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
+        return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
+                startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
                         .equalsIgnoreCase(OperationType.CLOSE.toString());
     }
 
     private boolean hasOperationNew(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
+        return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
+                startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
                         .equalsIgnoreCase(OperationType.NEW.toString());
     }
 
     private boolean hasOperationInsert(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
+        return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
+                startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
                         .equalsIgnoreCase(OperationType.INSERT.toString());
     }
 }
