@@ -7,11 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class CreditOptimizer {
-
     private static final Logger logger = LoggerFactory.getLogger(CreditOptimizer.class);
-
-    private CreditOptimizer() {
-    }
 
     public static String getKeyString(final IBaseEntity iBaseEntity) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -20,18 +16,16 @@ public final class CreditOptimizer {
         IBaseValue creditorBaseValue = iBaseEntity.getBaseValue("creditor");
 
         if (primaryContractBaseValue == null || creditorBaseValue == null ||
-                primaryContractBaseValue.getValue() == null || creditorBaseValue.getValue() == null){
-            logger.error(Errors.getError(Errors.getMessage(Errors.E184))+" : \n"+iBaseEntity);
+                primaryContractBaseValue.getValue() == null || creditorBaseValue.getValue() == null) {
+            logger.error(Errors.getError(Errors.getMessage(Errors.E184)) + " : \n" + iBaseEntity);
             throw new IllegalStateException(Errors.getMessage(Errors.E184));
         }
-
-
 
         IBaseEntity primaryContractEntity = (IBaseEntity) primaryContractBaseValue.getValue();
         IBaseEntity creditorEntity = (IBaseEntity) creditorBaseValue.getValue();
 
-        if (creditorEntity.getId() == 0){
-            logger.error(Errors.getError(Errors.getMessage(Errors.E185))+" : \n"+iBaseEntity);
+        if (creditorEntity.getId() == 0) {
+            logger.error(Errors.getError(Errors.getMessage(Errors.E185)) + " : \n" + iBaseEntity);
             throw new IllegalStateException(Errors.getMessage(Errors.E185));
         }
 
@@ -39,7 +33,7 @@ public final class CreditOptimizer {
             return null;
 
         stringBuilder.append(primaryContractEntity.getId());
-        stringBuilder.append("|").append(creditorEntity.getId());
+        stringBuilder.append(Errors.SEPARATOR).append(creditorEntity.getId());
 
         return stringBuilder.toString();
     }

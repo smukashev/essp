@@ -136,11 +136,6 @@ public class BatchServiceImpl implements IBatchService {
     @Override
     public void endBatch(long batchId) {
         EavGlobal statusCompleted = globalService.getGlobal(BatchStatuses.COMPLETED);
-        addBatchStatus(new BatchStatus()
-                .setBatchId(batchId)
-                .setStatusId(statusCompleted.getId())
-                .setReceiptDate(new Date())
-        );
 
         List<BatchStatus> batchStatusList = getBatchStatusList(batchId);
 
@@ -154,17 +149,21 @@ public class BatchServiceImpl implements IBatchService {
         }
 
         if (!hasError) {
-            Batch batch = getBatch(batchId);
-
-            try {
-                File file = new File(batch.getFileName());
-                if (!file.delete())
-                    logger.error("Не удалось удалить файл после завершения " + batch.getFileName());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            addBatchStatus(new BatchStatus()
+                    .setBatchId(batchId)
+                    .setStatusId(statusCompleted.getId())
+                    .setReceiptDate(new Date()));
         }
 
+        Batch batch = getBatch(batchId);
+
+        try {
+            File file = new File(batch.getFileName());
+            if (!file.delete())
+                logger.error("Не удалось удалить файл после завершения " + batch.getFileName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

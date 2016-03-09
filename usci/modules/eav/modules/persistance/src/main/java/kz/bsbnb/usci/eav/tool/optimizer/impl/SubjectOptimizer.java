@@ -13,20 +13,15 @@ import java.util.Comparator;
 import java.util.List;
 
 public class SubjectOptimizer {
-
     private static Logger logger = LoggerFactory.getLogger(SubjectOptimizer.class);
-
-    private SubjectOptimizer() {
-        super();
-    }
 
     public static String getKeyString(final IBaseEntity iBaseEntity) {
         StringBuilder stringBuilder = new StringBuilder();
 
         IBaseValue docsBaseValue = iBaseEntity.getBaseValue("docs");
 
-        if (docsBaseValue == null || docsBaseValue.getValue() == null){
-            logger.error(Errors.getError(Errors.getMessage(Errors.E188)) +" : "+iBaseEntity);
+        if (docsBaseValue == null || docsBaseValue.getValue() == null) {
+            logger.error(Errors.getError(Errors.getMessage(Errors.E188)) + " : " + iBaseEntity);
             throw new IllegalStateException(Errors.getMessage(Errors.E188));
         }
 
@@ -48,8 +43,8 @@ public class SubjectOptimizer {
             }
         }
 
-        if (documents.size() == 0){
-            logger.error(Errors.getError(Errors.getMessage(Errors.E189)) +" : "+iBaseEntity);
+        if (documents.size() == 0) {
+            logger.error(Errors.getError(Errors.getMessage(Errors.E189)) + " : " + iBaseEntity);
             throw new IllegalStateException(Errors.getMessage(Errors.E189));
         }
 
