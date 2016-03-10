@@ -32,28 +32,13 @@ public class BatchProcessServiceImpl implements IBatchProcessService {
     @Autowired
     protected SQLQueriesStats sqlStats;
 
-    @PostConstruct
-    public void init() {
-    }
-
     @Override
     public void processBatch(String fileName, Long userId, boolean isNB) {
         zipFilesMonitor.readFiles(fileName, userId, isNB);
     }
 
     @Override
-    public void processBatch(String fileName, Long userId) {
-        zipFilesMonitor.readFiles(fileName, userId);
-    }
-
-    @Override
-    public void processBatchWithoutUser(String fileName) {
-        zipFilesMonitor.readFilesWithoutUser(fileName);
-    }
-
-    @Override
-    public ReceiverStatus getStatus()
-    {
+    public ReceiverStatus getStatus() {
         ReceiverStatus rs = receiverStatusSingleton.getStatus();
 
         HashMap<String, QueryEntry> stats = sqlStats.getStats();
