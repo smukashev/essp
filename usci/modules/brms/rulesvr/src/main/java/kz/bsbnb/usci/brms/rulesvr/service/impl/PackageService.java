@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class PackageService implements IPackageService
         return batchDao.getAllPackages();
     }
 
-    @Override
+    /*@Override
     public List<Pair> getBatchVersions(Long batchId) {
         List<IPackageVersion> list = batchDao.getBatchVersions(batchId);
         List<Pair> ret = new LinkedList<>();
@@ -55,5 +56,5 @@ public class PackageService implements IPackageService
         }
 
         return ret;
-    }
+    }*/
 }

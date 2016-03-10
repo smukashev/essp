@@ -14,5 +14,5 @@ public interface IPackageDao extends IDao {
     long save(RulePackage batch);
     List<RulePackage> getAllPackages();
     long getBatchVersionId(long batchId, Date repDate);
-    List<IPackageVersion> getBatchVersions(long batchId);
+    //List<IPackageVersion> getBatchVersions(long batchId);
 }

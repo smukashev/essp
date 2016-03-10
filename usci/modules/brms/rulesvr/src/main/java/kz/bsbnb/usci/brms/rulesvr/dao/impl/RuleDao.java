@@ -111,30 +111,53 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
 
 
     @Override
-    public List<SimpleTrack> getRuleTitles(Long packageId, Date repDate) {
-        String SQL = "SELECT id, title AS NAME, is_active as isActive FROM " + PREFIX_ + "rules WHERE id IN (\n" +
+    public List<SimpleTrack> getRuleTitles(Long packageId, Date reportDate) {
+        /*String SQL = "SELECT id, title AS NAME, is_active as isActive FROM " + PREFIX_ + "rules WHERE id IN (\n" +
                 "SELECT rule_id FROM " + PREFIX_ + "rule_package_versions WHERE package_versions_id = \n" +
                 "(SELECT id FROM " + PREFIX_ + "package_versions WHERE OPEN_DATE = \n" +
                 "    (SELECT MAX(OPEN_DATE) FROM " + PREFIX_ + "package_versions WHERE package_id = ? AND OPEN_DATE <= ? ) \n" +
                 " AND package_id = ? AND rownum = 1\n" +
-                " )) order by id";
+                " )) order by id";*/
 
 
-        List<SimpleTrack> ret = jdbcTemplate.query(SQL, new Object[]{packageId, repDate, packageId}, new BeanPropertyRowMapper(SimpleTrack.class));
+        Select select = context.select(LOGIC_RULES.ID, LOGIC_RULES.TITLE)
+                .from(LOGIC_RULES)
+                .join(LOGIC_RULE_PACKAGE).on(LOGIC_RULE_PACKAGE.RULE_ID.eq(LOGIC_RULES.ID))
+                .where(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(packageId))
+                .and(LOGIC_RULES.OPEN_DATE.lessOrEqual(DataUtils.convert(reportDate)))
+                .and(LOGIC_RULES.CLOSE_DATE.greaterThan(DataUtils.convert(reportDate)).or(LOGIC_RULES.CLOSE_DATE.isNull()));
+
+
+
+
+        //List<SimpleTrack> ret = jdbcTemplate.query(SQL, new Object[]{packageId, reportDate, packageId}, new BeanPropertyRowMapper(SimpleTrack.class));
+        List<Map<String,Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        List<SimpleTrack> ret = new ArrayList<>();
+
+        for(Map<String,Object> row: rows) {
+            SimpleTrack s = new SimpleTrack();
+            s.setId(((BigDecimal) row.get(LOGIC_RULES.ID.getName())).longValue());
+            s.setName(((String) row.get(LOGIC_RULES.TITLE.getName())));
+            s.setIsActive(true);
+            ret.add(s);
+        }
 
         return ret;
     }
 
     @Override
-    public List<SimpleTrack> getRuleTitles(Long batchVersionId, String searchText) {
-        return new LinkedList<>();
-        /*searchText = searchText.toLowerCase();
-        Select select = context.select(LOGIC_RULES.ID, LOGIC_RULES.TITLE.as("name"), LOGIC_RULES.IS_ACTIVE, LOGIC_RULES.RULE)
+    public List<SimpleTrack> getRuleTitles(Long packageId, Date reportDate, String searchText) {
+        //return new LinkedList<>();
+        searchText = searchText.toLowerCase();
+        Select select = context.select(LOGIC_RULES.ID, LOGIC_RULES.TITLE.as("name"), LOGIC_RULES.RULE)
                 .from(LOGIC_RULES)
-                .join(LOGIC_RULE_PACKAGE_VERSIONS).on(LOGIC_RULES.ID.eq(LOGIC_RULE_PACKAGE_VERSIONS.RULE_ID))
-                .where(LOGIC_RULE_PACKAGE_VERSIONS.PACKAGE_VERSIONS_ID.eq(batchVersionId))
+                .join(LOGIC_RULE_PACKAGE).on(LOGIC_RULES.ID.eq(LOGIC_RULE_PACKAGE.RULE_ID))
+                .where(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(packageId))
+                .and(LOGIC_RULES.OPEN_DATE.lessOrEqual(DataUtils.convert(reportDate)))
+                .and(LOGIC_RULES.CLOSE_DATE.greaterThan(DataUtils.convert(reportDate)).or(LOGIC_RULES.CLOSE_DATE.isNull()))
                 .and(LOGIC_RULES.RULE.lower().like("%" + searchText + "%").or(LOGIC_RULES.TITLE.lower().like("%" + searchText + "%")));
-        return jdbcTemplate.query(select.getSQL(), select.getBindValues().toArray(), new BeanPropertyRowMapper<SimpleTrack>(SimpleTrack.class));*/
+
+        return jdbcTemplate.query(select.getSQL(), select.getBindValues().toArray(), new BeanPropertyRowMapper<SimpleTrack>(SimpleTrack.class));
     }
 
     public long save(Rule rule, PackageVersion packageVersion){

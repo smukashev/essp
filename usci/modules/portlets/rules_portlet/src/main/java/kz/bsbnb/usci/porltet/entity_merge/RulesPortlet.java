@@ -6,6 +6,7 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.core.service.IEntityService;
@@ -152,7 +153,10 @@ public class RulesPortlet extends MVCPortlet{
                     break;
                 case PACKAGE_VERSIONS:
                     batchId = Long.parseLong(resourceRequest.getParameter("packageId"));
-                    writer.write(JsonMaker.getJson(batchService.getBatchVersions(batchId)));
+                    //writer.write(JsonMaker.getJson(batchService.getBatchVersions(batchId)));
+                    RulePackage r = new RulePackage();
+                    r.setId(batchId);
+                    writer.write(JsonMaker.getJson(ruleService.getPackageVersions(r)));
                     break;
                 case GET_RULE_TITLES:
                     long packageId = Long.parseLong(resourceRequest.getParameter("packageId"));

@@ -12,5 +12,5 @@ public interface IPackageService {
     public long save(RulePackage batch);
     public RulePackage load(long id);
     public List<RulePackage> getAllPackages();
-    public List<Pair> getBatchVersions(Long batchId);
+    //public List<Pair> getBatchVersions(Long batchId);
 }

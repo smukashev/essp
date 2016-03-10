@@ -4,6 +4,8 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.util.Pair;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,7 @@ public interface IRuleService {
     List<Rule> load(PackageVersion packageVersion);
     void update(Rule rule);
     RulePackage getPackage(String name);
+    List<Pair> getPackageVersions(RulePackage rulePackage);
 
     /**
      * Select * from rules

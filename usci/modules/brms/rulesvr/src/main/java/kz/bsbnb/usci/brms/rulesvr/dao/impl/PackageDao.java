@@ -129,10 +129,9 @@ public class PackageDao extends JDBCSupport implements IPackageDao
         return jdbcTemplate.queryForLong(SQL, batchId, repDate, batchId);
     }
 
-    @Override
+    /*@Override
     public List<IPackageVersion> getBatchVersions(long batchId) {
-        return new LinkedList<>();
-        /*Select select = context.select(LOGIC_PACKAGE_VERSIONS.ID, LOGIC_PACKAGE_VERSIONS.OPEN_DATE)
+        Select select = context.select(LOGIC_PACKAGE_VERSIONS.ID, LOGIC_PACKAGE_VERSIONS.OPEN_DATE)
                 .from(LOGIC_PACKAGE_VERSIONS)
                 .where(LOGIC_PACKAGE_VERSIONS.PACKAGE_ID.eq(batchId))
                 .orderBy(LOGIC_PACKAGE_VERSIONS.OPEN_DATE.desc());
@@ -148,6 +147,6 @@ public class PackageDao extends JDBCSupport implements IPackageDao
             ret.add(batchVersion);
         }
 
-        return ret;*/
-    }
+        return ret;
+    }*/
 }

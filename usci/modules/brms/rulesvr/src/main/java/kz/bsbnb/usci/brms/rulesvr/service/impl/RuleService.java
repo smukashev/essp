@@ -1,21 +1,20 @@
 package kz.bsbnb.usci.brms.rulesvr.service.impl;
 
+import kz.bsbnb.usci.brms.rulemodel.model.IPackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.brms.rulesvr.dao.IPackageDao;
-import kz.bsbnb.usci.brms.rulesvr.dao.IBatchVersionDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.brms.rulesvr.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 //import kz.bsbnb.usci.brms.rulesvr.service.ListenerSingleton;
 
@@ -77,22 +76,22 @@ public class RuleService implements IRuleService {
 
     @Override
     public Map getRuleTitles(Long packageId, Date repDate) {
-        long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
+        //long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
         Map m = new HashMap();
-        m.put("batchVersionId",batchVersionId);
+        //m.put("batchVersionId",batchVersionId);
         m.put("data",ruleDao.getRuleTitles(packageId,repDate));
         return m;
     }
 
     @Override
-    public Map getRuleTitles(Long packageId, Date repDate, String searchText) {
+    public Map getRuleTitles(Long packageId, Date reportDate, String searchText) {
         if(searchText == null || searchText.length() < 1)
             throw new IllegalArgumentException("поисковой ключ не задан");
 
-        long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
+        //long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
         Map m = new HashMap();
-        m.put("batchVersionId", batchVersionId);
-        m.put("data",ruleDao.getRuleTitles(batchVersionId, searchText));
+        //m.put("batchVersionId", batchVersionId);
+        m.put("data",ruleDao.getRuleTitles(packageId, reportDate, searchText));
         return m;
     }
 
@@ -210,6 +209,21 @@ public class RuleService implements IRuleService {
     @Override
     public void clearAllRules() {
         ruleDao.clearAllRules();
+    }
+
+    @Override
+    public List<Pair> getPackageVersions(RulePackage rulePackage) {
+        List<PackageVersion> versions = ruleDao.getPackageVersions(rulePackage);
+
+        List<Pair> ret = new LinkedList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+
+        for(IPackageVersion packageVersion: versions) {
+            Pair p = new Pair(packageVersion.getId(), sdf.format(packageVersion.getReportDate()));
+            ret.add(p);
+        }
+
+        return ret;
     }
 
 
