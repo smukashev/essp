@@ -1385,7 +1385,8 @@ public class CLI {
 
                         System.out.println(fileNumber + " - Sending file: " + newFile.getCanonicalFile());
 
-                        batchProcessService.processBatchWithoutUser(newFile.getAbsolutePath());
+                        // fixme!
+                        /*batchProcessService.processBatchWithoutUser(newFile.getAbsolutePath());*/
 
                         preparedStatementDone.setInt(Integer.valueOf(1), 1);
                         preparedStatementDone.setInt(Integer.valueOf(2), id);
