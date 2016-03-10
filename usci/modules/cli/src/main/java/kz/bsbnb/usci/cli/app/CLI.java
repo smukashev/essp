@@ -16,6 +16,7 @@ import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
@@ -1891,7 +1892,7 @@ public class CLI {
         StringBuilder str = new StringBuilder();
         if(args.get(0).equals("run")){
             SqlRunner runner = new SqlRunner(storage.getConnection(),  true);
-            runner.runScript(args.get(1));
+            runner.runScript(args.get(1), StaticRouter.getCoreSchemaName());
         } else {
             for (Object o : args)
                 str.append(o + " ");
@@ -2362,7 +2363,7 @@ public class CLI {
         } else if(args.get(0).equals("sql")) {
           if(args.get(1).equals("run")) {
               SqlRunner runner = new SqlRunner(jdbcTemplateSC.getDataSource().getConnection(),  true);
-              runner.runScript(args.get(2));
+              runner.runScript(args.get(2), StaticRouter.getShowcaseSchemaName());
           }
         } else {
             throw new IllegalArgumentException(Errors.getMessage(Errors.E219));

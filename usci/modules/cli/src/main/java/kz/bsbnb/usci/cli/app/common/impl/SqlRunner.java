@@ -29,7 +29,7 @@ public class SqlRunner {
         return new String(encoded, encoding);
     }
 
-    public boolean runScript(final String FilePath) throws SQLException {
+    public boolean runScript(final String FilePath, String schema) throws SQLException {
         final boolean originalAutoCommit = this.connection.getAutoCommit();
         try {
             if (originalAutoCommit != this.autoCommit) {
@@ -38,6 +38,7 @@ public class SqlRunner {
             Charset charset = new KOI8_U();
             String script = readFile(FilePath, charset);
             CallableStatement cs = connection.prepareCall(script);
+            cs.setString(1, schema);
             cs.execute();
 
 
