@@ -974,7 +974,7 @@ public class CLI {
                     actualCount++;
                 } catch (Exception ex) {
                     lastException = ex;
-                    System.out.println("Ошибка: " + ex.getMessage());
+                    System.out.println("Ошибка: " + Errors.unmarshall(ex.getMessage()));
                 }
             }
             Batch batch = reader.getBatch();
@@ -1386,7 +1386,8 @@ public class CLI {
 
                         System.out.println(fileNumber + " - Sending file: " + newFile.getCanonicalFile());
 
-                        batchProcessService.processBatchWithoutUser(newFile.getAbsolutePath());
+                        // fixme!
+                        /*batchProcessService.processBatchWithoutUser(newFile.getAbsolutePath());*/
 
                         preparedStatementDone.setInt(Integer.valueOf(1), 1);
                         preparedStatementDone.setInt(Integer.valueOf(2), id);

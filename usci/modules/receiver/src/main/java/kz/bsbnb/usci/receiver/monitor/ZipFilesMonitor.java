@@ -253,15 +253,13 @@ public class ZipFilesMonitor {
 		Long cId;
 		boolean haveError = false;
 
-		if (batchInfo.getUserId() != 100500L) {
-			List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
+		List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
 
-			if (isNB) {
-				cId = 0L;
-			} else if (cList.size() == 1) {
+		if (batchInfo.getUserId() != 100500L) {
+            if (cList.size() > 0) {
 				cId = getCreditor(batchInfo, cList);
 
-				if (cId == -1) {
+				if (cId <= 0) {
 					String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
 					String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
 
@@ -281,14 +279,14 @@ public class ZipFilesMonitor {
 				batchService.addBatchStatus(new BatchStatus()
 								.setBatchId(batchId)
 								.setStatus(BatchStatuses.ERROR)
-								.setDescription("Can't find creditor for user with id: " + batchInfo.getUserId())
+								.setDescription("Пользователь не имеет доступа к кредиторам: " + batchInfo.getUserId())
 								.setReceiptDate(new Date()));
 
 				haveError = true;
 			}
 		} else {
 			cId = getCreditor(batchInfo, creditors);
-			if (cId == -1L) {
+			if (cId <= 0) {
 				String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
 				String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
 
@@ -300,7 +298,7 @@ public class ZipFilesMonitor {
 				batchService.addBatchStatus(new BatchStatus()
 								.setBatchId(batchId)
 								.setStatus(BatchStatuses.ERROR)
-								.setDescription("Кредитор не найден")
+								.setDescription("Кредитор с документами (" + docType + ", " + docValue + ")не найден")
 								.setReceiptDate(new Date()));
 				haveError = true;
 			}
@@ -636,96 +634,6 @@ public class ZipFilesMonitor {
 				saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public boolean isValidFormat(String format, String value) {
-		Date date = null;
-		try {
-			SimpleDateFormat sdf = new SimpleDateFormat(format);
-			date = sdf.parse(value);
-			if (!value.equals(sdf.format(date))) {
-				date = null;
-			}
-		} catch (ParseException ex) {
-			ex.printStackTrace();
-		}
-		return date != null;
-	}
-
-	public void readFilesWithoutUser(String filename) {
-		BatchInfo batchInfo = new BatchInfo();
-		try {
-
-			ZipFile zipFile = new ZipFile(filename);
-
-			ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
-
-			InputStream inManifest = zipFile.getInputStream(manifestEntry);
-
-			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-
-			DocumentBuilder documentBuilder = null;
-			try {
-				documentBuilder = documentBuilderFactory.newDocumentBuilder();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			}
-
-			Document document = null;
-			try {
-				// TODO: Out of memory
-				document = documentBuilder.parse(inManifest);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			}
-
-
-			batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent()
-					.replaceAll("\\s+", ""));
-
-			batchInfo.setBatchName(parseFileNameFromPath(filename));
-
-			batchInfo.setUserId(100500L);
-			NodeList nlist = document.getElementsByTagName("property");
-			HashMap<String, String> params = new HashMap<>();
-			for (int i = 0; i < nlist.getLength(); i++) {
-				Node node = nlist.item(i);
-				NodeList childrenList = node.getChildNodes();
-				String name = "";
-				String value = "";
-
-				for (int j = 0; j < childrenList.getLength(); j++) {
-					Node curChild = childrenList.item(j);
-					if (curChild.getNodeName().equals("name")) {
-						name = curChild.getTextContent().replaceAll("\\s+", "");
-					}
-					if (curChild.getNodeName().equals("value")) {
-						value = curChild.getTextContent().replaceAll("\\s+", "");
-					}
-				}
-
-				params.put(name, value);
-			}
-
-			batchInfo.setAdditionalParams(params);
-			batchInfo.setSize(Long.parseLong(document.getElementsByTagName("size").item(0).getTextContent()));
-
-
-			Date date = null;
-			try {
-				date = new SimpleDateFormat("dd.MM.yyyy").parse(document.getElementsByTagName("date").
-						item(0).getTextContent().replaceAll("\\s+", ""));
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-
-			batchInfo.setRepDate(date);
-			zipFile.close();
-
-			saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), false);
-		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

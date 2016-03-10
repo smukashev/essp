@@ -427,6 +427,8 @@ public enum Errors {
     }
 
     public static String unmarshall(String message) {
+        if (message == null) return null;
+
         String[] paramArr = message.split(Errors.SEPARATOR);
         String error = Errors.getError(paramArr[0]);
         List<String> params = Arrays.asList(Arrays.copyOfRange(paramArr, 1, paramArr.length));

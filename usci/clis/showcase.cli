@@ -797,8 +797,8 @@ showcase save
 #  DEBTOR_INFO_PERSON
 #=================================================================================
 showcase set meta credit
-showcase set name CORE_PERSON_DEBTOR_INFO
-showcase set tableName CORE_PERSON_DEBTOR_INFO
+showcase set name CORE_PERSON_DI
+showcase set tableName CORE_PERSON_DI
 showcase set downPath subject.person_info
 
 showcase list add bank_relations person_bank_relation_id
@@ -820,9 +820,9 @@ showcase list addHistoryKey person_bank_relation_id person_bank_relation_id
 # CHILD BANK_RELATION
 #-----------------------------------------------------------------------------------
 showcase child init
-showcase child set name CORE_PERSON_DEBTOR_INFO_BANK_RELATION
+showcase child set name CORE_PERSON_DI_BANK_RELATION
 showcase child set meta subject
-showcase child set tableName CORE_PERSON_DEBTOR_INFO
+showcase child set tableName CORE_PERSON_DI
 showcase child set downPath person_info
 
 showcase child list add bank_relations person_bank_relation_id
@@ -844,8 +844,8 @@ showcase save
 #  DEBTOR_INFO_ORGANIZATION
 #=================================================================================
 showcase set meta credit
-showcase set name CORE_ORG_DEBTOR_INFO
-showcase set tableName CORE_ORG_DEBTOR_INFO
+showcase set name CORE_ORG_DI
+showcase set tableName CORE_ORG_DI
 showcase set downPath subject.organization_info
 
 showcase list add bank_relations org_bank_relation_id
@@ -867,9 +867,9 @@ showcase list addHistoryKey org_bank_relation_id org_bank_relation_id
 # CHILD BANK_RELATION
 #-----------------------------------------------------------------------------------
 showcase child init
-showcase child set name CORE_ORG_DEBTOR_INFO_BANK_RELATION
+showcase child set name CORE_ORG_DI_BANK_RELATION
 showcase child set meta subject
-showcase child set tableName CORE_ORG_DEBTOR_INFO
+showcase child set tableName CORE_ORG_DI
 showcase child set downPath organization_info
 
 showcase child list add bank_relations org_bank_relation_id
