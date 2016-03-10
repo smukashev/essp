@@ -107,7 +107,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     if (found) {
                         for (Map.Entry<ShowCase, Future> entry : showCaseFutureMap.entrySet()) {
                             try {
-                                entry.getValue().get(5, TimeUnit.SECONDS);
+                                entry.getValue().get(60, TimeUnit.SECONDS);
                             } catch (Exception e) {
                                 System.err.println(entry.getKey().toString());
                                 throw e;
