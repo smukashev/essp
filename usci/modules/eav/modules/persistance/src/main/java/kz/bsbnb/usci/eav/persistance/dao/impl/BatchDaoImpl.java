@@ -66,6 +66,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
     @Override
     public List<Batch> getPendingBatchList() {
         EavGlobal statusCompleted = eavGlobalDao.get(BatchStatuses.COMPLETED.type(), BatchStatuses.COMPLETED.code());
+        EavGlobal statusError = eavGlobalDao.get(BatchStatuses.ERROR.type(), BatchStatuses.ERROR.code());
 
         Select select = context.select(
                 EAV_BATCHES.ID,
@@ -81,18 +82,20 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 EAV_BATCHES.ACTUAL_COUNT,
                 EAV_BATCHES.REPORT_ID,
                 DSL.field("\"bs\".STATUS_ID")
-        ).from(EAV_BATCHES).join(context.select(
+        ).from(EAV_BATCHES).join(
+                context.select(
                         EAV_BATCH_STATUSES.BATCH_ID,
                         EAV_BATCH_STATUSES.STATUS_ID,
                         DSL.rowNumber().over()
                                 .partitionBy(EAV_BATCH_STATUSES.BATCH_ID)
                                 .orderBy(EAV_BATCH_STATUSES.RECEIPT_DATE.desc(),
-                                        EAV_BATCH_STATUSES.STATUS_ID.desc()).as("num")).
-                        from(EAV_BATCH_STATUSES).asTable("bs")).
+                                        EAV_BATCH_STATUSES.STATUS_ID.desc()).as("num"))
+                        .from(EAV_BATCH_STATUSES).asTable("bs")).
                 on(EAV_BATCHES.ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class)))
-                .where(DSL.field("\"bs\".\"num\"").eq(1)).
-                        and(DSL.field("\"bs\".STATUS_ID").ne(statusCompleted.getId())).
-                        and(EAV_BATCHES.IS_DISABLED.eq(DataUtils.convert(false))).orderBy(EAV_BATCHES.ID);
+                .where(DSL.field("\"bs\".\"num\"").eq(1))
+                .and(DSL.field("\"bs\".STATUS_ID").ne(statusCompleted.getId())
+                        .and(DSL.field("\"bs\".STATUS_ID").ne(statusError.getId())))
+                .and(EAV_BATCHES.IS_DISABLED.eq(DataUtils.convert(false))).orderBy(EAV_BATCHES.ID);
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
