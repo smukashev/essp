@@ -648,15 +648,13 @@ public class CortegeDaoImpl extends CommonDao {
 
     /* Does CLOSE operation on showcases */
     @Transactional
-    public synchronized void closeEntities(Long scId, IBaseEntity entity, List<ShowCase> showCases) {
+    public synchronized void closeEntities(IBaseEntity entity, List<ShowCase> showCases) {
         for (ShowCase showCase : showCases) {
             if (!showCase.getMeta().getClassName().equals(entity.getMeta().getClassName()))
                 continue;
 
-            if (scId == null || scId == 0L || scId == showCase.getId()) {
-                if (showCase.getDownPath() == null || showCase.getDownPath().length() == 0)
-                    closeEntity(entity, showCase);
-            }
+            if (showCase.getDownPath() == null || showCase.getDownPath().length() == 0)
+                closeEntity(entity, showCase);
         }
     }
 

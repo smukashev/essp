@@ -17,11 +17,10 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.Map;
+import java.util.concurrent.*;
 
 @Component
 public class ShowcaseMessageConsumer implements MessageListener {
@@ -54,10 +53,8 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 return;
             }
 
-            Long scId = queueEntry.getScId();
-
             try {
-                ArrayList<Future> futures = new ArrayList<>();
+                Map<ShowCase, Future> showCaseFutureMap = new HashMap<>();
                 List<ShowCase> showCases = showcaseDao.getShowCases();
 
                 if (showCases.size() == 0)
@@ -77,7 +74,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
                     cortegeDao.deleteById(showCase, queueEntry.getBaseEntityApplied());
                 } else if (operationType == OperationType.CLOSE) {
-                    cortegeDao.closeEntities(scId, queueEntry.getBaseEntityApplied(), showCases);
+                    cortegeDao.closeEntities(queueEntry.getBaseEntityApplied(), showCases);
                 } else {
                     boolean found = false;
 
@@ -85,14 +82,11 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
                     for (ShowCase showCase : showCases) {
                         if (showCase.getMeta().getClassName().equals(metaClassName)) {
-                            if (scId == null || scId == 0L || scId == showCase.getId()) {
-                                Future future = exec.submit(
-                                        new CortegeGenerator(queueEntry.getBaseEntityApplied(), showCase));
+                            Future future = exec.submit(
+                                    new CortegeGenerator(queueEntry.getBaseEntityApplied(), showCase));
 
-                                futures.add(future);
-
-                                found = true;
-                            }
+                            showCaseFutureMap.put(showCase, future);
+                            found = true;
                         }
                     }
 
@@ -103,8 +97,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                                     Future future = exec.submit(
                                             new CortegeGenerator(queueEntry.getBaseEntityApplied(), childShowCase));
 
-                                    futures.add(future);
-
+                                    showCaseFutureMap.put(childShowCase, future);
                                     found = true;
                                 }
                             }
@@ -112,16 +105,20 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     }
 
                     if (found) {
-                        for (Future f : futures) f.get();
+                        for (Map.Entry<ShowCase, Future> entry : showCaseFutureMap.entrySet()) {
+                            try {
+                                entry.getValue().get(5, TimeUnit.SECONDS);
+                            } catch (Exception e) {
+                                System.err.println(entry.getKey().toString());
+                                throw e;
+                            }
+                        }
                     } else {
                         logger.error("Для мета класа  " + metaClassName + " нет существующих витрин;");
                     }
-
-                    futures.clear();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                logger.error(e.getMessage());
                 throw new RuntimeException(e.getMessage());
             }
         }
