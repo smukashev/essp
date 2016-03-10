@@ -29,6 +29,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component
@@ -91,7 +93,7 @@ public class RulesSingleton
         }
     }
 
-    //private HashMap<String, ArrayList<RuleCasheEntry>> ruleCache = new HashMap<String, ArrayList<RuleCasheEntry>>();
+    private HashMap<String, ArrayList<RuleCasheEntry>> ruleCache = new HashMap<String, ArrayList<RuleCasheEntry>>();
 
     private ArrayList<RulePackageError> rulePackageErrors = new ArrayList<RulePackageError>();
 
@@ -237,9 +239,8 @@ public class RulesSingleton
         List<RulePackage> packages = ruleBatchService.getAllPackages();
 
         rulePackageErrors.clear();
-        //ruleCache.clear();
-
-
+        ruleCache.clear();
+        DateFormat sdf = new SimpleDateFormat("dd_MM_yyyy");
 
         for (RulePackage curPackage : packages) {
             List<PackageVersion> versions = ruleDao.getPackageVersions(curPackage);
@@ -251,7 +252,7 @@ public class RulesSingleton
 
                 StringBuilder droolPackage = new StringBuilder();
 
-                droolPackage.append("package " + curPackage.getName() + "_" + version.getReportDate() + "\n");
+                droolPackage.append("package " + curPackage.getName() + "_" + sdf.format(version.getReportDate()) + "\n");
                 droolPackage.append("dialect \"mvel\"\n");
                 droolPackage.append("import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n");
                 droolPackage.append("import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n");
@@ -276,14 +277,13 @@ public class RulesSingleton
             }
 
             Collections.sort(ruleCasheEntries);
-            //ruleCache.put(curPackage.getName(), ruleCasheEntries);
+            ruleCache.put(curPackage.getName(), ruleCasheEntries);
         }
     }
 
     public String getRulePackageName(String pkgName, Date repDate)
     {
-        return "";
-        /*List<RuleCasheEntry> versions = ruleCache.get(pkgName);
+        List<RuleCasheEntry> versions = ruleCache.get(pkgName);
 
         if (versions == null)
             throw new IllegalArgumentException("No such package " + pkgName);
@@ -293,12 +293,12 @@ public class RulesSingleton
         RuleCasheEntry result = versions.get(0);
         for (RuleCasheEntry entry : versions)
         {
-            if (entry.getReportDate().compareTo(repDate) <= 0)
+            if (entry.getRepDate().compareTo(repDate) <= 0)
                 return entry.getRules();
             result = entry;
         }
 
-        return result.getRules();*/
+        return result.getRules();
     }
 
     public void runRules(BaseEntity entity, String pkgName, Date repDate)

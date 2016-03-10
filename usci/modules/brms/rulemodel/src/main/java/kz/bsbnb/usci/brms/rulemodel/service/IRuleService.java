@@ -12,9 +12,10 @@ import java.util.Map;
  * @author abukabayev
  */
 public interface IRuleService {
-    public long save(Rule rule,PackageVersion packageVersion);
-    public List<Rule> load(PackageVersion packageVersion);
-    public void update(Rule rule);
+    long save(Rule rule,PackageVersion packageVersion);
+    List<Rule> load(PackageVersion packageVersion);
+    void update(Rule rule);
+    RulePackage getPackage(String name);
 
     /**
      * Select * from rules

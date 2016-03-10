@@ -21,6 +21,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -71,8 +72,20 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
                 .and(LOGIC_RULES.CLOSE_DATE.greaterThan(DataUtils.convert(packageVersion.getReportDate()))
                         .or(LOGIC_RULES.CLOSE_DATE.isNull()));
 
-        List<Rule> ruleList = jdbcTemplate.query(select.getSQL(),select.getBindValues().toArray(),
-                new BeanPropertyRowMapper(Rule.class));
+        //List<Rule> ruleList = jdbcTemplate.query(select.getSQL(),select.getBindValues().toArray(),
+        //        new BeanPropertyRowMapper(Rule.class));
+
+        List<Rule> ruleList = new ArrayList<>();
+
+        List<Map<String,Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        for(Map<String,Object> row : rows) {
+            Rule rule = new Rule();
+            rule.setId(((BigDecimal) row.get(LOGIC_RULES.ID.getName())).longValue());
+            rule.setRule(((String) row.get(LOGIC_RULES.RULE.getName())));
+            rule.setOpenDate(((Date) row.get(LOGIC_RULES.OPEN_DATE.getName())));
+            rule.setTitle(((String) row.get(LOGIC_RULES.TITLE.getName())));
+        }
 
         return ruleList;
     }
@@ -187,6 +200,23 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
     }
 
     @Override
+    public RulePackage getPackage(String name) {
+        Select select = context.selectFrom(LOGIC_PACKAGES).where(LOGIC_PACKAGES.NAME.eq(name));
+
+        List<Map<String,Object> > rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if(rows.size() < 1)
+            throw new IllegalArgumentException("Отсутствует пакет: " + name);
+
+        Map<String,Object> row = rows.iterator().next();
+
+        RulePackage ret = new RulePackage();
+        ret.setId(((BigDecimal) row.get(LOGIC_PACKAGES.ID.getName())).longValue());
+        ret.setName(name);
+        return ret;
+    }
+
+    @Override
     public void updateBody(Long ruleId, String body) {
         String sql = "UPDATE " + PREFIX_ + "rules SET rule = ? WHERE id=?";
         jdbcTemplate.update(sql, new Object[]{body, ruleId});
@@ -261,7 +291,7 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
                 .and(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(rulePackage.getId()));
 
         List<Map<String,Object>> rows
-                = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
+                = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         Set<Date> dates = new HashSet<>();
 
@@ -272,7 +302,11 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
         select = context.select(LOGIC_RULES.CLOSE_DATE)
                 .from(LOGIC_RULES)
                 .join(LOGIC_RULE_PACKAGE).on(LOGIC_RULES.ID.eq(LOGIC_RULE_PACKAGE.RULE_ID))
-                .and(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(rulePackage.getId()));
+                .and(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(rulePackage.getId()))
+                .and(LOGIC_RULES.CLOSE_DATE.isNotNull());
+
+
+        rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         for(Map<String,Object> row: rows) {
             dates.add((Date)row.get(LOGIC_RULES.CLOSE_DATE.getName()));

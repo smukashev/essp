@@ -151,6 +151,8 @@ public class CLI {
 
     private PackageVersion currentPackageVersion;
 
+    private RulePackage currentRulePackage;
+
     private BaseEntity currentBaseEntity;
 
     private Mnt mnt;
@@ -2013,14 +2015,14 @@ public class CLI {
                 else if (args.get(1).equals("version"))
                     System.out.println(currentPackageVersion);
                 else if (args.get(1).equals("package"))
-                    System.out.println(currentPackageName);
+                    System.out.println(currentRulePackage);
                 else if (args.get(1).equals("date"))
                     System.out.println(currentDate);
                 else if (args.get(1).equals("entity"))
                     System.out.println(currentBaseEntity);
                 else throw new IllegalArgumentException();
             } else if (args.get(0).equals("save")) {
-                long ruleId = ruleService.createNewRuleInBatch(currentRule, new RulePackage(currentPackageName));
+                long ruleId = ruleService.createNewRuleInBatch(currentRule, currentRulePackage);
                 System.out.println("ok saved: ruleId = " + ruleId);
             } else if (args.get(0).equals("run")) {
 
@@ -2029,7 +2031,7 @@ public class CLI {
 
                 try {
                     long creditorId = 0L;
-                    CLIXMLReader reader = new CLIXMLReader("/home/bauka/a.xml", metaClassRepository, batchService,
+                    CLIXMLReader reader = new CLIXMLReader("C:\\a.xml", metaClassRepository, batchService,
                             reportDate, creditorId);
                     currentBaseEntity = reader.read();
                     reader.close();
@@ -2049,7 +2051,8 @@ public class CLI {
                     currentBatchVersion = batchVersionService.getBatchVersion(currentPackageName, currentDate);
                 } else */if (args.size() < 3) throw new IllegalArgumentException();
                 else if (args.get(1).equals("package")) {
-                    ruleService.getRulePackageName(args.get(2), currentDate);
+                    currentRulePackage = ruleService.getPackage(args.get(2));
+                    //ruleService.getRulePackageName(args.get(2), currentDate);
                     currentPackageName = args.get(2);
                 } else if (args.get(1).equals("date")) {
                     DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");

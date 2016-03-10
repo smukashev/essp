@@ -37,4 +37,9 @@ public class RulePackage extends Persistable
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Override
+    public String toString() {
+        return "name: " + name + ", id: " + id;
+    }
 }

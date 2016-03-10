@@ -66,6 +66,11 @@ public class RuleService implements IRuleService {
     }
 
     @Override
+    public RulePackage getPackage(String name) {
+        return ruleDao.getPackage(name);
+    }
+
+    @Override
     public List<Rule> getAllRules() {
         return ruleDao.getAllRules();
     }
