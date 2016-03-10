@@ -85,6 +85,7 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
             rule.setRule(((String) row.get(LOGIC_RULES.RULE.getName())));
             rule.setOpenDate(((Date) row.get(LOGIC_RULES.OPEN_DATE.getName())));
             rule.setTitle(((String) row.get(LOGIC_RULES.TITLE.getName())));
+            ruleList.add(rule);
         }
 
         return ruleList;

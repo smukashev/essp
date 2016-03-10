@@ -10,6 +10,7 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
+import kz.bsbnb.usci.brms.rulesvr.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.cli.app.command.impl.*;
 import kz.bsbnb.usci.cli.app.exporter.EntityExporter;
 import kz.bsbnb.usci.cli.app.mnt.Mnt;
@@ -1940,7 +1941,9 @@ public class CLI {
             init();
             started = true;
             try {
-            } catch (Exception e) {
+                currentDate = RulesSingleton.ruleDateFormat.parse("01_04_2001");
+                currentRulePackage = ruleService.getPackage(currentPackageName);
+            } catch (ParseException e) {
                 e.printStackTrace();
             }
         }

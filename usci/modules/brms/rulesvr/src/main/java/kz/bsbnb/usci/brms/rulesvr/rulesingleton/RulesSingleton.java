@@ -46,6 +46,9 @@ public class RulesSingleton
     private RmiProxyFactoryBean entityRmiService;
     private IEntityService entityService;
 
+
+    public static DateFormat ruleDateFormat = new SimpleDateFormat("dd_MM_yyyy");
+
     @Autowired
     @Qualifier(value = "remoteMetaService")
     private RmiProxyFactoryBean metaRmiService;
@@ -240,7 +243,6 @@ public class RulesSingleton
 
         rulePackageErrors.clear();
         ruleCache.clear();
-        DateFormat sdf = new SimpleDateFormat("dd_MM_yyyy");
 
         for (RulePackage curPackage : packages) {
             List<PackageVersion> versions = ruleDao.getPackageVersions(curPackage);
@@ -252,14 +254,14 @@ public class RulesSingleton
 
                 StringBuilder droolPackage = new StringBuilder();
 
-                droolPackage.append("package " + curPackage.getName() + "_" + sdf.format(version.getReportDate()) + "\n");
+                droolPackage.append("package " + curPackage.getName() + "_" + ruleDateFormat.format(version.getReportDate()) + "\n");
                 droolPackage.append("dialect \"mvel\"\n");
                 droolPackage.append("import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n");
                 droolPackage.append("import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n");
 
                 for (Rule r : rules)
                 {
-                    if(r.isActive())
+                    if(r.isActive() || true)
                         droolPackage.append(r.getRule() + "\n");
                 }
 
@@ -281,7 +283,7 @@ public class RulesSingleton
         }
     }
 
-    public String getRulePackageName(String pkgName, Date repDate)
+    /*public String getRulePackageName(String pkgName, Date repDate)
     {
         List<RuleCasheEntry> versions = ruleCache.get(pkgName);
 
@@ -299,7 +301,7 @@ public class RulesSingleton
         }
 
         return result.getRules();
-    }
+    }*/
 
     public void runRules(BaseEntity entity, String pkgName, Date repDate)
     {
@@ -307,11 +309,13 @@ public class RulesSingleton
         ksession.setGlobal("entityService", entityService);
         ksession.setGlobal("metaService", metaFactoryService);
 
+        String packageName = pkgName + "_" + ruleDateFormat.format(repDate);
+
         @SuppressWarnings("rawtypes")
         List<Command> commands = new ArrayList<Command>();
         commands.add(CommandFactory.newInsert(entity));
         commands.add(new FireAllRulesCommand(new PackageAgendaFilter(
-                getRulePackageName(pkgName, repDate))));
+                packageName)));
         ksession.execute(CommandFactory.newBatchExecution(commands));
     }
 

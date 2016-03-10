@@ -164,10 +164,10 @@ public class RuleService implements IRuleService {
         return list;
     }
 
-    @Override
+    /*@Override
     public String getRulePackageName(String pkgName, Date repDate) {
         return rulesSingleton.getRulePackageName(pkgName, repDate);
-    }
+    }*/
 
     @Override
     public String getRuleErrors(String rule) {

@@ -96,7 +96,7 @@ public interface IRuleService {
 
     //public List<String> runRules(BaseEntity entity, String pkgName, Date repDate);
 
-    public String getRulePackageName(String pkgName, Date repDate);
+    //public String getRulePackageName(String pkgName, Date repDate);
 
     public String getRuleErrors(String rule);
 
