@@ -269,77 +269,6 @@ public class CortegeDaoImpl extends CommonDao {
         }
     }
 
-    private boolean checkMaps (Map<ValueElement, Object> savingMap, Map<String, Object> dbMap) {
-        boolean equalityFlag = true;
-
-        for (Map.Entry<ValueElement, Object> innerEntry : savingMap.entrySet()) {
-            Object savingValue = innerEntry.getValue();
-            Object dbValue = dbMap.get(innerEntry.getKey().columnName.toUpperCase());
-
-            if (savingValue == null && dbValue == null)
-                continue;
-
-            if (savingValue == null || dbValue == null) {
-                equalityFlag = false;
-                break;
-            }
-
-            if (!compareValue(savingValue, dbValue)) {
-                equalityFlag = false;
-                break;
-            }
-        }
-
-        return equalityFlag;
-    }
-
-    @Transactional
-    private void simpleInsertValueElement(Map<ValueElement, Object> map, String tableName) {
-        StringBuilder sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
-        StringBuilder values = new StringBuilder("(");
-
-        Object[] valueArray = new Object[map.size()];
-
-        int i = 0;
-
-        for (Map.Entry<ValueElement, Object> entry : map.entrySet()) {
-            sql.append(COLUMN_PREFIX).append(entry.getKey().columnName).append(", ");
-            values.append("?, ");
-            valueArray[i++] = entry.getValue();
-        }
-
-        sql.append("CDC");
-        values.append("SYSDATE)");
-
-        sql.append(") VALUES ").append(values);
-
-        jdbcTemplateSC.update(sql.toString(), valueArray);
-    }
-
-    @Transactional
-    private void simpleInsertString(Map<String, Object> map, String tableName) {
-        StringBuilder sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
-        StringBuilder values = new StringBuilder("(");
-
-        Object[] valueArray = new Object[map.size()];
-
-        int i = 0;
-
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            sql.append(COLUMN_PREFIX).append(entry.getKey()).append(", ");
-            values.append("?, ");
-            valueArray[i++] = entry.getValue();
-        }
-
-        sql.append("CDC");
-        values.append("SYSDATE)");
-
-        sql.append(") VALUES ").append(values);
-
-        jdbcTemplateSC.update(sql.toString(), valueArray);
-    }
-
-
     @Transactional
     private void childCortegeGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowCase showCase) {
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(entity, showCase);
@@ -351,26 +280,10 @@ public class CortegeDaoImpl extends CommonDao {
 
         try {
             for (Map.Entry<ArrayElement, HashMap<ValueElement, Object>> entry : savingMap.entrySet()) {
+                String sql;
                 HashMap<ValueElement, Object> entryMap = entry.getValue();
 
-                /* Change attribute_path to columnName */
-                for (ShowCaseField sf : showCase.getHistoryKeyFieldsList()) {
-                    ValueElement oldKey = null, newKey = null;
-
-                    for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
-                        if (innerEntry.getKey().columnName.equals(sf.getAttributePath())) {
-                            oldKey = innerEntry.getKey();
-
-                            newKey = new ValueElement(sf.getColumnName(), oldKey.elementId, oldKey.isArray, oldKey.isSimple, oldKey.index);
-                        }
-                    }
-
-                    if (globalEntity == null && (newKey == null || entryMap.get(oldKey) == null))
-                        throw new IllegalStateException(Errors.getMessage(Errors.E273));
-
-                    if (newKey != null && entryMap.get(oldKey) != null)
-                        entryMap.put(newKey, entryMap.remove(oldKey));
-                }
+                changeMetaKeys(globalEntity, showCase, entryMap);
 
                 if (globalEntity != null) { // downPath != null
                     for (ShowCaseField sf : showCase.getRootKeyFieldsList()) {
@@ -389,7 +302,7 @@ public class CortegeDaoImpl extends CommonDao {
                 KeyElement historyKeyElement = new KeyElement(entryMap, showCase.getHistoryKeyFieldsList());
 
                 /* Get list all by history keys */
-                String sql = "SELECT * FROM %s WHERE " + historyKeyElement.queryKeys;
+                sql = "SELECT * FROM %s WHERE " + historyKeyElement.queryKeys;
                 sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
                 List<Map<String, Object>> dbList = jdbcTemplateSC.queryForList(sql, historyKeyElement.values);
@@ -648,15 +561,13 @@ public class CortegeDaoImpl extends CommonDao {
 
     /* Does CLOSE operation on showcases */
     @Transactional
-    public synchronized void closeEntities(Long scId, IBaseEntity entity, List<ShowCase> showCases) {
+    public synchronized void closeEntities(IBaseEntity entity, List<ShowCase> showCases) {
         for (ShowCase showCase : showCases) {
             if (!showCase.getMeta().getClassName().equals(entity.getMeta().getClassName()))
                 continue;
 
-            if (scId == null || scId == 0L || scId == showCase.getId()) {
-                if (showCase.getDownPath() == null || showCase.getDownPath().length() == 0)
-                    closeEntity(entity, showCase);
-            }
+            if (showCase.getDownPath() == null || showCase.getDownPath().length() == 0)
+                closeEntity(entity, showCase);
         }
     }
 
@@ -1132,6 +1043,97 @@ public class CortegeDaoImpl extends CommonDao {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private void changeMetaKeys (IBaseEntity globalEntity, ShowCase showCase, Map<ValueElement, Object> entryMap) {
+        /* Change attribute_path to columnName */
+        for (ShowCaseField sf : showCase.getHistoryKeyFieldsList()) {
+            ValueElement oldKey = null, newKey = null;
+
+            for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
+                if (innerEntry.getKey().columnName.equals(sf.getAttributePath())) {
+                    oldKey = innerEntry.getKey();
+
+                    newKey = new ValueElement(sf.getColumnName(), oldKey.elementId, oldKey.isArray, oldKey.isSimple, oldKey.index);
+                }
+            }
+
+            if (globalEntity == null && (newKey == null || entryMap.get(oldKey) == null))
+                throw new IllegalStateException(Errors.getMessage(Errors.E273));
+
+            if (newKey != null && entryMap.get(oldKey) != null)
+                entryMap.put(newKey, entryMap.remove(oldKey));
+        }
+    }
+
+    private boolean checkMaps (Map<ValueElement, Object> savingMap, Map<String, Object> dbMap) {
+        boolean equalityFlag = true;
+
+        for (Map.Entry<ValueElement, Object> innerEntry : savingMap.entrySet()) {
+            Object savingValue = innerEntry.getValue();
+            Object dbValue = dbMap.get(innerEntry.getKey().columnName.toUpperCase());
+
+            if (savingValue == null && dbValue == null)
+                continue;
+
+            if (savingValue == null || dbValue == null) {
+                equalityFlag = false;
+                break;
+            }
+
+            if (!compareValue(savingValue, dbValue)) {
+                equalityFlag = false;
+                break;
+            }
+        }
+
+        return equalityFlag;
+    }
+
+    @Transactional
+    private void simpleInsertValueElement(Map<ValueElement, Object> map, String tableName) {
+        StringBuilder sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
+        StringBuilder values = new StringBuilder("(");
+
+        Object[] valueArray = new Object[map.size()];
+
+        int i = 0;
+
+        for (Map.Entry<ValueElement, Object> entry : map.entrySet()) {
+            sql.append(COLUMN_PREFIX).append(entry.getKey().columnName).append(", ");
+            values.append("?, ");
+            valueArray[i++] = entry.getValue();
+        }
+
+        sql.append("CDC");
+        values.append("SYSDATE)");
+
+        sql.append(") VALUES ").append(values);
+
+        jdbcTemplateSC.update(sql.toString(), valueArray);
+    }
+
+    @Transactional
+    private void simpleInsertString(Map<String, Object> map, String tableName) {
+        StringBuilder sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
+        StringBuilder values = new StringBuilder("(");
+
+        Object[] valueArray = new Object[map.size()];
+
+        int i = 0;
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            sql.append(COLUMN_PREFIX).append(entry.getKey()).append(", ");
+            values.append("?, ");
+            valueArray[i++] = entry.getValue();
+        }
+
+        sql.append("CDC");
+        values.append("SYSDATE)");
+
+        sql.append(") VALUES ").append(values);
+
+        jdbcTemplateSC.update(sql.toString(), valueArray);
     }
 
     public void waitShowCase(Long id) {
