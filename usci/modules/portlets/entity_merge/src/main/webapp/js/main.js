@@ -600,6 +600,23 @@ Ext.onReady(function() {
         ]
     });
 
+    Ext.define('entitySelectModel', {
+        extend: 'Ext.data.Model',
+        fields: [
+            {name: 'title', type: 'string'},
+            {name: 'code', type: 'string'},
+            {name: 'value', type: 'string'},
+            {name: 'simple', type: 'boolean'},
+            {name: 'array', type: 'boolean'},
+            {name: 'ref', type: 'boolean'},
+            {name: 'type', type: 'string'},
+            {name: 'isKey', type: 'boolean'},
+            {name: 'isRequired', type: 'boolean'},
+            {name: 'metaId', type: 'string'},
+            {name: 'childMetaId', type: 'string'},
+            {name: 'childType', type: 'string'},
+        ]
+    });
 
     var types = Ext.create('Ext.data.Store', {
         fields: ['searchName', 'title'],
@@ -631,12 +648,12 @@ Ext.onReady(function() {
                 root: 'data',
                 totalProperty: 'total'
             }
-        },
+        }
     });
 
     entityStoreSelect = Ext.create('Ext.data.TreeStore', {
-        model: 'entityModel',
-        storeId: 'entityStore',
+        model: 'entitySelectModel',
+        storeId: 'entityStoreSelect',
         proxy: {
             type: 'ajax',
             url: dataUrl,
@@ -719,36 +736,8 @@ Ext.onReady(function() {
             //entityId = Ext.getCmp("entityId");
             userNavHistory.init();
             Ext.getCmp('form-area').doSearch();
+
             return;
-            var keySearchComponent = document.getElementById('inp-1-' + currentMeta + '-null');
-
-            if (keySearchComponent != null) {
-                var entityId = document.getElementById('inp-1-' + currentMeta + '-null').value;
-                loadEntity(entityId, Ext.getCmp('edDate').value, currentSearch);
-            } else {
-                //for custom implementations
-                var params = {op: 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch, timeout: 120000};
-                var inputs = document.getElementById("entity-editor-form").childNodes;
-                for (i = 0; i < inputs.length; i++) {
-                    if (inputs[i].tagName == 'INPUT') {
-                        params[inputs[i].name] = inputs[i].value;
-                    }
-                }
-
-                //console.log(params);
-
-                var loadingGif = document.getElementById('form-loading');
-                loadingGif.style.display = 'inline';
-                entityStore.load({
-                    params: params,
-                    callback: function (records, operation, success) {
-                        if (!success) {
-                            Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
-                        }
-                        loadingGif.style.display = 'none';
-                    }
-                });
-            }
         },
         maxWidth: 70,
         shadow: true
