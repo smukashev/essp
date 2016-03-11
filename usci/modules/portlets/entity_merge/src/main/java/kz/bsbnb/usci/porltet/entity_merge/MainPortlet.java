@@ -16,7 +16,10 @@ import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
@@ -158,6 +161,273 @@ public class MainPortlet extends MVCPortlet {
 		String outStr = str.replaceAll("\"", " ");
 		System.out.println(outStr);
 		return outStr;
+	}
+
+	private String getMetaTypeStr(IMetaType metaType) {
+		if (metaType.isSet())
+			return "META_SET";
+		else if (metaType.isComplex()) {
+			return "META_CLASS";
+		} else {
+			return ((IMetaValue) metaType).getTypeCode().name();
+		}
+	}
+
+	private String setToJsonSelect(BaseSet set, String title, String code, IMetaAttribute attr,
+								   boolean isNb,
+								   long creditorId) {
+		IMetaType type = set.getMemberType();
+
+		if (title == null) {
+			title = code;
+		}
+
+		String str = "{";
+
+		str += "\"title\": \"" + title + "\",";
+		str += "\"code\": \"" + code + "\",";
+		str += "\"value\": \"" + set.get().size() + "\",";
+		str += "\"simple\": " + !attr.getMetaType().isComplex() + ",";
+		str += "\"array\": true,";
+		str += "\"isKey\": " + attr.isKey() + ",";
+		str += "\"type\": \"META_SET\",";
+		str += "\"iconCls\":\"folder\",";
+
+		{
+			StringBuilder result = new StringBuilder();
+			IMetaType memberType = set.getMemberType();
+
+			if (memberType.isComplex()) {
+				result.append("\"childMetaId\":");
+				result.append("\"");
+				result.append(((IMetaClass) memberType).getId());
+				result.append("\",");
+			}
+
+			result.append("\"childType\":");
+			result.append("\"");
+			result.append(getMetaTypeStr(memberType));
+			result.append("\",");
+
+			str += result.toString();
+		}
+
+		str += "\"children\":[";
+
+		boolean first = true;
+
+		int i = 0;
+
+		if (type.isComplex()) {
+			for (IBaseValue value : set.get()) {
+				if (value != null && value.getValue() != null) {
+
+					//bank relation check
+					try {
+						if (!isNb) {
+							if ("bank_relations".equals(attr.getName())) {
+								BaseEntity relation = (BaseEntity) value.getValue();
+								if (((BaseEntity) relation.getEl("creditor")).getId() != creditorId)
+									continue;
+							}
+						}
+					} catch (Exception e) {
+						System.err.println(e.getMessage());
+						// strict mode
+						continue;
+					}
+
+					if (!first) {
+						str += ",";
+					} else {
+						first = false;
+					}
+
+					str += entityToJsonSelect((BaseEntity) (value.getValue()), "[" + i + "]", "[" + i + "]",
+							null, false, isNb, creditorId);
+					i++;
+				}
+
+			}
+		} else {
+			for (IBaseValue value : set.get()) {
+				if (value != null && value.getValue() != null) {
+					if (!first) {
+						str += ",";
+					} else {
+						first = false;
+					}
+
+					if (((MetaValue) type).getTypeCode() != DataTypes.DATE) {
+						str += "{" +
+								"\"title\":\"" + "[" + i + "]" + "\",\n" +
+								"\"code\":\"" + "[" + i + "]" + "\",\n" +
+								"\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+								"\"simple\": true,\n" +
+								"\"array\": false,\n" +
+								"\"type\": \"" + ((MetaValue) type).getTypeCode() + "\",\n" +
+								"\"leaf\":true,\n" +
+								"\"iconCls\":\"file\"\n" +
+								"}";
+					} else {
+						Object dtVal = value.getValue();
+						String dtStr = "";
+						if (dtVal != null) {
+							dtStr = new SimpleDateFormat("dd.MM.yyyy").format(dtVal);
+						}
+
+						str += "{" +
+								"\"title\":\"" + "[" + i + "]" + "\",\n" +
+								"\"code\":\"" + "[" + i + "]" + "\",\n" +
+								"\"value\":\"" + dtStr + "\",\n" +
+								"\"simple\": true,\n" +
+								"\"array\": false,\n" +
+								"\"type\": \"" + ((MetaValue) type).getTypeCode() + "\",\n" +
+								"\"leaf\":true,\n" +
+								"\"iconCls\":\"file\"\n" +
+								"}";
+					}
+				}
+			}
+		}
+
+		str += "]}";
+
+		return str;
+	}
+
+	private String entityToJsonSelect(BaseEntity entity, String title, String code, IMetaAttribute attr,
+									  boolean asRoot,
+									  boolean isNb,
+									  long creditorId) {
+
+		MetaClass meta = entity.getMeta();
+
+		//credit check
+		if (meta.getClassName().equals("credit") && !isNb) {
+			BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
+			if (creditor.getId() != creditorId)
+				throw new RuntimeException(Errors.getMessage(Errors.E238));
+		}
+
+		if (title == null) {
+			title = code;
+		}
+
+		String str = "{";
+
+		str += "\"title\": \"" + title + "\",";
+		str += "\"code\": \"" + code + "\",";
+//        str += "\"value\": \"" + clearSlashes(testNull(meta.getClassTitle())) + "\",";
+		str += "\"value\": \"" + entity.getId() + "\",";
+		str += "\"simple\": false,";
+		str += "\"array\": false,";
+		str += "\"ref\": " + entity.getMeta().isReference() + ",";
+		str += "\"isKey\": " + (attr != null ? attr.isKey() : false) + ",";
+		str += "\"isRequired\": " + (attr != null ? attr.isRequired() : false) + ",";
+		str += "\"root\": " + asRoot + ",";
+		str += "\"type\": \"META_CLASS\",";
+		str += "\"metaId\": \"" + entity.getMeta().getId() + "\",";
+		str += "\"iconCls\":\"folder\",";
+		str += "\"children\":[";
+
+		boolean first = true;
+
+		for (String innerClassesNames : meta.getComplexAttributesNames()) {
+			String attrTitle = innerClassesNames;
+			if (meta.getMetaAttribute(innerClassesNames).getTitle() != null &&
+					meta.getMetaAttribute(innerClassesNames).getTitle().trim().length() > 0)
+				attrTitle = meta.getMetaAttribute(innerClassesNames).getTitle();
+
+			IBaseValue value = entity.getBaseValue(innerClassesNames);
+
+			if (value != null && value.getValue() != null) {
+				if (!first) {
+					str += ",";
+				} else {
+					first = false;
+				}
+
+				str += entityToJsonSelect((BaseEntity) (value.getValue()), attrTitle, innerClassesNames,
+						meta.getMetaAttribute(innerClassesNames), false, isNb, creditorId);
+			}
+
+		}
+
+		for (String innerClassesNames : meta.getComplexArrayAttributesNames()) {
+			String attrTitle = innerClassesNames;
+			if (meta.getMetaAttribute(innerClassesNames).getTitle() != null &&
+					meta.getMetaAttribute(innerClassesNames).getTitle().trim().length() > 0)
+				attrTitle = meta.getMetaAttribute(innerClassesNames).getTitle();
+
+			IBaseValue value = entity.getBaseValue(innerClassesNames);
+
+			if (value != null && value.getValue() != null) {
+				if (!first) {
+					str += ",";
+				} else {
+					first = false;
+				}
+
+				str += setToJsonSelect((BaseSet) (value.getValue()), attrTitle, innerClassesNames, value.getMetaAttribute(),
+						isNb, creditorId);
+			}
+		}
+
+		for (String innerClassesNames : meta.getSimpleAttributesNames()) {
+			String attrTitle = innerClassesNames;
+			if (meta.getMetaAttribute(innerClassesNames).getTitle() != null &&
+					meta.getMetaAttribute(innerClassesNames).getTitle().trim().length() > 0)
+				attrTitle = meta.getMetaAttribute(innerClassesNames).getTitle();
+
+			IBaseValue value = entity.getBaseValue(innerClassesNames);
+
+			if (value != null && value.getValue() != null) {
+				if (!first) {
+					str += ",";
+				} else {
+					first = false;
+				}
+
+				if (((MetaValue) meta.getMemberType(innerClassesNames)).getTypeCode() != DataTypes.DATE) {
+					str += "{" +
+							"\"title\":\"" + attrTitle + "\",\n" +
+							"\"code\":\"" + innerClassesNames + "\",\n" +
+							"\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+							"\"simple\": true,\n" +
+							"\"array\": false,\n" +
+							"\"type\": \"" + ((MetaValue) meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
+							"\"leaf\":true,\n" +
+							"\"iconCls\":\"file\",\n" +
+							"\"isKey\":\"" + meta.getMetaAttribute(innerClassesNames).isKey() + "\",\n" +
+							"\"isRequired\":\"" + meta.getMetaAttribute(innerClassesNames).isRequired() + "\"\n" +
+							"}";
+				} else {
+					Object dtVal = value.getValue();
+					String dtStr = "";
+					if (dtVal != null) {
+						dtStr = new SimpleDateFormat("dd.MM.yyyy").format(dtVal);
+					}
+
+					str += "{" +
+							"\"title\":\"" + attrTitle + "\",\n" +
+							"\"code\":\"" + innerClassesNames + "\",\n" +
+							"\"value\":\"" + dtStr + "\",\n" +
+							"\"simple\": true,\n" +
+							"\"array\": false,\n" +
+							"\"type\": \"" + ((MetaValue) meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
+							"\"leaf\":true,\n" +
+							"\"iconCls\":\"file\",\n" +
+							"\"isKey\":\"" + meta.getMetaAttribute(innerClassesNames).isKey() + "\",\n" +
+							"\"isRequired\":\"" + meta.getMetaAttribute(innerClassesNames).isRequired() + "\"\n" +
+							"}";
+				}
+			}
+		}
+
+		str += "]}";
+
+		return str;
 	}
 
 	private String entityToJson(BaseEntity entityLeft, BaseEntity entityRight, String title, String code) {
@@ -601,7 +871,7 @@ public class MainPortlet extends MVCPortlet {
 
 
 		PrintWriter writer = resourceResponse.getWriter();
-
+		List<Creditor> creditors;
 		try {
 			OperationTypes operationType = OperationTypes.valueOf(getParam("op", resourceRequest));
 			User currentUser = PortalUtil.getUser(resourceRequest);
@@ -716,6 +986,10 @@ public class MainPortlet extends MVCPortlet {
 
 					//writer.write("{\"success\":\"true\", \"data\": " + gson.toJson(classes) + "}");
 					break;
+				case LIST_CREDITORS:
+					creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
+					writer.write(JsonMaker.getJson(creditors));
+					break;
 				case GET_ENTITY_ID: {
 					String entityId = resourceRequest.getParameter("entityId");
 					String asRootStr = resourceRequest.getParameter("asRoot");
@@ -729,7 +1003,7 @@ public class MainPortlet extends MVCPortlet {
 							break;
 						}
 
-					List<Creditor> creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
+					creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
 
 					if (!isNb) {
 						if (creditors.size() > 1)
@@ -777,6 +1051,117 @@ public class MainPortlet extends MVCPortlet {
 
 					break;
 				}
+				case LIST_ENTITY_SELECT:
+					String entityId = resourceRequest.getParameter("entityId");
+					String asRootStr = resourceRequest.getParameter("asRoot");
+					boolean isNb = false;
+					creditorId = new Long(-1);
+
+					for (Role r : currentUser.getRoles())
+						if ("NationalBankEmployee".equals(r.getDescriptiveName()) ||
+								"Administrator".equals(r.getDescriptiveName())) {
+							isNb = true;
+							break;
+						}
+
+					creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
+
+					if (!isNb) {
+						if (creditors.size() > 1)
+							throw new RuntimeException(Errors.getMessage(Errors.E240));
+
+						if (creditors.size() == 0)
+							throw new RuntimeException(Errors.getMessage(Errors.E241));
+
+						creditorId = creditors.get(0).getId();
+					}
+
+					boolean asRoot = StringUtils.isNotEmpty(asRootStr) ? Boolean.valueOf(asRootStr) : false;
+
+					if (entityId != null && entityId.trim().length() > 0) {
+						//search by single Id
+						Date date = null;
+						if (resourceRequest.getParameter("date") != null)
+							date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+
+						if (date == null)
+							date = new Date();
+
+						BaseEntity entity = entityService.load(Integer.parseInt(entityId), date);
+
+						String sJson = "{\"text\":\".\",\"children\": [\n" +
+								entityToJsonSelect(entity, entity.getMeta().getClassTitle(),
+										entity.getMeta().getClassName(), null, asRoot, isNb, creditorId) +
+								"]}";
+
+						writer.write(sJson);
+					} else {
+						searchClassName = resourceRequest.getParameter("searchName");
+						String metaName = resourceRequest.getParameter("metaClass");
+						metaClass = metaFactoryService.getMetaClass(metaName);
+						try {
+							creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
+						} catch (Exception e) {
+							creditorId = new Long(-1);
+						}
+						list = resourceRequest.getParameterNames();
+						parameters = new HashMap<>();
+						while (list.hasMoreElements()) {
+							String attribute = list.nextElement();
+							if (attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
+								continue;
+							parameters.put(attribute, resourceRequest.getParameter(attribute));
+						}
+
+
+						searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "", creditorId);
+
+						StringBuilder sb = new StringBuilder("{\"text\":\".\"");
+						if (searchResult.hasPagination())
+							sb = sb.append(",\"totalCount\":" + searchResult.getTotalCount());
+						sb = sb.append(",\"children\":[\n");
+
+						Iterator<BaseEntity> it = searchResult.getData().iterator();
+						do {
+							if (!it.hasNext())
+								break;
+							BaseEntity currentEntity = it.next();
+							sb.append(entityToJsonSelect(currentEntity, currentEntity.getMeta().getClassTitle(),
+									currentEntity.getMeta().getClassName(), null, true, isNb, creditorId));
+
+							if (it.hasNext()) sb.append(",");
+						} while (true);
+
+						sb.append("]}");
+						writer.write(sb.toString());
+
+						if (1 == 1)
+							return;
+
+						//search by parameters
+
+						list = resourceRequest.getParameterNames();
+						metaName = resourceRequest.getParameter("metaClass");
+						searchClassName = resourceRequest.getParameter("searchName");
+
+						metaClass = metaFactoryService.getMetaClass(metaName);
+						parameters = new HashMap<String, String>();
+
+						while (list.hasMoreElements()) {
+							String attribute = list.nextElement();
+							if (attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
+								continue;
+							parameters.put(attribute, resourceRequest.getParameter(attribute));
+						}
+
+						searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "", creditorId);
+						if (searchResult.getData() == null)
+							throw new IllegalArgumentException(Errors.getMessage(Errors.E242));
+
+						sb.append("]}");
+						writer.write(sb.toString());
+					}
+					break;
 				case LIST_ENTITY: {
 					String leftEntityId = resourceRequest.getParameter("leftEntityId");
 					String leftReportDate = resourceRequest.getParameter("leftReportDate");
@@ -810,8 +1195,8 @@ public class MainPortlet extends MVCPortlet {
 				case LIST_CREDITOR: {
 					Map m = new HashMap();
 					List<Map> l = new LinkedList<>();
-					List<Creditor> creditors =
-							portalUserBeanRemoteBusiness.getPortalUserCreditorList(currentUser.getUserId());
+					creditors = portalUserBeanRemoteBusiness.getPortalUserCreditorList(currentUser.getUserId());
+
 					for (Creditor creditor : creditors) {
 						Map creditorMap = new HashMap();
 						creditorMap.put("id", creditor.getId());
@@ -850,7 +1235,9 @@ public class MainPortlet extends MVCPortlet {
 
 	enum OperationTypes {
 		LIST_CLASSES,
+		LIST_CREDITORS,
 		GET_ENTITY_ID,
+		LIST_ENTITY_SELECT,
 		LIST_ENTITY,
 		LIST_CREDITOR,
 		SAVE_JSON,

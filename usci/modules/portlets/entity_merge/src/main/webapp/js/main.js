@@ -13,6 +13,32 @@ var currentMeta;
 
 var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
 var errors = [];
+var forms = [];
+var entityStoreSelect;
+var fetchSize = 50;
+
+var userNavHistory = {
+    currentPage: 1,
+    nextPage: 1,
+    getNextPage: function () {
+        return this.nextPage;
+    },
+    setNextPage: function (nextPage) {
+        this.nextPage = nextPage;
+        console.log(this.nextPage);
+    },
+    init: function () {
+        this.nextPage = 1;
+    },
+    success: function (totalCount) {
+        this.currentPage = this.nextPage;
+        if (totalCount) {
+            Ext.getCmp('totalCount').setText(totalCount);
+            Ext.getCmp('totalPageNo').setText(Math.floor((fetchSize - 1 + totalCount) / fetchSize));
+            Ext.getCmp('currentPageNo').setText(this.currentPage);
+        }
+    }
+};
 
 function createJSON(currentNode, offset, first){
 
@@ -575,6 +601,50 @@ Ext.onReady(function() {
     });
 
 
+    var types = Ext.create('Ext.data.Store', {
+        fields: ['searchName', 'title'],
+        /*data : [
+         {"id":"s_credit_pc", "name":"Договор по номеру и дате договора"},
+         {"id":"s_person_doc", "name":"Физ лицо по документу"},
+         {"id":"s_org_doc", "name":"Юр лицо по документу"}
+         ]*/
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op: 'LIST_CLASSES'},
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        }
+    });
+
+    var creditors = Ext.create('Ext.data.Store', {
+        fields: ['id', 'name'],
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op: 'LIST_CREDITORS'},
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        },
+    });
+
+    entityStoreSelect = Ext.create('Ext.data.TreeStore', {
+        model: 'entityModel',
+        storeId: 'entityStore',
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op: 'LIST_ENTITY_SELECT'}
+        },
+        folderSort: true
+    });
+
     var CreditorStore = Ext.create('Ext.data.Store',
         {
             model: 'refStoreModel',
@@ -608,6 +678,80 @@ Ext.onReady(function() {
             extraParams: {op : 'LIST_ENTITY'}
         },
         folderSort: true
+    });
+
+    var buttonSaveEntity = Ext.create('Ext.button.Button', {
+        id: "entityEditorXmlBtn",
+        text: label_SAVE,
+        handler: function () {
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                if (hasEmptyKeyAttr(rootNode.childNodes[i])) {
+                    return;
+                }
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true);
+            }
+
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
+                    op: 'SAVE_XML'
+                },
+                success: function () {
+                    Ext.MessageBox.alert("", "Сохранено успешно");
+                }
+            });
+        },
+        maxWidth: 70
+    });
+
+    var buttonShowEntity = Ext.create('Ext.button.Button', {
+        id: "entityEditorShowBtn",
+        text: label_VIEW,
+        handler: function () {
+            //entityId = Ext.getCmp("entityId");
+            userNavHistory.init();
+            Ext.getCmp('form-area').doSearch();
+            return;
+            var keySearchComponent = document.getElementById('inp-1-' + currentMeta + '-null');
+
+            if (keySearchComponent != null) {
+                var entityId = document.getElementById('inp-1-' + currentMeta + '-null').value;
+                loadEntity(entityId, Ext.getCmp('edDate').value, currentSearch);
+            } else {
+                //for custom implementations
+                var params = {op: 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch, timeout: 120000};
+                var inputs = document.getElementById("entity-editor-form").childNodes;
+                for (i = 0; i < inputs.length; i++) {
+                    if (inputs[i].tagName == 'INPUT') {
+                        params[inputs[i].name] = inputs[i].value;
+                    }
+                }
+
+                //console.log(params);
+
+                var loadingGif = document.getElementById('form-loading');
+                loadingGif.style.display = 'inline';
+                entityStore.load({
+                    params: params,
+                    callback: function (records, operation, success) {
+                        if (!success) {
+                            Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
+                        }
+                        loadingGif.style.display = 'none';
+                    }
+                });
+            }
+        },
+        maxWidth: 70,
+        shadow: true
     });
 
     var buttonShow = Ext.create('Ext.button.Button', {
@@ -979,6 +1123,175 @@ Ext.onReady(function() {
         ]
     });
 
+    var entityGridSelect = Ext.create('Ext.tree.Panel', {
+        //collapsible: true,
+        id: 'entityTreeView',
+        preventHeader: true,
+        useArrows: true,
+        rootVisible: false,
+        store: entityStoreSelect,
+        multiSelect: true,
+        singleExpand: true,
+        columns: [{
+            xtype: 'treecolumn',
+            text: label_TITLE,
+            flex: 4,
+            sortable: true,
+            dataIndex: 'title'
+        }, {
+            text: label_VALUE,
+            flex: 2,
+            dataIndex: 'value',
+            sortable: true
+        }, {
+            text: label_SUBJECT_NAME,
+            flex: 4,
+            dataIndex: 'code',
+            sortable: true,
+            renderer: function (val, meta, record) {
+                if (val == 'subject') {
+                    var subjectName;
+                    record.eachChild(function (n) {
+                        if (n.get('code') == 'person_info') {
+                            var lastname;
+                            var firstname;
+                            var middlename;
+                            n.eachChild(function (n) {
+                                if (n.get('code') == 'names') {
+                                    if (n.firstChild) {
+                                        n.firstChild.eachChild(function (n) {
+                                            if (n.get('code') == 'lastname') {
+                                                lastname = n.get('value')
+                                            } else if (n.get('code') == 'firstname') {
+                                                firstname = n.get('value')
+                                            } else if (n.get('code') == 'middlename') {
+                                                middlename = n.get('value')
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                            subjectName = "{0} {1} {2}".format(lastname ? lastname : '', firstname ? firstname : '', middlename ? middlename : '')
+                        } else if (n.get('code') == 'organization_info') {
+                            n.eachChild(function (n) {
+                                if (n.get('code') == 'names') {
+                                    if (n.firstChild) {
+                                        n.firstChild.eachChild(function (n) {
+                                            if (n.get('code') == 'name') {
+                                                subjectName = n.get('value')
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                }
+                return subjectName;
+            }
+        }]
+    });
+
+    var mainPanel = Ext.create('Ext.panel.Panel', {
+        title: label_MERGE_PANEL,
+        preventHeader: true,
+        width: '100%',
+        height: 500,
+        //renderTo: 'merge-content',
+        //preventHeader: true,
+        layout: 'border',
+        items: [{
+            region: 'west',
+            width: '50%',
+            split: true,
+            layout: 'border',
+            items: [{
+                region: 'north',
+                height: '20%',
+                split: true,
+                layout: {
+                    type: 'vbox',
+                    padding: 5,
+                    align: 'stretch'
+                },
+                items: [{
+                    id: 'edSearch',
+                    xtype: 'combobox',
+                    displayField: 'title',
+                    store: types,
+                    labelWidth: 70,
+                    valueField: 'searchName',
+                    fieldLabel: 'Вид поиска',
+                    editable: false,
+                    listeners: {
+                        change: function (a, key, prev) {
+                            for (p in forms)
+                                if (p == key)
+                                    forms[p](Ext.getCmp('form-area'));
+                        }
+                    }
+                }, {
+                    id: 'edCreditor',
+                    xtype: 'combobox',
+                    displayField: 'name',
+                    store: creditors,
+                    labelWidth: 70,
+                    valueField: 'id',
+                    fieldLabel: 'Кредитор',
+                    editable: false
+                }, {
+                    xtype: 'datefield',
+                    id: 'edDate',
+                    fieldLabel: 'Дата',
+                    listeners: {
+                        change: function () {
+                            console.log('datefield changed');
+                        }
+                    },
+                    format: 'd.m.Y',
+                    value: '01.11.2015'
+                }]
+            }, {
+                region: 'center',
+                id: 'form-area',
+                height: '80%',
+                split: true,
+                html: '<div id="entity-editor-form"></div>',
+                tbar: [buttonShowEntity, buttonSaveEntity]
+            }]
+        }, {
+            region: 'east',
+            width: "50%",
+            split: true,
+            items: [entityGridSelect],
+            autoScroll: true,
+            bbar: [
+                {
+                    text: '<<',
+                    id: 'previousNav',
+                    handler: function () {
+                        userNavHistory.setNextPage(userNavHistory.currentPage - 1);
+                        Ext.getCmp('form-area').doSearch();
+                    }
+                },
+                {xtype: 'label', text: '1', id: 'currentPageNo'},
+                {xtype: 'label', text: '/'},
+                {xtype: 'label', text: '1', id: 'totalPageNo'},
+                {
+                    text: '>>', id: 'nextNav',
+                    handler: function () {
+                        userNavHistory.setNextPage(userNavHistory.currentPage + 1);
+                        Ext.getCmp('form-area').doSearch();
+                    }
+                },
+                {xtype: 'label', text: 'Всего результатов:'},
+                {xtype: 'label', text: '0', id: 'totalCount'}
+            ]
+        }]
+
+    });
+
     tabs = Ext.widget('tabpanel', {
         id:"tabs",
         width: '100%',
@@ -989,7 +1302,7 @@ Ext.onReady(function() {
         defaults :{
            bodyPadding: 0
         },
-        items: [mainEntityEditorPanel, clientEntityEditorPanel]
+        items: [mainEntityEditorPanel, mainPanel]
     });
 
     var rootPanel = Ext.create('Ext.panel.Panel', {

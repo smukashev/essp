@@ -1,5 +1,5 @@
-<%@ page import="com.liferay.portal.theme.ThemeDisplay" %>
 <%@ page import="com.liferay.portal.kernel.util.WebKeys" %>
+<%@ page import="com.liferay.portal.theme.ThemeDisplay" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 <%@ taglib prefix="aui" uri="http://alloy.liferay.com/tld/aui" %>
 
@@ -56,6 +56,9 @@
 <script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/main.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/st_format.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/s_subject_doc.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/s_person_fio.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/s_org_name.js" type="text/javascript"></script>
 
 <script src="<%=request.getContextPath()%>/js/lang/default.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/lang/<%= ((ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY)).getLocale() %>.js" type="text/javascript"></script>
