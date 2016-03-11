@@ -69,9 +69,7 @@ public class UploadApplication extends Application {
                             }
                         }
                     }
-                } catch (PortalException e) {
-                    e.printStackTrace();
-                } catch (SystemException e) {
+                } catch (PortalException | SystemException e) {
                     e.printStackTrace();
                 }
 
@@ -82,10 +80,8 @@ public class UploadApplication extends Application {
                 mainWindow.addComponent(new MainLayout(
                         new UploadPortletEnvironmentFacade(PortalUtil.getUser(request), isNB)));
                 setMainWindow(mainWindow);
-            } catch (PortalException pe) {
+            } catch (PortalException | SystemException pe) {
                 log.log(Level.SEVERE, "", pe);
-            } catch (SystemException se) {
-                log.log(Level.SEVERE, "", se);
             }
         }
 
