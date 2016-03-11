@@ -14,7 +14,6 @@
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.eav.tool" />
     <context:component-scan base-package="kz.bsbnb.usci.cli" />
-    <context:component-scan base-package="kz.bsbnb.usci.brms.rulesingleton" />
 
     <context:annotation-config/>
 
