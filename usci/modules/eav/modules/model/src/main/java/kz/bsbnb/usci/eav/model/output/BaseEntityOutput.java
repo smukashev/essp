@@ -25,6 +25,9 @@ public class BaseEntityOutput {
 
         MetaClass meta = entity.getMeta();
 
+        if (!meta.isReference())
+            return entity.getId() + "*";
+
         for (String memberName : meta.getMemberNames()) {
             IMetaAttribute attribute = meta.getMetaAttribute(memberName);
             IMetaType type = attribute.getMetaType();
@@ -42,7 +45,6 @@ public class BaseEntityOutput {
                     valueToString = "null";
                 }
             }
-
 
             if (value != null && value.getValue() != null) {
                 if (type.isComplex()) {
