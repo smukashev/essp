@@ -3,7 +3,7 @@
  v_table_ddl VARCHAR2(30000);
  v_trigger_ddl varchar2(4000);
  v_trigger_enable_ddl VARCHAR2(4000);
- v_schema VARCHAR2(32) := 'SHOWCASE';
+ v_schema VARCHAR2(32) := ?;
  v_counter number;
 
  v_index_ddl VARCHAR2(4000 CHAR);

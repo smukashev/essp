@@ -18,4 +18,12 @@ public interface ShowcaseService {
     void reloadCash();
 
     ShowCase load(Long id);
+
+    String getUrlSc();
+
+    String getSchemaSc();
+
+    String getPasswordSc();
+
+    String getDriverSc();
 }
