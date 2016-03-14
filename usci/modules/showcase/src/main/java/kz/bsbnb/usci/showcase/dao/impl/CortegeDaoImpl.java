@@ -72,8 +72,7 @@ public class CortegeDaoImpl extends CommonDao {
 
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(entity, showCase);
 
-        if (savingMap == null || savingMap.size() == 0)
-            return;
+        if (savingMap == null || savingMap.size() == 0) return;
 
         waitShowCase(showCase.getId());
 
@@ -261,6 +260,24 @@ public class CortegeDaoImpl extends CommonDao {
                                 simpleInsertValueElement(entryMap, getHistoryTableName(showCase));
                             }
                         }
+                    }
+                } else {
+                    Date maxOpenDate;
+                    try {
+                        sql = "SELECT MAX(rep_date) AS REP_DATE FROM %s WHERE " + historyKeyElement.queryKeys;
+                        sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                        maxOpenDate = (Date) jdbcTemplateSC.queryForMap(sql, historyKeyElement.values).get("REP_DATE");
+                    } catch (EmptyResultDataAccessException e) {
+                        maxOpenDate = null;
+                    }
+
+                    entryMap.put(new ValueElement("REP_DATE", 0L, 0), entity.getReportDate());
+
+                    if (maxOpenDate == null || entity.getReportDate().compareTo(maxOpenDate) >= 0) {
+                        simpleInsertValueElement(entryMap, getActualTableName(showCase));
+                    } else {
+                        simpleInsertValueElement(entryMap, getHistoryTableName(showCase));
                     }
                 }
             }
