@@ -55,7 +55,7 @@ public class CortegeDaoImpl extends CommonDao {
             } else {
                 childCortegeGenerate(null, globalEntityApplied, showCase);
             }
-        } else if (showCase.getDownPath() != null) {
+        } else if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0) {
             List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath(), true);
 
             for (BaseEntity baseEntityApplied : allApplied)
