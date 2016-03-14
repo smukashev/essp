@@ -105,7 +105,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                             jdbcTemplateSC.update(sql, getObjectArray(false, getObjectArray(true, historyKeyElement.values, entity.getReportDate())));
 
-                            moveActualMapToHistory(rootKeyElement, showCase);
+                            moveActualMapToHistory(historyKeyElement, showCase);
                             break;
                         default:
                             throw new IllegalStateException(Errors.getMessage(Errors.E118, ot));
@@ -269,288 +269,220 @@ public class CortegeDaoImpl extends CommonDao {
         }
     }
 
-    private boolean checkMaps (Map<ValueElement, Object> savingMap, Map<String, Object> dbMap) {
-        boolean equalityFlag = true;
-
-        for (Map.Entry<ValueElement, Object> innerEntry : savingMap.entrySet()) {
-            Object savingValue = innerEntry.getValue();
-            Object dbValue = dbMap.get(innerEntry.getKey().columnName.toUpperCase());
-
-            if (savingValue == null && dbValue == null)
-                continue;
-
-            if (savingValue == null || dbValue == null) {
-                equalityFlag = false;
-                break;
-            }
-
-            if (!compareValue(savingValue, dbValue)) {
-                equalityFlag = false;
-                break;
-            }
-        }
-
-        return equalityFlag;
-    }
-
-    @Transactional
-    private void simpleInsertValueElement(Map<ValueElement, Object> map, String tableName) {
-        StringBuilder sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
-        StringBuilder values = new StringBuilder("(");
-
-        Object[] valueArray = new Object[map.size()];
-
-        int i = 0;
-
-        for (Map.Entry<ValueElement, Object> entry : map.entrySet()) {
-            sql.append(COLUMN_PREFIX).append(entry.getKey().columnName).append(", ");
-            values.append("?, ");
-            valueArray[i++] = entry.getValue();
-        }
-
-        sql.append("CDC");
-        values.append("SYSDATE)");
-
-        sql.append(") VALUES ").append(values);
-
-        jdbcTemplateSC.update(sql.toString(), valueArray);
-    }
-
-    @Transactional
-    private void simpleInsertString(Map<String, Object> map, String tableName) {
-        StringBuilder sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
-        StringBuilder values = new StringBuilder("(");
-
-        Object[] valueArray = new Object[map.size()];
-
-        int i = 0;
-
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            sql.append(COLUMN_PREFIX).append(entry.getKey()).append(", ");
-            values.append("?, ");
-            valueArray[i++] = entry.getValue();
-        }
-
-        sql.append("CDC");
-        values.append("SYSDATE)");
-
-        sql.append(") VALUES ").append(values);
-
-        jdbcTemplateSC.update(sql.toString(), valueArray);
-    }
-
-
     @Transactional
     private void childCortegeGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowCase showCase) {
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(entity, showCase);
 
-        if (savingMap == null || savingMap.size() == 0)
-            return;
+        if (showCase.isFinal() || savingMap == null || savingMap.size() == 0) return;
 
         waitShowCase(showCase.getId());
 
+        boolean rootExecutionFlag = false;
+
         try {
             for (Map.Entry<ArrayElement, HashMap<ValueElement, Object>> entry : savingMap.entrySet()) {
+                String sql;
                 HashMap<ValueElement, Object> entryMap = entry.getValue();
 
-                /* Change attribute_path to columnName */
-                for (ShowCaseField sf : showCase.getHistoryKeyFieldsList()) {
-                    ValueElement oldKey = null, newKey = null;
+                changeMetaKeys(globalEntity, showCase, entryMap);
 
-                    for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
-                        if (innerEntry.getKey().columnName.equals(sf.getAttributePath())) {
-                            oldKey = innerEntry.getKey();
+                if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0)
+                    addRootKeysToChild(globalEntity, showCase, entryMap);
 
-                            newKey = new ValueElement(sf.getColumnName(), oldKey.elementId, oldKey.isArray, oldKey.isSimple, oldKey.index);
-                        }
-                    }
+                assert (globalEntity != null);
 
-                    if (globalEntity == null && (newKey == null || entryMap.get(oldKey) == null))
-                        throw new IllegalStateException(Errors.getMessage(Errors.E273));
+                if (!globalEntity.getMeta().isReference())
+                    entryMap.put(new ValueElement("creditor_id", 0L, 0), globalEntity.getBaseEntityReportDate().getCreditorId());
 
-                    if (newKey != null && entryMap.get(oldKey) != null)
-                        entryMap.put(newKey, entryMap.remove(oldKey));
-                }
+                if (showCase.isRevival() && !rootExecutionFlag) {
+                    KeyElement rootKeyElement = new KeyElement(entryMap, showCase.getRootKeyFieldsList());
 
-                if (globalEntity != null) { // downPath != null
-                    for (ShowCaseField sf : showCase.getRootKeyFieldsList()) {
-                        Long rootElementId;
-                        if (sf.getAttributePath().equals(ROOT)) {
-                            rootElementId = globalEntity.getId();
-                        } else {
-                            IBaseEntity tmpEntity = (IBaseEntity) globalEntity.getEl(sf.getAttributePath());
-                            rootElementId = tmpEntity.getId();
-                        }
+                    sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys + " and open_date = ?";
 
-                        entryMap.put(new ValueElement(sf.getColumnName(), 0L, 0), rootElementId);
-                    }
+                    /* Deletes from actual table */
+                    jdbcTemplateSC.update(String.format(sql, getActualTableName(showCase), COLUMN_PREFIX,
+                            showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
+
+                    /* Deletes from history table */
+                    if (!showCase.isFinal())
+                        jdbcTemplateSC.update(String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX,
+                                showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
+
+                    /* Execute only ones */
+                    rootExecutionFlag = true;
                 }
 
                 KeyElement historyKeyElement = new KeyElement(entryMap, showCase.getHistoryKeyFieldsList());
 
                 /* Get list all by history keys */
-                String sql = "SELECT * FROM %s WHERE " + historyKeyElement.queryKeys;
+                sql = "SELECT * FROM %s WHERE " + historyKeyElement.queryKeys;
                 sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
                 List<Map<String, Object>> dbList = jdbcTemplateSC.queryForList(sql, historyKeyElement.values);
 
-                for (Map<String, Object> dbMap : dbList) {
-                    Date maxOpenDate = (Date) dbMap.get("OPEN_DATE");
+                if (showCase.isRevival() && dbList.size() == 0) {
+                    /* No data, insert to actual data */
+                    entryMap.put(new ValueElement("OPEN_DATE", 0L, 0), entity.getReportDate());
+                    simpleInsertValueElement(entryMap, getActualTableName(showCase));
+                } else {
+                    for (Map<String, Object> dbMap : dbList) {
+                        Date maxOpenDate = (Date) dbMap.get("OPEN_DATE");
 
-                    Long recordId = ((BigDecimal) dbMap.remove("ID")).longValue();
-                    dbMap.remove("CDC");
+                        Long recordId = ((BigDecimal) dbMap.remove("ID")).longValue();
+                        dbMap.remove("CDC");
 
-                    if (entity.getReportDate().compareTo(maxOpenDate) == 0) {
-                        updateData(historyKeyElement, entryMap, showCase, entity);
-                    } else if (entity.getReportDate().compareTo(maxOpenDate) > 0) {
-                        if (!checkMaps(entryMap, dbMap)) {
-                            dbMap.put("CLOSE_DATE", entity.getReportDate());
-                            for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
-                                dbMap.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
+                        if (entity.getReportDate().compareTo(maxOpenDate) == 0) {
+                            updateData(historyKeyElement, entryMap, showCase, entity);
+                        } else if (entity.getReportDate().compareTo(maxOpenDate) > 0) {
+                            if (!checkMaps(entryMap, dbMap)) {
+                                dbMap.put("CLOSE_DATE", entity.getReportDate());
+                                for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
+                                    dbMap.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
 
-                            simpleInsertString(dbMap, getHistoryTableName(showCase));
+                                simpleInsertString(dbMap, getHistoryTableName(showCase));
 
-                            sql = "DELETE FROM %s WHERE ID = ? ";
-                            sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+                                sql = "DELETE FROM %s WHERE ID = ? ";
+                                sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                            jdbcTemplateSC.update(sql, recordId);
+                                jdbcTemplateSC.update(sql, recordId);
 
-                            for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
-                                dbMap.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
+                                for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
+                                    dbMap.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
 
-                            dbMap.put("OPEN_DATE", entity.getReportDate());
-                            dbMap.remove("CLOSE_DATE");
-                            simpleInsertString(dbMap, getActualTableName(showCase));
-                        }
-                    } else if (entity.getReportDate().compareTo(maxOpenDate) < 0) {
+                                dbMap.put("OPEN_DATE", entity.getReportDate());
+                                dbMap.remove("CLOSE_DATE");
+                                simpleInsertString(dbMap, getActualTableName(showCase));
+                            }
+                        } else if (entity.getReportDate().compareTo(maxOpenDate) < 0) {
                         /* Closest upper date */
-                        sql = "SELECT MIN(open_date) as open_date FROM %s WHERE " + historyKeyElement.queryKeys + " AND open_date > ? ";
-                        sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
+                            sql = "SELECT MIN(open_date) as open_date FROM %s WHERE " + historyKeyElement.queryKeys + " AND open_date > ? ";
+                            sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
 
-                        Date historyMin = (Date) jdbcTemplateSC.queryForMap(sql,getObjectArray(false, historyKeyElement.values, entity.getReportDate())).get("OPEN_DATE");
+                            Date historyMin = (Date) jdbcTemplateSC.queryForMap(sql,getObjectArray(false, historyKeyElement.values, entity.getReportDate())).get("OPEN_DATE");
 
                         /* Closest lower date */
-                        sql = "SELECT MAX(open_date) as open_date FROM %s WHERE " + historyKeyElement.queryKeys + " AND open_date < ? ";
-                        sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
+                            sql = "SELECT MAX(open_date) as open_date FROM %s WHERE " + historyKeyElement.queryKeys + " AND open_date < ? ";
+                            sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
 
-                        Date historyMax = (Date) jdbcTemplateSC.queryForMap(sql,getObjectArray(false, historyKeyElement.values, entity.getReportDate())).get("OPEN_DATE");
+                            Date historyMax = (Date) jdbcTemplateSC.queryForMap(sql,getObjectArray(false, historyKeyElement.values, entity.getReportDate())).get("OPEN_DATE");
 
-                        if (historyMax == null && historyMin == null) {
+                            if (historyMax == null && historyMin == null) {
                             /* Deletes from history with same date */
-                            sql = "DELETE FROM %s WHERE open_date = ? and " + historyKeyElement.queryKeys;
-                            sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
-
-                            jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate()));
-
-                            /* Compares with actual data */
-                            sql = "SELECT * FROM %s WHERE " + historyKeyElement.queryKeys;
-                            sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
-
-                            Map<String, Object> dbMapHistory = jdbcTemplateSC.queryForMap(sql, historyKeyElement.values);
-                            dbMapHistory.remove("ID");
-                            dbMapHistory.remove("CDC");
-
-                            if (checkMaps(entryMap, dbMapHistory)) {
-                                /* Data's are same, update report date */
-                                sql = "UPDATE %s SET open_date = ? WHERE " + historyKeyElement.queryKeys;
-                                sql = String.format(sql, getActualTableName(showCase));
+                                sql = "DELETE FROM %s WHERE open_date = ? and " + historyKeyElement.queryKeys;
+                                sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
                                 jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate()));
-                            } else {
-                                for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
-                                    dbMapHistory.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
+
+                            /* Compares with actual data */
+                                sql = "SELECT * FROM %s WHERE " + historyKeyElement.queryKeys;
+                                sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                                Map<String, Object> dbMapHistory = jdbcTemplateSC.queryForMap(sql, historyKeyElement.values);
+                                dbMapHistory.remove("ID");
+                                dbMapHistory.remove("CDC");
+
+                                if (checkMaps(entryMap, dbMapHistory)) {
+                                /* Data's are same, update report date */
+                                    sql = "UPDATE %s SET open_date = ? WHERE " + historyKeyElement.queryKeys;
+                                    sql = String.format(sql, getActualTableName(showCase));
+
+                                    jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate()));
+                                } else {
+                                    for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
+                                        dbMapHistory.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
 
                                 /* Data's are not same, insert to history table */
-                                dbMapHistory.put("OPEN_DATE", entity.getReportDate());
-                                dbMapHistory.put("CLOSE_DATE", maxOpenDate);
-                                simpleInsertString(dbMapHistory, getHistoryTableName(showCase));
-                            }
-                        } else if (historyMax != null && historyMin != null) {
+                                    dbMapHistory.put("OPEN_DATE", entity.getReportDate());
+                                    dbMapHistory.put("CLOSE_DATE", maxOpenDate);
+                                    simpleInsertString(dbMapHistory, getHistoryTableName(showCase));
+                                }
+                            } else if (historyMax != null && historyMin != null) {
                              /* Deletes from history with same date */
-                            sql = "DELETE FROM %s WHERE open_date = ? and " + historyKeyElement.queryKeys;
-                            sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+                                sql = "DELETE FROM %s WHERE open_date = ? and " + historyKeyElement.queryKeys;
+                                sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                            jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate()));
-                            sql = "SELECT * FROM %s WHERE open_date = ? AND " + historyKeyElement.queryKeys;
-                            sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
-
-                            Map<String, Object> dbMapHistoryMax = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMax));
-
-                            if (!checkMaps(entryMap, dbMapHistoryMax)) {
+                                jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate()));
                                 sql = "SELECT * FROM %s WHERE open_date = ? AND " + historyKeyElement.queryKeys;
                                 sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                                Map<String, Object> dbMapHistoryMin = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMin));
+                                Map<String, Object> dbMapHistoryMax = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMax));
 
-                                if (checkMaps(entryMap, dbMapHistoryMin)) {
+                                if (!checkMaps(entryMap, dbMapHistoryMax)) {
+                                    sql = "SELECT * FROM %s WHERE open_date = ? AND " + historyKeyElement.queryKeys;
+                                    sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                                    Map<String, Object> dbMapHistoryMin = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMin));
+
+                                    if (checkMaps(entryMap, dbMapHistoryMin)) {
                                     /* Data's are same, update report date */
+                                        sql = "UPDATE %s SET open_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
+                                        sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                                        jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMin));
+                                    } else {
+                                    /* Upper and lower data exists in history and they're different */
+                                    /* Update close_date lower data */
+                                        sql = "UPDATE %s SET close_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
+                                        sql = String.format(sql, getHistoryTableName(showCase));
+
+                                    /* Insert to history table, close_date to historyMin */
+                                        jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMax));
+                                        entryMap.put(new ValueElement("OPEN_DATE", 0L, 0), entity.getReportDate());
+                                        entryMap.put(new ValueElement("CLOSE_DATE", 0L, 0), historyMin);
+                                        simpleInsertValueElement(entryMap, getHistoryTableName(showCase));
+                                    }
+                                }
+                            } else if (historyMin != null) {
+                            /* Compare with upper data */
+                                sql = "SELECT * FROM %s WHERE open_date = ? AND " + historyKeyElement.queryKeys;
+                                sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                                Map<String, Object> dbMapHistory = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMin));
+                                dbMapHistory.remove("ID");
+                                dbMapHistory.remove("CDC");
+
+                                if (checkMaps(entryMap, dbMapHistory)) {
+                                /* Data's are same, update report date */
                                     sql = "UPDATE %s SET open_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
                                     sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
                                     jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMin));
                                 } else {
-                                    /* Upper and lower data exists in history and they're different */
-                                    /* Update close_date lower data */
-                                    sql = "UPDATE %s SET close_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
-                                    sql = String.format(sql, getHistoryTableName(showCase));
+                                /* Data's are not same, insert to history table */
+                                    dbMapHistory.put("OPEN_DATE", entity.getReportDate());
+                                    dbMapHistory.put("CLOSE_DATE", historyMin);
 
-                                    /* Insert to history table, close_date to historyMin */
+                                    for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
+                                        dbMapHistory.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
+
+                                    simpleInsertString(dbMapHistory, getHistoryTableName(showCase));
+                                }
+                            } else  {// if (historyMax != null) {
+                            /* Compare with lower data */
+                                sql = "SELECT * FROM %s WHERE open_date = ? AND " + historyKeyElement.queryKeys;
+                                sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                                Map<String, Object> dbMapHistory = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMax));
+                                dbMapHistory.remove("ID");
+                                dbMapHistory.remove("CDC");
+
+                                if (!checkMaps(entryMap, dbMapHistory)) {
+                                /* Data's are not same, insert to history table */
+                                    sql = "UPDATE %s SET close_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
+                                    sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
                                     jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMax));
-                                    entryMap.put(new ValueElement("OPEN_DATE", 0L, 0), entity.getReportDate());
-                                    entryMap.put(new ValueElement("CLOSE_DATE", 0L, 0), historyMin);
-                                    simpleInsertValueElement(entryMap, getHistoryTableName(showCase));
+
+                                    for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
+                                        dbMapHistory.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
+
+                                    dbMapHistory.put("OPEN_DATE", entity.getReportDate());
+                                    dbMapHistory.put("CLOSE_DATE", maxOpenDate);
+                                    simpleInsertString(dbMapHistory, getHistoryTableName(showCase));
                                 }
                             }
-                        } else if (historyMin != null) {
-                            /* Compare with upper data */
-                            sql = "SELECT * FROM %s WHERE open_date = ? AND " + historyKeyElement.queryKeys;
-                            sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                            Map<String, Object> dbMapHistory = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMin));
-                            dbMapHistory.remove("ID");
-                            dbMapHistory.remove("CDC");
-
-                            if (checkMaps(entryMap, dbMapHistory)) {
-                                /* Data's are same, update report date */
-                                sql = "UPDATE %s SET open_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
-                                sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
-
-                                jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMin));
-                            } else {
-                                /* Data's are not same, insert to history table */
-                                dbMapHistory.put("OPEN_DATE", entity.getReportDate());
-                                dbMapHistory.put("CLOSE_DATE", historyMin);
-
-                                for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
-                                    dbMapHistory.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
-
-                                simpleInsertString(dbMapHistory, getHistoryTableName(showCase));
-                            }
-                        } else  {// if (historyMax != null) {
-                            /* Compare with lower data */
-                            sql = "SELECT * FROM %s WHERE open_date = ? AND " + historyKeyElement.queryKeys;
-                            sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
-
-                            Map<String, Object> dbMapHistory = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMax));
-                            dbMapHistory.remove("ID");
-                            dbMapHistory.remove("CDC");
-
-                            if (!checkMaps(entryMap, dbMapHistory)) {
-                                /* Data's are not same, insert to history table */
-                                sql = "UPDATE %s SET close_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
-                                sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
-
-                                jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMax));
-
-                                for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet())
-                                    dbMapHistory.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
-
-                                dbMapHistory.put("OPEN_DATE", entity.getReportDate());
-                                dbMapHistory.put("CLOSE_DATE", maxOpenDate);
-                                simpleInsertString(dbMapHistory, getHistoryTableName(showCase));
-                            }
                         }
-
                     }
                 }
             }
@@ -648,15 +580,13 @@ public class CortegeDaoImpl extends CommonDao {
 
     /* Does CLOSE operation on showcases */
     @Transactional
-    public synchronized void closeEntities(Long scId, IBaseEntity entity, List<ShowCase> showCases) {
+    public synchronized void closeEntities(IBaseEntity entity, List<ShowCase> showCases) {
         for (ShowCase showCase : showCases) {
             if (!showCase.getMeta().getClassName().equals(entity.getMeta().getClassName()))
                 continue;
 
-            if (scId == null || scId == 0L || scId == showCase.getId()) {
-                if (showCase.getDownPath() == null || showCase.getDownPath().length() == 0)
-                    closeEntity(entity, showCase);
-            }
+            if (showCase.getDownPath() == null || showCase.getDownPath().length() == 0)
+                closeEntity(entity, showCase);
         }
     }
 
@@ -1132,6 +1062,111 @@ public class CortegeDaoImpl extends CommonDao {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private void addRootKeysToChild(IBaseEntity globalEntity, ShowCase showCase, HashMap<ValueElement, Object> entryMap) {
+        for (ShowCaseField sf : showCase.getRootKeyFieldsList()) {
+            Long rootElementId;
+            if (sf.getAttributePath().equals(ROOT)) {
+                rootElementId = globalEntity.getId();
+            } else {
+                IBaseEntity tmpEntity = (IBaseEntity) globalEntity.getEl(sf.getAttributePath());
+                rootElementId = tmpEntity.getId();
+            }
+
+            entryMap.put(new ValueElement(sf.getColumnName(), 0L, 0), rootElementId);
+        }
+    }
+
+    private void changeMetaKeys (IBaseEntity globalEntity, ShowCase showCase, Map<ValueElement, Object> entryMap) {
+        /* Change attribute_path to columnName */
+        for (ShowCaseField sf : showCase.getHistoryKeyFieldsList()) {
+            ValueElement oldKey = null, newKey = null;
+
+            for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
+                if (innerEntry.getKey().columnName.equals(sf.getAttributePath())) {
+                    oldKey = innerEntry.getKey();
+
+                    newKey = new ValueElement(sf.getColumnName(), oldKey.elementId, oldKey.isArray, oldKey.isSimple, oldKey.index);
+                }
+            }
+
+            if (globalEntity == null && (newKey == null || entryMap.get(oldKey) == null))
+                throw new IllegalStateException(Errors.getMessage(Errors.E273));
+
+            if (newKey != null && entryMap.get(oldKey) != null)
+                entryMap.put(newKey, entryMap.remove(oldKey));
+        }
+    }
+
+    private boolean checkMaps (Map<ValueElement, Object> savingMap, Map<String, Object> dbMap) {
+        boolean equalityFlag = true;
+
+        for (Map.Entry<ValueElement, Object> innerEntry : savingMap.entrySet()) {
+            Object savingValue = innerEntry.getValue();
+            Object dbValue = dbMap.get(innerEntry.getKey().columnName.toUpperCase());
+
+            if (savingValue == null && dbValue == null)
+                continue;
+
+            if (savingValue == null || dbValue == null) {
+                equalityFlag = false;
+                break;
+            }
+
+            if (!compareValue(savingValue, dbValue)) {
+                equalityFlag = false;
+                break;
+            }
+        }
+
+        return equalityFlag;
+    }
+
+    @Transactional
+    private void simpleInsertValueElement(Map<ValueElement, Object> map, String tableName) {
+        StringBuilder sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
+        StringBuilder values = new StringBuilder("(");
+
+        Object[] valueArray = new Object[map.size()];
+
+        int i = 0;
+
+        for (Map.Entry<ValueElement, Object> entry : map.entrySet()) {
+            sql.append(COLUMN_PREFIX).append(entry.getKey().columnName).append(", ");
+            values.append("?, ");
+            valueArray[i++] = entry.getValue();
+        }
+
+        sql.append("CDC");
+        values.append("SYSDATE)");
+
+        sql.append(") VALUES ").append(values);
+
+        jdbcTemplateSC.update(sql.toString(), valueArray);
+    }
+
+    @Transactional
+    private void simpleInsertString(Map<String, Object> map, String tableName) {
+        StringBuilder sql = new StringBuilder("INSERT INTO ").append(tableName).append("(");
+        StringBuilder values = new StringBuilder("(");
+
+        Object[] valueArray = new Object[map.size()];
+
+        int i = 0;
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            sql.append(COLUMN_PREFIX).append(entry.getKey()).append(", ");
+            values.append("?, ");
+            valueArray[i++] = entry.getValue();
+        }
+
+        sql.append("CDC");
+        values.append("SYSDATE)");
+
+        sql.append(") VALUES ").append(values);
+
+        jdbcTemplateSC.update(sql.toString(), valueArray);
     }
 
     public void waitShowCase(Long id) {

@@ -271,8 +271,6 @@ public class ZipFilesMonitor {
 					failFast(batchId, "Несоответствие кредитора пользователю портала");
 					haveError = true;
 				}
-
-				cId = cList.get(0).getId();
 			} else {
 				cId = -1L;
 

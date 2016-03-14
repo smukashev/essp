@@ -10,6 +10,7 @@
     <column name="down_path" primaryKey="false" required="false" type="varchar" size="128" />
     <column name="is_final" required="true" type="NUMERIC" size="5,0" autoIncrement="false"/>
     <column name="is_child" required="true" type="NUMERIC" size="5,0" autoIncrement="false"/>
+    <column name="is_revival" required="true" type="NUMERIC" size="5,0" autoIncrement="false"/>
     <unique name="ess_UN_n">
       <unique-column name="name"/>
     </unique>

@@ -1905,10 +1905,9 @@ public class CLI {
             SqlRunner runner = new SqlRunner(storage.getConnection(),  true);
             runner.runScript(args.get(1), StaticRouter.getCoreSchemaName());
         } else {
-            for (Object o : args)
-                str.append(o + " ");
+            for (Object o : args) str.append(o).append(" ");
             boolean res = storage.simpleSql(str.toString());
-            System.out.println(res ? "sql execution success" : "sql execution fail");
+            if (!res) System.out.println("Скрипт не отработан: " + str);
         }
     }
 
@@ -2304,6 +2303,8 @@ public class CLI {
                     childShowCase.setDownPath(args.get(3));
                 } else if (args.get(2).equals("tableName")) {
                     childShowCase.setTableName(args.get(3));
+                } else if (args.get(2).equals("revival")) {
+                    childShowCase.setRevival(true);
                 } else {
                     throw new IllegalArgumentException();
                 }
@@ -2373,9 +2374,11 @@ public class CLI {
             showcaseStat();
         } else if(args.get(0).equals("sql")) {
           if(args.get(1).equals("run")) {
+              System.out.println("Запускаю скрипт " + args.get(2));
               InitDataSourceSC(showcaseService.getDriverSc(), showcaseService.getSchemaSc(), showcaseService.getPasswordSc(), showcaseService.getUrlSc());
               SqlRunner runner = new SqlRunner(jdbcTemplateSC.getDataSource().getConnection(),  true);
               runner.runScript(args.get(2), StaticRouter.getShowcaseSchemaName());
+              System.out.println("Скрипт отработан.");
           }
         } else {
             throw new IllegalArgumentException(Errors.getMessage(Errors.E219));

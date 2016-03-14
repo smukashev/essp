@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
+import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -30,7 +31,7 @@ public class SubjectOptimizer {
 
         if (docsBaseValue == null || docsBaseValue.getValue() == null) {
             logger.error(Errors.getError(Errors.getMessage(Errors.E188)) + " : " + iBaseEntity);
-            throw new IllegalStateException(Errors.getMessage(Errors.E188));
+            throw new KnownException(Errors.getMessage(Errors.E188));
         }
 
         BaseSet docSet = (BaseSet) docsBaseValue.getValue();
@@ -53,7 +54,7 @@ public class SubjectOptimizer {
 
         if (documents.size() == 0) {
             logger.error(Errors.getError(Errors.getMessage(Errors.E189)) + " : " + iBaseEntity);
-            throw new IllegalStateException(Errors.getMessage(Errors.E189));
+            throw new KnownException(Errors.getMessage(Errors.E189));
         }
 
 
