@@ -2306,8 +2306,6 @@ public class CLI {
                     childShowCase.setDownPath(args.get(3));
                 } else if (args.get(2).equals("tableName")) {
                     childShowCase.setTableName(args.get(3));
-                } else if (args.get(2).equals("revival")) {
-                    childShowCase.setRevival(true);
                 } else {
                     throw new IllegalArgumentException();
                 }

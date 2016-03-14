@@ -307,7 +307,7 @@ public class CortegeDaoImpl extends CommonDao {
                 if (!entity.getMeta().isReference())
                     entryMap.put(new ValueElement("creditor_id", 0L, 0), entity.getBaseEntityReportDate().getCreditorId());
 
-                if (showCase.isRevival() && !rootExecutionFlag) {
+                if (!rootExecutionFlag) {
                     KeyElement rootKeyElement = new KeyElement(entryMap, showCase.getRootKeyFieldsList());
 
                     sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys + " and open_date = ?";
@@ -333,7 +333,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                 List<Map<String, Object>> dbList = jdbcTemplateSC.queryForList(sql, historyKeyElement.values);
 
-                if (showCase.isRevival() && dbList.size() == 0) {
+                if (dbList.size() == 0) {
                     /* No data, insert to actual data */
                     entryMap.put(new ValueElement("OPEN_DATE", 0L, 0), entity.getReportDate());
                     simpleInsertValueElement(entryMap, getActualTableName(showCase));
