@@ -48,6 +48,9 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
         this.jdbcTemplateSC = new JdbcTemplate(dataSourceSC);
     }
 
+    public DataSource getDataSourceSc() {
+        return jdbcTemplateSC.getDataSource();
+    }
     @Override
     public void afterPropertiesSet() throws Exception {
         showCases = populateShowCases();

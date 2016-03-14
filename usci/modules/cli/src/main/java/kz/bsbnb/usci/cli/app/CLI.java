@@ -50,6 +50,7 @@ import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
 import kz.bsbnb.usci.tool.status.SystemStatus;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -161,9 +162,18 @@ public class CLI {
 
     private JdbcTemplate jdbcTemplateSC;
 
-    @Autowired
-    public void setDataSourceSC(DataSource dataSourceSC) {
-        this.jdbcTemplateSC = new JdbcTemplate(dataSourceSC);
+
+    public void InitDataSourceSC(String Driver, String Username, String password, String url) {
+        BasicDataSource source = new BasicDataSource();
+        source.setDriverClassName(Driver);
+        source.setUrl(url);
+        source.setUsername(Username);
+        source.setPassword(password);
+        source.setInitialSize(16);
+        source.setMaxActive(16);
+        source.setTestOnBorrow(true);
+        source.setTestOnReturn(true);
+        this.jdbcTemplateSC = new JdbcTemplate(source);
     }
 
     public IEntityService getEntityService(String url) {
@@ -2363,6 +2373,7 @@ public class CLI {
             showcaseStat();
         } else if(args.get(0).equals("sql")) {
           if(args.get(1).equals("run")) {
+              InitDataSourceSC(showcaseService.getDriverSc(), showcaseService.getSchemaSc(), showcaseService.getPasswordSc(), showcaseService.getUrlSc());
               SqlRunner runner = new SqlRunner(jdbcTemplateSC.getDataSource().getConnection(),  true);
               runner.runScript(args.get(2), StaticRouter.getShowcaseSchemaName());
           }

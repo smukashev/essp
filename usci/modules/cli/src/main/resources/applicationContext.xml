@@ -33,19 +33,6 @@
         <property name="username" value="${jdbc.ref.user}" />
         <property name="password" value="${jdbc.ref.password}" />
     </bean>
-
-    <bean id="dataSourceSC" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
-        <property name="url" value="jdbc:oracle:thin:@localhost:1521:orcl"/>
-        <property name="username" value="SHOWCASE"/>
-        <property name="password" value="SHOW_2015"/>
-        <property name="initialSize" value="16"/>
-        <property name="maxActive" value="16"/>
-        <!--<property name="validationQuery" value="${jdbcSC.validationQuery}"/>-->
-        <property name="testOnBorrow" value="true"/>
-        <property name="testOnReturn" value="true"/>
-    </bean>
-
     <bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IBatchService"/>

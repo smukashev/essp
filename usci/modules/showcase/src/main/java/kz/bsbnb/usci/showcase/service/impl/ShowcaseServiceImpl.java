@@ -5,6 +5,7 @@ import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,22 @@ public class ShowcaseServiceImpl implements ShowcaseService {
         showcaseDao.createTables(showCase);
         return id;
     }
-
+    @Override
+    public String getUrlSc() {
+        return  ((BasicDataSource)showcaseDao.getDataSourceSc()).getUrl();
+    }
+    @Override
+    public String getSchemaSc() {
+      return ((BasicDataSource)showcaseDao.getDataSourceSc()).getUsername();
+    }
+    @Override
+    public String getPasswordSc() {
+        return ((BasicDataSource)showcaseDao.getDataSourceSc()).getPassword();
+    }
+    @Override
+    public String getDriverSc() {
+        return ((BasicDataSource)showcaseDao.getDataSourceSc()).getDriverClassName();
+    }
     @Override
     public List<ShowCase> list() {
         return showcaseDao.getShowCases();
