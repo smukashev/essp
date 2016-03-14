@@ -1902,8 +1902,10 @@ public class CLI {
     public void commandSql() throws FileNotFoundException, SQLException {
         StringBuilder str = new StringBuilder();
         if(args.get(0).equals("run")){
+            System.out.println("Запускаю скрипт " + args.get(1));
             SqlRunner runner = new SqlRunner(storage.getConnection(),  true);
             runner.runScript(args.get(1), StaticRouter.getCoreSchemaName());
+            System.out.println("Скрипт отработан");
         } else {
             for (Object o : args) str.append(o).append(" ");
             boolean res = storage.simpleSql(str.toString());
