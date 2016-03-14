@@ -202,7 +202,7 @@ showcase set name CORE_ORG_HEAD_DOCS
 showcase set tableName CORE_ORG_HEAD_DOCS
 showcase set downPath subject.organization_info.head
 
-showcase list add docs doc_id
+showcase list add docs document_id
 showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type_id
 showcase list add docs.name doc_name
@@ -213,7 +213,7 @@ showcase list addCustom credit subject subject_id
 showcase list addRootKey subject_id subject_id
 
 showcase list addHistoryKey subject_id subject_id
-showcase list addHistoryKey document_id doc_id
+showcase list addHistoryKey document_id document_id
 
 
 #-----------------------------------------------------------------------------------
@@ -226,7 +226,7 @@ showcase child set tableName CORE_ORG_HEAD_DOCS
 showcase child set downPath organization_info.head
 showcase child set revival
 
-showcase child list add docs doc_id
+showcase child list add docs document_id
 showcase child list add docs.no doc_no
 showcase child list add docs.doc_type doc_type_id
 showcase child list add docs.name doc_name
@@ -234,7 +234,7 @@ showcase child list add docs.name doc_name
 showcase child list addRootKey root subject_id
 
 showcase child list addHistoryKey subject_id subject_id
-showcase child list addHistoryKey document_id doc_id
+showcase child list addHistoryKey document_id document_id
 
 showcase child save
 
@@ -251,15 +251,15 @@ showcase child list add no no
 showcase child list add doc_type.code doc_type_code
 showcase child list add name name
 
-showcase child list addRootKey document_id doc_id
+showcase child list addRootKey document_id document_id
 
-showcase child list addHistoryKey document_id doc_id
+showcase child list addHistoryKey document_id document_id
 
 showcase child save
 
-showcase addIndex nonunique subject_id doc_id
+showcase addIndex nonunique subject_id document_id
 showcase addIndex nonunique subject_id
-showcase addIndex nonunique doc_id
+showcase addIndex nonunique document_id
 
 showcase save
 
@@ -492,7 +492,7 @@ showcase set name CORE_SUBJECT_DOC
 showcase set tableName CORE_SUBJECT_DOC
 showcase set downPath subject
 
-showcase list add docs doc_id
+showcase list add docs document_id
 showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type
 showcase list add docs.name doc_name
@@ -505,7 +505,7 @@ showcase list addCustom credit creditor creditor_id
 showcase list addRootKey subject_id subject_id
 
 showcase list addHistoryKey subject_id subject_id
-showcase list addHistoryKey doc_id doc_id
+showcase list addHistoryKey document_id document_id
 
 #-----------------------------------------------------------------------------------
 # CHILD SUBJECT
@@ -515,7 +515,7 @@ showcase child set name CORE_SUBJECT_DOC_SUBJECT
 showcase child set meta subject
 showcase child set tableName CORE_SUBJECT_DOC
 
-showcase child list add docs doc_id
+showcase child list add docs document_id
 showcase child list add docs.no doc_no
 showcase child list add docs.doc_type doc_type
 showcase child list add docs.name doc_name
@@ -542,15 +542,15 @@ showcase child list add no no
 showcase child list add doc_type.code doc_type_code
 showcase child list add name name
 
-showcase child list addRootKey document_id doc_id
+showcase child list addRootKey document_id document_id
 
-showcase child list addHistoryKey document_id doc_id
+showcase child list addHistoryKey document_id document_id
 
 showcase child save
 
-showcase addIndex nonunique subject_id doc_id
+showcase addIndex nonunique subject_id document_id
 showcase addIndex nonunique subject_id
-showcase addIndex nonunique doc_id
+showcase addIndex nonunique document_id
 
 showcase save
 

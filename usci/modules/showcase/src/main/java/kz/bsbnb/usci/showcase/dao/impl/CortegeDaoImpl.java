@@ -301,15 +301,11 @@ public class CortegeDaoImpl extends CommonDao {
                 String sql;
                 HashMap<ValueElement, Object> entryMap = entry.getValue();
 
-                changeMetaKeys(globalEntity, showCase, entryMap);
-
                 if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0)
                     addRootKeysToChild(globalEntity, showCase, entryMap);
 
-                assert (globalEntity != null);
-
-                if (!globalEntity.getMeta().isReference())
-                    entryMap.put(new ValueElement("creditor_id", 0L, 0), globalEntity.getBaseEntityReportDate().getCreditorId());
+                if (!entity.getMeta().isReference())
+                    entryMap.put(new ValueElement("creditor_id", 0L, 0), entity.getBaseEntityReportDate().getCreditorId());
 
                 if (showCase.isRevival() && !rootExecutionFlag) {
                     KeyElement rootKeyElement = new KeyElement(entryMap, showCase.getRootKeyFieldsList());
@@ -1092,27 +1088,6 @@ public class CortegeDaoImpl extends CommonDao {
             }
 
             entryMap.put(new ValueElement(sf.getColumnName(), 0L, 0), rootElementId);
-        }
-    }
-
-    private void changeMetaKeys (IBaseEntity globalEntity, ShowCase showCase, Map<ValueElement, Object> entryMap) {
-        /* Change attribute_path to columnName */
-        for (ShowCaseField sf : showCase.getHistoryKeyFieldsList()) {
-            ValueElement oldKey = null, newKey = null;
-
-            for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
-                if (innerEntry.getKey().columnName.equals(sf.getAttributePath())) {
-                    oldKey = innerEntry.getKey();
-
-                    newKey = new ValueElement(sf.getColumnName(), oldKey.elementId, oldKey.isArray, oldKey.isSimple, oldKey.index);
-                }
-            }
-
-            if (globalEntity == null && (newKey == null || entryMap.get(oldKey) == null))
-                throw new IllegalStateException(Errors.getMessage(Errors.E273));
-
-            if (newKey != null && entryMap.get(oldKey) != null)
-                entryMap.put(newKey, entryMap.remove(oldKey));
         }
     }
 
