@@ -105,7 +105,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                             jdbcTemplateSC.update(sql, getObjectArray(false, getObjectArray(true, historyKeyElement.values, entity.getReportDate())));
 
-                            moveActualMapToHistory(rootKeyElement, showCase);
+                            moveActualMapToHistory(historyKeyElement, showCase);
                             break;
                         default:
                             throw new IllegalStateException(Errors.getMessage(Errors.E118, ot));
