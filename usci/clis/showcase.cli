@@ -164,6 +164,7 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit subject subject_id
 
 showcase list addRootKey subject_id subject_id
+
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey name_id name_id
 
@@ -171,10 +172,11 @@ showcase list addHistoryKey name_id name_id
 # CHILD HEAD
 #-----------------------------------------------------------------------------------
 showcase child init
-showcase child set name CORE_ORG_HEAD_NAMES_NAME
+showcase child set name CORE_ORG_HEAD_NAMES_SUBJECT
 showcase child set meta subject
 showcase child set tableName CORE_ORG_HEAD_NAMES
 showcase child set downPath organization_info.head
+showcase child set revival
 
 showcase child list add names name_id
 showcase child list add names.firstname firstname
@@ -183,14 +185,15 @@ showcase child list add names.middlename middlename
 showcase child list add names.lang lang
 
 showcase child list addRootKey root subject_id
+
 showcase child list addHistoryKey subject_id subject_id
 showcase child list addHistoryKey name_id name_id
 
 showcase child save
 
 showcase addIndex nonunique subject_id
-showcase addIndex nonunique subject_id head_id
-showcase addIndex nonunique head_id
+showcase addIndex nonunique subject_id name_id
+showcase addIndex nonunique name_id
 
 showcase save
 
@@ -226,6 +229,7 @@ showcase child set name CORE_ORG_HEAD_DOCS_SUBJECT
 showcase child set meta subject
 showcase child set tableName CORE_ORG_HEAD_DOCS
 showcase child set downPath organization_info.head
+showcase child set revival
 
 showcase child list add docs doc_id
 showcase child list add docs.no doc_no
@@ -233,6 +237,7 @@ showcase child list add docs.doc_type doc_type_id
 showcase child list add docs.name doc_name
 
 showcase child list addRootKey root subject_id
+
 showcase child list addHistoryKey subject_id subject_id
 showcase child list addHistoryKey document_id doc_id
 
@@ -252,6 +257,7 @@ showcase child list add doc_type.code doc_type_code
 showcase child list add name name
 
 showcase child list addRootKey document_id doc_id
+
 showcase child list addHistoryKey document_id doc_id
 
 showcase child save
@@ -295,13 +301,11 @@ showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
 showcase list addCustom credit creditor creditor_id
-showcase list addCustom credit root credit_id
+#r showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id credit_id
 showcase list addRootKey subject_id subject_id
 
-showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey address_id address_id
 
@@ -309,10 +313,11 @@ showcase list addHistoryKey address_id address_id
 # CHILD ADDRESS
 #-----------------------------------------------------------------------------------
 showcase child init
-showcase child set name CORE_PERSON_ADDRESS_ADDRESS
+showcase child set name CORE_PERSON_ADDRESS_SUBJECT
 showcase child set meta subject
 showcase child set tableName CORE_PERSON_ADDRESS
 showcase child set downPath person_info
+showcase child set revival
 
 showcase child list add addresses address_id
 showcase child list add addresses.region region_id
@@ -326,8 +331,8 @@ showcase child list addHistoryKey address_id address_id
 
 showcase child save
 
-showcase addIndex nonunique credit_id subject_id address_id
 showcase addIndex nonunique subject_id address_id
+showcase addIndex nonunique address_id
 
 showcase save
 
@@ -346,13 +351,11 @@ showcase list add addresses.region.code region_code
 showcase list add addresses.type address_type
 
 showcase list addCustom credit creditor creditor_id
-showcase list addCustom credit root credit_id
+#r showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id credit_id
 showcase list addRootKey subject_id subject_id
 
-showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey address_id address_id
 
@@ -377,7 +380,8 @@ showcase child list addHistoryKey address_id address_id
 
 showcase child save
 
-showcase addIndex nonunique credit_id subject_id address_id
+showcase addIndex nonunique subject_id address_id
+showcase addIndex nonunique address_id
 
 showcase save
 
@@ -395,13 +399,11 @@ showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
 
 showcase list addCustom credit creditor creditor_id
-showcase list addCustom credit root credit_id
+#r showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id credit_id
 showcase list addRootKey subject_id subject_id
 
-showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey contact_id contact_id
 
@@ -413,6 +415,7 @@ showcase child set name CORE_PERSON_CONTACTS_CONTACT
 showcase child set meta subject
 showcase child set tableName CORE_PERSON_CONTACT
 showcase child set downPath person_info
+showcase child set revival
 
 showcase child list add contacts contact_id
 showcase child list add contacts.contact_type contact_type_id
@@ -425,8 +428,8 @@ showcase child list addHistoryKey contact_id contact_id
 
 showcase child save
 
-showcase addIndex nonunique credit_id subject_id contact_id
 showcase addIndex nonunique subject_id contact_id
+showcase addIndex nonunique contact_id
 
 showcase save
 
@@ -444,12 +447,11 @@ showcase list add contacts.details details
 showcase list add contacts.contact_type.code contact_type_code
 
 showcase list addCustom credit creditor creditor_id
-showcase list addCustom credit root credit_id
+#r showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id credit_id
 showcase list addRootKey subject_id subject_id
-showcase list addHistoryKey credit_id credit_id
+
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey contact_id contact_id
 
@@ -461,6 +463,7 @@ showcase child set name CORE_ORG_CONTACTS_CONTACT
 showcase child set meta subject
 showcase child set tableName CORE_ORG_CONTACT
 showcase child set downPath person_info
+showcase child set revival
 
 showcase child list add contacts contact_id
 showcase child list add contacts.contact_type contact_type_id
@@ -468,13 +471,14 @@ showcase child list add contacts.details details
 showcase child list add contacts.contact_type.code contact_type_code
 
 showcase child list addRootKey root subject_id
+
 showcase child list addHistoryKey subject_id subject_id
 showcase child list addHistoryKey contact_id contact_id
 
 showcase child save
 
-showcase addIndex nonunique credit_id subject_id contact_id
 showcase addIndex nonunique subject_id contact_id
+showcase addIndex nonunique contact_id
 
 showcase save
 
@@ -495,11 +499,10 @@ showcase list add is_organization is_organization
 showcase list add is_creditor is_creditor
 
 showcase list addCustom credit creditor creditor_id
-showcase list addCustom credit root credit_id
+#r showcase list addCustom credit root credit_id
 
-showcase list addRootKey credit_id credit_id
 showcase list addRootKey subject_id subject_id
-showcase list addHistoryKey credit_id credit_id
+
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey doc_id doc_id
 
@@ -542,8 +545,8 @@ showcase child list addHistoryKey document_id doc_id
 
 showcase child save
 
-showcase addIndex nonunique credit_id subject_id
-showcase addIndex nonunique credit_id subject_id doc_id
+showcase addIndex nonunique subject_id
+showcase addIndex nonunique subject_id doc_id
 showcase addIndex nonunique doc_id
 
 showcase save
@@ -562,24 +565,21 @@ showcase list add names.lastname lastname
 showcase list add names.middlename middlename
 showcase list add names.lang lang
 
-showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id credit_id
 showcase list addRootKey subject_id subject_id
 
-showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey name_id name_id
 
-showcase addIndex nonunique credit_id subject_id name_id
 showcase addIndex nonunique subject_id name_id
+showcase addIndex nonunique name_id
 
 #-----------------------------------------------------------------------------------
 # CHILD NAME
 #-----------------------------------------------------------------------------------
 showcase child init
-showcase child set name CORE_PERSON_NAME_NAME
+showcase child set name CORE_PERSON_NAME_SUBJECT
 showcase child set meta subject
 showcase child set tableName CORE_PERSON_NAME
 showcase child set downPath person_info
@@ -591,6 +591,7 @@ showcase child list add names.middlename middlename
 showcase child list add names.lang lang
 
 showcase child list addRootKey root subject_id
+
 showcase child list addHistoryKey subject_id subject_id
 showcase child list addHistoryKey name_id name_id
 
@@ -611,12 +612,11 @@ showcase list add names.name name
 showcase list add names.lang lang
 
 showcase list addCustom credit creditor creditor_id
-showcase list addCustom credit root credit_id
+#r showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id credit_id
 showcase list addRootKey subject_id subject_id
-showcase list addHistoryKey credit_id credit_id
+
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey name_id name_id
 
@@ -624,7 +624,7 @@ showcase list addHistoryKey name_id name_id
 # CHILD NAME
 #-----------------------------------------------------------------------------------
 showcase child init
-showcase child set name CORE_ORG_NAME_NAME
+showcase child set name CORE_ORG_NAME_SUBJECT
 showcase child set meta subject
 showcase child set tableName CORE_ORG_NAME
 showcase child set downPath organization_info
@@ -640,8 +640,8 @@ showcase child list addHistoryKey name_id name_id
 
 showcase child save
 
-showcase addIndex nonunique credit_id subject_id name_id
 showcase addIndex nonunique subject_id name_id
+showcase addIndex nonunique name_id
 
 showcase save
 
@@ -806,13 +806,11 @@ showcase list add bank_relations.bank_relation ref_bank_relation_id
 showcase list add bank_relations.creditor creditor_id
 
 showcase list addCustom credit creditor creditor_sender_id
-showcase list addCustom credit root credit_id
+#r showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id credit_id
 showcase list addRootKey subject_id subject_id
 
-showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey person_bank_relation_id person_bank_relation_id
 
@@ -820,7 +818,7 @@ showcase list addHistoryKey person_bank_relation_id person_bank_relation_id
 # CHILD BANK_RELATION
 #-----------------------------------------------------------------------------------
 showcase child init
-showcase child set name CORE_PERSON_DI_BANK_RELATION
+showcase child set name CORE_PERSON_DI_SUBJECT
 showcase child set meta subject
 showcase child set tableName CORE_PERSON_DI
 showcase child set downPath person_info
@@ -830,13 +828,14 @@ showcase child list add bank_relations.bank_relation ref_bank_relation_id
 showcase child list add bank_relations.creditor creditor_id
 
 showcase child list addRootKey root subject_id
+
 showcase child list addHistoryKey subject_id subject_id
 showcase child list addHistoryKey bank_relation_id person_bank_relation_id
 
 showcase child save
 
-showcase addIndex nonunique credit_id subject_id person_bank_relation_id
 showcase addIndex nonunique subject_id person_bank_relation_id
+showcase addIndex nonunique person_bank_relation_id
 
 showcase save
 
@@ -853,13 +852,11 @@ showcase list add bank_relations.bank_relation ref_bank_relation_id
 showcase list add bank_relations.creditor creditor_id
 
 showcase list addCustom credit creditor creditor_sender_id
-showcase list addCustom credit root credit_id
+#r showcase list addCustom credit root credit_id
 showcase list addCustom credit subject subject_id
 
-showcase list addRootKey credit_id credit_id
 showcase list addRootKey subject_id subject_id
 
-showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey org_bank_relation_id org_bank_relation_id
 
@@ -867,7 +864,7 @@ showcase list addHistoryKey org_bank_relation_id org_bank_relation_id
 # CHILD BANK_RELATION
 #-----------------------------------------------------------------------------------
 showcase child init
-showcase child set name CORE_ORG_DI_BANK_RELATION
+showcase child set name CORE_ORG_DI_SUBJECT
 showcase child set meta subject
 showcase child set tableName CORE_ORG_DI
 showcase child set downPath organization_info
@@ -877,12 +874,14 @@ showcase child list add bank_relations.bank_relation ref_bank_relation_id
 showcase child list add bank_relations.creditor creditor_id
 
 showcase child list addRootKey root subject_id
+
 showcase child list addHistoryKey subject_id subject_id
 showcase child list addHistoryKey org_bank_relation_id org_bank_relation_id
 
 showcase child save
 
 showcase addIndex nonunique subject_id org_bank_relation_id
+showcase addIndex nonunique org_bank_relation_id
 
 showcase save
 
