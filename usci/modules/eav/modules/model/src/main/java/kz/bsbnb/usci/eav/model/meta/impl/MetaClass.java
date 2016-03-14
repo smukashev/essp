@@ -93,7 +93,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         IMetaAttribute metaAttribute = members.get(name);
 
         if (metaAttribute == null)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E45,name,this.getClassName()));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E45,name, this.getClassName()));
 
         return metaAttribute.getMetaType();
     }

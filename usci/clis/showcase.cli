@@ -42,6 +42,7 @@ showcase list add portfolio.portfolio.code portfolio_code
 showcase list add portfolio.portfolio_msfo.code portfolio_msfo_code
 
 showcase list addRootKey credit_id credit_id
+
 showcase list addHistoryKey credit_id credit_id
 
 showcase addIndex nonunique credit_id
@@ -67,6 +68,7 @@ showcase list addCustom credit subject subject_id
 
 showcase list addRootKey credit_id credit_id
 showcase list addRootKey subject_id subject_id
+
 showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey subject_id subject_id
 
@@ -85,6 +87,7 @@ showcase child list add country.code country_code
 showcase child list add offshore.code offshore_code
 
 showcase child list addRootKey root subject_id
+
 showcase child list addHistoryKey subject_id subject_id
 
 showcase child save
