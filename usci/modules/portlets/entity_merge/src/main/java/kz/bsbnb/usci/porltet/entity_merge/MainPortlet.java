@@ -1134,32 +1134,6 @@ public class MainPortlet extends MVCPortlet {
 
 						sb.append("]}");
 						writer.write(sb.toString());
-
-						if (1 == 1)
-							return;
-
-						//search by parameters
-
-						list = resourceRequest.getParameterNames();
-						metaName = resourceRequest.getParameter("metaClass");
-						searchClassName = resourceRequest.getParameter("searchName");
-
-						metaClass = metaFactoryService.getMetaClass(metaName);
-						parameters = new HashMap<String, String>();
-
-						while (list.hasMoreElements()) {
-							String attribute = list.nextElement();
-							if (attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
-								continue;
-							parameters.put(attribute, resourceRequest.getParameter(attribute));
-						}
-
-						searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "", creditorId);
-						if (searchResult.getData() == null)
-							throw new IllegalArgumentException(Errors.getMessage(Errors.E242));
-
-						sb.append("]}");
-						writer.write(sb.toString());
 					}
 					break;
 				case LIST_ENTITY: {

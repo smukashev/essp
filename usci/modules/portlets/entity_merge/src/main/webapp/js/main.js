@@ -17,6 +17,11 @@ var forms = [];
 var entityStoreSelect;
 var fetchSize = 50;
 
+var leftEntityId;
+var rightEntityId;
+var leftEntityDate;
+var rightEntityDate;
+
 var userNavHistory = {
     currentPage: 1,
     nextPage: 1,
@@ -40,6 +45,22 @@ var userNavHistory = {
     }
 };
 
+function getCurrentDate() {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+
+    var yyyy = today.getFullYear();
+    if (dd < 10) {
+        dd = '0' + dd
+    }
+    if (mm < 10) {
+        mm = '0' + mm
+    }
+    var today = dd + '.' + mm + '.' + yyyy;
+
+    return today;
+}
 function createJSON(currentNode, offset, first){
 
     var JSONstr = "";
@@ -499,7 +520,7 @@ function getLeftEntityId() {
     if (currentTabIndex == 0) {
         return Ext.getCmp("leftEntityId").getValue();
     } else {
-        return document.getElementsByClassName('inp-1')[0].value;
+        return leftEntityId
     }
 }
 
@@ -510,9 +531,9 @@ function getCreditorId()
 
     if (currentTabIndex == 0) {
         return Ext.getCmp("creditor").getValue();
-    } /*else {
-        return document.getElementsByClassName('inp-1')[0].value;
-    }*/
+    } else {
+        return Ext.getCmp('edCreditor').value
+    }
 }
 
 function getRightEntityId() {
@@ -522,7 +543,7 @@ function getRightEntityId() {
     if (currentTabIndex == 0) {
         return Ext.getCmp("rightEntityId").getValue();
     } else {
-        return document.getElementsByClassName('inp-1')[1].value;
+        return rightEntityId;
     }
 }
 
@@ -533,7 +554,7 @@ function getLeftReportDate() {
     if (currentTabIndex == 0) {
         return Ext.getCmp("leftReportDate").getValue();
     } else {
-        return Ext.getCmp("edDate").getValue();
+        return leftEntityDate;
     }
 }
 
@@ -544,7 +565,7 @@ function getRightReportDate() {
     if (currentTabIndex == 0) {
         return Ext.getCmp("rightReportDate").getValue();
     } else {
-        return Ext.getCmp("edDate2").getValue();
+        return rightReportDate;
     }
 }
 
@@ -698,33 +719,10 @@ Ext.onReady(function() {
     });
 
     var buttonSaveEntity = Ext.create('Ext.button.Button', {
-        id: "entityEditorXmlBtn",
+        id: "buttonSaveSelect",
         text: label_SAVE,
         handler: function () {
-            var tree = Ext.getCmp('entityTreeView');
-            rootNode = tree.getRootNode();
-
-            var xmlStr = "";
-
-            for (var i = 0; i < rootNode.childNodes.length; i++) {
-                if (hasEmptyKeyAttr(rootNode.childNodes[i])) {
-                    return;
-                }
-                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true);
-            }
-
-            Ext.Ajax.request({
-                url: dataUrl,
-                method: 'POST',
-                params: {
-                    xml_data: xmlStr,
-                    date: Ext.getCmp('edDate').value,
-                    op: 'SAVE_XML'
-                },
-                success: function () {
-                    Ext.MessageBox.alert("", "Сохранено успешно");
-                }
-            });
+            Ext.getCmp('winSelect').hide();
         },
         maxWidth: 70
     });
@@ -736,6 +734,8 @@ Ext.onReady(function() {
             //entityId = Ext.getCmp("entityId");
             userNavHistory.init();
             Ext.getCmp('form-area').doSearch();
+
+            win.show();
 
             return;
         },
@@ -1009,117 +1009,15 @@ Ext.onReady(function() {
         ]
     });
 
-    var clientEntityEditorPanel = Ext.create('Ext.panel.Panel', {
-        title : label_MERGE_PANEL,
-        preventHeader: true,
-        width : '100%',
-        height: '100%',
-        defaults : {
-            padding: '3'
-        },
-        dockedItems: [
-            {
-                xtype: 'panel',
-                layout: 'hbox',
-                border: 0,
-                items: [
-                    {
-                        border: 1,
-                        padding: 10,
-                        items: [
-                            {
-                                xtype: 'panel',
-                                layout: 'vbox',
-                                padding: 15,
-                                border: 0,
-                                items: [
-                                    {
-                                        id: 'edSearch',
-                                        xtype: 'combobox',
-                                        labelWidth: 350,
-                                        store: classesStore,
-                                        valueField:'searchName',
-                                        displayField:'title',
-                                        fieldLabel: label_CLASS,
-                                        editable: false
-                                    },
-
-                                    {
-                                        xtype: 'component',
-                                        html: "<a href='#' onclick='getForm();'>" +LABEL_UPDATE+ "</a>"
-                                    },
-                                    {
-                                        xtype: 'datefield',
-                                        id: 'edDate',
-                                        labelWidth: 350,
-                                        fieldLabel: label_date,
-                                        format: 'd.m.Y',
-                                        value: new Date()
-                                    },
-                                    {
-                                        xtype: 'component',
-                                        html: '<div id="f1_entity-editor-form" style="height: 350px;"></div>'
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        xtype: 'tbfill'
-                    },
-                    {
-                        border: 1,
-                        padding: 10,
-                        items: [
-                            {
-                                xtype: 'panel',
-                                layout: 'vbox',
-                                padding: 15,
-                                border: 0,
-                                items: [
-                                    {
-                                        id: 'edSearch2',
-                                        xtype: 'combobox',
-                                        store: classesStore,
-                                        labelWidth: 350,
-                                        valueField:'searchName',
-                                        displayField:'title',
-                                        fieldLabel: label_CLASS,
-                                        editable: false
-                                    },
-                                    {
-                                        xtype: 'component',
-                                        html: "<a href='#' onclick='getForm2();'>" +LABEL_UPDATE+ "</a>"
-                                    },
-                                    {
-                                        xtype: 'datefield',
-                                        id: 'edDate2',
-                                        labelWidth: 350,
-                                        fieldLabel: label_date,
-                                        format: 'd.m.Y',
-                                        value: new Date()
-                                    },
-                                    {
-                                        xtype: 'component',
-                                        html: '<div id="f2_entity-editor-form2" style="height: 350px;"></div>'
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    });
-
     var entityGridSelect = Ext.create('Ext.tree.Panel', {
+        height: 500,
         //collapsible: true,
         id: 'entityTreeView',
         preventHeader: true,
         useArrows: true,
         rootVisible: false,
         store: entityStoreSelect,
-        multiSelect: true,
+        multiSelect: false,
         singleExpand: true,
         columns: [{
             xtype: 'treecolumn',
@@ -1179,17 +1077,24 @@ Ext.onReady(function() {
                 }
                 return subjectName;
             }
-        }]
+        }],
+        listeners: {
+            itemclick: function (view, record, item, index, e, eOpts) {
+                //Ext.getCmp("leftEntityId").setValue((record.get('value')));
+                leftEntityId = record.get('value');
+            }
+        }
     });
 
     var mainPanel = Ext.create('Ext.panel.Panel', {
         title: label_MERGE_PANEL,
-        preventHeader: true,
         width: '100%',
         height: 500,
         //renderTo: 'merge-content',
         //preventHeader: true,
         layout: 'border',
+        //collapsible: true,
+        //collapsed: false,
         items: [{
             region: 'west',
             width: '50%',
@@ -1239,7 +1144,7 @@ Ext.onReady(function() {
                         }
                     },
                     format: 'd.m.Y',
-                    value: '01.11.2015'
+                    value: getCurrentDate() //'01.11.2015'
                 }]
             }, {
                 region: 'center',
@@ -1247,36 +1152,12 @@ Ext.onReady(function() {
                 height: '80%',
                 split: true,
                 html: '<div id="entity-editor-form"></div>',
-                tbar: [buttonShowEntity, buttonSaveEntity]
+                tbar: [buttonShowEntity]
             }]
         }, {
             region: 'east',
             width: "50%",
             split: true,
-            items: [entityGridSelect],
-            autoScroll: true,
-            bbar: [
-                {
-                    text: '<<',
-                    id: 'previousNav',
-                    handler: function () {
-                        userNavHistory.setNextPage(userNavHistory.currentPage - 1);
-                        Ext.getCmp('form-area').doSearch();
-                    }
-                },
-                {xtype: 'label', text: '1', id: 'currentPageNo'},
-                {xtype: 'label', text: '/'},
-                {xtype: 'label', text: '1', id: 'totalPageNo'},
-                {
-                    text: '>>', id: 'nextNav',
-                    handler: function () {
-                        userNavHistory.setNextPage(userNavHistory.currentPage + 1);
-                        Ext.getCmp('form-area').doSearch();
-                    }
-                },
-                {xtype: 'label', text: 'Всего результатов:'},
-                {xtype: 'label', text: '0', id: 'totalCount'}
-            ]
         }]
 
     });
@@ -1336,5 +1217,59 @@ Ext.onReady(function() {
                 ]
             }
         ]
+    });
+
+    var win = Ext.create('widget.window', {
+        id: "winSelect",
+        title: 'Выберите сущность',
+        x: 400,
+        y: 200,
+        height: 500,
+        width: 900,
+        //layout: 'fit',
+
+        autoWidth: true,
+        autoHeight: true,
+        autoScroll: true,
+        overflowY: 'scroll',
+        maximizable: true,
+        bodyPadding: '10px',
+        bodyStyle: 'background-color:#fff',
+        closeAction: 'hide',
+        shadow: true,
+        resizable: true,
+        draggable: true,
+        closable: true,
+        modal: false,
+        headerPosition: 'top',
+        dockedItems: [entityGridSelect],
+        split: true,
+        bbarCfg: {
+            buttonAlign: 'left'
+        },
+        bbar: [
+            buttonSaveEntity,
+            {
+                text: '<<',
+                id: 'previousNav',
+                handler: function () {
+                    userNavHistory.setNextPage(userNavHistory.currentPage - 1);
+                    Ext.getCmp('form-area').doSearch();
+                }
+            },
+            {xtype: 'label', text: '1', id: 'currentPageNo'},
+            {xtype: 'label', text: '/'},
+            {xtype: 'label', text: '1', id: 'totalPageNo'},
+            {
+                text: '>>', id: 'nextNav',
+                handler: function () {
+                    userNavHistory.setNextPage(userNavHistory.currentPage + 1);
+                    Ext.getCmp('form-area').doSearch();
+                }
+            },
+            {xtype: 'label', text: 'Всего результатов:'},
+            {xtype: 'label', text: '0', id: 'totalCount'}
+        ]
+
     });
 });

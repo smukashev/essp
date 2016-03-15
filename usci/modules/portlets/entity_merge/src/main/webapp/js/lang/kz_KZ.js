@@ -6,6 +6,7 @@ var label_TITLE = 'Аты';
 var label_VALUE = 'Мәні';
 var label_ITEMS = 'Элементтер';
 var label_ERROR = 'Қате';
+var label_INFO = 'Хабарлама';
 var label_ERROR_NO_DATA = 'Мәліметтерді алу мүмкін емес';
 var label_VIEW = 'Көру';
 var label_ERROR_NO_DATA_FOR = 'Мәліметтерді алу мүмкін емес: {0}';
