@@ -14,7 +14,8 @@ var currentMeta;
 var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
 var errors = [];
 var forms = [];
-var entityStoreSelect;
+var entityStoreSelectLeft;
+var entityStoreSelectRight;
 var fetchSize = 50;
 
 var leftEntityId;
@@ -565,39 +566,14 @@ function getRightReportDate() {
     if (currentTabIndex == 0) {
         return Ext.getCmp("rightReportDate").getValue();
     } else {
-        return rightReportDate;
+        return rightEntityDate;
     }
 }
 
 Ext.onReady(function() {
     grid = null;
 
-    Ext.define('classesStoreModel', {
-        extend: 'Ext.data.Model',
-        fields: ['searchName','metaName','title']
-    });
-
-    var classesStore = Ext.create('Ext.data.Store', {
-        model: 'classesStoreModel',
-        pageSize: 100,
-        proxy: {
-            type: 'ajax',
-            url: dataUrl,
-            extraParams: {op : 'LIST_CLASSES'},
-            actionMethods: {
-                read: 'POST'
-            },
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'total'
-            }
-        },
-        autoLoad: true,
-        remoteSort: true
-    });
-
-    Ext.define('refStoreModel', {
+    Ext.define('refStoreModelLeft', {
         extend: 'Ext.data.Model',
         fields: ['id','title']
     });
@@ -621,7 +597,7 @@ Ext.onReady(function() {
         ]
     });
 
-    Ext.define('entitySelectModel', {
+    Ext.define('entitySelectModelLeft', {
         extend: 'Ext.data.Model',
         fields: [
             {name: 'title', type: 'string'},
@@ -639,7 +615,7 @@ Ext.onReady(function() {
         ]
     });
 
-    var types = Ext.create('Ext.data.Store', {
+    var typesLeft = Ext.create('Ext.data.Store', {
         fields: ['searchName', 'title'],
         /*data : [
          {"id":"s_credit_pc", "name":"Договор по номеру и дате договора"},
@@ -658,7 +634,7 @@ Ext.onReady(function() {
         }
     });
 
-    var creditors = Ext.create('Ext.data.Store', {
+    var creditorsLeft = Ext.create('Ext.data.Store', {
         fields: ['id', 'name'],
         proxy: {
             type: 'ajax',
@@ -672,9 +648,9 @@ Ext.onReady(function() {
         }
     });
 
-    entityStoreSelect = Ext.create('Ext.data.TreeStore', {
-        model: 'entitySelectModel',
-        storeId: 'entityStoreSelect',
+    entityStoreSelectLeft = Ext.create('Ext.data.TreeStore', {
+        model: 'entitySelectModelLeft',
+        storeId: 'entityStoreSelectLeft',
         proxy: {
             type: 'ajax',
             url: dataUrl,
@@ -683,9 +659,9 @@ Ext.onReady(function() {
         folderSort: true
     });
 
-    var CreditorStore = Ext.create('Ext.data.Store',
+    var CreditorStoreLeft = Ext.create('Ext.data.Store',
         {
-            model: 'refStoreModel',
+            model: 'refStoreModelLeft',
             proxy: {
                 type: 'ajax',
                 url: dataUrl,
@@ -718,24 +694,24 @@ Ext.onReady(function() {
         folderSort: true
     });
 
-    var buttonSaveEntity = Ext.create('Ext.button.Button', {
+    var buttonSaveEntityLeft = Ext.create('Ext.button.Button', {
         id: "buttonSaveSelect",
         text: label_SAVE,
         handler: function () {
-            Ext.getCmp('winSelect').hide();
+            Ext.getCmp('winSelectLeft').hide();
         },
         maxWidth: 70
     });
 
-    var buttonShowEntity = Ext.create('Ext.button.Button', {
-        id: "entityEditorShowBtn",
+    var buttonShowEntityLeft = Ext.create('Ext.button.Button', {
+        id: "entityEditorShowBtnLeft",
         text: label_VIEW,
         handler: function () {
             //entityId = Ext.getCmp("entityId");
             userNavHistory.init();
-            Ext.getCmp('form-area').doSearch();
+            Ext.getCmp('form-area-left').doSearch();
 
-            win.show();
+            winLeft.show();
 
             return;
         },
@@ -744,7 +720,7 @@ Ext.onReady(function() {
     });
 
     var buttonShowMerge = Ext.create('Ext.button.Button', {
-        id: "entityEditorShowBtn",
+        id: "entityEditorShowBtnLeft",
         text: label_VIEW,
         handler : function (){
             leftReportDate = Ext.getCmp("leftReportDate");
@@ -955,7 +931,7 @@ Ext.onReady(function() {
                       xtype: 'combobox',
                       valueField: 'id',
                       displayField: 'title',
-                      store: CreditorStore,
+                      store: CreditorStoreLeft,
                       margin: '10 10 10 10'
                   }
               ]
@@ -1009,14 +985,14 @@ Ext.onReady(function() {
         ]
     });
 
-    var entityGridSelect = Ext.create('Ext.tree.Panel', {
+    var entityGridSelectLeft = Ext.create('Ext.tree.Panel', {
         height: 500,
         //collapsible: true,
         id: 'entityTreeView',
         preventHeader: true,
         useArrows: true,
         rootVisible: false,
-        store: entityStoreSelect,
+        store: entityStoreSelectLeft,
         multiSelect: false,
         singleExpand: true,
         columns: [{
@@ -1110,10 +1086,10 @@ Ext.onReady(function() {
                     align: 'stretch'
                 },
                 items: [{
-                    id: 'edSearch',
+                    id: 'edSearchLeft',
                     xtype: 'combobox',
                     displayField: 'title',
-                    store: types,
+                    store: typesLeft,
                     labelWidth: 70,
                     valueField: 'searchName',
                     fieldLabel: 'Вид поиска',
@@ -1122,21 +1098,21 @@ Ext.onReady(function() {
                         change: function (a, key, prev) {
                             for (p in forms)
                                 if (p == key)
-                                    forms[p](Ext.getCmp('form-area'));
+                                    forms[p](Ext.getCmp('form-area-left'), Ext.getCmp('edDateLeft'), Ext.getCmp('edCreditorLeft'), 'left');
                         }
                     }
                 }, {
-                    id: 'edCreditor',
+                    id: 'edCreditorLeft',
                     xtype: 'combobox',
                     displayField: 'name',
-                    store: creditors,
+                    store: creditorsLeft,
                     labelWidth: 70,
                     valueField: 'id',
                     fieldLabel: 'Кредитор',
                     editable: false
                 }, {
                     xtype: 'datefield',
-                    id: 'edDate',
+                    id: 'edDateLeft',
                     fieldLabel: 'Дата',
                     listeners: {
                         change: function () {
@@ -1148,11 +1124,11 @@ Ext.onReady(function() {
                 }]
             }, {
                 region: 'center',
-                id: 'form-area',
+                id: 'form-area-left',
                 height: '80%',
                 split: true,
                 html: '<div id="entity-editor-form"></div>',
-                tbar: [buttonShowEntity]
+                tbar: [buttonShowEntityLeft]
             }]
         }, {
             region: 'east',
@@ -1219,8 +1195,8 @@ Ext.onReady(function() {
         ]
     });
 
-    var win = Ext.create('widget.window', {
-        id: "winSelect",
+    var winLeft = Ext.create('widget.window', {
+        id: "winSelectLeft",
         title: 'Выберите сущность',
         x: 400,
         y: 200,
@@ -1242,19 +1218,19 @@ Ext.onReady(function() {
         closable: true,
         modal: false,
         headerPosition: 'top',
-        dockedItems: [entityGridSelect],
+        dockedItems: [entityGridSelectLeft],
         split: true,
         bbarCfg: {
             buttonAlign: 'left'
         },
         bbar: [
-            buttonSaveEntity,
+            buttonSaveEntityLeft,
             {
                 text: '<<',
                 id: 'previousNav',
                 handler: function () {
                     userNavHistory.setNextPage(userNavHistory.currentPage - 1);
-                    Ext.getCmp('form-area').doSearch();
+                    Ext.getCmp('form-area-left').doSearch();
                 }
             },
             {xtype: 'label', text: '1', id: 'currentPageNo'},
@@ -1264,7 +1240,7 @@ Ext.onReady(function() {
                 text: '>>', id: 'nextNav',
                 handler: function () {
                     userNavHistory.setNextPage(userNavHistory.currentPage + 1);
-                    Ext.getCmp('form-area').doSearch();
+                    Ext.getCmp('form-area-left').doSearch();
                 }
             },
             {xtype: 'label', text: 'Всего результатов:'},
