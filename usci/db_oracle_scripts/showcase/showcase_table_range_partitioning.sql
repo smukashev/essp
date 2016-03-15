@@ -117,8 +117,10 @@ for rec_index in (select ui.index_name, rownum as num_pp
       --dbms_output.put_line(v_index_ddl);
 
       v_index_ddl_table.extend();
-      v_index_ddl_table(v_index_ddl_table.last) := v_index_ddl;
-
+      v_index_ddl_table(v_index_ddl_table.last) := v_index_ddl||' local';
+     if(rec_index.index_name not like 'SYS_%') then
+       execute immediate 'drop index '||rec_index.index_name;
+     end if;
     end loop;
 execute immediate v_table_ddl;
 
@@ -149,7 +151,7 @@ DBMS_REDEFINITION.copy_table_dependents(
 
 DBMS_OUTPUT.put_line('Errors=' || l_errors);
 
-DBMS_STATS.gather_table_stats(USER, rec_table.table_name||'_NEW', cascade => TRUE);
+--DBMS_STATS.gather_table_stats(USER, rec_table.table_name||'_NEW', cascade => TRUE);
 
  dbms_redefinition.finish_redef_table(
     uname      => USER,
@@ -178,7 +180,7 @@ FOR i IN v_index_ddl_table.first .. v_index_ddl_table.last LOOP
 exception when others then
 DBMS_OUTPUT.PUT_LINE(sqlerrm);
 end;
-DBMS_STATS.gather_table_stats(USER, rec_table.table_name, cascade => TRUE);
+--DBMS_STATS.gather_table_stats(USER, rec_table.table_name, cascade => TRUE);
 
 end loop;
 
