@@ -21,6 +21,7 @@ import org.apache.http.protocol.HttpContext;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.RuntimeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ import java.util.Map;
  */
 public class ApprovalBusiness {
 
-    private static final String BONITA_URI = "http://localhost:8082/bonita";
+    private static final String BONITA_URI = "http://localhost:8080/bonita";
 
     /**
      * Human user username
@@ -164,6 +165,9 @@ public class ApprovalBusiness {
 
         int s1 = content.indexOf("\"id\"");
         int s2 = content.indexOf(",", s1);
+        if(s1 < 0 || s2 < 0)
+            throw new RuntimeException("indexOf incorrect, probably bar file not installed");
+
         content = content.substring(s1 + 6, s2 - 1);
 
         Long processId = null;
