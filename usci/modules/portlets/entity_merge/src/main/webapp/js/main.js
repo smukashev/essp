@@ -14,60 +14,8 @@ var currentMeta;
 var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
 var errors = [];
 var forms = [];
-var entityStoreSelectLeft;
-var entityStoreSelectRight;
+var entityStoreSelect;
 var fetchSize = 50;
-
-var leftEntityId;
-var rightEntityId;
-var leftEntityDate;
-var rightEntityDate;
-
-var userNavHistoryLeft = {
-    currentPage: 1,
-    nextPage: 1,
-    getNextPage: function () {
-        return this.nextPage;
-    },
-    setNextPage: function (nextPage) {
-        this.nextPage = nextPage;
-        console.log(this.nextPage);
-    },
-    init: function () {
-        this.nextPage = 1;
-    },
-    success: function (totalCount) {
-        this.currentPage = this.nextPage;
-        if (totalCount) {
-            Ext.getCmp('totalCountLeft').setText(totalCount);
-            Ext.getCmp('totalPageNoLeft').setText(Math.floor((fetchSize - 1 + totalCount) / fetchSize));
-            Ext.getCmp('currentPageNoLeft').setText(this.currentPage);
-        }
-    }
-};
-
-var userNavHistoryRight = {
-    currentPage: 1,
-    nextPage: 1,
-    getNextPage: function () {
-        return this.nextPage;
-    },
-    setNextPage: function (nextPage) {
-        this.nextPage = nextPage;
-        console.log(this.nextPage);
-    },
-    init: function () {
-        this.nextPage = 1;
-    },
-    success: function (totalCount) {
-        this.currentPage = this.nextPage;
-        if (totalCount) {
-            Ext.getCmp('totalCountRight').setText(totalCount);
-            Ext.getCmp('totalPageNoRight').setText(Math.floor((fetchSize - 1 + totalCount) / fetchSize));
-            Ext.getCmp('currentPageNoRight').setText(this.currentPage);
-        }
-    }
-};
 
 function getCurrentDate() {
     var today = new Date();
@@ -85,6 +33,30 @@ function getCurrentDate() {
 
     return today;
 }
+
+var userNavHistory = {
+    currentPage: 1,
+    nextPage: 1,
+    getNextPage: function () {
+        return this.nextPage;
+    },
+    setNextPage: function (nextPage) {
+        this.nextPage = nextPage;
+        console.log(this.nextPage);
+    },
+    init: function () {
+        this.nextPage = 1;
+    },
+    success: function (totalCount) {
+        this.currentPage = this.nextPage;
+        if (totalCount) {
+            Ext.getCmp('totalCount').setText(totalCount);
+            Ext.getCmp('totalPageNo').setText(Math.floor((fetchSize - 1 + totalCount) / fetchSize));
+            Ext.getCmp('currentPageNo').setText(this.currentPage);
+        }
+    }
+};
+
 function createJSON(currentNode, offset, first){
 
     var JSONstr = "";
@@ -93,23 +65,23 @@ function createJSON(currentNode, offset, first){
     if(first){
         if(currentNode.data.keep_left){
             JSONstr += offset + "{" +"\n" +
-                         '"action" : "keep_left", \n'+
-                         '"childMap" : [ \n';
+            '"action" : "keep_left", \n' +
+            '"childMap" : [ \n';
         }
         if(currentNode.data.keep_right){
             JSONstr += offset + "{" +"\n" +
-                         '"action" : "keep_right", \n'+
-                         '"childMap" : [ \n';
+            '"action" : "keep_right", \n' +
+            '"childMap" : [ \n';
         }
         if(currentNode.data.keep_both){
             JSONstr += offset + "{" +"\n" +
-                         '"action" : "keep_both", \n'+
-                         '"childMap" : [ \n';
+            '"action" : "keep_both", \n' +
+            '"childMap" : [ \n';
         }
         if(currentNode.data.merge){
             JSONstr += offset + "{" +"\n" +
-                                     '"action" : "merge", \n'+
-                                     '"childMap" : [ \n';
+            '"action" : "merge", \n' +
+            '"childMap" : [ \n';
         }
     }
 
@@ -123,7 +95,7 @@ function createJSON(currentNode, offset, first){
                 if(children[i].data.keep_left)
                 {
                     JSONstr += offset + '{ "id":{ "type":"long", "left": "'+ children[i].data.id_left +'", "right":"'+ children[i].data.id_right+'"},'+
-                                ' "map": { "action" : "keep_left", "childMap" : ['+ createJSON(children[i], offset+" ", false, false)+'] } }';
+                    ' "map": { "action" : "keep_left", "childMap" : [' + createJSON(children[i], offset + " ", false, false) + '] } }';
                     if(!(i + 1 == children.length)){
                         JSONstr +=",";
                     }
@@ -131,7 +103,7 @@ function createJSON(currentNode, offset, first){
                 if(children[i].data.keep_right)
                 {
                     JSONstr += offset + '{ "id":{ "type":"long", "left":"'+ children[i].data.id_left +'", "right":"'+ children[i].data.id_right+'"},'+
-                                ' "map": { "action" : "keep_right", "childMap" : ['+ createJSON(children[i], offset+" ", false, false)+'] } }';
+                    ' "map": { "action" : "keep_right", "childMap" : [' + createJSON(children[i], offset + " ", false, false) + '] } }';
                     if(!(i + 1 == children.length)){
                         JSONstr +=",";
                     }
@@ -139,7 +111,7 @@ function createJSON(currentNode, offset, first){
                 if(children[i].data.merge)
                 {
                     JSONstr += offset + '{"id":{ "type":"long", "left":"'+ children[i].data.id_left +'", "right":"'+ children[i].data.id_right+'"},'+
-                                ' "map": { "action" : "merge", "childMap" : ['+ createJSON(children[i], offset+" ", false, false)+'] } }';
+                    ' "map": { "action" : "merge", "childMap" : [' + createJSON(children[i], offset + " ", false, false) + '] } }';
                     if(!(i + 1 == children.length)){
                         JSONstr +=",";
                     }
@@ -147,7 +119,7 @@ function createJSON(currentNode, offset, first){
                 if(children[i].data.keep_both)
                 {
                     JSONstr += offset + '{"id":{ "type":"long", "left":"'+ children[i].data.id_left +'", "right":"'+ children[i].data.id_right+'"},'+
-                                ' "map": { "action" : "keep_both", "childMap" : ['+ createJSON(children[i], offset+" ", false, false)+'] } }';
+                    ' "map": { "action" : "keep_both", "childMap" : [' + createJSON(children[i], offset + " ", false, false) + '] } }';
                     if(!(i + 1 == children.length)){
                         JSONstr +=",";
                     }
@@ -161,7 +133,7 @@ function createJSON(currentNode, offset, first){
                 if(children[i].data.keep_left)
                 {
                     JSONstr += offset + '{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                ' "map": { "action" : "keep_left", "childMap" : [] } }';
+                    ' "map": { "action" : "keep_left", "childMap" : [] } }';
                     if(!(i + 1 == children.length)){
                         JSONstr +=",";
                     }
@@ -169,7 +141,7 @@ function createJSON(currentNode, offset, first){
                 if(children[i].data.keep_right)
                 {
                     JSONstr += offset + '{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                ' "map": { "action" : "keep_right", "childMap" : [] } }';
+                    ' "map": { "action" : "keep_right", "childMap" : [] } }';
                     if(!(i + 1 == children.length)){
                         JSONstr +=",";
                     }
@@ -177,7 +149,7 @@ function createJSON(currentNode, offset, first){
                 if(children[i].data.merge)
                 {
                     JSONstr += offset + '{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                ' "map": { "action" : "merge", "childMap" : [] } }';
+                    ' "map": { "action" : "merge", "childMap" : [] } }';
                     if(!(i + 1 == children.length)){
                         JSONstr +=",";
                     }
@@ -185,7 +157,7 @@ function createJSON(currentNode, offset, first){
                 if(children[i].data.keep_both)
                 {
                     JSONstr += offset + '{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                ' "map": { "action" : "keep_both", "childMap" : [] } }';
+                    ' "map": { "action" : "keep_both", "childMap" : [] } }';
                     if(!(i + 1 == children.length)){
                         JSONstr +=",";
                     }
@@ -210,16 +182,16 @@ function createJSON(currentNode, offset, first){
 
                     if (currentNode.data.id_left != "" && currentNode.data.id_right != "" && !first && currentNode.data.code.indexOf("[")==-1){
 
-                         JSONstr += offset + '{ "id":{ "type":"long", "left": "'+currentNode.data.id_left +'", "right":"'+ currentNode.data.id_right+'"},'+
-                                    ' "map": { "action" : "'+subNodeAction+'", "childMap" : [{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                    ' "map": { "action" : "keep_left", "childMap" : ['+createJSON(children[i], offset+" ", false)+'] } }] } }';
+                        JSONstr += offset + '{ "id":{ "type":"long", "left": "' + currentNode.data.id_left + '", "right":"' + currentNode.data.id_right + '"},' +
+                        ' "map": { "action" : "' + subNodeAction + '", "childMap" : [{ "id":{ "type":"attribute", "attr":"' + children[i].data.code + '"},' +
+                        ' "map": { "action" : "keep_left", "childMap" : [' + createJSON(children[i], offset + " ", false) + '] } }] } }';
                         if(!(i + 1 == children.length)){
                             JSONstr +=",";
                         }
 
                     } else {
                         JSONstr += offset + '{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                    ' "map": { "action" : "keep_left", "childMap" : ['+createJSON(children[i], offset+" ", false)+'] } }';
+                        ' "map": { "action" : "keep_left", "childMap" : [' + createJSON(children[i], offset + " ", false) + '] } }';
                         if(!(i + 1 == children.length)){
                             JSONstr +=",";
                         }
@@ -230,16 +202,16 @@ function createJSON(currentNode, offset, first){
                 {
                     if(currentNode.data.id_left != "" && currentNode.data.id_right != "" && !first && currentNode.data.code.indexOf("[")==-1){
 
-                         JSONstr += offset + '{ "id":{ "type":"long", "left": "'+currentNode.data.id_left +'", "right":"'+ currentNode.data.id_right+'"},'+
-                                    ' "map": { "action" : "'+subNodeAction+'", "childMap" : [{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                    ' "map": { "action" : "keep_right", "childMap" : ['+createJSON(children[i], offset+" ", false)+'] } }] } }';
+                        JSONstr += offset + '{ "id":{ "type":"long", "left": "' + currentNode.data.id_left + '", "right":"' + currentNode.data.id_right + '"},' +
+                        ' "map": { "action" : "' + subNodeAction + '", "childMap" : [{ "id":{ "type":"attribute", "attr":"' + children[i].data.code + '"},' +
+                        ' "map": { "action" : "keep_right", "childMap" : [' + createJSON(children[i], offset + " ", false) + '] } }] } }';
                         if(!(i + 1 == children.length)){
                             JSONstr +=",";
                         }
                     } else {
 
                         JSONstr += offset + '{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                    ' "map": { "action" : "keep_right", "childMap" : ['+createJSON(children[i], offset+" ", false)+'] } }';
+                        ' "map": { "action" : "keep_right", "childMap" : [' + createJSON(children[i], offset + " ", false) + '] } }';
                         if(!(i + 1 == children.length)){
                             JSONstr +=",";
                         }
@@ -250,9 +222,9 @@ function createJSON(currentNode, offset, first){
                 if(children[i].data.merge)
                 {
                     if(currentNode.data.id_left != "" && currentNode.data.id_right != "" && !first && currentNode.data.code.indexOf("[")==-1){
-                         JSONstr += offset + '{ "id":{ "type":"long", "left": "'+currentNode.data.id_left +'", "right":"'+ currentNode.data.id_right+'"},'+
-                                    ' "map": { "action" : "'+subNodeAction+'", "childMap" : [{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                    ' "map": { "action" : "merge", "childMap" : ['+createJSON(children[i], offset+" ", false)+'] } }] } }';
+                        JSONstr += offset + '{ "id":{ "type":"long", "left": "' + currentNode.data.id_left + '", "right":"' + currentNode.data.id_right + '"},' +
+                        ' "map": { "action" : "' + subNodeAction + '", "childMap" : [{ "id":{ "type":"attribute", "attr":"' + children[i].data.code + '"},' +
+                        ' "map": { "action" : "merge", "childMap" : [' + createJSON(children[i], offset + " ", false) + '] } }] } }';
                         if(!(i + 1 == children.length)){
                             JSONstr +=",";
                         }
@@ -260,7 +232,7 @@ function createJSON(currentNode, offset, first){
                     } else {
 
                         JSONstr += offset + '{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                    ' "map": { "action" : "merge", "childMap" : ['+createJSON(children[i], offset+" ", false)+'] } }';
+                        ' "map": { "action" : "merge", "childMap" : [' + createJSON(children[i], offset + " ", false) + '] } }';
                         if(!(i + 1 == children.length)){
                             JSONstr +=",";
                         }
@@ -270,9 +242,9 @@ function createJSON(currentNode, offset, first){
                 if(children[i].data.keep_both)
                 {
                     if(currentNode.data.id_left != "" && currentNode.data.id_right != "" && !first && currentNode.data.code.indexOf("[")==-1){
-                         JSONstr += offset + '{ "id":{ "type":"long", "left": "'+currentNode.data.id_left +'", "right":"'+ currentNode.data.id_right+'"},'+
-                                    ' "map": { "action" : "'+subNodeAction+'", "childMap" : [{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                    ' "map": { "action" : "keep_both", "childMap" : ['+createJSON(children[i], offset+" ", false)+'] } }] } }';
+                        JSONstr += offset + '{ "id":{ "type":"long", "left": "' + currentNode.data.id_left + '", "right":"' + currentNode.data.id_right + '"},' +
+                        ' "map": { "action" : "' + subNodeAction + '", "childMap" : [{ "id":{ "type":"attribute", "attr":"' + children[i].data.code + '"},' +
+                        ' "map": { "action" : "keep_both", "childMap" : [' + createJSON(children[i], offset + " ", false) + '] } }] } }';
                         if(!(i + 1 == children.length)){
                             JSONstr +=",";
                         }
@@ -280,7 +252,7 @@ function createJSON(currentNode, offset, first){
                     } else {
 
                         JSONstr += offset + '{ "id":{ "type":"attribute", "attr":"'+ children[i].data.code +'"},'+
-                                    ' "map": { "action" : "keep_both", "childMap" : ['+createJSON(children[i], offset+" ", false)+'] } }';
+                        ' "map": { "action" : "keep_both", "childMap" : [' + createJSON(children[i], offset + " ", false) + '] } }';
                         if(!(i + 1 == children.length)){
                             JSONstr +=",";
                         }
@@ -317,7 +289,7 @@ function markEntityKeepLeft(){
         selectedNode.data.keep_both = false;
     }
 
-     Ext.getCmp("entityTreeView").getView().refresh();
+    Ext.getCmp("entityTreeView").getView().refresh();
 }
 
 
@@ -544,7 +516,7 @@ function getLeftEntityId() {
     if (currentTabIndex == 0) {
         return Ext.getCmp("leftEntityId").getValue();
     } else {
-        return leftEntityId
+        return document.getElementsByClassName('inp-1')[0].value;
     }
 }
 
@@ -555,9 +527,10 @@ function getCreditorId()
 
     if (currentTabIndex == 0) {
         return Ext.getCmp("creditor").getValue();
-    } else {
-        return Ext.getCmp('edCreditor').value
     }
+    /*else {
+     return document.getElementsByClassName('inp-1')[0].value;
+     }*/
 }
 
 function getRightEntityId() {
@@ -567,7 +540,7 @@ function getRightEntityId() {
     if (currentTabIndex == 0) {
         return Ext.getCmp("rightEntityId").getValue();
     } else {
-        return rightEntityId;
+        return document.getElementsByClassName('inp-1')[1].value;
     }
 }
 
@@ -578,7 +551,7 @@ function getLeftReportDate() {
     if (currentTabIndex == 0) {
         return Ext.getCmp("leftReportDate").getValue();
     } else {
-        return leftEntityDate;
+        return Ext.getCmp("edDate").getValue();
     }
 }
 
@@ -589,14 +562,39 @@ function getRightReportDate() {
     if (currentTabIndex == 0) {
         return Ext.getCmp("rightReportDate").getValue();
     } else {
-        return rightEntityDate;
+        return Ext.getCmp("edDate2").getValue();
     }
 }
 
 Ext.onReady(function() {
     grid = null;
 
-    Ext.define('refStoreModelLeft', {
+    Ext.define('classesStoreModel', {
+        extend: 'Ext.data.Model',
+        fields: ['searchName', 'metaName', 'title']
+    });
+
+    var classesStore = Ext.create('Ext.data.Store', {
+        model: 'classesStoreModel',
+        pageSize: 100,
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op: 'LIST_CLASSES'},
+            actionMethods: {
+                read: 'POST'
+            },
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        },
+        autoLoad: true,
+        remoteSort: true
+    });
+
+    Ext.define('refStoreModel', {
         extend: 'Ext.data.Model',
         fields: ['id','title']
     });
@@ -620,7 +618,7 @@ Ext.onReady(function() {
         ]
     });
 
-    Ext.define('entitySelectModelLeft', {
+    Ext.define('entitySelectModel', {
         extend: 'Ext.data.Model',
         fields: [
             {name: 'title', type: 'string'},
@@ -638,7 +636,7 @@ Ext.onReady(function() {
         ]
     });
 
-    var typesLeft = Ext.create('Ext.data.Store', {
+    var types = Ext.create('Ext.data.Store', {
         fields: ['searchName', 'title'],
         /*data : [
          {"id":"s_credit_pc", "name":"Договор по номеру и дате договора"},
@@ -657,26 +655,7 @@ Ext.onReady(function() {
         }
     });
 
-    var typesRight = Ext.create('Ext.data.Store', {
-        fields: ['searchName', 'title'],
-        /*data : [
-         {"id":"s_credit_pc", "name":"Договор по номеру и дате договора"},
-         {"id":"s_person_doc", "name":"Физ лицо по документу"},
-         {"id":"s_org_doc", "name":"Юр лицо по документу"}
-         ]*/
-        proxy: {
-            type: 'ajax',
-            url: dataUrl,
-            extraParams: {op: 'LIST_CLASSES'},
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'total'
-            }
-        }
-    });
-
-    var creditorsLeft = Ext.create('Ext.data.Store', {
+    var creditors = Ext.create('Ext.data.Store', {
         fields: ['id', 'name'],
         proxy: {
             type: 'ajax',
@@ -690,23 +669,9 @@ Ext.onReady(function() {
         }
     });
 
-    var creditorsRight = Ext.create('Ext.data.Store', {
-        fields: ['id', 'name'],
-        proxy: {
-            type: 'ajax',
-            url: dataUrl,
-            extraParams: {op: 'LIST_CREDITORS'},
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'total'
-            }
-        }
-    });
-
-    entityStoreSelectLeft = Ext.create('Ext.data.TreeStore', {
-        model: 'entitySelectModelLeft',
-        storeId: 'entityStoreSelectLeft',
+    entityStoreSelect = Ext.create('Ext.data.TreeStore', {
+        model: 'entitySelectModel',
+        storeId: 'entityStoreSelect',
         proxy: {
             type: 'ajax',
             url: dataUrl,
@@ -715,20 +680,9 @@ Ext.onReady(function() {
         folderSort: true
     });
 
-    entityStoreSelectRight = Ext.create('Ext.data.TreeStore', {
-        model: 'entitySelectModelRight',
-        storeId: 'entityStoreSelectRight',
-        proxy: {
-            type: 'ajax',
-            url: dataUrl,
-            extraParams: {op: 'LIST_ENTITY_SELECT'}
-        },
-        folderSort: true
-    });
-
-    var CreditorStoreLeft = Ext.create('Ext.data.Store',
+    var CreditorStore = Ext.create('Ext.data.Store',
         {
-            model: 'refStoreModelLeft',
+            model: 'refStoreModel',
             proxy: {
                 type: 'ajax',
                 url: dataUrl,
@@ -751,33 +705,6 @@ Ext.onReady(function() {
             autoLoad: true,
             remoteSort: true
         });
-
-    var CreditorStoreRight = Ext.create('Ext.data.Store',
-        {
-            model: 'refStoreModelLeft',
-            proxy: {
-                type: 'ajax',
-                url: dataUrl,
-                extraParams: {op: 'LIST_CREDITOR'},
-                actionMethods: {
-                    read: 'POST'
-                },
-                reader: {
-                    type: 'json',
-                    root: 'data'
-                }/*,
-                 listeners: {
-                 load: function (obj, records) {
-                 Ext.each(records, function (rec) {
-                 console.log(rec.get('title'));
-                 });
-                 }
-                 }*/
-            },
-            autoLoad: true,
-            remoteSort: true
-        });
-
     var entityStore = Ext.create('Ext.data.TreeStore', {
         model: 'entityModel',
         proxy: {
@@ -788,33 +715,45 @@ Ext.onReady(function() {
         folderSort: true
     });
 
-    var buttonSaveEntityLeft = Ext.create('Ext.button.Button', {
-        id: "buttonSaveSelectLeft",
+    var buttonSaveEntity = Ext.create('Ext.button.Button', {
+        id: "entityEditorXmlBtn",
         text: label_SAVE,
         handler: function () {
-            Ext.getCmp('winSelectLeft').hide();
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                if (hasEmptyKeyAttr(rootNode.childNodes[i])) {
+                    return;
+                }
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true);
+            }
+
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
+                    op: 'SAVE_XML'
+                },
+                success: function () {
+                    Ext.MessageBox.alert("", "Сохранено успешно");
+                }
+            });
         },
         maxWidth: 70
     });
 
-    var buttonSaveEntityRight = Ext.create('Ext.button.Button', {
-        id: "buttonSaveSelectRight",
-        text: label_SAVE,
-        handler: function () {
-            Ext.getCmp('winSelectLeft').hide();
-        },
-        maxWidth: 70
-    });
-
-    var buttonShowEntityLeft = Ext.create('Ext.button.Button', {
-        id: "entityEditorShowBtnLeft",
+    var buttonShowEntity = Ext.create('Ext.button.Button', {
+        id: "entityEditorShowBtn",
         text: label_VIEW,
         handler: function () {
             //entityId = Ext.getCmp("entityId");
-            userNavHistoryLeft.init();
-            Ext.getCmp('form-area-left').doSearch();
-
-            winLeft.show();
+            userNavHistory.init();
+            Ext.getCmp('form-area').doSearch();
 
             return;
         },
@@ -822,24 +761,8 @@ Ext.onReady(function() {
         shadow: true
     });
 
-    var buttonShowEntityRight = Ext.create('Ext.button.Button', {
-        id: "entityEditorShowBtnRight",
-        text: label_VIEW,
-        handler: function () {
-            //entityId = Ext.getCmp("entityId");
-            userNavHistoryLeft.init();
-            Ext.getCmp('form-area-right').doSearch();
-
-            winRight.show();
-
-            return;
-        },
-        maxWidth: 70,
-        shadow: true
-    });
-
-    var buttonShowMerge = Ext.create('Ext.button.Button', {
-        id: "entityEditorShowBtnLeft",
+    var buttonShow = Ext.create('Ext.button.Button', {
+        id: "entityEditorShowBtn",
         text: label_VIEW,
         handler : function (){
             leftReportDate = Ext.getCmp("leftReportDate");
@@ -863,7 +786,7 @@ Ext.onReady(function() {
         }
     });
 
-    var buttonSaveJSON = Ext.create('Ext.button.Button', {
+    var buttonXML = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
         handler : function (){
@@ -897,7 +820,7 @@ Ext.onReady(function() {
         }
     });
 
-    var buttonShowJSON = Ext.create('Ext.button.Button', {
+    var buttonShowXML = Ext.create('Ext.button.Button', {
         id: "entityEditorShowXmlBtn",
         text: 'JSON',
         handler : function (){
@@ -907,46 +830,46 @@ Ext.onReady(function() {
             var JSONstr = createJSON(rootNode.childNodes[0], "", true)
 
             var buttonClose = Ext.create('Ext.button.Button', {
-             id: "itemFormCancel",
-             text: label_CANCEL,
-             handler : function (){
-             Ext.getCmp('xmlFromWin').destroy();
-             }
-             });
+                id: "itemFormCancel",
+                text: label_CANCEL,
+                handler: function () {
+                    Ext.getCmp('xmlFromWin').destroy();
+                }
+            });
 
-             var xmlForm = Ext.create('Ext.form.Panel', {
-             id: 'xmlForm',
-             region: 'center',
-             width: 615,
-             fieldDefaults: {
-             msgTarget: 'side'
-             },
-             defaults: {
-             anchor: '100%'
-             },
+            var xmlForm = Ext.create('Ext.form.Panel', {
+                id: 'xmlForm',
+                region: 'center',
+                width: 615,
+                fieldDefaults: {
+                    msgTarget: 'side'
+                },
+                defaults: {
+                    anchor: '100%'
+                },
 
-             bodyPadding: '5 5 0',
-             items: [{
-             fieldLabel: 'JSON',
-             name: 'id',
-             xtype: 'textarea',
-             value: JSONstr,
-             height: 615
-             }],
+                bodyPadding: '5 5 0',
+                items: [{
+                    fieldLabel: 'JSON',
+                    name: 'id',
+                    xtype: 'textarea',
+                    value: JSONstr,
+                    height: 615
+                }],
 
-             buttons: [buttonClose]
-             });
+                buttons: [buttonClose]
+            });
 
-             xmlFromWin = new Ext.Window({
-             id: "xmlFromWin",
-             layout: 'fit',
-             title:'JSON',
-             modal: true,
-             maximizable: true,
-             items:[xmlForm]
-             });
+            xmlFromWin = new Ext.Window({
+                id: "xmlFromWin",
+                layout: 'fit',
+                title: 'JSON',
+                modal: true,
+                maximizable: true,
+                items: [xmlForm]
+            });
 
-             xmlFromWin.show();
+            xmlFromWin.show();
         }
     });
 
@@ -988,43 +911,43 @@ Ext.onReady(function() {
             dataIndex: 'type',
             sortable: true
         },
-        {
-            text: label_KEEP_BOTH,
-            flex: 3,
-            dataIndex: 'keep_both',
-            sortable: true,
+            {
+                text: label_KEEP_BOTH,
+                flex: 3,
+                dataIndex: 'keep_both',
+                sortable: true,
                 renderer: function (dataIndex) {
-                            return '<center><input type="checkbox" onclick="markEntityKeepBoth()"'+ (dataIndex ? 'checked' : '') +' /></center>'
-                        }
-        },{
-            text: label_KEEP_LEFT,
-            flex: 3,
-            dataIndex: 'keep_left',
-            sortable: true,
+                    return '<center><input type="checkbox" onclick="markEntityKeepBoth()"' + (dataIndex ? 'checked' : '') + ' /></center>'
+                }
+            }, {
+                text: label_KEEP_LEFT,
+                flex: 3,
+                dataIndex: 'keep_left',
+                sortable: true,
                 renderer: function (dataIndex) {
-                            return '<center><input type="checkbox" onclick="markEntityKeepLeft()"'+ (dataIndex ? 'checked' : '') +' /></center>'
-                        }
-         },{
-            text: label_KEEP_RIGHT,
-            flex: 3,
-            dataIndex: 'keep_right',
-            sortable: true,
+                    return '<center><input type="checkbox" onclick="markEntityKeepLeft()"' + (dataIndex ? 'checked' : '') + ' /></center>'
+                }
+            }, {
+                text: label_KEEP_RIGHT,
+                flex: 3,
+                dataIndex: 'keep_right',
+                sortable: true,
                 renderer: function (dataIndex) {
-                            return '<center><input type="checkbox" onclick="markEntityKeepRight()"'+ (dataIndex ? 'checked' : '') +' /></center>'
-                        }
-         },{
-            text: label_MERGE,
-            flex: 3,
-            dataIndex: 'merge',
-            sortable: true,
+                    return '<center><input type="checkbox" onclick="markEntityKeepRight()"' + (dataIndex ? 'checked' : '') + ' /></center>'
+                }
+            }, {
+                text: label_MERGE,
+                flex: 3,
+                dataIndex: 'merge',
+                sortable: true,
                 renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-                            if(record.get('array')){
-                                return '<center><input type="checkbox" onclick="markEntityMerge()"'+ (record.get('merge') ? 'checked' : '') +' /></center>'
-                            } else {
-                                return "";
-                            }
-                     }
-         }],
+                    if (record.get('array')) {
+                        return '<center><input type="checkbox" onclick="markEntityMerge()"' + (record.get('merge') ? 'checked' : '') + ' /></center>'
+                    } else {
+                        return "";
+                    }
+                }
+            }],
         listeners : {}
     });
 
@@ -1039,21 +962,21 @@ Ext.onReady(function() {
         },
         dockedItems: [
             {
-              xtype: 'panel',
-              layout: 'hbox',
-              border: 0,
-              items: [
-                  {
-                      fieldLabel : 'Кредитор',
-                      id: 'creditor',
-                      name: 'creditor',
-                      xtype: 'combobox',
-                      valueField: 'id',
-                      displayField: 'title',
-                      store: CreditorStoreLeft,
-                      margin: '10 10 10 10'
-                  }
-              ]
+                xtype: 'panel',
+                layout: 'hbox',
+                border: 0,
+                items: [
+                    {
+                        fieldLabel: 'Кредитор',
+                        id: 'creditor',
+                        name: 'creditor',
+                        xtype: 'combobox',
+                        valueField: 'id',
+                        displayField: 'title',
+                        store: CreditorStore,
+                        margin: '10 10 10 10'
+                    }
+                ]
             },
             {
                 xtype: 'panel',
@@ -1104,92 +1027,117 @@ Ext.onReady(function() {
         ]
     });
 
-    var entityGridSelectLeft = Ext.create('Ext.tree.Panel', {
-        height: 500,
-        //collapsible: true,
-        id: 'entityTreeView',
+    var clientEntityEditorPanel = Ext.create('Ext.panel.Panel', {
+        title: label_MERGE_PANEL,
         preventHeader: true,
-        useArrows: true,
-        rootVisible: false,
-        store: entityStoreSelectLeft,
-        multiSelect: false,
-        singleExpand: true,
-        columns: [{
-            xtype: 'treecolumn',
-            text: label_TITLE,
-            flex: 4,
-            sortable: true,
-            dataIndex: 'title'
-        }, {
-            text: label_VALUE,
-            flex: 2,
-            dataIndex: 'value',
-            sortable: true
-        }, {
-            text: label_SUBJECT_NAME,
-            flex: 4,
-            dataIndex: 'code',
-            sortable: true,
-            renderer: function (val, meta, record) {
-                if (val == 'subject') {
-                    var subjectName;
-                    record.eachChild(function (n) {
-                        if (n.get('code') == 'person_info') {
-                            var lastname;
-                            var firstname;
-                            var middlename;
-                            n.eachChild(function (n) {
-                                if (n.get('code') == 'names') {
-                                    if (n.firstChild) {
-                                        n.firstChild.eachChild(function (n) {
-                                            if (n.get('code') == 'lastname') {
-                                                lastname = n.get('value')
-                                            } else if (n.get('code') == 'firstname') {
-                                                firstname = n.get('value')
-                                            } else if (n.get('code') == 'middlename') {
-                                                middlename = n.get('value')
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                            subjectName = "{0} {1} {2}".format(lastname ? lastname : '', firstname ? firstname : '', middlename ? middlename : '')
-                        } else if (n.get('code') == 'organization_info') {
-                            n.eachChild(function (n) {
-                                if (n.get('code') == 'names') {
-                                    if (n.firstChild) {
-                                        n.firstChild.eachChild(function (n) {
-                                            if (n.get('code') == 'name') {
-                                                subjectName = n.get('value')
-                                            }
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    });
+        width: '100%',
+        height: '100%',
+        defaults: {
+            padding: '3'
+        },
+        dockedItems: [
+            {
+                xtype: 'panel',
+                layout: 'hbox',
+                border: 0,
+                items: [
+                    {
+                        border: 1,
+                        padding: 10,
+                        items: [
+                            {
+                                xtype: 'panel',
+                                layout: 'vbox',
+                                padding: 15,
+                                border: 0,
+                                items: [
+                                    {
+                                        id: 'edSearch',
+                                        xtype: 'combobox',
+                                        labelWidth: 350,
+                                        store: classesStore,
+                                        valueField: 'searchName',
+                                        displayField: 'title',
+                                        fieldLabel: label_CLASS,
+                                        editable: false
+                                    },
 
-                }
-                return subjectName;
+                                    {
+                                        xtype: 'component',
+                                        html: "<a href='#' onclick='getForm();'>" + LABEL_UPDATE + "</a>"
+                                    },
+                                    {
+                                        xtype: 'datefield',
+                                        id: 'edDate',
+                                        labelWidth: 350,
+                                        fieldLabel: label_date,
+                                        format: 'd.m.Y',
+                                        value: new Date()
+                                    },
+                                    {
+                                        xtype: 'component',
+                                        html: '<div id="f1_entity-editor-form" style="height: 350px;"></div>'
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        xtype: 'tbfill'
+                    },
+                    {
+                        border: 1,
+                        padding: 10,
+                        items: [
+                            {
+                                xtype: 'panel',
+                                layout: 'vbox',
+                                padding: 15,
+                                border: 0,
+                                items: [
+                                    {
+                                        id: 'edSearch2',
+                                        xtype: 'combobox',
+                                        store: classesStore,
+                                        labelWidth: 350,
+                                        valueField: 'searchName',
+                                        displayField: 'title',
+                                        fieldLabel: label_CLASS,
+                                        editable: false
+                                    },
+                                    {
+                                        xtype: 'component',
+                                        html: "<a href='#' onclick='getForm2();'>" + LABEL_UPDATE + "</a>"
+                                    },
+                                    {
+                                        xtype: 'datefield',
+                                        id: 'edDate2',
+                                        labelWidth: 350,
+                                        fieldLabel: label_date,
+                                        format: 'd.m.Y',
+                                        value: new Date()
+                                    },
+                                    {
+                                        xtype: 'component',
+                                        html: '<div id="f2_entity-editor-form2" style="height: 350px;"></div>'
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
             }
-        }],
-        listeners: {
-            itemclick: function (view, record, item, index, e, eOpts) {
-                //Ext.getCmp("leftEntityId").setValue((record.get('value')));
-                leftEntityId = record.get('value');
-            }
-        }
+        ]
     });
 
-    var entityGridSelectRight = Ext.create('Ext.tree.Panel', {
-        height: 500,
+    var entityGridSelect = Ext.create('Ext.tree.Panel', {
         //collapsible: true,
         id: 'entityTreeView',
         preventHeader: true,
         useArrows: true,
         rootVisible: false,
-        store: entityStoreSelectRight,
-        multiSelect: false,
+        store: entityStoreSelect,
+        multiSelect: true,
         singleExpand: true,
         columns: [{
             xtype: 'treecolumn',
@@ -1254,19 +1202,19 @@ Ext.onReady(function() {
             itemclick: function (view, record, item, index, e, eOpts) {
                 //Ext.getCmp("leftEntityId").setValue((record.get('value')));
                 leftEntityId = record.get('value');
+                alert(leftEntityId);
             }
         }
     });
 
     var mainPanel = Ext.create('Ext.panel.Panel', {
         title: label_MERGE_PANEL,
+        preventHeader: true,
         width: '100%',
         height: 500,
         //renderTo: 'merge-content',
         //preventHeader: true,
         layout: 'border',
-        //collapsible: true,
-        //collapsed: false,
         items: [{
             region: 'west',
             width: '50%',
@@ -1282,10 +1230,10 @@ Ext.onReady(function() {
                     align: 'stretch'
                 },
                 items: [{
-                    id: 'edSearchLeft',
+                    id: 'edSearch',
                     xtype: 'combobox',
                     displayField: 'title',
-                    store: typesLeft,
+                    store: types,
                     labelWidth: 70,
                     valueField: 'searchName',
                     fieldLabel: 'Вид поиска',
@@ -1294,21 +1242,21 @@ Ext.onReady(function() {
                         change: function (a, key, prev) {
                             for (p in forms)
                                 if (p == key)
-                                    forms[p](Ext.getCmp('form-area-left'), Ext.getCmp('edDateLeft'), Ext.getCmp('edCreditorLeft'), 'left');
+                                    forms[p](Ext.getCmp('form-area'));
                         }
                     }
                 }, {
-                    id: 'edCreditorLeft',
+                    id: 'edCreditor',
                     xtype: 'combobox',
                     displayField: 'name',
-                    store: creditorsLeft,
+                    store: creditors,
                     labelWidth: 70,
                     valueField: 'id',
                     fieldLabel: 'Кредитор',
                     editable: false
                 }, {
                     xtype: 'datefield',
-                    id: 'edDateLeft',
+                    id: 'edDate',
                     fieldLabel: 'Дата',
                     listeners: {
                         change: function () {
@@ -1316,75 +1264,45 @@ Ext.onReady(function() {
                         }
                     },
                     format: 'd.m.Y',
-                    value: getCurrentDate() //'01.11.2015'
+                    value: getCurrentDate()
                 }]
             }, {
                 region: 'center',
-                id: 'form-area-left',
+                id: 'form-area',
                 height: '80%',
                 split: true,
-                html: '<div id="entity-editor-form"></div>',
-                tbar: [buttonShowEntityLeft]
+                html: '<div id="entity-editor-form"></div>' +
+                '</br><select><option value="left">Первая сущность</option><option value="right">Вторая сущность</option></select>',
+                tbar: [buttonShowEntity, buttonSaveEntity]
             }]
         }, {
             region: 'east',
-            width: '50%',
+            width: "50%",
             split: true,
-            layout: 'border',
-            items: [{
-                region: 'north',
-                height: '20%',
-                split: true,
-                layout: {
-                    type: 'vbox',
-                    padding: 5,
-                    align: 'stretch'
-                },
-                items: [{
-                    id: 'edSearchRight',
-                    xtype: 'combobox',
-                    displayField: 'title',
-                    store: typesRight,
-                    labelWidth: 70,
-                    valueField: 'searchName',
-                    fieldLabel: 'Вид поиска',
-                    editable: false,
-                    listeners: {
-                        change: function (a, key, prev) {
-                            for (p in forms)
-                                if (p == key)
-                                    forms[p](Ext.getCmp('form-area-right'), Ext.getCmp('edDateRight'), Ext.getCmp('edCreditorRight'), 'right');
-                        }
+            items: [entityGridSelect],
+            autoScroll: true,
+            bbar: [
+                {
+                    text: '<<',
+                    id: 'previousNav',
+                    handler: function () {
+                        userNavHistory.setNextPage(userNavHistory.currentPage - 1);
+                        Ext.getCmp('form-area').doSearch();
                     }
-                }, {
-                    id: 'edCreditorRight',
-                    xtype: 'combobox',
-                    displayField: 'name',
-                    store: creditorsRight,
-                    labelWidth: 70,
-                    valueField: 'id',
-                    fieldLabel: 'Кредитор',
-                    editable: false
-                }, {
-                    xtype: 'datefield',
-                    id: 'edDateRight',
-                    fieldLabel: 'Дата',
-                    listeners: {
-                        change: function () {
-                            console.log('datefield changed');
-                        }
-                    },
-                    format: 'd.m.Y',
-                    value: getCurrentDate() //'01.11.2015'
-                }]
-            }, {
-                region: 'center',
-                id: 'form-area-right',
-                height: '80%',
-                split: true,
-                html: '<div id="entity-editor-form"></div>',
-                tbar: [buttonShowEntityRight]
-            }]
+                },
+                {xtype: 'label', text: '1', id: 'currentPageNo'},
+                {xtype: 'label', text: '/'},
+                {xtype: 'label', text: '1', id: 'totalPageNo'},
+                {
+                    text: '>>', id: 'nextNav',
+                    handler: function () {
+                        userNavHistory.setNextPage(userNavHistory.currentPage + 1);
+                        Ext.getCmp('form-area').doSearch();
+                    }
+                },
+                {xtype: 'label', text: 'Всего результатов:'},
+                {xtype: 'label', text: '0', id: 'totalCount'}
+            ]
         }]
 
     });
@@ -1397,7 +1315,7 @@ Ext.onReady(function() {
         activeTab: 0,
         border: 0,
         defaults :{
-           bodyPadding: 0
+            bodyPadding: 0
         },
         items: [mainEntityEditorPanel, mainPanel]
     });
@@ -1427,7 +1345,7 @@ Ext.onReady(function() {
                         layout: 'hbox',
                         split: true,
                         items: [
-                            buttonShowMerge, buttonShowJSON, buttonSaveJSON,
+                            buttonShow, buttonShowXML, buttonXML,
                             {
                                 fieldLabel: label_DELETE_UNUSED,
                                 xtype: 'component',
@@ -1444,113 +1362,5 @@ Ext.onReady(function() {
                 ]
             }
         ]
-    });
-
-    var winLeft = Ext.create('widget.window', {
-        id: "winSelectLeft",
-        title: 'Выберите сущность',
-        x: 400,
-        y: 200,
-        height: 500,
-        width: 900,
-        //layout: 'fit',
-
-        autoWidth: true,
-        autoHeight: true,
-        autoScroll: true,
-        overflowY: 'scroll',
-        maximizable: true,
-        bodyPadding: '10px',
-        bodyStyle: 'background-color:#fff',
-        closeAction: 'hide',
-        shadow: true,
-        resizable: true,
-        draggable: true,
-        closable: true,
-        modal: false,
-        headerPosition: 'top',
-        dockedItems: [entityGridSelectLeft],
-        split: true,
-        bbarCfg: {
-            buttonAlign: 'left'
-        },
-        bbar: [
-            buttonSaveEntityLeft,
-            {
-                text: '<<',
-                id: 'previousNav',
-                handler: function () {
-                    userNavHistoryLeft.setNextPage(userNavHistoryLeft.currentPage - 1);
-                    Ext.getCmp('form-area-left').doSearch();
-                }
-            },
-            {xtype: 'label', text: '1', id: 'currentPageNoLeft'},
-            {xtype: 'label', text: '/'},
-            {xtype: 'label', text: '1', id: 'totalPageNoLeft'},
-            {
-                text: '>>', id: 'nextNav',
-                handler: function () {
-                    userNavHistoryLeft.setNextPage(userNavHistoryLeft.currentPage + 1);
-                    Ext.getCmp('form-area-left').doSearch();
-                }
-            },
-            {xtype: 'label', text: 'Всего результатов:'},
-            {xtype: 'label', text: '0', id: 'totalCountLeft'}
-        ]
-
-    });
-
-    var winRight = Ext.create('widget.window', {
-        id: "winSelectRight",
-        title: 'Выберите сущность',
-        x: 400,
-        y: 200,
-        height: 500,
-        width: 900,
-        //layout: 'fit',
-
-        autoWidth: true,
-        autoHeight: true,
-        autoScroll: true,
-        overflowY: 'scroll',
-        maximizable: true,
-        bodyPadding: '10px',
-        bodyStyle: 'background-color:#fff',
-        closeAction: 'hide',
-        shadow: true,
-        resizable: true,
-        draggable: true,
-        closable: true,
-        modal: false,
-        headerPosition: 'top',
-        dockedItems: [entityGridSelectRight],
-        split: true,
-        bbarCfg: {
-            buttonAlign: 'left'
-        },
-        bbar: [
-            buttonSaveEntityRight,
-            {
-                text: '<<',
-                id: 'previousNav',
-                handler: function () {
-                    userNavHistoryRight.setNextPage(userNavHistoryRight.currentPage - 1);
-                    Ext.getCmp('form-area-left').doSearch();
-                }
-            },
-            {xtype: 'label', text: '1', id: 'currentPageNoRight'},
-            {xtype: 'label', text: '/'},
-            {xtype: 'label', text: '1', id: 'totalPageNoRight'},
-            {
-                text: '>>', id: 'nextNav',
-                handler: function () {
-                    userNavHistoryRight.setNextPage(userNavHistoryRight.currentPage + 1);
-                    Ext.getCmp('form-area-left').doSearch();
-                }
-            },
-            {xtype: 'label', text: 'Всего результатов:'},
-            {xtype: 'label', text: '0', id: 'totalCountRight'}
-        ]
-
     });
 });
