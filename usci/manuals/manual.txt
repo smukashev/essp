@@ -1,0 +1,12 @@
+1) essp_soft: papka E:\apache-activemq-5.12.0\bin\  запускаем start.bat
+2) essp_soft: papka D:\usci
+     запускаем а) run_core.bat (ждем до - Security manager installed)
+               b) run_sync.bat (ждем до - Security manager installed)
+               c) run_brms.bat (ждем до - Security manager installed)
+               d) run_showcase.bat  (ждем до - Security manager installed)
+               e) run_receiver.bat 
+
+3) 192.168.20.50 papka C:\soft\glassfish3\glassfish\bin запускаем startserv.bat
+4) 192.168.20.50 papka C:\soft\BonitaBPMCommunity-6.5.1 запускаем BonitaBPMCommunity.exe[закрываем все модальные окна если таковые имеются - cancel]
+               а) нажимаем на Portal [12й значок на верхнем меню]
+
