@@ -26,8 +26,6 @@ public class ShowCase extends Persistable {
 
     private boolean isChild = false;
 
-    private boolean isRevival = false;
-
     private List<ShowCaseField> fields = new ArrayList<>();
 
     private List<ShowCaseField> customFields = new ArrayList<>();
@@ -122,14 +120,6 @@ public class ShowCase extends Persistable {
 
     public void setFinal(boolean isFinal) {
         this.isFinal = isFinal;
-    }
-
-    public boolean isRevival() {
-        return isRevival;
-    }
-
-    public void setRevival(boolean revival) {
-        isRevival = revival;
     }
 
     public String getRootClassName() {

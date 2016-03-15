@@ -103,7 +103,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public IBaseEntity prepare(IBaseEntity baseEntity, long creditorId) {
+    public IBaseEntity prepare(final IBaseEntity baseEntity, long creditorId) {
         MetaClass metaClass = baseEntity.getMeta();
 
         if(isReferenceCacheEnabled && metaClass.isReference()) {

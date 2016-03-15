@@ -299,8 +299,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
                         EAV_SC_SHOWCASES.CLASS_NAME,
                         EAV_SC_SHOWCASES.DOWN_PATH,
                         EAV_SC_SHOWCASES.IS_FINAL,
-                        EAV_SC_SHOWCASES.IS_CHILD,
-                        EAV_SC_SHOWCASES.IS_REVIVAL)
+                        EAV_SC_SHOWCASES.IS_CHILD)
                 .from(EAV_SC_SHOWCASES)
                 .where(EAV_SC_SHOWCASES.ID.equal(showCase.getId()));
 
@@ -322,7 +321,6 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
         showCase.setDownPath((String) row.get(EAV_SC_SHOWCASES.DOWN_PATH.getName()));
         showCase.setFinal((row.get(EAV_SC_SHOWCASES.IS_FINAL.getName())).toString().equals("1"));
         showCase.setChild((row.get(EAV_SC_SHOWCASES.IS_CHILD.getName())).toString().equals("1"));
-        showCase.setRevival((row.get(EAV_SC_SHOWCASES.IS_REVIVAL.getName())).toString().equals("1"));
 
         String metaClassName = (String) row.get(EAV_SC_SHOWCASES.CLASS_NAME.getName());
         MetaClass metaClass = metaService.getMetaClass(metaClassName);
@@ -459,8 +457,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
                 .set(EAV_SC_SHOWCASES.CLASS_NAME, showCase.getMeta().getClassName())
                 .set(EAV_SC_SHOWCASES.DOWN_PATH, showCase.getDownPath())
                 .set(EAV_SC_SHOWCASES.IS_FINAL, showCase.isFinal() ? 1 : 0)
-                .set(EAV_SC_SHOWCASES.IS_CHILD, showCase.isChild() ? 1 : 0)
-                .set(EAV_SC_SHOWCASES.IS_REVIVAL, showCase.isRevival() ? 1 : 0);
+                .set(EAV_SC_SHOWCASES.IS_CHILD, showCase.isChild() ? 1 : 0);
 
         logger.debug(insert.toString());
 
@@ -484,8 +481,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
                     .set(EAV_SC_SHOWCASES.CLASS_NAME, csc.getMeta().getClassName())
                     .set(EAV_SC_SHOWCASES.DOWN_PATH, csc.getDownPath())
                     .set(EAV_SC_SHOWCASES.IS_FINAL, csc.isFinal() ? 1 : 0)
-                    .set(EAV_SC_SHOWCASES.IS_CHILD, csc.isChild() ? 1 : 0)
-                    .set(EAV_SC_SHOWCASES.IS_REVIVAL, csc.isRevival() ? 1 : 0);
+                    .set(EAV_SC_SHOWCASES.IS_CHILD, csc.isChild() ? 1 : 0);
 
             logger.debug(childInsert.toString());
 

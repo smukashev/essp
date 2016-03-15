@@ -55,7 +55,7 @@ public class CortegeDaoImpl extends CommonDao {
             } else {
                 childCortegeGenerate(null, globalEntityApplied, showCase);
             }
-        } else if (showCase.getDownPath() != null) {
+        } else if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0) {
             List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath(), true);
 
             for (BaseEntity baseEntityApplied : allApplied)
@@ -72,8 +72,7 @@ public class CortegeDaoImpl extends CommonDao {
 
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(entity, showCase);
 
-        if (savingMap == null || savingMap.size() == 0)
-            return;
+        if (savingMap == null || savingMap.size() == 0) return;
 
         waitShowCase(showCase.getId());
 
@@ -262,6 +261,24 @@ public class CortegeDaoImpl extends CommonDao {
                             }
                         }
                     }
+                } else {
+                    Date maxOpenDate;
+                    try {
+                        sql = "SELECT MAX(rep_date) AS REP_DATE FROM %s WHERE " + historyKeyElement.queryKeys;
+                        sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                        maxOpenDate = (Date) jdbcTemplateSC.queryForMap(sql, historyKeyElement.values).get("REP_DATE");
+                    } catch (EmptyResultDataAccessException e) {
+                        maxOpenDate = null;
+                    }
+
+                    entryMap.put(new ValueElement("REP_DATE", 0L, 0), entity.getReportDate());
+
+                    if (maxOpenDate == null || entity.getReportDate().compareTo(maxOpenDate) >= 0) {
+                        simpleInsertValueElement(entryMap, getActualTableName(showCase));
+                    } else {
+                        simpleInsertValueElement(entryMap, getHistoryTableName(showCase));
+                    }
                 }
             }
         } finally {
@@ -284,17 +301,13 @@ public class CortegeDaoImpl extends CommonDao {
                 String sql;
                 HashMap<ValueElement, Object> entryMap = entry.getValue();
 
-                changeMetaKeys(globalEntity, showCase, entryMap);
-
                 if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0)
                     addRootKeysToChild(globalEntity, showCase, entryMap);
 
-                assert (globalEntity != null);
+                if (!entity.getMeta().isReference())
+                    entryMap.put(new ValueElement("creditor_id", 0L, 0), entity.getBaseEntityReportDate().getCreditorId());
 
-                if (!globalEntity.getMeta().isReference())
-                    entryMap.put(new ValueElement("creditor_id", 0L, 0), globalEntity.getBaseEntityReportDate().getCreditorId());
-
-                if (showCase.isRevival() && !rootExecutionFlag) {
+                if (!rootExecutionFlag) {
                     KeyElement rootKeyElement = new KeyElement(entryMap, showCase.getRootKeyFieldsList());
 
                     sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys + " and open_date = ?";
@@ -320,7 +333,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                 List<Map<String, Object>> dbList = jdbcTemplateSC.queryForList(sql, historyKeyElement.values);
 
-                if (showCase.isRevival() && dbList.size() == 0) {
+                if (dbList.size() == 0) {
                     /* No data, insert to actual data */
                     entryMap.put(new ValueElement("OPEN_DATE", 0L, 0), entity.getReportDate());
                     simpleInsertValueElement(entryMap, getActualTableName(showCase));
@@ -1075,27 +1088,6 @@ public class CortegeDaoImpl extends CommonDao {
             }
 
             entryMap.put(new ValueElement(sf.getColumnName(), 0L, 0), rootElementId);
-        }
-    }
-
-    private void changeMetaKeys (IBaseEntity globalEntity, ShowCase showCase, Map<ValueElement, Object> entryMap) {
-        /* Change attribute_path to columnName */
-        for (ShowCaseField sf : showCase.getHistoryKeyFieldsList()) {
-            ValueElement oldKey = null, newKey = null;
-
-            for (Map.Entry<ValueElement, Object> innerEntry : entryMap.entrySet()) {
-                if (innerEntry.getKey().columnName.equals(sf.getAttributePath())) {
-                    oldKey = innerEntry.getKey();
-
-                    newKey = new ValueElement(sf.getColumnName(), oldKey.elementId, oldKey.isArray, oldKey.isSimple, oldKey.index);
-                }
-            }
-
-            if (globalEntity == null && (newKey == null || entryMap.get(oldKey) == null))
-                throw new IllegalStateException(Errors.getMessage(Errors.E273));
-
-            if (newKey != null && entryMap.get(oldKey) != null)
-                entryMap.put(newKey, entryMap.remove(oldKey));
         }
     }
 
