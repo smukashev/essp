@@ -743,7 +743,7 @@ Ext.onReady(function() {
         shadow: true
     });
 
-    var buttonShow = Ext.create('Ext.button.Button', {
+    var buttonShowMerge = Ext.create('Ext.button.Button', {
         id: "entityEditorShowBtn",
         text: label_VIEW,
         handler : function (){
@@ -768,7 +768,7 @@ Ext.onReady(function() {
         }
     });
 
-    var buttonXML = Ext.create('Ext.button.Button', {
+    var buttonSaveJSON = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
         handler : function (){
@@ -802,7 +802,7 @@ Ext.onReady(function() {
         }
     });
 
-    var buttonShowXML = Ext.create('Ext.button.Button', {
+    var buttonShowJSON = Ext.create('Ext.button.Button', {
         id: "entityEditorShowXmlBtn",
         text: 'JSON',
         handler : function (){
@@ -1157,7 +1157,7 @@ Ext.onReady(function() {
         }, {
             region: 'east',
             width: "50%",
-            split: true,
+            split: true
         }]
 
     });
@@ -1200,7 +1200,7 @@ Ext.onReady(function() {
                         layout: 'hbox',
                         split: true,
                         items: [
-                            buttonShow, buttonShowXML, buttonXML,
+                            buttonShowMerge, buttonShowJSON, buttonSaveJSON,
                             {
                                 fieldLabel: label_DELETE_UNUSED,
                                 xtype: 'component',
