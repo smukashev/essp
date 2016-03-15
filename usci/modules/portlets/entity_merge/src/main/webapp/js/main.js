@@ -23,7 +23,7 @@ var rightEntityId;
 var leftEntityDate;
 var rightEntityDate;
 
-var userNavHistory = {
+var userNavHistoryLeft = {
     currentPage: 1,
     nextPage: 1,
     getNextPage: function () {
@@ -39,9 +39,32 @@ var userNavHistory = {
     success: function (totalCount) {
         this.currentPage = this.nextPage;
         if (totalCount) {
-            Ext.getCmp('totalCount').setText(totalCount);
-            Ext.getCmp('totalPageNo').setText(Math.floor((fetchSize - 1 + totalCount) / fetchSize));
-            Ext.getCmp('currentPageNo').setText(this.currentPage);
+            Ext.getCmp('totalCountLeft').setText(totalCount);
+            Ext.getCmp('totalPageNoLeft').setText(Math.floor((fetchSize - 1 + totalCount) / fetchSize));
+            Ext.getCmp('currentPageNoLeft').setText(this.currentPage);
+        }
+    }
+};
+
+var userNavHistoryRight = {
+    currentPage: 1,
+    nextPage: 1,
+    getNextPage: function () {
+        return this.nextPage;
+    },
+    setNextPage: function (nextPage) {
+        this.nextPage = nextPage;
+        console.log(this.nextPage);
+    },
+    init: function () {
+        this.nextPage = 1;
+    },
+    success: function (totalCount) {
+        this.currentPage = this.nextPage;
+        if (totalCount) {
+            Ext.getCmp('totalCountRight').setText(totalCount);
+            Ext.getCmp('totalPageNoRight').setText(Math.floor((fetchSize - 1 + totalCount) / fetchSize));
+            Ext.getCmp('currentPageNoRight').setText(this.currentPage);
         }
     }
 };
@@ -634,7 +657,40 @@ Ext.onReady(function() {
         }
     });
 
+    var typesRight = Ext.create('Ext.data.Store', {
+        fields: ['searchName', 'title'],
+        /*data : [
+         {"id":"s_credit_pc", "name":"Договор по номеру и дате договора"},
+         {"id":"s_person_doc", "name":"Физ лицо по документу"},
+         {"id":"s_org_doc", "name":"Юр лицо по документу"}
+         ]*/
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op: 'LIST_CLASSES'},
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        }
+    });
+
     var creditorsLeft = Ext.create('Ext.data.Store', {
+        fields: ['id', 'name'],
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op: 'LIST_CREDITORS'},
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        }
+    });
+
+    var creditorsRight = Ext.create('Ext.data.Store', {
         fields: ['id', 'name'],
         proxy: {
             type: 'ajax',
@@ -659,6 +715,17 @@ Ext.onReady(function() {
         folderSort: true
     });
 
+    entityStoreSelectRight = Ext.create('Ext.data.TreeStore', {
+        model: 'entitySelectModelRight',
+        storeId: 'entityStoreSelectRight',
+        proxy: {
+            type: 'ajax',
+            url: dataUrl,
+            extraParams: {op: 'LIST_ENTITY_SELECT'}
+        },
+        folderSort: true
+    });
+
     var CreditorStoreLeft = Ext.create('Ext.data.Store',
         {
             model: 'refStoreModelLeft',
@@ -673,17 +740,44 @@ Ext.onReady(function() {
                     type: 'json',
                     root: 'data'
                 }/*,
-                listeners: {
-                    load: function (obj, records) {
-                        Ext.each(records, function (rec) {
-                            console.log(rec.get('title'));
-                        });
-                    }
-                }*/
+                 listeners: {
+                 load: function (obj, records) {
+                 Ext.each(records, function (rec) {
+                 console.log(rec.get('title'));
+                 });
+                 }
+                 }*/
             },
             autoLoad: true,
             remoteSort: true
-    });
+        });
+
+    var CreditorStoreRight = Ext.create('Ext.data.Store',
+        {
+            model: 'refStoreModelLeft',
+            proxy: {
+                type: 'ajax',
+                url: dataUrl,
+                extraParams: {op: 'LIST_CREDITOR'},
+                actionMethods: {
+                    read: 'POST'
+                },
+                reader: {
+                    type: 'json',
+                    root: 'data'
+                }/*,
+                 listeners: {
+                 load: function (obj, records) {
+                 Ext.each(records, function (rec) {
+                 console.log(rec.get('title'));
+                 });
+                 }
+                 }*/
+            },
+            autoLoad: true,
+            remoteSort: true
+        });
+
     var entityStore = Ext.create('Ext.data.TreeStore', {
         model: 'entityModel',
         proxy: {
@@ -695,7 +789,16 @@ Ext.onReady(function() {
     });
 
     var buttonSaveEntityLeft = Ext.create('Ext.button.Button', {
-        id: "buttonSaveSelect",
+        id: "buttonSaveSelectLeft",
+        text: label_SAVE,
+        handler: function () {
+            Ext.getCmp('winSelectLeft').hide();
+        },
+        maxWidth: 70
+    });
+
+    var buttonSaveEntityRight = Ext.create('Ext.button.Button', {
+        id: "buttonSaveSelectRight",
         text: label_SAVE,
         handler: function () {
             Ext.getCmp('winSelectLeft').hide();
@@ -708,10 +811,26 @@ Ext.onReady(function() {
         text: label_VIEW,
         handler: function () {
             //entityId = Ext.getCmp("entityId");
-            userNavHistory.init();
+            userNavHistoryLeft.init();
             Ext.getCmp('form-area-left').doSearch();
 
             winLeft.show();
+
+            return;
+        },
+        maxWidth: 70,
+        shadow: true
+    });
+
+    var buttonShowEntityRight = Ext.create('Ext.button.Button', {
+        id: "entityEditorShowBtnRight",
+        text: label_VIEW,
+        handler: function () {
+            //entityId = Ext.getCmp("entityId");
+            userNavHistoryLeft.init();
+            Ext.getCmp('form-area-right').doSearch();
+
+            winRight.show();
 
             return;
         },
@@ -1062,6 +1181,83 @@ Ext.onReady(function() {
         }
     });
 
+    var entityGridSelectRight = Ext.create('Ext.tree.Panel', {
+        height: 500,
+        //collapsible: true,
+        id: 'entityTreeView',
+        preventHeader: true,
+        useArrows: true,
+        rootVisible: false,
+        store: entityStoreSelectRight,
+        multiSelect: false,
+        singleExpand: true,
+        columns: [{
+            xtype: 'treecolumn',
+            text: label_TITLE,
+            flex: 4,
+            sortable: true,
+            dataIndex: 'title'
+        }, {
+            text: label_VALUE,
+            flex: 2,
+            dataIndex: 'value',
+            sortable: true
+        }, {
+            text: label_SUBJECT_NAME,
+            flex: 4,
+            dataIndex: 'code',
+            sortable: true,
+            renderer: function (val, meta, record) {
+                if (val == 'subject') {
+                    var subjectName;
+                    record.eachChild(function (n) {
+                        if (n.get('code') == 'person_info') {
+                            var lastname;
+                            var firstname;
+                            var middlename;
+                            n.eachChild(function (n) {
+                                if (n.get('code') == 'names') {
+                                    if (n.firstChild) {
+                                        n.firstChild.eachChild(function (n) {
+                                            if (n.get('code') == 'lastname') {
+                                                lastname = n.get('value')
+                                            } else if (n.get('code') == 'firstname') {
+                                                firstname = n.get('value')
+                                            } else if (n.get('code') == 'middlename') {
+                                                middlename = n.get('value')
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                            subjectName = "{0} {1} {2}".format(lastname ? lastname : '', firstname ? firstname : '', middlename ? middlename : '')
+                        } else if (n.get('code') == 'organization_info') {
+                            n.eachChild(function (n) {
+                                if (n.get('code') == 'names') {
+                                    if (n.firstChild) {
+                                        n.firstChild.eachChild(function (n) {
+                                            if (n.get('code') == 'name') {
+                                                subjectName = n.get('value')
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                }
+                return subjectName;
+            }
+        }],
+        listeners: {
+            itemclick: function (view, record, item, index, e, eOpts) {
+                //Ext.getCmp("leftEntityId").setValue((record.get('value')));
+                leftEntityId = record.get('value');
+            }
+        }
+    });
+
     var mainPanel = Ext.create('Ext.panel.Panel', {
         title: label_MERGE_PANEL,
         width: '100%',
@@ -1132,8 +1328,63 @@ Ext.onReady(function() {
             }]
         }, {
             region: 'east',
-            width: "50%",
-            split: true
+            width: '50%',
+            split: true,
+            layout: 'border',
+            items: [{
+                region: 'north',
+                height: '20%',
+                split: true,
+                layout: {
+                    type: 'vbox',
+                    padding: 5,
+                    align: 'stretch'
+                },
+                items: [{
+                    id: 'edSearchRight',
+                    xtype: 'combobox',
+                    displayField: 'title',
+                    store: typesRight,
+                    labelWidth: 70,
+                    valueField: 'searchName',
+                    fieldLabel: 'Вид поиска',
+                    editable: false,
+                    listeners: {
+                        change: function (a, key, prev) {
+                            for (p in forms)
+                                if (p == key)
+                                    forms[p](Ext.getCmp('form-area-right'), Ext.getCmp('edDateRight'), Ext.getCmp('edCreditorRight'), 'right');
+                        }
+                    }
+                }, {
+                    id: 'edCreditorRight',
+                    xtype: 'combobox',
+                    displayField: 'name',
+                    store: creditorsRight,
+                    labelWidth: 70,
+                    valueField: 'id',
+                    fieldLabel: 'Кредитор',
+                    editable: false
+                }, {
+                    xtype: 'datefield',
+                    id: 'edDateRight',
+                    fieldLabel: 'Дата',
+                    listeners: {
+                        change: function () {
+                            console.log('datefield changed');
+                        }
+                    },
+                    format: 'd.m.Y',
+                    value: getCurrentDate() //'01.11.2015'
+                }]
+            }, {
+                region: 'center',
+                id: 'form-area-right',
+                height: '80%',
+                split: true,
+                html: '<div id="entity-editor-form"></div>',
+                tbar: [buttonShowEntityRight]
+            }]
         }]
 
     });
@@ -1229,22 +1480,76 @@ Ext.onReady(function() {
                 text: '<<',
                 id: 'previousNav',
                 handler: function () {
-                    userNavHistory.setNextPage(userNavHistory.currentPage - 1);
+                    userNavHistoryLeft.setNextPage(userNavHistoryLeft.currentPage - 1);
                     Ext.getCmp('form-area-left').doSearch();
                 }
             },
-            {xtype: 'label', text: '1', id: 'currentPageNo'},
+            {xtype: 'label', text: '1', id: 'currentPageNoLeft'},
             {xtype: 'label', text: '/'},
-            {xtype: 'label', text: '1', id: 'totalPageNo'},
+            {xtype: 'label', text: '1', id: 'totalPageNoLeft'},
             {
                 text: '>>', id: 'nextNav',
                 handler: function () {
-                    userNavHistory.setNextPage(userNavHistory.currentPage + 1);
+                    userNavHistoryLeft.setNextPage(userNavHistoryLeft.currentPage + 1);
                     Ext.getCmp('form-area-left').doSearch();
                 }
             },
             {xtype: 'label', text: 'Всего результатов:'},
-            {xtype: 'label', text: '0', id: 'totalCount'}
+            {xtype: 'label', text: '0', id: 'totalCountLeft'}
+        ]
+
+    });
+
+    var winRight = Ext.create('widget.window', {
+        id: "winSelectRight",
+        title: 'Выберите сущность',
+        x: 400,
+        y: 200,
+        height: 500,
+        width: 900,
+        //layout: 'fit',
+
+        autoWidth: true,
+        autoHeight: true,
+        autoScroll: true,
+        overflowY: 'scroll',
+        maximizable: true,
+        bodyPadding: '10px',
+        bodyStyle: 'background-color:#fff',
+        closeAction: 'hide',
+        shadow: true,
+        resizable: true,
+        draggable: true,
+        closable: true,
+        modal: false,
+        headerPosition: 'top',
+        dockedItems: [entityGridSelectRight],
+        split: true,
+        bbarCfg: {
+            buttonAlign: 'left'
+        },
+        bbar: [
+            buttonSaveEntityRight,
+            {
+                text: '<<',
+                id: 'previousNav',
+                handler: function () {
+                    userNavHistoryRight.setNextPage(userNavHistoryRight.currentPage - 1);
+                    Ext.getCmp('form-area-left').doSearch();
+                }
+            },
+            {xtype: 'label', text: '1', id: 'currentPageNoRight'},
+            {xtype: 'label', text: '/'},
+            {xtype: 'label', text: '1', id: 'totalPageNoRight'},
+            {
+                text: '>>', id: 'nextNav',
+                handler: function () {
+                    userNavHistoryRight.setNextPage(userNavHistoryRight.currentPage + 1);
+                    Ext.getCmp('form-area-left').doSearch();
+                }
+            },
+            {xtype: 'label', text: 'Всего результатов:'},
+            {xtype: 'label', text: '0', id: 'totalCountRight'}
         ]
 
     });

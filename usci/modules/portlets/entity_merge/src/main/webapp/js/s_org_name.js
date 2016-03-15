@@ -1,14 +1,21 @@
 Ext.onReady(function () {
     var serviceCode = 'kz.bsbnb.usci.core.service.form.searcher.impl.cr.OrgFormImpl';
-    forms[serviceCode] = function (panel) {
+    forms[serviceCode] = function (panel, edDateComponent, edCreditorComponent, flag) {
         panel.removeAll();
         panel.add(Ext.create("Ext.form.field.Text",
             {
-                id: 'edName',
+                id: (flag == 'left') ? 'edNameLeft' : 'edNameRight',
                 fieldLabel: 'Наименование',
                 width: '40%',
                 margin: 10
             }));
+
+        var userNavHistory;
+        if (flag == 'left') {
+            userNavHistory = userNavHistoryLeft;
+        } else {
+            userNavHistory = userNavHistoryRight;
+        }
 
         panel.doSearch = function () {
             var params = {
@@ -16,11 +23,18 @@ Ext.onReady(function () {
                 metaClass: 'organization_info',
                 searchName: serviceCode,
                 timeout: 120000,
-                name: Ext.getCmp('edName').value,
-                date: Ext.getCmp('edDate').value,
-                creditorId: Ext.getCmp('edCreditor').value,
+                name: (flag == 'left') ? panel.getComponent('edNameLeft').value : panel.getComponent('edNameRight').value,
+                date: edDateComponent.value,
+                creditorId: edCreditorComponent.value,
                 pageNo: userNavHistory.getNextPage()
             };
+
+            var entityStoreSelect;
+            if (flag == 'left') {
+                entityStoreSelect = entityStoreSelectLeft;
+            } else {
+                entityStoreSelect = entityStoreSelectRight;
+            }
 
             entityStoreSelect.load({
                 params: params,
@@ -46,6 +60,8 @@ Ext.onReady(function () {
                     }
                 }
             });
+
+
         }
     };
 });

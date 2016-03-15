@@ -53,14 +53,15 @@
     }
 </style>
 
+<script src="<%=request.getContextPath()%>/js/lang/default.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/lang/<%= ((ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY)).getLocale() %>.js"
+        type="text/javascript"></script>
+
 <script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/main.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/st_format.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/s_subject_doc.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/s_person_fio.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/s_org_name.js" type="text/javascript"></script>
-
-<script src="<%=request.getContextPath()%>/js/lang/default.js" type="text/javascript"></script>
-<script src="<%=request.getContextPath()%>/js/lang/<%= ((ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY)).getLocale() %>.js" type="text/javascript"></script>
 
 <div id="merge-content"></div>
