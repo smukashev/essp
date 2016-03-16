@@ -607,7 +607,7 @@ Ext.onReady(function () {
         ]
     });
 
-    Ext.define('entitySelectModel', {
+    Ext.define('entityModelSelect', {
         extend: 'Ext.data.Model',
         fields: [
             {name: 'title', type: 'string'},
@@ -659,7 +659,7 @@ Ext.onReady(function () {
     });
 
     entityStoreSelect = Ext.create('Ext.data.TreeStore', {
-        model: 'entitySelectModel',
+        model: 'entityModelSelect',
         storeId: 'entityStoreSelect',
         proxy: {
             type: 'ajax',
@@ -696,6 +696,7 @@ Ext.onReady(function () {
         });
     var entityStore = Ext.create('Ext.data.TreeStore', {
         model: 'entityModel',
+        storeId: 'entityStore',
         proxy: {
             type: 'ajax',
             url: dataUrl,
@@ -708,7 +709,7 @@ Ext.onReady(function () {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
         handler: function () {
-            var tree = Ext.getCmp('entityTreeView');
+            var tree = Ext.getCmp('entityTreeViewSelect');
             rootNode = tree.getRootNode();
 
             var xmlStr = "";
@@ -1121,7 +1122,7 @@ Ext.onReady(function () {
 
     var entityGridSelect = Ext.create('Ext.tree.Panel', {
         //collapsible: true,
-        id: 'entityTreeView',
+        id: 'entityTreeViewSelect',
         preventHeader: true,
         useArrows: true,
         rootVisible: false,
