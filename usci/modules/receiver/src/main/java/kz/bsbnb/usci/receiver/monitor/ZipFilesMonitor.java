@@ -4,6 +4,7 @@ import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.cr.model.Report;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
@@ -368,7 +369,6 @@ public class ZipFilesMonitor {
 						.setReceiptDate(new Date()));
 
 		batchService.endBatch(batchId);
-
 	}
 
 	private Long getCreditor(BatchInfo batchInfo, List<Creditor> creditors) {
@@ -438,18 +438,43 @@ public class ZipFilesMonitor {
 
 		Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
 
-		if (existing != null) {
-			if (ReportStatus.COMPLETED.code().equals(existing.getStatus().getCode())) {
-				String errMsg = "Данные на указанную отчетную дату утверждены организацией = "
-						+ creditorId + ", отчетная дата = " + dateFormat.format(batchInfo.getRepDate());
+		if(!StaticRouter.isDevMode()) {
+			String errMsg = null;
+
+			if (existing != null) {
+				if (ReportStatus.COMPLETED.code().equals(existing.getStatus().getCode())) {
+					errMsg = "Данные на указанную отчетную дату утверждены организацией = "
+							+ creditorId + ", отчетная дата = " + dateFormat.format(batchInfo.getRepDate());
+				}
+			} else {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(batchInfo.getRepDate());
+				cal.add(Calendar.MONTH, -1);
+				Date prevMonth = cal.getTime();
+
+				Report prevMonthReport = reportBeanRemoteBusiness.getReport(creditorId, prevMonth);
+
+				if (prevMonthReport != null && !ReportStatus.COMPLETED.code().equals(prevMonthReport.getStatus().getCode())) {
+					errMsg = "Необходимо утвердить данные за отчетный периюд : " + dateFormat.format(prevMonthReport.getReportDate());
+				}
+			}
+
+			if(errMsg != null){
+				batchService.addBatchStatus(new BatchStatus()
+						.setBatchId(batchId)
+						.setStatus(BatchStatuses.WAITING)
+						.setReceiptDate(new Date()));
+
+				batchService.addBatchStatus(new BatchStatus()
+						.setBatchId(batchId)
+						.setStatus(BatchStatuses.PROCESSING)
+						.setReceiptDate(new Date()));
+
 				logger.error(errMsg);
 				failFast(batchId, errMsg);
 				return false;
 			}
-		} else {
-			// FIXME: 18.11.15
 		}
-
 
 		EavGlobal inProgress = serviceFactory.getGlobalService().getGlobal(ReportStatus.IN_PROGRESS);
 

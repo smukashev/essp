@@ -115,6 +115,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             inputInfo.setReceiverDate(batchStatus.getReceiptDate());
         } else if (lastStatus == ERROR && inputInfo.getReceiverDate() == null) {
             inputInfo.setReceiverDate(batchStatus.getReceiptDate());
+            inputInfo.setCompletionDate(batchStatus.getReceiptDate());
         }
 
         return lastStatus.code();

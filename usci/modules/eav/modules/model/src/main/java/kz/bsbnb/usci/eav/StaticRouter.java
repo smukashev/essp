@@ -10,7 +10,7 @@ public final class StaticRouter {
     }
 
     /* Set up before compiling */
-    private static final MODE mode = MODE.PROD;
+    private static final MODE mode = MODE.DEV;
 
     /* Application Server IP */
     private final static String stendAsIP = "10.10.20.28";
@@ -44,12 +44,12 @@ public final class StaticRouter {
 
     /* Core Schema name */
     private final static String stendCoreSchemaName = "C##CORE";
-    private final static String devCoreSchemaName = "C##CORE";
+    private final static String devCoreSchemaName = "CORE";
     private final static String prodCoreSchemaName = "CORE";
 
     /* Showcase Schema name */
     private final static String stendShowcaseSchemaName = "C##SHOWCASE";
-    private final static String devShowcaseSchemaName = "C##SHOWCASE";
+    private final static String devShowcaseSchemaName = "SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHOWCASE3";
 
     /* Credit Registry DB IP */
@@ -244,5 +244,9 @@ public final class StaticRouter {
             default:
                 throw new IllegalStateException(Errors.getMessage(Errors.E284));
         }
+    }
+
+    public static boolean isDevMode(){
+        return mode == MODE.DEV;
     }
 }
