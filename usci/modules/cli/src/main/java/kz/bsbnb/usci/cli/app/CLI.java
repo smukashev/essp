@@ -1902,10 +1902,11 @@ public class CLI {
     public void commandSql() throws FileNotFoundException, SQLException {
         StringBuilder str = new StringBuilder();
         if(args.get(0).equals("run")){
-            System.out.println("Запускаю скрипт " + args.get(1));
+            System.out.println("ЗапускаюЗапускаю скрипт " + args.get(1));
+            long t1 = System.currentTimeMillis();
             SqlRunner runner = new SqlRunner(storage.getConnection(),  true);
             runner.runScript(args.get(1), StaticRouter.getCoreSchemaName());
-            System.out.println("Скрипт отработан");
+            System.out.println("Скрипт отработан за " + Math.round(((System.currentTimeMillis() - t1) / 1000)) + " сек.");
         } else {
             for (Object o : args) str.append(o).append(" ");
             boolean res = storage.simpleSql(str.toString());
@@ -2305,8 +2306,6 @@ public class CLI {
                     childShowCase.setDownPath(args.get(3));
                 } else if (args.get(2).equals("tableName")) {
                     childShowCase.setTableName(args.get(3));
-                } else if (args.get(2).equals("revival")) {
-                    childShowCase.setRevival(true);
                 } else {
                     throw new IllegalArgumentException();
                 }
@@ -2377,10 +2376,11 @@ public class CLI {
         } else if(args.get(0).equals("sql")) {
           if(args.get(1).equals("run")) {
               System.out.println("Запускаю скрипт " + args.get(2));
+              long t1 = System.currentTimeMillis();
               InitDataSourceSC(showcaseService.getDriverSc(), showcaseService.getSchemaSc(), showcaseService.getPasswordSc(), showcaseService.getUrlSc());
               SqlRunner runner = new SqlRunner(jdbcTemplateSC.getDataSource().getConnection(),  true);
               runner.runScript(args.get(2), StaticRouter.getShowcaseSchemaName());
-              System.out.println("Скрипт отработан.");
+              System.out.println("Скрипт отработан за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
           }
         } else {
             throw new IllegalArgumentException(Errors.getMessage(Errors.E219));
