@@ -6,8 +6,10 @@ Ext.require([
     'Ext.ux.CheckColumn'
 ]);
 
+var currentEntityId;
 var leftEntityId;
 var rightEntityId;
+var currentEntityDate;
 var leftEntityDate;
 var rightEntityDate;
 
@@ -709,30 +711,13 @@ Ext.onReady(function () {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
         handler: function () {
-            var tree = Ext.getCmp('entityTreeViewSelect');
-            rootNode = tree.getRootNode();
-
-            var xmlStr = "";
-
-            for (var i = 0; i < rootNode.childNodes.length; i++) {
-                if (hasEmptyKeyAttr(rootNode.childNodes[i])) {
-                    return;
-                }
-                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true);
+            if (document.getElementById("entity_select").selectedIndex == 1) {
+                leftEntityId = currentEntityId;
+                leftEntityDate = currentEntityDate;
+            } else {
+                rightEntityId = currentEntityId;
+                rightEntityDate = currentEntityDate;
             }
-
-            Ext.Ajax.request({
-                url: dataUrl,
-                method: 'POST',
-                params: {
-                    xml_data: xmlStr,
-                    date: Ext.getCmp('edDate').value,
-                    op: 'SAVE_XML'
-                },
-                success: function () {
-                    Ext.MessageBox.alert("", "Сохранено успешно");
-                }
-            });
         },
         maxWidth: 70
     });
@@ -1191,6 +1176,7 @@ Ext.onReady(function () {
         listeners: {
             itemclick: function (view, record, item, index, e, eOpts) {
                 //Ext.getCmp("leftEntityId").setValue((record.get('value')));
+                /*
                 if (document.getElementById("entity_select").selectedIndex == 1) {
                     leftEntityId = record.get('value');
                     leftEntityDate = Ext.getCmp('edDate').value;
@@ -1198,6 +1184,9 @@ Ext.onReady(function () {
                     rightEntityId = record.get('value');
                     rightEntityDate = Ext.getCmp('edDate').value;
                 }
+                 */
+                currentEntityId = record.get('value');
+                currentEntityDate = Ext.getCmp('edDate').value;
             }
         }
     });
