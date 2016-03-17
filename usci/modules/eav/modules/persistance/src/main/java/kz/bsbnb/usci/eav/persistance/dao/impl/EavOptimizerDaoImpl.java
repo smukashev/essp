@@ -38,12 +38,13 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
     }
 
     @Override
-    public long find(Long creditorId, String keyString) {
+    public long find(Long creditorId, Long metaId, String keyString) {
         String tableAlias = "eo";
         Select select = context
                 .select(EAV_OPTIMIZER.as(tableAlias).ENTITY_ID)
                 .from(EAV_OPTIMIZER.as(tableAlias))
                 .where(EAV_OPTIMIZER.as(tableAlias).CREDITOR_ID.equal(creditorId)
+                        .and(EAV_OPTIMIZER.as(tableAlias).META_ID.equal(metaId))
                         .and(EAV_OPTIMIZER.as(tableAlias).KEY_STRING.equal(keyString)));
 
         logger.debug(select.toString());
@@ -98,9 +99,6 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
         String tableAlias = "sv";
         Update update = context
                 .update(EAV_OPTIMIZER.as(tableAlias))
-                .set(EAV_OPTIMIZER.as(tableAlias).CREDITOR_ID, eavOptimizerData.getCreditorId())
-                .set(EAV_OPTIMIZER.as(tableAlias).ENTITY_ID, eavOptimizerData.getEntityId())
-                .set(EAV_OPTIMIZER.as(tableAlias).META_ID, eavOptimizerData.getMetaId())
                 .set(EAV_OPTIMIZER.as(tableAlias).KEY_STRING, eavOptimizerData.getKeyString())
                 .where(EAV_OPTIMIZER.as(tableAlias).ID.equal(eavOptimizerData.getId()));
 

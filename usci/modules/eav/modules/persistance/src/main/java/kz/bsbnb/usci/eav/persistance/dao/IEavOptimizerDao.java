@@ -5,7 +5,7 @@ import kz.bsbnb.usci.eav.tool.optimizer.EavOptimizerData;
 public interface IEavOptimizerDao {
     long insert (EavOptimizerData eavOptimizerData);
 
-    long find (Long creditorId, String keyString);
+    long find (Long creditorId, Long metaId, String keyString);
 
     long find (Long entityId);
 
