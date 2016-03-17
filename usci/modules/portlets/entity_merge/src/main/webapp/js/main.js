@@ -972,7 +972,8 @@ Ext.onReady(function () {
                         name: 'leftReportDate',
                         xtype: 'datefield',
                         format: 'd.m.Y',
-                        margin: '10 10 10 10'
+                        margin: '10 10 10 10',
+                        value: getCurrentDate()
                     }
                 ]
             },
@@ -995,7 +996,8 @@ Ext.onReady(function () {
                         name: 'rightReportDate',
                         xtype: 'datefield',
                         format: 'd.m.Y',
-                        margin: '10 10 10 10'
+                        margin: '10 10 10 10',
+                        value: getCurrentDate()
                     }
                 ]
             }
@@ -1241,7 +1243,7 @@ Ext.onReady(function () {
                 }, {
                     xtype: 'datefield',
                     id: 'edDate',
-                    fieldLabel: 'Дата',
+                    fieldLabel: 'Отчетная дата',
                     listeners: {
                         change: function () {
                             console.log('datefield changed');
