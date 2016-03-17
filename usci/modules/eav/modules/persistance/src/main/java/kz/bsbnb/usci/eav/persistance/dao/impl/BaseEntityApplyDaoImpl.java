@@ -2345,13 +2345,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 + "\n" + insertedObject);
                         throw new IllegalStateException(Errors.getMessage(Errors.E76,e.getMessage()));
                     }
-
-                    if (insertedObject instanceof IBaseEntity) {
-                        IBaseEntity baseEntity = (IBaseEntity) insertedObject;
-
-                        if (baseEntity.getMeta().isReference())
-                            refRepositoryDao.setRef(baseEntity.getId(), baseEntity.getReportDate(), baseEntity);
-                    }
                 }
             }
         }
@@ -2368,13 +2361,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     } catch (Exception e) {
                         logger.error(Errors.getError(Errors.getMessage(Errors.E77)) + " : \n" + e.getMessage() + "\n" + updatedObject);
                         throw new IllegalStateException(Errors.getMessage(Errors.E77,e.getMessage()));
-                    }
-
-                    if (updatedObject instanceof IBaseEntity) {
-                        IBaseEntity baseEntity = (IBaseEntity) updatedObject;
-
-                        if (baseEntity.getMeta().isReference())
-                            refRepositoryDao.setRef(baseEntity.getId(), baseEntity.getReportDate(), baseEntity);
                     }
                 }
             }
@@ -2398,13 +2384,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 + "\n" + deletedObject));
                         throw new IllegalStateException(Errors.getMessage(Errors.E78,e.getMessage()));
                     }
-
-                    if (deletedObject instanceof IBaseEntity) {
-                        IBaseEntity baseEntity = (IBaseEntity) deletedObject;
-
-                        if (baseEntity.getMeta().isReference())
-                            refRepositoryDao.delRef(baseEntity.getId(), baseEntity.getReportDate());
-                    }
                 }
             }
         }
@@ -2423,7 +2402,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     }
 
     private Object returnCastedValue(IMetaValue metaValue, IBaseValue baseValue) {
-        return metaValue.getTypeCode() == DataTypes.DATE ? new Date(((Date) baseValue.getValue()).getTime()) :
-                baseValue.getValue();
+        return metaValue.getTypeCode() == DataTypes.DATE ?
+                new Date(((Date) baseValue.getValue()).getTime()) : baseValue.getValue();
     }
 }

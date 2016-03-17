@@ -3,10 +3,13 @@ package kz.bsbnb.usci.eav.repository.impl;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 @Component
 public class RefRepository extends JDBCSupport implements IRefRepository {
@@ -22,6 +25,14 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
 
     public void delRef(long Id, Date reportDate) {
         cache.remove(new BaseEntityKey(Id, reportDate));
+    }
+
+    public void delRef(long id) {
+        Iterator<Map.Entry<BaseEntityKey, IBaseEntity>> entryIterator = cache.entrySet().iterator();
+        while (entryIterator.hasNext()) {
+            if (id == entryIterator.next().getKey().getId())
+                entryIterator.remove();
+        }
     }
 
     private class BaseEntityKey {
@@ -59,6 +70,14 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
             int result = (int) (id ^ (id >>> 32));
             result = 31 * result + reportDate.hashCode();
             return result;
+        }
+
+        @Override
+        public String toString() {
+            return "BaseEntityKey{" +
+                    "id=" + id +
+                    ", reportDate=" + DataUtils.dateFormatDot.format(reportDate) +
+                    '}';
         }
     }
 }
