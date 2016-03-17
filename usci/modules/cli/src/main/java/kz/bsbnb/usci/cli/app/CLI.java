@@ -326,54 +326,6 @@ public class CLI {
         }
     }
 
-    public void addMetaClassKeyFilter(String className, String attrName, String subName, String value) {
-        MetaClass meta = metaClassRepository.getMetaClass(className);
-
-        if (meta == null) {
-            System.out.println("No such meta class with name: " + className);
-        } else {
-            IMetaType attr = meta.getMemberType(attrName);
-
-            if (attr != null) {
-                if (attr.isSet() && attr.isComplex()) {
-                    MetaSet set = (MetaSet) attr;
-
-                    set.addArrayKeyFilter(subName, value);
-
-                    metaClassRepository.saveMetaClass(meta);
-                } else {
-                    System.out.println("Attribute: " + attrName + " is not a complex set");
-                }
-            } else {
-                System.out.println("No such attribute: " + attrName);
-            }
-        }
-    }
-
-    public void addMetaClassKeyFilter(long id, String attrName, String subName, String value) {
-        MetaClass meta = metaClassRepository.getMetaClass(id);
-
-        if (meta == null) {
-            System.out.println("No such meta class with id: " + id);
-        } else {
-            IMetaType attr = meta.getMemberType(attrName);
-
-            if (attr != null) {
-                if (attr.isSet() && attr.isComplex()) {
-                    MetaSet set = (MetaSet) attr;
-
-                    set.addArrayKeyFilter(subName, value);
-
-                    metaClassRepository.saveMetaClass(meta);
-                } else {
-                    System.out.println("Attribute: " + attrName + " is not a complex set");
-                }
-            } else {
-                System.out.println("No such attribute: " + attrName);
-            }
-        }
-    }
-
     public void entityToJava(long id, String reportDateStr) {
         IBaseEntity entity;
 
@@ -1261,19 +1213,6 @@ public class CLI {
                     }
                 } else {
                     System.out.println("Argument needed: <paths> <id, name> <id or name> <attributeName>");
-                }
-            } else if (args.get(0).equals("fkey")) {
-                if (args.size() > 5) {
-                    if (args.get(1).equals("id")) {
-                        addMetaClassKeyFilter(Long.parseLong(args.get(2)), args.get(3), args.get(4), args.get(5));
-                    } else if (args.get(1).equals("name")) {
-                        addMetaClassKeyFilter(args.get(2), args.get(3), args.get(4), args.get(5));
-                    } else {
-                        System.out.println("No such metaClass identification method: " + args.get(1));
-                    }
-                } else {
-                    System.out.println("Argument needed: <fkey> <id, name> <id or name> <attributeName> " +
-                            "<subAttributeName> <filterValue>");
                 }
             } else if (args.get(0).equals("tojava")) {
                 MetaClass metaClass = metaClassRepository.getMetaClass(args.get(1));

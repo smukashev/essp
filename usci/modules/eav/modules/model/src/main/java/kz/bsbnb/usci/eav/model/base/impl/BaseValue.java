@@ -207,9 +207,6 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         if (thisValue == null || thatValue == null)
             throw new RuntimeException(Errors.getMessage(Errors.E39));
 
-        if (metaType.isSetOfSets())
-            throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
-
         if (metaType.isComplex()) {
             if (metaType.isSet()) {
                 IBaseSet thisBaseSet = (IBaseSet) thisValue;
@@ -236,10 +233,6 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                 return thisBaseEntity.getId() == thatBaseEntity.getId() && thisBaseEntity.getId() > 0;
             }
         } else {
-            if (metaType.isSetOfSets()) {
-                throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
-            }
-
             if (metaType.isSet()) {
                 IMetaSet metaSet = (IMetaSet) metaType;
                 IMetaType childMetaType = metaSet.getMemberType();

@@ -7,8 +7,6 @@ public interface IMetaType extends Serializable {
 
     boolean isComplex();
 
-    boolean isSetOfSets();
-
     String toString(String prefix);
 
     String toJava(String prefix);

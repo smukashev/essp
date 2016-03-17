@@ -89,8 +89,6 @@ public class KeySearcherForm implements ISearcherForm {
                 if(metaType.isReference()) {
                     ret+=getDomRef( userId, (MetaClass) metaType, attr);
                 } else if (metaType.isComplex()) {
-                    if(metaType.isSetOfSets())
-                        throw new NotImplementedException();
                     if(metaType.isSet()) {
                         IMetaType childMeta = ((MetaSet) metaType).getMemberType();
                         ret += getDom(userId, (MetaClass) childMeta, attr, prefix);
@@ -165,9 +163,6 @@ public class KeySearcherForm implements ISearcherForm {
             if(metaAttribute == null)
                 continue;
             IMetaType metaType = metaAttribute.getMetaType();
-
-            if(metaType.isSetOfSets())
-                throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
 
             if(metaType.isSet()) {
                 BaseSet childBaseSet = new BaseSet(metaType);

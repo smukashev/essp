@@ -58,7 +58,7 @@ public class BaseEntityOutput {
                 }
             }
 
-            if(!valueIsNull)
+            if (!valueIsNull)
                 str += "\n" + prefix + memberName + " : " + value.getCreditorId() + " : " + valueToString;
         }
 
@@ -106,10 +106,6 @@ public class BaseEntityOutput {
                         }
                     } else // if a set
                     {
-                        if (type.isSetOfSets()) //if set in a set
-                        {
-                            valueToString = toJava((BaseEntity) value.getValue(), prefix, 0);
-                        }
                         if (type.isSet())//creates new set object
                         {
                             str += "\n BaseSet " + meta.getClassName() +
@@ -170,11 +166,7 @@ public class BaseEntityOutput {
         int counter = 0;
         for (IBaseValue value : set.get()) {
             if (metaSet.isSet()) {
-                if (metaSet.isSetOfSets()) {
-                    str += complexJavaSet((BaseSet) value.getValue(), prefix, (MetaSet) metaSet.getMemberType(),
-                            memberName);
-                } else if (metaSet.isComplex())//if an entity
-                {
+                if (metaSet.isComplex()) {
                     str += toJava((BaseEntity) value.getValue(), prefix, counter);
                 } else {
                     str += "\n " + memberName + "Set.put(new BaseValue(batch," + value.getValue().toString() + "));";
@@ -210,9 +202,7 @@ public class BaseEntityOutput {
 
         for (IBaseValue value : set.get()) {
             if (metaSet.isSet()) {
-                if (metaSet.isSetOfSets()) {
-                    str += complexSet((BaseSet) value.getValue(), prefix + "\t", (MetaSet) metaSet.getMemberType());
-                } else if (metaSet.isComplex()) {
+                if (metaSet.isComplex()) {
                     str += "\n" + prefix + toString((BaseEntity) value.getValue(), prefix + "\t");
                 } else {
                     str += value.getValue().toString();
