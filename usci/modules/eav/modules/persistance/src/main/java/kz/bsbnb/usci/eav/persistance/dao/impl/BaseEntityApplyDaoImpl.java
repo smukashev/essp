@@ -67,14 +67,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     if (minReportDate == null)
                         throw new UnsupportedOperationException(Errors.getMessage(Errors.E56,baseEntitySaving.getId()));
 
-                    baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), minReportDate, reportDateSaving);
+                    baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), minReportDate);
 
                     if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
                         throw new UnsupportedOperationException(Errors.getMessage(Errors.E57,
                                 baseEntityLoaded.getId(),baseEntityLoaded.getBaseEntityReportDate().getReportDate()));
 
                 } else {
-                    baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), maxReportDate, reportDateSaving);
+                    baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), maxReportDate);
 
                     if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
                         throw new UnsupportedOperationException(Errors.getMessage(Errors.E57,baseEntityLoaded.getId(),

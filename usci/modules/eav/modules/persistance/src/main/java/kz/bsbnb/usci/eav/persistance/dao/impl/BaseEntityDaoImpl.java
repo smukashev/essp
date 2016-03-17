@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -16,6 +15,7 @@ import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -46,19 +46,17 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Override
     public long insert(IPersistable persistable) {
         IBaseEntity baseEntity = (IBaseEntity) persistable;
-        long baseEntityId = insert(baseEntity.getMeta().getId());
+
+        Insert insert = context
+                .insertInto(EAV_BE_ENTITIES)
+                .set(EAV_BE_ENTITIES.CLASS_ID, baseEntity.getMeta().getId());
+
+        logger.debug(insert.toString());
+        long baseEntityId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+
         baseEntity.setId(baseEntityId);
 
         return baseEntityId;
-    }
-
-    protected long insert(long metaClassId) {
-        Insert insert = context
-                .insertInto(EAV_BE_ENTITIES)
-                .set(EAV_BE_ENTITIES.CLASS_ID, metaClassId);
-
-        logger.debug(insert.toString());
-        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     @Override
@@ -121,7 +119,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     }
 
     @Override
-    public IBaseEntity load(long id, Date reportDate, Date savingReportDate) {
+    public IBaseEntity load(long id, Date reportDate) {
         if (id < 1)
             throw new IllegalArgumentException(Errors.getMessage(Errors.E93));
 
@@ -148,15 +146,13 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         baseValueCounts.put(BaseEntitySimpleSet.class, baseEntityReportDate.getSimpleSetsCount());
         baseValueCounts.put(BaseEntityComplexSet.class, baseEntityReportDate.getComplexSetsCount());
 
-        int compare = DataUtils.compareBeginningOfTheDay(savingReportDate, reportDate);
-
         for (Class<? extends IBaseValue> baseValueClass : baseValueCounts.keySet()) {
             long baseValuesCount = baseValueCounts.get(baseValueClass);
             if (baseValuesCount > 0) {
                 IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
                         .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
 
-                baseEntityValueDao.loadBaseValues(baseEntity, compare == -1 ? reportDate : savingReportDate);
+                baseEntityValueDao.loadBaseValues(baseEntity, reportDate);
             }
         }
 
@@ -197,15 +193,15 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                 .select(DSL.val(1L).as("ex_flag"))
                 .from("dual")
                 .where(DSL.exists(context.select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
-                                        .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                                        .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
-                                        .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.notEqual(exceptContainingId))
+                                .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
+                                .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
+                                .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.notEqual(exceptContainingId))
                         )
                 ).or(DSL.exists(context.select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
                         .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias)
-                                        .join(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias)).on(
-                                                EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).SET_ID
-                                                        .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).SET_ID))
+                                .join(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias)).on(
+                                        EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).SET_ID
+                                                .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).SET_ID))
                         ).where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.
                                 equal(baseEntityId))
                         .and(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).ENTITY_ID.

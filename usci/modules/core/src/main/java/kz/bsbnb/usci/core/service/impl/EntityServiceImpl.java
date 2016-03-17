@@ -164,7 +164,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             throw new UnsupportedOperationException(Errors.getMessage(Errors.E234));
         }
 
-        return (BaseEntity) baseEntityLoadDao.load(baseEntity.getId(), maxReportDate, baseEntity.getReportDate());
+        return (BaseEntity) baseEntityLoadDao.load(baseEntity.getId(), maxReportDate);
     }
 
     @Override
