@@ -2,16 +2,16 @@
 <batch>
   <entities>
     <ref_portfolio>
-      <code>1042</code>
-      <name_kz>Теңге жеке тұлғалардың біртекті қарыздар портфелі</name_kz>
-      <name_ru>Портфель по однородным займам по физическим лицам в тенге</name_ru>
+      <code>1072</code>
+      <name_kz>Портфель краткосрочных займов МСБ</name_kz>
+      <name_ru>Портфель краткосрочных займов МСБ</name_ru>
       <creditor>
-        <name>АО ДБ "Национальный Банк Пакистана" в Казахстане</name>
-        <short_name>АО ДБ "NBP" в Казахстане</short_name>
-        <code>553</code>
+        <name>АО "Qazaq Banki" (прежнее наименование АО "СЕНИМ-БАНК")</name>
+        <short_name>АО "Qazaq Banki"</short_name>
+        <code>549</code>
         <docs>
           <item>
-            <no>000440001339</no>
+            <no>950140000367</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -23,7 +23,7 @@
             </doc_type>
           </item>
           <item>
-            <no>NBPAKZKA</no>
+            <no>SENIKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>

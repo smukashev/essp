@@ -2,16 +2,28 @@
 <batch>
   <entities>
     <ref_portfolio>
-      <code>0870</code>
-      <name_kz>Прочие</name_kz>
-      <name_ru>Прочие</name_ru>
+      <code>1071</code>
+      <name_kz>Нефтегазовый сектор, включая торговлю нефтепродуктами, Химическая промышленность, Металлургическая промышленность (НарБанк)</name_kz>
+      <name_ru>Нефтегазовый сектор, включая торговлю нефтепродуктами, Химическая промышленность, Металлургическая промышленность (НарБанк)</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО "Народный сберегательный банк Казахстана"</name>
+        <short_name>АО "Народный банк Казахстана"</short_name>
+        <code>601</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>940140000385</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HSBKKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -23,15 +35,15 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>600200048129</no>
             <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
               <is_identification>1</is_identification>
               <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -45,16 +57,28 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0858</code>
-      <name_kz>корпоративные займы с рейтингом</name_kz>
-      <name_ru>корпоративные займы с рейтингом</name_ru>
+      <code>1069</code>
+      <name_kz>Жилищное строительство, Гостиничный бизнес, Операции с недвижимостью (НарБанк)</name_kz>
+      <name_ru>Жилищное строительство, Гостиничный бизнес, Операции с недвижимостью (НарБанк)</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО "Народный сберегательный банк Казахстана"</name>
+        <short_name>АО "Народный банк Казахстана"</short_name>
+        <code>601</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>940140000385</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HSBKKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -66,15 +90,15 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>600200048129</no>
             <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
               <is_identification>1</is_identification>
               <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -88,16 +112,28 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0869</code>
-      <name_kz>Логистика</name_kz>
-      <name_ru>Логистика</name_ru>
+      <code>1062</code>
+      <name_kz>Карточные займы (нарбанк)</name_kz>
+      <name_ru>Карточные займы (нарбанк)</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО "Народный сберегательный банк Казахстана"</name>
+        <short_name>АО "Народный банк Казахстана"</short_name>
+        <code>601</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>940140000385</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HSBKKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -109,15 +145,15 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>600200048129</no>
             <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
               <is_identification>1</is_identification>
               <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -131,16 +167,28 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0868</code>
-      <name_kz>Сельское хозяйство</name_kz>
-      <name_ru>Сельское хозяйство</name_ru>
+      <code>1070</code>
+      <name_kz>Финансовая (небанковская деятельность) (Нарбанк)</name_kz>
+      <name_ru>Финансовая (небанковская деятельность) (Нарбанк)</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО "Народный сберегательный банк Казахстана"</name>
+        <short_name>АО "Народный банк Казахстана"</short_name>
+        <code>601</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>940140000385</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HSBKKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -152,15 +200,15 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>600200048129</no>
             <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
               <is_identification>1</is_identification>
               <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -174,16 +222,28 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0865</code>
-      <name_kz>Розничная торговля</name_kz>
-      <name_ru>Розничная торговля</name_ru>
+      <code>1067</code>
+      <name_kz>Производство и распределение электроэнергии, газа, пара и горячей воды, Связь и коммуникация, Государственные органы (образование, здравоохранение) </name_kz>
+      <name_ru>Производство и распределение электроэнергии, газа, пара и горячей воды, Связь и коммуникация, Государственные органы (образование, здравоохранение) </name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО "Народный сберегательный банк Казахстана"</name>
+        <short_name>АО "Народный банк Казахстана"</short_name>
+        <code>601</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>940140000385</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HSBKKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -195,15 +255,15 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>600200048129</no>
             <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
               <is_identification>1</is_identification>
               <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -217,16 +277,28 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0864</code>
-      <name_kz>Оптовая торговля</name_kz>
-      <name_ru>Оптовая торговля</name_ru>
+      <code>1068</code>
+      <name_kz>Производственное строительство,Коммерческое строительство, Строительство торговых площадей, Прочие строительные работы</name_kz>
+      <name_ru>Производственное строительство,Коммерческое строительство, Строительство торговых площадей, Прочие строительные работы</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО "Народный сберегательный банк Казахстана"</name>
+        <short_name>АО "Народный банк Казахстана"</short_name>
+        <code>601</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>940140000385</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HSBKKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -238,15 +310,15 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>600200048129</no>
             <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
               <is_identification>1</is_identification>
               <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -260,16 +332,28 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0867</code>
-      <name_kz>Пищевая промышленность</name_kz>
-      <name_ru>Пищевая промышленность</name_ru>
+      <code>1065</code>
+      <name_kz>Горнодобывающая промышленность,Ллегкая и обрабатывающая промышленность, Производство машин и оборудования</name_kz>
+      <name_ru>Горнодобывающая промышленность,Ллегкая и обрабатывающая промышленность, Производство машин и оборудования</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО "Народный сберегательный банк Казахстана"</name>
+        <short_name>АО "Народный банк Казахстана"</short_name>
+        <code>601</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>940140000385</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HSBKKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -281,15 +365,15 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>600200048129</no>
             <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
               <is_identification>1</is_identification>
               <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -303,16 +387,28 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0866</code>
-      <name_kz>Услуги</name_kz>
-      <name_ru>Услуги</name_ru>
+      <code>1066</code>
+      <name_kz>Производство пищевых продуктов, Розничная торговля (в том числе займы ЕБРР), Транспорт, предоставление услуг</name_kz>
+      <name_ru>Производство пищевых продуктов, Розничная торговля (в том числе займы ЕБРР), Транспорт, предоставление услуг</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО "Народный сберегательный банк Казахстана"</name>
+        <short_name>АО "Народный банк Казахстана"</short_name>
+        <code>601</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>940140000385</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HSBKKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -324,15 +420,15 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>600200048129</no>
             <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
               <is_identification>1</is_identification>
               <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -346,16 +442,28 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0871</code>
-      <name_kz>Ипотечные кредиты</name_kz>
-      <name_ru>Ипотечные кредиты</name_ru>
+      <code>1063</code>
+      <name_kz>Народная (НарБанк)</name_kz>
+      <name_ru>Народная (НарБанк)</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО "Народный сберегательный банк Казахстана"</name>
+        <short_name>АО "Народный банк Казахстана"</short_name>
+        <code>601</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>940140000385</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HSBKKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -367,15 +475,15 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>600200048129</no>
             <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
               <is_identification>1</is_identification>
               <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -389,16 +497,28 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0861</code>
-      <name_kz>Займы   МСБ с рейтингом </name_kz>
-      <name_ru>Займы   МСБ с рейтингом </name_ru>
+      <code>1064</code>
+      <name_kz>Нефтегазовый сектор, включая торговлю нефтепродуктами, Химическая промышленность, Металлургическая промышленность (НарБанк)</name_kz>
+      <name_ru>Нефтегазовый сектор, включая торговлю нефтепродуктами, Химическая промышленность, Металлургическая промышленность (НарБанк)</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО "Народный сберегательный банк Казахстана"</name>
+        <short_name>АО "Народный банк Казахстана"</short_name>
+        <code>601</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>940140000385</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>HSBKKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -410,273 +530,15 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>600200048129</no>
             <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
               <is_identification>1</is_identification>
               <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-        </docs>
-        <subject_type>
-          <kind_id>31</kind_id>
-          <name_kz>Банк второго уровня</name_kz>
-          <name_ru>Банк второго уровня</name_ru>
-          <code>0001</code>
-          <report_period_duration_months>1</report_period_duration_months>
-        </subject_type>
-      </creditor>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0872</code>
-      <name_kz>Автокредиты</name_kz>
-      <name_ru>Автокредиты</name_ru>
-      <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
-        <docs>
-          <item>
-            <no>ALMNKZKA</no>
-            <doc_type>
-              <name_ru>Банковский идентификационный код </name_ru>
-              <name_kz>Банковский идентификационный код </name_kz>
-              <is_identification>0</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>30</weight>
-              <code>15</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>951140000151</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-        </docs>
-        <subject_type>
-          <kind_id>31</kind_id>
-          <name_kz>Банк второго уровня</name_kz>
-          <name_ru>Банк второго уровня</name_ru>
-          <code>0001</code>
-          <report_period_duration_months>1</report_period_duration_months>
-        </subject_type>
-      </creditor>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0873</code>
-      <name_kz>Потребительские кредиты</name_kz>
-      <name_ru>Потребительские кредиты</name_ru>
-      <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
-        <docs>
-          <item>
-            <no>ALMNKZKA</no>
-            <doc_type>
-              <name_ru>Банковский идентификационный код </name_ru>
-              <name_kz>Банковский идентификационный код </name_kz>
-              <is_identification>0</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>30</weight>
-              <code>15</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>951140000151</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-        </docs>
-        <subject_type>
-          <kind_id>31</kind_id>
-          <name_kz>Банк второго уровня</name_kz>
-          <name_ru>Банк второго уровня</name_ru>
-          <code>0001</code>
-          <report_period_duration_months>1</report_period_duration_months>
-        </subject_type>
-      </creditor>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0857</code>
-      <name_kz>корпоративные займы с рейтингом</name_kz>
-      <name_ru>корпоративные займы с рейтингом</name_ru>
-      <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
-        <docs>
-          <item>
-            <no>ALMNKZKA</no>
-            <doc_type>
-              <name_ru>Банковский идентификационный код </name_ru>
-              <name_kz>Банковский идентификационный код </name_kz>
-              <is_identification>0</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>30</weight>
-              <code>15</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>951140000151</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-        </docs>
-        <subject_type>
-          <kind_id>31</kind_id>
-          <name_kz>Банк второго уровня</name_kz>
-          <name_ru>Банк второго уровня</name_ru>
-          <code>0001</code>
-          <report_period_duration_months>1</report_period_duration_months>
-        </subject_type>
-      </creditor>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0863</code>
-      <name_kz>Строительство и недвижимость</name_kz>
-      <name_ru>Строительство и недвижимость</name_ru>
-      <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
-        <docs>
-          <item>
-            <no>ALMNKZKA</no>
-            <doc_type>
-              <name_ru>Банковский идентификационный код </name_ru>
-              <name_kz>Банковский идентификационный код </name_kz>
-              <is_identification>0</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>30</weight>
-              <code>15</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>951140000151</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-        </docs>
-        <subject_type>
-          <kind_id>31</kind_id>
-          <name_kz>Банк второго уровня</name_kz>
-          <name_ru>Банк второго уровня</name_ru>
-          <code>0001</code>
-          <report_period_duration_months>1</report_period_duration_months>
-        </subject_type>
-      </creditor>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0874</code>
-      <name_kz>Кредитные карточки, дебетные карточки с кредитным лимитом</name_kz>
-      <name_ru>Кредитные карточки, дебетные карточки с кредитным лимитом</name_ru>
-      <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
-        <docs>
-          <item>
-            <no>ALMNKZKA</no>
-            <doc_type>
-              <name_ru>Банковский идентификационный код </name_ru>
-              <name_kz>Банковский идентификационный код </name_kz>
-              <is_identification>0</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>30</weight>
-              <code>15</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>951140000151</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-        </docs>
-        <subject_type>
-          <kind_id>31</kind_id>
-          <name_kz>Банк второго уровня</name_kz>
-          <name_ru>Банк второго уровня</name_ru>
-          <code>0001</code>
-          <report_period_duration_months>1</report_period_duration_months>
-        </subject_type>
-      </creditor>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0862</code>
-      <name_kz>Портфель МСБ без рейтинга  </name_kz>
-      <name_ru>Портфель МСБ без рейтинга  </name_ru>
-      <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
-        <docs>
-          <item>
-            <no>ALMNKZKA</no>
-            <doc_type>
-              <name_ru>Банковский идентификационный код </name_ru>
-              <name_kz>Банковский идентификационный код </name_kz>
-              <is_identification>0</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>30</weight>
-              <code>15</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>951140000151</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>

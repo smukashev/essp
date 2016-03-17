@@ -2,16 +2,16 @@
 <batch>
   <entities>
     <ref_portfolio>
-      <code>1042</code>
-      <name_kz>Теңге жеке тұлғалардың біртекті қарыздар портфелі</name_kz>
-      <name_ru>Портфель по однородным займам по физическим лицам в тенге</name_ru>
+      <code>1033</code>
+      <name_kz>Пул по займам ЮЛ транспорт - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ транспорт - просрочка 61-90 дней</name_ru>
       <creditor>
-        <name>АО ДБ "Национальный Банк Пакистана" в Казахстане</name>
-        <short_name>АО ДБ "NBP" в Казахстане</short_name>
-        <code>553</code>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
         <docs>
           <item>
-            <no>000440001339</no>
+            <no>930140000323</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -23,7 +23,7 @@
             </doc_type>
           </item>
           <item>
-            <no>NBPAKZKA</no>
+            <no>KZIBKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>

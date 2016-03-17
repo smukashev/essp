@@ -2,16 +2,16 @@
 <batch>
   <entities>
     <ref_portfolio>
-      <code>1042</code>
-      <name_kz>Теңге жеке тұлғалардың біртекті қарыздар портфелі</name_kz>
-      <name_ru>Портфель по однородным займам по физическим лицам в тенге</name_ru>
+      <code>0958</code>
+      <name_kz>Біртекті кредит қоржыны</name_kz>
+      <name_ru>Портфель однородных займов</name_ru>
       <creditor>
-        <name>АО ДБ "Национальный Банк Пакистана" в Казахстане</name>
-        <short_name>АО ДБ "NBP" в Казахстане</short_name>
-        <code>553</code>
+        <name>АО "ДБ "Punjab National Bank"-Казахстан"</name>
+        <short_name>АО "ДБ "PNB"</short_name>
+        <code>620</code>
         <docs>
           <item>
-            <no>000440001339</no>
+            <no>950740000130</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -23,7 +23,7 @@
             </doc_type>
           </item>
           <item>
-            <no>NBPAKZKA</no>
+            <no>DABNKZ2P</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>

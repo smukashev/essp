@@ -368,8 +368,8 @@
       </subject_type>
     </ref_creditor>
     <ref_creditor>
-      <name>АО "БанкПозитив Казахстан"</name>
-      <short_name>АО "БанкПозитив Казахстан"</short_name>
+      <name>АО "EU Bank (ДБ АО "Евразийский Банк")"</name>
+      <short_name>АО "EU Bank (ДБ АО "Евразийский Банк")"</short_name>
       <code>492</code>
       <docs>
         <item>
@@ -1518,19 +1518,7 @@
       <short_name>Тестовая организация</short_name>
       <docs>
         <item>
-          <no>sdfsdfasdfsadf</no>
-          <doc_type>
-            <name_ru>Аккредитационное удостоверение</name_ru>
-            <name_kz>Аккредитационное удостоверение</name_kz>
-            <is_identification>0</is_identification>
-            <is_organization_doc>0</is_organization_doc>
-            <is_person_doc>1</is_person_doc>
-            <weight>65</weight>
-            <code>13</code>
-          </doc_type>
-        </item>
-        <item>
-          <no>TESTBIN111</no>
+          <no>TTTTKA</no>
           <doc_type>
             <name_ru>Банковский идентификационный код </name_ru>
             <name_kz>Банковский идентификационный код </name_kz>

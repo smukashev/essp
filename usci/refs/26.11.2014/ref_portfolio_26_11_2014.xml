@@ -2,16 +2,16 @@
 <batch>
   <entities>
     <ref_portfolio>
-      <code>0870</code>
-      <name_kz>Прочие</name_kz>
-      <name_ru>Прочие</name_ru>
+      <code>0948</code>
+      <name_kz>МБ1</name_kz>
+      <name_ru>МБ1</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -23,7 +23,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -45,16 +45,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0858</code>
-      <name_kz>корпоративные займы с рейтингом</name_kz>
-      <name_ru>корпоративные займы с рейтингом</name_ru>
+      <code>0949</code>
+      <name_kz>Кредитные карты</name_kz>
+      <name_ru>Кредитные карты</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -66,7 +66,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -88,16 +88,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0869</code>
-      <name_kz>Логистика</name_kz>
-      <name_ru>Логистика</name_ru>
+      <code>0936</code>
+      <name_kz>Группа 1</name_kz>
+      <name_ru>Группа 1</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -109,7 +109,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -131,16 +131,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0868</code>
-      <name_kz>Сельское хозяйство</name_kz>
-      <name_ru>Сельское хозяйство</name_ru>
+      <code>0946</code>
+      <name_kz>Бланковые</name_kz>
+      <name_ru>Бланковые</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -152,7 +152,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -174,16 +174,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0865</code>
-      <name_kz>Розничная торговля</name_kz>
-      <name_ru>Розничная торговля</name_ru>
+      <code>0947</code>
+      <name_kz>Залоговые</name_kz>
+      <name_ru>Залоговые</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -195,7 +195,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -217,16 +217,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0864</code>
-      <name_kz>Оптовая торговля</name_kz>
-      <name_ru>Оптовая торговля</name_ru>
+      <code>0952</code>
+      <name_kz>Тех.овер</name_kz>
+      <name_ru>Тех.овер</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -238,7 +238,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -260,16 +260,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0867</code>
-      <name_kz>Пищевая промышленность</name_kz>
-      <name_ru>Пищевая промышленность</name_ru>
+      <code>0944</code>
+      <name_kz>Потреб БЛТ</name_kz>
+      <name_ru>Потреб БЛТ</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -281,7 +281,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -303,16 +303,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0866</code>
-      <name_kz>Услуги</name_kz>
-      <name_ru>Услуги</name_ru>
+      <code>0943</code>
+      <name_kz>Группа 8</name_kz>
+      <name_ru>Группа 8</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -324,7 +324,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -346,102 +346,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0871</code>
-      <name_kz>Ипотечные кредиты</name_kz>
-      <name_ru>Ипотечные кредиты</name_ru>
-      <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
-        <docs>
-          <item>
-            <no>ALMNKZKA</no>
-            <doc_type>
-              <name_ru>Банковский идентификационный код </name_ru>
-              <name_kz>Банковский идентификационный код </name_kz>
-              <is_identification>0</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>30</weight>
-              <code>15</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>951140000151</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-        </docs>
-        <subject_type>
-          <kind_id>31</kind_id>
-          <name_kz>Банк второго уровня</name_kz>
-          <name_ru>Банк второго уровня</name_ru>
-          <code>0001</code>
-          <report_period_duration_months>1</report_period_duration_months>
-        </subject_type>
-      </creditor>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0861</code>
-      <name_kz>Займы   МСБ с рейтингом </name_kz>
-      <name_ru>Займы   МСБ с рейтингом </name_ru>
-      <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
-        <docs>
-          <item>
-            <no>ALMNKZKA</no>
-            <doc_type>
-              <name_ru>Банковский идентификационный код </name_ru>
-              <name_kz>Банковский идентификационный код </name_kz>
-              <is_identification>0</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>30</weight>
-              <code>15</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>951140000151</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-        </docs>
-        <subject_type>
-          <kind_id>31</kind_id>
-          <name_kz>Банк второго уровня</name_kz>
-          <name_ru>Банк второго уровня</name_ru>
-          <code>0001</code>
-          <report_period_duration_months>1</report_period_duration_months>
-        </subject_type>
-      </creditor>
-    </ref_portfolio>
-    <ref_portfolio>
-      <code>0872</code>
+      <code>0950</code>
       <name_kz>Автокредиты</name_kz>
       <name_ru>Автокредиты</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -453,7 +367,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -475,16 +389,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0873</code>
-      <name_kz>Потребительские кредиты</name_kz>
-      <name_ru>Потребительские кредиты</name_ru>
+      <code>0951</code>
+      <name_kz>Овердрафты ПК</name_kz>
+      <name_ru>Овердрафты ПК</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -496,7 +410,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -518,16 +432,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0857</code>
-      <name_kz>корпоративные займы с рейтингом</name_kz>
-      <name_ru>корпоративные займы с рейтингом</name_ru>
+      <code>0945</code>
+      <name_kz>Потреб ЛТ</name_kz>
+      <name_ru>Потреб ЛТ</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -539,7 +453,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -561,16 +475,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0863</code>
-      <name_kz>Строительство и недвижимость</name_kz>
-      <name_ru>Строительство и недвижимость</name_ru>
+      <code>0940</code>
+      <name_kz>Группа 5</name_kz>
+      <name_ru>Группа 5</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -582,7 +496,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -604,16 +518,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0874</code>
-      <name_kz>Кредитные карточки, дебетные карточки с кредитным лимитом</name_kz>
-      <name_ru>Кредитные карточки, дебетные карточки с кредитным лимитом</name_ru>
+      <code>0939</code>
+      <name_kz>Группа 4</name_kz>
+      <name_ru>Группа 4</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -625,7 +539,7 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -647,16 +561,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0862</code>
-      <name_kz>Портфель МСБ без рейтинга  </name_kz>
-      <name_ru>Портфель МСБ без рейтинга  </name_ru>
+      <code>0942</code>
+      <name_kz>Группа 7</name_kz>
+      <name_ru>Группа 7</name_ru>
       <creditor>
-        <name>АО "АТФБанк"</name>
-        <short_name>АО "АТФБанк"</short_name>
-        <code>826</code>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
         <docs>
           <item>
-            <no>ALMNKZKA</no>
+            <no>ALFAKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -668,7 +582,136 @@
             </doc_type>
           </item>
           <item>
-            <no>951140000151</no>
+            <no>941240000341</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0941</code>
+      <name_kz>Группа 6</name_kz>
+      <name_ru>Группа 6</name_ru>
+      <creditor>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
+        <docs>
+          <item>
+            <no>ALFAKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>941240000341</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0938</code>
+      <name_kz>Группа 3</name_kz>
+      <name_ru>Группа 3</name_ru>
+      <creditor>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
+        <docs>
+          <item>
+            <no>ALFAKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>941240000341</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0937</code>
+      <name_kz>Группа 2</name_kz>
+      <name_ru>Группа 2</name_ru>
+      <creditor>
+        <name>АО ДБ "Альфа-Банк"</name>
+        <short_name>АО ДБ "Альфа-Банк"</short_name>
+        <code>947</code>
+        <docs>
+          <item>
+            <no>ALFAKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>941240000341</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>

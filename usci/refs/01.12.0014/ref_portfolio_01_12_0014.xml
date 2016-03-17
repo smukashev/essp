@@ -2,16 +2,16 @@
 <batch>
   <entities>
     <ref_portfolio>
-      <code>1042</code>
-      <name_kz>Теңге жеке тұлғалардың біртекті қарыздар портфелі</name_kz>
-      <name_ru>Портфель по однородным займам по физическим лицам в тенге</name_ru>
+      <code>0961</code>
+      <name_kz>құнсыздану белгісі жоқ жеке тұлғаларға арналған жеке мағыналы несиелер пулы</name_kz>
+      <name_ru>Пул инд.значимых займов физ.лицам без признаков обесценения</name_ru>
       <creditor>
-        <name>АО ДБ "Национальный Банк Пакистана" в Казахстане</name>
-        <short_name>АО ДБ "NBP" в Казахстане</short_name>
-        <code>553</code>
+        <name>АО "Исламский Банк "Al Hilal"</name>
+        <short_name>АО "Al Hilal"</short_name>
+        <code>246</code>
         <docs>
           <item>
-            <no>000440001339</no>
+            <no>100140011772</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -23,7 +23,7 @@
             </doc_type>
           </item>
           <item>
-            <no>NBPAKZKA</no>
+            <no>HLALKZKZ</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
