@@ -99,7 +99,7 @@ public enum Errors {
         errors.put("E59", "Родитель атрибута #baseValueSaving.getMetaAttribute().getName() должна быть сущность");
         errors.put("E60", "Атрибут должен содержать мета данные");
         errors.put("E61", "Поддержка массив массивов не реализовано");
-        errors.put("E62", "Запись класса #metaclass не найдена; #baseEntity");
+        errors.put("E62", "Запись класса #metaclass не найдена;");
         errors.put("E63", "В базе нет данных для записи #baseEntityId до отчетной даты(включительно): #reportDate");
         errors.put("E64", "Комплексный элелемент не содержит внутренних элементов #metaclass");
         errors.put("E65", "Оперативные атрибуты могут сожержать только оперативные данные. Мета: #metaclass , атрибут: #attribute");
@@ -114,9 +114,9 @@ public enum Errors {
         errors.put("E73", "Запись открытия не была найдена #metaAttribute");
         errors.put("E74", "Last значение выгружено неправильно");
         errors.put("E75", "Закрытие атрибута за прошлый период не является возможным");
-        errors.put("E76", "Ошибка при вставке #e.getMessage() #insertedObject");
-        errors.put("E77", "Ошибка при обновлений #e.getMessage() #updatedObject");
-        errors.put("E78", "Ошибка при удалений #e.getMessage() #deletedObject");
+        errors.put("E76", "Ошибка при вставке #e.getMessage()");
+        errors.put("E77", "Ошибка при обновлений #e.getMessage()");
+        errors.put("E78", "Ошибка при удалений #e.getMessage()");
         errors.put("E79", "Удаление затронуло #count записей #id , EAV_BE_BOOLEAN_VALUES");
 
         errors.put("E80", "Мета данные атрибута не могут быть NULL");
@@ -155,10 +155,10 @@ public enum Errors {
 
         errors.put("E110", "Невозмозжно удалить кредитор у которго есть связки с пользователями (id: #id )");
         errors.put("E111", "Кредитор не найден #creditor");
-        errors.put("E112", "Сущность для удаления не найдена #baseEntity");
-        errors.put("E113", "Справочник с историей не может быть удалена #baseEntity");
-        errors.put("E114", "Сущность для закрытия не найдена #baseEntity");
-        errors.put("E115", "Дата закрытия не может быть одинаковой с датой открытия #baseEntity");
+        errors.put("E112", "Сущность для удаления не найдена");
+        errors.put("E113", "Справочник с историей не может быть удалена");
+        errors.put("E114", "Сущность для закрытия не найдена");
+        errors.put("E115", "Дата закрытия не может быть одинаковой с датой открытия");
         errors.put("E116", "Запись была найдена в базе ( #baseEntityId ). Вставка не произведена");
         errors.put("E117", "Запись не была найдена в базе. Обновление не выполнено; ");
         errors.put("E118", "Операция не поддерживается #operation");
@@ -224,7 +224,7 @@ public enum Errors {
         errors.put("E172", "Persistable класс не может быть null");//Persistable class can not be null
         errors.put("E173", "Не найдено соответствующий интерфейс для persistable класса #metaclass");//Not found appropriate interface for persistable class #metaclass
         errors.put("E174", "Найдено более одного договора");
-        errors.put("E175", "Найдено более одного документа #entity");
+        errors.put("E175", "Найдено более одного документа");
         errors.put("E176", "Метакласс не может быть NULL");
         errors.put("E177", "Ключевой атрибут( #name ) не может быть пустым. Родитель: #metaclass ;");
         errors.put("E178", "Массив должен содержать элементы( #metaclass );");
@@ -236,9 +236,9 @@ public enum Errors {
         errors.put("E183", "Мета класс для оптимизаций не найден;");
         errors.put("E184", "Документ не содержит обязательные поля; ");
         errors.put("E185", "Кредитор не найден в справочнике;");
-        errors.put("E186", "Тип документа не найден; #iBaseEntity");
+        errors.put("E186", "Тип документа не найден;");
         errors.put("E187", "Договор не содержит обязательные поля;");
-        errors.put("E188", "Ключевое поле docs пустое; #iBaseEntity");
+        errors.put("E188", "Ключевое поле docs пустое;");
         errors.put("E189", "Субъект должен иметь идентификационные документы;");
 
         errors.put("E190", "Тип данных не определён #dataTypes");
