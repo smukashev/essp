@@ -38,10 +38,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     private DSLContext context;
 
     @Autowired
-    IMetaClassRepository metaClassRepository;
+    private IMetaClassRepository metaClassRepository;
 
     @Autowired
-    IPersistableDaoPool persistableDaoPool;
+    private IPersistableDaoPool persistableDaoPool;
 
     @Override
     public long insert(IPersistable persistable) {
@@ -254,8 +254,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
             return false;
         }
 
-        Set<Class<? extends IBaseValue>> baseValueClasses =
-                new HashSet<Class<? extends IBaseValue>>();
+        Set<Class<? extends IBaseValue>> baseValueClasses = new HashSet<>();
         baseValueClasses.add(BaseEntityBooleanValue.class);
         baseValueClasses.add(BaseEntityDateValue.class);
         baseValueClasses.add(BaseEntityDoubleValue.class);

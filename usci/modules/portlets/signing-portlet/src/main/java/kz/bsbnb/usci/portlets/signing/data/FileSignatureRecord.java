@@ -34,7 +34,7 @@ public class FileSignatureRecord {
     }
     
     public String getSentDate() {
-        //return DATE_FORMAT.format(inputFile.getInputInfo().getReceiverDate());
+        //return DATE_FORMAT_SLASH_STR.format(inputFile.getInputInfo().getReceiverDate());
         return DATE_FORMAT.format(new Date());
     }
     

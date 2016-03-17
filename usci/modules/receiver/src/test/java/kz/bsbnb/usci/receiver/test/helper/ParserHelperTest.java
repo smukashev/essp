@@ -2,6 +2,7 @@ package kz.bsbnb.usci.receiver.test.helper;
 
 import junit.framework.Assert;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.helper.impl.ParserHelper;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import java.text.SimpleDateFormat;
  */
 public class ParserHelperTest {
     private ParserHelper parserHelper = new ParserHelper();
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Global.DATE_FORMAT);
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DataUtils.DATE_FORMAT_SLASH);
 
     @Test
     public void testInteger() {

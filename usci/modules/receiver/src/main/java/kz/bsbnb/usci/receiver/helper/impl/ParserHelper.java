@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.helper.impl;
 
+import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.helper.IHelper;
@@ -20,8 +21,8 @@ public class ParserHelper implements IHelper {
             case INTEGER:
                 return Integer.parseInt(value);
             case DATE:
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Global.DATE_FORMAT);
-                SimpleDateFormat simpleDateFormatDot = new SimpleDateFormat(Global.DATE_FORMAT_DOT);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DataUtils.DATE_FORMAT_SLASH);
+                SimpleDateFormat simpleDateFormatDot = new SimpleDateFormat(DataUtils.DATE_FORMAT_DOT);
 
                 Date date = null;
 

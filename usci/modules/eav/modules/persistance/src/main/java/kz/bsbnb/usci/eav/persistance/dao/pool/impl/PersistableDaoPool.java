@@ -20,8 +20,7 @@ public class PersistableDaoPool implements IPersistableDaoPool {
     @Autowired
     private ApplicationContext applicationContext;
 
-    private Map<Class<? extends IPersistable>, Class<? extends IPersistableDao>> persistableDaoMap =
-            new HashMap<>();
+    private Map<Class<? extends IPersistable>, Class<? extends IPersistableDao>> persistableDaoMap = new HashMap<>();
 
     public PersistableDaoPool() {
         persistableDaoMap.put(BaseEntity.class, IBaseEntityDao.class);
@@ -56,8 +55,7 @@ public class PersistableDaoPool implements IPersistableDaoPool {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IPersistableDao> T getPersistableDao(Class<? extends IPersistable> persistableClass,
-                                                           Class<T> extendedPersistableDaoClass) {
+    public <T extends IPersistableDao> T getPersistableDao(Class<? extends IPersistable> persistableClass, Class<T> extendedPersistableDaoClass) {
         if (persistableClass == null)
             throw new RuntimeException(Errors.getMessage(Errors.E172));
 
@@ -68,5 +66,4 @@ public class PersistableDaoPool implements IPersistableDaoPool {
 
         throw new RuntimeException(Errors.getMessage(Errors.E173, persistableClass.getName()));
     }
-
 }

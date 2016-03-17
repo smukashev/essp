@@ -307,19 +307,18 @@ public class BeanDataProvider implements DataProvider {
                     throw new RuntimeException(Errors.getMessage(Errors.E236));
 
                 if (targetCreditor.getSubjectType() == null)
-                    throw new RuntimeException(String.format("Subject type of the creditor with ID {0} is null",
-                            creditorId));
+                    throw new RuntimeException("Subject type of the creditor with ID " + creditorId + " is null");
 
-                return DataTypeUtil.plus(lastApprovedDate,
-                        Calendar.MONTH, targetCreditor.getSubjectType().getReportPeriodDurationMonths());
+                final Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(lastApprovedDate.getTime());
+                calendar.add(Calendar.MONTH, targetCreditor.getSubjectType().getReportPeriodDurationMonths());
+                return calendar.getTime();
             }
 
             // TODO Пока что начальная дата как константа, нужно сделать настройку
             Calendar calendar = Calendar.getInstance();
             calendar.clear();
             calendar.set(2014, Calendar.JANUARY, 13);
-
-
 
             return calendar.getTime();
 
