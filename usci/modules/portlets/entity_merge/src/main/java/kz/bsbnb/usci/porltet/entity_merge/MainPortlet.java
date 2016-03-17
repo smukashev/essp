@@ -13,13 +13,11 @@ import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.form.ISearcherFormService;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.meta.IMetaValue;
+import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
@@ -148,6 +146,125 @@ public class MainPortlet extends MVCPortlet {
 			return;
 
 		super.doView(renderRequest, renderResponse);
+	}
+
+	private RefListResponse refListToShort(RefListResponse refListResponse) {
+		List<Map<String, Object>> shortRows = new ArrayList<>();
+
+		String titleKey = null;
+
+		if (!refListResponse.getData().isEmpty()) {
+			Set<String> keys = refListResponse.getData().get(0).keySet();
+
+			if (keys.contains("name_ru"))
+				titleKey = "name_ru";
+			else if (keys.contains("name_kz"))
+				titleKey = "name_kz";
+			else if (keys.contains("name"))
+				titleKey = "name";
+		}
+
+		for (Map<String, Object> row : refListResponse.getData()) {
+			Object id = row.get("ID");
+			Object title = titleKey != null ? row.get(titleKey) : "------------------------";
+
+			Map<String, Object> shortRow = new HashMap<>();
+			shortRow.put("ID", id);
+			shortRow.put("title", title);
+			shortRows.add(shortRow);
+		}
+
+		return new RefListResponse(shortRows);
+	}
+
+	private String getAttributesJson(IMetaClass meta) {
+		StringBuilder result = new StringBuilder();
+
+		result.append("{\"total\":");
+		result.append(meta.getAttributeNames().size());
+		result.append(",\"data\":[");
+
+		boolean first = true;
+
+		for (String attrName : meta.getAttributeNames()) {
+			IMetaAttribute metaAttribute = meta.getMetaAttribute(attrName);
+
+			if (first) {
+				first = false;
+			} else {
+				result.append(",");
+			}
+			result.append("{");
+
+			result.append("\"code\":");
+			result.append("\"");
+			result.append(attrName);
+			result.append("\"");
+
+			result.append(",\"title\":");
+			result.append("\"");
+			result.append(metaAttribute.getTitle());
+			result.append("\"");
+
+			result.append(",\"isKey\":");
+			result.append("\"");
+			result.append(metaAttribute.isKey());
+			result.append("\"");
+
+			result.append(",\"isRequired\":");
+			result.append("\"");
+			result.append(metaAttribute.isRequired());
+			result.append("\"");
+
+			result.append(",\"array\":");
+			result.append("\"");
+			result.append(metaAttribute.getMetaType().isSet());
+			result.append("\"");
+
+			result.append(",\"simple\":");
+			result.append("\"");
+			result.append(!metaAttribute.getMetaType().isComplex());
+			result.append("\"");
+
+			result.append(",\"ref\":");
+			result.append("\"");
+			result.append(metaAttribute.getMetaType().isReference());
+			result.append("\"");
+
+			if (metaAttribute.getMetaType().isComplex() && !metaAttribute.getMetaType().isSet()) {
+				result.append(",\"metaId\":");
+				result.append("\"");
+				result.append(((IMetaClass) metaAttribute.getMetaType()).getId());
+				result.append("\"");
+			}
+
+			result.append(",\"type\":");
+			result.append("\"");
+			result.append(getMetaTypeStr(metaAttribute.getMetaType()));
+			result.append("\"");
+
+			if (metaAttribute.getMetaType().isSet()) {
+				IMetaType memberType = ((IMetaSet) metaAttribute.getMetaType()).getMemberType();
+
+				if (memberType.isComplex()) {
+					result.append(",\"childMetaId\":");
+					result.append("\"");
+					result.append(((IMetaClass) memberType).getId());
+					result.append("\"");
+				}
+
+				result.append(",\"childType\":");
+				result.append("\"");
+				result.append(getMetaTypeStr(memberType));
+				result.append("\"");
+			}
+
+			result.append("}");
+		}
+
+		result.append("]}");
+
+		return result.toString();
 	}
 
 	private String testNull(String str) {
@@ -877,6 +994,7 @@ public class MainPortlet extends MVCPortlet {
 			User currentUser = PortalUtil.getUser(resourceRequest);
 
 			Gson gson = new Gson();
+			String sJson;
 
 			switch (operationType) {
 				case SAVE_JSON: {
@@ -1051,6 +1169,24 @@ public class MainPortlet extends MVCPortlet {
 
 					break;
 				}
+				case LIST_BY_CLASS_SHORT_SELECT:
+					String metaId = resourceRequest.getParameter("metaId");
+					RefListResponse refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), null, false);
+					refListResponse = refListToShort(refListResponse);
+					sJson = gson.toJson(refListResponse);
+					writer.write(sJson);
+
+					break;
+				case LIST_ATTRIBUTES_SELECT:
+					metaId = resourceRequest.getParameter("metaId");
+
+					if (StringUtils.isNotEmpty(metaId)) {
+						metaClass = metaFactoryService.getMetaClass(Long.valueOf(metaId));
+						sJson = getAttributesJson(metaClass);
+						writer.write(sJson);
+					}
+
+					break;
 				case LIST_ENTITY_SELECT:
 					String entityId = resourceRequest.getParameter("entityId");
 					String asRootStr = resourceRequest.getParameter("asRoot");
@@ -1089,7 +1225,7 @@ public class MainPortlet extends MVCPortlet {
 
 						BaseEntity entity = entityService.load(Integer.parseInt(entityId), date);
 
-						String sJson = "{\"text\":\".\",\"children\": [\n" +
+						sJson = "{\"text\":\".\",\"children\": [\n" +
 								entityToJsonSelect(entity, entity.getMeta().getClassTitle(),
 										entity.getMeta().getClassName(), null, asRoot, isNb, creditorId) +
 								"]}";
@@ -1212,6 +1348,8 @@ public class MainPortlet extends MVCPortlet {
 		LIST_CREDITORS,
 		GET_ENTITY_ID,
 		LIST_ENTITY_SELECT,
+		LIST_BY_CLASS_SHORT_SELECT,
+		LIST_ATTRIBUTES_SELECT,
 		LIST_ENTITY,
 		LIST_CREDITOR,
 		SAVE_JSON,

@@ -41,3 +41,4 @@ var label_CLASS = "Класс";
 var LABEL_UPDATE = 'Обновить';
 var LABEL_GET_ENTITY = 'Получить сущность';
 var label_date = "Дата";
+var label_REQUIRED_FIELD = "Обязательное поле";

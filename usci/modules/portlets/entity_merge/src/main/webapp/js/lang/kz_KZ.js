@@ -40,3 +40,4 @@ var label_CLASS = "Класс";
 var LABEL_UPDATE = 'Жанарту';
 var LABEL_GET_ENTITY = 'Байып алу';
 var label_date = 'Күні';
+var label_REQUIRED_FIELD = "Обязательное поле";
