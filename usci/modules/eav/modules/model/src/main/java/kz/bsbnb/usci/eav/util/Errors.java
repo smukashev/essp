@@ -114,9 +114,9 @@ public enum Errors {
         errors.put("E73", "Запись открытия не была найдена #metaAttribute");
         errors.put("E74", "Last значение выгружено неправильно");
         errors.put("E75", "Закрытие атрибута за прошлый период не является возможным");
-        errors.put("E76", "Ошибка при вставке #e.getMessage()");
-        errors.put("E77", "Ошибка при обновлений #e.getMessage()");
-        errors.put("E78", "Ошибка при удалений #e.getMessage()");
+        errors.put("E76", "Ошибка при вставке #e_message");
+        errors.put("E77", "Ошибка при обновлений #e_message");
+        errors.put("E78", "Ошибка при удалений #e_message");
         errors.put("E79", "Удаление затронуло #count записей #id , EAV_BE_BOOLEAN_VALUES");
 
         errors.put("E80", "Мета данные атрибута не могут быть NULL");
@@ -231,7 +231,7 @@ public enum Errors {
         errors.put("E179", "Простой массив не может быть ключевым( #metaclass );");
 
         errors.put("E180", "Неудается найти конфигурационный файл БД #schema");
-        errors.put("E181", "Проблемы с очередью: #e.message()");
+        errors.put("E181", "Проблемы с очередью: #e_message");
         errors.put("E182", "ОС не поддерживается");//OS is not support
         errors.put("E183", "Мета класс для оптимизаций не найден;");
         errors.put("E184", "Документ не содержит обязательные поля; ");
@@ -245,17 +245,17 @@ public enum Errors {
         errors.put("E191", "ZIP-файл не содержит каких-либо файлов");//ZIP file does not contain any files
         errors.put("E192", "Sync тайм-аут в reader-е");//Sync timeout in reader
         errors.put("E193", "Ошибка при проверки XML");//XML validation error
-        errors.put("E194", "Ошибка преобразования класса: #localName , текст исключении :  #e.getMessage()");//Cast error: #localName , exception text:  #e.getMessage()
+        errors.put("E194", "Ошибка преобразования класса: #localName , текст исключении :  #e_message");//Cast error: #localName , exception text:  #e_message
 
-        errors.put("E195", "Ошибка бизнес правил #e.getMessage");
+        errors.put("E195", "Ошибка бизнес правил #e_message");
         errors.put("E196", "Запись найдена в базе( #id ). Вставка не произведена;");
         errors.put("E197", "Кредитор установлен не правильно;");
         errors.put("E198", "Запись не найдена в базе. Обновление не выполнено;");
         errors.put("E199", "Ошибка при обработке описания протокола;");
         errors.put("E200", "Параметр <Liferay пользователя> не может быть null;");//Parameter <liferayUser> can not be null;
-        errors.put("E201", "Не удалось получить ответ. #e.getMessage"); //Failed to consume response. #e.getMessage
+        errors.put("E201", "Не удалось получить ответ. #e_message"); //Failed to consume response. #e_message
         errors.put("E202", "Ошибка : HTTP код ошибки : #statusCode : #reasonPhrase");//Failed : HTTP error code : #statusCode : #reasonPhrase
-        errors.put("E203", "Возможно Bonita не запущен, или URL является недействительным. Пожалуйста, проверьте имя хоста и номер порта. Используемый URL : #BONITA_URI , #e.getMessage"); //Bonita bundle may not have been started, or the URL is invalid. Please verify hostname and port number. URL used is: #BONITA_URI , #e.getMessage
+        errors.put("E203", "Возможно Bonita не запущен, или URL является недействительным. Пожалуйста, проверьте имя хоста и номер порта. Используемый URL : #BONITA_URI , #e_message"); //Bonita bundle may not have been started, or the URL is invalid. Please verify hostname and port number. URL used is: #BONITA_URI , #e_message
         errors.put("E204", "Первичная отчетнная дата неправильно отформатирована");//Initial report date is incorrectly formatted
         errors.put("E205", "Количество Отчет > 1");//Reports size > 1
         errors.put("E206", "Пока не поддерживается.");//Not supported yet.
@@ -298,14 +298,14 @@ public enum Errors {
         errors.put("E243", "Мета является null");//Meta is null
         errors.put("E244", "Услуги является null");//Services are null
         errors.put("E245", "Тип является null");//Type is null
-        errors.put("E246", "Невозможно разобрать значение конфигурации #LAST_MAIL_HANDLER_LAUNCH_TIME_CODE # e.getMessage");//Couldn't parse #LAST_MAIL_HANDLER_LAUNCH_TIME_CODE configuration value #e.getMessage
+        errors.put("E246", "Невозможно разобрать значение конфигурации #LAST_MAIL_HANDLER_LAUNCH_TIME_CODE #e_message");//Couldn't parse #LAST_MAIL_HANDLER_LAUNCH_TIME_CODE configuration value #e_message
         errors.put("E247", "Shared не может быть null");//Shared can not be null
-        errors.put("E248", "Не удалось найти кодировку # e.getMessage");//Couldn't find encoding #e.getMessage
+        errors.put("E248", "Не удалось найти кодировку #e_message");//Couldn't find encoding #e_message
         errors.put("E249", "Null неправильное значение для свойств массива"); //Null is illegal value for properties array
         errors.put("E250", "Null неправильное значение длины имен свойств");//Null is illegal value for property names length
         errors.put("E251", "Свойства и имена свойств должны содержать одинаковое количество элементов");//Properties and property names should contain equal number of elements
-        errors.put("E252", "I/O exception #e.getMessage");
-        errors.put("E253", "Parse error #e.getMessage");
+        errors.put("E252", "I/O exception #e_message");
+        errors.put("E253", "Parse error #e_message");
         errors.put("E254", "Коллекции должны быть одинакового размера");//Collections should be of equal size
         errors.put("E255", "Null параметры");//null parameters
         errors.put("E256", "Нет больше записей");//No more records
