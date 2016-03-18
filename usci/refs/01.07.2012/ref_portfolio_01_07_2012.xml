@@ -1,0 +1,3875 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_portfolio>
+      <code>1038</code>
+      <name_kz>Пул по займам ЮЛ транспорт - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ транспорт - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0996</code>
+      <name_kz>Пул по займам ФЛ прочие займы - просрочка 151-180 дней</name_kz>
+      <name_ru>Пул по займам ФЛ прочие займы - просрочка 151-180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0997</code>
+      <name_kz>Пул по займам ФЛ прочие займы - просрочка свыше 180 дней</name_kz>
+      <name_ru>Пул по займам ФЛ прочие займы - просрочка свыше 180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0994</code>
+      <name_kz>Пул по займам ФЛ прочие займы - просрочка 91-120 дней</name_kz>
+      <name_ru>Пул по займам ФЛ прочие займы - просрочка 91-120 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0995</code>
+      <name_kz>Пул по займам ФЛ прочие займы - просрочка 121-150 дней</name_kz>
+      <name_ru>Пул по займам ФЛ прочие займы - просрочка 121-150 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1000</code>
+      <name_kz>Пул по займам ЮЛ строительство - просрочка 31-60 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ строительство - просрочка 31-60 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0998</code>
+      <name_kz>Пул по займам ЮЛ строительство - просрочка 0 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ строительство - просрочка 0 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0999</code>
+      <name_kz>Пул по займам ЮЛ строительство - просрочка 1-30 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ строительство - просрочка 1-30 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1004</code>
+      <name_kz>Пул по займам ЮЛ строительство - просрочка 151-180 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ строительство - просрочка 151-180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1003</code>
+      <name_kz>Пул по займам ЮЛ строительство - просрочка 121-150 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ строительство - просрочка 121-150 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1002</code>
+      <name_kz>Пул по займам ЮЛ строительство - просрочка 91-120 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ строительство - просрочка 91-120 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1001</code>
+      <name_kz>Пул по займам ЮЛ строительство - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ строительство - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1050</code>
+      <name_kz>Пул договоров аккредитивов - просрочка 121-150 дней</name_kz>
+      <name_ru>Пул договоров аккредитивов - просрочка 121-150 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0983</code>
+      <name_kz>Пул по займам ФЛ ипотека - просрочка 1-30 дней</name_kz>
+      <name_ru>Пул по займам ФЛ ипотека - просрочка 1-30 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1049</code>
+      <name_kz>Пул договоров аккредитивов - просрочка 91-120 дней</name_kz>
+      <name_ru>Пул договоров аккредитивов - просрочка 91-120 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0984</code>
+      <name_kz>Пул по займам ФЛ ипотека - просрочка 31-60 дней</name_kz>
+      <name_ru>Пул по займам ФЛ ипотека - просрочка 31-60 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1048</code>
+      <name_kz>Пул договоров аккредитивов - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул договоров аккредитивов - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0985</code>
+      <name_kz>Пул по займам ФЛ ипотека - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул по займам ФЛ ипотека - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1047</code>
+      <name_kz>Пул договоров аккредитивов - просрочка 31-60 дней</name_kz>
+      <name_ru>Пул договоров аккредитивов - просрочка 31-60 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0986</code>
+      <name_kz>Пул по займам ФЛ ипотека - просрочка 91-120 дней</name_kz>
+      <name_ru>Пул по займам ФЛ ипотека - просрочка 91-120 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1046</code>
+      <name_kz>Пул договоров аккредитивов - просрочка 1-30 дней</name_kz>
+      <name_ru>Пул договоров аккредитивов - просрочка 1-30 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0987</code>
+      <name_kz>Пул по займам ФЛ ипотека - просрочка 121-150 дней</name_kz>
+      <name_ru>Пул по займам ФЛ ипотека - просрочка 121-150 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1045</code>
+      <name_kz>Пул договоров аккредитивов - просрочка 0 дней</name_kz>
+      <name_ru>Пул договоров аккредитивов - просрочка 0 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0988</code>
+      <name_kz>Пул по займам ФЛ ипотека - просрочка 151-180 дней</name_kz>
+      <name_ru>Пул по займам ФЛ ипотека - просрочка 151-180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0989</code>
+      <name_kz>Пул по займам ФЛ ипотека - просрочка свыше 180 дней</name_kz>
+      <name_ru>Пул по займам ФЛ ипотека - просрочка свыше 180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0990</code>
+      <name_kz>Пул по займам ФЛ прочие займы - просрочка 0 дней</name_kz>
+      <name_ru>Пул по займам ФЛ прочие займы - просрочка 0 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1028</code>
+      <name_kz>Пул по займам ЮЛ торговля - просрочка 151-180 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ торговля - просрочка 151-180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1027</code>
+      <name_kz>Пул по займам ЮЛ торговля - просрочка 121-150 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ торговля - просрочка 121-150 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1030</code>
+      <name_kz>Пул по займам ЮЛ транспорт - просрочка 0 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ транспорт - просрочка 0 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1029</code>
+      <name_kz>Пул по займам ЮЛ торговля - просрочка свыше 180 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ торговля - просрочка свыше 180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0982</code>
+      <name_kz>Пул по займам ФЛ ипотека - просрочка 0 дней</name_kz>
+      <name_ru>Пул по займам ФЛ ипотека - просрочка 0 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0981</code>
+      <name_kz>Пул по займам ФЛ индивидуальных предпринимателей - просрочка свыше 180 дней</name_kz>
+      <name_ru>Пул по займам ФЛ индивидуальных предпринимателей - просрочка свыше 180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0980</code>
+      <name_kz>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 151-180 дней</name_kz>
+      <name_ru>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 151-180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0991</code>
+      <name_kz>Пул по займам ФЛ прочие займы - просрочка 1-30 дней</name_kz>
+      <name_ru>Пул по займам ФЛ прочие займы - просрочка 1-30 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0993</code>
+      <name_kz>Пул по займам ФЛ прочие займы - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул по займам ФЛ прочие займы - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0992</code>
+      <name_kz>Пул по займам ФЛ прочие займы - просрочка 31-60 дней</name_kz>
+      <name_ru>Пул по займам ФЛ прочие займы - просрочка 31-60 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0974</code>
+      <name_kz>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 0 дней</name_kz>
+      <name_ru>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 0 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1031</code>
+      <name_kz>Пул по займам ЮЛ транспорт - просрочка 1-30 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ транспорт - просрочка 1-30 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0975</code>
+      <name_kz>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 1-30 дней</name_kz>
+      <name_ru>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 1-30 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1032</code>
+      <name_kz>Пул по займам ЮЛ транспорт - просрочка 31-60 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ транспорт - просрочка 31-60 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0972</code>
+      <name_kz>Пул по займам ФЛ потребительские - просрочка 151-180 дней</name_kz>
+      <name_ru>Пул по займам ФЛ потребительские - просрочка 151-180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0973</code>
+      <name_kz>Пул по займам ФЛ потребительские - просрочка свыше 180 дней</name_kz>
+      <name_ru>Пул по займам ФЛ потребительские - просрочка свыше 180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1034</code>
+      <name_kz>Пул по займам ЮЛ транспорт - просрочка 91-120 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ транспорт - просрочка 91-120 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0978</code>
+      <name_kz>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 91-120 дней</name_kz>
+      <name_ru>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 91-120 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1035</code>
+      <name_kz>Пул по займам ЮЛ транспорт - просрочка 121-150 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ транспорт - просрочка 121-150 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0979</code>
+      <name_kz>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 121-150 дней</name_kz>
+      <name_ru>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 121-150 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1036</code>
+      <name_kz>Пул по займам ЮЛ транспорт - просрочка 151-180 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ транспорт - просрочка 151-180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0976</code>
+      <name_kz>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 31-60 дней</name_kz>
+      <name_ru>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 31-60 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1037</code>
+      <name_kz>Пул по займам ЮЛ транспорт - просрочка свыше 180 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ транспорт - просрочка свыше 180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0977</code>
+      <name_kz>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул по займам ФЛ индивидуальных предпринимателей - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1020</code>
+      <name_kz>Пул по займам ЮЛ прочие займы - просрочка 151-180 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ прочие займы - просрочка 151-180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0971</code>
+      <name_kz>Пул по займам ФЛ потребительские - просрочка 121-150 дней</name_kz>
+      <name_ru>Пул по займам ФЛ потребительские - просрочка 121-150 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1018</code>
+      <name_kz>Пул по займам ЮЛ прочие займы - просрочка 91-120 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ прочие займы - просрочка 91-120 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1019</code>
+      <name_kz>Пул по займам ЮЛ прочие займы - просрочка 121-150 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ прочие займы - просрочка 121-150 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1016</code>
+      <name_kz>Пул по займам ЮЛ прочие займы - просрочка 31-60 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ прочие займы - просрочка 31-60 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1017</code>
+      <name_kz>Пул по займам ЮЛ прочие займы - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ прочие займы - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1026</code>
+      <name_kz>Пул по займам ЮЛ торговля - просрочка 91-120 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ торговля - просрочка 91-120 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0966</code>
+      <name_kz>Пул по займам ФЛ потребительские - просрочка 0 дней</name_kz>
+      <name_ru>Пул по займам ФЛ потребительские - просрочка 0 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1025</code>
+      <name_kz>Пул по займам ЮЛ торговля - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ торговля - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0965</code>
+      <name_kz>Пул по займам ФЛ потребительские - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул по займам ФЛ потребительские - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1024</code>
+      <name_kz>Пул по займам ЮЛ торговля - просрочка 31-60 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ торговля - просрочка 31-60 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0968</code>
+      <name_kz>Пул по займам ФЛ потребительские - просрочка 31-60 дней</name_kz>
+      <name_ru>Пул по займам ФЛ потребительские - просрочка 31-60 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1023</code>
+      <name_kz>Пул по займам ЮЛ торговля - просрочка 1-30 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ торговля - просрочка 1-30 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0967</code>
+      <name_kz>Пул по займам ФЛ потребительские - просрочка 1-30 дней</name_kz>
+      <name_ru>Пул по займам ФЛ потребительские - просрочка 1-30 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1022</code>
+      <name_kz>Пул по займам ЮЛ торговля - просрочка 0 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ торговля - просрочка 0 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1021</code>
+      <name_kz>Пул по займам ЮЛ прочие займы - просрочка свыше 180 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ прочие займы - просрочка свыше 180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0970</code>
+      <name_kz>Пул по займам ФЛ потребительские - просрочка 91-120 дней</name_kz>
+      <name_ru>Пул по займам ФЛ потребительские - просрочка 91-120 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>0969</code>
+      <name_kz>Пул по займам ФЛ потребительские - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул по займам ФЛ потребительские - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1052</code>
+      <name_kz>Пул договоров аккредитивов - просрочка свыше 180 дней</name_kz>
+      <name_ru>Пул договоров аккредитивов - просрочка свыше 180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1009</code>
+      <name_kz>Пул по займам ЮЛ производство - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ производство - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1051</code>
+      <name_kz>Пул договоров аккредитивов - просрочка 151-180 дней</name_kz>
+      <name_ru>Пул договоров аккредитивов - просрочка 151-180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1010</code>
+      <name_kz>Пул по займам ЮЛ производство - просрочка 91-120 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ производство - просрочка 91-120 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1053</code>
+      <name_kz>Пул договоров гарантий - просрочка 0 дней</name_kz>
+      <name_ru>Пул договоров гарантий - просрочка 0 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1005</code>
+      <name_kz>Пул по займам ЮЛ строительство - просрочка свыше 180 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ строительство - просрочка свыше 180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1006</code>
+      <name_kz>Пул по займам ЮЛ производство - просрочка 0 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ производство - просрочка 0 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1007</code>
+      <name_kz>Пул по займам ЮЛ производство - просрочка 1-30 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ производство - просрочка 1-30 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1008</code>
+      <name_kz>Пул по займам ЮЛ производство - просрочка 31-60 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ производство - просрочка 31-60 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1054</code>
+      <name_kz>Пул договоров гарантий - просрочка 1-30 дней</name_kz>
+      <name_ru>Пул договоров гарантий - просрочка 1-30 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1013</code>
+      <name_kz>Пул по займам ЮЛ производство - просрочка свыше 180 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ производство - просрочка свыше 180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1055</code>
+      <name_kz>Пул договоров гарантий - просрочка 31-60 дней</name_kz>
+      <name_ru>Пул договоров гарантий - просрочка 31-60 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1012</code>
+      <name_kz>Пул по займам ЮЛ производство - просрочка 151-180 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ производство - просрочка 151-180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1056</code>
+      <name_kz>Пул договоров гарантий - просрочка 61-90 дней</name_kz>
+      <name_ru>Пул договоров гарантий - просрочка 61-90 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1015</code>
+      <name_kz>Пул по займам ЮЛ прочие займы - просрочка 1-30 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ прочие займы - просрочка 1-30 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1057</code>
+      <name_kz>Пул договоров гарантий - просрочка 91-120 дней</name_kz>
+      <name_ru>Пул договоров гарантий - просрочка 91-120 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1014</code>
+      <name_kz>Пул по займам ЮЛ прочие займы - просрочка 0 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ прочие займы - просрочка 0 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1058</code>
+      <name_kz>Пул договоров гарантий - просрочка 121-160 дней</name_kz>
+      <name_ru>Пул договоров гарантий - просрочка 121-160 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1059</code>
+      <name_kz>Пул договоров гарантий - просрочка 121-150 дней</name_kz>
+      <name_ru>Пул договоров гарантий - просрочка 121-150 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1060</code>
+      <name_kz>Пул договоров гарантий - просрочка 151-180 дней</name_kz>
+      <name_ru>Пул договоров гарантий - просрочка 151-180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1011</code>
+      <name_kz>Пул по займам ЮЛ производство - просрочка 121-150 дней</name_kz>
+      <name_ru>Пул по займам ЮЛ производство - просрочка 121-150 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1061</code>
+      <name_kz>Пул договоров гарантий - просрочка свыше 180 дней</name_kz>
+      <name_ru>Пул договоров гарантий - просрочка свыше 180 дней</name_ru>
+      <creditor>
+        <name>АО "ДБ "КЗИ Банк"</name>
+        <short_name>АО "ДБ "КЗИ Банк"</short_name>
+        <code>885</code>
+        <docs>
+          <item>
+            <no>930140000323</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>KZIBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+  </entities>
+</batch>

@@ -188,11 +188,6 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         return true;
     }
 
-    @Override
-    public boolean isSetOfSets() {
-        return false;
-    }
-
     public int getAttributesCount() {
         return members.size();
     }
@@ -455,9 +450,6 @@ public class MetaClass extends MetaContainer implements IMetaClass {
 
             if (metaType.isComplex()) {
                 if (metaType.isSet()) {
-                    if (metaType.isSetOfSets())
-                        throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
-
                     IMetaSet childMetaSet = (IMetaSet) metaType;
                     IMetaClass childMetaClass = (IMetaClass) childMetaSet.getMemberType();
 

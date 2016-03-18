@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_enterprise_type>
+      <code>08</code>
+      <is_organization>0</is_organization>
+      <is_se>1</is_se>
+      <name_kz>Ірі кәсiпкерлiк субъектiсi - дара кәсіпкер</name_kz>
+      <name_ru>Субъект крупного предпринимательства - индивидуальный предприниматель</name_ru>
+    </ref_enterprise_type>
+    <ref_enterprise_type>
+      <code>09</code>
+      <is_organization>0</is_organization>
+      <is_se>1</is_se>
+      <name_kz>Ірі кәсiпкерлiк субъектiсi - шаруа немесе фермер қожалығы</name_kz>
+      <name_ru>Субъект крупного предпринимательства - крестьянское или фермерское хозяйство</name_ru>
+    </ref_enterprise_type>
+  </entities>
+</batch>

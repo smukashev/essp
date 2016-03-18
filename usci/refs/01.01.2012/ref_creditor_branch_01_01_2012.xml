@@ -14635,8 +14635,8 @@
         </item>
       </docs>
       <main_office>
-        <name>АО "БанкПозитив Казахстан"</name>
-        <short_name>АО "БанкПозитив Казахстан"</short_name>
+        <name>АО "EU Bank (ДБ АО "Евразийский Банк")"</name>
+        <short_name>АО "EU Bank (ДБ АО "Евразийский Банк")"</short_name>
         <code>492</code>
         <docs>
           <item>
@@ -14696,8 +14696,8 @@
         </item>
       </docs>
       <main_office>
-        <name>АО "БанкПозитив Казахстан"</name>
-        <short_name>АО "БанкПозитив Казахстан"</short_name>
+        <name>АО "EU Bank (ДБ АО "Евразийский Банк")"</name>
+        <short_name>АО "EU Bank (ДБ АО "Евразийский Банк")"</short_name>
         <code>492</code>
         <docs>
           <item>
@@ -14757,8 +14757,8 @@
         </item>
       </docs>
       <main_office>
-        <name>АО "БанкПозитив Казахстан"</name>
-        <short_name>АО "БанкПозитив Казахстан"</short_name>
+        <name>АО "EU Bank (ДБ АО "Евразийский Банк")"</name>
+        <short_name>АО "EU Bank (ДБ АО "Евразийский Банк")"</short_name>
         <code>492</code>
         <docs>
           <item>
@@ -19971,7 +19971,7 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО "Банк Астаны" в г. Алматы</name>
+      <name>Алматинский филиал АО "Банк Астаны"</name>
       <short_name>филиал в г. Алматы</short_name>
       <docs>
         <item>
@@ -20502,7 +20502,7 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО "Банк Астаны" в г. Караганды</name>
+      <name>Карагандинский филиал Акционерного общества "Банк Астаны"</name>
       <short_name>филиал в г. Караганды</short_name>
       <docs>
         <item>
@@ -20667,7 +20667,7 @@
       </main_office>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО "Банк Астаны" в г. Актау</name>
+      <name>Актауский филиал АО "Банк Астаны"</name>
       <short_name>филиал в г. Актау</short_name>
       <docs>
         <item>
@@ -20837,7 +20837,7 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО "Банк Астаны" в г. Атырау</name>
+      <name>Атырауский филиал АО "Банк Астаны"</name>
       <short_name>филиал в г. Атырау</short_name>
       <docs>
         <item>
@@ -20922,7 +20922,7 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО "Банк Астаны" в г. Астана</name>
+      <name>Астанинский филиал АО "Банк Астаны"</name>
       <short_name>филиал в г. Астана</short_name>
       <docs>
         <item>
@@ -24343,8 +24343,9 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО Казинвестбанк в г. Алматы</name>
-      <short_name>филиал АО Казинвестбанк в г. Алматы</short_name>
+      <code>644</code>
+      <name>Филиал Акционерного общества "Казинвестбанк" в г. Алматы</name>
+      <short_name>филиал в г. Алматы</short_name>
       <docs>
         <item>
           <no>600900577042</no>
@@ -24356,6 +24357,18 @@
             <is_person_doc>1</is_person_doc>
             <weight>25</weight>
             <code>11</code>
+          </doc_type>
+        </item>
+        <item>
+          <no>060941004477</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
           </doc_type>
         </item>
       </docs>
@@ -24404,8 +24417,9 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
+      <code>421</code>
       <name>Астанинский региональный филиал АО Казинвестбанк</name>
-      <short_name>Астанинский региональный филиал АО Казинвестбанк</short_name>
+      <short_name>Астанинский региональный филиал</short_name>
       <docs>
         <item>
           <no>620200245593</no>
@@ -24417,6 +24431,18 @@
             <is_person_doc>1</is_person_doc>
             <weight>25</weight>
             <code>11</code>
+          </doc_type>
+        </item>
+        <item>
+          <no>041041002754</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
           </doc_type>
         </item>
       </docs>
@@ -24465,9 +24491,22 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО Казинвестбанкв г. Атырау</name>
-      <short_name>филиал АО Казинвестбанкв г. Атырау</short_name>
+      <code>418</code>
+      <name>Филиал Акционерного общества "Казинвестбанк" в г. Атырау</name>
+      <short_name>филиал в г. Атырау</short_name>
       <docs>
+        <item>
+          <no>080541007252</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
         <item>
           <no>150100262018</no>
           <doc_type>
@@ -24526,8 +24565,9 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>Актюбинский областной филиал АО Казинвестбанк</name>
-      <short_name>Актюбинский областной филиал АО Казинвестбанк</short_name>
+      <code>417</code>
+      <name>Филиал акционерного общества "Казинвестбанк" в городе Актобе</name>
+      <short_name>Филиал в г. Актобе</short_name>
       <docs>
         <item>
           <no>61800235911</no>
@@ -24539,6 +24579,18 @@
             <is_person_doc>1</is_person_doc>
             <weight>25</weight>
             <code>11</code>
+          </doc_type>
+        </item>
+        <item>
+          <no>040941003009</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
           </doc_type>
         </item>
       </docs>
@@ -24587,9 +24639,22 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО Казинвестбанкв г. Павлодар</name>
-      <short_name>филиал АО Казинвестбанкв г. Павлодар</short_name>
+      <code>420</code>
+      <name>Филиал Акционерного общества "Казинвестбанк" в г. Павлодар </name>
+      <short_name>филиал в г. Павлодар</short_name>
       <docs>
+        <item>
+          <no>070941010740</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
         <item>
           <no>451500248716</no>
           <doc_type>
@@ -24648,9 +24713,22 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО Казинвестбанкв г. Караганда</name>
-      <short_name>филиал АО Казинвестбанкв г. Караганда</short_name>
+      <code>419</code>
+      <name>Филиал Акционерного общества "Казинвестбанк" в городе Караганда</name>
+      <short_name>филиал в г. Караганда</short_name>
       <docs>
+        <item>
+          <no>071041001781</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
         <item>
           <no>302000280241</no>
           <doc_type>
@@ -24770,9 +24848,22 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО Казинвестбанк в г. Шымкент</name>
-      <short_name>филиал АО Казинвестбанк в г. Шымкент</short_name>
+      <code>422</code>
+      <name>Филиал Акционерного общества "Казинвестбанк" в городе Шымкент</name>
+      <short_name>филиал в г. Шымкент</short_name>
       <docs>
+        <item>
+          <no>060941004675</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
         <item>
           <no>582100264355</no>
           <doc_type>

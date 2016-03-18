@@ -125,10 +125,6 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				IMetaType metaType = metaAttribute.getMetaType();
 				// since there is no child map - there is need to look for child merge manager
 				if (mergeManager.getChildMap() == null) {
-					if (metaType.isSetOfSets()) {
-						throw new UnsupportedOperationException(String.valueOf(Errors.E2));
-					}
-
 					if (metaType.isSet()) {
 						// merge set
 						mergeSet(creditorId, baseEntityApplied, baseValueLeft, baseValueRight,
@@ -141,11 +137,6 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				} else {
 					// get child manager for this attribute
 					if (mergeManager.containsKey(attrKey)) {
-
-						if (metaType.isSetOfSets()) {
-							throw new UnsupportedOperationException(String.valueOf(Errors.E2));
-						}
-
 						if (metaType.isSet()) {
 							// merge set
 							mergeSet(creditorId, baseEntityApplied, baseValueLeft, baseValueRight,

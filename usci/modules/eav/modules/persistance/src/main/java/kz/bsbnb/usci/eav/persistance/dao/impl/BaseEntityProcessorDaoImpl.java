@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.EntityHolder;
@@ -12,7 +11,6 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.model.exceptions.KnownIterativeException;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.*;
@@ -21,11 +19,11 @@ import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.logic.IRuleServicePool;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.DSLContext;
 import org.jooq.Select;
 import org.slf4j.Logger;
@@ -84,12 +82,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         this.applyListener = applyListener;
     }
 
-    @Autowired
-    IRefRepository refRepositoryDao;
-
-    @Value("${refs.cache.enabled}")
-    private boolean isReferenceCacheEnabled;
-
     @Value("${rules.enabled}")
     private boolean rulesEnabled;
 
@@ -106,15 +98,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public IBaseEntity prepare(final IBaseEntity baseEntity, long creditorId) {
         MetaClass metaClass = baseEntity.getMeta();
 
-        if(isReferenceCacheEnabled && metaClass.isReference()) {
-            IBaseEntity refBaseEntity = refRepositoryDao.getRef(baseEntity);
-
-            if (refBaseEntity != null)
-                return refBaseEntity;
-        }
-
         final boolean isReference = metaClass.isReference();
-        creditorId =  isReference ? 0 : creditorId;
+        creditorId = isReference ? 0 : creditorId;
 
         for (String attribute : baseEntity.getAttributes()) {
             IMetaType metaType = baseEntity.getMemberType(attribute);
@@ -146,7 +131,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             long baseEntityId;
 
             if (BasicOptimizer.metaList.contains(metaClass.getClassName())) {
-                baseEntityId = eavOptimizerDao.find(creditorId, BasicOptimizer.getKeyString(baseEntity));
+                baseEntityId = eavOptimizerDao.find(creditorId, baseEntity.getMeta().getId(), BasicOptimizer.getKeyString(baseEntity));
             } else {
                 baseEntityId = search(baseEntity, creditorId);
             }
@@ -182,14 +167,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
                 case DELETE:
-                    if (baseEntityPostPrepared.getId() <= 0){
+                    if (baseEntityPostPrepared.getId() <= 0) {
                         logger.error("Сущность для удаления не найдена; \n" + baseEntityPostPrepared);
                         throw new KnownException(Errors.getMessage(Errors.E112));
                     }
 
 
                     if (baseEntity.getMeta().isReference() && refProcessorDao.historyExists(
-                            baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId())){
+                            baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId())) {
                         logger.error("Справочник с историей не может быть удалена; \n " + baseEntity);
                         throw new KnownException(Errors.getMessage(Errors.E113));
                     }
@@ -204,7 +189,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
                 case CLOSE:
-                    if (baseEntityPostPrepared.getId() <= 0){
+                    if (baseEntityPostPrepared.getId() <= 0) {
                         logger.error("Сущность для закрытия не найдена; \n" + baseEntityPostPrepared);
                         throw new KnownException(Errors.getMessage(Errors.E114));
                     }
@@ -214,12 +199,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
                     if (baseEntityReportDateDao.getMinReportDate(baseEntityPostPrepared.getId()).equals(
-                            baseEntityPostPrepared.getReportDate())){
+                            baseEntityPostPrepared.getReportDate())) {
                         logger.error("Дата закрытия не может быть одинаковой с датой открытия; \n"
                                 + baseEntityPostPrepared);
                         throw new IllegalStateException(Errors.getMessage(Errors.E115));
                     }
-
 
 
                     boolean reportDateExists = baseEntityReportDateDao.exists(baseEntityPostPrepared.getId(),
@@ -248,13 +232,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     baseEntityApplyDao.applyToDb(baseEntityManager);
 
-                    if(isReferenceCacheEnabled) {
-                        if(baseEntityApplied.getMeta().isReference()){
-                            if(refRepositoryDao.getRef(baseEntityApplied)!=null) {
-                                refRepositoryDao.delRef(baseEntityApplied);
-                            }
-                        }
-                    }
                     entityHolder.setApplied(baseEntityApplied);
                     break;
                 case INSERT:
@@ -264,18 +241,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);
 
-                    if(rulesEnabled)
+                    if (rulesEnabled)
                         processLogicControl(baseEntityApplied);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
-
-                    if(isReferenceCacheEnabled) {
-                        if(baseEntityApplied.getMeta().isReference()){
-                            if(refRepositoryDao.getRef(baseEntityApplied)==null) {
-                                refRepositoryDao.setRef(baseEntityApplied);
-                            }
-                        }
-                    }
                     break;
                 case UPDATE:
                     if (baseEntityPostPrepared.getId() <= 0)
@@ -284,51 +253,33 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
                             baseEntityManager, entityHolder);
 
-                    if(rulesEnabled)
+                    if (rulesEnabled)
                         processLogicControl(baseEntityApplied);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
-
-                    if(isReferenceCacheEnabled) {
-                        if(baseEntityApplied.getMeta().isReference()){
-                            if(refRepositoryDao.getRef(baseEntityApplied)==null) {
-                                refRepositoryDao.setRef(baseEntityApplied);
-                            }
-                        }
-                    }
                     break;
                 default:
                     throw new UnsupportedOperationException(Errors.getMessage(Errors.E118, baseEntityPostPrepared.getOperation()));
             }
         } else {
-            baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null,
-                    baseEntityManager, entityHolder);
+            baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager, entityHolder);
 
             baseEntityApplyDao.applyToDb(baseEntityManager);
-
-            if(isReferenceCacheEnabled) {
-                if(baseEntityApplied.getMeta().isReference()){
-                    if(refRepositoryDao.getRef(baseEntityApplied)==null){
-                        refRepositoryDao.setRef(baseEntityApplied);
-                    }
-                }
-            }
         }
 
         if (applyListener != null)
-            applyListener.applyToDBEnded(entityHolder.getSaving(), entityHolder.getLoaded(),
-                    entityHolder.getApplied(), baseEntityManager);
+            applyListener.applyToDBEnded(entityHolder.getSaving(), entityHolder.getLoaded(), entityHolder.getApplied(), baseEntityManager);
 
         return baseEntityApplied;
     }
 
-    private void processLogicControl(IBaseEntity baseEntityApplied){
-        if(metaRules == null) {
+    private void processLogicControl(IBaseEntity baseEntityApplied) {
+        if (metaRules == null) {
             String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
             metaRules = new HashSet<>(Arrays.asList(metaArray));
         }
 
-        if(metaRules.contains(baseEntityApplied.getMeta().getClassName())) {
+        if (metaRules.contains(baseEntityApplied.getMeta().getClassName())) {
             List<String> errors = ruleServicePool.getRuleService().runRules((BaseEntity) baseEntityApplied,
                     baseEntityApplied.getMeta().getClassName() + "_process", baseEntityApplied.getReportDate());
 
@@ -359,7 +310,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
 
             if (rows.size() > 0) {
-                throw new IllegalStateException(Errors.getMessage(Errors.E109, baseEntity.getId(),sbUsages.toString()));
+                throw new IllegalStateException(Errors.getMessage(Errors.E109, baseEntity.getId(), sbUsages.toString()));
             }
         }
 
@@ -372,7 +323,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         select.getBindValues().toArray());
 
                 if (rows.size() > 0) {
-                    throw new RuntimeException(Errors.getMessage(Errors.E110,baseEntity.getId()));
+                    throw new RuntimeException(Errors.getMessage(Errors.E110, baseEntity.getId()));
                 }
             }
         }

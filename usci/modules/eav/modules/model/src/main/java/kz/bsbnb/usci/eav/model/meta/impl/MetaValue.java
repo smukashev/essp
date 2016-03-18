@@ -1,114 +1,78 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
-/**
- * Represents EAV entity attribute's type meta
- *
- * @author a.tkachenko
- * @version 1.1, 17.01.2013
- */
-public class MetaValue implements IMetaValue
-{
-	/**
-	 * Attributes type's code
-	 */
+public class MetaValue implements IMetaValue {
     private DataTypes typeCode;
 
     private boolean immutable = false;
 
     private boolean reference = false;
 
-    public MetaValue()
-    {
+    public MetaValue() {
         super();
     }
-    
-    /**
-     * 
-     * @param typeCode code of the attribute's type
-     */
-    public MetaValue(DataTypes typeCode)
-    {
+
+    public MetaValue(DataTypes typeCode) {
         this.typeCode = typeCode;
     }
-    
-	public DataTypes getTypeCode()
-    {
+
+    public DataTypes getTypeCode() {
         return typeCode;
     }
 
-    /**
-     * 
-     * @param type attributes type code
-     */
-    public void setTypeCode(DataTypes type)
-    {
+    public void setTypeCode(DataTypes type) {
         this.typeCode = type;
     }
 
-    public boolean equals(Object obj)
-    {
-		if (obj == this)
-			return true;
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
 
-		if (obj == null)
-			return false;
+        if (obj == null)
+            return false;
 
-		if (!(getClass() == obj.getClass()))
-			return false;
-		else
-        {
-			MetaValue tmp = (MetaValue) obj;
-            return !(tmp.getTypeCode() != this.getTypeCode());
+        if (!(getClass() == obj.getClass()))
+            return false;
+        else {
+            MetaValue tmp = (MetaValue) obj;
+            return tmp.getTypeCode() == this.getTypeCode();
         }
-	}
+    }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return typeCode.hashCode();
     }
 
     @Override
-	public boolean isSet()
-    {
-		return false;
-	}
-
-	@Override
-	public boolean isComplex()
-    {
-		return false;
-	}
-
-    @Override
-    public boolean isSetOfSets() {
+    public boolean isSet() {
         return false;
     }
 
     @Override
-    public String toString(String prefix)
-    {
+    public boolean isComplex() {
+        return false;
+    }
+
+    @Override
+    public String toString(String prefix) {
         return "metaValue: " + typeCode;
     }
 
     @Override
     public String toJava(String prefix) {
-        return "new MetaValue(DataTypes." + typeCode+")";
+        return "new MetaValue(DataTypes." + typeCode + ")";
     }
 
     @Override
-    public boolean isReference()
-    {
+    public boolean isReference() {
         return reference;
     }
 
     @Override
-    public void setReference(boolean value)
-    {
+    public void setReference(boolean value) {
         reference = value;
     }
 }

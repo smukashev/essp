@@ -2,27 +2,28 @@
 <batch>
   <entities>
     <ref_portfolio>
-      <code>0932</code>
-      <name_kz>test</name_kz>
-      <name_ru>test</name_ru>
+      <code>1039</code>
+      <name_kz>Кредитные лимиты, установление на банковские карты (CTL</name_kz>
+      <name_ru>Кредитные лимиты, установление на банковские карты (CTL)</name_ru>
       <creditor>
-        <name>Тестовая организация</name>
-        <short_name>Тестовая организация</short_name>
+        <name>АО "Казкоммерцбанк"</name>
+        <short_name>АО "ККБ"</short_name>
+        <code>926</code>
         <docs>
           <item>
-            <no>sdfsdfasdfsadf</no>
+            <no>911040000021</no>
             <doc_type>
-              <name_ru>Аккредитационное удостоверение</name_ru>
-              <name_kz>Аккредитационное удостоверение</name_kz>
-              <is_identification>0</is_identification>
-              <is_organization_doc>0</is_organization_doc>
-              <is_person_doc>1</is_person_doc>
-              <weight>65</weight>
-              <code>13</code>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
             </doc_type>
           </item>
           <item>
-            <no>TESTBIN111</no>
+            <no>KZKOKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>

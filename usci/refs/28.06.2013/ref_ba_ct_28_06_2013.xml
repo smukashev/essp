@@ -51,6 +51,14 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
+        <no_>1741251</no_>
+      </balance_account>
+      <credit_type>
+        <code>07</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct>
+      <balance_account>
         <no_>1417253</no_>
       </balance_account>
       <credit_type>
@@ -62,7 +70,7 @@
         <no_>1741251</no_>
       </balance_account>
       <credit_type>
-        <code>07</code>
+        <code>10</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -78,7 +86,7 @@
         <no_>1741251</no_>
       </balance_account>
       <credit_type>
-        <code>10</code>
+        <code>16</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -94,7 +102,7 @@
         <no_>1741251</no_>
       </balance_account>
       <credit_type>
-        <code>16</code>
+        <code>19</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -110,7 +118,7 @@
         <no_>1741251</no_>
       </balance_account>
       <credit_type>
-        <code>19</code>
+        <code>09</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -119,14 +127,6 @@
       </balance_account>
       <credit_type>
         <code>08</code>
-      </credit_type>
-    </ref_ba_ct>
-    <ref_ba_ct>
-      <balance_account>
-        <no_>1741251</no_>
-      </balance_account>
-      <credit_type>
-        <code>09</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -283,18 +283,18 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1417251</no_>
-      </balance_account>
-      <credit_type>
-        <code>01</code>
-      </credit_type>
-    </ref_ba_ct>
-    <ref_ba_ct>
-      <balance_account>
         <no_>1741253</no_>
       </balance_account>
       <credit_type>
         <code>07</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct>
+      <balance_account>
+        <no_>1417251</no_>
+      </balance_account>
+      <credit_type>
+        <code>01</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -307,18 +307,18 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1417251</no_>
-      </balance_account>
-      <credit_type>
-        <code>19</code>
-      </credit_type>
-    </ref_ba_ct>
-    <ref_ba_ct>
-      <balance_account>
         <no_>1741253</no_>
       </balance_account>
       <credit_type>
         <code>16</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct>
+      <balance_account>
+        <no_>1417251</no_>
+      </balance_account>
+      <credit_type>
+        <code>19</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -331,14 +331,6 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1417251</no_>
-      </balance_account>
-      <credit_type>
-        <code>09</code>
-      </credit_type>
-    </ref_ba_ct>
-    <ref_ba_ct>
-      <balance_account>
         <no_>1741253</no_>
       </balance_account>
       <credit_type>
@@ -350,7 +342,7 @@
         <no_>1417251</no_>
       </balance_account>
       <credit_type>
-        <code>08</code>
+        <code>09</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -359,6 +351,14 @@
       </balance_account>
       <credit_type>
         <code>09</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct>
+      <balance_account>
+        <no_>1417251</no_>
+      </balance_account>
+      <credit_type>
+        <code>08</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -371,18 +371,18 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1417252</no_>
-      </balance_account>
-      <credit_type>
-        <code>08</code>
-      </credit_type>
-    </ref_ba_ct>
-    <ref_ba_ct>
-      <balance_account>
         <no_>1741253</no_>
       </balance_account>
       <credit_type>
         <code>19</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct>
+      <balance_account>
+        <no_>1417252</no_>
+      </balance_account>
+      <credit_type>
+        <code>08</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -403,18 +403,18 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1424252</no_>
-      </balance_account>
-      <credit_type>
-        <code>09</code>
-      </credit_type>
-    </ref_ba_ct>
-    <ref_ba_ct>
-      <balance_account>
         <no_>1740253</no_>
       </balance_account>
       <credit_type>
         <code>06</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct>
+      <balance_account>
+        <no_>1424252</no_>
+      </balance_account>
+      <credit_type>
+        <code>09</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -427,18 +427,18 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1424252</no_>
-      </balance_account>
-      <credit_type>
-        <code>19</code>
-      </credit_type>
-    </ref_ba_ct>
-    <ref_ba_ct>
-      <balance_account>
         <no_>1740253</no_>
       </balance_account>
       <credit_type>
         <code>05</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct>
+      <balance_account>
+        <no_>1424252</no_>
+      </balance_account>
+      <credit_type>
+        <code>19</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -647,6 +647,14 @@
       </balance_account>
       <credit_type>
         <code>01</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct>
+      <balance_account>
+        <no_>1740253</no_>
+      </balance_account>
+      <credit_type>
+        <code>21</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -659,26 +667,10 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1740253</no_>
-      </balance_account>
-      <credit_type>
-        <code>21</code>
-      </credit_type>
-    </ref_ba_ct>
-    <ref_ba_ct>
-      <balance_account>
         <no_>1741253</no_>
       </balance_account>
       <credit_type>
         <code>02</code>
-      </credit_type>
-    </ref_ba_ct>
-    <ref_ba_ct>
-      <balance_account>
-        <no_>1421252</no_>
-      </balance_account>
-      <credit_type>
-        <code>04</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -691,18 +683,18 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1741253</no_>
+        <no_>1421252</no_>
       </balance_account>
       <credit_type>
-        <code>05</code>
+        <code>04</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1421253</no_>
+        <no_>1741253</no_>
       </balance_account>
       <credit_type>
-        <code>23</code>
+        <code>05</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -715,15 +707,15 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1741253</no_>
+        <no_>1421253</no_>
       </balance_account>
       <credit_type>
-        <code>04</code>
+        <code>23</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1421253</no_>
+        <no_>1741253</no_>
       </balance_account>
       <credit_type>
         <code>04</code>
@@ -739,6 +731,14 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
+        <no_>1421253</no_>
+      </balance_account>
+      <credit_type>
+        <code>04</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct>
+      <balance_account>
         <no_>1741253</no_>
       </balance_account>
       <credit_type>
@@ -747,18 +747,18 @@
     </ref_ba_ct>
     <ref_ba_ct>
       <balance_account>
-        <no_>1421251</no_>
-      </balance_account>
-      <credit_type>
-        <code>23</code>
-      </credit_type>
-    </ref_ba_ct>
-    <ref_ba_ct>
-      <balance_account>
         <no_>1740253</no_>
       </balance_account>
       <credit_type>
         <code>10</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct>
+      <balance_account>
+        <no_>1421251</no_>
+      </balance_account>
+      <credit_type>
+        <code>23</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -919,6 +919,14 @@
       </balance_account>
       <credit_type>
         <code>07</code>
+      </credit_type>
+    </ref_ba_ct>
+    <ref_ba_ct>
+      <balance_account>
+        <no_>1741252</no_>
+      </balance_account>
+      <credit_type>
+        <code>06</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -934,7 +942,7 @@
         <no_>1741252</no_>
       </balance_account>
       <credit_type>
-        <code>06</code>
+        <code>09</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -950,7 +958,7 @@
         <no_>1741252</no_>
       </balance_account>
       <credit_type>
-        <code>09</code>
+        <code>08</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>
@@ -959,14 +967,6 @@
       </balance_account>
       <credit_type>
         <code>19</code>
-      </credit_type>
-    </ref_ba_ct>
-    <ref_ba_ct>
-      <balance_account>
-        <no_>1741252</no_>
-      </balance_account>
-      <credit_type>
-        <code>08</code>
       </credit_type>
     </ref_ba_ct>
     <ref_ba_ct>

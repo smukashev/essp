@@ -111,13 +111,11 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             }
 
             if (metaAttribute.isKey()) {
-                if ((baseValue == null || baseValue.getValue() == null)
-                        && metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
+                if ((baseValue == null || baseValue.getValue() == null) && metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
                     throw new KnownException(Errors.getMessage(Errors.E177, name, entity.getMeta().getClassName()));
 
-
-                if ((baseValue == null || baseValue.getValue() == null) &&
-                        (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY)) continue;
+                if ((baseValue == null || baseValue.getValue() == null) && (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY))
+                    continue;
 
                 if (!memberType.isSet()) {
                     if (!memberType.isComplex()) {
@@ -296,6 +294,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             } else {
                 joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias))
                         .on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID)
+                        .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).CREDITOR_ID.equal(creditorId))
                         .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ATTRIBUTE_ID.equal(attribute.getId())));
             }
         }

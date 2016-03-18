@@ -2,7 +2,7 @@
 <batch>
   <entities>
     <ref_portfolio>
-      <code>0933</code>
+      <code>1042</code>
       <name_kz>Теңге жеке тұлғалардың біртекті қарыздар портфелі</name_kz>
       <name_ru>Портфель по однородным займам по физическим лицам в тенге</name_ru>
       <creditor>

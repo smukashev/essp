@@ -4,21 +4,12 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 
 import java.util.Date;
 
-/**
- * Created by Bauyrzhan.Ibraimov on 10.09.2015.
- */
 public interface IRefRepository {
+    IBaseEntity getRef(long Id, Date reportDate);
 
-    public void fillRefRepository();
-    public IBaseEntity getRef(long Id, Date reportDate);
+    void setRef(long id, Date reportDate, IBaseEntity baseEntity);
 
-    public IBaseEntity getRef(IBaseEntity baseEntity);
+    void delRef(long id, Date reportDate);
 
-    public void setRef(long Id, Date reportDate, IBaseEntity baseEntity);
-
-    public void setRef(IBaseEntity baseEntity);
-
-    public void delRef(long Id, Date reportDate);
-
-    public void delRef(IBaseEntity baseEntity);
+    void delRef(long id);
 }

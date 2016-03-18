@@ -346,9 +346,9 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0861</code>
-      <name_kz>Займы   МСБ с рейтингом </name_kz>
-      <name_ru>Займы   МСБ с рейтингом </name_ru>
+      <code>0871</code>
+      <name_kz>Ипотечные кредиты</name_kz>
+      <name_ru>Ипотечные кредиты</name_ru>
       <creditor>
         <name>АО "АТФБанк"</name>
         <short_name>АО "АТФБанк"</short_name>
@@ -389,9 +389,9 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0871</code>
-      <name_kz>Ипотечные кредиты</name_kz>
-      <name_ru>Ипотечные кредиты</name_ru>
+      <code>0861</code>
+      <name_kz>Займы   МСБ с рейтингом </name_kz>
+      <name_ru>Займы   МСБ с рейтингом </name_ru>
       <creditor>
         <name>АО "АТФБанк"</name>
         <short_name>АО "АТФБанк"</short_name>
@@ -475,9 +475,9 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0857</code>
-      <name_kz>корпоративные займы с рейтингом</name_kz>
-      <name_ru>корпоративные займы с рейтингом</name_ru>
+      <code>0873</code>
+      <name_kz>Потребительские кредиты</name_kz>
+      <name_ru>Потребительские кредиты</name_ru>
       <creditor>
         <name>АО "АТФБанк"</name>
         <short_name>АО "АТФБанк"</short_name>
@@ -518,9 +518,9 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0873</code>
-      <name_kz>Потребительские кредиты</name_kz>
-      <name_ru>Потребительские кредиты</name_ru>
+      <code>0857</code>
+      <name_kz>корпоративные займы с рейтингом</name_kz>
+      <name_ru>корпоративные займы с рейтингом</name_ru>
       <creditor>
         <name>АО "АТФБанк"</name>
         <short_name>АО "АТФБанк"</short_name>
