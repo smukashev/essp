@@ -2259,9 +2259,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     BaseEntity savedDocType = (BaseEntity) savedDocument.getBaseValue("doc_type").getValue();
                     BaseEntity loadedDocType = (BaseEntity) loadedDocument.getBaseValue("doc_type").getValue();
 
-                    if (savedDocType.equals(loadedDocType)) {
-                        int compare = DataUtils.compareBeginningOfTheDay(savedValue.getRepDate(),
-                                loadedValue.getRepDate());
+                    if (savedDocType.equalsByKey(loadedDocType)) {
+                        int compare = DataUtils.compareBeginningOfTheDay(savedValue.getRepDate(), loadedValue.getRepDate());
 
                         if (compare == 0) {
                             IBaseValue deletedBaseValue = BaseValueFactory.create(
@@ -2277,9 +2276,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             deletedBaseValue.setBaseContainer(loadedValue.getBaseContainer());
                             baseEntityManager.registerAsDeleted(deletedBaseValue);
 
-                            /* Для удаления из витрин */
-                            /*loadedDocument.setOperation(OperationType.DELETE);
-                            childBaseSetApplied.put(deletedBaseValue);*/
+                            if (childBaseSetApplied != null)
+                                childBaseSetApplied.get().remove(loadedValue);
                         } else if (compare == 1) {
                             IBaseValue closedBaseValue = BaseValueFactory.create(
                                     MetaContainerTypes.META_SET,
@@ -2293,10 +2291,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             closedBaseValue.setBaseContainer(loadedValue.getBaseContainer());
                             baseEntityManager.registerAsInserted(closedBaseValue);
-
-                            /* Для закрытия записи в витринах */
-                            /*loadedDocument.setOperation(OperationType.CLOSE);
-                            childBaseSetApplied.put(closedBaseValue);*/
                         } else if (compare == -1) {
                             IBaseValue closedBaseValue = BaseValueFactory.create(
                                     MetaContainerTypes.META_SET,
