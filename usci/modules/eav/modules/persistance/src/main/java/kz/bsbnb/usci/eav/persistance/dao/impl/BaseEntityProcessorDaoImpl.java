@@ -82,9 +82,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         this.applyListener = applyListener;
     }
 
-    @Autowired
-    IRefRepository refRepositoryDao;
-
     @Value("${rules.enabled}")
     private boolean rulesEnabled;
 
@@ -235,9 +232,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     baseEntityApplyDao.applyToDb(baseEntityManager);
 
-                    if (baseEntityApplied.getMeta().isReference())
-                        refRepositoryDao.delRef(baseEntityApplied.getId(), baseEntityApplied.getReportDate());
-
                     entityHolder.setApplied(baseEntityApplied);
                     break;
                 case INSERT:
@@ -251,9 +245,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         processLogicControl(baseEntityApplied);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
-
-                    if (baseEntityApplied.getMeta().isReference())
-                        refRepositoryDao.setRef(baseEntityApplied.getId(), baseEntityApplied.getReportDate(), baseEntityApplied);
                     break;
                 case UPDATE:
                     if (baseEntityPostPrepared.getId() <= 0)
@@ -266,9 +257,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         processLogicControl(baseEntityApplied);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
-
-                    if (baseEntityApplied.getMeta().isReference())
-                        refRepositoryDao.setRef(baseEntityApplied.getId(), baseEntityApplied.getReportDate(), baseEntityApplied);
                     break;
                 default:
                     throw new UnsupportedOperationException(Errors.getMessage(Errors.E118, baseEntityPostPrepared.getOperation()));
@@ -277,9 +265,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager, entityHolder);
 
             baseEntityApplyDao.applyToDb(baseEntityManager);
-
-            if (baseEntityApplied.getMeta().isReference())
-                refRepositoryDao.setRef(baseEntityApplied.getId(), baseEntityApplied.getReportDate(), baseEntityApplied);
         }
 
         if (applyListener != null)
