@@ -455,8 +455,6 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
 				baseEntityManager.registerAsUpdated(newBaseValueLeft);
 
-				registerAsDeleted(baseEntityManager, metaType, baseValueLeft);
-
 				childBaseSetApplied = (BaseSet) baseValueRight.getValue();
 
 				// merge two sets
@@ -479,7 +477,6 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 								childBaseValueLeft.isClosed(),
 								childBaseValueLeft.isLast());
 
-						childBaseSetApplied.put(childBaseValueLeft);
 						newChildBaseValueLeft.setBaseContainer(childBaseSetApplied);
 
 						baseEntityManager.registerAsUpdated(newChildBaseValueLeft);
