@@ -4,6 +4,8 @@ import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 public class MetaValue implements IMetaValue {
+
+    private static final long serialVersionUID = -6508043791119539004L;
     private DataTypes typeCode;
 
     private boolean immutable = false;

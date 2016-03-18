@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MetaSet extends MetaContainer implements IMetaSet {
+
+    private static final long serialVersionUID = -8685213083933324775L;
+
     IMetaType metaType;
 
     private boolean reference = false;
