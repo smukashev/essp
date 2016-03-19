@@ -42,8 +42,8 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
-    public static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
-    public static final String LOGIC_RULE_META = "LOGIC_RULE_META";
+    private static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
+    private static final String LOGIC_RULE_META = "LOGIC_RULE_META";
 
     @Autowired
     private IMetaClassRepository metaClassRepository;
