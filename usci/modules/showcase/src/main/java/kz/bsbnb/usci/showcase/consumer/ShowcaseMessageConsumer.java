@@ -56,6 +56,8 @@ public class ShowcaseMessageConsumer implements MessageListener {
             }
 
             try {
+                if (queueEntry.getBaseEntityApplied() != null && queueEntry.getBaseEntityApplied().getOperation() != null) return;
+
                 Map<ShowCase, Future> showCaseFutureMap = new HashMap<>();
                 List<ShowCase> showCases = showcaseDao.getShowCases();
 

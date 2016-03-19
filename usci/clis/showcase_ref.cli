@@ -27,7 +27,7 @@ showcase set meta ref_creditor
 showcase set name REF_CREDITOR_DOC
 showcase set tableName REF_CREDITOR_DOC
 
-showcase list add docs doc_id
+showcase list add docs document_id
 showcase list add docs.doc_type doc_type_id
 showcase list add docs.no no
 showcase list add docs.doc_type.code doc_type_code
@@ -35,7 +35,7 @@ showcase list add docs.name name
 
 showcase list addRootKey ref_creditor_id ref_creditor_id
 showcase list addHistoryKey ref_creditor_id ref_creditor_id
-showcase list addHistoryKey document_id doc_id
+showcase list addHistoryKey document_id document_id
 
 #-----------------------------------------------------------------------------------
 # CHILD DOCUMENT
@@ -50,14 +50,14 @@ showcase child list add no no
 showcase child list add doc_type.code doc_type_code
 showcase child list add name name
 
-showcase child list addRootKey document_id doc_id
-showcase child list addHistoryKey document_id doc_id
+showcase child list addRootKey document_id document_id
+showcase child list addHistoryKey document_id document_id
 
 showcase child save
 
 showcase addIndex nonunique ref_creditor_id
-showcase addIndex nonunique ref_creditor_id doc_id
-showcase addIndex nonunique doc_id
+showcase addIndex nonunique ref_creditor_id document_id
+showcase addIndex nonunique document_id
 
 showcase save
 #=================================================================================
