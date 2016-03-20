@@ -306,7 +306,7 @@ showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey address_id address_id
 
 #-----------------------------------------------------------------------------------
-# CHILD ADDRESS
+# CHILD SUBJECT
 #-----------------------------------------------------------------------------------
 showcase child init
 showcase child set name CORE_PERSON_ADDRESS_SUBJECT
@@ -356,7 +356,7 @@ showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey address_id address_id
 
 #-----------------------------------------------------------------------------------
-# CHILD ADDRESS
+# CHILD SUBJECT
 #-----------------------------------------------------------------------------------
 showcase child init
 showcase child set name CORE_ORG_ADDRESS_ADDRESS
@@ -405,7 +405,7 @@ showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey contact_id contact_id
 
 #-----------------------------------------------------------------------------------
-# CHILD CONTACT
+# CHILD SUBJECT
 #-----------------------------------------------------------------------------------
 showcase child init
 showcase child set name CORE_PERSON_CONTACTS_CONTACT
@@ -453,7 +453,7 @@ showcase list addHistoryKey subject_id subject_id
 showcase list addHistoryKey contact_id contact_id
 
 #-----------------------------------------------------------------------------------
-# CHILD CONTACT
+# CHILD SUBJECT
 #-----------------------------------------------------------------------------------
 showcase child init
 showcase child set name CORE_ORG_CONTACTS_CONTACT
