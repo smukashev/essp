@@ -31,10 +31,9 @@ public class CortegeDaoImpl extends CommonDao {
     private JdbcTemplate jdbcTemplateSC;
 
     /* Same showcases could not be processed in parallel */
-    private static final Set<Long> cortegeElements = Collections.synchronizedSet(new HashSet<Long>());
+    private static final Set<Long> cortegeElements = new HashSet<>();
 
     private static final String ROOT = "root";
-
     private static final String ROOT_DOT = "root.";
 
     @Autowired
@@ -572,52 +571,6 @@ public class CortegeDaoImpl extends CommonDao {
         }
 
         return clearedGlobalMap;
-    }
-
-    /* Updates close_date column using @keyElement with entity.getReportDate() */
-    @Transactional
-    private void updateCloseDate(HistoryState historyState, KeyElement keyElement, IBaseEntity entity, ShowCase showCase) {
-        String sql = "UPDATE %s SET close_date = ? WHERE " + keyElement.queryKeys;
-
-        if (historyState == HistoryState.ACTUAL) {
-            sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
-        } else {
-            sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
-        }
-
-        jdbcTemplateSC.update(sql, getObjectArray(true, keyElement.values, entity.getReportDate()));
-    }
-
-    /* Moves data from actual table to history */
-    @Transactional
-    private void moveActualMapToHistory(KeyElement keyElement, ShowCase showCase) {
-        StringBuilder select = new StringBuilder();
-        StringBuilder sql = new StringBuilder("INSERT INTO %s");
-
-        select.append(COLUMN_PREFIX).append(showCase.getRootClassName()).append("_id, ");
-
-        // default fields
-        for (ShowCaseField sf : showCase.getFieldsList())
-            select.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
-
-        // custom fields
-        for (ShowCaseField sf : showCase.getCustomFieldsList()) {
-            select.append(COLUMN_PREFIX).append(sf.getColumnName()).append(", ");
-        }
-
-        select.append("CDC, OPEN_DATE, CLOSE_DATE ");
-        sql.append("(").append(select).append(")( SELECT ").append(select)
-                .append("FROM %s WHERE ").append(keyElement.queryKeys).append(")");
-
-        String sqlResult = String.format(sql.toString(), getHistoryTableName(showCase),
-                getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
-
-        jdbcTemplateSC.update(sqlResult, keyElement.values);
-
-        sqlResult = String.format("DELETE FROM %s WHERE " + keyElement.queryKeys + " AND CLOSE_DATE IS NOT NULL",
-                getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
-
-        jdbcTemplateSC.update(sqlResult, keyElement.values);
     }
 
     /* Generates path for relational tables using showCase */

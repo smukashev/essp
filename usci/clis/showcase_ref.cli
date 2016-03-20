@@ -48,7 +48,7 @@ showcase save
 showcase set meta ref_balance_account
 showcase set name REF_BALANCE_ACCOUNT
 showcase set tableName REF_BALANCE_ACCOUNT
- 
+
 showcase list add display_no display_no
 showcase list add fifth_sign fifth_sign
 showcase list add first_fourth_signs first_fourth_signs
@@ -72,7 +72,7 @@ showcase save
 showcase set meta ref_bank_relation
 showcase set name REF_BANK_RELATION
 showcase set tableName REF_BANK_RELATION
- 
+
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
@@ -90,7 +90,7 @@ showcase save
 showcase set meta ref_classification
 showcase set name REF_CLASSIFICATION
 showcase set tableName REF_CLASSIFICATION
- 
+
 showcase list add code code
 showcase list add comment_kz comment_kz
 showcase list add comment_ru comment_ru
@@ -115,7 +115,7 @@ showcase save
 showcase set meta ref_contact_type
 showcase set name REF_CONTACT_TYPE
 showcase set tableName REF_CONTACT_TYPE
- 
+
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
@@ -133,7 +133,7 @@ showcase save
 showcase set meta ref_country
 showcase set name REF_COUNTRY
 showcase set tableName REF_COUNTRY
- 
+
 showcase list add code code
 showcase list add code_numeric code_numeric
 showcase list add name_kz name_kz
@@ -154,7 +154,7 @@ showcase save
 showcase set meta ref_credit_object
 showcase set name REF_CREDIT_OBJECT
 showcase set tableName REF_CREDIT_OBJECT
- 
+
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
@@ -165,7 +165,7 @@ showcase list addHistoryKey ref_credit_object_id ref_credit_object_id
 showcase addIndex nonunique ref_credit_object_id
 
 showcase save
- 
+
 #=================================================================================
 # REF_CREDITOR_BRANCH
 #=================================================================================
@@ -194,7 +194,7 @@ showcase save
 showcase set meta ref_credit_purpose
 showcase set name REF_CREDIT_PURPOSE
 showcase set tableName REF_CREDIT_PURPOSE
- 
+
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
@@ -212,7 +212,7 @@ showcase save
 showcase set meta ref_credit_type
 showcase set name REF_CREDIT_TYPE
 showcase set tableName REF_CREDIT_TYPE
- 
+
 showcase list add code code
 showcase list add kind_id kind_id
 showcase list add name_kz name_kz
@@ -231,7 +231,7 @@ showcase save
 showcase set meta ref_currency
 showcase set name REF_CURRENCY
 showcase set tableName REF_CURRENCY
- 
+
 showcase list add code code
 showcase list add is_convertible is_convertible
 showcase list add name_kz name_kz
@@ -252,7 +252,7 @@ showcase save
 showcase set meta ref_debtor_type
 showcase set name REF_DEBTOR_TYPE
 showcase set tableName REF_DEBTOR_TYPE
- 
+
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
@@ -270,7 +270,7 @@ showcase save
 showcase set meta ref_doc_type
 showcase set name REF_DOC_TYPE
 showcase set tableName REF_DOC_TYPE
- 
+
 showcase list add code code
 showcase list add is_identification is_identification
 showcase list add is_organization_doc is_organization_doc
@@ -295,7 +295,7 @@ showcase save
 showcase set meta ref_econ_trade
 showcase set name REF_ECON_TRADE
 showcase set tableName REF_ECON_TRADE
- 
+
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
@@ -313,7 +313,7 @@ showcase save
 showcase set meta ref_enterprise_type
 showcase set name REF_ENTERPRISE_TYPE
 showcase set tableName REF_ENTERPRISE_TYPE
- 
+
 showcase list add code code
 showcase list add is_organization is_organization
 showcase list add is_se is_se
@@ -326,14 +326,14 @@ showcase list addHistoryKey ref_enterprise_type_id ref_enterprise_type_id
 showcase addIndex nonunique ref_enterprise_type_id
 
 showcase save
- 
+
 #=================================================================================
 # REF_FINANCE_SOURCE
 #=================================================================================
 showcase set meta ref_finance_source
 showcase set name REF_FINANCE_SOURCE
 showcase set tableName REF_FINANCE_SOURCE
- 
+
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
@@ -351,7 +351,7 @@ showcase save
 showcase set meta ref_legal_form
 showcase set name REF_LEGAL_FORM
 showcase set tableName REF_LEGAL_FORM
- 
+
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
@@ -391,7 +391,7 @@ showcase save
 showcase set meta ref_pledge_type
 showcase set name REF_PLEDGE_TYPE
 showcase set tableName REF_PLEDGE_TYPE
- 
+
 showcase list add code code
 showcase list add is_liquid_all is_liquid_all
 showcase list add is_liquid_invest is_liquid_invest
@@ -404,7 +404,7 @@ showcase list addHistoryKey ref_pledge_type_id ref_pledge_type_id
 showcase addIndex nonunique ref_pledge_type_id
 
 showcase save
- 
+
 #=================================================================================
 # REF_PORTFOLIO
 #=================================================================================
@@ -431,7 +431,7 @@ showcase save
 showcase set meta ref_region
 showcase set name REF_REGION
 showcase set tableName REF_REGION
- 
+
 showcase list add code code
 showcase list add name_kz name_kz
 showcase list add name_ru name_ru
@@ -449,7 +449,7 @@ showcase save
 showcase set meta ref_subject_type
 showcase set name REF_SUBJECT_TYPE
 showcase set tableName REF_SUBJECT_TYPE
- 
+
 showcase list add code code
 showcase list add kind_id kind_id
 showcase list add name_kz name_kz
