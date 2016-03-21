@@ -15,6 +15,15 @@ import java.util.Map;
 public class RefRepository extends JDBCSupport implements IRefRepository {
     private final HashMap<BaseEntityKey, IBaseEntity> cache = new HashMap<>();
 
+    public IBaseEntity findRef(IBaseEntity baseEntity) {
+        for (Map.Entry<BaseEntityKey, IBaseEntity> entry : cache.entrySet()) {
+            if (baseEntity.equalsByReference(entry.getValue()))
+                return entry.getValue();
+        }
+
+        return null;
+    }
+
     public IBaseEntity getRef(long Id, Date reportDate) {
         return cache.get(new BaseEntityKey(Id, reportDate));
     }

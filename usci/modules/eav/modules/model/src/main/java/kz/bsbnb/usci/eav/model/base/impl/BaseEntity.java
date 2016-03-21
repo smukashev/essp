@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
+import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
@@ -397,6 +398,84 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         }
 
         return keyElements;
+    }
+
+    @Override
+    public boolean equalsByReference(IBaseEntity baseEntity) {
+        if (meta == null)
+            throw new IllegalStateException(Errors.getMessage(Errors.E176));
+
+        if (this.meta.getId() != baseEntity.getMeta().getId())
+            return false;
+
+        for (String attrName : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(attrName);
+            IMetaType metaType = metaAttribute.getMetaType();
+
+            if (metaAttribute.isKey()) {
+                IBaseValue thisValue = this.getBaseValue(attrName);
+                IBaseValue thatValue =  baseEntity.getBaseValue(attrName);
+
+                if (metaType.isComplex()) {
+                    if (!metaType.isSet()) {
+                        IBaseEntity thisBaseEntity = (IBaseEntity) thisValue.getValue();
+                        IBaseEntity thatBaseEntity = (IBaseEntity) thatValue.getValue();
+
+                        if (!thisBaseEntity.equalsByReference(thatBaseEntity))
+                            return false;
+                    } else {
+                        BaseSet thisSet = (BaseSet) thisValue.getValue();
+                        BaseSet thatSet = (BaseSet) thatValue.getValue();
+
+                        MetaSet metaSet = (MetaSet) thisSet.getMemberType();
+
+                        if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY) {
+                            boolean found = false;
+
+                            for (IBaseValue thisChildValue : thisSet.get()) {
+                                IBaseEntity thisChildEntity = (IBaseEntity) thisChildValue.getValue();
+
+                                for (IBaseValue thatChildValue : thatSet.get()) {
+                                    IBaseEntity thatChildEntity = (IBaseEntity) thatChildValue.getValue();
+
+                                    if (thisChildEntity.equalsByReference(thatChildEntity)) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!found)
+                                return false;
+                        } else {
+                            for (IBaseValue thisChildValue : thisSet.get()) {
+                                boolean found  = false;
+
+                                IBaseEntity thisChildEntity = (IBaseEntity) thisChildValue.getValue();
+
+                                for ( IBaseValue thatChildValue : thatSet.get()) {
+                                    IBaseEntity thatChildEntity = (IBaseEntity) thatChildValue.getValue();
+                                    if (thisChildEntity.equalsByReference(thatChildEntity)) {
+                                        found = true;
+                                    }
+                                }
+
+                                if (!found)
+                                    return false;
+                            }
+                        }
+                    }
+                } else {
+                    if (metaType.isSet())
+                        throw new IllegalStateException(Errors.getMessage(Errors.E285));
+
+                    if (thisValue.getValue().equals(thatValue.getValue()))
+                        return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override

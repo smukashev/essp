@@ -88,6 +88,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     private IEavGlobalDao globalDao;
 
+    @Autowired
+    private IRefRepository refRepository;
+
     @Override
     public long search(IBaseEntity baseEntity, long creditorId) {
         Long baseEntityId = searcherPool.getSearcher(baseEntity.getMeta().getClassName()).findSingle((BaseEntity) baseEntity, creditorId);
@@ -100,6 +103,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         final boolean isReference = metaClass.isReference();
         creditorId = isReference ? 0 : creditorId;
+
+        if (isReference) {
+            IBaseEntity referenceEntity = refRepository.findRef(baseEntity);
+
+            if (referenceEntity != null)
+                return referenceEntity;
+        }
 
         for (String attribute : baseEntity.getAttributes()) {
             IMetaType metaType = baseEntity.getMemberType(attribute);
