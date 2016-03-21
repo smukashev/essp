@@ -472,9 +472,6 @@ showcase list add docs document_id
 showcase list add docs.no doc_no
 showcase list add docs.doc_type doc_type
 showcase list add docs.name doc_name
-showcase list add is_person is_person
-showcase list add is_organization is_organization
-showcase list add is_creditor is_creditor
 
 showcase list addCustom credit creditor creditor_id
 
@@ -495,9 +492,6 @@ showcase child list add docs document_id
 showcase child list add docs.no doc_no
 showcase child list add docs.doc_type doc_type
 showcase child list add docs.name doc_name
-showcase child list add is_person is_person
-showcase child list add is_organization is_organization
-showcase child list add is_creditor is_creditor
 
 showcase child list addRootKey subject_id subject_id
 

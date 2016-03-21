@@ -70,8 +70,13 @@ public class CortegeDaoImpl extends CommonDao {
             for (Map.Entry<ArrayElement, HashMap<ValueElement, Object>> entry : savingMap.entrySet()) {
                 HashMap<ValueElement, Object> entryMap = entry.getValue();
 
-                if (!entity.getMeta().isReference())
-                    entryMap.put(new ValueElement("creditor_id", 0L, 0), entity.getBaseEntityReportDate().getCreditorId());
+                if (showCase.isChild()) {
+                    if (!entity.getMeta().isReference())
+                        entryMap.put(new ValueElement("creditor_id", 0L, 0), entity.getBaseEntityReportDate().getCreditorId());
+
+                    if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0)
+                        entryMap.put(new ValueElement(globalEntity.getMeta().getClassName() + "_id", 0L, 0), globalEntity.getId());
+                }
 
                 addCustomKeys(entryMap, globalEntity, showCase);
 
