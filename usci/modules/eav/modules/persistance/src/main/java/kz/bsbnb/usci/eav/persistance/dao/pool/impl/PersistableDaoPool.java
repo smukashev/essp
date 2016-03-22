@@ -31,7 +31,6 @@ public class PersistableDaoPool implements IPersistableDaoPool {
         persistableDaoMap.put(BaseEntityIntegerValue.class, IBaseEntityIntegerValueDao.class);
         persistableDaoMap.put(BaseEntityStringValue.class, IBaseEntityStringValueDao.class);
         persistableDaoMap.put(BaseEntityComplexValue.class, IBaseEntityComplexValueDao.class);
-        persistableDaoMap.put(BaseSet.class, IBaseSetDao.class);
         persistableDaoMap.put(BaseEntitySimpleSet.class, IBaseEntitySimpleSetDao.class);
         persistableDaoMap.put(BaseEntityComplexSet.class, IBaseEntityComplexSetDao.class);
         persistableDaoMap.put(BaseSetBooleanValue.class, IBaseSetBooleanValueDao.class);

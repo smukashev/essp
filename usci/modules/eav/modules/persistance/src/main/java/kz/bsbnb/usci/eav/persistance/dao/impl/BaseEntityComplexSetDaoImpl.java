@@ -16,7 +16,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityComplexSetDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseSetComplexValueDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseSetDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -43,9 +42,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
     @Autowired
     IBatchRepository batchRepository;
-
-    @Autowired
-    IBaseSetDao baseSetDao;
 
     @Autowired
     IBaseSetComplexValueDao baseSetComplexValueDao;
@@ -545,9 +541,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-
-        for (long childBaseSetId : childBaseSetIds)
-            baseSetDao.deleteRecursive(childBaseSetId);
     }
 
     @Override
