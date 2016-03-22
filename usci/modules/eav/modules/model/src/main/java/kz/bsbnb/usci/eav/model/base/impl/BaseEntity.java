@@ -412,6 +412,17 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             IMetaAttribute metaAttribute = meta.getMetaAttribute(attrName);
             IMetaType metaType = metaAttribute.getMetaType();
 
+            if (metaAttribute.isOptionalKey()) {
+                IBaseValue thisValue = this.getBaseValue(attrName);
+                IBaseValue thatValue = baseEntity.getBaseValue(attrName);
+
+                if (thisValue == null || thatValue == null || thisValue.getValue() == null || thatValue.getValue() == null)
+                    continue;
+
+                if (thisValue.getValue().equals(thatValue.getValue()))
+                    return true;
+            }
+
             if (metaAttribute.isKey()) {
                 IBaseValue thisValue = this.getBaseValue(attrName);
                 IBaseValue thatValue =  baseEntity.getBaseValue(attrName);
@@ -469,7 +480,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     if (metaType.isSet())
                         throw new IllegalStateException(Errors.getMessage(Errors.E285));
 
-                    if (thisValue.getValue().equals(thatValue.getValue()))
+                    if (!thisValue.getValue().equals(thatValue.getValue()))
                         return false;
                 }
             }

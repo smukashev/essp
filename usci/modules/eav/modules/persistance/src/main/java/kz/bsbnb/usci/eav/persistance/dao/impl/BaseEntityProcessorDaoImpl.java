@@ -107,8 +107,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if (isReference) {
             IBaseEntity referenceEntity = refRepository.findRef(baseEntity);
 
-            if (referenceEntity != null)
-                return referenceEntity;
+            if (referenceEntity != null) {
+                baseEntity.setId(referenceEntity.getId());
+                return baseEntity;
+            }
         }
 
         for (String attribute : baseEntity.getAttributes()) {
@@ -279,6 +281,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         if (applyListener != null)
             applyListener.applyToDBEnded(entityHolder.getSaving(), entityHolder.getLoaded(), entityHolder.getApplied(), baseEntityManager);
+
+        if (baseEntityApplied.getMeta().isReference())
+            refRepository.setRef(baseEntityApplied.getId(), baseEntityApplied.getReportDate(), baseEntityApplied);
 
         return baseEntityApplied;
     }

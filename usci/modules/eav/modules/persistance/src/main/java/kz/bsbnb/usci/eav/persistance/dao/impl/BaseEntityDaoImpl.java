@@ -285,7 +285,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Override
     public Set<Long> getChildBaseEntityIds(long parentBaseEntityId) {
-        Set<Long> allChildBaseEntitiesIds = new HashSet<Long>();
+        Set<Long> allChildBaseEntitiesIds = new HashSet<>();
 
         // Complex values
         IBaseEntityComplexValueDao baseEntityComplexValueDao = persistableDaoPool
