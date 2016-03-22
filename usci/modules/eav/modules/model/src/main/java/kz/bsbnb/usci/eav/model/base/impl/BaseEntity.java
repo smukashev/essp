@@ -438,7 +438,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                         BaseSet thisSet = (BaseSet) thisValue.getValue();
                         BaseSet thatSet = (BaseSet) thatValue.getValue();
 
-                        MetaSet metaSet = (MetaSet) thisSet.getMemberType();
+                        MetaSet metaSet = (MetaSet) metaType;
 
                         if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY) {
                             boolean found = false;
