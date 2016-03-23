@@ -51,9 +51,6 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
         if (maxReportDate == null)
             throw new UnsupportedOperationException(Errors.getMessage(Errors.E101, id));
 
-        if (baseEntityDao.isDeleted(id))
-            return null;
-
         return load(id, maxReportDate);
     }
 

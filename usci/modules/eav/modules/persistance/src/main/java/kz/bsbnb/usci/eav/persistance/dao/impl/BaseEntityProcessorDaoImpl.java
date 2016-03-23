@@ -350,8 +350,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         Select select = context
                 .select(EAV_BE_ENTITIES.ID)
                 .from(EAV_BE_ENTITIES)
-                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId).
-                        and(EAV_BE_ENTITIES.DELETED.eq(DataUtils.convert(false))));
+                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

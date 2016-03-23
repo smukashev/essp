@@ -76,6 +76,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public SelectConditionStep generateSQL(IBaseEntity entity, Long creditorId, String entityName) {
         MetaClass metaClass = entity.getMeta();
         String entityAlias = (entityName == null ? "root" : "e_" + entityName);
@@ -140,8 +141,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                             Select select = context
                                 .select(simpleTable.as(valueAlias).field("ID"))
                                 .from(simpleTable.as(valueAlias))
-                                .where(simpleTable.as(valueAlias).field("ENTITY_ID").equal(
-                                        EAV_BE_ENTITIES.as(entityAlias).ID)
+                                .where(simpleTable.as(valueAlias).field("ENTITY_ID").equal(EAV_BE_ENTITIES.as(entityAlias).ID)
                                     .and(simpleTable.as(valueAlias).field("VALUE").equal(simpleValue))
                                     .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
                                     .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true))));
@@ -263,8 +263,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             }
         }
 
-        SelectConditionStep where = joins.where(EAV_BE_ENTITIES.as(entityAlias).CLASS_ID.equal(metaClass.getId()))
-                .and(EAV_BE_ENTITIES.as(entityAlias).DELETED.equal(DataUtils.convert(false)));
+        SelectConditionStep where = joins.where(EAV_BE_ENTITIES.as(entityAlias).CLASS_ID.equal(metaClass.getId()));
 
         if (condition != null) {
             where = where.and(condition);

@@ -72,25 +72,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Override
     public void delete(IPersistable persistable) {
-        IBaseEntity baseEntity = (BaseEntity) persistable;
-        if (baseEntity.getOperation() == OperationType.DELETE) {
-            Update update = context
-                    .update(EAV_BE_ENTITIES)
-                    .set(EAV_BE_ENTITIES.DELETED, DataUtils.convert(true))
-                    .where(EAV_BE_ENTITIES.ID.equal(baseEntity.getId()));
-
-            logger.debug(update.toString());
-            int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-
-            if (count > 1)
-                throw new IllegalStateException(Errors.getMessage(Errors.E89, baseEntity.getId()));
-
-            if (count < 1)
-                throw new IllegalStateException(Errors.getMessage(Errors.E90, baseEntity.getId()));
-        } else {
-            delete(persistable.getId());
-        }
-
+        delete(persistable.getId());
         refRepository.delRef(persistable.getId());
     }
 
@@ -110,17 +92,6 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
             throw new IllegalStateException(Errors.getMessage(Errors.E90,id));
 
         refRepository.delRef(id);
-    }
-
-    @Override
-    public boolean isDeleted(long id) {
-        Select select = context.select(EAV_BE_ENTITIES.DELETED.as("deleted"))
-                .from(EAV_BE_ENTITIES)
-                .where(EAV_BE_ENTITIES.ID.eq(id));
-
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        return rows.get(0).get("deleted").equals(BigDecimal.ONE);
     }
 
     public IBaseEntity loadMock(long id) {
