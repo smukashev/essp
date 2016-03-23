@@ -97,7 +97,7 @@ public class OrgFormImpl extends AbstractSubjectForm {
 
         Select orgSelect = context.select(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID)
                 .from(EAV_BE_ENTITY_COMPLEX_SETS)
-                .where(EAV_BE_ENTITY_COMPLEX_SETS.SET_ID.in(setSelect))
+                .where(EAV_BE_ENTITY_COMPLEX_SETS.ID.in(setSelect))
                 .and(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID.eq(namesAttribute.getId()));
 
         IMetaAttribute personInfoAttribute = subjectClass.getElAttribute("organization_info");

@@ -148,7 +148,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         return metaCache.get(metaName);
     }
 
-    public void startElement(XMLEvent event, StartElement startElement, String localName) {
+    private void startElement(StartElement startElement, String localName) {
         if (localName.equals("batch")) {
             logger.debug("batch");
         } else if (localName.equals("entities")) {
@@ -176,23 +176,23 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             IMetaType metaType = currentContainer.getMemberType(localName);
 
             if (metaType.isSet()) {
+                hasMembers = false;
                 stack.push(currentContainer);
                 flagsStack.push(hasMembers);
-                hasMembers = false;
                 currentContainer = new BaseSet(((MetaSet) metaType).getMemberType());
                 level++;
             } else if (metaType.isComplex()) {
                 stack.push(currentContainer);
                 currentContainer = new BaseEntity((MetaClass) metaType, batch.getRepDate(), creditorId);
                 flagsStack.push(hasMembers);
-                hasMembers = false;
                 level++;
+                hasMembers = false;
             } else {
                 Object obj = null;
                 MetaValue metaValue = (MetaValue) metaType;
 
                 try {
-                    event = (XMLEvent) xmlEventReader.next();
+                    XMLEvent event = (XMLEvent) xmlEventReader.next();
                     obj = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
@@ -258,7 +258,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
 
-                startElement(event, startElement, localName);
+                startElement(startElement, localName);
             } else if (event.isEndElement()) {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
@@ -285,7 +285,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         return null;
     }
 
-    public boolean endElement(String localName) {
+    private boolean endElement(String localName) {
         if (localName.equals("batch")) {
             logger.debug("batch");
         } else if (localName.equals("entities")) {

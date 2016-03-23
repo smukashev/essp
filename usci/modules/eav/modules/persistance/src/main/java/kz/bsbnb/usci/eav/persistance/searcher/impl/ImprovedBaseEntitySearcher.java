@@ -196,11 +196,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     for (IBaseValue childBaseValue : baseSet.get()) {
                         BaseEntity childBaseEntity = (BaseEntity) childBaseValue.getValue();
 
-                        Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().
-                                getClassName()).findSingle(childBaseEntity, creditorId);
-
-                        if (childBaseEntityId != null) {
-                            childBaseEntityIds.add(childBaseEntityId);
+                        if (childBaseEntity.getId() > 0) {
+                            childBaseEntityIds.add(childBaseEntity.getId());
                         } else {
                             if (metaSet.getArrayKeyType() == ComplexKeyTypes.ALL)
                                 return null;
@@ -223,7 +220,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                 .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID
                                         .equal(metaAttribute.getId()))
                                 .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID
-                                        .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                        .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ID))
                                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID
                                         .equal(EAV_BE_ENTITIES.as(entityAlias).ID)
                                         .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias)
@@ -248,7 +245,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                 .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID
                                         .eq(metaAttribute.getId()))
                                 .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID
-                                        .eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).SET_ID))
+                                        .eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ID))
                                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID
                                         .eq(EAV_BE_ENTITIES.as(entityAlias).ID)
                                         .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias)
