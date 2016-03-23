@@ -397,7 +397,6 @@
 		<column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="entity_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
-		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="is_closed" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_last" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
@@ -416,32 +415,6 @@
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
-		<index name="ebecs_IN_ei_ai_si_rd_ic">
-		  <unique-column name="creditor_id"/>
-			<index-column name="entity_id"/>
-			<index-column name="attribute_id"/>
-			<index-column name="set_id"/>
-			<index-column name="report_date"/>
-			<index-column name="is_closed"/>
-		</index>
-		<index name="ebecs_IN_ei_ai_si_il">
-			<index-column name="entity_id"/>
-			<index-column name="attribute_id"/>
-			<index-column name="set_id"/>
-			<index-column name="is_last"/>
-		</index>
-		<index name="ebecs_IN_ei">
-			<index-column name="entity_id"/>
-		</index>
-		<index name="ebecs_IN_ai_si">
-			<index-column name="attribute_id"/>
-			<index-column name="set_id"/>
-		</index>
-		<index name="ebecs_IN_ai_si_ei">
-			<index-column name="attribute_id"/>
-			<index-column name="set_id"/>
-			<index-column name="entity_id"/>
-		</index>
 	</table>
 	<table name="eav_be_entity_report_dates">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>

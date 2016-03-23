@@ -23,13 +23,13 @@ import java.util.regex.Pattern;
 public class BaseEntity extends BaseContainer implements IBaseEntity {
     private static final long serialVersionUID = 1L;
 
-    Logger logger = LoggerFactory.getLogger(BaseEntity.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseEntity.class);
 
     private UUID uuid = UUID.randomUUID();
 
     private MetaClass meta;
 
-    OperationType operationType;
+    private OperationType operationType;
 
     private IBaseEntityReportDate baseEntityReportDate;
 
@@ -654,19 +654,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return result;
     }
 
-    public int hashCode2() {
-        int result = 31 * meta.hashCode();
-
-        for (String name : meta.getAttributeNames()) {
-            IMetaAttribute metaAttribute = meta.getMetaAttribute(name);
-            if (metaAttribute.isKey()) {
-                result += values.get(name).getValue().toString().hashCode();
-            }
-        }
-
-        return result;
-    }
-
     public Object getEls(String path){
         return getEls(path, false);
     }
@@ -1056,7 +1043,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return valueOut;
     }
 
-    public boolean equalsToString(HashMap<String, String> params) {
+    boolean equalsToString(HashMap<String, String> params) {
         for (String fieldName : params.keySet()) {
             String ownFieldName;
             String innerPath = null;
@@ -1113,11 +1100,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             baseEntityCloned.setBaseEntityReportDate(baseEntityReportDateCloned);
 
             HashMap<String, IBaseValue> valuesCloned = new HashMap<>();
-            Iterator<String> attributesIt = values.keySet().iterator();
 
-            while (attributesIt.hasNext()) {
-                String attribute = attributesIt.next();
-
+            for (String attribute : values.keySet()) {
                 IBaseValue baseValue = values.get(attribute);
                 IBaseValue baseValueCloned = ((BaseValue) baseValue).clone();
                 baseValueCloned.setBaseContainer(baseEntityCloned);

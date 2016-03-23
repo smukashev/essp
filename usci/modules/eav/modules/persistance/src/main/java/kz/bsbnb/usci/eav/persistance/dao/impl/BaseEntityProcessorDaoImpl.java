@@ -282,7 +282,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if (applyListener != null)
             applyListener.applyToDBEnded(entityHolder.getSaving(), entityHolder.getLoaded(), entityHolder.getApplied(), baseEntityManager);
 
-        if (baseEntityApplied.getMeta().isReference())
+        if (baseEntityApplied.getMeta().isReference() && baseEntityApplied.getId() > 0)
             refRepository.setRef(baseEntityApplied.getId(), baseEntityApplied.getReportDate(), baseEntityApplied);
 
         return baseEntityApplied;

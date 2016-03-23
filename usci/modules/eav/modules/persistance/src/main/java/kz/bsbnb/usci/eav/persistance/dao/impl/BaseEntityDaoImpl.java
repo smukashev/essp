@@ -212,7 +212,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                         .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias)
                                 .join(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias)).on(
                                         EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).SET_ID
-                                                .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).SET_ID))
+                                                .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).ID))
                         ).where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.
                                 equal(baseEntityId))
                         .and(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).ENTITY_ID.
