@@ -187,7 +187,7 @@ class CLIXMLReader {
                 stack.push(currentContainer);
                 flagsStack.push(hasMembers);
                 hasMembers = false;
-                currentContainer = new BaseSet(((MetaSet) metaType).getMemberType());
+                currentContainer = new BaseSet(((MetaSet) metaType).getMemberType(), creditorId);
                 level++;
             } else if (metaType.isComplex() && !metaType.isSet()) {
                 stack.push(currentContainer);

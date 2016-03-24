@@ -84,7 +84,7 @@ public class CreditUtilsImpl implements ICreditUtils {
         try {
             // checkme!
             IBaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"), new Date(), 0);
-            IBaseSet baseSet = new BaseSet(metaClassRepository.getMetaClass("document"));
+            IBaseSet baseSet = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
 
             while (resultSet.next()) {
                 IBaseEntity doc = new BaseEntity(metaClassRepository.getMetaClass("document"), new Date(), 0);
