@@ -83126,6 +83126,30 @@
       </doc_type>
     </ref_exclusive_doc>
     <ref_exclusive_doc>
+      <code>891123000096</code>
+      <doc_type>
+        <name_ru>Индивидуальный идентификационный номер </name_ru>
+        <name_kz>Индивидуальный идентификационный номер </name_kz>
+        <is_identification>1</is_identification>
+        <is_organization_doc>1</is_organization_doc>
+        <is_person_doc>1</is_person_doc>
+        <weight>5</weight>
+        <code>06</code>
+      </doc_type>
+    </ref_exclusive_doc>
+    <ref_exclusive_doc>
+      <code>970813000021</code>
+      <doc_type>
+        <name_ru>Индивидуальный идентификационный номер </name_ru>
+        <name_kz>Индивидуальный идентификационный номер </name_kz>
+        <is_identification>1</is_identification>
+        <is_organization_doc>1</is_organization_doc>
+        <is_person_doc>1</is_person_doc>
+        <weight>5</weight>
+        <code>06</code>
+      </doc_type>
+    </ref_exclusive_doc>
+    <ref_exclusive_doc>
       <code>811115000107</code>
       <doc_type>
         <name_ru>Индивидуальный идентификационный номер </name_ru>
@@ -83294,6 +83318,18 @@
       </doc_type>
     </ref_exclusive_doc>
     <ref_exclusive_doc>
+      <code>840310000308</code>
+      <doc_type>
+        <name_ru>Индивидуальный идентификационный номер </name_ru>
+        <name_kz>Индивидуальный идентификационный номер </name_kz>
+        <is_identification>1</is_identification>
+        <is_organization_doc>1</is_organization_doc>
+        <is_person_doc>1</is_person_doc>
+        <weight>5</weight>
+        <code>06</code>
+      </doc_type>
+    </ref_exclusive_doc>
+    <ref_exclusive_doc>
       <code>730201012247</code>
       <doc_type>
         <name_ru>Индивидуальный идентификационный номер </name_ru>
@@ -83391,6 +83427,18 @@
     </ref_exclusive_doc>
     <ref_exclusive_doc>
       <code>730320000131</code>
+      <doc_type>
+        <name_ru>Индивидуальный идентификационный номер </name_ru>
+        <name_kz>Индивидуальный идентификационный номер </name_kz>
+        <is_identification>1</is_identification>
+        <is_organization_doc>1</is_organization_doc>
+        <is_person_doc>1</is_person_doc>
+        <weight>5</weight>
+        <code>06</code>
+      </doc_type>
+    </ref_exclusive_doc>
+    <ref_exclusive_doc>
+      <code>900420000250</code>
       <doc_type>
         <name_ru>Индивидуальный идентификационный номер </name_ru>
         <name_kz>Индивидуальный идентификационный номер </name_kz>

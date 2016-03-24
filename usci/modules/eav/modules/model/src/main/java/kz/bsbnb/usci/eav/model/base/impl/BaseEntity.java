@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
+import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
@@ -22,13 +23,13 @@ import java.util.regex.Pattern;
 public class BaseEntity extends BaseContainer implements IBaseEntity {
     private static final long serialVersionUID = 1L;
 
-    Logger logger = LoggerFactory.getLogger(BaseEntity.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseEntity.class);
 
     private UUID uuid = UUID.randomUUID();
 
     private MetaClass meta;
 
-    OperationType operationType;
+    private OperationType operationType;
 
     private IBaseEntityReportDate baseEntityReportDate;
 
@@ -400,6 +401,95 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     }
 
     @Override
+    public boolean equalsByReference(IBaseEntity baseEntity) {
+        if (meta == null)
+            throw new IllegalStateException(Errors.getMessage(Errors.E176));
+
+        if (this.meta.getId() != baseEntity.getMeta().getId())
+            return false;
+
+        for (String attrName : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(attrName);
+            IMetaType metaType = metaAttribute.getMetaType();
+
+            if (metaAttribute.isOptionalKey()) {
+                IBaseValue thisValue = this.getBaseValue(attrName);
+                IBaseValue thatValue = baseEntity.getBaseValue(attrName);
+
+                if (thisValue == null || thatValue == null || thisValue.getValue() == null || thatValue.getValue() == null)
+                    continue;
+
+                if (thisValue.getValue().equals(thatValue.getValue()))
+                    return true;
+            }
+
+            if (metaAttribute.isKey()) {
+                IBaseValue thisValue = this.getBaseValue(attrName);
+                IBaseValue thatValue =  baseEntity.getBaseValue(attrName);
+
+                if (metaType.isComplex()) {
+                    if (!metaType.isSet()) {
+                        IBaseEntity thisBaseEntity = (IBaseEntity) thisValue.getValue();
+                        IBaseEntity thatBaseEntity = (IBaseEntity) thatValue.getValue();
+
+                        if (!thisBaseEntity.equalsByReference(thatBaseEntity))
+                            return false;
+                    } else {
+                        BaseSet thisSet = (BaseSet) thisValue.getValue();
+                        BaseSet thatSet = (BaseSet) thatValue.getValue();
+
+                        MetaSet metaSet = (MetaSet) metaType;
+
+                        if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY) {
+                            boolean found = false;
+
+                            for (IBaseValue thisChildValue : thisSet.get()) {
+                                IBaseEntity thisChildEntity = (IBaseEntity) thisChildValue.getValue();
+
+                                for (IBaseValue thatChildValue : thatSet.get()) {
+                                    IBaseEntity thatChildEntity = (IBaseEntity) thatChildValue.getValue();
+
+                                    if (thisChildEntity.equalsByReference(thatChildEntity)) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!found)
+                                return false;
+                        } else {
+                            for (IBaseValue thisChildValue : thisSet.get()) {
+                                boolean found  = false;
+
+                                IBaseEntity thisChildEntity = (IBaseEntity) thisChildValue.getValue();
+
+                                for ( IBaseValue thatChildValue : thatSet.get()) {
+                                    IBaseEntity thatChildEntity = (IBaseEntity) thatChildValue.getValue();
+                                    if (thisChildEntity.equalsByReference(thatChildEntity)) {
+                                        found = true;
+                                    }
+                                }
+
+                                if (!found)
+                                    return false;
+                            }
+                        }
+                    }
+                } else {
+                    if (metaType.isSet())
+                        throw new IllegalStateException(Errors.getMessage(Errors.E285));
+
+                    if (!thisValue.getValue().equals(thatValue.getValue()))
+                        return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean equalsByKey(IBaseEntity baseEntity) {
         if (baseEntity == this)
             return true;
@@ -560,19 +650,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         int result = super.hashCode();
         result += 31 * result + meta.hashCode();
         result += 31 * result + values.hashCode();
-
-        return result;
-    }
-
-    public int hashCode2() {
-        int result = 31 * meta.hashCode();
-
-        for (String name : meta.getAttributeNames()) {
-            IMetaAttribute metaAttribute = meta.getMetaAttribute(name);
-            if (metaAttribute.isKey()) {
-                result += values.get(name).getValue().toString().hashCode();
-            }
-        }
 
         return result;
     }
@@ -966,7 +1043,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return valueOut;
     }
 
-    public boolean equalsToString(HashMap<String, String> params) {
+    boolean equalsToString(HashMap<String, String> params) {
         for (String fieldName : params.keySet()) {
             String ownFieldName;
             String innerPath = null;
@@ -1023,11 +1100,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             baseEntityCloned.setBaseEntityReportDate(baseEntityReportDateCloned);
 
             HashMap<String, IBaseValue> valuesCloned = new HashMap<>();
-            Iterator<String> attributesIt = values.keySet().iterator();
 
-            while (attributesIt.hasNext()) {
-                String attribute = attributesIt.next();
-
+            for (String attribute : values.keySet()) {
                 IBaseValue baseValue = values.get(attribute);
                 IBaseValue baseValueCloned = ((BaseValue) baseValue).clone();
                 baseValueCloned.setBaseContainer(baseEntityCloned);

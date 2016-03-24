@@ -145,7 +145,7 @@ public enum Errors {
         errors.put("E100", "Обновление затронуло #count записей #id , EAV_BE_INTEGER_VALUES");
         errors.put("E101", "В базе отсутсвует отчетная дата на #id");
         errors.put("E102", "Необходимо предоставить ID записи и отчётную дату");
-        errors.put("E103", "Запись #id не действует до отчётного периода #reportDate");
+        errors.put("E103", "Справочник #id не доступен на отчётный период #reportDate");
         errors.put("E104", "Нельзя обьединять сущности разных банков");
         errors.put("E105", "Для слияние двух объектов BaseEntity необходимо существование обоих объектов в БД");//Merging two BaseEntity objects requires for both objects to exits in DB
         errors.put("E106", "Невозможно обработать sets после операции слияния");//Can't process sets after MERGE operation
@@ -337,7 +337,7 @@ public enum Errors {
         errors.put("E282", "Класс не найден : #metaClassName");//No such class : #metaClassName
         errors.put("E283", "Метакласс не содержит атрибутов");//MetaClass with no members
         errors.put("E284", "Неизвестный тип;");
-        errors.put("E285", "");
+        errors.put("E285", "Ключевые простые массивы не поддерживются;");
         errors.put("E286", "");
         errors.put("E287", "");
         errors.put("E288", "");

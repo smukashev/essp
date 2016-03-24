@@ -42,9 +42,6 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
     IBatchRepository batchRepository;
 
     @Autowired
-    IBaseSetDao baseSetDao;
-
-    @Autowired
     IBaseSetBooleanValueDao baseSetBooleanValueDao;
 
     @Autowired
@@ -570,8 +567,6 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     public void deleteAll(long baseEntityId) {
-        Set<Long> childBaseSetIds = getChildBaseSetIds(baseEntityId);
-
         String tableAlias = "cv";
         Delete delete = context
                 .delete(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias))
@@ -579,14 +574,11 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-
-        for (long childBaseSetId : childBaseSetIds)
-            baseSetDao.deleteRecursive(childBaseSetId);
     }
 
     @Override
     public Set<Long> getChildBaseSetIds(long parentBaseEntityId) {
-        Set<Long> baseSetIds = new HashSet<Long>();
+        Set<Long> baseSetIds = new HashSet<>();
 
         String tableAlias = "bv";
         Select select = context

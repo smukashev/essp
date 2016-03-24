@@ -1,12 +1,10 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
@@ -14,6 +12,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityBooleanValueDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -60,8 +58,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         return baseValueId;
     }
 
-    protected long insert(long baseEntityId, long creditorId, long metaAttributeId, Date reportDate, Object value,
-                          boolean closed, boolean last) {
+    protected long insert(long baseEntityId, long creditorId, long metaAttributeId, Date reportDate, Object value, boolean closed, boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_BOOLEAN_VALUES)
                 .set(EAV_BE_BOOLEAN_VALUES.ENTITY_ID, baseEntityId)
@@ -89,8 +86,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 baseValue.isLast());
     }
 
-    protected void update(long id, long baseEntityId, long creditorId, long metaAttributeId, Date reportDate,
-                          Object value, boolean closed, boolean last) {
+    protected void update(long id, long baseEntityId, long creditorId, long metaAttributeId, Date reportDate, Object value, boolean closed, boolean last) {
         String tableAlias = "sv";
         Update update = context
                 .update(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
@@ -128,6 +124,30 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
             throw new IllegalStateException(Errors.getMessage(Errors.E79, count, id));
     }
 
+    private IBaseValue constructValue(Map<String, Object> row, IMetaType metaType) {
+        long id = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue();
+
+        long creditorId = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID.getName())).longValue();
+
+        Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName()));
+
+        boolean value = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())).longValue() == 1;
+
+        boolean closed = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
+        boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1;
+
+        return BaseValueFactory.create(
+                MetaContainerTypes.META_CLASS,
+                metaType,
+                id,
+                creditorId,
+                reportDate,
+                value,
+                closed,
+                last);
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
@@ -148,15 +168,14 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
             return null;
 
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
-        IMetaClass metaClass = baseEntity.getMeta();
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue nextBaseValue = null;
 
         String tableAlias = "bv";
-        String subqueryAlias = "bvn";
+        String subQueryAlias = "bvn";
 
-        Table subqueryTable = context
+        Table subQueryTable = context
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).ID,
@@ -169,19 +188,18 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
-                        DataUtils.convert(baseValue.getRepDate())))
-                .asTable(subqueryAlias);
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_BOOLEAN_VALUES.ID),
-                        subqueryTable.field(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID),
-                        subqueryTable.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_BOOLEAN_VALUES.VALUE),
-                        subqueryTable.field(EAV_BE_BOOLEAN_VALUES.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_BOOLEAN_VALUES.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_BOOLEAN_VALUES.ID),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.VALUE),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());
@@ -193,28 +211,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            boolean value = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
-                    row.get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName()));
-
-            nextBaseValue = BaseValueFactory.create(
-                    metaClass.getType(),
-                    metaType,
-                    id,
-                    creditorId,
-                    reportDate,
-                    value,
-                    closed,
-                    last);
+            nextBaseValue = constructValue(row, metaType);
         }
 
         return nextBaseValue;
@@ -240,15 +237,14 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
             return null;
 
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
-        IMetaClass metaClass = baseEntity.getMeta();
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue previousBaseValue = null;
 
         String tableAlias = "bv";
-        String subqueryAlias = "bvn";
+        String subQueryAlias = "bvn";
 
-        Table subqueryTable = context
+        Table subQueryTable = context
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.desc()).as("num_pp"),
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).ID,
@@ -261,19 +257,18 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.lessThan(
-                        DataUtils.convert(baseValue.getRepDate())))
-                .asTable(subqueryAlias);
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_BOOLEAN_VALUES.ID),
-                        subqueryTable.field(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID),
-                        subqueryTable.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_BOOLEAN_VALUES.VALUE),
-                        subqueryTable.field(EAV_BE_BOOLEAN_VALUES.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_BOOLEAN_VALUES.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_BOOLEAN_VALUES.ID),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.VALUE),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());
@@ -285,33 +280,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            boolean value = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName()));
-
-            previousBaseValue = BaseValueFactory.create(
-                    metaClass.getType(),
-                    metaType,
-                    id,
-                    creditorId,
-                    reportDate,
-                    value,
-                    closed,
-                    last);
+            previousBaseValue = constructValue(row, metaType);
         }
 
         return previousBaseValue;
@@ -342,14 +311,15 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         Select select = context
                 .select(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ID,
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_BOOLEAN_VALUES.as(tableAlias).VALUE,
-                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_LAST)
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_LAST,
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_CLOSED)
                 .from(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.lessOrEqual(
-                        DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
@@ -361,27 +331,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            boolean value = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())).longValue() == 1;
-
-            closedBaseValue = BaseValueFactory.create(
-                    MetaContainerTypes.META_CLASS,
-                    metaType,
-                    id,
-                    creditorId,
-                    baseValue.getRepDate(),
-                    value,
-                    true,
-                    last);
+            closedBaseValue = constructValue(row, metaType);
         }
 
         return closedBaseValue;
@@ -431,30 +381,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            boolean value = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName()));
-
-            lastBaseValue = BaseValueFactory.create(
-                    MetaContainerTypes.META_CLASS,
-                    metaType,
-                    id,
-                    creditorId,
-                    reportDate,
-                    value,
-                    closed,
-                    true);
+            lastBaseValue = constructValue(row, metaType);
         }
 
         return lastBaseValue;
@@ -481,8 +408,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                         tableOfValues.field(EAV_BE_BOOLEAN_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.ENTITY_ID).eq(baseEntity.getId()))
-                .and(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE)
-                        .lessOrEqual(DataUtils.convert(actualReportDate)))
+                .and(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(actualReportDate)))
                 .asTable("vn");
 
         select = context
@@ -506,36 +432,12 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        Iterator<Map<String, Object>> it = rows.iterator();
-        while (it.hasNext()) {
-            Map<String, Object> row = it.next();
-
-            long id = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            boolean value = ((BigDecimal) row.get(EAV_BE_BOOLEAN_VALUES.VALUE.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
-                    row.get(EAV_BE_BOOLEAN_VALUES.REPORT_DATE.getName()));
-
+        for (Map<String, Object> row : rows) {
             String attribute = (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
 
             IMetaType metaType = baseEntity.getMemberType(attribute);
 
-            baseEntity.put(attribute, BaseValueFactory.create(
-                    MetaContainerTypes.META_CLASS,
-                    metaType,
-                    id,
-                    creditorId,
-                    reportDate,
-                    value,
-                    closed,
-                    last));
+            baseEntity.put(attribute, constructValue(row, metaType));
         }
     }
 

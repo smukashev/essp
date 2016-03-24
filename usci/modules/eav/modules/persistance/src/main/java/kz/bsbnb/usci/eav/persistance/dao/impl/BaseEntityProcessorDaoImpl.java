@@ -42,8 +42,8 @@ import static kz.bsbnb.eav.persistance.generated.Tables.*;
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
-    public static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
-    public static final String LOGIC_RULE_META = "LOGIC_RULE_META";
+    private static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
+    private static final String LOGIC_RULE_META = "LOGIC_RULE_META";
 
     @Autowired
     private IMetaClassRepository metaClassRepository;
@@ -88,6 +88,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     private IEavGlobalDao globalDao;
 
+    @Autowired
+    private IRefRepository refRepository;
+
     @Override
     public long search(IBaseEntity baseEntity, long creditorId) {
         Long baseEntityId = searcherPool.getSearcher(baseEntity.getMeta().getClassName()).findSingle((BaseEntity) baseEntity, creditorId);
@@ -100,6 +103,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         final boolean isReference = metaClass.isReference();
         creditorId = isReference ? 0 : creditorId;
+
+        if (isReference) {
+            IBaseEntity referenceEntity = refRepository.findRef(baseEntity);
+
+            if (referenceEntity != null) {
+                baseEntity.setId(referenceEntity.getId());
+                return baseEntity;
+            }
+        }
 
         for (String attribute : baseEntity.getAttributes()) {
             IMetaType metaType = baseEntity.getMemberType(attribute);
@@ -270,6 +282,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if (applyListener != null)
             applyListener.applyToDBEnded(entityHolder.getSaving(), entityHolder.getLoaded(), entityHolder.getApplied(), baseEntityManager);
 
+        if (baseEntityApplied.getMeta().isReference() && baseEntityApplied.getId() > 0)
+            refRepository.setRef(baseEntityApplied.getId(), baseEntityApplied.getReportDate(), baseEntityApplied);
+
         return baseEntityApplied;
     }
 
@@ -335,8 +350,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         Select select = context
                 .select(EAV_BE_ENTITIES.ID)
                 .from(EAV_BE_ENTITIES)
-                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId).
-                        and(EAV_BE_ENTITIES.DELETED.eq(DataUtils.convert(false))));
+                .where(EAV_BE_ENTITIES.CLASS_ID.equal(metaClassId));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

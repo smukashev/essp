@@ -24,7 +24,7 @@ public class CreditorBranchRepository extends BaseRepository {
     public CreditorBranchRepository() {
         QUERY_ALL = "SELECT * FROM ref.creditor_branch";
         QUERY_OPEN = "SELECT t1.*, t2.region_id FROM ref.v_creditor_his t1, ref.creditor t2 where t1.id = t2.id and t1.open_date = to_date('repDate', 'dd.MM.yyyy') " +
-                " and (t1.close_date > to_date('repDate','dd.MM.yyyy') or t1.close_date is null) and t1.main_office_id is not null";
+                " and (t1.close_date > to_date('repDate','dd.MM.yyyy') or t1.close_date is null)";
         QUERY_CLOSE = "SELECT t1.*, t2.region_id FROM ref.v_creditor_his t1, ref.creditor t2 " +
                 "where t1.id = t2.id and t1.close_date = to_date('repDate', 'dd.MM.yyyy') and t1.main_office_id is not null";
         COLUMNS_QUERY = "SELECT * from (" +

@@ -31,10 +31,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Stack;
 
-public class CLIXMLReader {
-    public static final String DATE_FORMAT = "dd.MM.yyyy";
+class CLIXMLReader {
+    private static final String DATE_FORMAT = "dd.MM.yyyy";
     protected DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-    protected XMLEventReader xmlEventReader;
+    private XMLEventReader xmlEventReader;
     private IMetaClassRepository metaClassRepository;
     private Date reportDate;
     private FileInputStream inputStream;
@@ -44,14 +44,14 @@ public class CLIXMLReader {
     private IBaseContainer currentContainer;
     private IBatchService batchService;
     private Batch batch;
-    private Long index = 1L, level = 0L;
+    private Long level = 0L;
     private boolean hasMembers = false;
     private boolean rootEntityExpected = false;
     private String currentRootMeta = null;
 
     private long creditorId = 0L;
 
-    public void init (InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService,
+    private void init(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService,
                       Date repDate) {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
@@ -72,16 +72,16 @@ public class CLIXMLReader {
         this.batchService.save(batch);
     }
 
-    public CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService,
-                        Date repDate, long creditorId) {
+    CLIXMLReader(InputStream inputStream, IMetaClassRepository metaRepo, IBatchService batchService,
+                 Date repDate, long creditorId) {
         this.creditorId = creditorId;
         DataUtils.toBeginningOfTheMonth(repDate);
         DataUtils.toBeginningOfTheDay(repDate);
         init(inputStream, metaRepo, batchService, repDate);
     }
 
-    public CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchService batchService,
-                        Date repDate, long creditorId) throws FileNotFoundException {
+    CLIXMLReader(String fileName, IMetaClassRepository metaRepo, IBatchService batchService,
+                 Date repDate, long creditorId) throws FileNotFoundException {
         logger.info("Reader init.");
         metaClassRepository = metaRepo;
         this.batchService = batchService;
@@ -107,11 +107,11 @@ public class CLIXMLReader {
         batch.setId(batchId);
     }
 
-    public Batch getBatch(){
+    Batch getBatch(){
         return batch;
     }
 
-    public Object getCastObject(DataTypes typeCode, String value) {
+    private Object getCastObject(DataTypes typeCode, String value) {
         switch (typeCode) {
             case INTEGER:
                 return Integer.parseInt(value);
@@ -160,7 +160,7 @@ public class CLIXMLReader {
                         .equalsIgnoreCase(OperationType.NEW.toString());
     }
 
-    public void startElement(XMLEvent event, StartElement startElement, String localName) {
+    private void startElement(XMLEvent event, StartElement startElement, String localName) {
         if (localName.equals("batch")) {
             logger.info("batch");
         } else if (localName.equals("entities")) {
@@ -194,7 +194,6 @@ public class CLIXMLReader {
                 currentContainer = new BaseEntity((MetaClass) metaType, batch.getRepDate(), creditorId);
                 flagsStack.push(hasMembers);
                 hasMembers = false;
-                //metaFactoryService.getBaseEntity((MetaClass)metaType, batch.getRepDate());
                 level++;
             } else if (!metaType.isComplex() && !metaType.isSet()) {
                 Object obj = null;
@@ -267,18 +266,16 @@ public class CLIXMLReader {
         return null;
     }
 
-    public void close() {
+    void close() {
         try {
             xmlEventReader.close();
             inputStream.close();
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (XMLStreamException | IOException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean endElement(String localName) {
+    private boolean endElement(String localName) {
         if (localName.equals("batch")) {
             //logger.info("batch");
         } else if (localName.equals("entities")) {
@@ -288,7 +285,6 @@ public class CLIXMLReader {
         } else if (localName.equals("entity")) {
         } else if (localName.equals(currentRootMeta)) {
             rootEntityExpected = true;
-            index++;
             return true;
         } else {
             IMetaType metaType;
