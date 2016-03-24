@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.model.meta.impl.MetaContainer;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -39,89 +40,63 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
     private DSLContext context;
 
     @Autowired
-    IBatchRepository batchRepository;
+    private IBaseSetBooleanValueDao baseSetBooleanValueDao;
 
     @Autowired
-    IBaseSetBooleanValueDao baseSetBooleanValueDao;
+    private IBaseSetIntegerValueDao baseSetIntegerValueDao;
 
     @Autowired
-    IBaseSetIntegerValueDao baseSetIntegerValueDao;
+    private IBaseSetStringValueDao baseSetStringValueDao;
 
     @Autowired
-    IBaseSetStringValueDao baseSetStringValueDao;
+    private IBaseSetDoubleValueDao baseSetDoubleValueDao;
 
     @Autowired
-    IBaseSetDoubleValueDao baseSetDoubleValueDao;
-
-    @Autowired
-    IBaseSetDateValueDao baseSetDateValueDao;
+    private IBaseSetDateValueDao baseSetDateValueDao;
 
     @Override
     public long insert(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
         IBaseSet baseSet = (IBaseSet) baseValue.getValue();
 
-        long baseValueId = insert(
-                baseValue.getBaseContainer().getId(),
-                baseValue.getMetaAttribute().getId(),
-                baseSet.getId(),
-                baseValue.getRepDate(),
-                baseValue.isClosed(),
-                baseValue.isLast());
-
-        baseValue.setId(baseValueId);
-
-        return baseValueId;
-    }
-
-    protected long insert(long baseEntityId, long metaAttributeId, long baseSetId, Date reportDate, boolean closed,
-                          boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_ENTITY_SIMPLE_SETS)
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID, baseEntityId)
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID, metaAttributeId)
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID, baseSetId)
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE, DataUtils.convert(reportDate))
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED, DataUtils.convert(closed))
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST, DataUtils.convert(last));
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID, baseValue.getBaseContainer().getId())
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.CREDITOR_ID, baseValue.getBaseContainer().getId())
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID, baseValue.getMetaAttribute().getId())
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE, DataUtils.convert(baseValue.getRepDate()))
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED, DataUtils.convert(baseValue.isClosed()))
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST, DataUtils.convert(baseValue.isLast()));
 
-        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        long baseValueId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+
+        baseSet.setId(baseValueId);
+
+        return baseValueId;
     }
 
     @Override
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
-        IBaseSet baseSet = (IBaseSet) baseValue.getValue();
 
-        update(baseValue.getId(),
-                baseValue.getBaseContainer().getId(),
-                baseValue.getMetaAttribute().getId(),
-                baseSet.getId(),
-                baseValue.getRepDate(),
-                baseValue.isClosed(),
-                baseValue.isLast());
-    }
-
-    protected void update(long id, long baseEntityId, long metaAttributeId, long baseSetId, Date reportDate,
-                          boolean closed, boolean last) {
         String tableAlias = "ss";
 
         Update update = context
                 .update(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias))
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ENTITY_ID, baseEntityId)
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ATTRIBUTE_ID, metaAttributeId)
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).SET_ID, baseSetId)
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE, DataUtils.convert(reportDate))
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_CLOSED, DataUtils.convert(closed))
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_LAST, DataUtils.convert(last))
-                .where(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ID.equal(id));
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ENTITY_ID, baseValue.getBaseContainer().getId())
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).CREDITOR_ID, baseValue.getCreditorId())
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ATTRIBUTE_ID, baseValue.getMetaAttribute().getId())
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE, DataUtils.convert(baseValue.getRepDate()))
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_CLOSED, DataUtils.convert(baseValue.isClosed()))
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_LAST, DataUtils.convert(baseValue.isLast()))
+                .where(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ID.equal(baseValue.getId()));
 
         logger.debug(update.toString());
 
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E128, count, id));
+            throw new IllegalStateException(Errors.getMessage(Errors.E128, count, persistable.getId()));
     }
 
     @Override
@@ -143,6 +118,30 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
             throw new IllegalStateException(Errors.getMessage(Errors.E126, count, id));
     }
 
+    private IBaseValue constructValue (long creditorId, Map<String, Object> row, IMetaType metaType, IMetaSet metaSet) {
+        long id = ((BigDecimal) row.get(EAV_BE_ENTITY_SIMPLE_SETS.ID.getName())).longValue();
+
+        Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
+
+        boolean closed = ((BigDecimal) row.get(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED.getName())).longValue() == 1;
+
+        boolean last = ((BigDecimal) row.get(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST.getName())).longValue() == 1;
+
+        IBaseSet baseSet = new BaseSet(id, metaSet.getMemberType());
+
+        loadBaseValues(baseSet, reportDate);
+
+        return BaseValueFactory.create(
+                MetaContainerTypes.META_CLASS,
+                metaType,
+                id,
+                creditorId,
+                reportDate,
+                baseSet,
+                closed,
+                last);
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
@@ -154,7 +153,6 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
-        IMetaClass metaClass = baseEntity.getMeta();
 
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         IMetaType metaType = metaAttribute.getMetaType();
@@ -163,69 +161,41 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseValue nextBaseValue = null;
 
         String tableAlias = "ess";
-        String subqueryAlias = "essn";
+        String subQueryAlias = "essn";
 
-        Table subqueryTable = context
+        Table subQueryTable = context
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ID,
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE,
-                        EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).SET_ID,
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_CLOSED,
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_LAST)
                 .from(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias))
                 .where(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
+                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE.greaterThan(
-                        DataUtils.convert(baseValue.getRepDate())))
-                .asTable(subqueryAlias);
+                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
-                        subqueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID),
-                        subqueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
+                        subQueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E83, subqueryTable.toString()));
+            throw new IllegalStateException(Errors.getMessage(Errors.E83, subQueryTable.toString()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.ID.getName())).longValue();
-
-            long setId = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.getName())).longValue();
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED.getName())).longValue() == 1;
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST.getName())).longValue() == 1;
-
-            IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-            loadBaseValues(baseSet, reportDate);
-
-            nextBaseValue = BaseValueFactory.create(
-                    metaClass.getType(),
-                    metaType,
-                    id,
-                    baseValue.getCreditorId(),
-                    reportDate,
-                    baseSet,
-                    closed,
-                    last);
+            nextBaseValue = constructValue(baseValue.getCreditorId(), row, metaType, metaSet);
         }
 
         return nextBaseValue;
@@ -242,7 +212,6 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         IBaseEntity baseEntity = (IBaseEntity) baseContainer;
-        IMetaClass metaClass = baseEntity.getMeta();
 
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         IMetaType metaType = metaAttribute.getMetaType();
@@ -251,70 +220,41 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseValue previousBaseValue = null;
 
         String tableAlias = "ess";
-        String subqueryAlias = "essn";
+        String subQueryAlias = "essn";
 
-        Table subqueryTable = context
+        Table subQueryTable = context
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE.desc()).as("num_pp"),
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ID,
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE,
-                        EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).SET_ID,
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_CLOSED,
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_LAST)
                 .from(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias))
                 .where(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
+                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE.
-                        lessThan(DataUtils.convert(baseValue.getRepDate())))
-                .asTable(subqueryAlias);
+                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
-                        subqueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID),
-                        subqueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
+                        subQueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E83, subqueryTable.toString()));
+            throw new IllegalStateException(Errors.getMessage(Errors.E83, subQueryTable.toString()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.ID.getName())).longValue();
-
-            long setId = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.getName())).longValue();
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED.getName())).longValue() == 1;
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST.getName())).longValue() == 1;
-
-            IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-
-            loadBaseValues(baseSet, reportDate);
-
-            previousBaseValue = BaseValueFactory.create(
-                    metaClass.getType(),
-                    metaType,
-                    id,
-                    baseValue.getCreditorId(),
-                    reportDate,
-                    baseSet,
-                    closed,
-                    last);
+            previousBaseValue = constructValue(baseValue.getCreditorId(), row, metaType, metaSet);
         }
 
         return previousBaseValue;
@@ -338,14 +278,14 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         String tableAlias = "ess";
         Select select = context
                 .select(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ID,
-                        EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).SET_ID,
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE,
+                        EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_CLOSED,
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_LAST)
                 .from(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias))
                 .where(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE.
-                        lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE.lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
@@ -357,31 +297,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.ID.getName())).longValue();
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
-
-            long setId = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.getName())).longValue();
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST.getName())).longValue() == 1;
-
-            IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-
-            loadBaseValues(baseSet, baseValue.getRepDate());
-
-            closedBaseValue = BaseValueFactory.create(
-                    MetaContainerTypes.META_CLASS,
-                    metaType,
-                    id,
-                    baseValue.getCreditorId(),
-                    reportDate,
-                    baseSet,
-                    true,
-                    last);
+            closedBaseValue = constructValue(baseValue.getCreditorId(), row, metaType, metaSet);
         }
 
         return closedBaseValue;
@@ -406,10 +322,11 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         Select select = context
                 .select(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ID,
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE,
-                        EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).SET_ID,
+                        EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_CLOSED,
                         EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_LAST)
                 .from(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias))
                 .where(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_LAST.equal(DataUtils.convert(true)));
 
@@ -422,31 +339,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED.getName())).longValue() == 1;
-
-            long setId = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.getName())).longValue();
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
-
-            IBaseSet baseSet = new BaseSet(setId, metaSet.getMemberType());
-
-            loadBaseValues(baseSet, baseValue.getRepDate());
-
-            lastBaseValue = BaseValueFactory.create(
-                    MetaContainerTypes.META_CLASS,
-                    metaType,
-                    id,
-                    baseValue.getCreditorId(),
-                    reportDate,
-                    baseSet,
-                    closed,
-                    true);
+            lastBaseValue = constructValue(baseValue.getCreditorId(), row, metaType, metaSet);
         }
 
         return lastBaseValue;
@@ -466,20 +359,18 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                         tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
                         tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID),
                         tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
-                        tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID),
                         tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
                         tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
                 .from(tableOfEntitySimpleSets)
                 .where(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID).eq(baseEntity.getId()))
-                .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE)
-                        .lessOrEqual(DataUtils.convert(actualReportDate)))
+                .and(EAV_BE_ENTITY_SIMPLE_SETS.CREDITOR_ID.eq(baseEntity.getBaseEntityReportDate().getCreditorId()))
+                .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE).lessOrEqual(DataUtils.convert(actualReportDate)))
                 .asTable("essn");
 
         select = context
                 .select(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.NAME),
                         tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.ID),
                         tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE),
-                        tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID),
                         tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED),
                         tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
                 .from(tableNumbering)
@@ -492,41 +383,14 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        Iterator<Map<String, Object>> it = rows.iterator();
-
-        while (it.hasNext()) {
-            Map<String, Object> row = it.next();
-
+        for (Map<String, Object> row : rows) {
             String attribute = (String) row.get(EAV_M_SIMPLE_SET.NAME.getName());
 
-            long setId = ((BigDecimal) row.get(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.getName())).longValue();
-
-            long baseValueId = ((BigDecimal) row.get(EAV_BE_ENTITY_SIMPLE_SETS.ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED.getName())).longValue() == 1;
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
-                    row.get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
-
             IMetaType metaType = baseEntity.getMemberType(attribute);
-            IMetaSet metaSet = (MetaSet) metaType;
-            IMetaType metaSetMemberType = metaSet.getMemberType();
-            IBaseSet baseSet = new BaseSet(setId, metaSetMemberType);
-            loadBaseValues(baseSet, actualReportDate);
 
-            baseEntity.put(attribute, BaseValueFactory.create(
-                    MetaContainerTypes.META_CLASS,
-                    metaType,
-                    baseValueId,
-                    0,
-                    reportDate,
-                    baseSet,
-                    closed,
-                    last));
+            IMetaSet metaSet = (MetaSet) metaType;
+
+            baseEntity.put(attribute, constructValue(baseEntity.getBaseEntityReportDate().getCreditorId(), row, metaType, metaSet));
         }
     }
 
@@ -574,35 +438,6 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-    }
-
-    @Override
-    public Set<Long> getChildBaseSetIds(long parentBaseEntityId) {
-        Set<Long> baseSetIds = new HashSet<>();
-
-        String tableAlias = "bv";
-        Select select = context
-                .select(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).SET_ID)
-                .from(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias))
-                .where(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ENTITY_ID.equal(parentBaseEntityId))
-                .groupBy(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).SET_ID);
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        if (rows.size() > 0) {
-            Iterator<Map<String, Object>> it = rows.iterator();
-            while (it.hasNext()) {
-                Map<String, Object> row = it.next();
-
-                long childBaseSetId = ((BigDecimal) row
-                        .get(EAV_BE_ENTITY_SIMPLE_SETS.SET_ID.getName())).longValue();
-
-                baseSetIds.add(childBaseSetId);
-            }
-        }
-
-        return baseSetIds;
     }
 }
 

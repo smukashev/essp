@@ -770,7 +770,10 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
 showcase list addRootKey credit_id credit_id
+showcase list addRootKey pledge_id pledge_id
+
 showcase list addHistoryKey credit_id credit_id
+showcase list addHistoryKey pledge_id pledge_id
 
 showcase addIndex nonunique creditor_id credit_id
 
