@@ -29,7 +29,7 @@ public abstract class AbstractDataJob extends Thread {
     protected final int SLEEP_TIME_LONG = 500;
 
     /* Number of processed entities to show stats */
-    protected final int STAT_INTERVAL = 100;
+    protected final int STAT_INTERVAL = 1000;
 
     /* Number of max processing threads */
     protected final int THREAD_MAX_LIMIT = 33;

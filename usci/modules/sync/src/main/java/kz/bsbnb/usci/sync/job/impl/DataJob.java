@@ -40,12 +40,12 @@ public final class DataJob extends AbstractDataJob {
 
     private final Logger logger = Logger.getLogger(DataJob.class);
 
-    protected final List<InProcessTester> entitiesInProcess = new ArrayList<>();
+    private final List<InProcessTester> entitiesInProcess = new ArrayList<>();
 
     private volatile BaseEntity currentEntity;
     private volatile boolean currentIntersection;
 
-    ExecutorService executorService = Executors.newCachedThreadPool();
+    private ExecutorService executorService = Executors.newCachedThreadPool();
 
     private double avgTimePrev = 0;
     private double avgTimeCur = 0;
