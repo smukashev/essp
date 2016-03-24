@@ -225,38 +225,41 @@
 		<!--<foreign-key foreignTable="eav_m_complex_attributes" name="eav_fk_005_02">
 			<reference local="attribute_id" foreign="id"/>
 		</foreign-key>-->
-		<unique name="ebcv_UN_ei_ai_rd">
-		  <unique-column name="creditor_id"/>
-			<unique-column name="entity_id"/>
+		<!-- next value -->
+    <!-- previous value -->
+		<unique name="ebcv_UN_ei_ai_ci_rd">
+			<unique-column name="entity_id" />
+			<unique-column name="creditor_id"/>
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
-		<index name="ebcv_IN_ei_ai_rd_ic">
-			<index-column name="creditor_id"/>
+    <!-- closed value -->
+		<index name="ebcv_IN_ei_ai_ci_rd_ic">
 			<index-column name="entity_id"/>
+			<index-column name="creditor_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
-		<index name="ebcv_IN_ei_ai_il">
-		  <index-column name="creditor_id"/>
+    <!-- last value -->
+		<index name="ebcv_IN_ei_ai_ci_il">
 			<index-column name="entity_id"/>
-			<index-column name="attribute_id"/>
+      <index-column name="creditor_id"/>
+      <index-column name="attribute_id"/>
 			<index-column name="is_last"/>
 		</index>
-		<index name="ebcv_IN_ai_evi">
-		  <index-column name="creditor_id"/>
-			<index-column name="attribute_id"/>
-			<index-column name="entity_value_id"/>
-		</index>
-		<index name="ebcv_IN_ei">
+    <!-- load values -->
+		<index name="ebcv_IN_ei_rd">
 			<index-column name="entity_id"/>
+      <index-column name="report_date"/>
 		</index>
-		<index name="ebcv_ai_evi_ei">
-		  <index-column name="creditor_id"/>
-			<index-column name="attribute_id"/>
-			<index-column name="entity_value_id"/>
-			<index-column name="entity_id"/>
+		<!-- improved searcher -->
+		<index name="ebcv_IN_ai_ci_ic_il">
+		  <index-column name="entity_id"/>
+      <index-column name="creditor_id"/>
+      <index-column name="attribute_id"/>
+      <index-column name="is_closed"/>
+      <index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_date_set_values">
