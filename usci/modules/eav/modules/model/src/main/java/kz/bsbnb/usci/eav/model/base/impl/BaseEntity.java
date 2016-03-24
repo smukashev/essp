@@ -41,7 +41,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     private Long index;
 
-    private final List<BaseEntity> keyElements = new ArrayList<>();
+    private final List<IBaseEntity> keyElements = new ArrayList<>();
 
     private boolean keyElementsInstalled = false;
 
@@ -368,7 +368,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         baseEntityReportDate.setComplexSetsCount(complexSetsCount);
     }
 
-    public List<BaseEntity> getKeyElements() {
+    public List<IBaseEntity> getKeyElements() {
         if (!keyElementsInstalled) {
             if (!this.containsComplexKey() && meta.isSearchable())
                 keyElements.add(this);
@@ -385,11 +385,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     if (baseValue == null || baseValue.getValue() == null) continue;
 
                     if (!metaType.isSet()) {
-                        keyElements.addAll(((BaseEntity) baseValue.getValue()).getKeyElements());
+                        keyElements.addAll(((IBaseEntity) baseValue.getValue()).getKeyElements());
                     } else {
                         BaseSet baseSet = (BaseSet) baseValue.getValue();
                         for (IBaseValue childBaseValue : baseSet.get())
-                            keyElements.addAll(((BaseEntity) childBaseValue.getValue()).getKeyElements());
+                            keyElements.addAll(((IBaseEntity) childBaseValue.getValue()).getKeyElements());
                     }
                 }
             }

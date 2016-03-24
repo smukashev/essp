@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.sync.job.AbstractDataJob;
@@ -61,8 +62,8 @@ public final class DataJob extends AbstractDataJob {
 
         public Boolean call() {
             try {
-                for (BaseEntity myEntityKeyElement : myEntity.getKeyElements()) {
-                    for (BaseEntity currentEntityKeyElement : currentEntity.getKeyElements()) {
+                for (IBaseEntity myEntityKeyElement : myEntity.getKeyElements()) {
+                    for (IBaseEntity currentEntityKeyElement : currentEntity.getKeyElements()) {
                         if (myEntityKeyElement.equalsByKey(currentEntityKeyElement)) {
                             currentIntersection = true;
                             return true;
