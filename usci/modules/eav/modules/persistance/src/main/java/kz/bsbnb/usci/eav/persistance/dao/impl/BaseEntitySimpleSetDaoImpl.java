@@ -1,22 +1,23 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.model.meta.impl.MetaContainer;
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
-import kz.bsbnb.usci.eav.model.meta.*;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaSet;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -26,7 +27,9 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITY_SIMPLE_SETS;
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_M_SIMPLE_SET;
@@ -363,7 +366,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                         tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
                 .from(tableOfEntitySimpleSets)
                 .where(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID).eq(baseEntity.getId()))
-                .and(EAV_BE_ENTITY_SIMPLE_SETS.CREDITOR_ID.eq(baseEntity.getBaseEntityReportDate().getCreditorId()))
+                .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.CREDITOR_ID).eq(baseEntity.getBaseEntityReportDate().getCreditorId()))
                 .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE).lessOrEqual(DataUtils.convert(actualReportDate)))
                 .asTable("essn");
 

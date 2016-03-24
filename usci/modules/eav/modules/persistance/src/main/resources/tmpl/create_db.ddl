@@ -144,6 +144,7 @@
 		<!-- load values -->
 		<index name="ebbsv_IN_si_rd_ic">
 			<index-column name="set_id"/>
+      <index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
@@ -240,6 +241,7 @@
 		<!-- load values -->
 		<index name="ebcsv_IN_si_rd_ic">
 			<index-column name="set_id"/>
+      <index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
@@ -335,6 +337,7 @@
 		<!-- load values -->
 		<index name="ebdasv_IN_si_rd_ic">
 			<index-column name="set_id"/>
+      <index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
@@ -430,6 +433,7 @@
 		<!-- load values -->
 		<index name="ebdosv_IN_si_rd_ic">
 			<index-column name="set_id"/>
+      <index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
@@ -541,6 +545,7 @@
 			<index-column name="entity_id"/>
 			<index-column name="creditor_id"/>
 			<index-column name="report_date"/>
+      <index-column name="is_closed"/>
 		</index>
 	</table>
 	<table name="eav_be_entity_report_dates">
@@ -650,6 +655,7 @@
 		<!-- load values -->
 		<index name="ebisv_IN_si_rd_ic">
 			<index-column name="set_id"/>
+      <index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>
@@ -745,6 +751,7 @@
 		<!-- load values -->
 		<index name="ebssv_IN_si_rd_ic">
 			<index-column name="set_id"/>
+      <index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
 		</index>

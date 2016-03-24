@@ -282,6 +282,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         Select select = context
                 .select(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ID,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).REPORT_DATE,
+                        EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).IS_CLOSED,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).IS_LAST)
                 .from(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias))
                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
@@ -330,6 +331,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         Select select = context
                 .select(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ID,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).REPORT_DATE,
+                        EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).IS_CLOSED,
                         EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).IS_LAST)
                 .from(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias))
                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
