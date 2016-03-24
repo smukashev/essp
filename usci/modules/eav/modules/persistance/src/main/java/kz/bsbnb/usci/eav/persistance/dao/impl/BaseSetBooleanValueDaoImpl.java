@@ -421,7 +421,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
                     MetaContainerTypes.META_SET,
                     baseSet.getMemberType(),
                     id,
-                    0,/*fixme!*/
+                    baseSet.getCreditorId(),
                     reportDate,
                     value,
                     false,
