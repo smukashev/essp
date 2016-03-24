@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.showcase.consumer;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
@@ -9,6 +10,7 @@ import kz.bsbnb.usci.showcase.dao.impl.CortegeDaoImpl;
 import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +19,11 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 @Component
-public class ShowcaseMessageConsumer implements MessageListener {
+public class ShowcaseMessageConsumer implements MessageListener, InitializingBean{
     @Autowired
     private ShowcaseDaoImpl showcaseDao;
 
@@ -34,10 +34,29 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
     private final Logger logger = LoggerFactory.getLogger(ShowcaseDaoImpl.class);
 
+    private static List<IBaseEntity> entities = new ArrayList<>();
+
+    ExecutorService executorService = Executors.newCachedThreadPool();
+
+    long start = 0L;
+    private static Integer counter = 0;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        start = System.currentTimeMillis();
+    }
+
     @Override
     @Transactional
     public void onMessage(Message message) {
         if (message instanceof ObjectMessage) {
+
+            if(counter > 250){
+                System.out.println("time 250 : "+(System.currentTimeMillis()-start));
+                counter = 0;
+                start = System.currentTimeMillis();
+            }
+
             ObjectMessage om = (ObjectMessage) message;
             QueueEntry queueEntry;
 
@@ -52,6 +71,8 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 logger.error("Переданный объект пустой;");
                 return;
             }
+
+            queueEntry.getBaseEntityApplied().getKeyElements();
 
             try {
                 Map<ShowCase, Future> showCaseFutureMap = new HashMap<>();
@@ -105,6 +126,10 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     }
 
                     if (found) {
+                        //System.out.println(entities.size());
+                        waitShowcase(queueEntry.getBaseEntityApplied());
+                        entities.add(queueEntry.getBaseEntityApplied());
+
                         for (Map.Entry<ShowCase, Future> entry : showCaseFutureMap.entrySet()) {
                             try {
                                 entry.getValue().get(60, TimeUnit.SECONDS);
@@ -116,10 +141,19 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     } else {
                         logger.error("Для мета класа  " + metaClassName + " нет существующих витрин;");
                     }
+
+                    synchronized (counter){
+                        counter++;
+                    }
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e.getMessage());
+            } finally {
+                synchronized (entities) {
+                    entities.remove(queueEntry.getBaseEntityApplied());
+                }
             }
         }
     }
@@ -138,4 +172,76 @@ public class ShowcaseMessageConsumer implements MessageListener {
             cortegeDao.generate(entity, showCase);
         }
     }
+
+    private void waitShowcase(IBaseEntity entity) {
+        while (true) {
+            boolean found = false;
+
+            List<InProcessTester> entitiesInProcess = new ArrayList<>();
+            synchronized (entities) {
+                for (IBaseEntity processingEntity : entities) {
+                    entitiesInProcess.add(new InProcessTester(entity, processingEntity));
+                }
+            }
+
+            List<Future<Boolean>> futures = null;
+            try {
+                futures = executorService.invokeAll(entitiesInProcess);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            for(Future<Boolean> future : futures){
+                try {
+                    if(future.get()){
+                        found = true;
+                        break;
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (found) {
+                try {
+                    Thread.currentThread().sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    private class InProcessTester implements Callable<Boolean> {
+        private IBaseEntity thisEntity;
+        private IBaseEntity thatEntity;
+
+        private InProcessTester(IBaseEntity thisEntity,IBaseEntity thatEntity) {
+            this.thisEntity = thisEntity;
+            this.thatEntity = thatEntity;
+        }
+
+        public Boolean call() {
+            try {
+                for (IBaseEntity keyEntity : thisEntity.getKeyElements()) {
+                    for (IBaseEntity keyProcessingEntity : thatEntity.getKeyElements()) {
+                        if (keyEntity.equalsByKey(keyProcessingEntity)) {
+                            return  true;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return false;
+        }
+
+    }
+
+
 }
