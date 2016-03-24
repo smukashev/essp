@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -10,8 +9,8 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseSetBooleanValueDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -36,9 +35,6 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
     @Autowired
     private DSLContext context;
 
-    @Autowired
-    IBatchRepository batchRepository;
-
     @Override
     public long insert(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
@@ -56,8 +52,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         return baseValueId;
     }
 
-    protected long insert(long baseSetId, long creditorId, Date reportDate, Object value, boolean closed,
-                          boolean last) {
+    protected long insert(long baseSetId, long creditorId, Date reportDate, Object value, boolean closed, boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_BOOLEAN_SET_VALUES)
                 .set(EAV_BE_BOOLEAN_SET_VALUES.SET_ID, baseSetId)
@@ -130,7 +125,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         if (baseValue.getBaseContainer() == null)
             throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -140,31 +135,28 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         IBaseValue previousBaseValue = null;
 
         String tableAlias = "bsv";
-        String subqueryAlias = "bsvn";
-        Table subqueryTable = context
+        String subQueryAlias = "bsvn";
+        Table subQueryTable = context
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
-                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(
-                        DataUtils.convert((Boolean) baseValue.getValue())))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.lessThan(
-                        DataUtils.convert(baseValue.getRepDate()))).asTable(subqueryAlias);
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Boolean) baseValue.getValue())))
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.ID),
-                        subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID),
-                        subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.ID),
+                        subQueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());
@@ -179,23 +171,17 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
             long id = ((BigDecimal) row
                     .get(EAV_BE_BOOLEAN_SET_VALUES.ID.getName())).longValue();
 
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
 
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID.getName())).longValue();
+            boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
+            boolean closed = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
             previousBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
                     metaType,
                     id,
-                    creditorId,
+                    baseValue.getCreditorId(),
                     reportDate,
                     baseValue.getValue(),
                     closed,
@@ -211,7 +197,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         if (baseValue.getBaseContainer() == null)
             throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -224,24 +210,20 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         String subqueryAlias = "bsvn";
         Table subqueryTable = context
                 .select(DSL.rank()
-                        .over().orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
-                    EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
-                    EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID,
-                    EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
-                    EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED,
-                    EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
+                                .over().orderBy(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(
-                        DataUtils.convert((Boolean) baseValue.getValue())))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
-                        DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Boolean) baseValue.getValue())))
                 .asTable(subqueryAlias);
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.ID),
-                        subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID),
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE),
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED),
                         subqueryTable.field(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST))
@@ -258,26 +240,19 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.ID.getName())).longValue();
+            long id = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.ID.getName())).longValue();
 
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID.getName())).longValue();
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
 
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
+            boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
+            boolean closed = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
             nextBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
                     metaType,
                     id,
-                    creditorId,
+                    baseValue.getCreditorId(),
                     reportDate,
                     baseValue.getValue(),
                     closed,
@@ -293,7 +268,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         if (baseValue.getBaseContainer() == null)
             throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -306,15 +281,12 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         Select select = context
                 .select(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).ID,
                         EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE,
-                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST,
-                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID)
+                        EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.
-                        lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(
-                        DataUtils.convert((Boolean) baseValue.getValue())))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).REPORT_DATE.lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Boolean) baseValue.getValue())))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
@@ -326,23 +298,17 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.ID.getName())).longValue();
+            long id = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.ID.getName())).longValue();
 
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID.getName())).longValue();
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
 
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
+            boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
             closedBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
                     metaType,
                     id,
-                    creditorId,
+                    baseValue.getCreditorId(),
                     reportDate,
                     baseValue.getValue(),
                     true,
@@ -357,7 +323,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         if (baseValue.getBaseContainer() == null)
             throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
-        if(baseValue.getBaseContainer().getId() == 0)
+        if (baseValue.getBaseContainer().getId() == 0)
             return null;
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
@@ -374,9 +340,8 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
                         EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_CLOSED)
                 .from(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
-                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(
-                        DataUtils.convert((Boolean) baseValue.getValue())))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Boolean) baseValue.getValue())))
                 .and(EAV_BE_BOOLEAN_SET_VALUES.as(tableAlias).IS_LAST.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
@@ -388,23 +353,17 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.ID.getName())).longValue();
+            long id = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.ID.getName())).longValue();
 
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID.getName())).longValue();
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
 
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
+            boolean closed = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
             lastBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
                     metaType,
                     id,
-                    creditorId,
+                    baseValue.getCreditorId(),
                     reportDate,
                     baseValue.getValue(),
                     closed,
@@ -433,8 +392,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
                         tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.SET_ID).eq(baseSet.getId()))
-                .and(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE)
-                        .lessOrEqual(DataUtils.convert(actualReportDate)))
+                .and(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(actualReportDate)))
                 .asTable("ssvn");
 
         select = context
@@ -450,26 +408,20 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        Iterator<Map<String, Object>> it = rows.iterator();
-        while (it.hasNext()) {
-            Map<String, Object> row = it.next();
-
+        for (Map<String, Object> row : rows) {
             long id = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID.getName())).longValue();
 
             boolean last = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
             boolean value = ((BigDecimal) row.get(EAV_BE_BOOLEAN_SET_VALUES.VALUE.getName())).longValue() == 1;
 
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
-                    row.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE.getName()));
 
             baseSet.put(BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
                     baseSet.getMemberType(),
                     id,
-                    creditorId,
+                    0,/*fixme!*/
                     reportDate,
                     value,
                     false,

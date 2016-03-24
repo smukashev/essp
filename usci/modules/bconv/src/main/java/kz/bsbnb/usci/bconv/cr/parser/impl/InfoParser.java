@@ -51,7 +51,7 @@ public class InfoParser extends BatchParser {
                 currentBaseEntity.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), crCode, false, true));
                 break;
             case "docs":
-                docs = new BaseSet(metaClassRepository.getMetaClass("document"));
+                docs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
                 break;
             case "doc":
                 currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),

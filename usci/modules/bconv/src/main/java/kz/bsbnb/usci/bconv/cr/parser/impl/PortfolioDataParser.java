@@ -80,13 +80,13 @@ public class PortfolioDataParser extends BatchParser {
 
     private BaseSet getPortfolioFlow() {
         if (portfolioFlow == null)
-            portfolioFlow = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_kfn"));
+            portfolioFlow = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_kfn"), creditorId);
         return portfolioFlow;
     }
 
     private BaseSet getPortfolioFlowMsfo() {
         if (portfolioFlowMsfo == null)
-            portfolioFlowMsfo = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_msfo"));
+            portfolioFlowMsfo = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_msfo"), creditorId);
         return portfolioFlowMsfo;
     }
 }

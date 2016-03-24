@@ -179,7 +179,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 hasMembers = false;
                 stack.push(currentContainer);
                 flagsStack.push(hasMembers);
-                currentContainer = new BaseSet(((MetaSet) metaType).getMemberType());
+                currentContainer = new BaseSet(((MetaSet) metaType).getMemberType(), creditorId);
                 level++;
             } else if (metaType.isComplex()) {
                 stack.push(currentContainer);

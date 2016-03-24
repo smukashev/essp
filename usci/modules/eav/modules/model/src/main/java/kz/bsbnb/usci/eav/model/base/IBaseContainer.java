@@ -29,6 +29,4 @@ public interface IBaseContainer extends IBaseObject {
     int getValueCount();
 
     BaseContainerType getBaseContainerType();
-
-    void setBaseContainerType(BaseContainerType baseContainerType);
 }

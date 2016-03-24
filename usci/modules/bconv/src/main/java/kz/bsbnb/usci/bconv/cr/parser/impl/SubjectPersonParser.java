@@ -81,7 +81,7 @@ public class SubjectPersonParser extends BatchParser {
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), ref_offshore, false, true));
                 break;
             case "bank_relations":
-                bankRelations = new BaseSet(metaClassRepository.getMetaClass("bank_relation"));
+                bankRelations = new BaseSet(metaClassRepository.getMetaClass("bank_relation"), creditorId);
                 break;
             case "bank_relation":
                 event = (XMLEvent) xmlReader.next();
@@ -101,7 +101,7 @@ public class SubjectPersonParser extends BatchParser {
                 bankRelations.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), bankRelation, false, true));
                 break;
             case "addresses":
-                addresses = new BaseSet(metaClassRepository.getMetaClass("address"));
+                addresses = new BaseSet(metaClassRepository.getMetaClass("address"), creditorId);
                 break;
             case "address":
                 currentAddress = new BaseEntity(metaClassRepository.getMetaClass("address"),
@@ -128,7 +128,7 @@ public class SubjectPersonParser extends BatchParser {
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
                 break;
             case "contacts":
-                contacts = new BaseSet(metaClassRepository.getMetaClass("contact"));
+                contacts = new BaseSet(metaClassRepository.getMetaClass("contact"), creditorId);
                 break;
             case "contact":
                 BaseEntity currentContact = new BaseEntity(metaClassRepository.getMetaClass("contact"),
@@ -144,7 +144,7 @@ public class SubjectPersonParser extends BatchParser {
                 currentContact.put("contact_type",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), contactType, false, true));
 
-                BaseSet contactDetails = new BaseSet(new MetaValue(DataTypes.STRING));
+                BaseSet contactDetails = new BaseSet(new MetaValue(DataTypes.STRING), creditorId);
 
                 event = (XMLEvent) xmlReader.next();
                 contactDetails.put(new BaseSetStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -155,7 +155,7 @@ public class SubjectPersonParser extends BatchParser {
                 contacts.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentContact, false, true));
                 break;
             case "names":
-                names = new BaseSet(metaClassRepository.getMetaClass("person_name"));
+                names = new BaseSet(metaClassRepository.getMetaClass("person_name"), creditorId);
                 break;
             case "name":
                 currentName = new BaseEntity(metaClassRepository.getMetaClass("person_name"), batch.getRepDate(), creditorId);
@@ -180,7 +180,7 @@ public class SubjectPersonParser extends BatchParser {
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
                 break;
             case "docs":
-                BaseSet personDocs = new BaseSet(metaClassRepository.getMetaClass("document"));
+                BaseSet personDocs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
 
                 while (true) {
                     subjectPersonDocsParser.parse(xmlReader, batch, index, creditorId);

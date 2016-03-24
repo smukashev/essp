@@ -39,7 +39,7 @@ public class SubjectOrganizationHeadParser extends BatchParser {
             case "head":
                 break;
             case "names":
-                BaseSet headNames = new BaseSet(metaClassRepository.getMetaClass("person_name"));
+                BaseSet headNames = new BaseSet(metaClassRepository.getMetaClass("person_name"), creditorId);
                 while (true) {
                     subjectOrganizationHeadNamesParser.parse(xmlReader, batch, index, creditorId);
                     if (subjectOrganizationHeadNamesParser.hasMore()) {
@@ -52,7 +52,7 @@ public class SubjectOrganizationHeadParser extends BatchParser {
                         new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), headNames, false, true));
                 break;
             case "docs":
-                BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("document"));
+                BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
 
                 while (true) {
                     subjectOrganizationHeadDocsParser.parse(xmlReader, batch, index, creditorId);

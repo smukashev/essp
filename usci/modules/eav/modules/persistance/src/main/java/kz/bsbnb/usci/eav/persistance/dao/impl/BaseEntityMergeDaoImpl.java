@@ -490,8 +490,8 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 			Set<UUID> processedUuidsLeft = new HashSet<UUID>();
 			Set<UUID> processedUuidsRight = new HashSet<UUID>();
 
-			childBaseSetAppliedLeft = new BaseSet(childBaseSetLeft.getId(), childMetaType);
-			childBaseSetAppliedRight = new BaseSet(childBaseSetRight.getId(), childMetaType);
+			childBaseSetAppliedLeft = new BaseSet(childBaseSetLeft.getId(), childMetaType, creditorId);
+			childBaseSetAppliedRight = new BaseSet(childBaseSetRight.getId(), childMetaType, creditorId);
 			// we haven't reached the base case - do recursion
 			for (IBaseValue childBaseValueLeft : childBaseSetLeft.get()) {
 				IBaseEntity childBaseEntityLeft = (IBaseEntity) childBaseValueLeft.getValue();

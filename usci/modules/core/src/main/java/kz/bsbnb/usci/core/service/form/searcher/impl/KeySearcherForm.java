@@ -165,7 +165,7 @@ public class KeySearcherForm implements ISearcherForm {
             IMetaType metaType = metaAttribute.getMetaType();
 
             if(metaType.isSet()) {
-                BaseSet childBaseSet = new BaseSet(metaType);
+                BaseSet childBaseSet = new BaseSet(metaType, creditorId);
                 IMetaType itemMeta = ((MetaSet) metaType).getMemberType();
                 BaseEntity childBaseEntity = new BaseEntity((MetaClass) itemMeta, new Date(), creditorId);
                 long childId = Long.valueOf(parameterValue);

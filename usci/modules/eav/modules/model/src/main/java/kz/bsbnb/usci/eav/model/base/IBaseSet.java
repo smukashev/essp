@@ -9,11 +9,11 @@ public interface IBaseSet extends IBaseContainer {
 
     void remove(String identifier);
 
-    long getLevel();
-
-    void setLevel(long level);
-
     boolean isLast();
 
     void setLast(boolean last);
+
+    long getCreditorId();
+
+    void setCreditorId(long creditorId);
 }

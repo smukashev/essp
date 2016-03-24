@@ -41,7 +41,7 @@ public class CreditorBranchParser extends BatchParser {
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
                 break;
             case "docs":
-                currentDocSet = new BaseSet(metaClassRepository.getMetaClass("document"));
+                currentDocSet = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
                 break;
             case "doc":
                 currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),

@@ -127,7 +127,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
         boolean last = ((BigDecimal) row.get(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST.getName())).longValue() == 1;
 
-        IBaseSet baseSet = new BaseSet(id, metaSet.getMemberType());
+        IBaseSet baseSet = new BaseSet(id, metaSet.getMemberType(), creditorId);
 
         loadBaseValues(baseSet, reportDate);
 

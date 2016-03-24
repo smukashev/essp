@@ -57,7 +57,7 @@ public class BaseEntityGenerator  extends AbstractDataGenerator {
 
     private BaseSet generateBaseSet(Batch batch, MetaSet metaSet, long index) {
         IMetaType metaTypeChild = metaSet.getMemberType();
-        BaseSet baseSet = new BaseSet(metaSet.getMemberType());
+        BaseSet baseSet = new BaseSet(metaSet.getMemberType(), 0);
 
         if (metaTypeChild.isSet()) {
             logger.debug("Generating values set of the sets.");

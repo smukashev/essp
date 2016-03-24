@@ -105,7 +105,7 @@ public class PackageParser extends BatchParser {
                 }
                 break;
             case "pledges":
-                BaseSet pledges = new BaseSet(metaClassRepository.getMetaClass("pledge"));
+                BaseSet pledges = new BaseSet(metaClassRepository.getMetaClass("pledge"), creditorId);
 
                 while (true) {
                     pledgesParser.parse(xmlReader, batch, index, creditorId);

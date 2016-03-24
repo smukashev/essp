@@ -38,9 +38,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     private IBaseEntityReportDateDao baseEntityReportDateDao;
 
     @Autowired
-    private IRefRepository refRepositoryDao;
-
-    @Autowired
     private IEavOptimizerDao eavOptimizerDao;
 
     private final Logger logger = LoggerFactory.getLogger(BaseEntityApplyDaoImpl.class);
@@ -140,7 +137,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IMetaSet childMetaSet = (IMetaSet) metaType;
                 IBaseSet childBaseSet = (IBaseSet) baseValueSaving.getValue();
 
-                IBaseSet childBaseSetApplied = new BaseSet(childMetaSet.getMemberType());
+                IBaseSet childBaseSetApplied = new BaseSet(childMetaSet.getMemberType(), creditorId);
                 for (IBaseValue childBaseValue : childBaseSet.get()) {
                     IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
 
@@ -238,7 +235,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseSet childBaseSet = (IBaseSet) baseValueSaving.getValue();
                 IMetaValue metaValue = (IMetaValue) childMetaSet.getMemberType();
 
-                IBaseSet childBaseSetApplied = new BaseSet(childMetaSet.getMemberType());
+                IBaseSet childBaseSetApplied = new BaseSet(childMetaSet.getMemberType(), creditorId);
                 for (IBaseValue childBaseValue : childBaseSet.get()) {
                     IBaseValue childBaseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_SET,
@@ -1293,7 +1290,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             childBaseSetLoaded = (IBaseSet) baseValueLoaded.getValue();
 
             if (childBaseSetSaving == null || childBaseSetSaving.getValueCount() == 0) {
-                childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+                childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType, creditorId);
 
                 Date reportDateSaving = baseValueSaving.getRepDate();
                 Date reportDateLoaded = baseValueLoaded.getRepDate();
@@ -1375,7 +1372,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 // case#3
                 if (compare == 0 || compare == 1) {
-                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType, creditorId);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1390,7 +1387,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     // case#4
                 } else if (compare == -1) {
-                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType, creditorId);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1445,7 +1442,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 baseValuePrevious.setMetaAttribute(baseValueSaving.getMetaAttribute());
 
                 childBaseSetLoaded = (IBaseSet) baseValueClosed.getValue();
-                childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+                childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType, creditorId);
 
                 IBaseValue baseValueApplied = BaseValueFactory.create(
                         MetaContainerTypes.META_CLASS,
@@ -1465,7 +1462,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 if (baseValueNext != null) {
                     childBaseSetLoaded = (IBaseSet) baseValueNext.getValue();
-                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType, creditorId);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1480,7 +1477,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsUpdated(baseValueApplied);
                 } else {
-                    childBaseSetApplied = new BaseSet(childMetaType);
+                    childBaseSetApplied = new BaseSet(childMetaType, creditorId);
                     baseEntityManager.registerAsInserted(childBaseSetApplied);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
@@ -1731,7 +1728,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             childBaseSetLoaded = (IBaseSet) baseValueLoaded.getValue();
 
             if (childBaseSetSaving == null || childBaseSetSaving.getValueCount() <= 0) {
-                childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+                childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType, creditorId);
                 reportDateSaving = baseValueSaving.getRepDate();
 
                 int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
@@ -1857,7 +1854,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     throw new IllegalStateException(Errors.getMessage(Errors.E67,metaAttribute.getName()));
 
                 if (compare == 0 || compare == 1) {
-                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType, creditorId);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1874,7 +1871,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                 } else if (compare == -1) {
-                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType, creditorId);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1941,7 +1938,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseValuePrevious.setMetaAttribute(metaAttribute);
 
                     childBaseSetLoaded = (IBaseSet) baseValueClosed.getValue();
-                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType);
+                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType, creditorId);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1969,7 +1966,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     reportDateLoaded = baseValueNext.getRepDate();
 
                     childBaseSetLoaded = (IBaseSet) baseValueNext.getValue();
-                    childBaseSetApplied = new BaseSet(baseValueNext.getId(), childMetaType);
+                    childBaseSetApplied = new BaseSet(baseValueNext.getId(), childMetaType, creditorId);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
@@ -1986,7 +1983,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     baseEntityManager.registerAsUpdated(baseValueApplied);
                 } else {
-                    childBaseSetApplied = new BaseSet(childMetaType);
+                    childBaseSetApplied = new BaseSet(childMetaType, creditorId);
                     baseEntityManager.registerAsInserted(childBaseSetApplied);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(

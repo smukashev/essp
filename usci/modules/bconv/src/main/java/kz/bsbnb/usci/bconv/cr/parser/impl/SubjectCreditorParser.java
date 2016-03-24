@@ -44,7 +44,7 @@ public class SubjectCreditorParser extends BatchParser {
                         event.asCharacters().getData(), false, true));
                 break;
             case "docs":
-                docs = new BaseSet(metaClassRepository.getMetaClass("document"));
+                docs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
                 break;
             case "doc":
                 currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),

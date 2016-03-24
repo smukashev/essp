@@ -47,7 +47,7 @@ public class PortfolioFlowMsfoParser extends BatchParser {
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), portfolio, false, true));
                 break;
             case "details":
-                currentDetails = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_detail"));
+                currentDetails = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_detail"), creditorId);
                 break;
             case "detail":
                 currentDetail = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_detail"),
