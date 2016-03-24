@@ -214,6 +214,35 @@
 		<!--<foreign-key foreignTable="eav_be_entities" name="eav_fk_004_02">
 			<reference local="entity_value_id" foreign="id"/>
 		</foreign-key>-->
+		<!-- previous value -->
+		<!-- next value -->
+		<index name="ebcsv_IN_si_ci_v_rd">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="entity_value_id"/>
+		</index>
+		<!-- closed value -->
+		<index name="ebcsv_IN_si_ci_v_rd_ic">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="entity_value_id"/>
+			<index-column name="is_closed"/>
+		</index>
+		<!-- last value -->
+		<index name="ebcsv_IN_si_ci_v_il">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="entity_value_id"/>
+			<index-column name="is_last"/>
+		</index>
+		<!-- load values -->
+		<index name="ebcsv_IN_si_rd_ic">
+			<index-column name="set_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
 	</table>
 	<table name="eav_be_complex_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -280,6 +309,35 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_006_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
+		<!-- previous value -->
+		<!-- next value -->
+		<index name="ebdasv_IN_si_ci_v_rd">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="value"/>
+		</index>
+		<!-- closed value -->
+		<index name="ebdasv_IN_si_ci_v_rd_ic">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="value"/>
+			<index-column name="is_closed"/>
+		</index>
+		<!-- last value -->
+		<index name="ebdasv_IN_si_ci_v_il">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="value"/>
+			<index-column name="is_last"/>
+		</index>
+		<!-- load values -->
+		<index name="ebdasv_IN_si_rd_ic">
+			<index-column name="set_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
 	</table>
 	<table name="eav_be_date_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -346,6 +404,35 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_008_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
+		<!-- previous value -->
+		<!-- next value -->
+		<index name="ebdosv_IN_si_ci_v_rd">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="value"/>
+		</index>
+		<!-- closed value -->
+		<index name="ebdosv_IN_si_ci_v_rd_ic">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="value"/>
+			<index-column name="is_closed"/>
+		</index>
+		<!-- last value -->
+		<index name="ebdosv_IN_si_ci_v_il">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="value"/>
+			<index-column name="is_last"/>
+		</index>
+		<!-- load values -->
+		<index name="ebdosv_IN_si_rd_ic">
+			<index-column name="set_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
 	</table>
 	<table name="eav_be_double_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -537,6 +624,35 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_015_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
+		<!-- previous value -->
+		<!-- next value -->
+		<index name="ebisv_IN_si_ci_v_rd">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="value"/>
+		</index>
+		<!-- closed value -->
+		<index name="ebisv_IN_si_ci_v_rd_ic">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="value"/>
+			<index-column name="is_closed"/>
+		</index>
+		<!-- last value -->
+		<index name="ebisv_IN_si_ci_v_il">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="value"/>
+			<index-column name="is_last"/>
+		</index>
+		<!-- load values -->
+		<index name="ebisv_IN_si_rd_ic">
+			<index-column name="set_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
 	</table>
 	<table name="eav_be_integer_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -603,6 +719,35 @@
 		<!--<foreign-key foreignTable="eav_be_sets" name="eav_fk_020_01">
 			<reference local="set_id" foreign="id"/>
 		</foreign-key>-->
+		<!-- previous value -->
+		<!-- next value -->
+		<index name="ebssv_IN_si_ci_v_rd">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="value"/>
+		</index>
+		<!-- closed value -->
+		<index name="ebssv_IN_si_ci_v_rd_ic">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="value"/>
+			<index-column name="is_closed"/>
+		</index>
+		<!-- last value -->
+		<index name="ebssv_IN_si_ci_v_il">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="value"/>
+			<index-column name="is_last"/>
+		</index>
+		<!-- load values -->
+		<index name="ebssv_IN_si_rd_ic">
+			<index-column name="set_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
+		</index>
 	</table>
 	<table name="eav_be_string_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
@@ -622,37 +767,37 @@
     <!-- next value -->
     <!-- previous value -->
     <unique name="ebsv_UN_ei_ai_ci_rd">
-    <unique-column name="entity_id" />
-    <unique-column name="attribute_id"/>
-    <unique-column name="creditor_id"/>
-    <unique-column name="report_date"/>
+			<unique-column name="entity_id" />
+			<unique-column name="attribute_id"/>
+			<unique-column name="creditor_id"/>
+			<unique-column name="report_date"/>
     </unique>
     <!-- closed value -->
     <index name="ebsv_IN_ei_ai_ci_rd_ic">
-    <index-column name="entity_id"/>
-    <index-column name="attribute_id"/>
-    <index-column name="creditor_id"/>
-    <index-column name="report_date"/>
-    <index-column name="is_closed"/>
+			<index-column name="entity_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="report_date"/>
+			<index-column name="is_closed"/>
     </index>
     <!-- last value -->
     <index name="ebsv_IN_ei_ai_ci_il">
-    <index-column name="entity_id"/>
-    <index-column name="creditor_id"/>
-    <index-column name="attribute_id"/>
-    <index-column name="is_last"/>
+			<index-column name="entity_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="is_last"/>
     </index>
     <!-- load values -->
     <index name="ebsv_IN_ei_rd">
-    <index-column name="entity_id"/>
-    <index-column name="report_date"/>
+			<index-column name="entity_id"/>
+			<index-column name="report_date"/>
     </index>
     <index name="ebsv_IN_ai_ci_v_ic_il">
-    <index-column name="creditor_id"/>
-    <index-column name="attribute_id"/>
-    <index-column name="value"/>
-    <index-column name="is_closed"/>
-    <index-column name="is_last"/>
+			<index-column name="creditor_id"/>
+			<index-column name="attribute_id"/>
+			<index-column name="value"/>
+			<index-column name="is_closed"/>
+			<index-column name="is_last"/>
     </index>
 	</table>
 	<table name="eav_a_user">
@@ -700,6 +845,9 @@
 		<column name="actual_count" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="is_disabled" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="0"/>
+		<index name="eb_IN_ci">
+			<index-column name="creditor_id"/>
+		</index>
 	</table>
 	<table name="eav_global">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
