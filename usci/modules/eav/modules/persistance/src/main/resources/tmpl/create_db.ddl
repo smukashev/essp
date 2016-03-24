@@ -469,6 +469,7 @@
 	<table name="eav_be_entity_simple_sets">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="attribute_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="set_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
@@ -483,8 +484,9 @@
 		<!--<foreign-key foreignTable="eav_m_simple_set" name="eav_fk_014_02">
 			<reference local="attribute_id" foreign="id"/>
 		</foreign-key>-->
-		<unique name="ebess_UN_ei_ai_rd">
+		<unique name="ebess_UN_ei_ci_ai_rd">
 			<unique-column name="entity_id"/>
+			<unique-column name="creditor_id"/>
 			<unique-column name="attribute_id"/>
 			<unique-column name="report_date"/>
 		</unique>
