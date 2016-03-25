@@ -21,10 +21,16 @@ Ext.onReady(function () {
                 creditorId: Ext.getCmp('edCreditor').value,
                 pageNo: userNavHistory.getNextPage()
             };
+            //loader
+            var myMask = new Ext.LoadMask(Ext.getCmp("entityTreeViewSelect"), {msg: "Please wait..."});
+            myMask.show();
 
             entityStoreSelect.load({
+
                 params: params,
                 callback: function (records, operation, success) {
+                    myMask.hide();
+
                     if (!success) {
                         var error = '';
                         if (operation.error != undefined) {
