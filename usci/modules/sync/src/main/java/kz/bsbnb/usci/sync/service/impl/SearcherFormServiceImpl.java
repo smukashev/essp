@@ -18,11 +18,12 @@ import java.util.List;
  */
 @Service
 public class SearcherFormServiceImpl implements ISearcherFormService {
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     @Qualifier(value = "remoteSearcherFormService")
-    RmiProxyFactoryBean rmiProxyFactoryBean;
+    private RmiProxyFactoryBean rmiProxyFactoryBean;
 
-    kz.bsbnb.usci.core.service.form.ISearcherFormService remoteSearcherFormService;
+    private kz.bsbnb.usci.core.service.form.ISearcherFormService remoteSearcherFormService;
 
     @PostConstruct
     public void init() {

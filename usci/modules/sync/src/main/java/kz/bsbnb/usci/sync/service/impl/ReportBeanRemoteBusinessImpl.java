@@ -1,10 +1,10 @@
 package kz.bsbnb.usci.sync.service.impl;
 
-import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.Report;
 import kz.bsbnb.usci.cr.model.ReportMessage;
 import kz.bsbnb.usci.cr.model.ReportMessageAttachment;
+import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -16,11 +16,12 @@ import java.util.List;
 
 @Service
 public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness {
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     @Qualifier(value = "reportBeanRemoteBusiness")
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
-    kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness remoteReportBusiness;
+    private kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness remoteReportBusiness;
 
     @PostConstruct
     public void init() {

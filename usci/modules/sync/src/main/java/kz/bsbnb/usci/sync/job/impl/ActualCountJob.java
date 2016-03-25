@@ -12,14 +12,14 @@ import java.util.Map;
  * Потоко-безопасный асинхронный job для обновления actual count для батчей
  */
 @Component
-public class ActualCountJob extends Thread {
-    private IBatchService batchService;
+class ActualCountJob extends Thread {
+    private final IBatchService batchService;
 
-    private Map<Long, Long> actualCountMap = new HashMap<>();
+    private final Map<Long, Long> actualCountMap = new HashMap<>();
 
-    private Logger logger = LoggerFactory.getLogger(ActualCountJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(ActualCountJob.class);
 
-    public ActualCountJob(IBatchService batchService) {
+    ActualCountJob(IBatchService batchService) {
         this.batchService = batchService;
     }
 
@@ -37,7 +37,7 @@ public class ActualCountJob extends Thread {
         }
     }
 
-    public void insertBatchId(Long batchId) {
+    void insertBatchId(Long batchId) {
         Long count = actualCountMap.get(batchId);
         count = count == null ? 0 : count;
         actualCountMap.put(batchId, count + 1);

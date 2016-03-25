@@ -45,7 +45,7 @@ public final class DataJob extends AbstractDataJob {
     private volatile BaseEntity currentEntity;
     private volatile boolean currentIntersection;
 
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private double avgTimePrev = 0;
     private double avgTimeCur = 0;
@@ -54,7 +54,7 @@ public final class DataJob extends AbstractDataJob {
     private int clearJobsIndex = 0;
 
     private class InProcessTester implements Callable<Boolean> {
-        private BaseEntity myEntity;
+        private final BaseEntity myEntity;
 
         private InProcessTester(BaseEntity myEntity) {
             this.myEntity = myEntity;
@@ -77,7 +77,7 @@ public final class DataJob extends AbstractDataJob {
             return false;
         }
 
-        public BaseEntity getMyEntity() {
+        BaseEntity getMyEntity() {
             return myEntity;
         }
     }
@@ -108,10 +108,6 @@ public final class DataJob extends AbstractDataJob {
                 }
 
                 syncStatusSingleton.put(entities.size(), entitiesInProcess.size(), avgTimeCur);
-
-                /* Uncomment only to check, time cost operation */
-                /*if(entitiesInProcess.size() != processingJobs.size())
-                    throw new IllegalStateException("CRITICAL: EntitiesInProcess != ProcessJobs");*/
             } catch (Exception e) {
                 e.printStackTrace();
             }
