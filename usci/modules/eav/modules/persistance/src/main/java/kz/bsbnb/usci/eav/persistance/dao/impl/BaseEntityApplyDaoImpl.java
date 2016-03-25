@@ -141,11 +141,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 for (IBaseValue childBaseValue : childBaseSet.get()) {
                     IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
 
-                    if (metaAttribute.isImmutable() && childBaseEntity.getValueCount() != 0 && childBaseEntity.getId() < 1) {
-                        logger.error(Errors.getError(Errors.getMessage(Errors.E62)) + " : \n" +
-                                childBaseEntity.getMeta().getClassName() + "\n" + childBaseEntity.toString());
+                    if (metaAttribute.isImmutable() && childBaseEntity.getValueCount() != 0 && childBaseEntity.getId() < 1)
                         throw new KnownException(Errors.getMessage(Errors.E62,childBaseEntity.getMeta().getClassName()));
-                    }
 
                     IBaseEntity childBaseEntityApplied = apply(creditorId, childBaseEntity, null, baseEntityManager, null);
 
@@ -182,11 +179,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseEntity childBaseEntity = (IBaseEntity) baseValueSaving.getValue();
 
                     if (childBaseEntity.getValueCount() != 0) {
-                        if (childBaseEntity.getId() < 1) {
-                            logger.error(Errors.getError(Errors.getMessage(Errors.E62)) + ": \n" + childBaseEntity.getMeta().getClassName()
-                                    + "\n" + childBaseEntity.toString());
+                        if (childBaseEntity.getId() < 1)
                             throw new KnownException(Errors.getMessage(Errors.E62,childBaseEntity.getMeta().getClassName()));
-                        }
 
                         IBaseEntity childBaseEntityImmutable = baseEntityLoadDao.loadByMaxReportDate(
                                 childBaseEntity.getId(), childBaseEntity.getReportDate());
@@ -936,12 +930,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseEntity baseEntityApplied;
 
                 if (metaAttribute.isImmutable()) {
-                    if (baseEntitySaving.getId() < 1) {
-                        logger.error(Errors.getError(Errors.getMessage(Errors.E62)) + " : \n" + baseEntitySaving.getMeta().
-                                getClassName() + "\n" + baseEntitySaving.toString());
+                    if (baseEntitySaving.getId() < 1)
                         throw new KnownException(Errors.getMessage(Errors.E62, baseEntitySaving.getMeta().getClassName()));
-                    }
-
 
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                             baseEntitySaving.getReportDate());
@@ -977,14 +967,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseEntity baseEntityApplied;
 
                 if (metaAttribute.isImmutable()) {
-                    if (baseEntitySaving.getId() < 1) {
-                        logger.error(Errors.getError(Errors.getMessage(Errors.E62)) + " : \n" + baseEntitySaving.getMeta().
-                                getClassName() + "\n" + baseEntitySaving.toString());
+                    if (baseEntitySaving.getId() < 1)
                         throw new KnownException(Errors.getMessage(Errors.E62,baseEntitySaving.getMeta().getClassName()));
-                    }
 
-                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
-                            baseEntitySaving.getReportDate());
+                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
                 } else {
                     baseEntityApplied = apply(creditorId, baseEntitySaving, null, baseEntityManager, null);
                 }
@@ -1099,14 +1085,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
-                            if (baseEntitySaving.getId() < 1) {
-                                logger.error(Errors.getError(Errors.getMessage(Errors.E62)) + " : \n" + baseEntitySaving.getMeta().
-                                        getClassName() + "\n" + baseEntitySaving.toString());
+                            if (baseEntitySaving.getId() < 1)
                                 throw new KnownException(Errors.getMessage(Errors.E62, baseEntitySaving.getMeta().getClassName()));
-                            }
 
-                            baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
-                                    baseEntitySaving.getReportDate());
+                            baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
                                     apply(creditorId, baseEntitySaving, null, baseEntityManager, null) :
@@ -1127,15 +1109,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     } else {
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
-                            if (baseEntitySaving.getId() < 1) {
-                                logger.error(Errors.getError(Errors.getMessage(Errors.E62)) + " : \n" + baseEntitySaving.getMeta().
-                                        getClassName() + "\n" + baseEntitySaving.toString());
+                            if (baseEntitySaving.getId() < 1)
                                 throw new KnownException(Errors.getMessage(Errors.E62,baseEntitySaving.getMeta().getClassName()));
-                            }
 
-
-                            baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
-                                    baseEntitySaving.getReportDate());
+                            baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
                                     apply(creditorId, baseEntitySaving, baseEntityClosed, baseEntityManager, null) :
@@ -1194,15 +1171,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseEntity baseEntityApplied;
 
                 if (metaAttribute.isImmutable()) {
-                    if (baseEntitySaving.getId() < 1) {
-                        logger.error(Errors.getError(Errors.getMessage(Errors.E62)) + " : \n" + baseEntitySaving.getMeta().
-                                getClassName() + "\n" + baseEntitySaving.toString());
+                    if (baseEntitySaving.getId() < 1)
                         throw new KnownException(Errors.getMessage(Errors.E62, baseEntitySaving.getMeta().getClassName()));
-                    }
 
-
-                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
-                            baseEntitySaving.getReportDate());
+                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
                 } else {
                     IBaseValue previousBaseValue = valueDao.getPreviousBaseValue(baseValueSaving);
 

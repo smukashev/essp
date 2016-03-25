@@ -98,8 +98,6 @@ public class ShowcaseMessageConsumer implements MessageListener {
                             throw e;
                         }
                     }
-                } else {
-                    logger.error("Для мета класа  " + metaClassName + " нет существующих витрин;");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

@@ -4,4 +4,4 @@ target
 version.properties
 oracle.properties
 *.log
-
+*.war

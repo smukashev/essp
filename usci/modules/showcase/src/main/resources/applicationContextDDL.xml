@@ -19,7 +19,7 @@
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
         <property name="url" value="jdbc:oracle:thin:@10.8.1.85:1521:SHOWCASE"/>
-        <property name="username" value="SHOWCASE3"/>
+        <property name="username" value="SHOWCASE"/>
         <property name="password" value="SHOW_2015"/>
         <property name="initialSize" value="16"/>
         <property name="maxActive" value="16"/>

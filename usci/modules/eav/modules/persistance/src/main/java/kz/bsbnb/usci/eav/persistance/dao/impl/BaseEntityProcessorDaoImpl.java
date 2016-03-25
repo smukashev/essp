@@ -179,15 +179,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
                 case DELETE:
-                    if (baseEntityPostPrepared.getId() <= 0) {
-                        logger.error("Сущность для удаления не найдена; \n" + baseEntityPostPrepared);
+                    if (baseEntityPostPrepared.getId() <= 0)
                         throw new KnownException(Errors.getMessage(Errors.E112));
-                    }
 
-
-                    if (baseEntity.getMeta().isReference() && refProcessorDao.historyExists(
-                            baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId())) {
-                        logger.error("Справочник с историей не может быть удалена; \n " + baseEntity);
+                    if (baseEntity.getMeta().isReference() &&
+                            refProcessorDao.historyExists(baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId())) {
                         throw new KnownException(Errors.getMessage(Errors.E113));
                     }
 
@@ -201,11 +197,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
                 case CLOSE:
-                    if (baseEntityPostPrepared.getId() <= 0) {
-                        logger.error("Сущность для закрытия не найдена; \n" + baseEntityPostPrepared);
+                    if (baseEntityPostPrepared.getId() <= 0)
                         throw new KnownException(Errors.getMessage(Errors.E114));
-                    }
-
 
                     IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool.getPersistableDao(
                             BaseEntityReportDate.class, IBaseEntityReportDateDao.class);

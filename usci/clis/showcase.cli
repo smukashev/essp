@@ -748,6 +748,7 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
 showcase list addRootKey credit_id credit_id
+
 showcase list addHistoryKey credit_id credit_id
 
 showcase addIndex nonunique creditor_id credit_id
@@ -904,6 +905,6 @@ showcase addIndex nonunique portfolio_data_id
 
 showcase save
 
-#showcase sql run usci/db_oracle_scripts/showcase/showcase_table_range_partitioning.sql
+showcase sql run usci/db_oracle_scripts/showcase/showcase_table_range_partitioning.sql
 
 quit
