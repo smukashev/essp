@@ -939,7 +939,7 @@ Ext.onReady(function () {
         proxy: {
             type: 'ajax',
             url: dataUrl,
-            extraParams: {op: 'LIST_ENTITY'}
+            extraParams: {op: 'LIST_ENTITY_SELECT'}
         },
         folderSort: true
     });
