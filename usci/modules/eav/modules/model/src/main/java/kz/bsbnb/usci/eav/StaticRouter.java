@@ -50,12 +50,12 @@ public final class StaticRouter {
     /* Showcase Schema name */
     private final static String stendShowcaseSchemaName = "C##SHOWCASE";
     private final static String devShowcaseSchemaName = "SHOWCASE";
-    private final static String prodShowcaseSchemaName = "SHOWCASE3";
+    private final static String prodShowcaseSchemaName = "SHOWCASE";
 
     /* Credit Registry DB IP */
     private final static String stendCRDBIP = "10.10.20.44";
     private final static String devCRDBIP = "10.10.20.44";
-    private final static String prodCRDBIP  = "10.8.1.97";
+    private final static String prodCRDBIP  = "10.8.1.250";
 
     /* Credit Registry DB Username */
     private final static String stendCRDBUsername = "core";
@@ -65,7 +65,7 @@ public final class StaticRouter {
     /* Credit Registry DB Password */
     private final static String stendCRDBPassword = "core_sep_2014";
     private final static String devCRDBPassword = "core_sep_2014";
-    private final static String prodCRDBPassword = "core_aug_2015";
+    private final static String prodCRDBPassword = "core_oct_2013";
 
     /* Report files catalog */
     private final static String stendReportFilesCatalog = "/home/essp/Portal_afn/Report/";
