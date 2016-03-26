@@ -56,10 +56,11 @@ public class ShowcaseMessageConsumer implements MessageListener {
             }
 
             try {
-                if (queueEntry.getBaseEntityApplied() != null && queueEntry.getBaseEntityApplied().getOperation() != null) return;
+                if (queueEntry.getBaseEntityApplied() != null && queueEntry.getBaseEntityApplied().getOperation() != null)
+                    return;
 
-                Map<ShowCase, Future> showCaseFutureMap = new HashMap<>();
-                List<ShowCase> showCases = showcaseDao.getShowCases();
+                final Map<ShowCase, Future> showCaseFutureMap = new HashMap<>();
+                final List<ShowCase> showCases = showcaseDao.getShowCases();
 
                 if (showCases.size() == 0)
                     throw new IllegalStateException(Errors.getMessage(Errors.E271));
@@ -107,8 +108,8 @@ public class ShowcaseMessageConsumer implements MessageListener {
     }
 
     private class CortegeGenerator implements Runnable {
-        private IBaseEntity entity;
-        private ShowCase showCase;
+        private final IBaseEntity entity;
+        private final ShowCase showCase;
 
         CortegeGenerator(IBaseEntity entity, ShowCase showCase) {
             this.entity = entity;
