@@ -3,7 +3,6 @@ package kz.bsbnb.usci.receiver.reader.impl;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
 import kz.bsbnb.usci.receiver.helper.impl.ParserHelper;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
@@ -58,26 +57,22 @@ public abstract class CommonReader<T> implements IReader<T> {
     @Value("#{jobParameters['creditorId']}")
     protected Long creditorId;
 
-    protected XMLEventReader xmlEventReader;
+    XMLEventReader xmlEventReader;
 
-    /* steps to wait sync, after throw exception */
-    protected static final long TOTAL_WAIT_TIMEOUT = 3600;
-
-    /* time for one step */
-    protected static final long STEP_WAIT_TIMEOUT = 500;
+    private static final long STEP_WAIT_TIMEOUT = 500;
 
     protected IBatchService batchService;
 
-    protected IMetaFactoryService metaFactoryService;
+    IMetaFactoryService metaFactoryService;
 
-    protected ReportBeanRemoteBusiness reportService;
+    ReportBeanRemoteBusiness reportService;
 
     protected Batch batch;
 
     @Override
     public abstract T read() throws UnexpectedInputException, ParseException, NonTransientResourceException;
 
-    protected class ErrorHandlerImpl implements ErrorHandler {
+    private class ErrorHandlerImpl implements ErrorHandler {
         private boolean isValid = true;
         private String errMessage;
 
@@ -99,7 +94,7 @@ public abstract class CommonReader<T> implements IReader<T> {
         }
     }
 
-    protected boolean validateSchema(boolean isOriginal, ByteArrayInputStream xmlInputStream) throws IOException, SAXException {
+    boolean validateSchema(boolean isOriginal, ByteArrayInputStream xmlInputStream) throws IOException, SAXException {
         URL schemaURL;
 
         if (isOriginal) {
@@ -134,18 +129,13 @@ public abstract class CommonReader<T> implements IReader<T> {
         return errorHandlerImpl.isValid;
     }
 
-    public void waitSync(IServiceRepository serviceFactory) {
-        int sleepCounter = 0;
+    void waitSync(IServiceRepository serviceFactory) {
         while (serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
             try {
                 Thread.sleep(STEP_WAIT_TIMEOUT);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-            sleepCounter++;
-            if (sleepCounter > TOTAL_WAIT_TIMEOUT)
-                throw new IllegalStateException(Errors.getMessage(Errors.E192));
         }
     }
 }

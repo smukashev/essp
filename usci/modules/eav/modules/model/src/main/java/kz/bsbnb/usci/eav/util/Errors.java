@@ -99,7 +99,7 @@ public enum Errors {
         errors.put("E59", "Родитель атрибута #baseValueSaving.getMetaAttribute().getName() должна быть сущность");
         errors.put("E60", "Атрибут должен содержать мета данные");
         errors.put("E61", "Поддержка массив массивов не реализовано");
-        errors.put("E62", "Запись класса #metaclass не найдена;");
+        errors.put("E62", "Справочник #metaclass не найдена;");
         errors.put("E63", "В базе нет данных для записи #baseEntityId до отчетной даты(включительно): #reportDate");
         errors.put("E64", "Комплексный элелемент не содержит внутренних элементов #metaclass");
         errors.put("E65", "Оперативные атрибуты могут сожержать только оперативные данные. Мета: #metaclass , атрибут: #attribute");
