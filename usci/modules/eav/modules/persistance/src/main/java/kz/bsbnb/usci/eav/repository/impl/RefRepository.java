@@ -16,10 +16,26 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
     private final HashMap<BaseEntityKey, IBaseEntity> cache = new HashMap<>();
 
     public IBaseEntity findRef(IBaseEntity baseEntity) {
-        for (Map.Entry<BaseEntityKey, IBaseEntity> entry : cache.entrySet()) {
-            if (baseEntity.getReportDate().compareTo(entry.getValue().getReportDate()) == 0 && baseEntity.equalsByReference(entry.getValue()))
-                return entry.getValue();
-        }
+        boolean synced;
+        int syncCounter = 0;
+        do {
+            try {
+                for (Map.Entry<BaseEntityKey, IBaseEntity> entry : cache.entrySet()) {
+                    if (baseEntity.getReportDate().compareTo(entry.getValue().getReportDate()) == 0 && baseEntity.equalsByReference(entry.getValue())) {
+                        return entry.getValue();
+                    }
+                }
+                synced = false;
+            } catch (Exception e) {
+                synced = true;
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        } while(synced && syncCounter++ < 1000);
+
 
         return null;
     }
