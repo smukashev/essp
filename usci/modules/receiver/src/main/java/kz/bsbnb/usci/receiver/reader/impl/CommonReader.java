@@ -3,8 +3,6 @@ package kz.bsbnb.usci.receiver.reader.impl;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
-import kz.bsbnb.usci.receiver.helper.impl.FileHelper;
-import kz.bsbnb.usci.receiver.helper.impl.ParserHelper;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 import kz.bsbnb.usci.receiver.reader.IReader;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
@@ -35,12 +33,6 @@ import java.util.Date;
 public abstract class CommonReader<T> implements IReader<T> {
     @Autowired
     protected IServiceRepository serviceRepository;
-
-    @Autowired
-    protected ParserHelper parserHelper;
-
-    @Autowired
-    protected FileHelper fileHelper;
 
     @Value("#{jobParameters['batchId']}")
     protected Long batchId;

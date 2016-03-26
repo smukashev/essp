@@ -1,7 +1,5 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
-import kz.bsbnb.usci.eav.util.Errors;
-import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
@@ -11,42 +9,30 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
-import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
-import kz.bsbnb.usci.sync.service.IBatchService;
-import kz.bsbnb.usci.sync.service.IMetaFactoryService;
-import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import javax.annotation.PostConstruct;
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Stack;
@@ -193,7 +179,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 try {
                     XMLEvent event = (XMLEvent) xmlEventReader.next();
-                    obj = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
+                    obj = DataTypes.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
                     throw new RuntimeException(Errors.getMessage(Errors.E194, localName, n.getMessage()));
@@ -215,7 +201,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 if (hasOperationNew(startElement)) {
                     IBaseValue newBaseValue = BaseValueFactory.create(currentContainer.getBaseContainerType(), metaType,
-                            0, creditorId, batch.getRepDate(), parserHelper.getCastObject(metaValue.getTypeCode(),
+                            0, creditorId, batch.getRepDate(), DataTypes.getCastObject(metaValue.getTypeCode(),
                                         startElement.getAttributeByName(new QName("data")).getValue()), false, true);
 
                     baseValue.setNewBaseValue(newBaseValue);

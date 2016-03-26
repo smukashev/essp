@@ -1,20 +1,17 @@
 package kz.bsbnb.usci.eav.util;
 
+import kz.bsbnb.usci.eav.model.type.DataTypes;
+
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
 public class DataUtils {
-    public static final long MILLISECONDS_PER_DAY = 24L * 60 * 60 * 1000;
-
-    public static final String DATE_FORMAT_SLASH = "yyyy-MM-dd";
-    public static final String DATE_FORMAT_DOT = "dd.MM.yyyy";
-
-    public static final DateFormat dateFormatSlash = new SimpleDateFormat(DATE_FORMAT_SLASH);
-    public static final DateFormat dateFormatDot = new SimpleDateFormat(DATE_FORMAT_DOT);
+    private static final long MILLISECONDS_PER_DAY = 24L * 60 * 60 * 1000;
 
     public static int compareBeginningOfTheDay(final Date comparingDate, final Date anotherDate) {
         final Date newComparingDate = new Date(comparingDate.getTime());

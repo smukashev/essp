@@ -55,7 +55,7 @@ public class SubjectDocFormImpl extends JDBCSupport implements ISearcherForm {
             throw new RuntimeException(Errors.getMessage(Errors.E231));
 
         long numDocs = Long.parseLong(parameters.get("childCnt"));
-        Date reportDate = reportDate = (Date) DataTypes.fromString(DataTypes.DATE, parameters.get("date"));
+        Date reportDate = reportDate = (Date) DataTypes.getCastObject(DataTypes.DATE, parameters.get("date"));
         BaseEntity subject = new BaseEntity(metaClassRepository.getMetaClass("subject"), reportDate, creditorId);
         BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
         int successfullDocCount = 0;

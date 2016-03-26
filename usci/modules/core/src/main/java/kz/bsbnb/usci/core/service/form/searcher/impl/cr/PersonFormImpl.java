@@ -43,7 +43,7 @@ public class PersonFormImpl extends AbstractSubjectForm {
         Date reportDate = null;
 
         if(parameters.get("date")!=null)
-            reportDate = (Date) DataTypes.fromString(DataTypes.DATE, parameters.get("date"));
+            reportDate = (Date) DataTypes.getCastObject(DataTypes.DATE, parameters.get("date"));
 
         if(parameters.get("pageNo") != null)
             ret = new PaginableSearchResult();

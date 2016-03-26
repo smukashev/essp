@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.repository.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -101,7 +102,7 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
         public String toString() {
             return "BaseEntityKey{" +
                     "id=" + id +
-                    ", reportDate=" + DataUtils.dateFormatDot.format(reportDate) +
+                    ", reportDate=" + DataTypes.dateFormatDot.format(reportDate) +
                     '}';
         }
     }

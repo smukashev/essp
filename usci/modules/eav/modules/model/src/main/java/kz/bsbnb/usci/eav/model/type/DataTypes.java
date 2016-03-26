@@ -2,43 +2,26 @@ package kz.bsbnb.usci.eav.model.type;
 
 import kz.bsbnb.usci.eav.util.Errors;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Holds codes for EAV entity attribute types
- *
- * @author a.tkachenko
- * @version 1.0, 17.01.2013
- */
-public enum DataTypes
-{
+public enum DataTypes {
     INTEGER,
     DATE,
     STRING,
     BOOLEAN,
     DOUBLE;
 
-    private static SimpleDateFormat dateFormat1 = new SimpleDateFormat("dd.MM.yyyy");
-    private static SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy-MM-dd");
+    public static final String DATE_FORMAT_SLASH = "yyyy-MM-dd";
+    public static final String DATE_FORMAT_DOT = "dd.MM.yyyy";
 
-    /**
-     * Returns appropriate class for given DataTypes enum value
-     *
-     * INTEGER - Integer
-     * DATE - java.util.Date
-     * STRING - String
-     * BOOLEAN - Boolean
-     * DOUBLE - Double
-     *
-     * @param dataType
-     * @return
-     */
-    public static Class<?> getDataTypeClass(DataTypes dataType)
-    {
-        switch(dataType)
-        {
+    public static final DateFormat dateFormatSlash = new SimpleDateFormat(DATE_FORMAT_SLASH);
+    public static final DateFormat dateFormatDot = new SimpleDateFormat(DATE_FORMAT_DOT);
+
+    public static Class<?> getDataTypeClass(DataTypes dataType) {
+        switch (dataType) {
             case INTEGER:
                 return Integer.class;
             case DATE:
@@ -54,44 +37,41 @@ public enum DataTypes
         }
     }
 
-    /**
-     * Same as getDataTypeClass for current instance
-     *
-     * @return
-     */
-    public Class<?> getDataTypeClass()
-    {
-        return getDataTypeClass(this);
-    }
-
-    public static Object fromString(DataTypes type, String value){
-
-        switch (type)
-        {
+    public static Object getCastObject(DataTypes typeCode, String value) {
+        switch(typeCode) {
             case INTEGER:
                 return Integer.parseInt(value);
-            case STRING:
-                return value;
-            case DOUBLE:
-                return Double.parseDouble(value);
-            case BOOLEAN:
-                return Boolean.parseBoolean(value);
             case DATE:
                 Date date = null;
 
                 try {
-                    date = dateFormat1.parse(value);
+                    date = dateFormatSlash.parse(value);
                 } catch (ParseException e) {
                     try {
-                        date = dateFormat2.parse(value);
+                        date = dateFormatDot.parse(value);
                     } catch (ParseException ex) {
                         e.printStackTrace();
                     }
                 }
 
                 return date;
+            case STRING:
+                return value;
+            case BOOLEAN:
+                try {
+                    int i = Integer.parseInt(value);
+                    return i == 1;
+                } catch (Exception e) {
+                    return Boolean.parseBoolean(value);
+                }
+            case DOUBLE:
+                return Double.parseDouble(value);
             default:
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E49));
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E127));
         }
+    }
+
+    public Class<?> getDataTypeClass() {
+        return getDataTypeClass(this);
     }
 }

@@ -63,7 +63,7 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
                 reportDate, creditorId);
         primaryContract.put("no", new BaseValue(creditorId, reportDate, parameters.get("no")));
         primaryContract.put("date", new BaseValue(creditorId, reportDate,
-                DataTypes.fromString(DataTypes.DATE, parameters.get("date"))));
+                DataTypes.getCastObject(DataTypes.DATE, parameters.get("date"))));
         credit.put("primary_contract", new BaseValue(creditorId, reportDate, primaryContract));
         Long id = searcher.findSingle(credit, creditorId);
 

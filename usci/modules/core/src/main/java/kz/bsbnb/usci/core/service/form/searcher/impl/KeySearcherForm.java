@@ -192,7 +192,7 @@ public class KeySearcherForm implements ISearcherForm {
 
             } else {
                 MetaValue metaValue = (MetaValue) metaType;
-                value = DataTypes.fromString(metaValue.getTypeCode(), parameterValue);
+                value = DataTypes.getCastObject(metaValue.getTypeCode(), parameterValue);
             }
 
             baseEntity.put(attribute, BaseValueFactory.create(
