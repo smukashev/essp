@@ -177,7 +177,7 @@ public class MainPortlet extends MVCPortlet {
 		return new RefListResponse(shortRows);
 	}
 
-	private String getAttributesJson(IMetaClass meta) {
+	private String getAttributesJsonSelect(IMetaClass meta) {
 		StringBuilder result = new StringBuilder();
 
 		result.append("{\"total\":");
@@ -547,7 +547,7 @@ public class MainPortlet extends MVCPortlet {
 		return str;
 	}
 
-	private String entityToJson(BaseEntity entityLeft, BaseEntity entityRight, String title, String code) {
+	private String entityToJson(BaseEntity entityLeft, BaseEntity entityRight, String title, String code, Boolean isKey) {
 		MetaClass meta = null;
 		String idLeft = "";
 		String idRight = "";
@@ -582,7 +582,8 @@ public class MainPortlet extends MVCPortlet {
 		str += "\"id_left\":  \"" + idLeft + "\", ";
 		str += "\"id_right\": \"" + idRight + "\", ";
 		str += "\"type\": \"META_CLASS\",";
-		str += "\"searchable\": " + isSearchable + ",";
+		str += "\"is_searchable\": " + isSearchable + ",";
+		str += "\"is_key\": " + isKey + ",";
 		str += "\"iconCls\":\"folder\",";
 		str += "\"children\":[";
 
@@ -624,7 +625,7 @@ public class MainPortlet extends MVCPortlet {
 				}
 
 				str += entityToJson(valueLeftSubEntity, valueRightSubEntity,
-						attrTitle, innerClassesNames);
+						attrTitle, innerClassesNames, meta.getMetaAttribute(innerClassesNames).isKey());
 			}
 
 		}
@@ -665,7 +666,7 @@ public class MainPortlet extends MVCPortlet {
 				}
 
 				str += setToJson(valueLeftSubSet, valueRightSubSet,
-						attrTitle, innerClassesNames);
+						attrTitle, innerClassesNames, meta.getMetaAttribute(innerClassesNames).isKey());
 			}
 		}
 
@@ -705,7 +706,7 @@ public class MainPortlet extends MVCPortlet {
 				}
 
 				str += setToJson(valueLeftSubSet, valueRightSubSet,
-						attrTitle, innerClassesNames);
+						attrTitle, innerClassesNames, meta.getMetaAttribute(innerClassesNames).isKey());
 			}
 		}
 
@@ -761,7 +762,10 @@ public class MainPortlet extends MVCPortlet {
 							"\"valueRight\":\"" + clearSlashes(testNull(rightValueString)) + "\",\n" +
 							"\"array\": false,\n" +
 							"\"simple\": true,\n" +
+							"\"is_searchable\": false,\n" +
+							"\"is_key\": " + meta.getMetaAttribute(innerClassesNames).isKey() + ",\n" +
 							"\"type\": \"" + ((MetaValue) meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
+							"\"is_parent_ref\": " + meta.isReference() + ",\n" +
 							"\"leaf\":true,\n" +
 							"\"iconCls\":\"file\"\n" +
 							"}";
@@ -783,6 +787,9 @@ public class MainPortlet extends MVCPortlet {
 							"\"valueRight\":\"" + dtStrRight + "\",\n" +
 							"\"array\": false,\n" +
 							"\"simple\": true,\n" +
+							"\"is_searchable\": false,\n" +
+							"\"is_key\": " + meta.getMetaAttribute(innerClassesNames).isKey() + ",\n" +
+							"\"is_parent_ref\": " + meta.isReference() + ",\n" +
 							"\"type\": \"" + ((MetaValue) meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
 							"\"leaf\":true,\n" +
 							"\"iconCls\":\"file\"\n" +
@@ -796,7 +803,7 @@ public class MainPortlet extends MVCPortlet {
 		return str;
 	}
 
-	private String setToJson(BaseSet setLeft, BaseSet setRight, String title, String code) {
+	private String setToJson(BaseSet setLeft, BaseSet setRight, String title, String code, Boolean isKey) {
 
 		IMetaType type = null;
 		int setLeftSize = 0;
@@ -832,7 +839,8 @@ public class MainPortlet extends MVCPortlet {
 		str += "\"valueRight\": \"" + setRightSize + "\",";
 		str += "\"simple\": false,";
 		str += "\"array\": true,";
-		str += "\"searchable\": " + isSearchable + ",";
+		str += "\"is_searchable\": " + isSearchable + ",";
+		str += "\"is_key\": " + isKey + ",";
 		str += "\"type\": \"META_SET\",";
 		str += "\"mergeable\": \"true\",";
 		str += "\"iconCls\":\"folder\",";
@@ -888,7 +896,7 @@ public class MainPortlet extends MVCPortlet {
 					}
 
 					str += entityToJson(valueLeftSubEntity, valueRightSubEntity, "[" + i + "]",
-							"[" + i + "]");
+							"[" + i + "]", isKey);
 					i++;
 				}
 
@@ -1194,7 +1202,7 @@ public class MainPortlet extends MVCPortlet {
 
 					if (StringUtils.isNotEmpty(metaId)) {
 						metaClass = metaFactoryService.getMetaClass(Long.valueOf(metaId));
-						sJson = getAttributesJson(metaClass);
+						sJson = getAttributesJsonSelect(metaClass);
 						writer.write(sJson);
 					}
 
@@ -1309,7 +1317,7 @@ public class MainPortlet extends MVCPortlet {
 
 						writer.write("{\"text\":\".\",\"children\": [\n" +
 								entityToJson(entityLeft, entityRight, entityLeft.getMeta().getClassTitle(),
-										entityLeft.getMeta().getClassName()) +
+										entityLeft.getMeta().getClassName(), false) +
 								"]}");
 					}
 					break;
