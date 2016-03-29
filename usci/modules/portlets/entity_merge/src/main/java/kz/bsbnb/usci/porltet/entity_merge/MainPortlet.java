@@ -567,6 +567,10 @@ public class MainPortlet extends MVCPortlet {
 		if (meta == null)
 			throw new NullPointerException(Errors.getMessage(Errors.E243));
 
+		Boolean isSearchable = false;
+		if (meta.isComplex())
+			isSearchable = meta.isSearchable();
+
 		String str = "{";
 
 		str += "\"title\": \"" + title + "\",";
@@ -578,6 +582,7 @@ public class MainPortlet extends MVCPortlet {
 		str += "\"id_left\":  \"" + idLeft + "\", ";
 		str += "\"id_right\": \"" + idRight + "\", ";
 		str += "\"type\": \"META_CLASS\",";
+		str += "\"searchable\": " + isSearchable + ",";
 		str += "\"iconCls\":\"folder\",";
 		str += "\"children\":[";
 
@@ -813,6 +818,12 @@ public class MainPortlet extends MVCPortlet {
 		if (type == null)
 			throw new NullPointerException(Errors.getMessage(Errors.E245));
 
+		Boolean isSearchable = false;
+		if (type.isComplex()) {
+			MetaClass metaClass = (MetaClass) type;
+			isSearchable = metaClass.isSearchable();
+		}
+
 		String str = "{";
 
 		str += "\"title\": \"" + title + "\",";
@@ -821,6 +832,7 @@ public class MainPortlet extends MVCPortlet {
 		str += "\"valueRight\": \"" + setRightSize + "\",";
 		str += "\"simple\": false,";
 		str += "\"array\": true,";
+		str += "\"searchable\": " + isSearchable + ",";
 		str += "\"type\": \"META_SET\",";
 		str += "\"mergeable\": \"true\",";
 		str += "\"iconCls\":\"folder\",";

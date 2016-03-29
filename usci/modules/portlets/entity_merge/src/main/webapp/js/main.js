@@ -845,6 +845,7 @@ Ext.onReady(function () {
             {name: 'keep_both', type: 'boolean', defaultValue: false},
             {name: 'id_left', type: 'string'},
             {name: 'id_right', type: 'string'},
+            {name: 'searchable', type: 'boolean'}
         ]
     });
 
@@ -1122,6 +1123,16 @@ Ext.onReady(function () {
     });
 
     var entityGrid = Ext.create('Ext.tree.Panel', {
+        viewConfig: {
+            //Return CSS class to apply to rows depending upon data values
+            getRowClass: function (record, index) {
+                if (record.get('searchable')) {
+                    return 'searchable-row'
+                } else {
+                    return 'unsearchable-row';
+                }
+            }
+        },
         //collapsible: true,
         id: 'entityTreeView',
         preventHeader: true,
@@ -1172,16 +1183,24 @@ Ext.onReady(function () {
                 flex: 3,
                 dataIndex: 'keep_left',
                 sortable: true,
-                renderer: function (dataIndex) {
-                    return '<center><input type="checkbox" onclick="markEntityKeepLeft()"' + (dataIndex ? 'checked' : '') + ' /></center>'
+                renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+                    if (record.get('searchable')) {
+                        return "";
+                    } else {
+                        return '<center><input type="checkbox" onclick="markEntityKeepLeft()" /></center>'
+                    }
                 }
             }, {
                 text: label_KEEP_RIGHT,
                 flex: 3,
                 dataIndex: 'keep_right',
                 sortable: true,
-                renderer: function (dataIndex) {
-                    return '<center><input type="checkbox" onclick="markEntityKeepRight()"' + (dataIndex ? 'checked' : '') + ' /></center>'
+                renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
+                    if (record.get('searchable')) {
+                        return "";
+                    } else {
+                        return '<center><input type="checkbox" onclick="markEntityKeepRight()" /></center>'
+                    }
                 }
             }, {
                 text: label_MERGE,
@@ -1189,12 +1208,21 @@ Ext.onReady(function () {
                 dataIndex: 'merge',
                 sortable: true,
                 renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-                    if (record.get('array')) {
+                    if (record.get('searchable')) {
+                        return "";
+                    } else if (record.get('array')) {
                         return '<center><input type="checkbox" onclick="markEntityMerge()"' + (record.get('merge') ? 'checked' : '') + ' /></center>'
                     } else {
                         return "";
                     }
                 }
+                /*
+                 }, {
+                 text: label_MERGE,
+                 flex: 3,
+                 dataIndex: 'searchable',
+                 sortable: true
+                 */
             }],
         listeners: {}
     });

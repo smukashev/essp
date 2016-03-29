@@ -25,6 +25,20 @@
 </script>
 
 <style>
+    .searchable-row .x-grid-cell {
+        border-style: dotted;
+        border-color: #a3bae9;
+        background-color: #c6cccb !important;
+    }
+
+    .unsearchable-row .x-grid-cell {
+        font: normal 11px/13px tahoma, arial, verdana, sans-serif;
+        background-color: white;
+        border-color: white;
+        border-style: solid;
+        border-width: 1px 0;
+    }
+
     .node {
         border: 1px solid black;
         margin: 5px;
