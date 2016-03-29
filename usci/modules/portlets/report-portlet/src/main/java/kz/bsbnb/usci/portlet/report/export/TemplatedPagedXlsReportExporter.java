@@ -257,6 +257,12 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
             ResultSet dataSource = getTargetReportComponent().getResultSet(firstRecordNumber, lastRecordNumber);
             logTime("After query");
             ResultSetMetaData rsmd = dataSource.getMetaData();
+            for(int columnIndex=1; columnIndex<=dataSource.getMetaData().getColumnCount(); columnIndex++) {
+                currentSheet.addCell(new Label(columnIndex, rowIndex, dataSource.getMetaData().getColumnName(columnIndex), times12Format));
+
+                recordCounter++;
+            }
+            rowIndex++;
             while (dataSource.next()) {
                 for (int columnIndex = 1; columnIndex <= rsmd.getColumnCount(); columnIndex++) {
                     int columnNumber = columnIndex;
@@ -369,6 +375,8 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
         File file = new File(templateFilePath);
         if (!file.exists()) {
             return 0;
+
+
         }
         log.log(Level.INFO, "Template file exists");
         Workbook templateWorkbook = null;

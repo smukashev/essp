@@ -138,19 +138,25 @@ public class DatabaseConnect {
         }
     }
 
-    public List<ValuePair> getValueListFromStoredProcedure(String procedureName) {
+    public List<ValuePair> getValueListFromStoredProcedure(String procedureName, String showcase_id) {
         Connection connection = getConnection();
         CallableStatement statement = null;
         OracleCallableStatement ocs = null;
         ResultSet cursor = null;
         try {
-            String procedureCallString = "{ call " + procedureName + "(?,?)}";
+            String procedureCallString="";
+            if(procedureName.equals("INPUT_PARAMETER_SC_FIELDS"))
+                procedureCallString = "{ call " + procedureName + "(?,?,?)}";
+            else
+                procedureCallString = "{ call " + procedureName + "(?,?)}";
             statement = connection.prepareCall(procedureCallString);
             ocs = statement.unwrap(OracleCallableStatement.class);
             statement.registerOutParameter(1, OracleTypes.CURSOR);
             log.log(Level.INFO, "Procedure name: {0}", procedureName);
             log.log(Level.INFO, "User id for procedure : {0}", user.getUserId());
             statement.setLong(2, user.getUserId());
+            if(procedureName.equals("INPUT_PARAMETER_SC_FIELDS"))
+                statement.setString(3, showcase_id);
             statement.execute();
             cursor = ocs.getCursor(1);
             List<ValuePair> result = new ArrayList<ValuePair>();
