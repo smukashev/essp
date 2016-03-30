@@ -763,6 +763,7 @@ public class MainPortlet extends MVCPortlet {
 							"\"array\": false,\n" +
 							"\"simple\": true,\n" +
 							"\"is_searchable\": false,\n" +
+							"\"is_parent_searchable\": " + meta.isSearchable() + ",\n" +
 							"\"is_key\": " + meta.getMetaAttribute(innerClassesNames).isKey() + ",\n" +
 							"\"type\": \"" + ((MetaValue) meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
 							"\"is_parent_ref\": " + meta.isReference() + ",\n" +
@@ -790,6 +791,7 @@ public class MainPortlet extends MVCPortlet {
 							"\"is_searchable\": false,\n" +
 							"\"is_key\": " + meta.getMetaAttribute(innerClassesNames).isKey() + ",\n" +
 							"\"is_parent_ref\": " + meta.isReference() + ",\n" +
+							"\"is_parent_searchable\": " + meta.isSearchable() + ",\n" +
 							"\"type\": \"" + ((MetaValue) meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
 							"\"leaf\":true,\n" +
 							"\"iconCls\":\"file\"\n" +

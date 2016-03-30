@@ -480,6 +480,18 @@ function createJSON(currentNode, offset, first) {
 
 }
 
+function markParent(selectedNode) {
+    if (selectedNode == null || selectedNode.parentNode == null) {
+        return;
+    }
+
+    if (selectedNode.parentNode.data.keep_left == false && selectedNode.parentNode.data.keep_right == false && selectedNode.parentNode.data.merge == false) {
+        selectedNode.parentNode.data.keep_both = true;
+    }
+
+    markParent(selectedNode.parentNode);
+}
+
 function markEntityKeepLeft() {
 
     var grid = Ext.getCmp('entityTreeView');
@@ -494,6 +506,8 @@ function markEntityKeepLeft() {
         selectedNode.data.keep_right = false;
         selectedNode.data.merge = false;
         selectedNode.data.keep_both = false;
+
+        //markParent(selectedNode);
     }
 
     Ext.getCmp("entityTreeView").getView().refresh();
@@ -845,7 +859,7 @@ Ext.onReady(function () {
             {name: 'keep_both', type: 'boolean', defaultValue: false},
             {name: 'id_left', type: 'string'},
             {name: 'id_right', type: 'string'},
-            {name: 'is_searchable', type: 'boolean'},
+            {name: 'is_parent_searchable', type: 'boolean'},
             {name: 'is_key', type: 'boolean'},
             {name: 'is_parent_ref', type: 'boolean'}
         ]
@@ -1128,7 +1142,7 @@ Ext.onReady(function () {
         viewConfig: {
             //Return CSS class to apply to rows depending upon data values
             getRowClass: function (record, index) {
-                if (record.get('is_searchable')) {
+                if (record.get('is_parent_searchable')) {
                     return 'searchable-row'
                 } else {
                     return 'unsearchable-row';
@@ -1186,10 +1200,10 @@ Ext.onReady(function () {
                 dataIndex: 'keep_left',
                 sortable: true,
                 renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-                    if (record.get('is_parent_ref')) {
+                    if (record.get('is_parent_searchable')) {
                         return "";
                     } else {
-                        return '<center><input type="checkbox" onclick="markEntityKeepLeft()" /></center>';
+                        return '<center><input type="checkbox" onclick="markEntityKeepLeft()"' + (value ? 'checked' : '') + ' /></center>';
                     }
                 }
             }, {
@@ -1198,10 +1212,10 @@ Ext.onReady(function () {
                 dataIndex: 'keep_right',
                 sortable: true,
                 renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-                    if (record.get('is_parent_ref')) {
+                    if (record.get('is_parent_searchable')) {
                         return "";
                     } else {
-                        return '<center><input type="checkbox" onclick="markEntityKeepRight()" /></center>';
+                        return '<center><input type="checkbox" onclick="markEntityKeepRight()' + (value ? 'checked' : '') + '" /></center>';
                     }
                 }
             }, {
@@ -1210,7 +1224,7 @@ Ext.onReady(function () {
                 dataIndex: 'merge',
                 sortable: true,
                 renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-                    if (record.get('is_parent_ref')) {
+                    if (record.get('is_parent_searchable')) {
                         return "";
                     } else if (record.get('array')) {
                         return '<center><input type="checkbox" onclick="markEntityMerge()"' + (record.get('merge') ? 'checked' : '') + ' /></center>'
