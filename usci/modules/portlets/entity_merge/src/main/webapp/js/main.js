@@ -480,7 +480,7 @@ function createJSON(currentNode, offset, first) {
 
 }
 
-function markParent(selectedNode) {
+function markParentKeepBothIfNotMarked(selectedNode) {
     if (selectedNode == null || selectedNode.parentNode == null) {
         return;
     }
@@ -489,7 +489,7 @@ function markParent(selectedNode) {
         selectedNode.parentNode.data.keep_both = true;
     }
 
-    markParent(selectedNode.parentNode);
+    markParentKeepBothIfNotMarked(selectedNode.parentNode);
 }
 
 function markEntityKeepLeft() {
@@ -507,7 +507,7 @@ function markEntityKeepLeft() {
         selectedNode.data.merge = false;
         selectedNode.data.keep_both = false;
 
-        //markParent(selectedNode);
+        markParentKeepBothIfNotMarked(selectedNode);
     }
 
     Ext.getCmp("entityTreeView").getView().refresh();
@@ -528,6 +528,8 @@ function markEntityKeepRight() {
         selectedNode.data.keep_left = false;
         selectedNode.data.merge = false;
         selectedNode.data.keep_both = false;
+
+        markParentKeepBothIfNotMarked(selectedNode);
     }
 
     Ext.getCmp("entityTreeView").getView().refresh();
@@ -548,6 +550,8 @@ function markEntityMerge() {
         selectedNode.data.keep_right = false;
         selectedNode.data.keep_left = false;
         selectedNode.data.keep_both = false;
+
+        markParentKeepBothIfNotMarked(selectedNode);
     }
 
     Ext.getCmp("entityTreeView").getView().refresh();
@@ -1143,9 +1147,9 @@ Ext.onReady(function () {
             //Return CSS class to apply to rows depending upon data values
             getRowClass: function (record, index) {
                 if (record.get('is_key') || record.get('is_parent_ref')) {
-                    return 'searchable-row'
+                    return 'changeable-row'
                 } else {
-                    return 'unsearchable-row';
+                    return 'unchangeable-row';
                 }
             }
         },
@@ -1192,7 +1196,7 @@ Ext.onReady(function () {
                 dataIndex: 'keep_both',
                 sortable: true,
                 renderer: function (dataIndex) {
-                    return '<center><input type="checkbox" onclick="markEntityKeepBoth()"' + (dataIndex ? 'checked' : '') + ' /></center>'
+                    return '<center><input type="checkbox" onclick="markEntityKeepBoth()" ' + (dataIndex ? 'checked' : '') + ' /></center>'
                 }
             }, {
                 text: label_KEEP_LEFT,
@@ -1203,7 +1207,7 @@ Ext.onReady(function () {
                     if (record.get('is_key') || record.get('is_parent_ref')) {
                         return "";
                     } else {
-                        return '<center><input type="checkbox" onclick="markEntityKeepLeft()"' + (value ? 'checked' : '') + ' /></center>';
+                        return '<center><input type="checkbox" onclick="markEntityKeepLeft()" ' + (value ? 'checked' : '') + ' /></center>';
                     }
                 }
             }, {
@@ -1215,7 +1219,7 @@ Ext.onReady(function () {
                     if (record.get('is_key') || record.get('is_parent_ref')) {
                         return "";
                     } else {
-                        return '<center><input type="checkbox" onclick="markEntityKeepRight()' + (value ? 'checked' : '') + '" /></center>';
+                        return '<center><input type="checkbox" onclick="markEntityKeepRight()" ' + (value ? 'checked' : '') + ' /></center>';
                     }
                 }
             }, {
