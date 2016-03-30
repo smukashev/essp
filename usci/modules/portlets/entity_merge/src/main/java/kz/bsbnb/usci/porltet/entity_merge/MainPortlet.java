@@ -547,7 +547,7 @@ public class MainPortlet extends MVCPortlet {
 		return str;
 	}
 
-	private String entityToJson(BaseEntity entityLeft, BaseEntity entityRight, String title, String code, Boolean isKey) {
+	private String entityToJson(BaseEntity entityLeft, BaseEntity entityRight, String title, String code, Boolean isKey, MetaClass parentMeta) {
 		MetaClass meta = null;
 		String idLeft = "";
 		String idRight = "";
@@ -584,6 +584,7 @@ public class MainPortlet extends MVCPortlet {
 		str += "\"type\": \"META_CLASS\",";
 		str += "\"is_searchable\": " + isSearchable + ",";
 		str += "\"is_key\": " + isKey + ",";
+		str += "\"is_parent_ref\": " + ((parentMeta == null) ? "false" : parentMeta.isReference()) + ",";
 		str += "\"iconCls\":\"folder\",";
 		str += "\"children\":[";
 
@@ -625,7 +626,7 @@ public class MainPortlet extends MVCPortlet {
 				}
 
 				str += entityToJson(valueLeftSubEntity, valueRightSubEntity,
-						attrTitle, innerClassesNames, meta.getMetaAttribute(innerClassesNames).isKey());
+						attrTitle, innerClassesNames, meta.getMetaAttribute(innerClassesNames).isKey(), meta);
 			}
 
 		}
@@ -898,7 +899,7 @@ public class MainPortlet extends MVCPortlet {
 					}
 
 					str += entityToJson(valueLeftSubEntity, valueRightSubEntity, "[" + i + "]",
-							"[" + i + "]", isKey);
+							"[" + i + "]", isKey, null);
 					i++;
 				}
 
@@ -1319,7 +1320,7 @@ public class MainPortlet extends MVCPortlet {
 
 						writer.write("{\"text\":\".\",\"children\": [\n" +
 								entityToJson(entityLeft, entityRight, entityLeft.getMeta().getClassTitle(),
-										entityLeft.getMeta().getClassName(), false) +
+										entityLeft.getMeta().getClassName(), false, null) +
 								"]}");
 					}
 					break;
