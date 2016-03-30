@@ -1142,7 +1142,7 @@ Ext.onReady(function () {
         viewConfig: {
             //Return CSS class to apply to rows depending upon data values
             getRowClass: function (record, index) {
-                if (record.get('is_parent_searchable')) {
+                if (record.get('is_key') || record.get('is_parent_ref')) {
                     return 'searchable-row'
                 } else {
                     return 'unsearchable-row';
@@ -1200,7 +1200,7 @@ Ext.onReady(function () {
                 dataIndex: 'keep_left',
                 sortable: true,
                 renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-                    if (record.get('is_parent_searchable')) {
+                    if (record.get('is_key') || record.get('is_parent_ref')) {
                         return "";
                     } else {
                         return '<center><input type="checkbox" onclick="markEntityKeepLeft()"' + (value ? 'checked' : '') + ' /></center>';
@@ -1212,7 +1212,7 @@ Ext.onReady(function () {
                 dataIndex: 'keep_right',
                 sortable: true,
                 renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-                    if (record.get('is_parent_searchable')) {
+                    if (record.get('is_key') || record.get('is_parent_ref')) {
                         return "";
                     } else {
                         return '<center><input type="checkbox" onclick="markEntityKeepRight()' + (value ? 'checked' : '') + '" /></center>';
@@ -1224,7 +1224,7 @@ Ext.onReady(function () {
                 dataIndex: 'merge',
                 sortable: true,
                 renderer: function (value, metaData, record, rowIndex, colIndex, store, view) {
-                    if (record.get('is_parent_searchable')) {
+                    if (record.get('is_key') || record.get('is_parent_ref')) {
                         return "";
                     } else if (record.get('array')) {
                         return '<center><input type="checkbox" onclick="markEntityMerge()"' + (record.get('merge') ? 'checked' : '') + ' /></center>'
