@@ -25,13 +25,13 @@
 </script>
 
 <style>
-    .searchable-row .x-grid-cell {
+    .changeable-row .x-grid-cell {
         border-style: dotted;
         border-color: #a3bae9;
-        background-color: #c6cccb !important;
+        background-color: #eceef0 !important;
     }
 
-    .unsearchable-row .x-grid-cell {
+    .unchangeable-row .x-grid-cell {
         font: normal 11px/13px tahoma, arial, verdana, sans-serif;
         background-color: white;
         border-color: white;
