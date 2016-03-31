@@ -1,6 +1,5 @@
 package com.bsbnb.creditregistry.portlets.approval;
 
-import static com.bsbnb.creditregistry.portlets.approval.ApprovalApplication.log;
 import com.bsbnb.creditregistry.portlets.approval.ui.Localization;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -10,6 +9,8 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
+import org.apache.log4j.Logger;
+
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -28,6 +29,7 @@ public class ApprovalPortletEnvironmentFacade implements PortletEnvironmentFacad
     private boolean isNbUser;
     private boolean isApprovalAuthority;
     private boolean isAdministrator;
+    private final Logger logger = org.apache.log4j.Logger.getLogger(ApprovalPortletEnvironmentFacade.class);
 
     public ApprovalPortletEnvironmentFacade(User user) {
         this.user = user;
@@ -56,9 +58,9 @@ public class ApprovalPortletEnvironmentFacade implements PortletEnvironmentFacad
             isNbUser = ExpandoValueLocalServiceUtil.getData(user.getCompanyId(), User.class.getName(),
                     ExpandoTableConstants.DEFAULT_TABLE_NAME, "isNb", user.getPrimaryKey(), false);
         } catch (PortalException pe) {
-            log.log(Level.SEVERE, null, pe);
+            logger.error(null,pe);
         } catch (SystemException se) {
-            log.log(Level.SEVERE, null, se);
+            logger.error(null,se);
         }
     }
 
@@ -102,7 +104,7 @@ public class ApprovalPortletEnvironmentFacade implements PortletEnvironmentFacad
         try {
             return UserLocalServiceUtil.getUsers(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
         } catch (SystemException se) {
-            log.log(Level.SEVERE, "", se);
+            logger.error(null,se);
         }
         return null;
     }

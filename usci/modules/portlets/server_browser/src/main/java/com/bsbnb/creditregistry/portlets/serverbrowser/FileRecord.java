@@ -1,6 +1,5 @@
 package com.bsbnb.creditregistry.portlets.serverbrowser;
 
-import static com.bsbnb.creditregistry.portlets.serverbrowser.ServerBrowserComponent.logger;
 import com.bsbnb.vaadin.messagebox.InputBox;
 import com.bsbnb.vaadin.messagebox.InputBoxListener;
 import com.bsbnb.vaadin.messagebox.MessageBox;
@@ -12,6 +11,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.themes.BaseTheme;
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,6 +32,7 @@ public class FileRecord {
     private Button renameButton;
     private ServerBrowserComponent component;
     private NameLink nameLink;
+    private final Logger logger = Logger.getLogger(FileRecord.class);
 
     FileRecord(File file, ServerBrowserComponent component) {
         this(null, file, component);
@@ -118,9 +120,9 @@ public class FileRecord {
 
     private void renameFileWithOverwriteHandling(String newName) {
         try {
-            logger.log(Level.INFO, "Rename: {0}", newName);
+            logger.info("Rename: "+ newName);
             String newFilePath = file.getParent() + File.separator + newName;
-            logger.log(Level.INFO, "New file path: {0}", newFilePath);
+            logger.info("New file path: "+ newFilePath);
             final File newFile = new File(newFilePath);
             if (newFile.exists()) {
                 MessageBox.Show("The file with this name already exists. Do you want to ovewrite existing file?", "File already exists", new MessageBoxListener() {
@@ -135,7 +137,7 @@ public class FileRecord {
                 renameFile(newFile);
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "", e);
+            logger.warn(null, e);
         }
     }
 
@@ -155,7 +157,7 @@ public class FileRecord {
                         file.delete();
                         component.load(file.getParent());
                     } catch (Exception e) {
-                        logger.log(Level.WARNING, "Delete failed", e);
+                        logger.warn("Delete failed", e);
                     }
                 }
             }

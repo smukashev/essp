@@ -1,10 +1,11 @@
 package com.bsbnb.creditregistry.portlets.notifications;
 
-import static com.bsbnb.creditregistry.portlets.notifications.NotificationsApplication.log;
 import com.bsbnb.creditregistry.portlets.notifications.ui.Localization;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
+import org.apache.log4j.Logger;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -20,6 +21,7 @@ public class NotificationsPortalEnvironmentFacade implements PortalEnvironmentFa
     private boolean isAdmin = false;
     private Locale locale;
     private ResourceBundle bundle;
+    public final Logger logger = Logger.getLogger(NotificationsPortalEnvironmentFacade.class);
 
     public NotificationsPortalEnvironmentFacade(User user) {
         this.user = user;
@@ -34,7 +36,7 @@ public class NotificationsPortalEnvironmentFacade implements PortalEnvironmentFa
                     }
                 }
             } catch (SystemException se) {
-                log.log(Level.WARNING, "Couldn't get user roles", se);
+                logger.warn("Couldn't get user roles", se);
             }
         }
 

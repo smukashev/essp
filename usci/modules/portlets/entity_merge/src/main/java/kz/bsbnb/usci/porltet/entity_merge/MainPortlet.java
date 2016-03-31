@@ -25,6 +25,7 @@ import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
@@ -40,7 +41,7 @@ public class MainPortlet extends MVCPortlet {
     private IBaseEntityMergeService entityMergeService;
     private PortalUserBeanRemoteBusiness portalUserBeanRemoteBusiness;
     private ISearcherFormService searcherFormService;
-
+    private Logger logger = Logger.getLogger(MainPortlet.class);
 
     void connectToServices() {
         try {
@@ -89,7 +90,7 @@ public class MainPortlet extends MVCPortlet {
 
             portalUserBeanRemoteBusiness = (PortalUserBeanRemoteBusiness) portalUserBean.getObject();
         } catch (Exception e) {
-            System.out.println("Can\"t initialise services: " + e.getMessage());
+            logger.error("Can\"t initialise services: " + e.getMessage());
         }
     }
 
@@ -127,9 +128,9 @@ public class MainPortlet extends MVCPortlet {
                 }
             }
         } catch (PortalException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         } catch (SystemException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
         if (!hasRights)
@@ -147,7 +148,7 @@ public class MainPortlet extends MVCPortlet {
     private String clearSlashes(String str) {
         //TODO: str.replaceAll("\"","\\\""); does not work! Fix needed.
         String outStr = str.replaceAll("\"", " ");
-        System.out.println(outStr);
+        logger.info(outStr);
         return outStr;
     }
 
@@ -613,12 +614,12 @@ public class MainPortlet extends MVCPortlet {
                     Date leftRD = df.parse(leftReportDt);
                     Date rightRD = df.parse(rightReportDt);
 
-                    System.out.println(json);
-                    System.out.println("\n THE LEFT ENTITY ID: " + leftEntity);
-                    System.out.println("\n THE RIGHT ENTITY ID: " + rightEntity);
-                    System.out.println("\n THE LEFT ENTITY REPORT DATE: " + leftReportDt);
-                    System.out.println("\n THE RIGHT ENTITY REPORT DATE: " + rightReportDt);
-                    System.out.println("\n DELETE UNUSED: " + deleteUnused);
+                    logger.info(json);
+                    logger.info("\n THE LEFT ENTITY ID: " + leftEntity);
+                    logger.info("\n THE RIGHT ENTITY ID: " + rightEntity);
+                    logger.info("\n THE LEFT ENTITY REPORT DATE: " + leftReportDt);
+                    logger.info("\n THE RIGHT ENTITY REPORT DATE: " + rightReportDt);
+                    logger.info("\n DELETE UNUSED: " + deleteUnused);
 
                     entityMergeService.mergeBaseEntities(Long.parseLong(leftEntity), Long.parseLong(rightEntity),
                             leftRD, rightRD, json, "true".equals(deleteUnused));
@@ -647,7 +648,7 @@ public class MainPortlet extends MVCPortlet {
                     if (creditorList.size() == 1) {
                         creditorId = creditorList.get(0).getId();
                     } else {
-                        System.err.println("Not correct creditors number(" + creditorList.size() + ")");
+                        logger.error("Not correct creditors number(" + creditorList.size() + ")");
                     }
 
                     Enumeration<String> list = resourceRequest.getParameterNames();
@@ -714,10 +715,10 @@ public class MainPortlet extends MVCPortlet {
                     String rightReportDate = resourceRequest.getParameter("rightReportDate");
                     String CreditorId = resourceRequest.getParameter("creditorId");
 
-                    System.out.println("\n THE LEFT ENTITY ID: " + leftEntityId);
-                    System.out.println("\n THE RIGHT ENTITY ID: " + rightEntityId);
-                    System.out.println("\n THE LEFT ENTITY REPORT DATE: " + leftReportDate);
-                    System.out.println("\n THE RIGHT ENTITY REPORT DATE: " + rightReportDate);
+                    logger.info("\n THE LEFT ENTITY ID: " + leftEntityId);
+                    logger.info("\n THE RIGHT ENTITY ID: " + rightEntityId);
+                    logger.info("\n THE LEFT ENTITY REPORT DATE: " + leftReportDate);
+                    logger.info("\n THE RIGHT ENTITY REPORT DATE: " + rightReportDate);
 
                     if ((leftEntityId != null && leftEntityId.trim().length() > 0) &&
                             (rightEntityId != null && rightEntityId.trim().length() > 0) &&
@@ -757,7 +758,7 @@ public class MainPortlet extends MVCPortlet {
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             writer.write("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}");
         }
     }

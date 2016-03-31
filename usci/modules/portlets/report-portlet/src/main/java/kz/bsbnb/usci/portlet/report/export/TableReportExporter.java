@@ -12,6 +12,7 @@ import kz.bsbnb.usci.portlet.report.ReportPortletResource;
 import kz.bsbnb.usci.portlet.report.dm.Report;
 import kz.bsbnb.usci.portlet.report.ui.ConstantValues;
 import kz.bsbnb.usci.portlet.report.ui.CustomDataSource;
+import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,10 +22,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
 
 import static kz.bsbnb.usci.portlet.report.ReportApplication.getApplicationLocale;
-import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 
 /**
  *
@@ -35,6 +34,7 @@ public class TableReportExporter extends AbstractReportExporter {
     private static final String LOCALIZATION_CONTEXT = "TABLE-REPORT-COMPONENT";
     private SimpleDateFormat defaultDateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private DecimalFormat defaultNumberFormat = new DecimalFormat("# ###");
+    private final Logger logger = Logger.getLogger(TableReportExporter.class);
 
     protected Table getTable(CustomDataSource customDataSource) {
         defaultNumberFormat.setMaximumFractionDigits(3);
@@ -87,7 +87,7 @@ public class TableReportExporter extends AbstractReportExporter {
             final String resourceFilePath = reportPath + reportName + "_" +
                     getApplicationLocale().getLanguage() + ".properties";
 
-            log.log(Level.INFO, "Resources file: {0}", resourceFilePath);
+            logger.info("Resources file: "+ resourceFilePath);
             PropertyResourceBundle resourceBundle = new PropertyResourceBundle(new FileInputStream(resourceFilePath));
             Object[] columnNames = table.getVisibleColumns();
             int columnCount = columnNames.length;
@@ -97,13 +97,13 @@ public class TableReportExporter extends AbstractReportExporter {
                     columnHeaders[columnIndex] = resourceBundle.getString(columnNames[columnIndex].toString());
                 } catch (MissingResourceException mre) {
                     columnHeaders[columnIndex] = columnNames[columnIndex].toString();
-                    log.log(Level.WARNING, "Resource not found: {0}", mre.getMessage());
+                    logger.warn("Resource not found: "+ mre.getMessage());
                 }
-                log.log(Level.INFO, "Column localization: {0}={1}", new Object[]{columnNames[columnIndex], columnHeaders[columnIndex]});
+                logger.info("Column localization: "+columnNames[columnIndex]+"="+columnHeaders[columnIndex]);
             }
             table.setColumnHeaders(columnHeaders);
         } catch (IOException ioe) {
-            log.log(Level.SEVERE, "Failed to access resource file: {0}", ioe.getMessage());
+            logger.error("Failed to access resource file: "+ ioe.getMessage(),ioe);
         }
     }
 
@@ -139,7 +139,7 @@ public class TableReportExporter extends AbstractReportExporter {
            // ResultSet rs =  getTargetReportComponent().getConnect().runQuery("select report_mail(2319, 'test', sysdate, 'Тест', sysdate) from dual");
         loadFinished();
         } catch (SQLException sqle) {
-            log.log(Level.SEVERE, "Sql exception", sqle);
+            logger.error("Sql exception", sqle);
             getTargetReportComponent().addOutputComponent(new Label("Sql exception: " + sqle.getMessage()));
         }
     }

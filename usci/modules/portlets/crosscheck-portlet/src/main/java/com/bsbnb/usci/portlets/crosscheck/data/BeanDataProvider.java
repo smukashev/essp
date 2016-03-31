@@ -6,6 +6,7 @@ import com.bsbnb.usci.portlets.crosscheck.helper.DbHelper;
 import com.bsbnb.usci.portlets.crosscheck.helper.ModelHelper;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.util.Errors;
+import org.apache.log4j.Logger;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -24,10 +25,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
-import static com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication.log;
 
 public class BeanDataProvider implements DataProvider {
     private PortletEnvironmentFacade facade;
+    private final Logger logger = Logger.getLogger(BeanDataProvider.class);
 
     private Connection getConnection() {
         Context context;
@@ -37,9 +38,9 @@ public class BeanDataProvider implements DataProvider {
             DataSource d = (DataSource) context.lookup("jdbc/RepPool");
             conn = d.getConnection();
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            logger.error(null,sqle);
         } catch (NamingException ne) {
-            ne.printStackTrace();
+            logger.error(null,ne);
         }
 
         return conn;
@@ -58,13 +59,13 @@ public class BeanDataProvider implements DataProvider {
         String query = "SELECT t0.REF_CREDITOR_ID AS ID, t0.OPEN_DATE AS CHANGE_DATE, t0.CODE, t0.NAME, t0.SHORT_NAME, " +
                 "t0.CLOSE_DATE AS SHUTDOWN_DATE, 0 AS MAIN_OFFICE_ID, t0.SUBJECT_TYPE_ID " +
                 "FROM " + StaticRouter.getShowcaseSchemaName() + ".R_REF_CREDITOR t0, " + StaticRouter.getCoreSchemaName() +
-                ".EAV_A_CREDITOR_USER@core t2, " + StaticRouter.getCoreSchemaName() + ".EAV_A_USER@core t1 " +
+                ".EAV_A_CREDITOR_USER t2, " + StaticRouter.getCoreSchemaName() + ".EAV_A_USER t1 " +
                 "WHERE ((t1.USER_ID = " + BigInteger.valueOf(facade.getUserID()) +") " +
                 "AND ((t2.CREDITOR_ID = t0.REF_CREDITOR_ID) AND (t1.USER_ID = t2.USER_ID))) " +
                 "AND (t0.REF_CREDITOR_ID = "+CreditorId+" OR "+CreditorId+" is NULL )"+
                 "ORDER BY t0.NAME ASC";
 
-        log.log(Level.INFO, "getCreditorsList: " + query);
+        logger.info("getCreditorsList: " + query);
 
         try {
             stmt = conn.createStatement();
@@ -76,19 +77,19 @@ public class BeanDataProvider implements DataProvider {
             }
 
         } catch (SQLException e ) {
-            e.printStackTrace();
+            logger.error(null,e);
         } finally {
             try {
                 if(stmt!=null) {stmt.close();}
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.error("Failed to cleanup", sqle);
             }
             try {
                 if(conn!=null) {
                     conn.close();
                 }
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.error("Failed to cleanup", sqle);
             }
         }
 
@@ -117,7 +118,7 @@ public class BeanDataProvider implements DataProvider {
 
         query += ")) AND (REPORT_DATE = TO_DATE('" + dateString + "', 'dd-MM-yyyy'))) ORDER BY DATE_BEGIN DESC, ID ASC";
 
-        log.log(Level.INFO, "getCrossChecks: " + query);
+        logger.error("getCrossChecks: " + query);
 
         try {
             stmt = conn.createStatement();
@@ -129,21 +130,21 @@ public class BeanDataProvider implements DataProvider {
                 crosscheckList.add(cc);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(null,e);
         } finally {
             try {
                 if (stmt != null) {
                     stmt.close();
                 }
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
         }
 
@@ -161,7 +162,7 @@ public class BeanDataProvider implements DataProvider {
                         "WHERE (CROSS_CHECK_ID = " + crossCheck.getId() + ") " +
                         "ORDER BY ID ASC";
 
-        log.log(Level.INFO, "getMessages: " + query);
+        logger.info("getMessages: " + query);
 
         try {
             stmt = conn.createStatement();
@@ -196,19 +197,19 @@ public class BeanDataProvider implements DataProvider {
 
             return result;
         } catch (SQLException e ) {
-            e.printStackTrace();
+            logger.error(null,e);
         } finally {
             try {
                 if(stmt!=null) {stmt.close();}
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
             try {
                 if(conn!=null) {
                     conn.close();
                 }
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
         }
 
@@ -223,7 +224,7 @@ public class BeanDataProvider implements DataProvider {
         String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM " + StaticRouter.getShowcaseSchemaName() +
                 ".R_REF_CREDITOR";
 
-        log.log(Level.INFO, "getFirstNotApprovedDate: " + query);
+        logger.info("getFirstNotApprovedDate: " + query);
 
         try {
             stmt = conn.createStatement();
@@ -231,19 +232,19 @@ public class BeanDataProvider implements DataProvider {
             rs.next();
             return rs.getDate("MAX_CHANGE_DATE");
         } catch (SQLException e ) {
-            e.printStackTrace();
+            logger.error(null,e);
         } finally {
             try {
                 if(stmt!=null) {stmt.close();}
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
             try {
                 if(conn!=null) {
                     conn.close();
                 }
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
         }
 
@@ -258,7 +259,7 @@ public class BeanDataProvider implements DataProvider {
         String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM " + StaticRouter.getShowcaseSchemaName() +
                 ".R_REF_CREDITOR";
 
-        log.log(Level.INFO, "getLastApprovedDate: " + query);
+        logger.info("getLastApprovedDate: " + query);
 
         try {
             stmt = conn.createStatement();
@@ -266,19 +267,19 @@ public class BeanDataProvider implements DataProvider {
             rs.next();
             return rs.getDate("MAX_CHANGE_DATE");
         } catch (SQLException e ) {
-            e.printStackTrace();
+            logger.error(null,e);
         } finally {
             try {
                 if(stmt!=null) {stmt.close();}
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
             try {
                 if(conn!=null) {
                     conn.close();
                 }
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
         }
 
@@ -328,7 +329,7 @@ public class BeanDataProvider implements DataProvider {
                     conn.close();
                 }
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
         }
     }

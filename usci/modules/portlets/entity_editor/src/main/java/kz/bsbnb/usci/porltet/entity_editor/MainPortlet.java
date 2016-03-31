@@ -26,8 +26,7 @@ import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
@@ -43,6 +42,7 @@ public class MainPortlet extends MVCPortlet {
     private IBatchEntryService batchEntryService;
     private ISearcherFormService searcherFormService;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
+    private final Logger logger = Logger.getLogger(MainPortlet.class);
 
     public void connectToServices() {
         try {
@@ -89,11 +89,10 @@ public class MainPortlet extends MVCPortlet {
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         } catch (Exception e) {
-            System.out.println("Can\"t initialise services: " + e.getMessage());
+            logger.error("Can\"t initialise services: " + e.getMessage());
         }
     }
 
-    private final Logger logger = LoggerFactory.getLogger(MainPortlet.class);
     private List<String> classesFilter;
 
     @Override
@@ -128,9 +127,9 @@ public class MainPortlet extends MVCPortlet {
                 }
             }
         } catch (PortalException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         } catch (SystemException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
         if(!hasRights)
@@ -360,7 +359,7 @@ public class MainPortlet extends MVCPortlet {
                             }
                         }
                     } catch(Exception e) {
-                        logger.error(e.getMessage());
+                        logger.error(null,e);
                         // strict mode
                         continue;
                     }
@@ -528,7 +527,7 @@ public class MainPortlet extends MVCPortlet {
                 case SAVE_XML:
                     String xml = resourceRequest.getParameter("xml_data");
                     String sDate = resourceRequest.getParameter("date");
-                    Date date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
+                    Date date = (Date) DataTypes.getCastObject(DataTypes.DATE, sDate);
 
                     BatchEntry batchEntry = new BatchEntry();
 
@@ -586,7 +585,7 @@ public class MainPortlet extends MVCPortlet {
                         //search by single Id
                         date = null;
                         if(resourceRequest.getParameter("date") != null)
-                            date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+                            date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
 
                         if(date == null)
                             date = new Date();
@@ -695,6 +694,9 @@ public class MainPortlet extends MVCPortlet {
                         //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
                         out.write(("{ \"success\": false, \"errorMessage\": \""+ originalError + e1.getMessage()
                                 .replaceAll("\"","").replaceAll("\n","")+"\"}").getBytes());
+
+                    } catch(Exception ex){
+                        logger.error(Errors.unmarshall(ex.getMessage()));
                     } finally {
                         retry = false;
                         return;

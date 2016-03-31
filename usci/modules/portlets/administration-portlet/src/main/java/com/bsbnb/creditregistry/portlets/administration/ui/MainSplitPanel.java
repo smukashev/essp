@@ -19,10 +19,9 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import kz.bsbnb.usci.cr.model.Creditor;
+import org.apache.log4j.Logger;
 
 import java.util.*;
-
-import static com.bsbnb.creditregistry.portlets.administration.AdministrationApplication.log;
 
 /**
  * @author Marat Madybayev
@@ -42,6 +41,7 @@ public class MainSplitPanel extends HorizontalSplitPanel {
     private IconButton addButton;
     private IconButton removeButton;
     private BeanItemContainer<User> usersContainer;
+    private static final Logger logger = Logger.getLogger(MainSplitPanel.class);
 
     public MainSplitPanel(ResourceBundle bundle, DataProvider provider) {
         this.bundle = bundle;
@@ -68,7 +68,7 @@ public class MainSplitPanel extends HorizontalSplitPanel {
             usersContainer = new BeanItemContainer<User>(User.class, listUser);
             usersTable.setContainerDataSource(usersContainer);
         } catch (SystemException ex) {
-            log.error(ex, ex);
+            logger.error(ex, ex);
         }
 
         usersTable.setVisibleColumns(new Object[]{"login"});
@@ -181,9 +181,9 @@ public class MainSplitPanel extends HorizontalSplitPanel {
             return ExpandoValueLocalServiceUtil.getData(user.getCompanyId(), User.class.getName(),
                     ExpandoTableConstants.DEFAULT_TABLE_NAME, "isNb", user.getPrimaryKey(), false);
         } catch (PortalException pe) {
-            log.error(null, pe);
+            logger.error(null, pe);
         } catch (SystemException se) {
-            log.error(null, se);
+            logger.error(null, se);
         }
         return false;
     }
@@ -196,7 +196,7 @@ public class MainSplitPanel extends HorizontalSplitPanel {
             Collection<Creditor> creditorsToAdd = (Collection<Creditor>) tableAvailableCreditors.getValue();
             for (Creditor creditorToAdd : creditorsToAdd) {
                 if ((isUserNBEmployee) || (!isUserNBEmployee && userCreditorsCount == 0)) {
-                    log.info("Adding creditor: " + creditorToAdd.getName());
+                    logger.info("Adding creditor: " + creditorToAdd.getName());
                     provider.addUserCreditor(selectedUser, creditorToAdd);
                     userCreditorsCount++;
                 } else {

@@ -17,6 +17,7 @@ import kz.bsbnb.usci.portlet.report.ReportPortletResource;
 import kz.bsbnb.usci.portlet.report.dm.ReportLoadFile;
 import com.vaadin.terminal.FileResource;
 import com.vaadin.ui.Button;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -29,6 +30,7 @@ public class FileDownloadComponent extends Button {
     private final ArrayList<File> files = new ArrayList<File>();
     private String downloadedFilename;
     private File zippedFile;
+    private static final Logger logger = Logger.getLogger(FileDownloadComponent.class);
 
     public FileDownloadComponent(String downloadedFilename) {
         this.downloadedFilename = downloadedFilename;
@@ -95,7 +97,7 @@ public class FileDownloadComponent extends Button {
             }
 
         } catch (IOException ioe) {
-            ReportApplication.log.log(Level.SEVERE, "IO exception ", ioe);
+            logger.error("IO exception ", ioe);
         } finally {
             if (fos != null) {
                 try {
@@ -121,6 +123,7 @@ public class FileDownloadComponent extends Button {
 
     public void addAllFiles(Collection<String> filenames, Collection<File> files) {
         if (filenames.size() != files.size()) {
+            logger.error(Errors.getError(String.valueOf(Errors.E254)));
             throw new IllegalArgumentException(Errors.getMessage(Errors.E254));
         }
         this.entryNames.addAll(filenames);

@@ -19,6 +19,8 @@ import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Table;
+import org.apache.log4j.Logger;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
@@ -32,6 +34,7 @@ public class FormattedTable extends Table {
 
     /** Java сериализация UID. */
     private static final long serialVersionUID = 804740605642799781L;
+    public final Logger logger = Logger.getLogger(ProtocolApplication.class);
 
     public FormattedTable() {
         alwaysRecalculateColumnWidths = true;
@@ -118,7 +121,7 @@ public class FormattedTable extends Table {
                         String componentCaption = ((Component) value).getCaption();
                         sheet.addCell(new Label(columnIndex, rowCounter, componentCaption, times12format));
                     } else {
-                        ProtocolApplication.log.log(Level.WARNING, "Unpredicted column type. Couldn export class: {0}", value.getClass().getCanonicalName());
+                        logger.warn("Unpredicted column type. Couldn export class: "+ value.getClass().getCanonicalName());
                     }
                 }  else {
                     sheet.addCell(new Blank(columnIndex, rowCounter, times12format));

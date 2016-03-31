@@ -1,6 +1,7 @@
 package com.bsbnb.usci.portlets.audit.dm;
 
 import com.liferay.util.portlet.PortletProps;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.text.DateFormat;
@@ -17,6 +18,7 @@ import java.util.List;
 public class AuditController {
 
     private static Connection connection;
+    private static final Logger logger = org.apache.log4j.Logger.getLogger(AuditController.class);
 
     private List<AuditTableRecord> getAuditTableRecordsList(List list) {
         int listSize = list.size();
@@ -46,7 +48,8 @@ public class AuditController {
                }
                connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error(e.getMessage(),e);
+            //To change body of catch statement use File | Settings | File Templates.
         }
 
         return ret;
@@ -110,9 +113,9 @@ public class AuditController {
             } */
             return connection.createStatement();
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error(e.getMessage(),e); //To change body of catch statement use File | Settings | File Templates.
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error(e.getMessage(),e); //To change body of catch statement use File | Settings | File Templates.
         }
 
         return null;

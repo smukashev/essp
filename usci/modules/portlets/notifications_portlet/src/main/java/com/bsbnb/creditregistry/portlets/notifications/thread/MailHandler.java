@@ -11,6 +11,8 @@ import com.liferay.util.portlet.PortletProps;
 import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.model.mail.MailMessage;
 import kz.bsbnb.usci.eav.model.mail.MailMessageStatuses;
+import kz.bsbnb.usci.eav.util.Errors;
+import org.apache.log4j.Logger;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -23,7 +25,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import static com.bsbnb.creditregistry.portlets.notifications.NotificationsApplication.log;
 
 /**
  *
@@ -35,6 +36,7 @@ public class MailHandler implements Runnable {
     private final MailHandlerConfiguration configuration;
     private long threadStartTimeMillis = -1;
     private final DataProvider provider;
+    public final Logger logger = Logger.getLogger(MailHandler.class);
 
     public MailHandler() {
         provider = new BeanDataProvider();
@@ -43,7 +45,7 @@ public class MailHandler implements Runnable {
 
     public void createNewThread() throws ConfigurationException {
         threadStartTimeMillis = System.currentTimeMillis();
-        log.log(Level.INFO, "New thread started: {0}", threadStartTimeMillis);
+        logger.info("New thread started: "+ threadStartTimeMillis);
         Thread thread = new Thread(this);
         thread.setName("mail-handler-thread" + threadStartTimeMillis);
         thread.setDaemon(true);
@@ -53,29 +55,29 @@ public class MailHandler implements Runnable {
     private void checkMailMessages() {
         try {
             if (!configuration.isMailHandlingOn()) {
-                log.log(Level.INFO, "Mail handling off");
+                logger.info("Mail handling off");
                 return;
             }
         } catch (ConfigurationException ce) {
-            log.log(Level.INFO, "Configuration exception", ce);
+            logger.info("Configuration exception", ce);
         }
 
 
         try {
             List<MailMessage> mailMessages = provider.getMessagesToSend();
             if (mailMessages.isEmpty()) {
-                log.log(Level.INFO, "No mail messages to send");
+                logger.info("No mail messages to send");
                 return;
             }
             for (MailMessage mailMessage : mailMessages) {
                 handleMailMessage(mailMessage);
             }
         } catch (ConfigurationException ce) {
-            log.log(Level.SEVERE, "Configuration exception", ce);
+            logger.error("Configuration exception", ce);
         } catch (MessagingException t) {
-            log.log(Level.SEVERE, "Unexpected exception. ", t);
+            logger.error("Unexpected exception. ", t);
         } catch (UnsupportedEncodingException t) {
-            log.log(Level.SEVERE, "Unexpected exception. ", t);
+            logger.error("Unexpected exception. ", t);
         }
     }
 
@@ -112,7 +114,7 @@ public class MailHandler implements Runnable {
         message.setSubject(provider.getMessageSubject(mailMessage));
         message.setText(provider.getMessageText(mailMessage), "utf-8", "html");
 
-        System.out.println("sent to: " + host + ", sender: " + sender);
+        logger.info("sent to: " + host + ", sender: " + sender);
         //Transport.send(message);
     }
 
@@ -125,7 +127,7 @@ public class MailHandler implements Runnable {
                     configuration.setLastLaunchMillis(threadStartTimeMillis);
                     break;
                 } catch (ConfigurationException ce) {
-                    log.log(Level.WARNING, "", ce);
+                    logger.warn(null, ce);
                     Thread.sleep(SLEEPING_INTERVAL);
                 }
             }
@@ -136,7 +138,7 @@ public class MailHandler implements Runnable {
                     try {
                         lastLaunchTimeMillis = configuration.getLastLaunchMillis();
                     } catch (ConfigurationException ce) {
-                        log.log(Level.WARNING, "", ce);
+                        logger.error(Errors.unmarshall(ce.getMessage()));
                     }
                     //Mail sending thread can be stopped by setting smtp host config to empty string
                     if (isSmtpHostConfigEmpty()) {
@@ -144,31 +146,31 @@ public class MailHandler implements Runnable {
                     }
                     if (lastLaunchTimeMillis != null) {
                         if (lastLaunchTimeMillis != threadStartTimeMillis) {
-                            log.log(Level.WARNING, "Last launch time doesn't match");
+                            logger.warn("Last launch time doesn't match");
                             break;
                         }
                         checkMailMessages();
                     } else {
-                        log.log(Level.WARNING, "Last launch time not found");
+                        logger.warn("Last launch time not found");
                         break;
                     }
                 } catch (Exception ex) {
-                    log.log(Level.WARNING, "Unexpected exception", ex);
+                    logger.warn("Unexpected exception", ex);
                 }
             }
 
         } catch (InterruptedException ie) {
-            log.log(Level.WARNING, "Thread sleep fail", ie);
+            logger.warn("Thread sleep fail", ie);
         }
         try {
             configuration.setLastLaunchMillis(-1);
         } catch (ConfigurationException ce) {
-            log.log(Level.INFO, "", ce);
+            logger.info(null, ce);
         } catch (Exception ex) {
-            log.log(Level.INFO, "Unexpected exception", ex);
+            logger.info("Unexpected exception", ex);
         }
 
-        log.log(Level.INFO, "Thread finished");
+        logger.info("Thread finished");
     }
 
     private boolean isSmtpHostConfigEmpty() {
@@ -180,7 +182,7 @@ public class MailHandler implements Runnable {
         }
 
         if (smtpHost == null || smtpHost.isEmpty() || smtpHost.trim().isEmpty()) {
-            log.log(Level.INFO, "Mail smtp host is empty");
+            logger.info("Mail smtp host is empty");
             return true;
         }
 

@@ -5,6 +5,7 @@ import com.bsbnb.usci.portlets.crosscheck.dm.Creditor;
 import com.bsbnb.usci.portlets.crosscheck.dm.CrossCheck;
 import com.bsbnb.usci.portlets.crosscheck.dm.Message;
 import kz.bsbnb.usci.eav.StaticRouter;
+import org.apache.log4j.Logger;
 
 import java.math.BigInteger;
 import java.sql.Connection;
@@ -13,12 +14,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-import static com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication.log;
 
 /**
  * Created by ktulbassiyev on 11/20/14.
  */
 public class DbHelper {
+
+    private static final Logger logger = Logger.getLogger(DbHelper.class);
+
     public static Creditor getCreditor(Connection conn, BigInteger id) {
         Statement stmt = null;
         String query = "SELECT REF_CREDITOR_ID AS ID, 0 AS MAIN_OFFICE_ID, SUBJECT_TYPE_ID, NAME, SHORT_NAME, CODE, " +
@@ -35,12 +38,12 @@ public class DbHelper {
             return ModelHelper.convertToCreditor(rs);
 
         } catch (SQLException e ) {
-            e.printStackTrace();
+            logger.error(null,e);
         } finally {
             try {
                 if(stmt!=null) {stmt.close();}
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
         }
 
@@ -63,12 +66,12 @@ public class DbHelper {
                     rs.getBigDecimal("CREDITOR_ID").toBigInteger()));
 
         } catch (SQLException e ) {
-            e.printStackTrace();
+            logger.error(null,e);
         } finally {
             try {
                 if(stmt!=null) {stmt.close();}
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
         }
 
@@ -87,12 +90,12 @@ public class DbHelper {
             return ModelHelper.convertToMessage(rs);
 
         } catch (SQLException e ) {
-            e.printStackTrace();
+            logger.error(null,e);
         } finally {
             try {
                 if(stmt!=null) {stmt.close();}
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
         }
 

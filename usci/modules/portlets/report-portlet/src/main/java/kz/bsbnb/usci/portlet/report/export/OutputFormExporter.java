@@ -24,6 +24,7 @@ import jxl.write.WriteException;
 
 import kz.bsbnb.usci.portlet.report.ReportApplication;
 import kz.bsbnb.usci.portlet.report.Localization;
+import org.apache.log4j.Logger;
 
 import static kz.bsbnb.usci.portlet.report.ReportApplication.logTime;
 
@@ -34,10 +35,11 @@ import static kz.bsbnb.usci.portlet.report.ReportApplication.logTime;
 public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
 
     private int idIndex = 1;
+    private final Logger logger = Logger.getLogger(OutputFormExporter.class);
 
     @Override
     protected boolean generatePage(String exportFilePrefix, int sheetNumber) throws WriteException, IOException, SQLException {
-        ReportApplication.log.log(Level.INFO, "Output report");
+        logger.info("Output report");
         WorkbookSettings settings = new WorkbookSettings();
         settings.setUseTemporaryFileDuringWrite(true);
         settings.setRationalization(false);
@@ -60,7 +62,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             dateFormat.setVerticalAlignment(VerticalAlignment.TOP);
             dateFormat.setBorder(Border.ALL, BorderLineStyle.THIN);
         } catch (WriteException we) {
-            ReportApplication.log.log(Level.INFO, "Error setting formats", we);
+            logger.info("Error setting formats", we);
         }
         CellView autosizeCellView = new CellView();
         autosizeCellView.setAutosize(true);
@@ -145,7 +147,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             workbook.close();
             ReportApplication.logTime("After writing");
             recordCounter--;
-            ReportApplication.log.log(Level.INFO, "Record counter: {0}", recordCounter);
+            logger.info("Record counter: "+ recordCounter);
             if (recordCounter > 0) {
                 if (recordCounter >= firstRecordNumber) {
                     String cleanFilename = String.format("%s%d-%d.xls", exportFilePrefix, startIdIndex, idIndex);

@@ -9,6 +9,7 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.util.Errors;
+import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.ArrayList;
@@ -16,41 +17,48 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.bsbnb.creditregistry.portlets.administration.AdministrationApplication.log;
-
 /**
  * @author Aidar.Myrzahanov
  */
 public class BeanDataProvider implements DataProvider {
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private RemoteCreditorBusiness creditorBusiness;
+    private final Logger logger = Logger.getLogger(BeanDataProvider.class);
 
     public BeanDataProvider() {
         initializeBeans();
-        synchronizePortalUsersWithDatabase();
+        try{
+            synchronizePortalUsersWithDatabase();
+        }catch (Exception e){
+            logger.error(Errors.unmarshall(e.getMessage()));
+        }
     }
 
     private void initializeBeans() {
-        RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
-                + ":1099/portalUserBeanRemoteBusiness");
-        portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
+        try {
+            RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1099/portalUserBeanRemoteBusiness");
+            portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
 
-        portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-        portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+            portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
-        RmiProxyFactoryBean remoteCreditorBusinessFactoryBean = new RmiProxyFactoryBean();
-        remoteCreditorBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
-                + ":1099/remoteCreditorBusiness");
-        remoteCreditorBusinessFactoryBean.setServiceInterface(RemoteCreditorBusiness.class);
+            RmiProxyFactoryBean remoteCreditorBusinessFactoryBean = new RmiProxyFactoryBean();
+            remoteCreditorBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1099/remoteCreditorBusiness");
+            remoteCreditorBusinessFactoryBean.setServiceInterface(RemoteCreditorBusiness.class);
 
-        remoteCreditorBusinessFactoryBean.afterPropertiesSet();
-        creditorBusiness = (RemoteCreditorBusiness) remoteCreditorBusinessFactoryBean.getObject();
+            remoteCreditorBusinessFactoryBean.afterPropertiesSet();
+            creditorBusiness = (RemoteCreditorBusiness) remoteCreditorBusinessFactoryBean.getObject();
+        } catch (Exception e) {
+            logger.error("Can't initialise services: " + e.getMessage());
+        }
     }
 
     public List<Creditor> getAllCreditors() {
         List<Creditor> mainOfficeCreditors = creditorBusiness.findMainOfficeCreditors();
-        log.info("Main office creditors count: " + mainOfficeCreditors.size());
+        logger.info("Main office creditors count: " + mainOfficeCreditors.size());
         return mainOfficeCreditors;
     }
 
@@ -105,9 +113,9 @@ public class BeanDataProvider implements DataProvider {
             }
             portalUserBusiness.synchronize(portalUserList);
         } catch (SystemException se) {
-            log.error("Failed to retrieve users", se);
+            logger.error("Failed to retrieve users", se);
         } catch (Exception e) {
-            log.error("Failed to synchronize portal users with database", e);
+            logger.error("Failed to synchronize portal users with database", e);
         }
     }
 }

@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.ReportStatus;
+import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.text.ParseException;
@@ -25,6 +26,7 @@ import java.util.Properties;
 public class BeanDataProvider implements DataProvider {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private final Logger logger = Logger.getLogger(BeanDataProvider.class);
 
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private ReportBeanRemoteBusiness reportBusiness;
@@ -32,33 +34,37 @@ public class BeanDataProvider implements DataProvider {
     private IGlobalService globalService;
 
     public BeanDataProvider() {
-        // portalUserBeanRemoteBusiness
-        RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
-                + ":1099/portalUserBeanRemoteBusiness");
-        portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
-        portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-        portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+        try {
+            // portalUserBeanRemoteBusiness
+            RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1099/portalUserBeanRemoteBusiness");
+            portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
+            portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
-        // reportBeanRemoteBusiness
-        RmiProxyFactoryBean reportBusinessFactoryBean = new RmiProxyFactoryBean();
-        reportBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
-                + ":1099/reportBeanRemoteBusiness");
-        reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
-        reportBusinessFactoryBean.afterPropertiesSet();
-        reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
+            // reportBeanRemoteBusiness
+            RmiProxyFactoryBean reportBusinessFactoryBean = new RmiProxyFactoryBean();
+            reportBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1099/reportBeanRemoteBusiness");
+            reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
+            reportBusinessFactoryBean.afterPropertiesSet();
+            reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
 
-        RmiProxyFactoryBean mailBusinessFactoryBean = new RmiProxyFactoryBean();
-        mailBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/mailRemoteBusiness");
-        mailBusinessFactoryBean.setServiceInterface(MailMessageBeanCommonBusiness.class);
-        mailBusinessFactoryBean.afterPropertiesSet();
-        mailMessageBusiness = (MailMessageBeanCommonBusiness) mailBusinessFactoryBean.getObject();
+            RmiProxyFactoryBean mailBusinessFactoryBean = new RmiProxyFactoryBean();
+            mailBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/mailRemoteBusiness");
+            mailBusinessFactoryBean.setServiceInterface(MailMessageBeanCommonBusiness.class);
+            mailBusinessFactoryBean.afterPropertiesSet();
+            mailMessageBusiness = (MailMessageBeanCommonBusiness) mailBusinessFactoryBean.getObject();
 
-        RmiProxyFactoryBean globalServiceFactoryBean = new RmiProxyFactoryBean();
-        globalServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/globalService");
-        globalServiceFactoryBean.setServiceInterface(IGlobalService.class);
-        globalServiceFactoryBean.afterPropertiesSet();
-        globalService = (IGlobalService) globalServiceFactoryBean.getObject();
+            RmiProxyFactoryBean globalServiceFactoryBean = new RmiProxyFactoryBean();
+            globalServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/globalService");
+            globalServiceFactoryBean.setServiceInterface(IGlobalService.class);
+            globalServiceFactoryBean.afterPropertiesSet();
+            globalService = (IGlobalService) globalServiceFactoryBean.getObject();
+        } catch (Exception e) {
+            logger.error("Can't initialise services: " + e.getMessage());
+        }
     }
 
     @Override

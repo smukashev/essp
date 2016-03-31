@@ -1,8 +1,6 @@
 package com.bsbnb.usci.portlets.protocol;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -21,6 +19,7 @@ import com.bsbnb.usci.portlets.protocol.data.DataProvider;
 import com.bsbnb.usci.portlets.protocol.ui.ProtocolLayout;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.process.ExceptionProcessCallable;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
@@ -29,14 +28,22 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import org.apache.log4j.Logger;
 
 public class ProtocolApplication extends Application {
     private static final long serialVersionUID = 2096197512742005243L;
     public static final String CONTEXT_NAME = "protocol_portlet";
-    public static final Logger log = Logger.getLogger(ProtocolApplication.class.getCanonicalName());
+    public final Logger logger = Logger.getLogger(ProtocolApplication.class);
 
     @Override
     public void init() {
+        Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler(){
+            public void uncaughtException(Thread t, Throwable e) {
+                System.out.println("*****Yeah, Caught the Exception*****");
+                logger.error(e.getMessage(),e);
+            }
+        });
+
         setTheme("custom");
         setMainWindow(new Window());
         if (getContext() instanceof PortletApplicationContext2) {
@@ -53,6 +60,7 @@ public class ProtocolApplication extends Application {
 
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
+
             boolean hasRights = false;
             boolean isNB = false;
             User user = null;
@@ -72,21 +80,25 @@ public class ProtocolApplication extends Application {
                     }
                 }
             } catch (PortalException e) {
-                e.printStackTrace();
+                logger.error(null,e);
             } catch (SystemException e) {
-                e.printStackTrace();
+                logger.error(null,e);
             }
 
             if(!hasRights)
                 return;
 
-            setTheme("custom");
-            log.log(Level.INFO, "User ID: {0}", user.getUserId());
-            Window mainWindow = new Window();
-            PortletEnvironmentFacade.set(new ProtocolPortletEnvironmentFacade(user, isNB));
-            DataProvider provider = new BeanDataProvider();
-            mainWindow.addComponent(new ProtocolLayout(provider));
-            setMainWindow(mainWindow);
+            try {
+                setTheme("custom");
+                logger.info("User ID: " + user.getUserId());
+                Window mainWindow = new Window();
+                PortletEnvironmentFacade.set(new ProtocolPortletEnvironmentFacade(user, isNB));
+                DataProvider provider = new BeanDataProvider();
+                mainWindow.addComponent(new ProtocolLayout(provider));
+                setMainWindow(mainWindow);
+            }catch (Exception e){
+                logger.error(e.getMessage(),e);
+            }
         }
 
         @Override

@@ -1,7 +1,6 @@
 package com.bsbnb.creditregistry.portlets.queue.ui;
 
 import com.bsbnb.creditregistry.portlets.queue.PortalEnvironmentFacade;
-import static com.bsbnb.creditregistry.portlets.queue.QueueApplication.log;
 import com.bsbnb.creditregistry.portlets.queue.QueueApplicationResource;
 import com.bsbnb.creditregistry.portlets.queue.data.DataProvider;
 import com.bsbnb.creditregistry.portlets.queue.data.QueueFileInfo;
@@ -24,6 +23,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.cr.model.Creditor;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,6 +50,7 @@ public class QueueComponent extends VerticalLayout {
     private HorizontalLayout autoUpdateLayout;
     private boolean autoUpdateEnabled = false;
     private static final long AUTO_UPDATE_THREAD_TIMEOUT_MILLIS = 1800*1000;
+    public final Logger logger = Logger.getLogger(QueueComponent.class);
 
     public QueueComponent(PortalEnvironmentFacade environment, DataProvider dataProvider) {
         this.env = environment;
@@ -111,7 +112,7 @@ public class QueueComponent extends VerticalLayout {
                                 try {
                                     Thread.sleep(1000);
                                 } catch (InterruptedException ie) {
-                                    log.log(Level.WARNING, null, ie);
+                                    logger.warn(null, ie);
                                 }
                             }
                             autoUpdateEnabled = false;
