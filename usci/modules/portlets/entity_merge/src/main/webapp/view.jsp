@@ -1,5 +1,5 @@
-<%@ page import="com.liferay.portal.theme.ThemeDisplay" %>
 <%@ page import="com.liferay.portal.kernel.util.WebKeys" %>
+<%@ page import="com.liferay.portal.theme.ThemeDisplay" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 <%@ taglib prefix="aui" uri="http://alloy.liferay.com/tld/aui" %>
 
@@ -25,6 +25,20 @@
 </script>
 
 <style>
+    .changeable-row .x-grid-cell {
+        border-style: dotted;
+        border-color: #a3bae9;
+        background-color: #eceef0 !important;
+    }
+
+    .unchangeable-row .x-grid-cell {
+        font: normal 11px/13px tahoma, arial, verdana, sans-serif;
+        background-color: white;
+        border-color: white;
+        border-style: solid;
+        border-width: 1px 0;
+    }
+
     .node {
         border: 1px solid black;
         margin: 5px;
@@ -53,11 +67,17 @@
     }
 </style>
 
+<script src="<%=request.getContextPath()%>/js/lang/default.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/lang/<%= ((ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY)).getLocale() %>.js"
+        type="text/javascript"></script>
+
 <script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/main.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/st_format.js" type="text/javascript"></script>
-
-<script src="<%=request.getContextPath()%>/js/lang/default.js" type="text/javascript"></script>
-<script src="<%=request.getContextPath()%>/js/lang/<%= ((ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY)).getLocale() %>.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/s_subject_doc.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/w_search_doc.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/s_credit_pc.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/s_person_fio.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/s_org_name.js" type="text/javascript"></script>
 
 <div id="merge-content"></div>

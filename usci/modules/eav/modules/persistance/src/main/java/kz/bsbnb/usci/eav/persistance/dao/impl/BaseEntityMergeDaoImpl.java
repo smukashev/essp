@@ -139,12 +139,16 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 					if (mergeManager.containsKey(attrKey)) {
 						if (metaType.isSet()) {
 							// merge set
-							mergeSet(creditorId, baseEntityApplied, baseValueLeft, baseValueRight,
-									mergeManager.getChildManager(attrKey), baseEntityManager, choice, deleteUnused);
+							for (IBaseEntityMergeManager baseEntityMergeManager : mergeManager.getChildManager(attrKey)) {
+								mergeSet(creditorId, baseEntityApplied, baseValueLeft, baseValueRight,
+										baseEntityMergeManager, baseEntityManager, choice, deleteUnused);
+							}
 						} else {
 							// merge value
-							mergeValue(creditorId, baseEntityApplied, baseValueLeft, baseValueRight,
-									mergeManager.getChildManager(attrKey), baseEntityManager, choice, deleteUnused);
+							for (IBaseEntityMergeManager baseEntityMergeManager : mergeManager.getChildManager(attrKey)) {
+								mergeValue(creditorId, baseEntityApplied, baseValueLeft, baseValueRight,
+										baseEntityMergeManager, baseEntityManager, choice, deleteUnused);
+							}
 						}
 
 					} else {
@@ -184,8 +188,10 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				} else {
 					if (mergeManager.containsKey(attrKey)) {
 						// one of the basevalues is null and there is a child manager
-						mergeNullValue(baseEntityApplied, baseEntityLeft, baseEntityRight, mergeManager.getChildManager(attrKey),
-								baseEntityManager, choice, attribute);
+						for (IBaseEntityMergeManager baseEntityMergeManager : mergeManager.getChildManager(attrKey)) {
+							mergeNullValue(baseEntityApplied, baseEntityLeft, baseEntityRight, baseEntityMergeManager,
+									baseEntityManager, choice, attribute);
+						}
 					} else {
 						// one of the basevalues is null and there is no child manager
 						if (choice == MergeResultChoice.RIGHT) {
@@ -446,8 +452,6 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
 				baseEntityManager.registerAsUpdated(newBaseValueLeft);
 
-				registerAsDeleted(baseEntityManager, metaType, baseValueLeft);
-
 				childBaseSetApplied = (BaseSet) baseValueRight.getValue();
 
 				// merge two sets
@@ -470,7 +474,6 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 								childBaseValueLeft.isClosed(),
 								childBaseValueLeft.isLast());
 
-						childBaseSetApplied.put(childBaseValueLeft);
 						newChildBaseValueLeft.setBaseContainer(childBaseSetApplied);
 
 						baseEntityManager.registerAsUpdated(newChildBaseValueLeft);
@@ -501,48 +504,51 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
 					MergeManagerKey idKey = new MergeManagerKey(childBaseEntityLeft.getId(),
 							childBaseEntityRight.getId());
-					if (mergeManager.containsKey(idKey) && (mergeManager.getChildManager(idKey) != null)) {
-						if (processedUuidsLeft.contains(childBaseValueLeft.getUuid()) ||
-								processedUuidsRight.contains(childBaseValueRight.getUuid())) {
-							throw new RuntimeException(String.valueOf(Errors.E107));
-						} else {
-							processedUuidsLeft.add(childBaseValueLeft.getUuid());
-							processedUuidsRight.add(childBaseValueRight.getUuid());
+					for (IBaseEntityMergeManager baseEntityMergeManager : mergeManager.getChildManager(idKey)) {
+						if (mergeManager.containsKey(idKey) && (baseEntityManager != null)) {
+							if (processedUuidsLeft.contains(childBaseValueLeft.getUuid()) ||
+									processedUuidsRight.contains(childBaseValueRight.getUuid())) {
+								throw new RuntimeException(String.valueOf(Errors.E107));
+							} else {
+								processedUuidsLeft.add(childBaseValueLeft.getUuid());
+								processedUuidsRight.add(childBaseValueRight.getUuid());
+							}
+
+							for (IBaseEntityMergeManager baseEntityMergeManager1 : mergeManager.getChildManager(idKey)) {
+								IBaseEntity currentEntity = mergeBaseEntity(childBaseEntityLeft, childBaseEntityRight, baseEntityMergeManager1,
+										baseEntityManager, choice, deleteUnused);
+
+								//if(mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_BOTH){
+								if (choice == MergeResultChoice.LEFT) {
+
+									IBaseValue newChildBaseValueLeft = BaseValueFactory.create(
+											MetaContainerTypes.META_CLASS,
+											childMetaType,
+											childBaseValueLeft.getId(),
+											creditorId,
+											new Date(childBaseValueLeft.getRepDate().getTime()),
+											currentEntity,
+											childBaseValueLeft.isClosed(),
+											childBaseValueLeft.isLast());
+									childBaseSetAppliedLeft.put(newChildBaseValueLeft);
+
+								} else {
+
+									IBaseValue newChildBaseValueRight = BaseValueFactory.create(
+											MetaContainerTypes.META_CLASS,
+											childMetaType,
+											childBaseValueRight.getId(),
+											creditorId,
+											new Date(childBaseValueRight.getRepDate().getTime()),
+											currentEntity,
+											childBaseValueRight.isClosed(),
+											childBaseValueRight.isLast());
+									childBaseSetAppliedRight.put(newChildBaseValueRight);
+								}
+							}
+							//}
 						}
-
-						IBaseEntity currentEntity = mergeBaseEntity(childBaseEntityLeft, childBaseEntityRight, mergeManager.getChildManager(idKey),
-								baseEntityManager, choice, deleteUnused);
-
-						//if(mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_BOTH){
-						if (choice == MergeResultChoice.LEFT) {
-
-							IBaseValue newChildBaseValueLeft = BaseValueFactory.create(
-									MetaContainerTypes.META_CLASS,
-									childMetaType,
-									childBaseValueLeft.getId(),
-									creditorId,
-									new Date(childBaseValueLeft.getRepDate().getTime()),
-									currentEntity,
-									childBaseValueLeft.isClosed(),
-									childBaseValueLeft.isLast());
-							childBaseSetAppliedLeft.put(newChildBaseValueLeft);
-
-						} else {
-
-							IBaseValue newChildBaseValueRight = BaseValueFactory.create(
-									MetaContainerTypes.META_CLASS,
-									childMetaType,
-									childBaseValueRight.getId(),
-									creditorId,
-									new Date(childBaseValueRight.getRepDate().getTime()),
-									currentEntity,
-									childBaseValueRight.isClosed(),
-									childBaseValueRight.isLast());
-							childBaseSetAppliedRight.put(newChildBaseValueRight);
-						}
-						//}
 					}
-
 				}
 
 			}
@@ -681,39 +687,41 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
 
 			MergeManagerKey<Long> idKey = new MergeManagerKey<Long>(new Long(baseEntityLeft.getId()), new Long(baseEntityRight.getId()));
-			IBaseEntityMergeManager childMergeManager = mergeManager.getChildManager(idKey);
-			IBaseEntity currentApplied = null;
-			if (childMergeManager == null) {
-				currentApplied = mergeBaseEntity(baseEntityLeft, baseEntityRight, mergeManager, baseEntityManager, choice, deleteUnused);
-			} else {
-				currentApplied = mergeBaseEntity(baseEntityLeft, baseEntityRight, childMergeManager, baseEntityManager, choice, deleteUnused);
-			}
-
-			if (mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_BOTH) {
-				if (choice == MergeResultChoice.LEFT) {
-					IBaseValue newBaseValueLeft = BaseValueFactory.create(
-							MetaContainerTypes.META_CLASS,
-							metaType,
-							baseValueLeft.getId(),
-							creditorId,
-							new Date(baseValueRight.getRepDate().getTime()),
-							currentApplied,
-							baseValueRight.isClosed(),
-							baseValueRight.isLast());
-					baseEntity.put(baseEntity.isSet() ? null : metaAttribute.getName(), newBaseValueLeft);
-
+			for (IBaseEntityMergeManager baseEntityMergeManager : mergeManager.getChildManager(idKey)) {
+				IBaseEntityMergeManager childMergeManager = baseEntityMergeManager;
+				IBaseEntity currentApplied = null;
+				if (childMergeManager == null) {
+					currentApplied = mergeBaseEntity(baseEntityLeft, baseEntityRight, mergeManager, baseEntityManager, choice, deleteUnused);
 				} else {
-					baseEntity.put(baseEntity.isSet() ? null : metaAttribute.getName(), baseValueRight);
-					IBaseValue newBaseValueRight = BaseValueFactory.create(
-							MetaContainerTypes.META_CLASS,
-							metaType,
-							baseValueRight.getId(),
-							creditorId,
-							new Date(baseValueLeft.getRepDate().getTime()),
-							currentApplied,
-							baseValueLeft.isClosed(),
-							baseValueLeft.isLast());
-					baseEntity.put(baseEntity.isSet() ? null : metaAttribute.getName(), newBaseValueRight);
+					currentApplied = mergeBaseEntity(baseEntityLeft, baseEntityRight, childMergeManager, baseEntityManager, choice, deleteUnused);
+				}
+
+				if (mergeManager.getAction() == IBaseEntityMergeManager.Action.KEEP_BOTH) {
+					if (choice == MergeResultChoice.LEFT) {
+						IBaseValue newBaseValueLeft = BaseValueFactory.create(
+								MetaContainerTypes.META_CLASS,
+								metaType,
+								baseValueLeft.getId(),
+								creditorId,
+								new Date(baseValueRight.getRepDate().getTime()),
+								currentApplied,
+								baseValueRight.isClosed(),
+								baseValueRight.isLast());
+						baseEntity.put(baseEntity.isSet() ? null : metaAttribute.getName(), newBaseValueLeft);
+
+					} else {
+						baseEntity.put(baseEntity.isSet() ? null : metaAttribute.getName(), baseValueRight);
+						IBaseValue newBaseValueRight = BaseValueFactory.create(
+								MetaContainerTypes.META_CLASS,
+								metaType,
+								baseValueRight.getId(),
+								creditorId,
+								new Date(baseValueLeft.getRepDate().getTime()),
+								currentApplied,
+								baseValueLeft.isClosed(),
+								baseValueLeft.isLast());
+						baseEntity.put(baseEntity.isSet() ? null : metaAttribute.getName(), newBaseValueRight);
+					}
 				}
 			}
 		}
