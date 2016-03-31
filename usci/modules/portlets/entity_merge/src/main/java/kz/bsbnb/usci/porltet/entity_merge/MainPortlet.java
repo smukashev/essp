@@ -37,11 +37,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MainPortlet extends MVCPortlet {
-    private IMetaFactoryService metaFactoryService;
-    private IEntityService entityService;
-    private IBaseEntityMergeService entityMergeService;
-    private PortalUserBeanRemoteBusiness portalUserBeanRemoteBusiness;
-    private ISearcherFormService searcherFormService;
     private Logger logger = Logger.getLogger(MainPortlet.class);
 	private IMetaFactoryService metaFactoryService;
 	private IEntityService entityService;
@@ -1248,7 +1243,7 @@ public class MainPortlet extends MVCPortlet {
 						//search by single Id
 						Date date = null;
 						if (resourceRequest.getParameter("date") != null)
-							date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+							date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
 
 						if (date == null)
 							date = new Date();
