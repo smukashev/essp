@@ -1,6 +1,6 @@
-Ext.onReady(function() {
+Ext.onReady(function () {
     var serviceCode = 'kz.bsbnb.usci.core.service.form.searcher.impl.cr.PersonFormImpl';
-    forms[serviceCode] = function(panel) {
+    forms[serviceCode] = function (panel) {
         panel.removeAll();
         panel.add(Ext.create("Ext.form.field.Text",
             {
@@ -26,9 +26,9 @@ Ext.onReady(function() {
                 margin: 10
             }));
 
-        panel.doSearch = function(){
+        panel.doSearch = function () {
             var params = {
-                op : 'LIST_ENTITY',
+                op: 'LIST_ENTITY_SELECT',
                 metaClass: 'subject',
                 searchName: serviceCode,
                 timeout: 120000,
@@ -40,10 +40,10 @@ Ext.onReady(function() {
                 pageNo: userNavHistory.getNextPage()
             };
             //loader
-            var myMask = new Ext.LoadMask(Ext.getCmp("entityTreeView"), {msg: "Please wait..."});
+            var myMask = new Ext.LoadMask(Ext.getCmp("entityTreeViewSelect"), {msg: "Please wait..."});
             myMask.show();
 
-            entityStore.load({
+            entityStoreSelect.load({
 
                 params: params,
                 callback: function (records, operation, success) {
@@ -51,8 +51,8 @@ Ext.onReady(function() {
 
                     if (!success) {
                         var error = '';
-                        if(operation.error != undefined) {
-                            if(operation.error.statusText in errors)
+                        if (operation.error != undefined) {
+                            if (operation.error.statusText in errors)
                                 error = errors[operation.error.statusText];
                             else
                                 error = operation.error.statusText;
@@ -61,14 +61,15 @@ Ext.onReady(function() {
                             error = operation.request.proxy.reader.rawData.errorMessage;
                         Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(error));
                     }
-                    if(records && records.length == 0)
+                    if (records && records.length == 0)
                         Ext.MessageBox.alert(label_INFO, 'Поиск вернул 0 результатов');
 
                     var totalCount = operation.request.proxy.reader.rawData.totalCount;
-                    if(totalCount) {
+                    if (totalCount) {
                         userNavHistory.success(totalCount);
                     }
-                }});
+                }
+            });
         }
     };
 });
