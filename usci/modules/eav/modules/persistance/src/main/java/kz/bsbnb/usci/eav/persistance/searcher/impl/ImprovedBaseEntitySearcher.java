@@ -181,11 +181,14 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         }
                     }
                 } else {
+                    if (baseValue == null)
+                        throw new UnsupportedOperationException(Errors.getMessage(Errors.E177, metaAttribute.getName(), metaClass.getClassName()));
+
                     BaseSet baseSet = (BaseSet) baseValue.getValue();
                     MetaSet metaSet = (MetaSet) memberType;
                     MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
 
-                    if (baseSet.get().size() == 0)
+                    if (baseSet == null || baseSet.get().size() == 0)
                         throw new UnsupportedOperationException(Errors.getMessage(Errors.E178, (childMetaClass).getClassName()));
 
                     if (!memberType.isComplex())
@@ -217,18 +220,13 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         select = context.select(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID)
                                 .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                 .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID
-                                        .equal(metaAttribute.getId()))
-                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID
-                                        .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ID))
-                                .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID
-                                        .equal(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias)
-                                                .ENTITY_VALUE_ID.in(childBaseEntityIds))
-                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias)
-                                                .IS_CLOSED.equal(DataUtils.convert(false)))
-                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias)
-                                                .IS_LAST.equal(DataUtils.convert(true))));
+                                .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.eq(metaAttribute.getId()))
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).CREDITOR_ID.eq(creditorId)) // KT: checkme!
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ID))
+                                .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID)
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds))
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.eq(DataUtils.convert(false)))
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.eq(DataUtils.convert(true))));
 
                         condition = condition == null ? DSL.exists(select) :
                                 metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
@@ -237,21 +235,16 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         Collections.sort(childBaseEntityIds);
                         String sChildBaseEntityIds = StringUtils.arrayToDelimitedString(childBaseEntityIds.toArray(), ", ");
 
-                        select = context.select(
-                                DSL.field("listagg(\"" + setValueAlias + "\".\"ENTITY_VALUE_ID\", ', ') " +
-                                        "within group (order by \"" + setValueAlias + "\".\"ENTITY_VALUE_ID\" asc)")
-                        ).from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
+                        select = context.select(DSL.field("listagg(\"" + setValueAlias + "\".\"ENTITY_VALUE_ID\", ', ') " +
+                                        "within group (order by \"" + setValueAlias + "\".\"ENTITY_VALUE_ID\" asc)"))
+                                .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                 .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
-                                .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID
-                                        .eq(metaAttribute.getId()))
-                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID
-                                        .eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ID))
-                                .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID
-                                        .eq(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias)
-                                                .IS_CLOSED.equal(DataUtils.convert(false)))
-                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias)
-                                                .IS_LAST.equal(DataUtils.convert(true))));
+                                .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.eq(metaAttribute.getId()))
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).CREDITOR_ID.eq(creditorId)) // KT: checkme!
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ID))
+                                .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID)
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.equal(DataUtils.convert(true))));
 
                         Condition setCondition = select.asField().eq(sChildBaseEntityIds);
 

@@ -150,7 +150,7 @@
                         <database>
                             <name>${jooq.db.name}</name>
                             <includes>(SC_.*)|(EAV_.*)|(BATCH_.*)|(LOGIC_.*)|(MNT_.*)|(MAIL_.*)</includes>
-                            <excludes>(SYS*)</excludes>
+                            <excludes>(SYS.*)</excludes>
                             <inputSchema>${jooq.db.schema}</inputSchema>
                             <customTypes>
                                 <!--<customType>
