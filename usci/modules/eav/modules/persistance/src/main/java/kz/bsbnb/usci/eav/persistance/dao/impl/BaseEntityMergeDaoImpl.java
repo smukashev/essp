@@ -65,7 +65,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
 		baseEntityApplyDao.applyToDb(baseEntityManager);
 
-		applyListener.applyToDBEnded(null, baseEntityRight, resultingBaseEntity, baseEntityManager);
+		applyListener.applyToDBEnded(resultingBaseEntity);
 
 
 		return resultingBaseEntity;

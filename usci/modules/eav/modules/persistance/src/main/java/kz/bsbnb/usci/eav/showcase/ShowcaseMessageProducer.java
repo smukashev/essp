@@ -10,13 +10,11 @@ import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
 @Component
 public class ShowcaseMessageProducer {
-
-    final static Logger logger = Logger.getLogger(ShowcaseMessageProducer.class);
+    private final static Logger logger = Logger.getLogger(ShowcaseMessageProducer.class);
 
     private JmsTemplate jmsTemplate;
 
@@ -24,20 +22,18 @@ public class ShowcaseMessageProducer {
     private ApplicationContext ctx;
 
     @Value("${jms.enabled:true}")
-    private void setJmsTemplate(boolean enabled){
-        if(enabled)
+    private void setJmsTemplate(boolean enabled) {
+        if (enabled)
             jmsTemplate = ctx.getBean(JmsTemplate.class);
     }
 
-    public void produce(final QueueEntry queueEntry) throws Exception {
+    void produce(final QueueEntry queueEntry) throws Exception {
         if (jmsTemplate != null) {
             MessageCreator mc = new MessageCreator() {
                 public Message createMessage(Session session) throws JMSException {
                     try {
-                        ObjectMessage message = session.createObjectMessage(queueEntry);
-                        return message;
-                    }
-                    catch (JMSException je) {
+                        return session.createObjectMessage(queueEntry);
+                    } catch (JMSException je) {
                         logger.error("JMS Exception : ", je);
                         return null;
                     }

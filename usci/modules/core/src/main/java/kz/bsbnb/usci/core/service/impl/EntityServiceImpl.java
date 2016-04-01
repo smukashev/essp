@@ -192,13 +192,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
-    public HashMap<String, QueryEntry> getSQLStats() {
+    public Map<String, QueryEntry> getSQLStats() {
         return stats.getStats();
-    }
-
-    @Override
-    public void clearSQLStats() {
-        stats.clear();
     }
 
     @Override
