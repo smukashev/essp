@@ -41,14 +41,13 @@ public class JDBCSupport {
             PreparedStatement ps = con.prepareStatement(query, new String[]{keyName});
 
             int i = 1;
-            for (Object obj : values) {
+
+            for (Object obj : values)
                 ps.setObject(i++, obj);
-            }
 
             return ps;
         }
     }
-
 
     public boolean testConnection() {
         try {
@@ -68,23 +67,17 @@ public class JDBCSupport {
     }
 
     protected int updateWithStats(String sql, Object... args) {
-        double t1 = System.currentTimeMillis();
-
+        long t1 = System.currentTimeMillis();
         int count = jdbcTemplate.update(sql, args);
-
-        if (sqlStats != null)
-            sqlStats.put(sql, System.currentTimeMillis() - t1);
+        sqlStats.put(sql, (System.currentTimeMillis() - t1));
 
         return count;
     }
 
     protected List<Map<String, Object>> queryForListWithStats(String sql, Object... args) {
-        double t1 = System.currentTimeMillis();
-
+        long t1 = System.currentTimeMillis();
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, args);
-
-        if (sqlStats != null)
-            sqlStats.put(sql, System.currentTimeMillis() - t1);
+        sqlStats.put(sql, (System.currentTimeMillis() - t1));
 
         return rows;
     }
@@ -92,12 +85,9 @@ public class JDBCSupport {
     protected long insertWithId(String query, Object[] values) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        double t1 = System.currentTimeMillis();
-
+        long t1 = System.currentTimeMillis();
         jdbcTemplate.update(new GenericInsertPreparedStatementCreator(query, values), keyHolder);
-
-        if (sqlStats != null)
-            sqlStats.put(query, System.currentTimeMillis() - t1);
+        sqlStats.put(query, (System.currentTimeMillis() - t1));
 
         return keyHolder.getKey().longValue();
     }

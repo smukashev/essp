@@ -74,7 +74,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             baseEntity.setBatchId(mockEntity.getBatchId());
             baseEntity.setIndex(mockEntity.getBatchIndex());
 
-            stats.put("core.EntityService.process()", t2);
+            stats.put("process(" + mockEntity.getMeta().getClassName() + ")", t2);
 
             EntityStatus entityStatus = new EntityStatus();
             entityStatus.setBatchId(baseEntity.getBatchId());

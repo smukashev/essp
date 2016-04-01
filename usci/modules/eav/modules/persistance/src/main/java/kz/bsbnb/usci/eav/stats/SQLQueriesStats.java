@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.stats;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -10,33 +11,37 @@ import java.util.HashMap;
 public class SQLQueriesStats {
     private final HashMap<String, QueryEntry> stats = new HashMap<>();
 
+    private static final boolean statsEnabled = true;
+
     public void put(final String query, final double time) {
-        new Thread() {
-            @Override
-            public void run() {
-                synchronized (stats) {
-                    QueryEntry qe = stats.get(query);
+        if (statsEnabled) {
+            new Thread() {
+                @Override
+                public void run() {
+                    synchronized (stats) {
+                        QueryEntry qe = stats.get(query);
 
-                    if (qe == null) {
-                        qe = new QueryEntry();
-                        qe.maxTime = time;
-                        qe.minTime = time;
-                        qe.totalTime = time;
-                        qe.count = 1;
-                        stats.put(query, qe);
-                    } else {
-                        qe.count++;
-                        qe.totalTime += time;
-
-                        if (time > qe.maxTime)
+                        if (qe == null) {
+                            qe = new QueryEntry();
                             qe.maxTime = time;
-
-                        if (time < qe.minTime)
                             qe.minTime = time;
+                            qe.totalTime = time;
+                            qe.count = 1;
+                            stats.put(query, qe);
+                        } else {
+                            qe.count++;
+                            qe.totalTime += time;
+
+                            if (time > qe.maxTime)
+                                qe.maxTime = time;
+
+                            if (time < qe.minTime)
+                                qe.minTime = time;
+                        }
                     }
                 }
-            }
-        }.start();
+            }.start();
+        }
     }
 
     public HashMap<String, QueryEntry> getStats() {

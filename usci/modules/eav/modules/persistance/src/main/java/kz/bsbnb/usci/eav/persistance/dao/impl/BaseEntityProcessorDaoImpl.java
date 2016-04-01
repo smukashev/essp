@@ -174,7 +174,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
 
+        long t1 = System.currentTimeMillis();
         baseEntityPostPrepared = prepare(((BaseEntity) baseEntity).clone(), creditorId);
+        sqlStats.put("prepare(" + baseEntity.getMeta().getClassName() + ")", (System.currentTimeMillis() - t1));
 
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
