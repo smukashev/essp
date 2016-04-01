@@ -64,7 +64,8 @@ public final class DataJob extends AbstractDataJob {
             try {
                 for (IBaseEntity myEntityKeyElement : myEntity.getKeyElements()) {
                     for (IBaseEntity currentEntityKeyElement : currentEntity.getKeyElements()) {
-                        if (myEntityKeyElement.equalsByKey(currentEntityKeyElement)) {
+                        if (myEntityKeyElement.getMeta().getId() == currentEntityKeyElement.getMeta().getId() &&
+                                myEntityKeyElement.equalsByKey(currentEntityKeyElement)) {
                             currentIntersection = true;
                             return true;
                         }
