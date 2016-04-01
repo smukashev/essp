@@ -96,7 +96,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E132, count, id));
+            throw new IllegalStateException(Errors.compose(Errors.E132, count, id));
 
     }
 
@@ -116,7 +116,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E131, count, id));
+            throw new IllegalStateException(Errors.compose(Errors.E131, count, id));
     }
 
     private IBaseValue constructValue (IBaseValue baseValue, IMetaType metaType, Map<String, Object> row) {
@@ -143,7 +143,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -183,7 +183,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException(Errors.getMessage(Errors.E83, baseValue.getMetaAttribute().getName()));
+            throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -198,7 +198,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -238,7 +238,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException(Errors.getMessage(Errors.E83, baseValue.getMetaAttribute().getName()));
+            throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -253,7 +253,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
     @SuppressWarnings("unchecked")
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -281,7 +281,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException(Errors.getMessage(Errors.E83, baseValue.getMetaAttribute().getName()));
+            throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -295,7 +295,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -323,7 +323,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException(Errors.getMessage(Errors.E83, baseValue.getMetaAttribute().getName()));
+            throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();

@@ -18,7 +18,7 @@ public final class DocumentOptimizer {
         if (noBaseValue == null || docTypeBaseValue == null ||
                 noBaseValue.getValue() == null || docTypeBaseValue.getValue() == null) {
             logger.error(Errors.E184 + " : \n" + iBaseEntity);
-            throw new IllegalStateException(Errors.getMessage(Errors.E184));
+            throw new IllegalStateException(Errors.compose(Errors.E184));
         }
 
 
@@ -26,7 +26,7 @@ public final class DocumentOptimizer {
 
         if (docTypeEntity.getId() == 0) {
             logger.error(Errors.E186 + " : \n" + iBaseEntity);
-            throw new IllegalStateException(Errors.getMessage(Errors.E186));
+            throw new IllegalStateException(Errors.compose(Errors.E186));
         }
 
         stringBuilder.append(noBaseValue.getValue());

@@ -426,7 +426,7 @@ public class MainPortlet extends MVCPortlet {
 		if (meta.getClassName().equals("credit") && !isNb) {
 			BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
 			if (creditor.getId() != creditorId)
-				throw new RuntimeException(Errors.getMessage(Errors.E238));
+				throw new RuntimeException(Errors.compose(Errors.E238));
 		}
 
 		if (title == null) {
@@ -567,7 +567,7 @@ public class MainPortlet extends MVCPortlet {
 			title = code;
 
 		if (meta == null)
-			throw new NullPointerException(Errors.getMessage(Errors.E243));
+			throw new NullPointerException(Errors.compose(Errors.E243));
 
 		Boolean isSearchable = false;
 		if (meta.isComplex())
@@ -828,7 +828,7 @@ public class MainPortlet extends MVCPortlet {
 			title = code;
 
 		if (type == null)
-			throw new NullPointerException(Errors.getMessage(Errors.E245));
+			throw new NullPointerException(Errors.compose(Errors.E245));
 
 		Boolean isSearchable = false;
 		if (type.isComplex()) {
@@ -1009,7 +1009,7 @@ public class MainPortlet extends MVCPortlet {
 	public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException {
 
 		if (metaFactoryService == null || entityService == null || entityMergeService == null)
-			throw new NullPointerException(Errors.getMessage(Errors.E244));
+			throw new NullPointerException(Errors.compose(Errors.E244));
 
 
 		PrintWriter writer = resourceResponse.getWriter();
@@ -1091,7 +1091,7 @@ public class MainPortlet extends MVCPortlet {
 					ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, prefix, creditorId);
 
 					if (searchResult.getData() == null)
-						throw new RuntimeException(Errors.getMessage(Errors.E242));
+						throw new RuntimeException(Errors.compose(Errors.E242));
 
 					Iterator<BaseEntity> cursor = searchResult.iterator();
 
@@ -1115,7 +1115,7 @@ public class MainPortlet extends MVCPortlet {
 					List<String[]> classes = searcherFormService.getMetaClasses(userId);
 
 					if (classes.size() < 1)
-						throw new RuntimeException(Errors.getMessage(Errors.E239));
+						throw new RuntimeException(Errors.compose(Errors.E239));
 
 					List<String[]> afterFilter = new LinkedList<>();
 
@@ -1150,10 +1150,10 @@ public class MainPortlet extends MVCPortlet {
 
 					if (!isNb) {
 						if (creditors.size() > 1)
-							throw new RuntimeException(Errors.getMessage(Errors.E240));
+							throw new RuntimeException(Errors.compose(Errors.E240));
 
 						if (creditors.size() == 0)
-							throw new RuntimeException(Errors.getMessage(Errors.E241));
+							throw new RuntimeException(Errors.compose(Errors.E241));
 
 						creditorId = creditors.get(0).getId();
 					}
@@ -1229,10 +1229,10 @@ public class MainPortlet extends MVCPortlet {
 
 					if (!isNb) {
 						if (creditors.size() > 1)
-							throw new RuntimeException(Errors.getMessage(Errors.E240));
+							throw new RuntimeException(Errors.compose(Errors.E240));
 
 						if (creditors.size() == 0)
-							throw new RuntimeException(Errors.getMessage(Errors.E241));
+							throw new RuntimeException(Errors.compose(Errors.E241));
 
 						creditorId = creditors.get(0).getId();
 					}

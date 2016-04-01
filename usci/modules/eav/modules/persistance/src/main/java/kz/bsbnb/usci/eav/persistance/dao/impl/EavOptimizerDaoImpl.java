@@ -51,7 +51,7 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E91, keyString));
+            throw new IllegalArgumentException(Errors.compose(Errors.E91, keyString));
 
         if (rows.size() < 1)
             return 0;
@@ -73,7 +73,7 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E91, entityId));
+            throw new IllegalArgumentException(Errors.compose(Errors.E91, entityId));
 
         if (rows.size() < 1)
             return 0;
@@ -105,6 +105,6 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E157, count, eavOptimizerData.getId()));
+            throw new IllegalStateException(Errors.compose(Errors.E157, count, eavOptimizerData.getId()));
     }
 }

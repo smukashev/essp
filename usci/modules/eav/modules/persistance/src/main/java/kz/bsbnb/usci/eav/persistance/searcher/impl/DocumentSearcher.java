@@ -43,8 +43,8 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
         List<Long> ids = searcherPool.getSearcher(entity.getMeta().getClassName()).findAll(entity, creditorId);
 
         if (ids.size() > 1){
-            logger.error(Errors.getError(Errors.getMessage(Errors.E175)+" : \n"+entity));
-            throw new IllegalStateException(Errors.getMessage(Errors.E175));
+            logger.error(Errors.getError(Errors.E175)+" : \n"+entity);
+            throw new IllegalStateException(Errors.compose(Errors.E175));
         }
 
         if (ids.size() < 1)

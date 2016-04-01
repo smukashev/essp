@@ -112,7 +112,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
             IBaseValue value2 = c2.safeGetValue(name);
 
             if (value1 == null || value2 == null)
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E1,name));
+                throw new IllegalArgumentException(Errors.compose(Errors.E1,name));
 
             if (meta.getComplexKeyType() == ComplexKeyTypes.ALL) {
                 if (!type.isSet())
@@ -189,7 +189,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
 
                         //paths.addAll(intersect(entity1, c2));
                     } else {
-                        throw new IllegalStateException(Errors.getMessage(Errors.E2));
+                        throw new IllegalStateException(Errors.compose(Errors.E2));
                     }
                 }
             }
@@ -252,7 +252,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
                         }
                     }
                 } else {
-                    throw new IllegalStateException(Errors.getMessage(Errors.E2));
+                    throw new IllegalStateException(Errors.compose(Errors.E2));
                 }
             }
         }
@@ -316,7 +316,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
 
                         //paths.addAll(intersect(entity1, c2));
                     } else {
-                        throw new IllegalStateException(Errors.getMessage(Errors.E2));
+                        throw new IllegalStateException(Errors.compose(Errors.E2));
                     }
                 }
             }
@@ -385,7 +385,7 @@ public class BasicBaseEntityComparator implements IBaseEntityComparator {
                         }
                     }
                 } else {
-                    throw new IllegalStateException(Errors.getMessage(Errors.E2));
+                    throw new IllegalStateException(Errors.compose(Errors.E2));
                 }
             }
         }

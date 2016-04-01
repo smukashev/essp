@@ -43,26 +43,26 @@ public class PersistableDaoPool implements IPersistableDaoPool {
 
     public IPersistableDao getPersistableDao(Class<? extends IPersistable> persistableClass) {
         if (persistableClass == null)
-            throw new RuntimeException(Errors.getMessage(Errors.E172));
+            throw new RuntimeException(Errors.compose(Errors.E172));
 
         Class<? extends IPersistableDao> persistableDaoClass = persistableDaoMap.get(persistableClass);
 
         if (persistableDaoClass != null)
             return applicationContext.getBean(persistableDaoClass);
 
-        throw new RuntimeException(Errors.getMessage(Errors.E173, persistableClass.getName()));
+        throw new RuntimeException(Errors.compose(Errors.E173, persistableClass.getName()));
     }
 
     @SuppressWarnings("unchecked")
     public <T extends IPersistableDao> T getPersistableDao(Class<? extends IPersistable> persistableClass, Class<T> extendedPersistableDaoClass) {
         if (persistableClass == null)
-            throw new RuntimeException(Errors.getMessage(Errors.E172));
+            throw new RuntimeException(Errors.compose(Errors.E172));
 
         Class<? extends IPersistableDao> persistableDaoClass = persistableDaoMap.get(persistableClass);
 
         if (persistableDaoClass != null && extendedPersistableDaoClass.isAssignableFrom(persistableDaoClass))
             return (T) applicationContext.getBean(persistableDaoClass);
 
-        throw new RuntimeException(Errors.getMessage(Errors.E173, persistableClass.getName()));
+        throw new RuntimeException(Errors.compose(Errors.E173, persistableClass.getName()));
     }
 }

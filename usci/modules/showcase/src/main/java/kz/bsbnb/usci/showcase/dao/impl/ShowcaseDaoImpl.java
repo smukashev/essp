@@ -242,7 +242,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             type = ((MetaSet) type).getMemberType();
 
         if (type.isSet())
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E277, type.toString()));
+            throw new IllegalArgumentException(Errors.compose(Errors.E277, type.toString()));
 
         MetaValue metaValue = (MetaValue) type;
 
@@ -258,7 +258,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             case DOUBLE:
                 return "NUMERIC";
             default:
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E276));
+                throw new IllegalArgumentException(Errors.compose(Errors.E276));
         }
     }
 
@@ -270,7 +270,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             type = ((MetaSet) type).getMemberType();
 
         if (type.isSet())
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E275));
+            throw new IllegalArgumentException(Errors.compose(Errors.E275));
 
         MetaValue metaValue = (MetaValue) type;
 
@@ -286,7 +286,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             case DOUBLE:
                 return "17,3";
             default:
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E276));
+                throw new IllegalArgumentException(Errors.compose(Errors.E276));
         }
     }
 
@@ -308,10 +308,10 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
         List<Map<String, Object>> rows = jdbcTemplateSC.queryForList(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException(Errors.getMessage(Errors.E278));
+            throw new RuntimeException(Errors.compose(Errors.E278));
 
         if (rows.size() < 1)
-            throw new RuntimeException(Errors.getMessage(Errors.E279));
+            throw new RuntimeException(Errors.compose(Errors.E279));
 
         Map<String, Object> row = rows.iterator().next();
 
@@ -418,7 +418,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
                 select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException(Errors.getMessage(Errors.E278));
+            throw new RuntimeException(Errors.compose(Errors.E278));
 
         if (rows.size() < 1)
             return 0;

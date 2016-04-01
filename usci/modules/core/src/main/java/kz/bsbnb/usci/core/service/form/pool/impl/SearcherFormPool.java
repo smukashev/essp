@@ -28,6 +28,6 @@ public class SearcherFormPool implements ISearcherFormPool {
             if(sf.getClass().getName().equals(className))
                 return sf;
 
-        throw new RuntimeException(Errors.getMessage(Errors.E230));
+        throw new RuntimeException(Errors.compose(Errors.E230));
     }
 }

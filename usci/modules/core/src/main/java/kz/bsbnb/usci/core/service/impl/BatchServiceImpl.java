@@ -108,7 +108,7 @@ public class BatchServiceImpl implements IBatchService {
 
     private String getFullFilePath(Batch batch) {
         if (batch.getRepDate() == null || batch.getCreditorId() == null || batch.getHash() == null) {
-            throw new RuntimeException(Errors.getMessage(Errors.E233));
+            throw new RuntimeException(Errors.compose(Errors.E233));
         }
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         return batchSaveDir + "/" + df.format(batch.getRepDate())
@@ -117,7 +117,7 @@ public class BatchServiceImpl implements IBatchService {
 
     private String getCreditorDirPath(Batch batch) {
         if (batch.getRepDate() == null || batch.getCreditorId() == null) {
-            throw new RuntimeException(Errors.getMessage(Errors.E232));
+            throw new RuntimeException(Errors.compose(Errors.E232));
         }
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         return batchSaveDir + "/" + df.format(batch.getRepDate())

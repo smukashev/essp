@@ -98,7 +98,7 @@ public class CrossCheckApplication extends Application {
                             new BeanDataProvider(portletData)));
                     
                 } catch (DataException de) {
-                    logger.error(Errors.unmarshall(de.getMessage()));
+                    logger.error(Errors.decompose(de.getMessage()));
                     mainWindow.addComponent(new Label(de.getMessage().replaceAll("\n", "<br/>")));
                 }
                 setMainWindow(mainWindow);

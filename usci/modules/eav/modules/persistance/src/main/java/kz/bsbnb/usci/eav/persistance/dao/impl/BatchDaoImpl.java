@@ -207,11 +207,11 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E149));
+            throw new IllegalArgumentException(Errors.compose(Errors.E149));
         }
 
         if (rows.size() < 1) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E150));
+            throw new IllegalArgumentException(Errors.compose(Errors.E150));
         }
 
         Map<String, Object> row = rows.get(0);

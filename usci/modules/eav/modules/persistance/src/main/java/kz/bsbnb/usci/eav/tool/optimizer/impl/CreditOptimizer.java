@@ -17,16 +17,16 @@ public final class CreditOptimizer {
 
         if (primaryContractBaseValue == null || creditorBaseValue == null ||
                 primaryContractBaseValue.getValue() == null || creditorBaseValue.getValue() == null) {
-            logger.error(Errors.getError(Errors.getMessage(Errors.E184)) + " : \n" + iBaseEntity);
-            throw new IllegalStateException(Errors.getMessage(Errors.E184));
+            logger.error(Errors.getError(Errors.E184) + " : \n" + iBaseEntity);
+            throw new IllegalStateException(Errors.compose(Errors.E184));
         }
 
         IBaseEntity primaryContractEntity = (IBaseEntity) primaryContractBaseValue.getValue();
         IBaseEntity creditorEntity = (IBaseEntity) creditorBaseValue.getValue();
 
         if (creditorEntity.getId() == 0) {
-            logger.error(Errors.getError(Errors.getMessage(Errors.E185)) + " : \n" + iBaseEntity);
-            throw new IllegalStateException(Errors.getMessage(Errors.E185));
+            logger.error(Errors.getError(Errors.E185) + " : \n" + iBaseEntity);
+            throw new IllegalStateException(Errors.compose(Errors.E185));
         }
 
         if (primaryContractEntity.getId() == 0)

@@ -49,12 +49,12 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
 
         if (rows.size() > 1)
         {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E151));
+            throw new IllegalArgumentException(Errors.compose(Errors.E151));
         }
 
         if (rows.size() < 1)
         {
-            throw new IllegalStateException(Errors.getMessage(Errors.E152, id));
+            throw new IllegalStateException(Errors.compose(Errors.E152, id));
         }
 
         Map<String, Object> row = rows.get(0);
@@ -98,7 +98,7 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
     public void remove(BatchEntry batch) {
         if(batch.getId() < 1)
         {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E153));
+            throw new IllegalArgumentException(Errors.compose(Errors.E153));
         }
 
         DeleteConditionStep delete = context

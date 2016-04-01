@@ -138,7 +138,7 @@ public class MailHandler implements Runnable {
                     try {
                         lastLaunchTimeMillis = configuration.getLastLaunchMillis();
                     } catch (ConfigurationException ce) {
-                        logger.error(Errors.unmarshall(ce.getMessage()));
+                        logger.error(Errors.decompose(ce.getMessage()));
                     }
                     //Mail sending thread can be stopped by setting smtp host config to empty string
                     if (isSmtpHostConfigEmpty()) {

@@ -21,12 +21,12 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
 
     public IBaseEntity loadByMaxReportDate(long id, Date savingReportDate) {
         if (id <= 0L || savingReportDate == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E102));
+            throw new IllegalStateException(Errors.compose(Errors.E102));
 
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id, savingReportDate);
 
         if (maxReportDate == null)
-            throw new RuntimeException(Errors.getMessage(Errors.E103, id, DataTypes.dateFormatDot.format(savingReportDate)));
+            throw new RuntimeException(Errors.compose(Errors.E103, id, DataTypes.dateFormatDot.format(savingReportDate)));
 
         return load(id, maxReportDate);
     }
@@ -34,12 +34,12 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
     @Override
     public IBaseEntity loadByMinReportDate(long id, Date savingReportDate) {
         if (id <= 0L || savingReportDate == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E102));
+            throw new IllegalStateException(Errors.compose(Errors.E102));
 
         Date minReportDate = baseEntityReportDateDao.getMinReportDate(id, savingReportDate);
 
         if (minReportDate == null)
-            throw new RuntimeException(Errors.getMessage(Errors.E103, id, DataTypes.dateFormatDot.format(savingReportDate)));
+            throw new RuntimeException(Errors.compose(Errors.E103, id, DataTypes.dateFormatDot.format(savingReportDate)));
 
         return load(id, minReportDate);
     }
@@ -49,7 +49,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id);
 
         if (maxReportDate == null)
-            throw new UnsupportedOperationException(Errors.getMessage(Errors.E101, id));
+            throw new UnsupportedOperationException(Errors.compose(Errors.E101, id));
 
         return load(id, maxReportDate);
     }

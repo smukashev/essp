@@ -66,7 +66,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         super(id);
 
         if (reportDate == null)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E36));
+            throw new IllegalArgumentException(Errors.compose(Errors.E36));
 
         Date newReportDate = (Date) reportDate.clone();
         DataUtils.toBeginningOfTheDay(newReportDate);
@@ -193,7 +193,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         IMetaAttribute thatMetaAttribute = baseValue.getMetaAttribute();
 
         if (thisMetaAttribute == null || thatMetaAttribute == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E38));
+            throw new IllegalStateException(Errors.compose(Errors.E38));
 
         return thisMetaAttribute.getId() == thatMetaAttribute.getId() &&
                 this.equalsByValue(thisMetaAttribute.getMetaType(), baseValue);
@@ -205,7 +205,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
         Object thatValue = baseValue.getValue();
 
         if (thisValue == null || thatValue == null)
-            throw new RuntimeException(Errors.getMessage(Errors.E39));
+            throw new RuntimeException(Errors.compose(Errors.E39));
 
         if (metaType.isComplex()) {
             if (metaType.isSet()) {
@@ -279,7 +279,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                 break;
             case DATE:
                 //TODO: add date format
-                throw new UnsupportedOperationException(Errors.getMessage(Errors.E41));
+                throw new UnsupportedOperationException(Errors.compose(Errors.E41));
             case STRING:
                 if (value.equals(str))
                     return true;
@@ -293,7 +293,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                     return true;
                 break;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E7, type));
+                throw new IllegalStateException(Errors.compose(Errors.E7, type));
         }
 
         return false;
@@ -318,7 +318,7 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
                 }
             }
         } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException(Errors.getMessage(Errors.E37));
+            throw new RuntimeException(Errors.compose(Errors.E37));
         }
         return baseValue;
     }

@@ -94,10 +94,10 @@ public class BaseRepository implements  Runnable
         if(startDate.equals(endDate))
             return;
         if(!startDate.matches("\\d{2}\\.\\d{2}\\.\\d{4}"))
-            throw new RuntimeException(Errors.getMessage(Errors.E224));
+            throw new RuntimeException(Errors.compose(Errors.E224));
 
         if(!endDate.matches("\\d{2}\\.\\d{2}\\.\\d{4}"))
-            throw new RuntimeException(Errors.getMessage(Errors.E225));
+            throw new RuntimeException(Errors.compose(Errors.E225));
 
         int mo = (startDate.charAt(3) - '0' )* 10 + (startDate.charAt(4) - '0');
         int year = (startDate.charAt(6) - '0') * 1000 + (startDate.charAt(7) - '0') * 100
@@ -118,7 +118,7 @@ public class BaseRepository implements  Runnable
                 return;
         }
 
-        throw new RuntimeException(Errors.getMessage(Errors.E226));
+        throw new RuntimeException(Errors.compose(Errors.E226));
     }
 
     public String getNextRepDate(String date){

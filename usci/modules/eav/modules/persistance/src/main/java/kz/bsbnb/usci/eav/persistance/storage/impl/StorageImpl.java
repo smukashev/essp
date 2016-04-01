@@ -28,7 +28,7 @@ public class StorageImpl extends JDBCSupport implements IStorage {
         URL dbConfigFileUrl = this.getClass().getClassLoader().getResource(getConfig().getSchema());
 
         if (dbConfigFileUrl == null) {
-            throw new IllegalStateException(Errors.getMessage(Errors.E180, getConfig().getSchema()));
+            throw new IllegalStateException(Errors.compose(Errors.E180, getConfig().getSchema()));
         }
 
         DDLHelper.changeDatabase(jdbcTemplate.getDataSource(),
@@ -42,7 +42,7 @@ public class StorageImpl extends JDBCSupport implements IStorage {
 
         if (dbConfigFileUrl == null) {
             logger.error("Can't find db config file: " + getConfig().getSchema());
-            throw new IllegalStateException(Errors.getMessage(Errors.E180, getConfig().getSchema()));
+            throw new IllegalStateException(Errors.compose(Errors.E180, getConfig().getSchema()));
         }
 
         DDLHelper.dropDatabase(jdbcTemplate.getDataSource(),

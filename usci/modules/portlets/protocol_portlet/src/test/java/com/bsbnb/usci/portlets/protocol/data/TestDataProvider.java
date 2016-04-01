@@ -31,11 +31,11 @@ import java.util.Map;
 public class TestDataProvider implements DataProvider {
 
     public List<Creditor> getCreditorsList() {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E206));
     }
 
     public List<InputInfoDisplayBean> getInputInfosByCreditors(List<Creditor> creditors, Date reportDate) {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E206));
     }
 
     public List<ProtocolDisplayBean> getProtocolsByInputInfo(InputInfoDisplayBean inputInfo) {
@@ -60,16 +60,16 @@ public class TestDataProvider implements DataProvider {
     }
 
     public Map<SharedDisplayBean, Map<String, List<ProtocolDisplayBean>>> getProtocolsByInputInfoGrouped(InputInfoDisplayBean inputInfo) {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E206));
     }
 
     public InputFile getFileByInputInfo(InputInfoDisplayBean inputInfo) {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E206));
     }
 
     @Override
     public BatchFullJModel getBatchFullModel(BigInteger batchId) {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E206));
     }
 
 }

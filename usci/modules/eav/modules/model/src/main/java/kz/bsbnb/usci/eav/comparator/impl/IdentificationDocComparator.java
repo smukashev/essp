@@ -13,25 +13,25 @@ public class IdentificationDocComparator implements Comparator<IBaseValue> {
         BaseEntity doc2 = (BaseEntity) val2.getValue();
 
         if (doc1 == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E3,val1));
+            throw new IllegalStateException(Errors.compose(Errors.E3,val1));
 
         if (doc2 == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E3,val2));
+            throw new IllegalStateException(Errors.compose(Errors.E3,val2));
 
         BaseEntity docType1 = (BaseEntity) doc1.getEl("doc_type");
         BaseEntity docType2 = (BaseEntity) doc2.getEl("doc_type");
 
         if (docType1 == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E4,doc1));
+            throw new IllegalStateException(Errors.compose(Errors.E4,doc1));
 
         if (docType2 == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E4,doc2));
+            throw new IllegalStateException(Errors.compose(Errors.E4,doc2));
 
         if (docType1.getBaseValue("weight") == null || docType1.getBaseValue("weight").getValue() == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E5,doc1));
+            throw new IllegalStateException(Errors.compose(Errors.E5,doc1));
 
         if (docType2.getBaseValue("weight") == null || docType2.getBaseValue("weight").getValue() == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E5,doc2));
+            throw new IllegalStateException(Errors.compose(Errors.E5,doc2));
 
         Integer weight1 = Integer.parseInt(docType1.getBaseValue("weight").getValue().toString());
         Integer weight2 = Integer.parseInt(docType2.getBaseValue("weight").getValue().toString());

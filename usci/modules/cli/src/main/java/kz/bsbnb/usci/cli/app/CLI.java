@@ -936,7 +936,7 @@ public class CLI {
                     actualCount++;
                 } catch (Exception ex) {
                     lastException = ex;
-                    System.out.println("Ошибка: " + Errors.unmarshall(ex.getMessage()));
+                    System.out.println("Ошибка: " + Errors.decompose(ex.getMessage()));
                 }
             }
             Batch batch = reader.getBatch();
@@ -1862,7 +1862,7 @@ public class CLI {
                 System.out.println("using default file " + BaseCrawler.fileName);
             }
             new BaseRepository().run();
-        } else throw new IllegalArgumentException(Errors.getMessage(Errors.E212));
+        } else throw new IllegalArgumentException(Errors.compose(Errors.E212));
     }
 
     public void init() {
@@ -1959,11 +1959,11 @@ public class CLI {
                     StringBuilder sb = new StringBuilder();
                     line = in.nextLine();
                     if (!line.startsWith("title: "))
-                        throw new IllegalArgumentException(Errors.getMessage(Errors.E213));
+                        throw new IllegalArgumentException(Errors.compose(Errors.E213));
                     String title = line.split("title: ")[1];
                     line = in.nextLine();
                     if (line.startsWith(args.get(1)))
-                        throw new IllegalArgumentException(Errors.getMessage(Errors.E214));
+                        throw new IllegalArgumentException(Errors.compose(Errors.E214));
                     sb.append(line);
                     do {
                         line = in.nextLine();
@@ -2188,7 +2188,7 @@ public class CLI {
                 System.out.println("* " + sf.getAttributePath() + ", " + sf.getColumnName());
         } else if (args.get(0).equals("set")) {
             if (args.size() != 3)
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E215));
+                throw new IllegalArgumentException(Errors.compose(Errors.E215));
             if (args.get(1).equals("meta")) {
                 showCase = new ShowCase();
                 showCase.setMeta(metaClassRepository.getMetaClass(args.get(2)));
@@ -2199,25 +2199,25 @@ public class CLI {
             } else if (args.get(1).equals("downPath")) {
                 MetaClass metaClass = showCase.getMeta();
                 if (metaClass.getEl(args.get(2)) == null)
-                    throw new IllegalArgumentException(Errors.getMessage(Errors.E215, args.get(2)));
+                    throw new IllegalArgumentException(Errors.compose(Errors.E215, args.get(2)));
 
                 showCase.setDownPath(args.get(2));
             } else if (args.get(1).equals("final")) {
                 showCase.setFinal(Boolean.parseBoolean(args.get(2)));
             } else
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E215));
+                throw new IllegalArgumentException(Errors.compose(Errors.E215));
 
         } else if (args.get(0).equals("list")) {
             if (args.get(1).equals("reset")) {
                 showCase.getFieldsList().clear();
             } else if (args.get(1).equals("add")) {
                 if (args.get(2) == null || args.get(3) == null)
-                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E217));
+                    throw new UnsupportedOperationException(Errors.compose(Errors.E217));
 
                 showCase.addField(args.get(2), args.get(3));
             } else if (args.get(1).equals("addCustom")) {
                 if (args.get(2) == null || args.get(3) == null || args.get(4) == null)
-                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E218));
+                    throw new UnsupportedOperationException(Errors.compose(Errors.E218));
 
                 showCase.addCustomField(args.get(3), args.get(4), metaClassRepository.getMetaClass(args.get(2)));
             } else if (args.get(1).equals("addRootKey")) {
@@ -2322,7 +2322,7 @@ public class CLI {
               System.out.println("Скрипт отработан за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
           }
         } else {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E219));
+            throw new IllegalArgumentException(Errors.compose(Errors.E219));
         }
     }
 
@@ -2424,7 +2424,7 @@ public class CLI {
                 System.out.println("No such command: " + command);
             }
         } catch (Exception e) {
-            System.err.println(Errors.unmarshall(e.getMessage()));
+            System.err.println(Errors.decompose(e.getMessage()));
             lastException = e;
         }
     }
@@ -2907,7 +2907,7 @@ public class CLI {
         public boolean intersects(DispatcherJob job) {
             if (job instanceof DeleteJob) {
                 if (ids == null || ((DeleteJob) job).ids == null)
-                    throw new RuntimeException(Errors.getMessage(Errors.E210));
+                    throw new RuntimeException(Errors.compose(Errors.E210));
 
                 Set<Long> inter = SetUtils.intersection(ids, ((DeleteJob) job).ids);
 

@@ -177,7 +177,7 @@ public class MainPortlet extends MVCPortlet {
         if(meta.getClassName().equals("credit") && !isNb) {
             BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
             if(creditor.getId() != creditorId)
-                throw new RuntimeException(Errors.getMessage(Errors.E238));
+                throw new RuntimeException(Errors.compose(Errors.E238));
         }
 
         if (title == null) {
@@ -452,7 +452,7 @@ public class MainPortlet extends MVCPortlet {
                     List<String[]> classes = searcherFormService.getMetaClasses(currentUser.getUserId());
 
                     if(classes.size() < 1)
-                        throw new RuntimeException(Errors.getMessage(Errors.E239));
+                        throw new RuntimeException(Errors.compose(Errors.E239));
                     //List<Pair> afterFilter = new LinkedList<>();
                     List<String[]> afterFilter = new LinkedList<>();
                     /*for(Pair c : classes)
@@ -485,7 +485,7 @@ public class MainPortlet extends MVCPortlet {
                     long creditorId;
 
                     if(creditors.size() == 0)
-                        throw new RuntimeException(Errors.getMessage(Errors.E241));
+                        throw new RuntimeException(Errors.compose(Errors.E241));
                     else
                     if(creditors.size() > 0) {
                         logger.warn("доступ к более одному банку");
@@ -571,10 +571,10 @@ public class MainPortlet extends MVCPortlet {
 
                     if(!isNb) {
                         if(creditors.size() > 1)
-                            throw new RuntimeException(Errors.getMessage(Errors.E240));
+                            throw new RuntimeException(Errors.compose(Errors.E240));
 
                         if(creditors.size() == 0)
-                            throw new RuntimeException(Errors.getMessage(Errors.E241));
+                            throw new RuntimeException(Errors.compose(Errors.E241));
 
                         creditorId = creditors.get(0).getId();
                     }
@@ -659,7 +659,7 @@ public class MainPortlet extends MVCPortlet {
 
                         searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "", creditorId);
                         if(searchResult.getData() == null)
-                            throw new IllegalArgumentException(Errors.getMessage(Errors.E242));
+                            throw new IllegalArgumentException(Errors.compose(Errors.E242));
                         /*
                         StringBuilder sb = new StringBuilder("{\"text\":\".\",\"children\": [\n");
                         Iterator<BaseEntity> it = searchResult.iterator();
@@ -696,7 +696,7 @@ public class MainPortlet extends MVCPortlet {
                                 .replaceAll("\"","").replaceAll("\n","")+"\"}").getBytes());
 
                     } catch(Exception ex){
-                        logger.error(Errors.unmarshall(ex.getMessage()));
+                        logger.error(Errors.decompose(ex.getMessage()));
                     } finally {
                         retry = false;
                         return;

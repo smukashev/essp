@@ -80,7 +80,7 @@ public class EavTest extends JDBCSupport {
 
     public void checkNoException(){
         if(cli.getLastException() != null)
-            throw new RuntimeException(Errors.getMessage(Errors.E211));
+            throw new RuntimeException(Errors.compose(Errors.E211));
     }
 
 }

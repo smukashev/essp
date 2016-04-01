@@ -112,7 +112,7 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
                             break;
                     }
                 } catch (Exception e) {
-                    logger.error(e.getMessage());
+                    logger.error(e.getMessage(),e);
                 }
             }
 

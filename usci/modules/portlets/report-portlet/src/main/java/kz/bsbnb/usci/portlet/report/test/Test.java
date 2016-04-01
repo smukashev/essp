@@ -78,7 +78,7 @@ public class Test {
 
         // validation
         if (headers == null || data == null) {
-            throw new Exception(Errors.getMessage(Errors.E255));
+            throw new Exception(Errors.compose(Errors.E255));
         }
 
       //  if (headers.size() != data.size()) {

@@ -63,18 +63,18 @@ public class TestPortletEnvironmentFacade implements PortletEnvironmentFacade {
     }
 
     public List<User> getPortalUsers() {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E206));
     }
 
     public String getUsername() {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E206));
     }
 
     public boolean isApprovalAuthority() {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E206));
     }
 
     public boolean isAdministrator() {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E206));
     }
 }

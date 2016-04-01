@@ -33,7 +33,7 @@ public class EntityProcessorListenerImpl implements IDaoListener {
                 try {
                     producer.produce(queueEntry);
                 } catch (Exception e) {
-                    throw new RuntimeException(Errors.getMessage(Errors.E181,e.getMessage()));
+                    throw new RuntimeException(Errors.compose(Errors.E181,e));
                 }
             }
         }).start();

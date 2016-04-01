@@ -32,16 +32,16 @@ public class XlsProtocolExporter extends ProtocolExporter {
     public XlsProtocolExporter(final String[] properties, final String[] propertyNames) {
         super();
         if (properties == null) {
-            logger.error(Errors.getError(String.valueOf(Errors.E249)));
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E249));
+            logger.error(Errors.getError(Errors.E249));
+            throw new IllegalArgumentException(Errors.compose(Errors.E249));
         }
         if (propertyNames == null) {
-            logger.error(Errors.getError(String.valueOf(Errors.E250)));
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E250));
+            logger.error(Errors.getError(Errors.E250));
+            throw new IllegalArgumentException(Errors.compose(Errors.E250));
         }
         if (properties.length != propertyNames.length) {
-            logger.error(Errors.getError(String.valueOf(Errors.E251)));
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E251));
+            logger.error(Errors.getError(Errors.E251));
+            throw new IllegalArgumentException(Errors.compose(Errors.E251));
         }
         this.properties = properties;
         this.propertyNames = propertyNames;

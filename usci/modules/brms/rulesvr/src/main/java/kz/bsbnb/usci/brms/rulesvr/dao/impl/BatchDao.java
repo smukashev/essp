@@ -63,7 +63,7 @@ public class BatchDao implements IBatchDao
     public Batch loadBatch(long id) {
 
         if(id < 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E259));
+            throw new IllegalArgumentException(Errors.compose(Errors.E259));
 
         String SQL = "SELECT * FROM " + PREFIX_ + "packages WHERE id  = ?";
         Batch batch = jdbcTemplate.queryForObject(SQL,new Object[]{id},new BatchMapper());
@@ -75,7 +75,7 @@ public class BatchDao implements IBatchDao
 
         if (batch.getRepDate() == null)
         {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E260));
+            throw new IllegalArgumentException(Errors.compose(Errors.E260));
         }
 
         String SQL = "INSERT INTO " + PREFIX_ + "packages(NAME, REPORT_DATE) VALUES (?, ?)";
@@ -92,7 +92,7 @@ public class BatchDao implements IBatchDao
 
         if(batchId < 1)
         {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E261));
+            throw new IllegalArgumentException(Errors.compose(Errors.E261));
         }
 
        String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";

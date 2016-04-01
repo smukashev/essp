@@ -107,7 +107,7 @@ public class BeanDataProvider implements DataProvider {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             return dateFormat.parse(Report.INITIAL_REPORT_DATE_STR);
         } catch (ParseException pe) {
-            throw new RuntimeException(Errors.getMessage(Errors.E205));
+            throw new RuntimeException(Errors.compose(Errors.E205));
         }
     }
 
@@ -117,7 +117,7 @@ public class BeanDataProvider implements DataProvider {
         creditors.add(creditor);
         List<Report> reports = reportBusiness.getReportsByReportDateAndCreditors(reportDate, creditors);
         if (reports.size() > 1) {
-            throw new RuntimeException(Errors.getMessage(Errors.E205));
+            throw new RuntimeException(Errors.compose(Errors.E205));
         }
         if (reports.isEmpty()) {
             return null;

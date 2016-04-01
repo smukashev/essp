@@ -93,7 +93,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         IMetaAttribute metaAttribute = members.get(name);
 
         if (metaAttribute == null)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E45,name, this.getClassName()));
+            throw new IllegalArgumentException(Errors.compose(Errors.E45,name, this.getClassName()));
 
         return metaAttribute.getMetaType();
     }
@@ -369,7 +369,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
                 }
             } else {
                 if (tokenizer.hasMoreTokens()) {
-                    throw new IllegalArgumentException(Errors.getMessage(Errors.E44));
+                    throw new IllegalArgumentException(Errors.compose(Errors.E44));
                 }
             }
         }
@@ -411,7 +411,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
                 }
             } else {
                 if (tokenizer.hasMoreTokens())
-                    throw new IllegalArgumentException(Errors.getMessage(Errors.E44));
+                    throw new IllegalArgumentException(Errors.compose(Errors.E44));
             }
         }
 

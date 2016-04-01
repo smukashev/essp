@@ -51,37 +51,32 @@ public class ApprovalApplication extends Application {
 
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
-            User user = null;
-            boolean hasRights = false;
             try {
+                User user = null;
+                boolean hasRights = false;
+
                 user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
-                if(user != null) {
+                if (user != null) {
                     for (Role role : user.getRoles()) {
                         if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
                                 || role.getName().equals("NationalBankEmployee"))
                             hasRights = true;
                     }
                 }
-            } catch (PortalException e) {
-                logger.error(e.getMessage(),e);
-            } catch (SystemException e) {
-                logger.error(e.getMessage(),e);
-            }
 
-            if(!hasRights)
-                return;
+                if (!hasRights)
+                    return;
 
-            try {
                 setTheme("custom");
 
                 Window mainWindow = new Window();
                 mainWindow.addComponent(new MainLayout(new BeanDataProvider(),
                         new ApprovalPortletEnvironmentFacade(user)));
                 setMainWindow(mainWindow);
-            } catch (Exception e) {
-                logger.error(Errors.unmarshall(e.getMessage()));
-            }
 
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
         }
 
         @Override

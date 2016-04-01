@@ -38,7 +38,7 @@ public class SearcherFormServiceImpl implements ISearcherFormService {
                 return sf;
         }
 
-        throw new RuntimeException(Errors.getMessage(Errors.E229));
+        throw new RuntimeException(Errors.compose(Errors.E229));
     }
 
     @Override

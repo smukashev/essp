@@ -76,7 +76,7 @@ public class BADRTRepository extends BaseRepository {
     }
 
     public BADRT getById(String id){
-        throw new RuntimeException(Errors.getMessage(Errors.E227));
+        throw new RuntimeException(Errors.compose(Errors.E227));
     }
 
     public void rc(){

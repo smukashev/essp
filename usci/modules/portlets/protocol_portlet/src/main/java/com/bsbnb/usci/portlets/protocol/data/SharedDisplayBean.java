@@ -14,7 +14,7 @@ public class SharedDisplayBean {
     
     public SharedDisplayBean(Shared shared) {
         if(shared==null) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E247));
+            throw new IllegalArgumentException(Errors.compose(Errors.E247));
         }
         this.shared = shared;
     }

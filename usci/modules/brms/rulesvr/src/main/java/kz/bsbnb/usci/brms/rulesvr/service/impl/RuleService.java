@@ -82,7 +82,7 @@ public class RuleService implements IRuleService {
     @Override
     public Map getRuleTitles(Long packageId, Date repDate, String searchText) {
         if(searchText == null || searchText.length() < 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E270));
+            throw new IllegalArgumentException(Errors.compose(Errors.E270));
 
         long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
         Map m = new HashMap();

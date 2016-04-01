@@ -73,7 +73,7 @@ public class BaseValueFactory {
                                 break;
                             }
                             default:
-                                throw new RuntimeException(Errors.getMessage(Errors.E7));
+                                throw new RuntimeException(Errors.compose(Errors.E7));
                         }
                     }
                 }
@@ -81,7 +81,7 @@ public class BaseValueFactory {
             }
             case MetaContainerTypes.META_SET: {
                 if (metaType.isSet()) {
-                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
+                    throw new UnsupportedOperationException(Errors.compose(Errors.E2));
                 } else {
                     if (metaType.isComplex()) {
                         IBaseEntity baseEntity = (IBaseEntity) value;
@@ -115,7 +115,7 @@ public class BaseValueFactory {
                                 break;
                             }
                             default:
-                                throw new RuntimeException(Errors.getMessage(Errors.E7));
+                                throw new RuntimeException(Errors.compose(Errors.E7));
                         }
                     }
                 }
@@ -124,7 +124,7 @@ public class BaseValueFactory {
         }
 
         if (baseValue == null) {
-            throw new RuntimeException(Errors.getMessage(Errors.E43));
+            throw new RuntimeException(Errors.compose(Errors.E43));
         }
 
         return baseValue;

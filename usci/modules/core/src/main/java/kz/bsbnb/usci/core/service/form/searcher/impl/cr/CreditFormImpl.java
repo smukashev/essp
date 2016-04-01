@@ -53,7 +53,7 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
     @Override
     public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix, long creditorId) {
         if(!metaClass.getClassName().equals("credit"))
-            throw new RuntimeException(Errors.getMessage(Errors.E231));
+            throw new RuntimeException(Errors.compose(Errors.E231));
         Date reportDate = new Date();
         IBaseEntitySearcher searcher = searcherPool.getSearcher("credit");
         ISearchResult result = new PaginableSearchResult();
