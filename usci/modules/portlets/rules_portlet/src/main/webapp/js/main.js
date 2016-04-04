@@ -201,10 +201,16 @@ function initGrid(){
                 id: 'btnNewRule',
                 hidden: readOnly,
                 handler: function(e1,e2){
-                    Ext.getCmp('txtTitle').show();
+                    newRuleForm().show();
+
+                    require(['ace/ace'],function(ace){
+                        ace.edit('bknew-rule');
+                    });
+
+                    /*Ext.getCmp('txtTitle').show();
                     Ext.getCmp('txtTitle').focus(false,200);
                     Ext.getCmp('btnAddGreen').show();
-                    Ext.EventObject.stopPropagation();
+                    Ext.EventObject.stopPropagation();*/
                 }
             },{
                 xtype: 'textfield',
