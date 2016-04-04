@@ -1841,7 +1841,7 @@ public class CLI {
     public void commandSql() throws FileNotFoundException, SQLException {
         StringBuilder str = new StringBuilder();
         if(args.get(0).equals("run")){
-            System.out.println("ЗапускаюЗапускаю скрипт " + args.get(1));
+            System.out.println("Запускаю скрипт " + args.get(1));
             long t1 = System.currentTimeMillis();
             SqlRunner runner = new SqlRunner(storage.getConnection(),  true);
             runner.runScript(args.get(1), StaticRouter.getCoreSchemaName());
@@ -2115,7 +2115,7 @@ public class CLI {
             System.out.println("Can't connect to receiver service: " + e.getMessage());
         }
 
-        HashMap<String, QueryEntry> map = showcaseService.getSQLStats();
+        Map<String, QueryEntry> map = showcaseService.getSQLStats();
 
         System.out.println();
         System.out.println("+---------+------------------+------------------------+");
