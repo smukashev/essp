@@ -8,24 +8,21 @@ import java.util.Date;
 /**
  * @author abukabayev
  */
-public class PackageVersion extends Persistable implements IPackageVersion {
+public class PackageVersion {
     private Date reportDate;
-    private long packageId;
-    private String packageName;
+
+    RulePackage rulePackage;
 
     public PackageVersion() {
 
     }
 
-    public PackageVersion(String packageName, Date date) {
+    public PackageVersion(RulePackage rulePackage, Date date) {
         this.reportDate = date;
-        this.packageName = packageName;
+        this.rulePackage = rulePackage;
     }
 
-    public PackageVersion(Date repDate, long package_id){
-       this.reportDate = repDate;
-       this.packageId = package_id;
-    }
+
 
     public Date getReportDate() {
         return reportDate;
@@ -35,24 +32,16 @@ public class PackageVersion extends Persistable implements IPackageVersion {
         this.reportDate = reportDate;
     }
 
-    public long getPackageId() {
-        return packageId;
+    public RulePackage getRulePackage() {
+        return rulePackage;
     }
 
-    public void setPackageId(long packageId) {
-        this.packageId = packageId;
+    public void setRulePackage(RulePackage rulePackage) {
+        this.rulePackage = rulePackage;
     }
 
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public void setName(String name) {
-        this.packageName = name;
-    }
-
-    @Override
+    /*@Override
     public String toString() {
         return "id: " + id + ", packageName: " + packageName + ", package_id: " + packageId;
-    }
+    }*/
 }

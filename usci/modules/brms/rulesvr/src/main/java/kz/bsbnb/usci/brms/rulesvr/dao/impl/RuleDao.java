@@ -71,7 +71,8 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
                 .on(LOGIC_RULE_PACKAGE.RULE_ID.eq(LOGIC_RULES.ID))
                 .where(LOGIC_RULES.OPEN_DATE.lessOrEqual(DataUtils.convert(packageVersion.getReportDate())))
                 .and(LOGIC_RULES.CLOSE_DATE.greaterThan(DataUtils.convert(packageVersion.getReportDate()))
-                        .or(LOGIC_RULES.CLOSE_DATE.isNull()));
+                        .or(LOGIC_RULES.CLOSE_DATE.isNull()))
+                .and(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(packageVersion.getRulePackage().getId()));
 
         //List<Rule> ruleList = jdbcTemplate.query(select.getSQL(),select.getBindValues().toArray(),
         //        new BeanPropertyRowMapper(Rule.class));
@@ -340,7 +341,7 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
         List<PackageVersion> ret = new LinkedList<>();
 
         for(Date date: dates) {
-            ret.add(new PackageVersion(rulePackage.getName(), date));
+            ret.add(new PackageVersion(rulePackage, date));
         }
 
         return ret;

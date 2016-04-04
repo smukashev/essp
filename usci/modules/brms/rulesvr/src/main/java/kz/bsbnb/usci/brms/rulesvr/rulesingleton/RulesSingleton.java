@@ -182,7 +182,7 @@ public class RulesSingleton
         //if(batchVersion == null)
         //    return "Версия пакета правил остутвует на текущую дату";
 
-        List<Rule> rules = ruleDao.load(new PackageVersion(pkgName, repDate));
+        List<Rule> rules = ruleDao.load(new PackageVersion(new RulePackage(1L, pkgName), repDate));
 
         String packages = "";
 

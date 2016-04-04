@@ -22,6 +22,11 @@ public class RulePackage extends Persistable
     public RulePackage() {
     }
 
+    public RulePackage(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }
