@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.eav.persistance.generated.tables.records.EavMClassesRecord;
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -12,6 +11,7 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import org.jooq.*;
 import org.slf4j.Logger;
@@ -534,7 +534,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         }
     }
 
-    void loadSimpleAttributes(IMetaContainer meta) {
+    private void loadSimpleAttributes(IMetaContainer meta) {
         SelectForUpdateStep select = context.select(
                 EAV_M_SIMPLE_ATTRIBUTES.ID,
                 EAV_M_SIMPLE_ATTRIBUTES.NAME,
@@ -581,7 +581,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         }
     }
 
-    void loadSimpleArrays(IMetaContainer meta) {
+    private void loadSimpleArrays(IMetaContainer meta) {
         SelectForUpdateStep select = context.select(
                 EAV_M_SIMPLE_SET.ID,
                 EAV_M_SIMPLE_SET.NAME,
@@ -636,7 +636,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         }
     }
 
-    void loadComplexAttributes(IMetaContainer meta) {
+    private void loadComplexAttributes(IMetaContainer meta) {
         SelectForUpdateStep select = context.select(
                 EAV_M_COMPLEX_ATTRIBUTES.ID,
                 EAV_M_COMPLEX_ATTRIBUTES.IS_KEY,
@@ -688,7 +688,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         }
     }
 
-    void loadComplexArrays(IMetaContainer meta) {
+    private void loadComplexArrays(IMetaContainer meta) {
         SelectForUpdateStep select = context.select(
                 EAV_M_COMPLEX_SET.ID,
                 EAV_M_COMPLEX_SET.IS_NULLABLE,
@@ -746,7 +746,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         }
     }
 
-    void loadAttributes(MetaClass meta) {
+    private void loadAttributes(MetaClass meta) {
         if (meta.getId() < 1)
             throw new IllegalStateException(Errors.getMessage(Errors.E164));
 
@@ -883,48 +883,6 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         return containingList;
     }
 
-    private void removeAllAttributes(long id, int type) {
-        DeleteConditionStep delete = context
-                .delete(EAV_M_SIMPLE_ATTRIBUTES)
-                .where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.equal(id))
-                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.equal(type));
-
-        logger.debug(delete.toString());
-
-        long t = 0;
-
-        if (sqlStats != null) t = System.nanoTime();
-
-        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
-
-        if (sqlStats != null) sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
-
-        delete = context
-                .delete(EAV_M_COMPLEX_ATTRIBUTES)
-                .where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.equal(id))
-                .and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.equal(type));
-
-        logger.debug(delete.toString());
-
-        t = 0;
-        if (sqlStats != null) t = System.nanoTime();
-
-        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
-
-        if (sqlStats != null) sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
-    }
-
-    private void removeSet(MetaSet set) {
-        if (set.getMemberType().isSet()) {
-            removeSet((MetaSet) set.getMemberType());
-            removeAllAttributes(set.getId(), MetaContainerTypes.META_SET);
-        } else {
-            if (set.getMemberType().isComplex()) {
-                remove((MetaClass) set.getMemberType());
-            }
-        }
-    }
-
     @Override
     @Transactional
     public void remove(MetaClass metaClass) {
@@ -973,13 +931,11 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         SelectForUpdateStep select;
         SelectJoinStep join;
 
-        join = context
-                .select(
-                        EAV_M_CLASSES.ID,
-                        EAV_M_CLASSES.NAME,
-                        EAV_M_CLASSES.TITLE,
-                        EAV_M_CLASSES.IS_DISABLED,
-                        EAV_M_CLASSES.IS_REFERENCE)
+        join = context.select(EAV_M_CLASSES.ID,
+                EAV_M_CLASSES.NAME,
+                EAV_M_CLASSES.TITLE,
+                EAV_M_CLASSES.IS_DISABLED,
+                EAV_M_CLASSES.IS_REFERENCE)
                 .from(EAV_M_CLASSES);
 
         if (refs)

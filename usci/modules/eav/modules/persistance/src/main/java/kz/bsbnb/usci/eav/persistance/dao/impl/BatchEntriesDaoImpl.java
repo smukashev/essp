@@ -1,10 +1,10 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchEntriesDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.DSLContext;
 import org.jooq.DeleteConditionStep;
 import org.jooq.Insert;
@@ -16,15 +16,16 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.sql.*;
 import java.sql.Date;
-import java.util.*;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.*;
+import static kz.bsbnb.eav.persistance.generated.Tables.BATCH_ENTRIES;
 
 @Repository
-public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
-{
+public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao {
     private final Logger logger = LoggerFactory.getLogger(BatchEntriesDaoImpl.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -48,28 +49,21 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-        {
             throw new IllegalArgumentException(Errors.getMessage(Errors.E151));
-        }
 
         if (rows.size() < 1)
-        {
             throw new IllegalStateException(Errors.getMessage(Errors.E152, id));
-        }
 
         Map<String, Object> row = rows.get(0);
-        if(row != null)
-        {
-            batchEntry.setId(((BigDecimal)row.get(BATCH_ENTRIES.ID.getName())).longValue());
+        if (row != null) {
+            batchEntry.setId(((BigDecimal) row.get(BATCH_ENTRIES.ID.getName())).longValue());
             batchEntry.setUserId(((BigDecimal) row.get(BATCH_ENTRIES.USER_ID.getName())).longValue());
             batchEntry.setUpdateDate(DataUtils.convert((Timestamp)
                     row.get(BATCH_ENTRIES.UPDATED_DATE.getName())));
             batchEntry.setRepDate(DataUtils.convert((Timestamp)
                     row.get(BATCH_ENTRIES.REPORT_DATE.getName())));
             batchEntry.setValue((String) row.get(BATCH_ENTRIES.VALUE.getName()));
-        }
-        else
-        {
+        } else {
             logger.error("Can't load instance of BatchEntry, empty data set.");
         }
 
@@ -79,7 +73,7 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
     @Override
     @Transactional
     public long save(BatchEntry batch) {
-        long baseEntityId = 0;
+        long baseEntityId;
 
         Insert insert = context
                 .insertInto(BATCH_ENTRIES)
@@ -96,10 +90,8 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
 
     @Override
     public void remove(BatchEntry batch) {
-        if(batch.getId() < 1)
-        {
+        if (batch.getId() < 1)
             throw new IllegalArgumentException(Errors.getMessage(Errors.E153));
-        }
 
         DeleteConditionStep delete = context
                 .delete(BATCH_ENTRIES)
@@ -110,9 +102,8 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
     }
 
     @Override
-    public List<BatchEntry> getBatchEntriesByUserId(long userId)
-    {
-        ArrayList<BatchEntry> result = new ArrayList <BatchEntry>();
+    public List<BatchEntry> getBatchEntriesByUserId(long userId) {
+        ArrayList<BatchEntry> result = new ArrayList<BatchEntry>();
 
         Select select = context
                 .select(BATCH_ENTRIES.ID,
@@ -128,12 +119,10 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
         for (Map<String, Object> row : rows) {
             BatchEntry batchEntry = new BatchEntry();
 
-            batchEntry.setId(((BigDecimal)row.get(BATCH_ENTRIES.ID.getName())).longValue());
-            batchEntry.setValue((String)row.get(BATCH_ENTRIES.VALUE.getName()));
-            batchEntry.setUpdateDate(DataUtils.convert((Timestamp)
-                    row.get(BATCH_ENTRIES.UPDATED_DATE.getName())));
-            batchEntry.setRepDate(DataUtils.convert((Timestamp)
-                    row.get(BATCH_ENTRIES.REPORT_DATE.getName())));
+            batchEntry.setId(((BigDecimal) row.get(BATCH_ENTRIES.ID.getName())).longValue());
+            batchEntry.setValue((String) row.get(BATCH_ENTRIES.VALUE.getName()));
+            batchEntry.setUpdateDate(DataUtils.convert((Timestamp) row.get(BATCH_ENTRIES.UPDATED_DATE.getName())));
+            batchEntry.setRepDate(DataUtils.convert((Timestamp) row.get(BATCH_ENTRIES.REPORT_DATE.getName())));
 
             result.add(batchEntry);
         }
