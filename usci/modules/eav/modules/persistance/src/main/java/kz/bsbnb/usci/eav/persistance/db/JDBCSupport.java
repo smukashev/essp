@@ -27,12 +27,12 @@ public class JDBCSupport {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    private class GenericInsertPreparedStatementCreator implements PreparedStatementCreator {
+    protected class GenericInsertPreparedStatementCreator implements PreparedStatementCreator {
         String query;
         Object[] values;
-        String keyName = "id";
+        final String keyName = "id";
 
-        GenericInsertPreparedStatementCreator(String query, Object[] values) {
+        public GenericInsertPreparedStatementCreator(String query, Object[] values) {
             this.query = query;
             this.values = values.clone();
         }
@@ -41,13 +41,12 @@ public class JDBCSupport {
             PreparedStatement ps = con.prepareStatement(query, new String[]{keyName});
 
             int i = 1;
-
-            for (Object obj : values)
-                ps.setObject(i++, obj);
+            for (Object obj : values) ps.setObject(i++, obj);
 
             return ps;
         }
     }
+
 
     public boolean testConnection() {
         try {

@@ -7,9 +7,11 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
+import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.showcase.dao.CommonDao;
+import kz.bsbnb.usci.showcase.driver.CustomJdbcTemplate;
 import kz.bsbnb.usci.showcase.element.ArrayElement;
 import kz.bsbnb.usci.showcase.element.KeyElement;
 import kz.bsbnb.usci.showcase.element.PathElement;
@@ -27,18 +29,14 @@ import java.util.*;
 
 @Component
 public class CortegeDaoImpl extends CommonDao {
-    private JdbcTemplate jdbcTemplateSC;
+    @Autowired
+    private CustomJdbcTemplate jdbcTemplateSC;
 
     /* Same showcases could not be processed in parallel */
     private static final Set<Long> cortegeElements = new HashSet<>();
 
     private static final String ROOT = "root";
     private static final String ROOT_DOT = "root.";
-
-    @Autowired
-    public void setDataSourceSC(DataSource dataSourceSC) {
-        this.jdbcTemplateSC = new JdbcTemplate(dataSourceSC);
-    }
 
     @SuppressWarnings("unchecked")
     @Transactional

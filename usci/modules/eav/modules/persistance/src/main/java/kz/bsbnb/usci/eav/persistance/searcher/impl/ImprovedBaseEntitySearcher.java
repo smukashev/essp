@@ -230,7 +230,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                 .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                 .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
                                 .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.eq(metaAttribute.getId()))
-                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).CREDITOR_ID.eq(creditorId)) // KT: checkme!
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).CREDITOR_ID.eq(creditorId))
                                 .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ID))
                                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID)
                                         .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds))
