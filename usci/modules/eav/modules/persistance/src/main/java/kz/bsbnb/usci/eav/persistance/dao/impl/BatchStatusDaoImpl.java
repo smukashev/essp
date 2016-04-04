@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchStatusDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
+import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BATCH_STATUSES;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_GLOBAL;
 
 @Repository
 public class BatchStatusDaoImpl extends JDBCSupport implements IBatchStatusDao {
@@ -43,7 +45,7 @@ public class BatchStatusDaoImpl extends JDBCSupport implements IBatchStatusDao {
 
     @Override
     public List<BatchStatus> getList(long batchId) {
-        Select select = context.selectFrom(EAV_BATCH_STATUSES)
+        Select select = context.selectFrom(EAV_BATCH_STATUSES.join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_BATCH_STATUSES.STATUS_ID)))
                 .where(EAV_BATCH_STATUSES.BATCH_ID.eq(batchId))
                 .orderBy(EAV_BATCH_STATUSES.RECEIPT_DATE.desc(), EAV_BATCH_STATUSES.STATUS_ID.asc());
 
@@ -66,6 +68,7 @@ public class BatchStatusDaoImpl extends JDBCSupport implements IBatchStatusDao {
         batchStatus.setStatusId(getNullSafeLong(row, EAV_BATCH_STATUSES.STATUS_ID));
         batchStatus.setDescription((String) row.get(EAV_BATCH_STATUSES.DESCRIPTION.getName()));
         batchStatus.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_BATCH_STATUSES.RECEIPT_DATE.getName())));
+        batchStatus.setStatus(BatchStatuses.valueOf(EAV_GLOBAL.CODE.getName()));
         return batchStatus;
     }
 

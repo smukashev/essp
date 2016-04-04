@@ -185,13 +185,6 @@ public class BatchServiceImpl implements IBatchService {
     public List<BatchStatus> getBatchStatusList(long batchId) {
         List<BatchStatus> batchStatusList = batchStatusDao.getList(batchId);
 
-        for (BatchStatus batchStatus : batchStatusList) {
-            if (batchStatus.getStatusId() > 0 && batchStatus.getStatus() == null) {
-                EavGlobal status = globalService.getGlobal(batchStatus.getStatusId());
-                batchStatus.setStatus(BatchStatuses.valueOf(status.getCode()));
-            }
-        }
-
         return batchStatusList;
     }
 
