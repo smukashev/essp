@@ -13,6 +13,7 @@ import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.StartedEvent;
 import com.vaadin.ui.Upload.SucceededEvent;
 import kz.bsbnb.usci.portlets.upload.UploadApplication;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -27,6 +28,8 @@ public class SingleUploadComponent extends AbstractUploadComponent
     private ProgressIndicator indicator;
     private ByteArrayOutputStream baos;
     private boolean uploadCancelled = false;
+
+    private final Logger logger = Logger.getLogger(SingleUploadComponent.class);
 
     public SingleUploadComponent(PortletEnvironmentFacade portletEnvironment) {
         super(portletEnvironment);
@@ -84,7 +87,7 @@ public class SingleUploadComponent extends AbstractUploadComponent
         }
         indicator.setVisible(false);
         upload.setEnabled(true);
-        UploadApplication.log.log(Level.SEVERE, "Upload failed", event.getReason());
+        logger.error("Upload failed", event.getReason());
         addStatusMessage(event.getReason().getMessage(), true);
     }
 
@@ -102,7 +105,7 @@ public class SingleUploadComponent extends AbstractUploadComponent
 
     @Override
     public void uploadSucceeded(SucceededEvent event) {
-        UploadApplication.log.log(Level.INFO, "Upload succeeded");
+        logger.info("Upload succeeded");
         byte[] array = baos.toByteArray();
         String fileName = event.getFilename();
         handleFile(array, fileName);

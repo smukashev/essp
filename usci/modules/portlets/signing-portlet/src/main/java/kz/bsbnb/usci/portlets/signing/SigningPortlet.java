@@ -10,6 +10,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import kz.bsbnb.usci.cr.model.Creditor;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -19,8 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -32,7 +31,7 @@ import javax.portlet.RenderResponse;
 
 public class SigningPortlet extends GenericPortlet {
 
-    public static Logger log = Logger.getLogger(SigningPortlet.class.getCanonicalName());
+    private final Logger logger = Logger.getLogger(SigningPortlet.class);
 
     public void init() throws PortletException {
         editJSP = getInitParameter("edit-jsp");
@@ -75,7 +74,7 @@ public class SigningPortlet extends GenericPortlet {
     public void doView(
             RenderRequest renderRequest, RenderResponse renderResponse)
             throws IOException, PortletException {
-        log.log(Level.INFO, "View");
+        logger.info("View");
         User user = null;
         boolean hasRights = false;
         try {
@@ -88,9 +87,9 @@ public class SigningPortlet extends GenericPortlet {
                 }
             }
         } catch (PortalException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         } catch (SystemException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
         if(!hasRights)
@@ -116,7 +115,7 @@ public class SigningPortlet extends GenericPortlet {
             ActionRequest actionRequest, ActionResponse actionResponse)
             throws IOException, PortletException {
         String command = actionRequest.getParameter("COMMAND");
-        log.log(Level.INFO, "Command: {0}", command);
+        logger.info("Command: "+ command);
 
         DataProvider provider = new BeanDataProvider();
         long userId = PortalUtil.getUserId(actionRequest);
@@ -135,8 +134,8 @@ public class SigningPortlet extends GenericPortlet {
             actionRequest.setAttribute("certificateSuccess", true);
             List<FileSignatureRecord> processedFiles = new ArrayList<FileSignatureRecord>();
             for (Entry<String, String[]> entry : parameterMap.entrySet()) {
-                log.log(Level.INFO, "Entry key: {0}", entry.getKey());
-                log.log(Level.INFO, "Entry value: {0}", Arrays.toString(entry.getValue()));
+                logger.info("Entry key: "+ entry.getKey());
+                logger.info("Entry value: "+ Arrays.toString(entry.getValue()));
                 String key = entry.getKey();
                 if (key != null && key.startsWith("sign") && entry.getValue().length > 0
                         && StringUtils.isNotEmpty(entry.getValue()[0])) {
@@ -158,7 +157,7 @@ public class SigningPortlet extends GenericPortlet {
 
                 provider.signFile(Long.parseLong(processedFile.getId()), processedFile.getSignature());
             }
-            log.log(Level.INFO, "Processed file names: {0}", processedFileNames.toString());
+            logger.info("Processed file names: "+ processedFileNames.toString());
             actionRequest.setAttribute("processedFilenames", new String[]{processedFileNames.toString()});
             actionRequest.setAttribute("hasInfoOnProcessedFiles", true);
 
@@ -178,7 +177,7 @@ public class SigningPortlet extends GenericPortlet {
                 getPortletContext().getRequestDispatcher(path);
 
         if (portletRequestDispatcher == null) {
-            log.log(Level.SEVERE, "{0} is not a valid include", path);
+            logger.error(path+" is not a valid include");
         } else {
             portletRequestDispatcher.include(renderRequest, renderResponse);
         }

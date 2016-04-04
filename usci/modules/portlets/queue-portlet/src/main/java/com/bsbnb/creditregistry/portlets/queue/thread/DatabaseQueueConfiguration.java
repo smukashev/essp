@@ -1,11 +1,11 @@
 package com.bsbnb.creditregistry.portlets.queue.thread;
 
-import static com.bsbnb.creditregistry.portlets.queue.QueueApplication.log;
 
 import com.bsbnb.creditregistry.portlets.queue.data.DataProvider;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,7 @@ public class DatabaseQueueConfiguration implements QueueConfiguration {
     private static final String QUEUE_ALGO = "QUEUE_ALGO";
     private static final String PRIORITY_CREDITOR_IDS_CODE = "PRIORITY_CREDITOR_IDS";
     private DataProvider dataProvider;
+    public final Logger logger = Logger.getLogger(DatabaseQueueConfiguration.class);
 
     public DatabaseQueueConfiguration(DataProvider dataProvider) {
         this.dataProvider = dataProvider;
@@ -78,7 +79,7 @@ public class DatabaseQueueConfiguration implements QueueConfiguration {
             String orderCode = dataProvider.getConfig(QUEUE_SETTING, QUEUE_ALGO);
             return QueueOrderType.getQueueOrderTypeByCode(orderCode);
         } catch (ConfigurationException ce) {
-            log.log(Level.WARNING, "", ce);
+            logger.warn(null, ce);
         }
 
         return QueueOrderType.CHRONOLOGICAL;
@@ -90,7 +91,7 @@ public class DatabaseQueueConfiguration implements QueueConfiguration {
             EavGlobal global = new EavGlobal(QUEUE_SETTING, QUEUE_ALGO, orderType.name());
             dataProvider.saveConfig(global);
         } catch (Exception e) {
-            log.log(Level.WARNING, "", e);
+            logger.warn(null, e);
         }
     }
 
@@ -104,12 +105,13 @@ public class DatabaseQueueConfiguration implements QueueConfiguration {
                 try {
                     ids.add(Integer.parseInt(idValue));
                 }catch (NumberFormatException nfe) {
+                    logger.error(Errors.unmarshall(Errors.getMessage(Errors.E253, nfe)));
                     throw new ConfigurationException(Errors.getMessage(Errors.E253, nfe));
                 }
             }
             return ids;
         } catch (ConfigurationException ce) {
-            log.log(Level.WARNING, "Exception on sysconfig: " + PRIORITY_CREDITOR_IDS_CODE, ce);
+            logger.warn("Exception on sysconfig: " + PRIORITY_CREDITOR_IDS_CODE, ce);
         }
 
         return new ArrayList<Integer>();
@@ -134,7 +136,7 @@ public class DatabaseQueueConfiguration implements QueueConfiguration {
             //config.setValue(value.toString());
             dataProvider.saveConfig(global);
         } catch (ConfigurationException ce) {
-            log.log(Level.WARNING, "Exception on writing sysconfig: " + PRIORITY_CREDITOR_IDS_CODE, ce);
+            logger.warn("Exception on writing sysconfig: " + PRIORITY_CREDITOR_IDS_CODE, ce);
         }
     }
 }

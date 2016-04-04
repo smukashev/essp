@@ -15,6 +15,7 @@ import com.vaadin.ui.themes.BaseTheme;
 import kz.bsbnb.usci.cr.model.InputFile;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -25,6 +26,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
 
     private InputInfo inputInfo;
     private DataProvider provider;
+    private final Logger logger = Logger.getLogger(InputInfoDisplayBean.class);
 
     private final String path = "C:\\tmp_zips";
 
@@ -127,7 +129,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
             try {
                 batchFile.createNewFile();
             } catch(IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(),e);
             }
         } else {
             batchFile.delete();
@@ -140,7 +142,7 @@ public class InputInfoDisplayBean implements Button.ClickListener {
             fos.write(batchFullJModel.getContent());
             fos.close();
         } catch(Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
         FileResource resource = new FileResource(batchFile, button.getApplication()) {

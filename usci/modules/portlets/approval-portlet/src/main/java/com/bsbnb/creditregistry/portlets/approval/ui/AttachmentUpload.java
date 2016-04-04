@@ -1,6 +1,5 @@
 package com.bsbnb.creditregistry.portlets.approval.ui;
 
-import static com.bsbnb.creditregistry.portlets.approval.ApprovalApplication.log;
 import com.bsbnb.creditregistry.portlets.approval.PortletEnvironmentFacade;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -8,6 +7,7 @@ import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.SucceededEvent;
 import kz.bsbnb.usci.cr.model.ReportMessageAttachment;
+import org.apache.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -31,6 +31,7 @@ public class AttachmentUpload extends HorizontalLayout
     private Label messageLabel;
     private final PortletEnvironmentFacade environment;
     private boolean uploadCancelled = false;
+    private final Logger logger = org.apache.log4j.Logger.getLogger(AttachmentUpload.class);
 
     public AttachmentUpload(PortletEnvironmentFacade environment) {
         this.environment = environment;
@@ -102,7 +103,7 @@ public class AttachmentUpload extends HorizontalLayout
         }
         indicator.setVisible(false);
         upload.setEnabled(true);
-        log.log(Level.SEVERE, "Upload failed", event.getReason());
+        logger.error("Upload failed", event.getReason());
         setMessage(event.getReason().getMessage());
     }
 

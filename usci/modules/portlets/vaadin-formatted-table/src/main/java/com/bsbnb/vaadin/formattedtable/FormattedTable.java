@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.SimpleTimeZone;
 import jxl.CellView;
 import jxl.Workbook;
-import jxl.common.Logger;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
 import jxl.format.CellFormat;
@@ -35,6 +34,7 @@ import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
+import org.apache.log4j.Logger;
 
 public class FormattedTable extends Table {
     private final HashMap<Object, String> formatData = new HashMap<>();
@@ -56,6 +56,8 @@ public class FormattedTable extends Table {
         final Calendar cal = Calendar.getInstance(new SimpleTimeZone(0, "GMT"));
         DATE_FORMATTER_TO_GMT.setCalendar(cal);
     }
+
+    private final Logger logger = Logger.getLogger(FormattedTable.class);
 
     public FormattedTable() {
         this(null);
@@ -249,7 +251,7 @@ public class FormattedTable extends Table {
             final String date = DATE_FORMATTER_FROM_CURRENT.format(base);
             return DATE_FORMATTER_TO_GMT.parse(date);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             return base;
         }
     }
@@ -294,9 +296,9 @@ public class FormattedTable extends Table {
             };
             getWindow().open(resource, "_blank");
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            logger.error(ioe.getMessage(),ioe);
         } catch (WriteException we) {
-            we.printStackTrace();
+            logger.error(we.getMessage(),we);
         }
     }
 

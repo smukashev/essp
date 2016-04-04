@@ -16,20 +16,20 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import kz.bsbnb.usci.eav.util.Errors;
+import org.apache.log4j.Logger;
 
 import javax.portlet.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class CrossCheckApplication extends Application {
 
     private static final long serialVersionUID = 2096197512742005243L;
     public static final String CONTEXT_NAME = "usci-crosscheck-portlet";
-    public static final Logger log = Logger.getLogger(CrossCheckApplication.class.getName());
+    private final Logger logger = Logger.getLogger(CrossCheckApplication.class);
 
     DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 
@@ -68,9 +68,9 @@ public class CrossCheckApplication extends Application {
                         }
                     }
                 } catch (PortalException e) {
-                    e.printStackTrace();
+                    logger.error(null,e);
                 } catch (SystemException e) {
-                    e.printStackTrace();
+                    logger.error(null,e);
                 }
 
                 if(!hasRights)
@@ -98,15 +98,16 @@ public class CrossCheckApplication extends Application {
                             new BeanDataProvider(portletData)));
                     
                 } catch (DataException de) {
+                    logger.error(Errors.unmarshall(de.getMessage()));
                     mainWindow.addComponent(new Label(de.getMessage().replaceAll("\n", "<br/>")));
                 }
                 setMainWindow(mainWindow);
             } catch (PortalException pe) {
-                log.log(Level.WARNING, "", pe);
+                logger.warn("", pe);
             } catch (SystemException se) {
-                log.log(Level.WARNING, "", se);
+                logger.warn("", se);
             } catch (ParseException e) {
-                e.printStackTrace();
+                logger.error(null,e);
             }
         }
 

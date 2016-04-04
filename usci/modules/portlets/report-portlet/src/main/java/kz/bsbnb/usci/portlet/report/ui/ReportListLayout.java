@@ -14,6 +14,7 @@ import kz.bsbnb.usci.portlet.report.dm.ExportType;
 import kz.bsbnb.usci.portlet.report.dm.Report;
 import kz.bsbnb.usci.portlet.report.dm.ReportController;
 import kz.bsbnb.usci.portlet.report.export.*;
+import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -35,6 +36,7 @@ public class ReportListLayout extends VerticalLayout {
     private Table reportsTable;
     private Button showReportsListButton;
     private VerticalLayout reportComponentLayout;
+    private static final Logger logger = Logger.getLogger(ReportListLayout.class);
 
     private String[] getColumnHeaders() {
         String[] columns = COLUMN_ORDER;
@@ -115,7 +117,7 @@ public class ReportListLayout extends VerticalLayout {
             reportComponent.addReportExporter(new JasperReportExporter());
         } else if(reportName.contains("Pledge")) {
             reportComponent.addReportExporter(new OutputFormExporter());
-            ReportApplication.log.log(Level.INFO, "Output form exporter applied");
+            logger.info("Output form exporter applied");
         } else {
             for (ExportType exportType : report.getExportTypesList()) {
                 if (ExportType.JASPER_XLS.equals(exportType.getName())) {
@@ -125,7 +127,7 @@ public class ReportListLayout extends VerticalLayout {
                 } else if (ExportType.TEMPLATE_XLS.equals(exportType.getName())) {
                     reportComponent.addReportExporter(new TemplatedPagedXlsReportExporter());
                 } else {
-                    ReportApplication.log.log(Level.WARNING, "Unknown export type: {0}", exportType.getName());
+                    logger.warn("Unknown export type: "+ exportType.getName());
                 }
             }
         }

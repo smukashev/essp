@@ -15,6 +15,7 @@ import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
+import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class BeanDataProvider implements DataProvider {
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private InputFileBeanRemoteBusiness inputFileBusiness;
 
+    private static final Logger logger = Logger.getLogger(BeanDataProvider.class);
     private static final String ENTITY_EDITOR_PAGE = "http://" + StaticRouter.getPortalUrl() +
             "/ru/web/guest/entity_editor";
 
@@ -43,48 +45,51 @@ public class BeanDataProvider implements DataProvider {
     }
 
     private void initializeBeans() {
-        protocolBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        protocolBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
-                ":1099/protocolBeanRemoteBusiness");
+        try {
+            protocolBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            protocolBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                    ":1099/protocolBeanRemoteBusiness");
 
-        protocolBeanRemoteBusinessFactoryBean.setServiceInterface(ProtocolBeanRemoteBusiness.class);
+            protocolBeanRemoteBusinessFactoryBean.setServiceInterface(ProtocolBeanRemoteBusiness.class);
 
-        protocolBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-        protocolBusiness = (ProtocolBeanRemoteBusiness) protocolBeanRemoteBusinessFactoryBean.getObject();
+            protocolBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            protocolBusiness = (ProtocolBeanRemoteBusiness) protocolBeanRemoteBusinessFactoryBean.getObject();
 
-        //////////////////////////////
+            //////////////////////////////
 
-        inputInfoBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        inputInfoBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
-                ":1099/inputInfoBeanRemoteBusiness");
-        inputInfoBeanRemoteBusinessFactoryBean.setServiceInterface(InputInfoBeanRemoteBusiness.class);
+            inputInfoBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            inputInfoBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                    ":1099/inputInfoBeanRemoteBusiness");
+            inputInfoBeanRemoteBusinessFactoryBean.setServiceInterface(InputInfoBeanRemoteBusiness.class);
 
-        inputInfoBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-        inputInfoBusiness = (InputInfoBeanRemoteBusiness) inputInfoBeanRemoteBusinessFactoryBean.getObject();
-        if (inputInfoBusiness == null)
-        {
-            System.out.println("InputInfoBusiness is null!");
+            inputInfoBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            inputInfoBusiness = (InputInfoBeanRemoteBusiness) inputInfoBeanRemoteBusinessFactoryBean.getObject();
+            if (inputInfoBusiness == null) {
+                logger.info("InputInfoBusiness is null!");
+            }
+
+            //////////////////////////////
+
+            portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                    ":1099/portalUserBeanRemoteBusiness");
+            portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
+
+            portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+
+            //////////////////////////////
+
+            inputFileBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            inputFileBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                    ":1099/inputFileBeanRemoteBusiness");
+            inputFileBeanRemoteBusinessFactoryBean.setServiceInterface(InputFileBeanRemoteBusiness.class);
+
+            inputFileBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            inputFileBusiness = (InputFileBeanRemoteBusiness) inputFileBeanRemoteBusinessFactoryBean.getObject();
+        } catch (Exception e) {
+            logger.error("Can't initialise services: " + e.getMessage());
         }
-
-        //////////////////////////////
-
-        portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
-                ":1099/portalUserBeanRemoteBusiness");
-        portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
-
-        portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-        portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
-
-        //////////////////////////////
-
-        inputFileBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        inputFileBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
-                ":1099/inputFileBeanRemoteBusiness");
-        inputFileBeanRemoteBusinessFactoryBean.setServiceInterface(InputFileBeanRemoteBusiness.class);
-
-        inputFileBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-        inputFileBusiness = (InputFileBeanRemoteBusiness) inputFileBeanRemoteBusinessFactoryBean.getObject();
     }
 
     public List<Creditor> getCreditorsList() {
@@ -93,7 +98,7 @@ public class BeanDataProvider implements DataProvider {
 
     public List<ProtocolDisplayBean> getProtocolsByInputInfo(InputInfoDisplayBean inputInfo) {
         List<Protocol> protocols = protocolBusiness.getProtocolsBy_InputInfo(inputInfo.getInputInfo());
-        System.out.println("Protocols count: " + protocols.size());
+        logger.info("Protocols count: " + protocols.size());
         List<ProtocolDisplayBean> result = new ArrayList<ProtocolDisplayBean>();
 
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");

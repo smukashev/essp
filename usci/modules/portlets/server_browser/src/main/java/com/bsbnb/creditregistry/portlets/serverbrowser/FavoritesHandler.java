@@ -1,6 +1,5 @@
 package com.bsbnb.creditregistry.portlets.serverbrowser;
 
-import static com.bsbnb.creditregistry.portlets.serverbrowser.ServerBrowserComponent.logger;
 import com.bsbnb.vaadin.messagebox.MessageBox;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -13,6 +12,8 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,6 +31,7 @@ class FavoritesHandler {
     private static final String BOOKMARKS_FILE_NAME = "serverbrowser.config";
     private final Set<String> favorites = new TreeSet<String>();
     private final PathSelectedListener listener;
+    private final Logger logger = Logger.getLogger(FavoritesHandler.class);
     
     FavoritesHandler(PathSelectedListener listener) {
         this.listener = listener;
@@ -51,7 +53,7 @@ class FavoritesHandler {
                 }
             }
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "", ioe);
+            logger.warn(null, ioe);
         }
     }
 
@@ -70,7 +72,7 @@ class FavoritesHandler {
                 out.close();
             }
         } catch (IOException ioe) {
-            logger.log(Level.WARNING, "", ioe);
+            logger.warn(null, ioe);
         }
     }
 

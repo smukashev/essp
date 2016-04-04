@@ -24,7 +24,8 @@ import java.util.logging.Level;
  */
 public class AdministrationApplication extends Application implements PortletRequestListener {
 
-    public static final org.apache.log4j.Logger log = Logger.getLogger(AdministrationApplication.class.getName());
+    private final Logger logger = Logger.getLogger(AdministrationApplication.class);
+
     private ResourceBundle bundle;
 
     @Override
@@ -82,9 +83,9 @@ public class AdministrationApplication extends Application implements PortletReq
                 setMainWindow(mainWindow);
 
             } catch (PortalException pe) {
-                log.log(Priority.FATAL,"",pe);
+                logger.fatal("",pe);
             } catch (SystemException se) {
-                log.log(Priority.FATAL, "", se);
+                logger.fatal("", se);
             }
         }
 

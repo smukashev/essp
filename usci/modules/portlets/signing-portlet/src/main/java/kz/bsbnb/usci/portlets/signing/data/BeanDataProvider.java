@@ -7,6 +7,7 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputFile;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.ArrayList;
@@ -19,32 +20,37 @@ public class BeanDataProvider implements DataProvider {
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private InputFileBeanRemoteBusiness inputFileBusiness;
     private IBatchProcessService batchProcessService;
+    private static final Logger logger = Logger.getLogger(BeanDataProvider.class);
 
     public BeanDataProvider() {
-        RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
-                ":1099/portalUserBeanRemoteBusiness");
-        portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
+        try {
+            RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                    ":1099/portalUserBeanRemoteBusiness");
+            portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
 
-        portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-        portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+            portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
-        RmiProxyFactoryBean inputFileBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        inputFileBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
-                ":1099/inputFileBeanRemoteBusiness");
-        inputFileBeanRemoteBusinessFactoryBean.setServiceInterface(InputFileBeanRemoteBusiness.class);
+            RmiProxyFactoryBean inputFileBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            inputFileBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                    ":1099/inputFileBeanRemoteBusiness");
+            inputFileBeanRemoteBusinessFactoryBean.setServiceInterface(InputFileBeanRemoteBusiness.class);
 
-        inputFileBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-        inputFileBusiness = (InputFileBeanRemoteBusiness) inputFileBeanRemoteBusinessFactoryBean.getObject();
+            inputFileBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            inputFileBusiness = (InputFileBeanRemoteBusiness) inputFileBeanRemoteBusinessFactoryBean.getObject();
 
-        RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-        batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
-            + ":1097/batchProcessService");
-        batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
-        batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+            RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+            batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1097/batchProcessService");
+            batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+            batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
-        batchProcessServiceFactoryBean.afterPropertiesSet();
-        batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+            batchProcessServiceFactoryBean.afterPropertiesSet();
+            batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+        } catch (Exception e) {
+            logger.error("Can't initialise services: " + e.getMessage());
+        }
     }
 
     public List<Creditor> getCreditorsList(long userId) {

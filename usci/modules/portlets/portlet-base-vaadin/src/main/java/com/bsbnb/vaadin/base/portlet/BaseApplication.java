@@ -7,8 +7,8 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
@@ -24,7 +24,7 @@ import javax.portlet.ResourceResponse;
  */
 public abstract class BaseApplication extends Application implements PortletListener {
 
-    private static final Logger log = Logger.getLogger(BaseApplication.class.getCanonicalName());
+    private final Logger logger = Logger.getLogger(BaseApplication.class);
 
     @Override
     public void init() {
@@ -48,9 +48,9 @@ public abstract class BaseApplication extends Application implements PortletList
             Window appWindow = createWindow(env);
             setMainWindow(appWindow);
         } catch (PortalException pe) {
-            log.log(Level.SEVERE, "", pe);
+            logger.error(null, pe);
         } catch (SystemException se) {
-            log.log(Level.SEVERE, "", se);
+            logger.error(null, se);
         }
     }
 

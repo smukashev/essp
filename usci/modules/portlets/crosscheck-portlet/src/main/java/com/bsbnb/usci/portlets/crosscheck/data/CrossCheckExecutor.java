@@ -14,12 +14,14 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import static com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication.log;
 import com.bsbnb.usci.portlets.crosscheck.dm.Creditor;
+import org.apache.log4j.Logger;
 
 public class CrossCheckExecutor {
 
     private static CrossCheckExecutor instance = new CrossCheckExecutor();
+
+    private final Logger logger = Logger.getLogger(CrossCheckExecutor.class);
 
     private CrossCheckExecutor() {
     }
@@ -78,14 +80,14 @@ public class CrossCheckExecutor {
             try {
                 if(stmt!=null) {stmt.close();}
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
             try {
                 if(conn!=null) {
                     conn.close();
                 }
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
         }
     }
@@ -113,14 +115,14 @@ public class CrossCheckExecutor {
                     stmt.close();
                 }
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
             try {
                 if(conn!=null) {
                     conn.close();
                 }
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
         }
     }

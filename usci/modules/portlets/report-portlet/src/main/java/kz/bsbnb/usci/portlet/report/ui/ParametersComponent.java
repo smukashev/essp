@@ -14,6 +14,7 @@ import com.bsbnb.vaadin.messagebox.MessageBox;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.AbstractProperty;
 import com.vaadin.terminal.UserError;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -23,6 +24,7 @@ public class ParametersComponent extends VerticalLayout {
     private DatabaseConnect connect;
 
     private static final String LOCALIZATION_PREFIX = "PARAMETERS-COMPONENT";
+    private static final Logger logger = Logger.getLogger(ParametersComponent.class);
 
     private static String getResourceString(String key) {
         return ReportApplication.getResourceString(LOCALIZATION_PREFIX + "." + key);
@@ -98,6 +100,7 @@ public class ParametersComponent extends VerticalLayout {
                             }
 
                             public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
+                                logger.error(Errors.getError(String.valueOf(Errors.E206)));
                                 throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
                             }
 

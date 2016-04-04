@@ -12,6 +12,7 @@ import kz.bsbnb.usci.eav.util.ReportStatus;
 import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
 import kz.bsbnb.usci.portlets.upload.UploadApplication;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.io.File;
@@ -20,7 +21,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 
 public abstract class AbstractUploadComponent extends VerticalLayout {
     private PortalUserBeanRemoteBusiness portalUserBusiness;
@@ -39,29 +39,35 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
 
     private PortletEnvironmentFacade portletEnvironment;
 
+    private final Logger logger = Logger.getLogger(AbstractUploadComponent.class);
+
     private void initializeBeans() {
-        RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-        portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
-                ":1099/portalUserBeanRemoteBusiness");
+        try {
+            RmiProxyFactoryBean portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() +
+                    ":1099/portalUserBeanRemoteBusiness");
 
-        portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
+            portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
 
-        portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-        portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+            portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
-        RmiProxyFactoryBean reportBusinessFactoryBean = new RmiProxyFactoryBean();
-        reportBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/reportBeanRemoteBusiness");
-        reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
+            RmiProxyFactoryBean reportBusinessFactoryBean = new RmiProxyFactoryBean();
+            reportBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/reportBeanRemoteBusiness");
+            reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
 
-        reportBusinessFactoryBean.afterPropertiesSet();
-        reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
+            reportBusinessFactoryBean.afterPropertiesSet();
+            reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
 
-        RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-        batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchProcessService");
-        batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+            RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+            batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchProcessService");
+            batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
 
-        batchProcessServiceFactoryBean.afterPropertiesSet();
-        batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+            batchProcessServiceFactoryBean.afterPropertiesSet();
+            batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+        } catch (Exception e) {
+            logger.error("Can't initialise services: " + e.getMessage());
+        }
     }
 
     public AbstractUploadComponent(PortletEnvironmentFacade portletEnvironment) {
@@ -91,12 +97,12 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
         File uploadsDirectory = new File(UPLOADS_PATH);
         if (!uploadsDirectory.exists()) {
             if (!uploadsDirectory.mkdir()) {
-                System.out.println("Can't create dir");
+                logger.warn("Can't create dir");
                 return null;
             }
         }
         if (creditor == null || creditor.getId() <= 0) {
-            System.out.println("No creditor id");
+            logger.warn("No creditor id");
             return null;
         }
         String creditorsPath = UPLOADS_PATH + creditor.getId() + "/";
@@ -147,15 +153,15 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
 
     protected void handleFile(byte[] array, String fileName) throws IllegalArgumentException {
         try {
-            System.out.println("#%% " + fileName);
+            logger.info("#%% " + fileName);
             String path = saveFileOnDisk(array, fileName);
-            UploadApplication.log.log(Level.INFO, "Path: {0}", path);
-            System.out.println("### " + path);
+            logger.info("Path: "+path);
+            logger.info("### " + path);
             batchProcessService.processBatch(path, portletEnvironment.getUserID(), portletEnvironment.isNB());
             addStatusMessage(String.format(getResourceString(Localization.UPLOAD_SUCCEDED_MESSAGE.getKey()),
                     fileName), false);
         } catch (IOException ioe) {
-            UploadApplication.log.log(Level.SEVERE, "Can't save file {0}", fileName);
+            logger.error("Can't save file : "+ fileName);
         }
     }
 
