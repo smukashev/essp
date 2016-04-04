@@ -1681,15 +1681,14 @@ public class CLI {
             for (String query : map.keySet()) {
                 QueryEntry qe = map.get(query);
 
-                System.out.printf("| %7d | %16.6f | %22.6f | %s%n", qe.count,
-                        qe.totalTime / qe.count, qe.totalTime, query);
+                System.out.printf("| %7d | %16d | %22d | %s%n", qe.count, (qe.totalTime / qe.count), qe.totalTime, query);
 
-                if (query.startsWith("insert")) {
+                if (query.startsWith("insert"))
                     totalInserts += qe.totalTime;
-                }
-                if (query.startsWith("select")) {
+
+                if (query.startsWith("select"))
                     totalSelects += qe.totalTime;
-                }
+
                 if (query.startsWith("coreService")) {
                     totalProcess += qe.totalTime;
                     totalProcessCount += qe.count;
@@ -2125,8 +2124,7 @@ public class CLI {
         for (String query : map.keySet()) {
             QueryEntry qe = map.get(query);
 
-            System.out.printf("| %7d | %16.6f | %22.6f | %s%n", qe.count,
-                    qe.totalTime / qe.count, qe.totalTime, query);
+            System.out.printf("| %7d | %16d | %22d | %s%n", qe.count, (qe.totalTime / qe.count), qe.totalTime, query);
 
             if (query.startsWith("insert")) {
                 totalInserts += qe.totalTime;

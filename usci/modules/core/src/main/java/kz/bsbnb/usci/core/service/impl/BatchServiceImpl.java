@@ -33,7 +33,6 @@ import java.util.Map;
  */
 @Service
 public class BatchServiceImpl implements IBatchService {
-
     @Autowired
     private IBatchDao batchDao;
 
@@ -54,7 +53,7 @@ public class BatchServiceImpl implements IBatchService {
         return batchDao.save(batch);
     }
 
-    Logger logger = LoggerFactory.getLogger(BatchServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(BatchServiceImpl.class);
 
     @Override
     public Batch getBatch(long batchId) {
@@ -176,16 +175,12 @@ public class BatchServiceImpl implements IBatchService {
 
     @Override
     public List<EntityStatus> getEntityStatusList(long batchId) {
-        List<EntityStatus> entityStatusList = entityStatusDao.getList(batchId);
-
-        return entityStatusList;
+        return entityStatusDao.getList(batchId);
     }
 
     @Override
     public List<BatchStatus> getBatchStatusList(long batchId) {
-        List<BatchStatus> batchStatusList = batchStatusDao.getList(batchId);
-
-        return batchStatusList;
+        return batchStatusDao.getList(batchId);
     }
 
     @Override
@@ -210,7 +205,7 @@ public class BatchServiceImpl implements IBatchService {
         return batchDao.getAll(repDate);
     }
 
-    public void setHash(Batch batch) {
+    private void setHash(Batch batch) {
         String hash = DigestUtils.md5DigestAsHex(batch.getContent());
         batch.setHash(hash);
     }

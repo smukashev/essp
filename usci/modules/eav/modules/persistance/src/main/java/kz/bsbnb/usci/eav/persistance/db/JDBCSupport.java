@@ -27,12 +27,12 @@ public class JDBCSupport {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    protected class GenericInsertPreparedStatementCreator implements PreparedStatementCreator {
+    private class GenericInsertPreparedStatementCreator implements PreparedStatementCreator {
         String query;
         Object[] values;
         final String keyName = "id";
 
-        public GenericInsertPreparedStatementCreator(String query, Object[] values) {
+        GenericInsertPreparedStatementCreator(String query, Object[] values) {
             this.query = query;
             this.values = values.clone();
         }
@@ -90,5 +90,4 @@ public class JDBCSupport {
 
         return keyHolder.getKey().longValue();
     }
-
 }
