@@ -94,7 +94,7 @@ function initGrid(){
                 field: {
                     allowBlank: false
                 }
-            },{
+            }/*,{
                 xtype: 'checkcolumn',
                 id: 'my-check',
                 text: 'активность',
@@ -150,7 +150,8 @@ function initGrid(){
                         return t;
                     }
                 }
-            }/* ,
+            }*/
+            /* ,
             {
                 text : 'Id6nik',
                 dataIndex: 'id',
@@ -463,21 +464,8 @@ Ext.getDoc().on('click',function(){
 Ext.onReady(function(){
     Ext.define('packageListModel',{
         extend: 'Ext.data.Model',
-        fields: ['id','name']
+        fields: ['name']
     });
-
-    var myData = [
-        {
-            id : '12',
-            name: 'Alex',
-            surname: 'Brown'
-        },
-        {
-            id: '14',
-            name: 'Bruce',
-            surname : 'Gordon'
-        }
-    ];
 
     var map1 = new Ext.util.KeyMap(document,{
             key: "s",
