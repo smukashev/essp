@@ -10,7 +10,6 @@ import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchStatusDao;
 import kz.bsbnb.usci.eav.persistance.dao.IEntityStatusDao;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
-import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,13 +177,6 @@ public class BatchServiceImpl implements IBatchService {
     @Override
     public List<EntityStatus> getEntityStatusList(long batchId) {
         List<EntityStatus> entityStatusList = entityStatusDao.getList(batchId);
-
-        for (EntityStatus entityStatus : entityStatusList) {
-            if (entityStatus.getStatusId() > 0 && entityStatus.getStatus() == null) {
-                EavGlobal status = globalService.getGlobal(entityStatus.getStatusId());
-                entityStatus.setStatus(EntityStatuses.valueOf(status.getCode()));
-            }
-        }
 
         return entityStatusList;
     }

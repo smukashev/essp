@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.persistance.dao.IEntityStatusDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.EntityStatuses;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Insert;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_ENTITY_STATUSES;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_GLOBAL;
 
 @Repository
 public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao {
@@ -53,9 +55,15 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
 
     @Override
     public List<EntityStatus> getList(long batchId) {
+/*
         Select select = context.selectFrom(EAV_ENTITY_STATUSES)
                 .where(EAV_ENTITY_STATUSES.BATCH_ID.eq(batchId))
                 .orderBy(EAV_ENTITY_STATUSES.STATUS_ID, EAV_ENTITY_STATUSES.RECEIPT_DATE);
+*/
+        Select select = context.selectFrom(EAV_ENTITY_STATUSES.join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID)))
+                .where(EAV_ENTITY_STATUSES.BATCH_ID.eq(batchId))
+                .orderBy(EAV_ENTITY_STATUSES.STATUS_ID, EAV_ENTITY_STATUSES.RECEIPT_DATE);
+
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
@@ -80,6 +88,7 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
         entityStatus.setDevDescription((String) row.get(EAV_ENTITY_STATUSES.DEV_DESCRIPTION.getName()));
         entityStatus.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_ENTITY_STATUSES.RECEIPT_DATE.getName())));
         entityStatus.setIndex(getNullSafeLong(row, EAV_ENTITY_STATUSES.INDEX_));
+        entityStatus.setStatus(EntityStatuses.valueOf(((String) row.get(EAV_GLOBAL.CODE.getName()))));
         return entityStatus;
     }
 
