@@ -171,19 +171,19 @@
 			<unique-column name="report_date"/>
 		</unique>
     <!-- closed value -->
-		<index name="ebbv_IN_ei_ai_ci_rd_ic">
+		<!--<index name="ebbv_IN_ei_ai_ci_rd_ic">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
-		</index>
+		</index>-->
     <!-- last value -->
 		<index name="ebbv_IN_ei_ai_ci_il">
 			<index-column name="entity_id"/>
       <index-column name="creditor_id"/>
       <index-column name="attribute_id"/>
-			<index-column name="is_last"/>
+			<!--<index-column name="is_last"/>-->
 		</index>
     <!-- load values -->
 		<index name="ebbv_IN_ei_rd">
@@ -195,8 +195,8 @@
       <index-column name="creditor_id"/>
       <index-column name="attribute_id"/>
 			<index-column name="value"/>
-      <index-column name="is_closed"/>
-      <index-column name="is_last"/>
+      <!--<index-column name="is_closed"/>-->
+      <!--<index-column name="is_last"/>-->
 		</index>
 	</table>
 	<table name="eav_be_complex_set_values">
@@ -235,6 +235,13 @@
 			<index-column name="creditor_id"/>
 			<index-column name="entity_value_id"/>
 			<index-column name="is_last"/>
+		</index>
+		<index name="ebcsv_IN_si_ci_v_il_ic">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="entity_value_id"/>
+			<index-column name="is_last"/>
+			<index-column name="is_closed"/>
 		</index>
 		<!-- load values -->
 		<index name="ebcsv_IN_si_rd_ic">
@@ -535,6 +542,16 @@
 			<index-column name="is_last"/>
 		</index>
 		<!-- load values -->
+    <index name="ebecs_IN_id_ai_ci">
+			<index-column name="attribute_id"/>
+			<index-column name="id"/>
+		</index>
+    <unique name="ebecs_IN_ei_ci_ai_rd">
+			<unique-column name="entity_id"/>
+			<unique-column name="creditor_id"/>
+			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
+		</unique>
 		<index name="ebecs_IN_ei_il">
 			<index-column name="entity_id"/>
 			<index-column name="creditor_id"/>
