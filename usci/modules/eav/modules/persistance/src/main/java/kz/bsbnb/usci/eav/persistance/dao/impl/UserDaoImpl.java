@@ -37,7 +37,7 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
     private DSLContext context;
 
     @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
+    private IBaseEntityLoadDao baseEntityLoadDao;
 
     @Override
     public boolean hasPortalUserCreditor(long userId, long creditorId) {
