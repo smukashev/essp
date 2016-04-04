@@ -40,8 +40,8 @@ public class BasicBaseEntityComparatorTest {
         document3.put("doc_type", new BaseValue<>(refDocType));
         document3.put("no", new BaseValue<>("no#2"));
 
-        BaseSet docs1 = new BaseSet(metaDocs);
-        BaseSet docs2 = new BaseSet(metaDocs);
+        BaseSet docs1 = new BaseSet(metaDocs, 0);
+        BaseSet docs2 = new BaseSet(metaDocs, 0);
 
         docs1.put(new BaseValue<>(document1));
         docs2.put(new BaseValue<>(document2));

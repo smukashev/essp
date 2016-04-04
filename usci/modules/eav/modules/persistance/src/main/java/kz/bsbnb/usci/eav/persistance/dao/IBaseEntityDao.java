@@ -7,9 +7,9 @@ import java.util.Date;
 import java.util.Set;
 
 public interface IBaseEntityDao extends IPersistableDao {
-    IBaseEntity load(long id);
+    IBaseEntity loadMock(long id);
 
-    IBaseEntity load(long id, Date reportDate, Date actualReportDate);
+    IBaseEntity load(long id, Date reportDate);
 
     IMetaClass getMetaClass(long baseEntityId);
 
@@ -22,6 +22,4 @@ public interface IBaseEntityDao extends IPersistableDao {
     boolean deleteRecursive(long baseEntityId, IMetaClass metaClass);
 
     Set<Long> getChildBaseEntityIds(long parentBaseEntityId);
-
-    boolean isDeleted(long id);
 }

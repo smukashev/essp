@@ -9,6 +9,8 @@ import java.util.Set;
 public abstract class BaseContainer extends BaseObject implements IBaseContainer {
     private BaseContainerType baseContainerType;
 
+    protected long creditorId;
+
     public BaseContainer(BaseContainerType baseContainerType) {
         this.baseContainerType = baseContainerType;
     }
@@ -21,10 +23,5 @@ public abstract class BaseContainer extends BaseObject implements IBaseContainer
     @Override
     public BaseContainerType getBaseContainerType() {
         return baseContainerType;
-    }
-
-    @Override
-    public void setBaseContainerType(BaseContainerType baseContainerType) {
-        this.baseContainerType = baseContainerType;
     }
 }

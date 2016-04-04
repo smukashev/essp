@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.manager.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -19,8 +19,6 @@ public class BaseEntityManager implements IBaseEntityManager {
     static {
         CLASS_PRIORITY.add(BaseEntity.class);
         CLASS_PRIORITY.add(BaseEntityReportDate.class);
-
-        CLASS_PRIORITY.add(BaseSet.class);
 
         CLASS_PRIORITY.add(BaseEntityBooleanValue.class);
         CLASS_PRIORITY.add(BaseEntityDateValue.class);
@@ -50,52 +48,41 @@ public class BaseEntityManager implements IBaseEntityManager {
 
     private Long creditorId;
 
+    private void registerEntity (Map<Class, List<IPersistable>> objects, IPersistable persistable) {
+        Class objectClass = persistable.getClass();
+
+        if (objects.containsKey(objectClass)) {
+            objects.get(objectClass).add(persistable);
+        } else {
+            List<IPersistable> objList = new ArrayList<>();
+            objList.add(persistable);
+
+            objects.put(objectClass, objList);
+        }
+    }
+
     @Override
     public void registerAsInserted(IPersistable insertedObject) {
         if (insertedObject == null)
-            throw new RuntimeException(String.valueOf(Errors.E54));
+            throw new RuntimeException(Errors.getMessage(Errors.E54));
 
-        Class objectClass = insertedObject.getClass();
-        if (insertedObjects.containsKey(objectClass)) {
-            insertedObjects.get(objectClass).add(insertedObject);
-        } else {
-            List<IPersistable> objects = new ArrayList<>();
-            objects.add(insertedObject);
-
-            insertedObjects.put(objectClass, objects);
-        }
+        registerEntity(insertedObjects, insertedObject);
     }
 
     @Override
     public void registerAsUpdated(IPersistable updatedObject) {
         if (updatedObject == null)
-            throw new RuntimeException(String.valueOf(Errors.E55));
+            throw new RuntimeException(Errors.getMessage(Errors.E55));
 
-        Class objectClass = updatedObject.getClass();
-        if (updatedObjects.containsKey(objectClass)) {
-            updatedObjects.get(objectClass).add(updatedObject);
-        } else {
-            List<IPersistable> objects = new ArrayList<>();
-            objects.add(updatedObject);
-
-            updatedObjects.put(objectClass, objects);
-        }
+        registerEntity(updatedObjects, updatedObject);
     }
 
     @Override
     public void registerAsDeleted(IPersistable deletedObject) {
         if (deletedObject == null)
-            throw new RuntimeException(String.valueOf(Errors.E53));
+            throw new RuntimeException(Errors.getMessage(Errors.E53));
 
-        Class objectClass = deletedObject.getClass();
-        if (deletedObjects.containsKey(objectClass)) {
-            deletedObjects.get(objectClass).add(deletedObject);
-        } else {
-            List<IPersistable> objects = new ArrayList<>();
-            objects.add(deletedObject);
-
-            deletedObjects.put(objectClass, objects);
-        }
+        registerEntity(deletedObjects, deletedObject);
     }
 
     @Override

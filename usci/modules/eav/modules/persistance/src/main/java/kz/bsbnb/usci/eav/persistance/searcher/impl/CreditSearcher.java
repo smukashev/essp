@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.searcher.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
@@ -41,7 +41,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
         List<Long> ids = searcherPool.getSearcher(entity.getMeta().getClassName()).findAll(entity, creditorId);
 
         if (ids.size() > 1)
-            throw new RuntimeException(String.valueOf(Errors.E174));
+            throw new RuntimeException(Errors.getMessage(Errors.E174));
 
         if (ids.size() < 1)
             return null;
@@ -80,8 +80,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
                         .on(EAV_BE_ENTITIES.as("en").ID.equal(EAV_BE_COMPLEX_VALUES.as("co2").ENTITY_ID))
                         .and(EAV_BE_COMPLEX_VALUES.as("co2").ATTRIBUTE_ID.equal(entity.
                                 getMetaAttribute("creditor").getId()))
-                        .and(EAV_BE_COMPLEX_VALUES.as("co2").ENTITY_VALUE_ID.equal(creditorId))
-                        .where(EAV_BE_ENTITIES.as("en").DELETED.eq(DataUtils.convert(false)));
+                        .and(EAV_BE_COMPLEX_VALUES.as("co2").ENTITY_VALUE_ID.equal(creditorId));
 
                 List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
                         select.getBindValues().toArray());

@@ -1,5 +1,6 @@
 package com.bsbnb.creditregistry.portlets.approval.bpm;
 
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
@@ -17,9 +18,11 @@ import org.apache.http.impl.conn.SchemeRegistryFactory;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.RuntimeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +32,7 @@ import java.util.Map;
  */
 public class ApprovalBusiness {
 
-    private static final String BONITA_URI = "http://localhost:8082/bonita";
+    private static final String BONITA_URI = "http://localhost:8080/bonita";
 
     /**
      * Human user username
@@ -49,6 +52,8 @@ public class ApprovalBusiness {
 
     private final String bonitaURI;
 
+    private final Logger logger = org.apache.log4j.Logger.getLogger(ApprovalBusiness.class);
+
     public ApprovalBusiness() {
         PoolingClientConnectionManager conMan = getConnectionManager();
         this.httpClient = new DefaultHttpClient(conMan);
@@ -63,7 +68,7 @@ public class ApprovalBusiness {
     }
 
     public int startACase(long processDefinitionId, Map<String, String> data) {
-        System.out.println("Starting a new case of process " + PROCESS_NAME + " (ID: " + processDefinitionId + ").");
+        logger.info("Starting a new case of process " + PROCESS_NAME + " (ID: " + processDefinitionId + ").");
         String apiURI = "/API/bpm/case/";
         String payloadAsString = "{\"processDefinitionId\": " + processDefinitionId + ", ";
         payloadAsString += "\"variables\": [ ";
@@ -81,7 +86,7 @@ public class ApprovalBusiness {
         return consumeResponse(executePostRequest(apiURI, payloadAsString),true);
     }
 
-    public void close() {
+    public void closeclose() {
         httpClient.getConnectionManager().shutdown();
     }
 
@@ -99,9 +104,9 @@ public class ApprovalBusiness {
             HttpResponse response = httpClient.execute(postRequest, httpContext);
             return consumeResponse(response, true);
         } catch (HttpHostConnectException e) {
-            throw new RuntimeException("Bonita bundle may not have been started, or the URL is invalid. Please verify hostname and port number. URL used is: " + BONITA_URI,e);
+            throw new RuntimeException(Errors.getMessage(Errors.E203,BONITA_URI,e));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -115,7 +120,7 @@ public class ApprovalBusiness {
             HttpResponse response = httpClient.execute(postRequest, httpContext);
             return response;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(null,e);
             throw new RuntimeException(e);
         }
     }
@@ -123,7 +128,7 @@ public class ApprovalBusiness {
     private int consumeResponse(HttpResponse response, boolean printResponse) {
         String responseAsString = consumeResponseIfNecessary(response);
         if(printResponse) {
-            System.out.println(responseAsString);
+            logger.info(responseAsString);
         }
         return ensureStatusOk(response);
     }
@@ -132,6 +137,7 @@ public class ApprovalBusiness {
         if (response.getEntity() != null) {
             BufferedReader rd;
             try {
+
                 rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
                 StringBuffer result = new StringBuffer();
                 String line = "";
@@ -139,8 +145,9 @@ public class ApprovalBusiness {
                     result.append(line);
                 }
                 return result.toString();
+
             } catch (Exception e) {
-                throw new RuntimeException("Failed to consume response.", e);
+                throw new RuntimeException(Errors.getMessage(Errors.E201), e);
             }
         } else {
             return "";
@@ -149,8 +156,8 @@ public class ApprovalBusiness {
 
     private int ensureStatusOk(HttpResponse response) {
         if (response.getStatusLine().getStatusCode() != 201 && response.getStatusLine().getStatusCode() != 200) {
-            throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode() + " : "
-                    + response.getStatusLine().getReasonPhrase());
+            throw new RuntimeException(Errors.getMessage(Errors.E202,response.getStatusLine().getStatusCode(),
+                    response.getStatusLine().getReasonPhrase()));
         }
         return response.getStatusLine().getStatusCode();
     }
@@ -163,6 +170,9 @@ public class ApprovalBusiness {
 
         int s1 = content.indexOf("\"id\"");
         int s2 = content.indexOf(",", s1);
+        if(s1 < 0 || s2 < 0)
+            throw new RuntimeException("indexOf incorrect, probably bar file not installed");
+
         content = content.substring(s1 + 6, s2 - 1);
 
         Long processId = null;
@@ -170,7 +180,7 @@ public class ApprovalBusiness {
         try {
             processId = Long.parseLong(content);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return processId;
@@ -191,7 +201,7 @@ public class ApprovalBusiness {
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(urlParameters, "utf-8");
             executePostRequest(loginURL, entity);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(null, e);
             throw new RuntimeException(e);
         }
     }
@@ -206,7 +216,7 @@ public class ApprovalBusiness {
             HttpResponse response = httpClient.execute(getRequest, httpContext);
             return response;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             throw new RuntimeException(e);
         }
     }

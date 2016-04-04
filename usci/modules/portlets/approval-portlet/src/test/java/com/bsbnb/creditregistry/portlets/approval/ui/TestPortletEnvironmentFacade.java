@@ -2,6 +2,8 @@ package com.bsbnb.creditregistry.portlets.approval.ui;
 
 import com.bsbnb.creditregistry.portlets.approval.PortletEnvironmentFacade;
 import com.liferay.portal.model.User;
+import kz.bsbnb.usci.eav.util.Errors;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -61,18 +63,18 @@ public class TestPortletEnvironmentFacade implements PortletEnvironmentFacade {
     }
 
     public List<User> getPortalUsers() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
     }
 
     public String getUsername() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
     }
 
     public boolean isApprovalAuthority() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
     }
 
     public boolean isAdministrator() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
     }
 }

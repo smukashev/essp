@@ -19,11 +19,14 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import org.apache.log4j.Logger;
 
 public class AuditApplication extends Application {
     
     //TODO: Использовать audit-dm
     private static final long serialVersionUID = 2096197512742005243L;
+
+    private final Logger logger = org.apache.log4j.Logger.getLogger(AuditApplication.class);
 
     @Override
     public void init() {
@@ -58,18 +61,21 @@ public class AuditApplication extends Application {
                     }
                 }
             } catch (PortalException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(),e);
             } catch (SystemException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(),e);
             }
 
             if(!hasRights)
                 return;
-
-            Window mainWindow = new Window();
-            mainWindow.setTheme("custom");
-            mainWindow.addComponent(new AuditLayout(request.getLocale()));
-            setMainWindow(mainWindow);
+            try{
+                Window mainWindow = new Window();
+                mainWindow.setTheme("custom");
+                mainWindow.addComponent(new AuditLayout(request.getLocale()));
+                setMainWindow(mainWindow);
+            }catch(Exception e){
+                logger.error(e.getMessage(),e);
+            }
         }
 
         @Override

@@ -31,6 +31,7 @@ import kz.bsbnb.usci.porltet.ref_portlet.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
@@ -50,6 +51,7 @@ public class MainPortlet extends MVCPortlet {
     private IEntityService entityService;
     private IBatchEntryService batchEntryService;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
+    public final Logger logger = Logger.getLogger(MainPortlet.class);
 
     public void connectToServices() {
         try {
@@ -87,7 +89,7 @@ public class MainPortlet extends MVCPortlet {
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         } catch (Exception e) {
-            System.out.println("Can\"t initialise services: " + e.getMessage());
+            logger.error("Can\"t initialise services: " + e.getMessage());
         }
     }
 
@@ -119,7 +121,7 @@ public class MainPortlet extends MVCPortlet {
                 }
             }
         } catch (PortalException | SystemException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
         if(!hasRights)
@@ -148,7 +150,7 @@ public class MainPortlet extends MVCPortlet {
 
     private String clearSlashes(String str) {
         String outStr = str.replaceAll("\"", "\\\\\"");
-        System.out.println(outStr);
+        logger.info(outStr);
         return outStr;
     }
 
@@ -403,7 +405,7 @@ public class MainPortlet extends MVCPortlet {
                 case SAVE_XML:
                     String xml = getParam("xml_data", resourceRequest);
                     String sDate = getParam("date", resourceRequest);
-                    Date date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
+                    Date date = (Date) DataTypes.getCastObject(DataTypes.DATE, sDate);
 
                     BatchEntry batchEntry = new BatchEntry();
 
@@ -448,7 +450,7 @@ public class MainPortlet extends MVCPortlet {
                     sDate = resourceRequest.getParameter("date");
                     date = null;
                     if (StringUtils.isNotEmpty(sDate)) {
-                        date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
+                        date = (Date) DataTypes.getCastObject(DataTypes.DATE, sDate);
                     }
                     String sWithHis = resourceRequest.getParameter("withHis");
                     boolean withHis = Boolean.valueOf(sWithHis);
@@ -491,7 +493,7 @@ public class MainPortlet extends MVCPortlet {
                         date = null;
 
                         if(StringUtils.isNotEmpty(resourceRequest.getParameter("date")))
-                            date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+                            date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
 
                         if(date == null)
                             date = new Date();
@@ -513,7 +515,7 @@ public class MainPortlet extends MVCPortlet {
                     sDate = resourceRequest.getParameter("date");
                     date = null;
                     if (StringUtils.isNotEmpty(sDate)) {
-                        date = (Date) DataTypes.fromString(DataTypes.DATE, sDate);
+                        date = (Date) DataTypes.getCastObject(DataTypes.DATE, sDate);
                     }
                     sWithHis = resourceRequest.getParameter("withHis");
                     withHis = Boolean.valueOf(sWithHis);
@@ -541,7 +543,7 @@ public class MainPortlet extends MVCPortlet {
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
             out.write(("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}").getBytes());
         }
     }
@@ -634,7 +636,7 @@ public class MainPortlet extends MVCPortlet {
                             try {
                                 number = new jxl.write.Number(columnIndex, rowCounter, ((Number) value).doubleValue(), dataFormat);
                             } catch (Exception e) {
-                                System.out.println("Excel export failed: number format not correct");
+                                logger.error("Excel export failed: number format not correct");
                                 number = new jxl.write.Number(columnIndex, rowCounter, 0, dataFormat);
                             }
                         }

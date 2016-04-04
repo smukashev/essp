@@ -31,10 +31,10 @@ public class EntityServiceImpl implements IEntityService {
     @Qualifier(value = "remoteEntityService")
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
-    kz.bsbnb.usci.core.service.IEntityService remoteEntityService;
+    private kz.bsbnb.usci.core.service.IEntityService remoteEntityService;
 
     @Autowired
-    SyncStatusSingleton syncStatusSingleton;
+    private SyncStatusSingleton syncStatusSingleton;
 
     @PostConstruct
     public void init() {

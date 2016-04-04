@@ -46,4 +46,8 @@ public interface IBaseEntity extends IBaseContainer {
     boolean equalsByKey(IBaseEntity baseEntity);
 
     boolean containsComplexKey();
+
+    List<IBaseEntity> getKeyElements();
+
+    boolean equalsByReference(IBaseEntity baseEntity);
 }

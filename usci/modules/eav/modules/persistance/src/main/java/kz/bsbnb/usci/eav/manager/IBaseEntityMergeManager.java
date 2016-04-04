@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.manager;
 
 import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
 
+import java.util.List;
 import java.util.Map;
 
 public interface IBaseEntityMergeManager {
@@ -16,9 +17,9 @@ public interface IBaseEntityMergeManager {
 
     void setAction(Action action);
 
-    Map<MergeManagerKey, IBaseEntityMergeManager> getChildMap();
+    Map<MergeManagerKey, List<IBaseEntityMergeManager>> getChildMap();
 
-    IBaseEntityMergeManager getChildManager(MergeManagerKey key);
+    List<IBaseEntityMergeManager> getChildManager(MergeManagerKey key);
 
     void setChildManager(MergeManagerKey key, IBaseEntityMergeManager member);
 

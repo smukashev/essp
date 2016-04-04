@@ -8,12 +8,16 @@ import java.util.List;
 import java.util.Set;
 
 import com.bsbnb.usci.portlets.protocol.data.ProtocolDisplayBean;
+import kz.bsbnb.usci.eav.util.Errors;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Aidar.Myrzahanov
  */
 public class TxtProtocolNumbersExporter extends ProtocolExporter {
+
+    private final Logger logger = Logger.getLogger(TxtProtocolNumbersExporter.class);
 
     public TxtProtocolNumbersExporter() {
         super();
@@ -37,7 +41,8 @@ public class TxtProtocolNumbersExporter extends ProtocolExporter {
             ps.close();
             return baos.toByteArray();
         } catch (UnsupportedEncodingException uee) {
-            throw new ExportException("Couldn't find encoding", uee);
+            logger.error(Errors.getMessage(Errors.E248, uee));
+            throw new ExportException(Errors.getMessage(Errors.E248, uee));
         }
     }
 

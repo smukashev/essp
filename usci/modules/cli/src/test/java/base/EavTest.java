@@ -2,6 +2,7 @@ package base;
 
 import kz.bsbnb.usci.cli.app.CLI;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +80,7 @@ public class EavTest extends JDBCSupport {
 
     public void checkNoException(){
         if(cli.getLastException() != null)
-            throw new RuntimeException("failed last exception check");
+            throw new RuntimeException(Errors.getMessage(Errors.E211));
     }
 
 }

@@ -7,9 +7,15 @@ import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 public class MetaAttribute extends Persistable implements IMetaAttribute {
     private static final long serialVersionUID = 1L;
 
-    IMetaType metaType;
+    private String name;
+
+    private String title;
+
+    private IMetaType metaType;
 
     private boolean isKey = false;
+
+    private boolean isOptionKey = false;
 
     private boolean isFinal = false;
 
@@ -19,18 +25,9 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
 
     private boolean isCumulative = false;
 
-    private String name = "";
-
     private boolean isNullable = true;
 
     private boolean isDisabled = true;
-
-    private String title;
-
-    public MetaAttribute(boolean isKey, boolean isNullable) {
-        this.isKey = isKey;
-        this.isNullable = isNullable && !isKey;
-    }
 
     public MetaAttribute(boolean isKey, boolean isNullable, IMetaType metaType) {
         this.isKey = isKey;
@@ -55,9 +52,19 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
         return isKey;
     }
 
+    @Override
+    public boolean isOptionalKey() {
+        return isOptionKey;
+    }
+
     public void setKey(boolean isKey) {
         this.isKey = isKey;
         this.isNullable = isNullable && !isKey;
+    }
+
+    @Override
+    public void setOptionalKey(boolean isOptionKey) {
+        this.isOptionKey = isOptionKey;
     }
 
     @Override
@@ -80,6 +87,11 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getTitle() {
+        if (title != null) return title;
+        return getName();
     }
 
     public boolean isFinal() {
@@ -124,9 +136,12 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
         this.isCumulative = isCumulative;
     }
 
-    @Override
-    public String toString() {
-        return name + ", " + isKey + ", "+ isFinal;
+    public boolean isDisabled() {
+        return isDisabled;
+    }
+
+    public void setDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
     }
 
     @Override
@@ -138,51 +153,50 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
         MetaAttribute that = (MetaAttribute) o;
 
         if (isKey != that.isKey) return false;
+        if (isOptionKey != that.isOptionKey) return false;
+        if (isFinal != that.isFinal) return false;
+        if (isRequired != that.isRequired) return false;
+        if (isImmutable != that.isImmutable) return false;
+        if (isCumulative != that.isCumulative) return false;
         if (isNullable != that.isNullable) return false;
-        //if (!metaType.equals(that.metaType)) return false;
+        if (isDisabled != that.isDisabled) return false;
+        if (!name.equals(that.name)) return false;
+        if (!title.equals(that.title)) return false;
+        return metaType.equals(that.metaType);
 
-        if (metaType.isSet() && metaType.isComplex()) {
-            MetaSet thisSet = (MetaSet) metaType;
-            MetaSet thatSet = (MetaSet) (that.getMetaType());
-
-            if (thisSet.getArrayKeyFilter().size() != thatSet.getArrayKeyFilter().size()) {
-                return false;
-            } else {
-                for (String attrName : thisSet.getArrayKeyFilter().keySet()) {
-                    for (String value : thatSet.getArrayKeyFilter().get(attrName)) {
-                        if (value == null || !value.equals(thisSet.getArrayKeyFilter().get(attrName))) {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        return true;
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + title.hashCode();
         result = 31 * result + metaType.hashCode();
         result = 31 * result + (isKey ? 1 : 0);
+        result = 31 * result + (isOptionKey ? 1 : 0);
+        result = 31 * result + (isFinal ? 1 : 0);
+        result = 31 * result + (isRequired ? 1 : 0);
+        result = 31 * result + (isImmutable ? 1 : 0);
+        result = 31 * result + (isCumulative ? 1 : 0);
         result = 31 * result + (isNullable ? 1 : 0);
+        result = 31 * result + (isDisabled ? 1 : 0);
         return result;
     }
 
-    public String getTitle() {
-        if (title != null)
-            return title;
-        return getName();
-    }
-
-    public boolean isDisabled() {
-        return isDisabled;
-    }
-
-    public void setDisabled(boolean isDisabled) {
-        this.isDisabled = isDisabled;
+    @Override
+    public String toString() {
+        return "MetaAttribute{" +
+                "name='" + name + '\'' +
+                ", title='" + title + '\'' +
+                ", metaType=" + metaType +
+                ", isKey=" + isKey +
+                ", isOptionKey=" + isOptionKey +
+                ", isFinal=" + isFinal +
+                ", isRequired=" + isRequired +
+                ", isImmutable=" + isImmutable +
+                ", isCumulative=" + isCumulative +
+                ", isNullable=" + isNullable +
+                ", isDisabled=" + isDisabled +
+                '}';
     }
 }

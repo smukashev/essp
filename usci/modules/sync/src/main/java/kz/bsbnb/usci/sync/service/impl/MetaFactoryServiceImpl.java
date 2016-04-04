@@ -21,7 +21,7 @@ public class MetaFactoryServiceImpl implements IMetaFactoryService {
     @Qualifier(value = "remoteMetaFactoryService")
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
-    kz.bsbnb.usci.core.service.IMetaFactoryService remoteMetaFactoryService;
+    private kz.bsbnb.usci.core.service.IMetaFactoryService remoteMetaFactoryService;
 
     @PostConstruct
     public void init() {

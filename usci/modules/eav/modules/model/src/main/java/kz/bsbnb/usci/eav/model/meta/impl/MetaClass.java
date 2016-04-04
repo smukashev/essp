@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
-import kz.bsbnb.usci.eav.Errors;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaSet;
@@ -8,6 +7,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 
 import java.util.*;
 
@@ -93,7 +93,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         IMetaAttribute metaAttribute = members.get(name);
 
         if (metaAttribute == null)
-            throw new IllegalArgumentException(Errors.E45 + "|" + name + "|" + this.getClassName());
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E45,name, this.getClassName()));
 
         return metaAttribute.getMetaType();
     }
@@ -186,11 +186,6 @@ public class MetaClass extends MetaContainer implements IMetaClass {
     @Override
     public boolean isComplex() {
         return true;
-    }
-
-    @Override
-    public boolean isSetOfSets() {
-        return false;
     }
 
     public int getAttributesCount() {
@@ -374,7 +369,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
                 }
             } else {
                 if (tokenizer.hasMoreTokens()) {
-                    throw new IllegalArgumentException(String.valueOf(Errors.E44));
+                    throw new IllegalArgumentException(Errors.getMessage(Errors.E44));
                 }
             }
         }
@@ -416,7 +411,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
                 }
             } else {
                 if (tokenizer.hasMoreTokens())
-                    throw new IllegalArgumentException(String.valueOf(Errors.E44));
+                    throw new IllegalArgumentException(Errors.getMessage(Errors.E44));
             }
         }
 
@@ -455,9 +450,6 @@ public class MetaClass extends MetaContainer implements IMetaClass {
 
             if (metaType.isComplex()) {
                 if (metaType.isSet()) {
-                    if (metaType.isSetOfSets())
-                        throw new UnsupportedOperationException(String.valueOf(Errors.E2));
-
                     IMetaSet childMetaSet = (IMetaSet) metaType;
                     IMetaClass childMetaClass = (IMetaClass) childMetaSet.getMemberType();
 
@@ -566,6 +558,20 @@ public class MetaClass extends MetaContainer implements IMetaClass {
             IMetaType type = this.getMemberType(attributeName);
 
             if (type.isSet() && type.isComplex())
+                filteredAttributeNames.add(attributeName);
+        }
+
+        return filteredAttributeNames;
+    }
+
+    public Set<String> getSimpleArrayAttributesNames() {
+        Set<String> allAttributeNames = this.members.keySet();
+        Set<String> filteredAttributeNames = new HashSet<>();
+
+        for (String attributeName : allAttributeNames) {
+            IMetaType type = this.getMemberType(attributeName);
+
+            if (type.isSet() && !type.isComplex())
                 filteredAttributeNames.add(attributeName);
         }
 

@@ -1,7 +1,5 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
-import kz.bsbnb.usci.eav.Errors;
-import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
@@ -11,42 +9,30 @@ import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
-import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
-import kz.bsbnb.usci.sync.service.IBatchService;
-import kz.bsbnb.usci.sync.service.IMetaFactoryService;
-import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.batch.item.NonTransientResourceException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import javax.annotation.PostConstruct;
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Stack;
@@ -59,18 +45,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
     @Autowired
     private IServiceRepository serviceFactory;
 
-    @Value("#{jobParameters['reportId']}")
-    private Long reportId;
-
-    @Value("#{jobParameters['actualCount']}")
-    private Long actualCount;
-
-    @Value("#{jobParameters['creditorId']}")
-    private Long creditorId;
-
     private Logger logger = Logger.getLogger(StaxEventEntityReader.class);
-
-    private static final long WAIT_TIMEOUT = 3600; // in sec
 
     private Stack<IBaseContainer> stack = new Stack<>();
 
@@ -78,15 +53,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     private IBaseContainer currentContainer;
 
-    private Batch batch;
-
     private Long index = 1L, level = 0L;
-
-    private IBatchService batchService;
-
-    private IMetaFactoryService metaFactoryService;
-
-    private ReportBeanRemoteBusiness reportService;
 
     private boolean hasMembers = false;
 
@@ -132,18 +99,17 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     .setBatchId(batchId)
                     .setStatus(BatchStatuses.ERROR)
                     .setDescription(e.getMessage())
-                    .setReceiptDate(new Date())
-            );
+                    .setReceiptDate(new Date()));
 
             throw new IllegalStateException(e);
         }
 
         try {
             if (out != null) {
-                if (validateSchema(new ByteArrayInputStream(out.toByteArray()))) {
+                if (validateSchema(true, new ByteArrayInputStream(out.toByteArray()))) {
                     xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
                 } else {
-                    throw new RuntimeException(String.valueOf(Errors.E193));
+                    throw new RuntimeException(Errors.getMessage(Errors.E193));
                 }
             }
         } catch (XMLStreamException | SAXException | IOException e) {
@@ -157,70 +123,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         }
     }
 
-    private boolean validateSchema(ByteArrayInputStream xmlInputStream) throws IOException, SAXException {
-        URL schemaURL = getClass().getClassLoader().getResource("usci.xsd");
-        Source xml = new StreamSource(xmlInputStream);
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-        if (schemaURL == null)
-            throw new IllegalStateException();
-
-        Schema schema = schemaFactory.newSchema(schemaURL);
-
-        Validator validator = schema.newValidator();
-
-        final boolean[] success = {true};
-
-        // fixme!
-        validator.setErrorHandler(new ErrorHandler() {
-            @Override
-            public void warning(SAXParseException exception) throws SAXException {
-            }
-
-            @Override
-            public void error(SAXParseException exception) throws SAXException {
-                success[0] = false;
-                batchService.addBatchStatus(new BatchStatus()
-                                .setBatchId(batchId)
-                                .setStatus(BatchStatuses.ERROR)
-                                .setDescription(exception.getMessage())
-                                .setReceiptDate(new Date()));
-            }
-
-            @Override
-            public void fatalError(SAXParseException exception) throws SAXException {
-                throw exception;
-            }
-        });
-
-        validator.validate(xml);
-        return success[0];
-    }
-
-    private boolean hasOperationDelete(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
-                        .equalsIgnoreCase(OperationType.DELETE.toString());
-    }
-
-    private boolean hasOperationClose(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
-                        .equalsIgnoreCase(OperationType.CLOSE.toString());
-    }
-
-    private boolean hasOperationNew(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
-                        .equalsIgnoreCase(OperationType.NEW.toString());
-    }
-
-    private boolean hasOperationInsert(StartElement startElement) {
-        return startElement.getAttributeByName(new QName("operation")) != null &&
-                startElement.getAttributeByName(new QName("operation")).getValue()
-                        .equalsIgnoreCase(OperationType.INSERT.toString());
-    }
-
     private HashMap<String, MetaClass> metaCache = new HashMap<>();
 
     private MetaClass getMeta(String metaName) {
@@ -232,7 +134,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         return metaCache.get(metaName);
     }
 
-    public void startElement(XMLEvent event, StartElement startElement, String localName) {
+    private void startElement(StartElement startElement, String localName) {
         if (localName.equals("batch")) {
             logger.debug("batch");
         } else if (localName.equals("entities")) {
@@ -260,28 +162,27 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             IMetaType metaType = currentContainer.getMemberType(localName);
 
             if (metaType.isSet()) {
+                hasMembers = false;
                 stack.push(currentContainer);
                 flagsStack.push(hasMembers);
-                hasMembers = false;
-                currentContainer = new BaseSet(((MetaSet) metaType).getMemberType());
+                currentContainer = new BaseSet(((MetaSet) metaType).getMemberType(), creditorId);
                 level++;
             } else if (metaType.isComplex()) {
                 stack.push(currentContainer);
                 currentContainer = new BaseEntity((MetaClass) metaType, batch.getRepDate(), creditorId);
                 flagsStack.push(hasMembers);
-                hasMembers = false;
                 level++;
+                hasMembers = false;
             } else {
                 Object obj = null;
                 MetaValue metaValue = (MetaValue) metaType;
 
                 try {
-                    event = (XMLEvent) xmlEventReader.next();
-                    obj = parserHelper.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
+                    XMLEvent event = (XMLEvent) xmlEventReader.next();
+                    obj = DataTypes.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
-                    throw new RuntimeException(Errors.E194+"|" + localName + "|"
-                            + (n.getMessage().length() > 255 ? n.getMessage().substring(0, 255) : n.getMessage()));
+                    throw new RuntimeException(Errors.getMessage(Errors.E194, localName, n.getMessage()));
                 } catch (ClassCastException ex) {
                     logger.debug("Empty tag: " + localName);
                     level--;
@@ -295,14 +196,12 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     memberName += "_" + currentContainer.getValueCount();
 
 
-                IBaseValue baseValue = BaseValueFactory
-                        .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId,
-                                batch.getRepDate(), obj, false, true);
+                IBaseValue baseValue = BaseValueFactory.create(currentContainer.getBaseContainerType(), metaType, 0,
+                        creditorId, batch.getRepDate(), obj, false, true);
 
                 if (hasOperationNew(startElement)) {
-                    IBaseValue newBaseValue = BaseValueFactory
-                            .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId,
-                                    batch.getRepDate(), parserHelper.getCastObject(metaValue.getTypeCode(),
+                    IBaseValue newBaseValue = BaseValueFactory.create(currentContainer.getBaseContainerType(), metaType,
+                            0, creditorId, batch.getRepDate(), DataTypes.getCastObject(metaValue.getTypeCode(),
                                         startElement.getAttributeByName(new QName("data")).getValue()), false, true);
 
                     baseValue.setNewBaseValue(newBaseValue);
@@ -327,27 +226,15 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     .setBatchId(batchId)
                     .setStatus(EntityStatuses.ERROR)
                     .setDescription(e.getLocalizedMessage())
-                    .setReceiptDate(new Date())
-            );
+                    .setReceiptDate(new Date()));
             
             return null;
         }
     }
 
     private T readInner() {
-        long sleepCounter = 0;
+        waitSync(serviceFactory);
 
-        while (serviceFactory.getEntityService().getQueueSize() > ZipFilesMonitor.MAX_SYNC_QUEUE_SIZE) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            sleepCounter++;
-            if (sleepCounter > WAIT_TIMEOUT) {
-                throw new IllegalStateException(String.valueOf(Errors.E192));
-            }
-        }
         while (xmlEventReader.hasNext()) {
             XMLEvent event = (XMLEvent) xmlEventReader.next();
 
@@ -357,7 +244,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 StartElement startElement = event.asStartElement();
                 String localName = startElement.getName().getLocalPart();
 
-                startElement(event, startElement, localName);
+                startElement(startElement, localName);
             } else if (event.isEndElement()) {
                 EndElement endElement = event.asEndElement();
                 String localName = endElement.getName().getLocalPart();
@@ -384,25 +271,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         return null;
     }
 
-    private void saveTotalCounts() {
-        reportService.setTotalCount(reportId, totalCount);
-
-        batchService.addEntityStatus(new EntityStatus()
-                .setBatchId(batchId)
-                        .setStatus(EntityStatuses.ACTUAL_COUNT)
-                        .setDescription(String.valueOf(actualCount))
-                        .setReceiptDate(new Date())
-        );
-
-        batchService.addEntityStatus(new EntityStatus()
-                .setBatchId(batchId)
-                        .setStatus(EntityStatuses.TOTAL_COUNT)
-                        .setDescription(String.valueOf(totalCount))
-                        .setReceiptDate(new Date())
-        );
-    }
-
-    public boolean endElement(String localName) {
+    private boolean endElement(String localName) {
         if (localName.equals("batch")) {
             logger.debug("batch");
         } else if (localName.equals("entities")) {
@@ -427,9 +296,8 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
-                        ((BaseSet) currentContainer).put(BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId,
-                                    batch.getRepDate(), obj, false, true));
+                        ((BaseSet) currentContainer).put(BaseValueFactory.create(currentContainer.getBaseContainerType(),
+                                metaType, 0, creditorId, batch.getRepDate(), obj, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
@@ -461,5 +329,47 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         }
 
         return false;
+    }
+
+    private void saveTotalCounts() {
+        reportService.setTotalCount(reportId, totalCount);
+
+        batchService.addEntityStatus(new EntityStatus()
+                .setBatchId(batchId)
+                .setStatus(EntityStatuses.ACTUAL_COUNT)
+                .setDescription(String.valueOf(actualCount))
+                .setReceiptDate(new Date()));
+
+        batchService.addEntityStatus(new EntityStatus()
+                .setBatchId(batchId)
+                .setStatus(EntityStatuses.TOTAL_COUNT)
+                .setDescription(String.valueOf(totalCount))
+                .setReceiptDate(new Date()));
+    }
+
+    private static final String OPERATION_STR = "operation";
+
+    private boolean hasOperationDelete(StartElement startElement) {
+        return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
+                startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
+                        .equalsIgnoreCase(OperationType.DELETE.toString());
+    }
+
+    private boolean hasOperationClose(StartElement startElement) {
+        return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
+                startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
+                        .equalsIgnoreCase(OperationType.CLOSE.toString());
+    }
+
+    private boolean hasOperationNew(StartElement startElement) {
+        return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
+                startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
+                        .equalsIgnoreCase(OperationType.NEW.toString());
+    }
+
+    private boolean hasOperationInsert(StartElement startElement) {
+        return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
+                startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
+                        .equalsIgnoreCase(OperationType.INSERT.toString());
     }
 }

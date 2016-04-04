@@ -12,11 +12,13 @@ import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.brms.rulesvr.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.cli.app.command.impl.*;
+import kz.bsbnb.usci.cli.app.common.impl.SqlRunner;
 import kz.bsbnb.usci.cli.app.exporter.EntityExporter;
 import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
@@ -41,6 +43,7 @@ import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
@@ -49,6 +52,7 @@ import kz.bsbnb.usci.tool.status.CoreStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.SyncStatus;
 import kz.bsbnb.usci.tool.status.SystemStatus;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -60,12 +64,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -157,6 +163,22 @@ public class CLI {
     private BaseEntity currentBaseEntity;
 
     private Mnt mnt;
+
+    private JdbcTemplate jdbcTemplateSC;
+
+
+    public void InitDataSourceSC(String Driver, String Username, String password, String url) {
+        BasicDataSource source = new BasicDataSource();
+        source.setDriverClassName(Driver);
+        source.setUrl(url);
+        source.setUsername(Username);
+        source.setPassword(password);
+        source.setInitialSize(16);
+        source.setMaxActive(16);
+        source.setTestOnBorrow(true);
+        source.setTestOnReturn(true);
+        this.jdbcTemplateSC = new JdbcTemplate(source);
+    }
 
     public IEntityService getEntityService(String url) {
         if (entityServiceCore == null) {
@@ -304,54 +326,6 @@ public class CLI {
 
             for (String path : paths) {
                 System.out.println(path);
-            }
-        }
-    }
-
-    public void addMetaClassKeyFilter(String className, String attrName, String subName, String value) {
-        MetaClass meta = metaClassRepository.getMetaClass(className);
-
-        if (meta == null) {
-            System.out.println("No such meta class with name: " + className);
-        } else {
-            IMetaType attr = meta.getMemberType(attrName);
-
-            if (attr != null) {
-                if (attr.isSet() && attr.isComplex()) {
-                    MetaSet set = (MetaSet) attr;
-
-                    set.addArrayKeyFilter(subName, value);
-
-                    metaClassRepository.saveMetaClass(meta);
-                } else {
-                    System.out.println("Attribute: " + attrName + " is not a complex set");
-                }
-            } else {
-                System.out.println("No such attribute: " + attrName);
-            }
-        }
-    }
-
-    public void addMetaClassKeyFilter(long id, String attrName, String subName, String value) {
-        MetaClass meta = metaClassRepository.getMetaClass(id);
-
-        if (meta == null) {
-            System.out.println("No such meta class with id: " + id);
-        } else {
-            IMetaType attr = meta.getMemberType(attrName);
-
-            if (attr != null) {
-                if (attr.isSet() && attr.isComplex()) {
-                    MetaSet set = (MetaSet) attr;
-
-                    set.addArrayKeyFilter(subName, value);
-
-                    metaClassRepository.saveMetaClass(meta);
-                } else {
-                    System.out.println("Attribute: " + attrName + " is not a complex set");
-                }
-            } else {
-                System.out.println("No such attribute: " + attrName);
             }
         }
     }
@@ -966,7 +940,7 @@ public class CLI {
                     actualCount++;
                 } catch (Exception ex) {
                     lastException = ex;
-                    System.out.println("Ошибка: " + ex.getMessage());
+                    System.out.println("Ошибка: " + Errors.unmarshall(ex.getMessage()));
                 }
             }
             Batch batch = reader.getBatch();
@@ -1244,19 +1218,6 @@ public class CLI {
                 } else {
                     System.out.println("Argument needed: <paths> <id, name> <id or name> <attributeName>");
                 }
-            } else if (args.get(0).equals("fkey")) {
-                if (args.size() > 5) {
-                    if (args.get(1).equals("id")) {
-                        addMetaClassKeyFilter(Long.parseLong(args.get(2)), args.get(3), args.get(4), args.get(5));
-                    } else if (args.get(1).equals("name")) {
-                        addMetaClassKeyFilter(args.get(2), args.get(3), args.get(4), args.get(5));
-                    } else {
-                        System.out.println("No such metaClass identification method: " + args.get(1));
-                    }
-                } else {
-                    System.out.println("Argument needed: <fkey> <id, name> <id or name> <attributeName> " +
-                            "<subAttributeName> <filterValue>");
-                }
             } else if (args.get(0).equals("tojava")) {
                 MetaClass metaClass = metaClassRepository.getMetaClass(args.get(1));
                 System.out.println(metaClass.toJava(""));
@@ -1378,7 +1339,8 @@ public class CLI {
 
                         System.out.println(fileNumber + " - Sending file: " + newFile.getCanonicalFile());
 
-                        batchProcessService.processBatchWithoutUser(newFile.getAbsolutePath());
+                        // fixme!
+                        /*batchProcessService.processBatchWithoutUser(newFile.getAbsolutePath());*/
 
                         preparedStatementDone.setInt(Integer.valueOf(1), 1);
                         preparedStatementDone.setInt(Integer.valueOf(2), id);
@@ -1880,12 +1842,19 @@ public class CLI {
         }
     }
 
-    public void commandSql() {
+    public void commandSql() throws FileNotFoundException, SQLException {
         StringBuilder str = new StringBuilder();
-        for (Object o : args)
-            str.append(o + " ");
-        boolean res = storage.simpleSql(str.toString());
-        System.out.println(res ? "sql execution success" : "sql execution fail");
+        if(args.get(0).equals("run")){
+            System.out.println("ЗапускаюЗапускаю скрипт " + args.get(1));
+            long t1 = System.currentTimeMillis();
+            SqlRunner runner = new SqlRunner(storage.getConnection(),  true);
+            runner.runScript(args.get(1), StaticRouter.getCoreSchemaName());
+            System.out.println("Скрипт отработан за " + Math.round(((System.currentTimeMillis() - t1) / 1000)) + " сек.");
+        } else {
+            for (Object o : args) str.append(o).append(" ");
+            boolean res = storage.simpleSql(str.toString());
+            if (!res) System.out.println("Скрипт не отработан: " + str);
+        }
     }
 
     public void commandRefs() {
@@ -1897,7 +1866,7 @@ public class CLI {
                 System.out.println("using default file " + BaseCrawler.fileName);
             }
             new BaseRepository().run();
-        } else throw new IllegalArgumentException("allowed operations refs [import] [filename]");
+        } else throw new IllegalArgumentException(Errors.getMessage(Errors.E212));
     }
 
     public void init() {
@@ -1996,11 +1965,11 @@ public class CLI {
                     StringBuilder sb = new StringBuilder();
                     line = in.nextLine();
                     if (!line.startsWith("title: "))
-                        throw new IllegalArgumentException("title must be specified format title: <name>");
+                        throw new IllegalArgumentException(Errors.getMessage(Errors.E213));
                     String title = line.split("title: ")[1];
                     line = in.nextLine();
                     if (line.startsWith(args.get(1)))
-                        throw new IllegalArgumentException("rule must not be empty");
+                        throw new IllegalArgumentException(Errors.getMessage(Errors.E214));
                     sb.append(line);
                     do {
                         line = in.nextLine();
@@ -2212,7 +2181,7 @@ public class CLI {
 
     }
 
-    public void commandShowCase() {
+    public void commandShowCase() throws SQLException {
         if (showcaseServiceFactoryBean == null || showcaseService == null)
             initSC();
 
@@ -2226,7 +2195,7 @@ public class CLI {
                 System.out.println("* " + sf.getAttributePath() + ", " + sf.getColumnName());
         } else if (args.get(0).equals("set")) {
             if (args.size() != 3)
-                throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E215));
             if (args.get(1).equals("meta")) {
                 showCase = new ShowCase();
                 showCase.setMeta(metaClassRepository.getMetaClass(args.get(2)));
@@ -2237,25 +2206,25 @@ public class CLI {
             } else if (args.get(1).equals("downPath")) {
                 MetaClass metaClass = showCase.getMeta();
                 if (metaClass.getEl(args.get(2)) == null)
-                    throw new IllegalArgumentException("no such path for downPath:" + args.get(2));
+                    throw new IllegalArgumentException(Errors.getMessage(Errors.E215, args.get(2)));
 
                 showCase.setDownPath(args.get(2));
             } else if (args.get(1).equals("final")) {
                 showCase.setFinal(Boolean.parseBoolean(args.get(2)));
             } else
-                throw new IllegalArgumentException("showcase set [meta,name,tableName,downPath] {value}");
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E215));
 
         } else if (args.get(0).equals("list")) {
             if (args.get(1).equals("reset")) {
                 showCase.getFieldsList().clear();
             } else if (args.get(1).equals("add")) {
                 if (args.get(2) == null || args.get(3) == null)
-                    throw new UnsupportedOperationException("AttributePath and columnName cannot be empty");
+                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E217));
 
                 showCase.addField(args.get(2), args.get(3));
             } else if (args.get(1).equals("addCustom")) {
                 if (args.get(2) == null || args.get(3) == null || args.get(4) == null)
-                    throw new UnsupportedOperationException("MetaClass, attributePath and columnName cannot be empty");
+                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E218));
 
                 showCase.addCustomField(args.get(3), args.get(4), metaClassRepository.getMetaClass(args.get(2)));
             } else if (args.get(1).equals("addRootKey")) {
@@ -2264,7 +2233,7 @@ public class CLI {
                 else
                     showCase.addRootKeyField(args.get(2),args.get(2));
             } else if (args.get(1).equals("addHistoryKey")) {
-                showCase.addHistoryKeyField(args.get(2));
+                showCase.addHistoryKeyField(args.get(2), args.get(3));
             } else {
                 System.err.println("Example: showcase list add [path] [columnName]");
                 System.err.println("Example: showcase list addCustom metaClass [path] [columnName]");
@@ -2279,7 +2248,7 @@ public class CLI {
                     childShowCase.setName(args.get(3));
                 } else if (args.get(2).equals("meta")) {
                     childShowCase.setMeta(metaClassRepository.getMetaClass(args.get(3)));
-                } else if (args.get(2).equals("child_down_path")) {
+                } else if (args.get(2).equals("downPath")) {
                     childShowCase.setDownPath(args.get(3));
                 } else if (args.get(2).equals("tableName")) {
                     childShowCase.setTableName(args.get(3));
@@ -2292,7 +2261,7 @@ public class CLI {
                 } else if(args.get(2).equals("addRootKey")) {
                     childShowCase.addRootKeyField(args.get(3), args.get(4));
                 } else if(args.get(2).equals("addHistoryKey")) {
-                    childShowCase.addRootKeyField(args.get(3), args.get(4));
+                    childShowCase.addHistoryKeyField(args.get(3), args.get(4));
                 } else {
                     throw new IllegalArgumentException();
                 }
@@ -2350,8 +2319,17 @@ public class CLI {
             showcaseService.reloadCash();
         } else if (args.get(0).equals("stats")) {
             showcaseStat();
+        } else if(args.get(0).equals("sql")) {
+          if(args.get(1).equals("run")) {
+              System.out.println("Запускаю скрипт " + args.get(2));
+              long t1 = System.currentTimeMillis();
+              InitDataSourceSC(showcaseService.getDriverSc(), showcaseService.getSchemaSc(), showcaseService.getPasswordSc(), showcaseService.getUrlSc());
+              SqlRunner runner = new SqlRunner(jdbcTemplateSC.getDataSource().getConnection(),  true);
+              runner.runScript(args.get(2), StaticRouter.getShowcaseSchemaName());
+              System.out.println("Скрипт отработан за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
+          }
         } else {
-            throw new IllegalArgumentException("Arguments: showcase [status, set]");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E219));
         }
     }
 
@@ -2453,7 +2431,7 @@ public class CLI {
                 System.out.println("No such command: " + command);
             }
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println(Errors.unmarshall(e.getMessage()));
             lastException = e;
         }
     }
@@ -2936,7 +2914,7 @@ public class CLI {
         public boolean intersects(DispatcherJob job) {
             if (job instanceof DeleteJob) {
                 if (ids == null || ((DeleteJob) job).ids == null)
-                    throw new RuntimeException("Unprepared thread");
+                    throw new RuntimeException(Errors.getMessage(Errors.E210));
 
                 Set<Long> inter = SetUtils.intersection(ids, ((DeleteJob) job).ids);
 

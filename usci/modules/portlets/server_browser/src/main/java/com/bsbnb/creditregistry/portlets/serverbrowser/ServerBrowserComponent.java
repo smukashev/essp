@@ -28,6 +28,8 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -35,8 +37,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  */
 public class ServerBrowserComponent extends VerticalLayout implements Upload.Receiver, Upload.SucceededListener, Upload.FailedListener {
 
-    public static final Logger logger = Logger.getLogger("Explorer");
+    private final Logger logger = Logger.getLogger(ServerBrowserComponent.class);
     private static final long AUTO_UPDATE_THREAD_TIMEOUT_MILLIS = 600 * 1000;
 
     private final Button.ClickListener pathButtonListener = new Button.ClickListener() {
@@ -263,7 +263,7 @@ public class ServerBrowserComponent extends VerticalLayout implements Upload.Rec
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ie) {
-                logger.log(Level.WARNING, "Thread interrupted", ie);
+                logger.warn("Thread interrupted", ie);
             }
         }
         autoUpdateEnabled = false;
@@ -296,7 +296,7 @@ public class ServerBrowserComponent extends VerticalLayout implements Upload.Rec
             message.append(stackTraceElement.toString());
         }
         String messageString = message.toString();
-        logger.log(Level.INFO, "Exception occured while loading path: {0}", messageString);
+        logger.info("Exception occured while loading path: "+ messageString);
         MessageBox.Show(exception.getMessage(), "Error", getWindow());
     }
 

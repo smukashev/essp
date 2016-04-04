@@ -38,7 +38,6 @@ import jxl.write.biff.RowsExceededException;
 
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.portlet.report.Localization;
-import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 import static kz.bsbnb.usci.portlet.report.ReportApplication.setStartTime;
 import static kz.bsbnb.usci.portlet.report.ReportApplication.logTime;
 import kz.bsbnb.usci.portlet.report.ReportPortletResource;
@@ -51,6 +50,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -66,6 +66,7 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
     private ProgressIndicator progressIndicator;
     protected List<FileDownloadComponent> downloadComponents = Collections.synchronizedList(new ArrayList<FileDownloadComponent>());
     //private List<ReportLoadFile> filesToDownload = new ArrayList<ReportLoadFile>();
+    private static final Logger logger = Logger.getLogger(TemplatedPagedXlsReportExporter.class);
 
     @Override
     public List<Component> getActionComponents() {
@@ -162,25 +163,25 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
                     for (File file : allFiles) {
                         try {
                             if (!file.delete()) {
-                                log.log(Level.WARNING, "Failed to delete temporary xls file: {0}", file.getAbsolutePath());
+                                logger.warn("Failed to delete temporary xls file: "+ file.getAbsolutePath());
                             }
                         } catch (Exception e) {
-                            log.log(Level.WARNING, "Failed to delete temporary xls file with exception", e);
+                            logger.warn("Failed to delete temporary xls file with exception", e);
                         }
                     }
 
                 } catch (WriteException we) {
                     showProgressLayout.addComponent(new com.vaadin.ui.Label(Localization.EXPORT_FAILED.getValue(), com.vaadin.ui.Label.CONTENT_XHTML));
-                    log.log(Level.SEVERE, "Export error", we);
+                    logger.error("Export error", we);
                 } catch (IOException ioe) {
                     showProgressLayout.addComponent(new com.vaadin.ui.Label(Localization.EXPORT_FAILED.getValue(), com.vaadin.ui.Label.CONTENT_XHTML));
-                    log.log(Level.SEVERE, "Export error", ioe);
+                    logger.error("Export error", ioe);
                 } catch (SQLException sqle) {
                     showProgressLayout.addComponent(new com.vaadin.ui.Label(Localization.EXPORT_FAILED.getValue(), com.vaadin.ui.Label.CONTENT_XHTML));
-                    log.log(Level.SEVERE, "Export error", sqle);
+                    logger.error("Export error", sqle);
                 } catch (Exception e) {
                     showProgressLayout.addComponent(new com.vaadin.ui.Label(Localization.EXPORT_FAILED.getValue(), com.vaadin.ui.Label.CONTENT_XHTML));
-                    log.log(Level.SEVERE, "Export error", e);
+                    logger.error("Export error", e);
                 } finally {
                     if (dataSource != null) {
                         try {
@@ -234,7 +235,7 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
             dateFormat.setVerticalAlignment(VerticalAlignment.TOP);
             dateFormat.setBorder(Border.ALL, BorderLineStyle.THIN);
         } catch (WriteException we) {
-            log.log(Level.INFO, "Error setting formats", we);
+            logger.info("Error setting formats", we);
         }
         CellView autosizeCellView = new CellView();
         autosizeCellView.setAutosize(true);
@@ -257,6 +258,12 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
             ResultSet dataSource = getTargetReportComponent().getResultSet(firstRecordNumber, lastRecordNumber);
             logTime("After query");
             ResultSetMetaData rsmd = dataSource.getMetaData();
+            for(int columnIndex=1; columnIndex<=dataSource.getMetaData().getColumnCount(); columnIndex++) {
+                currentSheet.addCell(new Label(columnIndex, rowIndex, dataSource.getMetaData().getColumnName(columnIndex), times12Format));
+
+                recordCounter++;
+            }
+            rowIndex++;
             while (dataSource.next()) {
                 for (int columnIndex = 1; columnIndex <= rsmd.getColumnCount(); columnIndex++) {
                     int columnNumber = columnIndex;
@@ -279,11 +286,11 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
             workbook.close();
             logTime("After xls file write");
             recordCounter--;
-            log.log(Level.INFO, "Checked record counter: {0}", recordCounter);
+            logger.info("Checked record counter: "+ recordCounter);
             if (recordCounter > 0) {
                 String cleanFilename = String.format("%s%d-%d.xls", exportFilePrefix, firstRecordNumber, recordCounter);
-                log.log(Level.INFO, "Clean file name: {0}",cleanFilename);
-                log.log(Level.INFO, "XLS file path: {0}", xlsFile.getAbsolutePath());
+                logger.info("Clean file name: "+cleanFilename);
+                logger.info("XLS file path: "+ xlsFile.getAbsolutePath());
                 FileDownloadComponent downloadComponent = new FileDownloadComponent(cleanFilename.replace(".xls", ".zip"), cleanFilename, xlsFile);
                 downloadComponent.setCaption(String.format(Localization.LOAD_RECORDS_FROM_TO.getValue(), firstRecordNumber, recordCounter));
                 downloadComponent.setImmediate(true);
@@ -299,7 +306,7 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
                 try {
                     workbook.close();
                 } catch (Exception e) {
-                    log.log(Level.WARNING, "Failed to close workbook", e);
+                    logger.warn("Failed to close workbook", e);
                 }
             }
             
@@ -307,7 +314,7 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
                 try {
                 fos.close();
                 } catch(Exception e) {
-                    log.log(Level.WARNING, "Failed to close file stream", e);
+                    logger.warn("Failed to close file stream", e);
                 }
             }
         }
@@ -319,19 +326,19 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
      */
 
     private void loadConfig(String configFilePath) {
-        log.log(Level.INFO, "Config file path: {0}", configFilePath);
+        logger.info("Config file path: "+ configFilePath);
         File configFile = new File(configFilePath);
         if (!configFile.exists()) {
             return;
         }
-        log.log(Level.INFO, "Config file exists");
+        logger.info("Config file exists");
         FileInputStream configFileStream = null;
         try {
             configFileStream = new FileInputStream(configFile);
             PropertyResourceBundle configuration = new PropertyResourceBundle(configFileStream);
             headerBottom = getIntegerFromConfiguration(configuration, "header-bottom");
         } catch (IOException ioe) {
-            log.log(Level.WARNING, "Error reading configuration file", ioe);
+            logger.warn("Error reading configuration file", ioe);
         } finally {
             if (configFileStream != null) {
                 try {
@@ -355,22 +362,24 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException nfe) {
-            log.log(Level.WARNING, "Failed to parse integer from config: {0}={1}", new Object[]{key, value});
+            logger.warn("Failed to parse integer from config: " +key+"="+value);
         }
         return null;
     }
 
     protected int writeHeaderToSheet(WritableSheet sheet) throws RowsExceededException, WriteException {
-        log.log(Level.INFO, "Template file: {0}", templateFilePath);
+        logger.info("Template file: "+ templateFilePath);
         if (!isConfigurationValid()) {
             return 0;
         }
-        log.log(Level.INFO, "The configuration is valid");
+        logger.info("The configuration is valid");
         File file = new File(templateFilePath);
         if (!file.exists()) {
             return 0;
+
+
         }
-        log.log(Level.INFO, "Template file exists");
+        logger.info("Template file exists");
         Workbook templateWorkbook = null;
         WritableWorkbook tempWorkbook = null;
         try {
@@ -378,7 +387,7 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
             List<String> parameterCaptions = getTargetReportComponent().getParameterCaptions();
             Map<String, String> parameters = new HashMap<String, String>();
             for (int i = 0; i < parameterNames.size(); i++) {
-                log.log(Level.INFO, "Parameter name: {0}", parameterNames.get(i));
+                logger.info("Parameter name: "+ parameterNames.get(i));
                 parameters.put(parameterNames.get(i), parameterCaptions.get(i));
             }
             templateWorkbook = Workbook.getWorkbook(file);
@@ -398,7 +407,7 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
                     if (content.startsWith("$P")) {
 
                         String parameterName = content.substring(2);
-                        log.log(Level.INFO, "Found parameter template: {0}", parameterName);
+                        logger.info("Found parameter template: "+ parameterName);
                         if (parameters.containsKey(parameterName)) {
                             newCell = new Label(colIdx, rowIdx, parameters.get(parameterName).toString());
                         }
@@ -420,9 +429,9 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
             }
             return headerBottom;
         } catch (IOException ioe) {
-            log.log(Level.WARNING, "Error reading template file", ioe);
+            logger.warn("Error reading template file", ioe);
         } catch (BiffException be) {
-            log.log(Level.WARNING, "Error parsing template file", be);
+            logger.warn("Error parsing template file", be);
         } finally {
             if (tempWorkbook != null) {
                 try {

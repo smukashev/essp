@@ -20,6 +20,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.export.JExcelApiExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import net.sf.jasperreports.engine.util.JRLoader;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -35,8 +36,8 @@ import java.util.zip.ZipOutputStream;
  * @author Aidar.Myrzahanov
  */
 public class JasperReportExporter extends AbstractReportExporter{
-    
-    
+
+    private final Logger logger = Logger.getLogger(FileDownloadComponent.class);
     
     @Override
     public List<Component> getActionComponents() {
@@ -60,17 +61,17 @@ public class JasperReportExporter extends AbstractReportExporter{
             final String reportPath = StaticRouter.getReportFilesCatalog() + reportName + "\\";
             final String jasperFilePath = reportPath+reportName+".jasper";
             final String resourceFilePath = reportPath+reportName+"_"+ ReportApplication.getApplicationLocale().getLanguage()+".properties";
-            ReportApplication.log.log(Level.INFO, "Report name: {0}", reportName);
-            ReportApplication.log.log(Level.INFO, "Report path: {0}", reportPath);
-            ReportApplication.log.log(Level.INFO, "Jasper file path: {0}", jasperFilePath);
-            ReportApplication.log.log(Level.INFO, "Resource file path: {0}", resourceFilePath);
+            logger.info("Report name: "+ reportName);
+            logger.info("Report path: "+ reportPath);
+            logger.info("Jasper file path: "+ jasperFilePath);
+            logger.info("Resource file path: "+ resourceFilePath);
             JasperReport jasperReport = (JasperReport)JRLoader.loadObjectFromFile(jasperFilePath);
             PropertyResourceBundle resourceBundle = new PropertyResourceBundle(new FileInputStream(resourceFilePath));
             Enumeration<String> resourceEnumeration = resourceBundle.getKeys();
             while(resourceEnumeration.hasMoreElements()) {
                 String resourceStringName = resourceEnumeration.nextElement();
                 String resourceStringValue = resourceBundle.getString(resourceStringName);
-                ReportApplication.log.log(Level.INFO, "Resource property: {0}={1}", new Object[] {resourceStringName, resourceStringValue});
+                logger.info("Resource property: "+resourceStringName+"="+ resourceStringValue);
             }
             HashMap<String,Object> reportParameters = new HashMap<String, Object>();
             reportParameters.put("REPORT_RESOURCE_BUNDLE", resourceBundle);
@@ -93,7 +94,7 @@ public class JasperReportExporter extends AbstractReportExporter{
                 }
             }
             for(Entry<String,Object> entry : reportParameters.entrySet()) {
-                ReportApplication.log.log(Level.INFO, "Report parameter {0}={1}", new Object[]{entry.getKey(), entry.getValue()});
+                logger.info("Report parameter "+entry.getKey()+"="+ entry.getValue());
             }
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, reportParameters, dataSource);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -137,11 +138,11 @@ public class JasperReportExporter extends AbstractReportExporter{
             (getWindow()).open(resource);
             loadFinished();
         } catch(JRException jre) {
-            ReportApplication.log.log(Level.INFO, "Report exception", jre);
+            logger.error("Report exception", jre);
         } catch(IOException ioe) {
-            ReportApplication.log.log(Level.INFO, "File access exception", ioe);
+            logger.info("File access exception", ioe);
         } catch(SQLException sqle) {
-            ReportApplication.log.log(Level.INFO, "SQL exception", sqle);
+            logger.info("SQL exception", sqle);
         }
     }
 }

@@ -37,77 +37,64 @@ public class InfoParser extends BatchParser {
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if (localName.equals("info")) {
-        } else if (localName.equals("creditor")) {
-            currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"), batch.getRepDate(), creditorId);
+        switch (localName) {
+            case "info":
+                break;
+            case "creditor":
+                currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"),
+                        batch.getRepDate(), creditorId);
+                break;
+            case "code":
+                event = (XMLEvent) xmlReader.next();
+                String crCode = event.asCharacters().getData();
 
-        } else if (localName.equals("code")) {
-            event = (XMLEvent) xmlReader.next();
-            String crCode = event.asCharacters().getData();
+                currentBaseEntity.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), crCode, false, true));
+                break;
+            case "docs":
+                docs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
+                break;
+            case "doc":
+                currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),
+                        batch.getRepDate(), creditorId);
 
-            RefListResponse refListResponse = refProcessorDao.getRefListResponse(
-                    metaClassRepository.getMetaClass("ref_creditor").getId(), batch.getRepDate(), false);
+                BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
+                        batch.getRepDate(), creditorId);
 
-            boolean found = false;
+                docType.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
+                                event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
 
-            for (Map<String, Object> m : refListResponse.getData())
-                if (m.get("CODE") != null && m.get("CODE").equals(crCode)) {
-                    long creditorId = ((BigDecimal) m.get("ID")).longValue();
-                    IBaseEntity loadedCreditor = baseEntityLoadDao.load(creditorId);
-                    BaseSet creditorDocsLoaded = (BaseSet) loadedCreditor.getEl("docs");
-                    BaseSet creditorDocs = new BaseSet(metaClassRepository.getMetaClass("document"));
-                    for (IBaseValue bv : creditorDocsLoaded.get()) {
-                        BaseEntity docLoaded = (BaseEntity) bv.getValue();
-                        BaseEntity doc = new BaseEntity(metaClassRepository.getMetaClass("document"),
-                                batch.getRepDate(), creditorId);
-                        doc.put("no", new BaseValue<>(0, creditorId, batch.getRepDate(), docLoaded.getEl("no")));
+                currentDoc.put("doc_type",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), docType, false, true));
+                break;
+            case "name":
+                event = (XMLEvent) xmlReader.next();
 
-                        BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
-                                batch.getRepDate(), creditorId);
-                        docType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                                (String) docLoaded.getEl("doc_type.code"), false, true));
-                        doc.put("doc_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), docType,
-                                false, true));
-                        creditorDocs.put(new BaseValue<>(0, creditorId, batch.getRepDate(), doc));
-                    }
-                    currentBaseEntity.put("docs", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(),
-                            creditorDocs, false, true));
-                    found = true;
-                    break;
+                currentDoc.put("name",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                break;
+            case "no":
+                event = (XMLEvent) xmlReader.next();
+
+                currentDoc.put("no",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                break;
+            case "account_date":
+                break;
+            case "report_date":
+                event = (XMLEvent) xmlReader.next();
+                String dateRaw = event.asCharacters().getData();
+
+                try {
+                    reportDate = new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw), false, true);
+                } catch (ParseException e) {
+                    currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
                 }
-
-            if (!found)
-                currentBaseEntity.addValidationError(String.format("Кредитор с кодом %s не найден", crCode));
-        } else if (localName.equals("docs")) {
-            docs = new BaseSet(metaClassRepository.getMetaClass("document"));
-        } else if (localName.equals("doc")) {
-            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate(), creditorId);
-
-            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate(), creditorId);
-            docType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
-            currentDoc.put("doc_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), docType, false, true));
-        } else if (localName.equals("name")) {
-            event = (XMLEvent) xmlReader.next();
-            currentDoc.put("name", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-        } else if (localName.equals("no")) {
-            event = (XMLEvent) xmlReader.next();
-            currentDoc.put("no", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-        } else if (localName.equals("account_date")) {
-        } else if (localName.equals("report_date")) {
-            event = (XMLEvent) xmlReader.next();
-            String dateRaw = event.asCharacters().getData();
-            try {
-                reportDate = new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw),
-                        false, true);
-            } catch (ParseException e) {
-                currentBaseEntity.addValidationError("Неправильная дата: " + dateRaw);
-            }
-        } else if (localName.equals("actual_credit_count")) {
-        } else {
-            throw new UnknownTagException(localName);
+                break;
+            case "actual_credit_count":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -115,21 +102,31 @@ public class InfoParser extends BatchParser {
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("info")) {
-            return true;
-        } else if (localName.equals("creditor")) {
-        } else if (localName.equals("code")) {
-        } else if (localName.equals("docs")) {
-            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), docs, false, true));
-        } else if (localName.equals("doc")) {
-            docs.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentDoc, false, true));
-        } else if (localName.equals("name")) {
-        } else if (localName.equals("no")) {
-        } else if (localName.equals("account_date")) {
-        } else if (localName.equals("report_date")) {
-        } else if (localName.equals("actual_credit_count")) {
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "info":
+                return true;
+            case "creditor":
+                break;
+            case "code":
+                break;
+            case "docs":
+                currentBaseEntity.put("docs", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), docs, false, true));
+                break;
+            case "doc":
+                docs.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentDoc, false, true));
+                break;
+            case "name":
+                break;
+            case "no":
+                break;
+            case "account_date":
+                break;
+            case "report_date":
+                break;
+            case "actual_credit_count":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;

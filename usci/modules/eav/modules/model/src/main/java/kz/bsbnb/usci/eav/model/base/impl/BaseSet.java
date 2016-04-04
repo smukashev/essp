@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -15,36 +15,38 @@ import java.util.*;
 public class BaseSet extends BaseContainer implements IBaseSet {
     private UUID uuid = UUID.randomUUID();
 
-    /**
-     * Holds data about entity structure
-     *
-     * @see kz.bsbnb.usci.eav.model.meta.impl.MetaClass
-     */
     private IMetaType metaType;
 
-    private Map<String, IBaseValue> values = new HashMap<String, IBaseValue>();
+    private Map<String, IBaseValue> values = new HashMap<>();
 
-    private long level = 1;
+    private long creditorId;
 
     private boolean last = true;
 
-    /**
-     * Initializes entity with a class name.
-     *
-     * @param metaType MetaClass of the entity..
-     */
-    public BaseSet(IMetaType metaType) {
+    public BaseSet(IMetaType metaType, long creditorId) {
         super(BaseContainerType.BASE_SET);
         this.metaType = metaType;
+        this.creditorId = creditorId;
     }
 
-    public BaseSet(long id, IMetaType metaType) {
+    public BaseSet(long id, IMetaType metaType, long creditorId) {
         super(id, BaseContainerType.BASE_SET);
         this.metaType = metaType;
+        this.creditorId = creditorId;
     }
 
     public UUID getUuid() {
         return uuid;
+    }
+
+    @Override
+    public long getCreditorId() {
+        return creditorId;
+    }
+
+    @Override
+    public void setCreditorId(long creditorId) {
+        this.creditorId = creditorId;
     }
 
     @Override
@@ -58,16 +60,6 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
     public Set<String> getAttributes() {
         return values.keySet();
-    }
-
-    @Override
-    public long getLevel() {
-        return level;
-    }
-
-    @Override
-    public void setLevel(long level) {
-        this.level = level;
     }
 
     @Override
@@ -138,7 +130,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
     public Object getElSimple(String filter) {
         if (metaType.isComplex() || metaType.isSet()) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E35));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E35));
         }
 
         for (IBaseValue value : values.values()) {
@@ -156,7 +148,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
     public Object getElComplex(String filter) {
         if (!metaType.isComplex() || metaType.isSet()) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E33));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E33));
         }
 
         StringTokenizer tokenizer = new StringTokenizer(filter, ",");
@@ -171,7 +163,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
             String fieldName = innerTokenizer.nextToken().trim();
             if (!innerTokenizer.hasMoreTokens())
-                throw new IllegalStateException(String.valueOf(Errors.E34));
+                throw new IllegalStateException(Errors.getMessage(Errors.E34));
 
             String fieldValue = innerTokenizer.nextToken().trim();
 
@@ -239,12 +231,12 @@ public class BaseSet extends BaseContainer implements IBaseSet {
                 if (!uuids.contains(thatBaseValue.getUuid())) {
                     Object thisObject = thisBaseValue.getValue();
                     if (thisObject == null) {
-                        throw new RuntimeException(String.valueOf(Errors.E32));
+                        throw new RuntimeException(Errors.getMessage(Errors.E32));
                     }
 
                     Object thatObject = thatBaseValue.getValue();
                     if (thatObject == null) {
-                        throw new RuntimeException(String.valueOf(Errors.E32));
+                        throw new RuntimeException(Errors.getMessage(Errors.E32));
                     }
 
                     if (date) {
@@ -275,11 +267,8 @@ public class BaseSet extends BaseContainer implements IBaseSet {
             baseSetCloned = (BaseSet) super.clone();
 
             HashMap<String, IBaseValue> valuesCloned = new HashMap<>();
-            Iterator<String> items = values.keySet().iterator();
 
-            while (items.hasNext()) {
-                String attribute = items.next();
-
+            for (String attribute : values.keySet()) {
                 IBaseValue baseValue = values.get(attribute);
                 IBaseValue baseValueCloned = ((BaseValue) baseValue).clone();
                 baseValueCloned.setBaseContainer(baseSetCloned);
@@ -288,7 +277,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
             baseSetCloned.values = valuesCloned;
         } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException(String.valueOf(Errors.E31));
+            throw new RuntimeException(Errors.getMessage(Errors.E31));
         }
         return baseSetCloned;
     }
@@ -297,4 +286,6 @@ public class BaseSet extends BaseContainer implements IBaseSet {
     public boolean isSet() {
         return true;
     }
+
+
 }

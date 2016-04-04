@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.tool.generator.random.data;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 import java.sql.Timestamp;
@@ -46,7 +46,7 @@ public abstract class AbstractDataGenerator {
             case DOUBLE:
                 return rand.nextDouble()*10000;
             default:
-                throw new IllegalArgumentException(String.valueOf(Errors.E49));
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E49));
         }
     }
 }

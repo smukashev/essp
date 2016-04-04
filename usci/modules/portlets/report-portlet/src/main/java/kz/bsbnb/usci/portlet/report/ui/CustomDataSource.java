@@ -8,14 +8,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
+
+import kz.bsbnb.usci.eav.util.Errors;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRField;
 
-import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -28,6 +30,7 @@ public class CustomDataSource extends IndexedContainer implements JRDataSource {
     private String[] columnNames;
     private HashMap<String, Integer> columnIndicesMap;
     private int columnCount;
+    private static final Logger logger = Logger.getLogger(CustomDataSource.class);
 
     public CustomDataSource(ResultSet rs) {
         try {
@@ -38,7 +41,7 @@ public class CustomDataSource extends IndexedContainer implements JRDataSource {
             for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
                 columnNames[columnIndex - 1] = rsmd.getColumnName(columnIndex);
                 columnIndicesMap.put(columnNames[columnIndex - 1], columnIndex - 1);
-                log.log(Level.INFO, "Column #{0}: {1}", new Object[]{columnIndex, columnNames[columnIndex - 1]});
+                logger.info("Column #"+columnIndex+": "+columnNames[columnIndex - 1]);
             }
             for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
                 Class columnClass = String.class;
@@ -71,7 +74,7 @@ public class CustomDataSource extends IndexedContainer implements JRDataSource {
             }
 
         } catch (SQLException sqle) {
-            log.log(Level.SEVERE, "SQL Exception occured while parsing report result set", sqle);
+            logger.error("SQL Exception occured while parsing report result set", sqle);
         }
     }
 
@@ -84,13 +87,15 @@ public class CustomDataSource extends IndexedContainer implements JRDataSource {
     @Override
     public Object getFieldValue(JRField jrf) throws JRException {
         if (currentRecordIndex >= dataSet.size()) {
-            throw new JRException("No more records");
+            logger.error(Errors.getError(String.valueOf(Errors.E256)));
+            throw new JRException(Errors.getMessage(Errors.E256));
         }
         String name = jrf.getName();
         try {
             return getFieldValue(name);
         } catch (NoSuchFieldException nsfe) {
-            throw new JRException("No such field: " + name);
+            logger.error(Errors.getMessage(Errors.E257, name));
+            throw new JRException(Errors.getMessage(Errors.E257, name));
         }
     }
 

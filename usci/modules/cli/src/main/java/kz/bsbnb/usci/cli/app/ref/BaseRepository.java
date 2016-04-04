@@ -2,6 +2,7 @@ package kz.bsbnb.usci.cli.app.ref;
 
 import kz.bsbnb.usci.cli.app.ref.craw.*;
 import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.commons.lang.NotImplementedException;
 
 import java.io.File;
@@ -93,10 +94,10 @@ public class BaseRepository implements  Runnable
         if(startDate.equals(endDate))
             return;
         if(!startDate.matches("\\d{2}\\.\\d{2}\\.\\d{4}"))
-            throw new RuntimeException("start format not correct");
+            throw new RuntimeException(Errors.getMessage(Errors.E224));
 
         if(!endDate.matches("\\d{2}\\.\\d{2}\\.\\d{4}"))
-            throw new RuntimeException("end format not correct");
+            throw new RuntimeException(Errors.getMessage(Errors.E225));
 
         int mo = (startDate.charAt(3) - '0' )* 10 + (startDate.charAt(4) - '0');
         int year = (startDate.charAt(6) - '0') * 1000 + (startDate.charAt(7) - '0') * 100
@@ -117,7 +118,7 @@ public class BaseRepository implements  Runnable
                 return;
         }
 
-        throw new RuntimeException("too long period given");
+        throw new RuntimeException(Errors.getMessage(Errors.E226));
     }
 
     public String getNextRepDate(String date){

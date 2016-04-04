@@ -4,7 +4,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>kz.bsbnb.usci</groupId>
 	<artifactId>cli</artifactId>
-	<!--<packaging>war</packaging>-->
 	<name>EAV Command Line Interface</name>
     <version>0.0.1-SNAPSHOT</version>
 
@@ -45,17 +44,6 @@
             </plugin>
 		</plugins>
 	</build>
-
-    <repositories>
-        <repository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-        <repository>
-            <id>code.google.com</id>
-            <url>http://code.google.com/p/google-gson/</url>
-        </repository>
-    </repositories>
 
     <parent>
         <groupId>kz.bsbnb.usci</groupId>

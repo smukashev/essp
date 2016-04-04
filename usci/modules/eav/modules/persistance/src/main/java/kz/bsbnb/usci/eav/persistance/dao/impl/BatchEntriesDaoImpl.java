@@ -1,16 +1,14 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchEntriesDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.jooq.DSLContext;
 import org.jooq.DeleteConditionStep;
 import org.jooq.Insert;
 import org.jooq.Select;
-import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,12 +49,12 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
 
         if (rows.size() > 1)
         {
-            throw new IllegalArgumentException(String.valueOf(Errors.E151));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E151));
         }
 
         if (rows.size() < 1)
         {
-            throw new IllegalStateException(Errors.E152+"|"+ id);
+            throw new IllegalStateException(Errors.getMessage(Errors.E152, id));
         }
 
         Map<String, Object> row = rows.get(0);
@@ -100,7 +98,7 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
     public void remove(BatchEntry batch) {
         if(batch.getId() < 1)
         {
-            throw new IllegalArgumentException(String.valueOf(Errors.E153));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E153));
         }
 
         DeleteConditionStep delete = context

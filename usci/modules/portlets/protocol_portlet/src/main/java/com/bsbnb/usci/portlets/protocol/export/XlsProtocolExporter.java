@@ -16,6 +16,8 @@ import jxl.WorkbookSettings;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
 import jxl.write.*;
+import kz.bsbnb.usci.eav.util.Errors;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -25,17 +27,21 @@ public class XlsProtocolExporter extends ProtocolExporter {
 
     private String[] properties;
     private String[] propertyNames;
+    private final Logger logger = Logger.getLogger(XlsProtocolExporter.class);
 
     public XlsProtocolExporter(final String[] properties, final String[] propertyNames) {
         super();
         if (properties == null) {
-            throw new IllegalArgumentException("Null is illegal value for properties array");
+            logger.error(Errors.getError(String.valueOf(Errors.E249)));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E249));
         }
         if (propertyNames == null) {
-            throw new IllegalArgumentException("Null is illegal value for property names length");
+            logger.error(Errors.getError(String.valueOf(Errors.E250)));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E250));
         }
         if (properties.length != propertyNames.length) {
-            throw new IllegalArgumentException("Properties and property names should contain equal number of elements");
+            logger.error(Errors.getError(String.valueOf(Errors.E251)));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E251));
         }
         this.properties = properties;
         this.propertyNames = propertyNames;

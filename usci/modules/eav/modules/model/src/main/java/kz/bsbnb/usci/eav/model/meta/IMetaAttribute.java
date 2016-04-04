@@ -8,6 +8,8 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 public interface IMetaAttribute extends IPersistable {
     boolean isKey();
 
+    boolean isOptionalKey();
+
     boolean isNullable();
 
     boolean isCumulative();
@@ -15,6 +17,8 @@ public interface IMetaAttribute extends IPersistable {
     IMetaType getMetaType();
 
     void setKey(boolean isKey);
+
+    void setOptionalKey(boolean isOptionKey);
 
     void setNullable(boolean isNullable);
 
@@ -34,12 +38,11 @@ public interface IMetaAttribute extends IPersistable {
 
     boolean isImmutable();
 
-    void setImmutable(boolean immutable);
+    void setImmutable(boolean isImmutable);
 
     boolean isDisabled();
 
-    void setDisabled(boolean immutable);
-
+    void setDisabled(boolean isDisabled);
 
     String getName();
 

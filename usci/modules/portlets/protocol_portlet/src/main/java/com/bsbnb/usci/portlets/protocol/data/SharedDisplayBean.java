@@ -3,6 +3,7 @@ package com.bsbnb.usci.portlets.protocol.data;
 //import com.bsbnb.creditregistry.dm.ref.Shared;
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
 import kz.bsbnb.usci.cr.model.Shared;
+import kz.bsbnb.usci.eav.util.Errors;
 
 /**
  *
@@ -13,7 +14,7 @@ public class SharedDisplayBean {
     
     public SharedDisplayBean(Shared shared) {
         if(shared==null) {
-            throw new IllegalArgumentException("Shared can not be null");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E247));
         }
         this.shared = shared;
     }

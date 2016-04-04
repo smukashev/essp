@@ -7,11 +7,12 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
  * @author k.tulbassiyev
  */
 public class ProcessJob extends Thread {
-    private BaseEntity baseEntity;
-    private IEntityService entityService;
+    private final BaseEntity baseEntity;
+    private final IEntityService entityService;
+
     private long timeSpent = 0;
 
-    public ProcessJob(IEntityService entityService, BaseEntity baseEntity) {
+    ProcessJob(IEntityService entityService, BaseEntity baseEntity) {
         this.entityService = entityService;
         this.baseEntity = baseEntity;
     }
@@ -23,11 +24,11 @@ public class ProcessJob extends Thread {
         timeSpent = System.currentTimeMillis() - t1;
     }
 
-    public BaseEntity getBaseEntity() {
+    BaseEntity getBaseEntity() {
         return baseEntity;
     }
 
-    public long getTimeSpent() {
+    long getTimeSpent() {
         return timeSpent;
     }
 }

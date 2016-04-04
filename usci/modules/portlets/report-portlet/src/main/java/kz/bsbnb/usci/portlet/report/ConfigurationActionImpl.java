@@ -4,6 +4,8 @@ import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
+import org.apache.log4j.Logger;
+
 import java.util.logging.Level;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -18,22 +20,24 @@ import javax.portlet.RenderResponse;
  */
 public class ConfigurationActionImpl implements ConfigurationAction {
 
+    private static final Logger logger = Logger.getLogger(ConfigurationActionImpl.class);
+
     @Override
     public void processAction(PortletConfig pc, ActionRequest ar, ActionResponse ar1) throws Exception {
         String portletResource = ParamUtil.getString(ar, "portletResource");
 
         PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(ar, portletResource);
         String typeValue = ar.getParameter("type");
-        ReportApplication.log.log(Level.INFO, typeValue);
+        logger.info(typeValue);
         if (typeValue != null) {
-            ReportApplication.log.log(Level.INFO, "Setting: {0}", typeValue);
+            logger.info("Setting: "+ typeValue);
             prefs.setValue("type", typeValue);
         }
 
         String defaultReportDateString = ar.getParameter("defaultreportdate");
-        ReportApplication.log.log(Level.INFO, defaultReportDateString);
+        logger.info(defaultReportDateString);
         if (defaultReportDateString != null) {
-            ReportApplication.log.log(Level.INFO, "Default report date string: {0}", defaultReportDateString);
+            logger.info("Default report date string: "+ defaultReportDateString);
             prefs.setValue("defaultreportdate", defaultReportDateString);
         }
         prefs.store();

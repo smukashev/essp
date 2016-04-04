@@ -14,7 +14,6 @@
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.eav.tool" />
     <context:component-scan base-package="kz.bsbnb.usci.cli" />
-    <context:component-scan base-package="kz.bsbnb.usci.brms.rulesingleton" />
 
     <context:annotation-config/>
 
@@ -33,7 +32,6 @@
         <property name="username" value="${jdbc.ref.user}" />
         <property name="password" value="${jdbc.ref.password}" />
     </bean>
-
     <bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IPackageService"/>

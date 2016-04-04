@@ -51,6 +51,7 @@ import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.SubjectType;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -76,6 +77,7 @@ public class ProtocolLayout extends VerticalLayout {
     private FormattedTable tableProtocol;
     private VerticalLayout protocolLayout;
     private Label noProtocolsLabel;
+    public final Logger logger = Logger.getLogger(ProtocolLayout.class);
 
     private static final String[] FILES_TABLE_VISIBLE_COLUMNS = new String[]{
         "creditorName", "fileLink", "receiverDate", "startDate", "completionDate", "statusName", "reportDate"};
@@ -155,10 +157,10 @@ public class ProtocolLayout extends VerticalLayout {
                     filesTable.downloadXls("files.xls", FILES_TABLE_COLUMNS_TO_EXPORT,
                             getResourceStrings(FILES_TABLE_COLUMNS_TO_EXPORT));
                 } catch (IOException ioe) {
-                    ProtocolApplication.log.log(Level.WARNING, "Input info export failed", ioe);
+                    logger.warn("Input info export failed", ioe);
                     MessageBox.Show(Localization.MESSAGE_EXPORT_FAILED.getValue(), getWindow());
                 } catch (WriteException we) {
-                    ProtocolApplication.log.log(Level.WARNING, "Input info export failed", we);
+                    logger.warn("Input info export failed", we);
                     MessageBox.Show(Localization.MESSAGE_EXPORT_FAILED.getValue(), getWindow());
                 }
             }
@@ -300,7 +302,7 @@ public class ProtocolLayout extends VerticalLayout {
                     return;
                 }
                 Object itemId = event.getProperty().getValue();
-                ProtocolApplication.log.log(Level.INFO, "Clicked item id: {0}", itemId);
+                logger.info("Clicked item id: "+ itemId);
                 List<ProtocolDisplayBean> protocols = groupsMapProtocol.get(itemId);
                 if (protocols == null) {
                     return;
@@ -376,7 +378,7 @@ public class ProtocolLayout extends VerticalLayout {
             Resource resource = zippedExporter.getResource();
             (getWindow()).open(resource);
         } catch (ExportException ee) {
-            ProtocolApplication.log.log(Level.INFO, "Failed to export", ee);
+            logger.info("Failed to export", ee);
             MessageBox.Show(Localization.MESSAGE_EXPORT_FAILED.getValue(), getWindow());
         }
     }
@@ -507,7 +509,7 @@ public class ProtocolLayout extends VerticalLayout {
             }
         }
         int groupItemsCount = groupsOfProtocolTree.getItemIds().size();
-        ProtocolApplication.log.log(Level.INFO, "Group items count: {0}", groupItemsCount);
+        logger.info("Group items count: "+ groupItemsCount);
         if (groupItemsCount == 0) {
             noProtocolsLabel.setVisible(true);
             protocolLayout.setVisible(false);

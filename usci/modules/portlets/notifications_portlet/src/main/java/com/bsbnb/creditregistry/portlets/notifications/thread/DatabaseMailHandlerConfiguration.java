@@ -2,6 +2,7 @@ package com.bsbnb.creditregistry.portlets.notifications.thread;
 
 //import com.bsbnb.creditregistry.dm.maintenance.Sysconfig;
 import com.bsbnb.creditregistry.portlets.notifications.data.DataProvider;
+import kz.bsbnb.usci.eav.util.Errors;
 
 /**
  *
@@ -27,7 +28,7 @@ public class DatabaseMailHandlerConfiguration implements MailHandlerConfiguratio
             //return Long.parseLong(dataProvider.getConfig(LAST_MAIL_HANDLER_LAUNCH_TIME_CODE).getValue());
             return lastLaunchMillis;
         } catch (NumberFormatException nfe) {
-            throw new ConfigurationException("Couldn't parse " + LAST_MAIL_HANDLER_LAUNCH_TIME_CODE + " configuration value", nfe);
+            throw new ConfigurationException(Errors.getMessage(Errors.E246, LAST_MAIL_HANDLER_LAUNCH_TIME_CODE , nfe));
         }
     }
 

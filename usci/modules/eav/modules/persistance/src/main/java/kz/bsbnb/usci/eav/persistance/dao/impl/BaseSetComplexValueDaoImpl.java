@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -39,16 +39,10 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     private DSLContext context;
 
     @Autowired
-    IBatchRepository batchRepository;
+    private IBaseEntityDao baseEntityDao;
 
     @Autowired
-    IBaseEntityDao baseEntityDao;
-
-    @Autowired
-    IBaseEntityProcessorDao baseEntityProcessorDao;
-
-    @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
+    private IBaseEntityLoadDao baseEntityLoadDao;
 
     @Override
     public long insert(IPersistable persistable) {
@@ -57,8 +51,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         Insert insert = context
                 .insertInto(EAV_BE_COMPLEX_SET_VALUES)
-                .set(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID, baseValue.getCreditorId())
                 .set(EAV_BE_COMPLEX_SET_VALUES.SET_ID, baseValue.getBaseContainer().getId())
+                .set(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID, baseValue.getCreditorId())
                 .set(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE, DataUtils.convert(baseValue.getRepDate()))
                 .set(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID, baseEntity.getId())
                 .set(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED, DataUtils.convert(baseValue.isClosed()))
@@ -80,8 +74,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         String tableAlias = "csv";
         Update update = context
                 .update(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
-                .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).CREDITOR_ID, baseValue.getCreditorId())
                 .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID, baseValue.getBaseContainer().getId())
+                .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).CREDITOR_ID, baseValue.getCreditorId())
                 .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE, DataUtils.convert(baseValue.getRepDate()))
                 .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID, baseEntity.getId())
                 .set(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_CLOSED, DataUtils.convert(baseValue.isClosed()))
@@ -91,7 +85,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.E138+"|" + count + "|" + baseValue.getId());
+            throw new IllegalStateException(Errors.getMessage(Errors.E138, count, baseValue.getId()));
     }
 
     @Override
@@ -104,14 +98,38 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.E133+"|" + count + "|" + persistable.getId());
+            throw new IllegalStateException(Errors.getMessage(Errors.E133, count, persistable.getId()));
+    }
+
+    private IBaseValue constructValue (Map<String, Object> row, IMetaType metaType, IBaseEntity childBaseEntity) {
+        long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
+
+        long creditorId = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID.getName())).longValue();
+
+        boolean last = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1;
+
+        boolean closed = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
+        Date reportDate = DataUtils.convertToSQLDate((Timestamp) row .get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
+
+        IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(), reportDate);
+
+        return BaseValueFactory.create(
+                MetaContainerTypes.META_SET,
+                metaType,
+                id,
+                creditorId,
+                reportDate,
+                childBaseEntityLoaded,
+                closed,
+                last);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -124,8 +142,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         IBaseValue previousBaseValue = null;
 
         String tableAlias = "csv";
-        String subqueryAlias = "csvn";
-        Table subqueryTable = context
+        String subQueryAlias = "csvn";
+        Table subQueryTable = context
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ID,
@@ -135,58 +153,31 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
-                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID.equal(childBaseEntity.getId()))
-                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE.
-                        lessThan(DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
-                .asTable(subqueryAlias);
+                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID.equal(childBaseEntity.getId()))
+                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_COMPLEX_SET_VALUES.ID),
+                        subQueryTable.field(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID),
+                        subQueryTable.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E137+"|" +childBaseEntity.getId() + "|" + childBaseEntity.getMeta().getClassName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E137, childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
-
-            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(),
-                    reportDate);
-
-            previousBaseValue = BaseValueFactory.create(
-                    MetaContainerTypes.META_SET,
-                    metaType,
-                    id,
-                    creditorId,
-                    reportDate,
-                    childBaseEntityLoaded,
-                    closed,
-                    last);
+           previousBaseValue = constructValue(row, metaType, childBaseEntity);
         }
 
         return previousBaseValue;
@@ -196,7 +187,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -221,10 +212,9 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
-                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID.equal(childBaseEntity.getId()))
-                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE.
-                        greaterThan(DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID.equal(childBaseEntity.getId()))
+                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subqueryAlias);
 
         Select select = context
@@ -241,38 +231,12 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E136+"|" + childBaseEntity.getId() + "|" + childBaseEntity.getMeta().getClassName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E136, childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
 
         if (rows.size() >= 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
-
-            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(),
-                    reportDate);
-
-            nextBaseValue = BaseValueFactory.create(
-                    MetaContainerTypes.META_SET,
-                    metaType,
-                    id,
-                    creditorId,
-                    reportDate,
-                    childBaseEntityLoaded,
-                    closed,
-                    last);
+            nextBaseValue = constructValue(row, metaType, childBaseEntity);
         }
 
         return nextBaseValue;
@@ -282,7 +246,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @SuppressWarnings("unchecked")
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -293,7 +257,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         IMetaType metaType = baseSet.getMemberType();
 
         if (baseContainer.getId() == 0)
-            throw new RuntimeException(String.valueOf(Errors.E134));
+            throw new RuntimeException(Errors.getMessage(Errors.E134));
 
         IBaseValue closedBaseValue = null;
 
@@ -305,8 +269,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
-                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE.
-                        lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE.lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID.equal(childBaseEntity.getId()))
                 .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
@@ -315,23 +278,19 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E135+"|" +
-                    childBaseEntity.getId() + "|" + childBaseEntity.getMeta().getClassName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E135,
+                    childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
+            long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
 
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID.getName())).longValue();
+            long creditorId = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID.getName())).longValue();
 
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1;
+            boolean last = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
-            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(),
-                    baseValue.getRepDate());
+            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(), baseValue.getRepDate());
 
             closedBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
@@ -350,7 +309,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.E82+"|" + baseValue.getMetaAttribute().getName());
+            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -378,25 +337,20 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.E83+"|" + select.toString());
+            throw new IllegalStateException(Errors.getMessage(Errors.E83, select.toString()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
+            long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
 
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID.getName())).longValue();
+            long creditorId = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID.getName())).longValue();
 
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
+            boolean closed = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
-            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(),
-                    reportDate);
+            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(), reportDate);
 
             lastBaseValue = BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
@@ -430,8 +384,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.SET_ID).eq(baseSet.getId()))
-                .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE)
-                        .lessOrEqual(DataUtils.convert(actualReportDate)))
+                .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(actualReportDate)))
                 .asTable("csvn");
 
         select = context
@@ -462,15 +415,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
             Date reportDate = DataUtils.convertToSQLDate((Timestamp)
                     row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
-            IBaseEntity baseEntity;
+            IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, actualReportDate);
 
-            // tmp solution
-            // fixme
-            try {
-                baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, actualReportDate);
-            } catch (Exception e) {
-                baseEntity = baseEntityLoadDao.loadByMinReportDate(entityValueId, actualReportDate);
-            }
 
             baseSet.put(BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
@@ -481,8 +427,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     baseEntity,
                     false,
                     isLast));
+            }
         }
-    }
 
     @Override
     public void deleteAll(long baseSetId) {
@@ -544,43 +490,5 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         return rows.size() == 0;
-    }
-
-    @Override
-    public Date getNextReportDate(long baseSetId, Date reportDate) {
-        String tableAlias = "csv";
-        Select select = context
-                .select(DSL.min(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE).as("next_report_date"))
-                .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
-                .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID.eq(baseSetId))
-                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(reportDate)));
-
-        logger.debug(select.toString());
-
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        if (rows.size() > 0)
-            return DataUtils.convert((Timestamp) rows.get(0).get("next_report_date"));
-
-        return null;
-    }
-
-    @Override
-    public Date getPreviousReportDate(long baseSetId, Date reportDate) {
-        String tableAlias = "csv";
-        Select select = context
-                .select(DSL.max(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE).as("previous_report_date"))
-                .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
-                .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID.eq(baseSetId))
-                .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(reportDate)));
-
-        logger.debug(select.toString());
-
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        if (rows.size() > 0)
-            return DataUtils.convert((Timestamp) rows.get(0).get("previous_report_date"));
-
-        return null;
     }
 }

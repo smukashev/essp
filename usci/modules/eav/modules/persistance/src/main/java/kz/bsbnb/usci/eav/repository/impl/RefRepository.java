@@ -1,43 +1,71 @@
 package kz.bsbnb.usci.eav.repository.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityReportDateDao;
-import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
-import kz.bsbnb.usci.eav.util.DataUtils; import org.jooq.DSLContext; import org.jooq.Select; import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.*;
-
 @Component
-@Scope(value = "singleton")
 public class RefRepository extends JDBCSupport implements IRefRepository {
-    @Autowired
-    IPersistableDaoPool persistableDaoPool;
+    private final HashMap<BaseEntityKey, IBaseEntity> cache = new HashMap<>();
 
-    @Autowired
-    private DSLContext context;
+    public IBaseEntity findRef(IBaseEntity baseEntity) {
+        boolean synced;
+        int syncCounter = 0;
+        do {
+            try {
+                for (Map.Entry<BaseEntityKey, IBaseEntity> entry : cache.entrySet()) {
+                    if (baseEntity.getReportDate().compareTo(entry.getValue().getReportDate()) == 0 && baseEntity.equalsByReference(entry.getValue())) {
+                        return entry.getValue();
+                    }
+                }
+                synced = false;
+            } catch (Exception e) {
+                synced = true;
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        } while(synced && syncCounter++ < 1000);
 
-    @Autowired
-    private IBaseEntityLoadDao baseEntityLoadDao;
+
+        return null;
+    }
+
+    public IBaseEntity getRef(long id, Date reportDate) {
+        return cache.get(new BaseEntityKey(id, reportDate));
+    }
+
+    public void setRef(long id, Date reportDate, IBaseEntity baseEntity) {
+        cache.put(new BaseEntityKey(id, reportDate), baseEntity);
+    }
+
+    public void delRef(long id, Date reportDate) {
+        cache.remove(new BaseEntityKey(id, reportDate));
+    }
+
+    public void delRef(long id) {
+        Iterator<Map.Entry<BaseEntityKey, IBaseEntity>> entryIterator = cache.entrySet().iterator();
+        while (entryIterator.hasNext()) {
+            if (id == entryIterator.next().getKey().getId())
+                entryIterator.remove();
+        }
+    }
 
     private class BaseEntityKey {
         private long id;
         private Date reportDate;
 
-        public BaseEntityKey(long id, Date reportDate) {
+        BaseEntityKey(long id, Date reportDate) {
             this.id = id;
             this.reportDate = reportDate;
         }
@@ -69,107 +97,13 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
             result = 31 * result + reportDate.hashCode();
             return result;
         }
-    }
-
-    private HashMap<BaseEntityKey, IBaseEntity> cache = new HashMap<>();
-
-    class EntityCacheKey {
-        private int cache;
-        private Date reportDate;
-
-        public EntityCacheKey(int cache, Date reportDate) {
-            this.cache = cache;
-            this.reportDate = reportDate;
-        }
-
-        public int getCache() {
-            return cache;
-        }
-
-        public void setCache(int cache) {
-            this.cache = cache;
-        }
-
-        public Date getReportDate() {
-            return reportDate;
-        }
-
-        public void setReportDate(Date reportDate) {
-            this.reportDate = reportDate;
-        }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            EntityCacheKey that = (EntityCacheKey) o;
-
-            if (cache != that.cache) return false;
-            if (!reportDate.equals(that.reportDate)) return false;
-
-            return true;
+        public String toString() {
+            return "BaseEntityKey{" +
+                    "id=" + id +
+                    ", reportDate=" + DataTypes.dateFormatDot.format(reportDate) +
+                    '}';
         }
-
-        @Override
-        public int hashCode() {
-            int result = (int) (cache ^ (cache >>> 32));
-            result = 31 * result + reportDate.hashCode();
-            return result;
-        }
-    }
-
-    private HashMap<EntityCacheKey, IBaseEntity> entityCache = new HashMap<>();
-
-    public void fillRefRepository() {
-        Select select = context
-                .select(EAV_BE_ENTITIES.ID, EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
-                .from(EAV_BE_ENTITIES, EAV_BE_ENTITY_REPORT_DATES, EAV_M_CLASSES)
-                .where(EAV_BE_ENTITIES.ID.equal(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID))
-                .and(EAV_BE_ENTITIES.CLASS_ID.equal(EAV_M_CLASSES.ID))
-                .and(EAV_M_CLASSES.IS_REFERENCE.equal(DataUtils.convert(true)));
-
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-        for (Map<String, Object> row : rows) {
-            long id = ((BigDecimal) row.get(EAV_BE_ENTITIES.ID.getName())).longValue();
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE.getName()));
-
-            IBaseEntityReportDateDao baseEntityReportDateDao =
-                    persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
-
-            Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(id, reportDate);
-
-            IBaseEntity en = baseEntityLoadDao.load(id, maxReportDate, reportDate);
-            cache.put(new BaseEntityKey(id, reportDate), en);
-            entityCache.put(new EntityCacheKey(((BaseEntity) en).hashCode2(), maxReportDate), en);
-        }
-    }
-
-    public IBaseEntity getRef(long Id, Date reportDate) {
-        return cache.get(new BaseEntityKey(Id, reportDate));
-    }
-
-    public IBaseEntity getRef(IBaseEntity baseEntity)
-    {
-        return entityCache.get(new EntityCacheKey(((BaseEntity)baseEntity).hashCode2(), baseEntity.getReportDate()));
-    }
-
-    public void setRef(IBaseEntity baseEntity)
-    {
-        entityCache.put(new EntityCacheKey(((BaseEntity) baseEntity).hashCode2(), baseEntity.getReportDate()), baseEntity);
-    }
-    public void setRef(long Id, Date reportDate, IBaseEntity baseEntity) {
-        cache.put(new BaseEntityKey(Id, reportDate), baseEntity);
-    }
-
-    public void delRef(long Id, Date reportDate) {
-        cache.remove(new BaseEntityKey(Id, reportDate));
-    }
-
-    public void delRef(IBaseEntity baseEntity)
-    {
-        entityCache.remove(new EntityCacheKey(((BaseEntity)baseEntity).hashCode2(), baseEntity.getReportDate()));
     }
 }

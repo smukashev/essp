@@ -1,11 +1,10 @@
 package kz.bsbnb.usci.portlet.report.export;
 
-import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 import kz.bsbnb.usci.portlet.report.ui.ConstantValues;
 import kz.bsbnb.usci.portlet.report.ui.CustomDataSource;
 import com.vaadin.data.Item;
 import com.vaadin.ui.Table;
-import java.util.logging.Level;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -13,10 +12,12 @@ import java.util.logging.Level;
  */
 public class BanksWithDataTableReportExporter extends TableReportExporter {
 
+    private static final Logger logger = Logger.getLogger(BanksWithDataTableReportExporter.class);
+
     @Override
     protected Table getTable(CustomDataSource customDataSource) {
         if (getApplication() != null) {
-            log.log(Level.INFO, "Theme: {0}", getApplication().getTheme());
+            logger.info("Theme: "+ getApplication().getTheme());
         }
         final Table table = super.getTable(customDataSource);
 

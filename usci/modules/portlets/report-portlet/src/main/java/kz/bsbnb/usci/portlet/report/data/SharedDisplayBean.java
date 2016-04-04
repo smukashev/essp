@@ -4,6 +4,8 @@ package kz.bsbnb.usci.portlet.report.data;
 //import com.bsbnb.creditregistry.dm.ref.Shared;
 //        import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
         import kz.bsbnb.usci.cr.model.Shared;
+        import kz.bsbnb.usci.eav.util.Errors;
+        import org.apache.log4j.Logger;
 
 /**
  *
@@ -11,10 +13,12 @@ package kz.bsbnb.usci.portlet.report.data;
  */
 public class SharedDisplayBean {
     private Shared shared;
+    public final Logger logger = Logger.getLogger(SharedDisplayBean.class);
 
     public SharedDisplayBean(Shared shared) {
         if(shared==null) {
-            throw new IllegalArgumentException("Shared can not be null");
+            logger.error(Errors.getError(String.valueOf(Errors.E247)));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E247));
         }
         this.shared = shared;
     }

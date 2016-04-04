@@ -3,10 +3,12 @@ package kz.bsbnb.usci.portlet.report.export;
 import com.mockrunner.mock.jdbc.MockResultSet;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.Protocol;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlet.report.data.BeanDataProvider;
 import kz.bsbnb.usci.portlet.report.data.DataProvider;
 import kz.bsbnb.usci.portlet.report.data.InputInfoDisplayBean;
 import kz.bsbnb.usci.portlet.report.data.ProtocolDisplayBean;
+import org.apache.log4j.Logger;
 
 import javax.xml.crypto.Data;
 import java.sql.ResultSet;
@@ -14,9 +16,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-
-import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 
 /**
  * Created by Bauyrzhan.Ibraimov on 18.06.2015.
@@ -29,6 +28,8 @@ public class ProtocolsTableReportExporter {
     String RepName;
 
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    private final Logger logger = Logger.getLogger(ProtocolsTableReportExporter.class);
+
     public ProtocolsTableReportExporter(List<Object> parameterList, String RepName)
     {
         this.RepName=RepName;
@@ -128,7 +129,7 @@ public class ProtocolsTableReportExporter {
         }
         catch (Exception ex)
         {
-            log.log(Level.WARNING, "MockResultSet error: {0}",ex.getStackTrace());
+            logger.warn("MockResultSet error",ex);
         }
         return  rs;
     }
@@ -152,7 +153,8 @@ public class ProtocolsTableReportExporter {
 
         // validation
         if (headers == null || data == null) {
-            throw new Exception("null parameters");
+            logger.error(Errors.getError(String.valueOf(Errors.E255)));
+            throw new Exception(Errors.getMessage(Errors.E255));
         }
 
         //  if (headers.size() != data.size()) {

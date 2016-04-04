@@ -12,6 +12,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerator;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
@@ -446,7 +447,7 @@ public class Mnt {
                 File tempDir = new File(path);
 
                 if(!tempDir.isDirectory())
-                    throw new RuntimeException("must be directory");
+                    throw new RuntimeException(Errors.getMessage(Errors.E223));
 
                 mntThread = new MntThread(conn, creditorId, reportDate, editId, limit,  path);
                 mntThread.setBaseEntityProcessorDao(baseEntityProcessorDao);

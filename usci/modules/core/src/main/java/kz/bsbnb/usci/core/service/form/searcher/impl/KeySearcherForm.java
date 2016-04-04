@@ -23,6 +23,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.apache.commons.lang.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,8 +89,6 @@ public class KeySearcherForm implements ISearcherForm {
                 if(metaType.isReference()) {
                     ret+=getDomRef( userId, (MetaClass) metaType, attr);
                 } else if (metaType.isComplex()) {
-                    if(metaType.isSetOfSets())
-                        throw new NotImplementedException();
                     if(metaType.isSet()) {
                         IMetaType childMeta = ((MetaSet) metaType).getMemberType();
                         ret += getDom(userId, (MetaClass) childMeta, attr, prefix);
@@ -165,11 +164,8 @@ public class KeySearcherForm implements ISearcherForm {
                 continue;
             IMetaType metaType = metaAttribute.getMetaType();
 
-            if(metaType.isSetOfSets())
-                throw new UnsupportedOperationException("Not yet implemented");
-
             if(metaType.isSet()) {
-                BaseSet childBaseSet = new BaseSet(metaType);
+                BaseSet childBaseSet = new BaseSet(metaType, creditorId);
                 IMetaType itemMeta = ((MetaSet) metaType).getMemberType();
                 BaseEntity childBaseEntity = new BaseEntity((MetaClass) itemMeta, new Date(), creditorId);
                 long childId = Long.valueOf(parameterValue);
@@ -196,7 +192,7 @@ public class KeySearcherForm implements ISearcherForm {
 
             } else {
                 MetaValue metaValue = (MetaValue) metaType;
-                value = DataTypes.fromString(metaValue.getTypeCode(), parameterValue);
+                value = DataTypes.getCastObject(metaValue.getTypeCode(), parameterValue);
             }
 
             baseEntity.put(attribute, BaseValueFactory.create(

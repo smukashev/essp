@@ -6,6 +6,9 @@ package com.bsbnb.usci.portlets.protocol.export;
 
 import com.bsbnb.usci.portlets.protocol.data.ProtocolDisplayBean;
 import com.vaadin.Application;
+import kz.bsbnb.usci.eav.util.Errors;
+import org.apache.log4j.Logger;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.zip.ZipOutputStream;
 public class ZippedProtocolExporter extends ProtocolExporter {
 
     private ProtocolExporter unzippedExporter;
+    private final Logger logger = Logger.getLogger(ZippedProtocolExporter.class);
 
     public ZippedProtocolExporter(ProtocolExporter innerExporter) {
         unzippedExporter = innerExporter;
@@ -45,7 +49,8 @@ public class ZippedProtocolExporter extends ProtocolExporter {
             zos.write(unzippedExporter.export());
             zos.closeEntry();
         } catch (IOException ioe) {
-            throw new ExportException("I/O exception", ioe);
+            logger.error(Errors.getMessage(Errors.E252, ioe));
+            throw new ExportException(Errors.getMessage(Errors.E252, ioe));
         } finally {
             try {
                 zos.close();

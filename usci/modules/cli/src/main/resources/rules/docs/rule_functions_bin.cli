@@ -1,0 +1,71 @@
+rule read $$$
+title: функций для проверки бин
+
+function String getBinError(List bins, String entCode) {
+    if(bins.size() < 1)
+        return "";
+
+    String bin = (String)bins.get(0);
+    try {
+         binCorrect(bin, entCode);
+    } catch(Exception e) {
+         return bin + ": " + e.getMessage();
+    }
+    return "";
+}
+
+function void binCorrect(String bin,String entCode) {
+
+    int[][] WEIGHTS = new int[][]{
+            {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+            {3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2}
+        };
+
+    Set<String> SE_CODES = new HashSet<String>(Arrays.asList("03","06","09"));
+
+    if(bin.length() != 12)
+        throw new RuntimeException("Должен содержать 12 символов");
+
+    if(!isDateValid(bin.substring(0,4), "yyMM"))
+        throw new RuntimeException("Первые 4 разряда должны соответствовать году и месяцу регистрации в формате ГГММ");
+
+    //проверка 5 го символа
+    if(bin.charAt(4) < '4' || bin.charAt(4) > '6')
+        throw new RuntimeException("Пятый разряд должен быть равен 4, 5, или 6");
+
+    if(SE_CODES.contains(entCode)) {
+        if(bin.charAt(4) != '6')
+            throw new RuntimeException("Пятый разряд должен быть равен 6 для субъектов с кодом СЧП 03, 06 или 09");
+    } else if (bin.charAt(4) != '4' && bin.charAt(4) != '5')
+            throw new RuntimeException("Пятый разряд должен быть равен 4 или 5 для субъектов с кодом СЧП 01, 04 или 07");
+
+    //проверка 6 го символа
+    if(bin.charAt(5) < '0' || bin.charAt(5) > '4')
+        throw new RuntimeException("Шестой разряд должен быть равен 0, 1, 2, 3 или 4");
+
+    if(!SE_CODES.contains(entCode) && bin.charAt(5) == '3')
+        throw new RuntimeException("Шестой разряд должен быть равен 0, 1, или 2 для субъектов с кодом СЧП 01, 04 или 07");
+
+
+    int sum = 10;
+    for(int i=0;i<WEIGHTS.length;i++) {
+       int[] w = WEIGHTS[i];
+       sum = 0;
+
+       for(int j=0;j<w.length;j++)
+         sum+= (bin.charAt(j) - '0' ) * w[j];
+
+       sum %= 11;
+
+       if(sum != 10)
+         break;
+    }
+
+    if(sum != bin.charAt(11) - '0')
+       throw new RuntimeException("Не совпадает контрольный символ");
+}
+$$$
+
+rule save
+
+quit

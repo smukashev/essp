@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import kz.bsbnb.usci.portlets.upload.UploadApplication;
+import org.apache.log4j.Logger;
 import org.vaadin.easyuploads.MultiFileUpload;
 
 import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
@@ -17,6 +18,8 @@ import com.vaadin.ui.Label;
  * @author Aidar.Myrzahanov
  */
 public class MultiUploadComponent extends AbstractUploadComponent {
+
+    private final Logger logger = Logger.getLogger(MultiUploadComponent.class);
 
     public MultiUploadComponent(PortletEnvironmentFacade portletEnvironment) {
         super(portletEnvironment);
@@ -40,7 +43,7 @@ public class MultiUploadComponent extends AbstractUploadComponent {
                         fis.read(content);
                         parent.handleFile(content, fileName);
                     } catch (IOException ex) {
-                        UploadApplication.log.log(Level.WARNING, "", ex);
+                        logger.warn("", ex);
                     } finally {
                         try {
                             fis.close();

@@ -2,6 +2,7 @@ package kz.bsbnb.usci.portlets.query;
 
 import com.vaadin.data.util.ObjectProperty;
 import oracle.jdbc.OracleTypes;
+import org.apache.log4j.Logger;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -52,6 +53,8 @@ class SqlExecutor {
     private String exceptionMessage;
     private int sqlErrorPosition = -1;
 
+    public final Logger logger = Logger.getLogger(SqlExecutor.class);
+
     SqlExecutor(QuerySettings settings) {
         this.settings = settings;
         usingConnectionPool = false;
@@ -62,13 +65,13 @@ class SqlExecutor {
                 connectionStringProperty.setValue(connection.getMetaData().getURL());
             }
         } catch (SQLException e) {
-            QueryApplication.log.log(Level.SEVERE, null, e);
+            logger.error(null, e);
         } finally {
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException ex) {
-                    QueryApplication.log.log(Level.SEVERE, null, ex);
+                    logger.error(null, ex);
                 }
             }
         }
@@ -96,7 +99,7 @@ class SqlExecutor {
     }
 
     private void saveException(Exception ex) {
-        QueryApplication.log.log(Level.SEVERE, null, ex);
+        logger.error(null, ex);
         exceptionMessage = ex.getMessage();
     }
 
@@ -166,7 +169,7 @@ class SqlExecutor {
             callStatement.execute();
             return callStatement.getInt(2);
         } catch (SQLException ex) {
-            QueryApplication.log.log(Level.SEVERE, "", ex);
+            logger.error(null, ex);
         } finally {
             if (callStatement != null) {
                 try {

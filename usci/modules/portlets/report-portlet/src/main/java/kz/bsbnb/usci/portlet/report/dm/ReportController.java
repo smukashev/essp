@@ -2,6 +2,7 @@ package kz.bsbnb.usci.portlet.report.dm;
 
 import com.liferay.portal.model.User;
 import kz.bsbnb.usci.portlet.report.ReportApplication;
+import org.apache.log4j.Logger;
 
 import javax.persistence.*;
 import java.sql.Connection;
@@ -10,8 +11,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -20,7 +19,7 @@ import java.util.logging.Logger;
 public class ReportController {
 
     private EntityManagerFactory emf;
-    public static final Logger log = Logger.getLogger(ReportApplication.class.getCanonicalName());
+    public static final Logger logger = Logger.getLogger(ReportApplication.class);
 
     private EntityManager getEntityManager() {
         if (emf == null) {
@@ -85,8 +84,7 @@ public class ReportController {
                     }
                 }
                 catch (SQLException e){
-                    e.printStackTrace();
-                    log.log(Level.WARNING, "REPORT_INPUT_PARAMETER: ", e);
+                    logger.warn("REPORT_INPUT_PARAMETER: ", e);
                     throw e;
                 }
                 String query3 = "select ep.* from report_export_type rep, export_type ep    where rep.export_type_id=ep.id and rep.report_id="+rs.getLong("ID");
@@ -108,27 +106,31 @@ public class ReportController {
                     }
                 }
                 catch(SQLException e)
-                {e.printStackTrace();}
+                {
+                    logger.error(e.getMessage(),e);
+                }
 
                 reports.add(rep);
 
             }
 
         }
-        catch (SQLException e){  e.printStackTrace(); }
+        catch (SQLException e){
+            logger.error(e.getMessage(),e);
+        }
         finally
         {
             try {
                 if(stmt!=null) {stmt.close();}
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
             try {
                 if(conn!=null) {
                     conn.close();
                 }
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, "Failed to cleanup", sqle);
+                logger.warn("Failed to cleanup", sqle);
             }
         }
 

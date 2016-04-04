@@ -6,7 +6,7 @@ import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Message;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.Shared;
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import org.apache.commons.lang.StringUtils;
@@ -55,9 +55,13 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         String err="";
 
         if(entityStatus.getErrorCode()!=null) {
-            err = Errors.getError(entityStatus.getErrorCode());
+            if(entityStatus.getDevDescription()!=null)
+                err = Errors.unmarshall(entityStatus.getErrorCode()+"|~~~|"+entityStatus.getDevDescription());
+            else
+                err = Errors.unmarshall(entityStatus.getErrorCode());
+            /*err = Errors.getError(entityStatus.getErrorCode());
             if(entityStatus.getDevDescription()!=null) {
-                String[] params = entityStatus.getDevDescription().split("\\|");
+                String[] params = entityStatus.getDevDescription().split("\\|~~~|");
                 String[] words = err.split(" ");
                 for(String param:params) {
                     for(int i = 0; i<words.length; i++){
@@ -69,7 +73,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
                 }
 
                 err = StringUtils.join(Arrays.copyOfRange(words, 0, words.length), " ");
-            }
+            }*/
         }
         Message message = new Message();
         message.setCode("A");

@@ -1,7 +1,9 @@
 package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.sync.job.AbstractDataJob;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.SyncStatusSingleton;
@@ -38,12 +40,12 @@ public final class DataJob extends AbstractDataJob {
 
     private final Logger logger = Logger.getLogger(DataJob.class);
 
-    protected final List<InProcessTester> entitiesInProcess = new ArrayList<>();
+    private final List<InProcessTester> entitiesInProcess = new ArrayList<>();
 
     private volatile BaseEntity currentEntity;
     private volatile boolean currentIntersection;
 
-    ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private double avgTimePrev = 0;
     private double avgTimeCur = 0;
@@ -52,7 +54,7 @@ public final class DataJob extends AbstractDataJob {
     private int clearJobsIndex = 0;
 
     private class InProcessTester implements Callable<Boolean> {
-        private BaseEntity myEntity;
+        private final BaseEntity myEntity;
 
         private InProcessTester(BaseEntity myEntity) {
             this.myEntity = myEntity;
@@ -60,9 +62,10 @@ public final class DataJob extends AbstractDataJob {
 
         public Boolean call() {
             try {
-                for (BaseEntity myEntityKeyElement : myEntity.getKeyElements()) {
-                    for (BaseEntity currentEntityKeyElement : currentEntity.getKeyElements()) {
-                        if (myEntityKeyElement.equalsByKey(currentEntityKeyElement)) {
+                for (IBaseEntity myEntityKeyElement : myEntity.getKeyElements()) {
+                    for (IBaseEntity currentEntityKeyElement : currentEntity.getKeyElements()) {
+                        if (myEntityKeyElement.getMeta().getId() == currentEntityKeyElement.getMeta().getId() &&
+                                myEntityKeyElement.equalsByKey(currentEntityKeyElement)) {
                             currentIntersection = true;
                             return true;
                         }
@@ -75,7 +78,7 @@ public final class DataJob extends AbstractDataJob {
             return false;
         }
 
-        public BaseEntity getMyEntity() {
+        BaseEntity getMyEntity() {
             return myEntity;
         }
     }
@@ -106,10 +109,6 @@ public final class DataJob extends AbstractDataJob {
                 }
 
                 syncStatusSingleton.put(entities.size(), entitiesInProcess.size(), avgTimeCur);
-
-                /* Uncomment only to check, time cost operation */
-                /*if(entitiesInProcess.size() != processingJobs.size())
-                    throw new IllegalStateException("CRITICAL: EntitiesInProcess != ProcessJobs");*/
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -150,7 +149,7 @@ public final class DataJob extends AbstractDataJob {
                 }
 
                 if (!found)
-                    throw new IllegalStateException("CRITICAL: Entity not found.");
+                    throw new IllegalStateException(Errors.getMessage(Errors.E280));
 
                 processJobIterator.remove();
             }

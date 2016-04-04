@@ -5,6 +5,8 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulesvr.dao.IPackageDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.mapper.BatchMapper;
 import kz.bsbnb.usci.brms.rulesvr.persistable.JDBCSupport;
+import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.DSLContext;
 import org.jooq.Insert;
 import org.jooq.Select;
@@ -53,7 +55,7 @@ public class PackageDao extends JDBCSupport implements IPackageDao
     public RulePackage loadBatch(long id) {
 
         if(id < 1)
-            throw new IllegalArgumentException("Does not have id. Can't load.");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E259));
 
         String SQL = "SELECT * FROM " + PREFIX_ + "packages WHERE id  = ?";
         RulePackage batch = jdbcTemplate.queryForObject(SQL,new Object[]{id},new BatchMapper());
@@ -88,7 +90,7 @@ public class PackageDao extends JDBCSupport implements IPackageDao
         /*
         if(batchId < 1)
         {
-            throw new IllegalArgumentException("Batch does not have id. Can't create batch version.");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E261));
         }
 
        String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";

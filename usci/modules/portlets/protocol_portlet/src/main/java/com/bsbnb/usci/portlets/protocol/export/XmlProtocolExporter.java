@@ -6,6 +6,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import com.bsbnb.usci.portlets.protocol.data.ProtocolDisplayBean;
+import kz.bsbnb.usci.eav.util.Errors;
+import org.apache.log4j.Logger;
+
 import java.text.SimpleDateFormat;
 
 /**
@@ -13,6 +16,8 @@ import java.text.SimpleDateFormat;
  * @author Aidar.Myrzahanov
  */
 public class XmlProtocolExporter extends ProtocolExporter {
+
+    private final Logger logger = Logger.getLogger(XmlProtocolExporter.class);
 
     public XmlProtocolExporter() {
         super();
@@ -48,7 +53,8 @@ public class XmlProtocolExporter extends ProtocolExporter {
             ps.close();
             return baos.toByteArray();
         } catch (UnsupportedEncodingException uee) {
-            throw new ExportException("Couldn't find encoding", uee);
+            logger.error(Errors.getMessage(Errors.E248, uee));
+            throw new ExportException(Errors.getMessage(Errors.E248, uee));
         }
     }
 

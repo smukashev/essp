@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.searcher.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
@@ -43,8 +43,8 @@ public class DocumentSearcher extends JDBCSupport implements IBaseEntitySearcher
         List<Long> ids = searcherPool.getSearcher(entity.getMeta().getClassName()).findAll(entity, creditorId);
 
         if (ids.size() > 1){
-            logger.error(Errors.getError(String.valueOf(Errors.E175)+" : \n"+entity));
-            throw new IllegalStateException(String.valueOf(Errors.E175));
+            logger.error(Errors.getError(Errors.getMessage(Errors.E175)+" : \n"+entity));
+            throw new IllegalStateException(Errors.getMessage(Errors.E175));
         }
 
         if (ids.size() < 1)

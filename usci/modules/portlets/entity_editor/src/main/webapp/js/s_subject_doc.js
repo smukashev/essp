@@ -134,10 +134,16 @@ Ext.onReady(function() {
                         params['no' + i] = docElem.data.value;
                 }
             }
+            //loader
+            var myMask = new Ext.LoadMask(Ext.getCmp("entityTreeView"), {msg: "Please wait..."});
+            myMask.show();
 
             entityStore.load({
+
                 params: params,
                 callback: function (records, operation, success) {
+                    myMask.hide();
+
                     if (!success) {
                         var error = '';
                         if(operation.error != undefined) {

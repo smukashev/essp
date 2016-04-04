@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.persistance.dao.IEavOptimizerDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.tool.optimizer.EavOptimizerData;
@@ -38,19 +38,20 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
     }
 
     @Override
-    public long find(Long creditorId, String keyString) {
+    public long find(Long creditorId, Long metaId, String keyString) {
         String tableAlias = "eo";
         Select select = context
                 .select(EAV_OPTIMIZER.as(tableAlias).ENTITY_ID)
                 .from(EAV_OPTIMIZER.as(tableAlias))
                 .where(EAV_OPTIMIZER.as(tableAlias).CREDITOR_ID.equal(creditorId)
+                        .and(EAV_OPTIMIZER.as(tableAlias).META_ID.equal(metaId))
                         .and(EAV_OPTIMIZER.as(tableAlias).KEY_STRING.equal(keyString)));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException(Errors.E91 + "|" + keyString);
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E91, keyString));
 
         if (rows.size() < 1)
             return 0;
@@ -72,7 +73,7 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException(Errors.E91 + "|" + entityId);
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E91, entityId));
 
         if (rows.size() < 1)
             return 0;
@@ -98,15 +99,12 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
         String tableAlias = "sv";
         Update update = context
                 .update(EAV_OPTIMIZER.as(tableAlias))
-                .set(EAV_OPTIMIZER.as(tableAlias).CREDITOR_ID, eavOptimizerData.getCreditorId())
-                .set(EAV_OPTIMIZER.as(tableAlias).ENTITY_ID, eavOptimizerData.getEntityId())
-                .set(EAV_OPTIMIZER.as(tableAlias).META_ID, eavOptimizerData.getMetaId())
                 .set(EAV_OPTIMIZER.as(tableAlias).KEY_STRING, eavOptimizerData.getKeyString())
                 .where(EAV_OPTIMIZER.as(tableAlias).ID.equal(eavOptimizerData.getId()));
 
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.E157+"|" + count + "|" + eavOptimizerData.getId());
+            throw new IllegalStateException(Errors.getMessage(Errors.E157, count, eavOptimizerData.getId()));
     }
 }

@@ -10,6 +10,7 @@ import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
 import kz.bsbnb.usci.portlet.report.ui.CustomDataSource;
 import oracle.jdbc.OracleCallableStatement;
 import oracle.jdbc.OracleTypes;
+import org.apache.log4j.Logger;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -20,9 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
-
-import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 
 /**
  *
@@ -31,7 +29,7 @@ import static kz.bsbnb.usci.portlet.report.ReportApplication.log;
 public class DatabaseConnect {
 
     private User user;
-
+    private final Logger logger = Logger.getLogger(DatabaseConnect.class);
 
     public DatabaseConnect() {
 
@@ -49,9 +47,9 @@ public class DatabaseConnect {
             return ExpandoValueLocalServiceUtil.getData(user.getCompanyId(), User.class.getName(),
                     ExpandoTableConstants.DEFAULT_TABLE_NAME, "hasAccessToPersonalData", user.getUserId(), false);
         } catch (PortalException pe) {
-            log.log(Level.WARNING, "", pe);
+            logger.warn(null, pe);
         } catch (SystemException se) {
-            log.log(Level.WARNING, "", se);
+            logger.warn(null, se);
         }
         return false;
     }
@@ -61,9 +59,9 @@ public class DatabaseConnect {
             return ExpandoValueLocalServiceUtil.getData(user.getCompanyId(), User.class.getName(),
                     ExpandoTableConstants.DEFAULT_TABLE_NAME, "isNb", user.getPrimaryKey(), false);
         } catch (PortalException pe) {
-            log.log(Level.WARNING, "", pe);
+            logger.warn(null, pe);
         } catch (SystemException se) {
-            log.log(Level.WARNING, "", se);
+            logger.warn(null, se);
         }
         return false;
     }
@@ -83,9 +81,9 @@ public class DatabaseConnect {
                 }
             }
         } catch (SystemException se) {
-            log.log(Level.SEVERE, "", se);
+            logger.error(null, se);
         } catch (PortalException se) {
-            log.log(Level.SEVERE, "", se);
+            logger.error(null, se);
         }
         return users;
     }
@@ -100,9 +98,9 @@ public class DatabaseConnect {
             DataSource d = (DataSource) context.lookup("jdbc/RepPool");
             return d.getConnection();
         } catch (SQLException ex) {
-            log.log(Level.SEVERE, null, ex);
+            logger.error(null, ex);
         } catch (NamingException ex) {
-            log.log(Level.SEVERE, null, ex);
+            logger.error(null, ex);
         }
         return null;
     }
@@ -112,45 +110,51 @@ public class DatabaseConnect {
             try {
                 resultSet.close();
             } catch (SQLException sqle) {
-                log.log(Level.INFO, null, sqle);
+                logger.info(null, sqle);
             }
         }
         if (ocs != null) {
             try {
                 ocs.close();
             } catch (SQLException sqle) {
-                log.log(Level.INFO, null, sqle);
+                logger.info(null, sqle);
             }
         }
         if (statement != null) {
             try {
                 statement.close();
             } catch (SQLException sqle) {
-                log.log(Level.INFO, null, sqle);
+                logger.info(null, sqle);
             }
         }
         if (connection != null) {
             try {
                 connection.close();
             } catch (SQLException sqle) {
-                log.log(Level.WARNING, null, sqle);
+                logger.warn(null, sqle);
             }
         }
     }
 
-    public List<ValuePair> getValueListFromStoredProcedure(String procedureName) {
+    public List<ValuePair> getValueListFromStoredProcedure(String procedureName, String showcase_id) {
         Connection connection = getConnection();
         CallableStatement statement = null;
         OracleCallableStatement ocs = null;
         ResultSet cursor = null;
         try {
-            String procedureCallString = "{ call " + procedureName + "(?,?)}";
+            String procedureCallString="";
+            if(procedureName.equals("INPUT_PARAMETER_SC_FIELDS"))
+                procedureCallString = "{ call " + procedureName + "(?,?,?)}";
+            else
+                procedureCallString = "{ call " + procedureName + "(?,?)}";
             statement = connection.prepareCall(procedureCallString);
             ocs = statement.unwrap(OracleCallableStatement.class);
             statement.registerOutParameter(1, OracleTypes.CURSOR);
-            log.log(Level.INFO, "Procedure name: {0}", procedureName);
-            log.log(Level.INFO, "User id for procedure : {0}", user.getUserId());
+            logger.info("Procedure name: "+ procedureName);
+            logger.info("User id for procedure : "+ user.getUserId());
             statement.setLong(2, user.getUserId());
+            if(procedureName.equals("INPUT_PARAMETER_SC_FIELDS"))
+                statement.setString(3, showcase_id);
             statement.execute();
             cursor = ocs.getCursor(1);
             List<ValuePair> result = new ArrayList<ValuePair>();
@@ -161,7 +165,7 @@ public class DatabaseConnect {
             }
             return result;
         } catch (SQLException sqle) {
-            log.log(Level.SEVERE, "SQL Exception", sqle);
+            logger.error("SQL Exception", sqle);
         } finally {
             closeResources(cursor, ocs, statement, connection);
         }
@@ -186,19 +190,19 @@ public class DatabaseConnect {
             procedureCallBuilder.deleteCharAt(procedureCallBuilder.length() - 1);
             procedureCallBuilder.append(")}");
             String procedureCallString = procedureCallBuilder.toString();
-            log.log(Level.INFO, "Procedure call string: {0}", procedureCallString);
+            logger.info("Procedure call string: "+ procedureCallString);
             statement = connection.prepareCall(procedureCallBuilder.toString());
             ocs = statement.unwrap(OracleCallableStatement.class);
             statement.registerOutParameter(1, OracleTypes.CURSOR);
-            log.log(Level.INFO, "User id : {0}", user.getUserId());
+            logger.info("User id : "+ user.getUserId());
 
             statement.setLong(2, user.getUserId());
             boolean hasAccess = hasAccessToPersonalData();
-            log.log(Level.INFO, "Has access: {0}", hasAccess);
+            logger.info("Has access: "+ hasAccess);
             statement.setLong(3, hasAccess ? 1 : 0);
             for (int parameterIndex = 0; parameterIndex < parametersCount; parameterIndex++) {
                 Object parameter = parameterList.get(parameterIndex);
-                log.log(Level.INFO, "Parameter value: {0}", parameter.toString());
+                logger.info("Parameter value: "+ parameter.toString());
                 String parameterValueString = "";
                 if (parameter instanceof Date) {
                     Date dateParameter = (Date) parameter;
@@ -208,7 +212,7 @@ public class DatabaseConnect {
                     statement.setString(parameterIndex + 4, parameterValueString);
                 }
 
-                log.log(Level.INFO, "String parameter: {0}", parameterValueString);
+                logger.info("String parameter: "+ parameterValueString);
             }
             statement.execute();
             cursor = ocs.getCursor(1);
@@ -234,18 +238,18 @@ public class DatabaseConnect {
             procedureCallBuilder.deleteCharAt(procedureCallBuilder.length() - 1);
             procedureCallBuilder.append(")}");
             String procedureCallString = procedureCallBuilder.toString();
-            log.log(Level.INFO, "Procedure call string: {0}", procedureCallString);
+            logger.info("Procedure call string: "+ procedureCallString);
             statement = connection.prepareCall(procedureCallBuilder.toString());
             ocs = statement.unwrap(OracleCallableStatement.class);
             statement.registerOutParameter(1, OracleTypes.CURSOR);
-            log.log(Level.INFO, "User id : {0}", user.getUserId());
+            logger.info("User id : "+ user.getUserId());
             statement.setLong(2, user.getUserId());
             boolean hasAccess = hasAccessToPersonalData();
-            log.log(Level.INFO, "Has access: {0}", hasAccess);
+            logger.info("Has access: "+ hasAccess);
             statement.setLong(3, hasAccess ? 1 : 0);
             for (int parameterIndex = 0; parameterIndex < parametersCount; parameterIndex++) {
                 Object parameter = parameterList.get(parameterIndex);
-                log.log(Level.INFO, "Parameter value: {0}", parameter.toString());
+                logger.info("Parameter value: "+ parameter.toString());
                 String parameterValueString = "";
                 if (parameter instanceof Date) {
                     Date dateParameter = (Date) parameter;
@@ -255,7 +259,7 @@ public class DatabaseConnect {
                     statement.setString(parameterIndex + 4, parameterValueString);
                 }
 
-                log.log(Level.INFO, "String parameter: {0}", parameterValueString);
+                logger.info("String parameter: "+ parameterValueString);
             }
             statement.execute();
             return ocs.getCursor(1);
@@ -271,13 +275,13 @@ public class DatabaseConnect {
         Connection conn = getConnection();
         CallableStatement statement = null;
         try {
-            log.log(Level.INFO, "SQL string: {0}", sqlQuery);
+            logger.info("SQL string: "+ sqlQuery);
             statement = conn.prepareCall(sqlQuery);
 
             statement.setQueryTimeout(300);
             return statement.executeQuery(sqlQuery);
         } catch (SQLException sqle) {
-            log.log(Level.SEVERE, "Sql exception", sqle);
+            logger.error("Sql exception", sqle);
         } finally {
             if (conn != null) {
                 try {

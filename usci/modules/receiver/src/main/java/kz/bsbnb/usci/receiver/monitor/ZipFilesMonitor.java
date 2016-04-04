@@ -4,7 +4,8 @@ import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.cr.model.Report;
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EavGlobal;
@@ -14,11 +15,16 @@ import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.ReportStatus;
 import kz.bsbnb.usci.receiver.queue.JobInfo;
 import kz.bsbnb.usci.receiver.queue.JobLauncherQueue;
+import kz.bsbnb.usci.receiver.reader.impl.InfoReader;
+import kz.bsbnb.usci.receiver.reader.impl.ManifestReader;
+import kz.bsbnb.usci.receiver.reader.impl.beans.InfoData;
+import kz.bsbnb.usci.receiver.reader.impl.beans.ManifestData;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
+import org.antlr.tool.ErrorManager;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
@@ -35,6 +41,8 @@ import javax.annotation.PostConstruct;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
 import java.io.*;
 import java.nio.file.*;
 import java.text.ParseException;
@@ -42,10 +50,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-/**
- * @author abukabayev
- */
 
 public class ZipFilesMonitor {
 	private final Logger logger = LoggerFactory.getLogger(ZipFilesMonitor.class);
@@ -61,6 +65,12 @@ public class ZipFilesMonitor {
 
 	@Autowired
 	private JobLauncherQueue jobLauncherQueue;
+
+	@Autowired
+	private InfoReader infoReader;
+
+	@Autowired
+	private ManifestReader manifestReader;
 
 	private IBatchService batchService;
 
@@ -78,6 +88,8 @@ public class ZipFilesMonitor {
 
 	private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
 	public ZipFilesMonitor(Map<String, Job> jobs) {
 		this.jobs = jobs;
 	}
@@ -86,8 +98,9 @@ public class ZipFilesMonitor {
 		try {
 			Batch batch = batchService.getBatch(batchId);
 			BatchInfo batchInfo = new BatchInfo(batch);
-			System.out.println(batchId + " - restarted");
-			//sender.addJob(batchId, batchInfo);
+
+            System.out.println(batchId + " - restarted");
+
 			jobLauncherQueue.addJob(batchId, batchInfo);
 			receiverStatusSingleton.batchReceived();
 			return true;
@@ -97,8 +110,6 @@ public class ZipFilesMonitor {
 
 		return false;
 	}
-
-	SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
 	@PostConstruct
 	public void init() {
@@ -121,8 +132,7 @@ public class ZipFilesMonitor {
 			System.out.println("-------------------------------------------------------------------------");
 
 			for (Batch b : pendingBatchList)
-				System.out.println(b.getId() + ", " + b.getFileName() + ", " +
-						dateFormat.format(b.getRepDate()));
+				System.out.println(b.getId() + ", " + b.getFileName() + ", " + dateFormat.format(b.getRepDate()));
 
 			System.out.println("-------------------------------------------------------------------------");
 
@@ -152,18 +162,19 @@ public class ZipFilesMonitor {
 
 		public void run() {
 			long sleepCounter = 0;
-			while (true) {
+            //noinspection InfiniteLoopStatement
+            while (true) {
 				JobInfo nextJob;
 
 				if (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
 					try {
-						sleep(10000L);
+						sleep(1000L);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 					sleepCounter++;
 					if (sleepCounter > WAIT_TIMEOUT) {
-						throw new IllegalStateException(String.valueOf(Errors.E192));
+						throw new IllegalStateException(Errors.getMessage(Errors.E192));
 					}
 					continue;
 				}
@@ -175,20 +186,15 @@ public class ZipFilesMonitor {
 					try {
 						JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
 
-                        jobParametersBuilder.addParameter("creditorId",
-                                new JobParameter(nextJob.getBatchInfo().getCreditorId()));
+                        jobParametersBuilder.addParameter("creditorId",new JobParameter(nextJob.getBatchInfo().getCreditorId()));
 
-                        jobParametersBuilder.addParameter("batchId",
-                                new JobParameter(nextJob.getBatchId()));
+                        jobParametersBuilder.addParameter("batchId", new JobParameter(nextJob.getBatchId()));
 
-						jobParametersBuilder.addParameter("userId",
-								new JobParameter(nextJob.getBatchInfo().getUserId()));
+						jobParametersBuilder.addParameter("userId", new JobParameter(nextJob.getBatchInfo().getUserId()));
 
-						jobParametersBuilder.addParameter("reportId",
-								new JobParameter(nextJob.getBatchInfo().getReportId()));
+						jobParametersBuilder.addParameter("reportId", new JobParameter(nextJob.getBatchInfo().getReportId()));
 
-						jobParametersBuilder.addParameter("actualCount",
-								new JobParameter(nextJob.getBatchInfo().getActualCount()));
+						jobParametersBuilder.addParameter("actualCount", new JobParameter(nextJob.getBatchInfo().getActualCount()));
 
 						Job job = jobs.get(nextJob.getBatchInfo().getBatchType());
 
@@ -212,7 +218,7 @@ public class ZipFilesMonitor {
 									.setReceiptDate(new Date()));
 						}
 
-						sleep(10000);
+						sleep(1000);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -229,7 +235,6 @@ public class ZipFilesMonitor {
 	}
 
 	public void saveData(BatchInfo batchInfo, String filename, byte[] bytes, boolean isNB) {
-		// TODO: fix hardcoded settings
 		receiverStatusSingleton.batchReceived();
 
 		IBatchService batchService = serviceFactory.getBatchService();
@@ -246,70 +251,61 @@ public class ZipFilesMonitor {
 		long batchId = batchService.save(batch);
 		batch.setId(batchId);
 
-		Long cId = -1L;
+		Long cId;
 		boolean haveError = false;
 
-		if (batchInfo.getUserId() != 100500L) {
-			List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
+		List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
 
-			if (isNB) {
-				cId = 0L;
-			} else if (cList.size() == 1) {
+		if (batchInfo.getUserId() != 100500L) {
+            if (cList.size() > 0) {
 				cId = getCreditor(batchInfo, cList);
 
-				if (cId == -1) {
+				if (cId <= 0) {
 					String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
 					String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
 
 					if (docType == null) docType = "";
 					if (docValue == null) docValue = "";
 
-					logger.error("Несоответствие кредитора пользователю портала: " + docType +
-							", " + docValue);
+					logger.error("Несоответствие кредитора пользователю портала: " + docType + ", " + docValue);
 
 					failFast(batchId, "Несоответствие кредитора пользователю портала");
 					haveError = true;
 				}
-
-				cId = cList.get(0).getId();
 			} else {
 				cId = -1L;
 
 				batchService.addBatchStatus(new BatchStatus()
 								.setBatchId(batchId)
 								.setStatus(BatchStatuses.ERROR)
-								.setDescription("Can't find creditor for user with id: " + batchInfo.getUserId())
-								.setReceiptDate(new Date())
-				);
+								.setDescription("Пользователь не имеет доступа к кредиторам: " + batchInfo.getUserId())
+								.setReceiptDate(new Date()));
 
 				haveError = true;
 			}
 		} else {
 			cId = getCreditor(batchInfo, creditors);
-			if (cId == -1L) {
+			if (cId <= 0) {
 				String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
 				String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
 
 				if (docType == null) docType = "";
 				if (docValue == null) docValue = "";
 
-				logger.error("Кредитор не найден: " + docType +
-						", " + docValue);
+				logger.error("Кредитор не найден: " + docType + ", " + docValue);
 
 				batchService.addBatchStatus(new BatchStatus()
 								.setBatchId(batchId)
 								.setStatus(BatchStatuses.ERROR)
-								.setDescription("Кредитор не найден")
-								.setReceiptDate(new Date())
-				);
+								.setDescription("Кредитор с документами (" + docType + ", " + docValue + ")не найден")
+								.setReceiptDate(new Date()));
 				haveError = true;
 			}
 		}
 
 
-		if (!haveError && !checkAndFillEavReport(cId, batchInfo, batchId)) {
+		if (!haveError && !checkAndFillEavReport(cId, batchInfo, batchId))
 			haveError = true;
-		}
 
 		batch.setCreditorId(cId);
 		batch.setReportId(batchInfo.getReportId());
@@ -325,16 +321,17 @@ public class ZipFilesMonitor {
 				batchInfo.setContentSize(batch.getContent().length);
 				batchInfo.setCreditorId(batch.getCreditorId());
 				batchInfo.setReceiptDate(batch.getReceiptDate());
-				//sender.addJob(batchId, batchInfo);
+
 				jobLauncherQueue.addJob(batchId, batchInfo);
 			}
 		}
 	}
 
 	boolean waitForSignature(Batch batch, BatchInfo batchInfo) {
-		String digitalSignOrgs = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,
+		String digitalSignArguments = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,
                 DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
-		String[] orgIds = digitalSignOrgs.split(",");
+
+		String[] orgIds = digitalSignArguments.split(",");
 		if(batch.getCreditorId() > 0 && Arrays.asList(orgIds).contains(batch.getCreditorId() + "")) {
 			batchService.addBatchStatus(new BatchStatus()
 					.setBatchId(batch.getId())
@@ -353,6 +350,7 @@ public class ZipFilesMonitor {
 	private void filterUnsignedBatches(List<Batch> pendingBatchList) {
 		String digitalSignOrgs = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,
                 DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
+
 		String[] orgIds = digitalSignOrgs.split(",");
 		Iterator<Batch> it = pendingBatchList.iterator();
 		while(it.hasNext()) {
@@ -368,17 +366,9 @@ public class ZipFilesMonitor {
 						.setBatchId(batchId)
 						.setStatus(BatchStatuses.ERROR)
 						.setDescription(error)
-						.setReceiptDate(new Date())
-		);
-
-		batchService.addBatchStatus(new BatchStatus()
-						.setBatchId(batchId)
-						.setStatus(BatchStatuses.PROCESSING)
-						.setReceiptDate(new Date())
-		);
+						.setReceiptDate(new Date()));
 
 		batchService.endBatch(batchId);
-
 	}
 
 	private Long getCreditor(BatchInfo batchInfo, List<Creditor> creditors) {
@@ -448,18 +438,43 @@ public class ZipFilesMonitor {
 
 		Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
 
-		if (existing != null) {
-			if (ReportStatus.COMPLETED.code().equals(existing.getStatus().getCode())) {
-				String errMsg = "Данные на указанную отчетную дату утверждены организацией = "
-						+ creditorId + ", отчетная дата = " + dateFormat.format(batchInfo.getRepDate());
+		if(!StaticRouter.isDevMode()) {
+			String errMsg = null;
+
+			if (existing != null) {
+				if (ReportStatus.COMPLETED.code().equals(existing.getStatus().getCode())) {
+					errMsg = "Данные на указанную отчетную дату утверждены организацией = "
+							+ creditorId + ", отчетная дата = " + dateFormat.format(batchInfo.getRepDate());
+				}
+			} else {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(batchInfo.getRepDate());
+				cal.add(Calendar.MONTH, -1);
+				Date prevMonth = cal.getTime();
+
+				Report prevMonthReport = reportBeanRemoteBusiness.getReport(creditorId, prevMonth);
+
+				if (prevMonthReport != null && !ReportStatus.COMPLETED.code().equals(prevMonthReport.getStatus().getCode())) {
+					errMsg = "Необходимо утвердить данные за отчетный периюд : " + dateFormat.format(prevMonthReport.getReportDate());
+				}
+			}
+
+			if(errMsg != null){
+				batchService.addBatchStatus(new BatchStatus()
+						.setBatchId(batchId)
+						.setStatus(BatchStatuses.WAITING)
+						.setReceiptDate(new Date()));
+
+				batchService.addBatchStatus(new BatchStatus()
+						.setBatchId(batchId)
+						.setStatus(BatchStatuses.PROCESSING)
+						.setReceiptDate(new Date()));
+
 				logger.error(errMsg);
 				failFast(batchId, errMsg);
 				return false;
 			}
-		} else {
-			// FIXME: 18.11.15
 		}
-
 
 		EavGlobal inProgress = serviceFactory.getGlobalService().getGlobal(ReportStatus.IN_PROGRESS);
 
@@ -536,32 +551,28 @@ public class ZipFilesMonitor {
 			ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
 
 			if (manifestEntry == null) { // credit-registry
-				// this is fix for zip extract for file names with non latin chars
-				String batchName = null;
 				ZipArchiveInputStream zis = null;
 				byte[] extractedBytes = null;
 
 				try {
 					zis = new ZipArchiveInputStream(new FileInputStream(filename));
-					ZipArchiveEntry zipArchiveEntry = null;
 
-					while ((zipArchiveEntry = zis.getNextZipEntry()) != null) {
-						ByteArrayOutputStream baos = null;
+					while (zis.getNextZipEntry() != null) {
+						ByteArrayOutputStream byteArrayOutputStream = null;
 						try {
 							int size;
 							byte[] buffer = new byte[ZIP_BUFFER_SIZE];
 
-							baos = new ByteArrayOutputStream();
+							byteArrayOutputStream = new ByteArrayOutputStream();
 
 							while ((size = zis.read(buffer, 0, buffer.length)) != -1) {
-								baos.write(buffer, 0, size);
+								byteArrayOutputStream.write(buffer, 0, size);
 							}
-							batchName = zipArchiveEntry.getName();
-							extractedBytes = baos.toByteArray();
+							extractedBytes = byteArrayOutputStream.toByteArray();
 						} finally {
-							if (baos != null) {
-								baos.flush();
-								baos.close();
+							if (byteArrayOutputStream != null) {
+								byteArrayOutputStream.flush();
+								byteArrayOutputStream.close();
 							}
 						}
 					}
@@ -572,7 +583,7 @@ public class ZipFilesMonitor {
 				}
 
 				if (extractedBytes == null)
-					throw new IOException(String.valueOf(Errors.E191));
+					throw new IOException(Errors.getMessage(Errors.E191));
 
 				if (userId == null)
 					userId = 100500L;
@@ -581,242 +592,71 @@ public class ZipFilesMonitor {
 				batchInfo.setBatchName(parseFileNameFromPath(filename));
 				batchInfo.setUserId(userId);
 
-				DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder documentBuilder = null;
+				XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+				XMLEventReader eventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(extractedBytes));
 
-				try {
-					documentBuilder = documentBuilderFactory.newDocumentBuilder();
-				} catch (ParserConfigurationException e) {
-					e.printStackTrace();
-				}
+				infoReader.parse(eventReader);
+				InfoData infoData = infoReader.getInfoData();
 
-				Document document = null;
+				Date repDate = infoData.getReportDate();
+				DataUtils.toBeginningOfTheMonth(repDate);
+				DataUtils.toBeginningOfTheDay(repDate);
+				batchInfo.setRepDate(repDate);
 
-				try {
-					// TODO: fix OutOfMemory
-					document = documentBuilder.parse(new ByteArrayInputStream(extractedBytes));
-				} catch (SAXException e) {
-					e.printStackTrace();
-				}
-
-				Date date = new Date();
-
-				String reportDate = document.getElementsByTagName("report_date").item(0).getTextContent();
-				if (isValidFormat("yyyy-MM-dd", reportDate)) {
-					date = new SimpleDateFormat("yyyy-MM-dd").parse(reportDate);
-				}
-
-                DataUtils.toBeginningOfTheMonth(date);
-				DataUtils.toBeginningOfTheDay(date);
-				batchInfo.setRepDate(date);
-
-				String actualCreditCount = document.getElementsByTagName("actual_credit_count").item(0).
-						getTextContent();
-
-				batchInfo.setSize(Long.parseLong(actualCreditCount));
-				batchInfo.setActualCount(Integer.parseInt(actualCreditCount));
+				batchInfo.setSize(infoData.getActualCreditCount());
+				batchInfo.setActualCount(infoData.getActualCreditCount());
 				batchInfo.setTotalCount(0);
 
-				try {
-					Element infoElement = (Element) document.getElementsByTagName("info").item(0);
-					Element creditorElement = (Element) infoElement.getElementsByTagName("creditor").item(0);
-					Element codeElement = (Element) creditorElement.getElementsByTagName("code").item(0);
-					String code = null;
+                String code = infoData.getCode();
+                if (code != null && code.length() > 0) {
+                    batchInfo.addParam("CODE", code.replaceAll("\\s+", ""));
+                } else {
+                    String docType = infoData.getDocType();
+                    String docValue = infoData.getDocValue();
 
-					if (codeElement != null)
-						code = codeElement.getTextContent();
+                    if (docType != null && docValue != null &&
+                            docType.length() > 0 && docValue.length() > 0) {
+                        batchInfo.addParam("DOC_TYPE", docType.replaceAll("\\s+", ""));
+                        batchInfo.addParam("DOC_VALUE", docValue.replaceAll("\\s+", ""));
+                    }
+                }
 
-					if (code != null && code.length() > 0) {
-						batchInfo.addParam("CODE", code.replaceAll("\\s+", ""));
-					} else {
-						NamedNodeMap map = document.getElementsByTagName("doc").item(0).getAttributes();
-						Node n = map.getNamedItem("doc_type");
-						String docType = n.getTextContent();
-
-						String docValue = document.getElementsByTagName("doc").item(0).getTextContent();
-
-						if (docType != null && docValue != null &&
-								docType.length() > 0 && docValue.length() > 0) {
-							batchInfo.addParam("DOC_TYPE", docType.replaceAll("\\s+", ""));
-							batchInfo.addParam("DOC_VALUE", docValue.replaceAll("\\s+", ""));
-						}
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
 
 				zipFile.close();
 				saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
-			} else {
+			} else { // usci
 				InputStream inManifest = zipFile.getInputStream(manifestEntry);
-				DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder documentBuilder = null;
 
-				try {
-					documentBuilder = documentBuilderFactory.newDocumentBuilder();
-				} catch (ParserConfigurationException e) {
-					e.printStackTrace();
-				}
+				XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+				XMLEventReader eventReader = inputFactory.createXMLEventReader(inManifest);
 
-				Document document = null;
-				try {
-					document = documentBuilder.parse(inManifest);
-				} catch (SAXException e) {
-					e.printStackTrace();
-				}
+				manifestReader.parse(eventReader);
+				ManifestData manifestData = manifestReader.getManifestData();
 
-
-				batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent().
-						replaceAll("\\s+", ""));
+				batchInfo.setBatchType(manifestData.getType().replaceAll("\\s+", ""));
 
 				batchInfo.setBatchName(parseFileNameFromPath(filename));
 
-				batchInfo.setUserId(userId == null ?
-						Long.parseLong(document.getElementsByTagName("userid").item(0).getTextContent().
-								replaceAll("\\s+", "")) : userId);
+				batchInfo.setUserId(userId == null ? manifestData.getUserId() : userId);
 
-				int actualCreditCount = Integer.parseInt(document.getElementsByTagName("size").item(0).
-						getTextContent().replaceAll("\\s+", ""));
+				int actualCreditCount = manifestData.getSize();
 
 				batchInfo.setSize((long) actualCreditCount);
 				batchInfo.setActualCount(actualCreditCount);
 				batchInfo.setTotalCount(0);
 
-				Date date = null;
-
-				try {
-					date = new SimpleDateFormat("dd.MM.yyyy").parse(
-							document.getElementsByTagName("date").item(0).getTextContent().replaceAll("\\s+", ""));
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
+				Date date = manifestData.getReportDate();
 
                 DataUtils.toBeginningOfTheMonth(date);
 				DataUtils.toBeginningOfTheDay(date);
 				batchInfo.setRepDate(date);
 
-				NodeList propertiesList = document.getElementsByTagName("properties");
-
-				for (int i = 0; i < propertiesList.getLength(); i++) {
-					Node propertiesNode = propertiesList.item(i);
-
-					if (propertiesNode.getNodeType() == Node.ELEMENT_NODE) {
-						Element propertiesElement = (Element) propertiesNode;
-
-						NodeList propertyList = propertiesElement.getElementsByTagName("property");
-
-						for (int j = 0; j < propertyList.getLength(); j++) {
-							Node propertyNode = propertyList.item(j);
-
-							if (propertyNode.getNodeType() == Node.ELEMENT_NODE) {
-								Element propertyElement = (Element) propertyNode;
-
-								String name = propertyElement.getElementsByTagName("name").item(0).getTextContent()
-										.replaceAll("\\s+", "");
-								String value = propertyElement.getElementsByTagName("value").item(0).getTextContent()
-										.replaceAll("\\s+", "");
-
-								batchInfo.addParam(name, value);
-							}
-						}
-					}
-				}
-
+				batchInfo.setAdditionalParams(manifestData.getAdditionalParams());
 
 				zipFile.close();
 				saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public boolean isValidFormat(String format, String value) {
-		Date date = null;
-		try {
-			SimpleDateFormat sdf = new SimpleDateFormat(format);
-			date = sdf.parse(value);
-			if (!value.equals(sdf.format(date))) {
-				date = null;
-			}
-		} catch (ParseException ex) {
-			ex.printStackTrace();
-		}
-		return date != null;
-	}
-
-	public void readFilesWithoutUser(String filename) {
-		BatchInfo batchInfo = new BatchInfo();
-		try {
-
-			ZipFile zipFile = new ZipFile(filename);
-
-			ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
-
-			InputStream inManifest = zipFile.getInputStream(manifestEntry);
-
-			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-
-			DocumentBuilder documentBuilder = null;
-			try {
-				documentBuilder = documentBuilderFactory.newDocumentBuilder();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			}
-
-			Document document = null;
-			try {
-				// TODO: Out of memory
-				document = documentBuilder.parse(inManifest);
-			} catch (SAXException e) {
-				e.printStackTrace();
-			}
-
-
-			batchInfo.setBatchType(document.getElementsByTagName("type").item(0).getTextContent()
-					.replaceAll("\\s+", ""));
-
-			batchInfo.setBatchName(parseFileNameFromPath(filename));
-
-			batchInfo.setUserId(100500L);
-			NodeList nlist = document.getElementsByTagName("property");
-			HashMap<String, String> params = new HashMap<>();
-			for (int i = 0; i < nlist.getLength(); i++) {
-				Node node = nlist.item(i);
-				NodeList childrenList = node.getChildNodes();
-				String name = "";
-				String value = "";
-
-				for (int j = 0; j < childrenList.getLength(); j++) {
-					Node curChild = childrenList.item(j);
-					if (curChild.getNodeName().equals("name")) {
-						name = curChild.getTextContent().replaceAll("\\s+", "");
-					}
-					if (curChild.getNodeName().equals("value")) {
-						value = curChild.getTextContent().replaceAll("\\s+", "");
-					}
-				}
-
-				params.put(name, value);
-			}
-
-			batchInfo.setAdditionalParams(params);
-			batchInfo.setSize(Long.parseLong(document.getElementsByTagName("size").item(0).getTextContent()));
-
-
-			Date date = null;
-			try {
-				date = new SimpleDateFormat("dd.MM.yyyy").parse(document.getElementsByTagName("date").
-						item(0).getTextContent().replaceAll("\\s+", ""));
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-
-			batchInfo.setRepDate(date);
-			zipFile.close();
-
-			saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), false);
-		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -827,24 +667,22 @@ public class ZipFilesMonitor {
 
 		IEntityService entityService = serviceFactory.getEntityService();
 
-		boolean valid = true;
+		boolean valid;
 		long sleepCounter = 0;
 		do {
 			while (entityService.getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
 				Thread.sleep(1000);
 
 				sleepCounter++;
-				if (sleepCounter > WAIT_TIMEOUT) {
+
+				if (sleepCounter > WAIT_TIMEOUT)
 					logger.error("Sync timeout in reader.");
-					// throw new IllegalStateException("Sync timeout in reader.");
-				}
 			}
 			sleepCounter = 0;
 
 			WatchKey watchKey = watchService.take();
 
 			for (WatchEvent<?> event : watchKey.pollEvents()) {
-				WatchEvent.Kind kind = event.kind();
 				if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
 					String fileName = event.context().toString();
 					System.out.println("Поступил батч : " + fileName);

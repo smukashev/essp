@@ -8,9 +8,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class Global {
-    public static final String DATE_FORMAT = "yyyy-MM-dd";
-    public static final String DATE_FORMAT_DOT = "dd.MM.yyyy";
-
     @Value("${batches.dir}")
     private String batchesDir;
 

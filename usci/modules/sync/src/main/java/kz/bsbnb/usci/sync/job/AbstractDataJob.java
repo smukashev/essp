@@ -23,16 +23,16 @@ public abstract class AbstractDataJob extends Thread {
     protected volatile int skip_count = 0;
 
     /* Inactive sleep time */
-    protected final int SLEEP_TIME_NORMAL = 1000;
+    protected final int SLEEP_TIME_NORMAL = 100;
 
     /* Sleep time after SKIP_TIME_MAX */
-    protected final int SLEEP_TIME_LONG = 5000;
+    protected final int SLEEP_TIME_LONG = 500;
 
     /* Number of processed entities to show stats */
     protected final int STAT_INTERVAL = 1000;
 
     /* Number of max processing threads */
-    protected final int THREAD_MAX_LIMIT = 33;
+    protected final int THREAD_MAX_LIMIT = 20;
 
     public final synchronized void addAll(List<BaseEntity> entities) {
         this.entities.addAll(entities);

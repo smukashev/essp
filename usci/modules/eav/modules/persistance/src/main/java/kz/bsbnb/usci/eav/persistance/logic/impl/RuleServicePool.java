@@ -18,8 +18,7 @@ public class RuleServicePool implements IRuleServicePool {
             return ruleService;
 
         RmiProxyFactoryBean ruleServiceFactoryBean = new RmiProxyFactoryBean();
-        ruleServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
-                + ":1097/ruleService");
+        ruleServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/ruleService");
         ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
         ruleServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 

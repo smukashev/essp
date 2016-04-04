@@ -12,8 +12,7 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.w3c.dom.Document;
 
@@ -36,7 +35,8 @@ public class MainPortlet extends MVCPortlet {
     private final static String TMP_FILE_DIR = "\\\\" + StaticRouter.getAsIP() + "\\batch_entry_list_temp_folder";
 
     private IBatchEntryService batchEntryService;
-    private Logger logger = LoggerFactory.getLogger(MainPortlet.class);
+    private Logger logger = Logger.getLogger(MainPortlet.class);
+
     private boolean retry;
 
     public void connectToServices() {
@@ -68,7 +68,7 @@ public class MainPortlet extends MVCPortlet {
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         } catch (Exception e) {
-            System.out.println("Can\"t initialise services: " + e.getMessage());
+            logger.error("Can\"t initialise services: " + e.getMessage());
         }
     }
 
@@ -98,9 +98,9 @@ public class MainPortlet extends MVCPortlet {
                 }
             }
         } catch (PortalException e) {
-            e.printStackTrace();
+            logger.error(null,e);
         } catch (SystemException e) {
-            e.printStackTrace();
+            logger.error(null,e);
         }
 
         if(!hasRights)

@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-import kz.bsbnb.usci.eav.Errors;
-import kz.bsbnb.usci.eav.model.Batch;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -74,7 +73,7 @@ public class BaseValueFactory {
                                 break;
                             }
                             default:
-                                throw new RuntimeException(String.valueOf(Errors.E7));
+                                throw new RuntimeException(Errors.getMessage(Errors.E7));
                         }
                     }
                 }
@@ -82,7 +81,7 @@ public class BaseValueFactory {
             }
             case MetaContainerTypes.META_SET: {
                 if (metaType.isSet()) {
-                    throw new UnsupportedOperationException(String.valueOf(Errors.E2));
+                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E2));
                 } else {
                     if (metaType.isComplex()) {
                         IBaseEntity baseEntity = (IBaseEntity) value;
@@ -116,7 +115,7 @@ public class BaseValueFactory {
                                 break;
                             }
                             default:
-                                throw new RuntimeException(String.valueOf(Errors.E7));
+                                throw new RuntimeException(Errors.getMessage(Errors.E7));
                         }
                     }
                 }
@@ -125,7 +124,7 @@ public class BaseValueFactory {
         }
 
         if (baseValue == null) {
-            throw new RuntimeException(String.valueOf(Errors.E43));
+            throw new RuntimeException(Errors.getMessage(Errors.E43));
         }
 
         return baseValue;

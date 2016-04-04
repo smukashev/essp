@@ -1,12 +1,10 @@
 package kz.bsbnb.usci.portlet.report.ui;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import com.vaadin.ui.*;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlet.report.dm.DatabaseConnect;
 import kz.bsbnb.usci.portlet.report.ReportApplication;
 import kz.bsbnb.usci.portlet.report.dm.Report;
@@ -16,13 +14,7 @@ import com.bsbnb.vaadin.messagebox.MessageBox;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.AbstractProperty;
 import com.vaadin.terminal.UserError;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.DateField;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -32,12 +24,15 @@ public class ParametersComponent extends VerticalLayout {
     private DatabaseConnect connect;
 
     private static final String LOCALIZATION_PREFIX = "PARAMETERS-COMPONENT";
+    private static final Logger logger = Logger.getLogger(ParametersComponent.class);
 
     private static String getResourceString(String key) {
         return ReportApplication.getResourceString(LOCALIZATION_PREFIX + "." + key);
     }
     private ReportInputParameter[] parameters;
     private Component[] parameterComponents;
+    OptionGroup optiongroup = new OptionGroup("Columns");
+
 
     public ParametersComponent(Report report, DatabaseConnect connect) {
         this.connect = connect;
@@ -66,6 +61,8 @@ public class ParametersComponent extends VerticalLayout {
             String localizedParameterName = parameter.getLocalizedName();
             Component parameterComponent = null;
             switch (parameter.getParameterType()) {
+                case NUMBER:
+                    break;
                 case DATE:
                     DateField dateField = new DateField();
                     dateField.setDateFormat("dd.MM.yyyy");
@@ -80,8 +77,19 @@ public class ParametersComponent extends VerticalLayout {
                     timeField.setValue(new Date());
                     parameterComponent = timeField;
                     break;
+                case STRING:
+                    break;
+                case OPTION:
+                    optiongroup.setMultiSelect(true);
+
+                    List<ValuePair> v_values = connect.getValueListFromStoredProcedure(parameter.getProcedureName(), "");
+                    for (ValuePair value : v_values) {
+                        optiongroup.addItem(value);
+                    }
+                    parameterComponent = optiongroup;
+                    break;
                 case LIST:
-                    List<ValuePair> values = connect.getValueListFromStoredProcedure(parameter.getProcedureName());
+                    List<ValuePair> values = connect.getValueListFromStoredProcedure(parameter.getProcedureName(), null);
                     if (values.size() == 1) {
                         final ValuePair value = values.get(0);
                         value.setDisplayName("<h1>" + value.getDisplayName() + "</h1>");
@@ -92,7 +100,8 @@ public class ParametersComponent extends VerticalLayout {
                             }
 
                             public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
-                                throw new UnsupportedOperationException("Not supported yet.");
+                                logger.error(Errors.getError(String.valueOf(Errors.E206)));
+                                throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
                             }
 
                             public Class<?> getType() {
@@ -102,16 +111,32 @@ public class ParametersComponent extends VerticalLayout {
                         Label label = new Label(property, Label.CONTENT_XHTML);
                         parameterComponent = label;
                     } else {
-                        ComboBox comboBox = new ComboBox();
+                        final ComboBox comboBox = new ComboBox();
                         for (ValuePair value : values) {
                             comboBox.addItem(value);
                         }
                         comboBox.setNullSelectionAllowed(false);
+                        comboBox.setImmediate(true);
                         comboBox.setNewItemsAllowed(false);
                         comboBox.setFilteringMode(ComboBox.FILTERINGMODE_CONTAINS);
                         comboBox.setWidth("200px");
                         comboBox.setCaption(localizedParameterName);
                         parameterComponent = comboBox;
+                        if(parameter.getProcedureName().equals("reporter.INPUT_PARAMETER_SHOWCASES")) {
+                            comboBox.addListener(new Property.ValueChangeListener() {
+
+                                public void valueChange(Property.ValueChangeEvent event) {
+                                    optiongroup.removeAllItems();
+                                    if (comboBox.getValue() != null) {
+                                        List<ValuePair> v_values = connect.getValueListFromStoredProcedure("INPUT_PARAMETER_SC_FIELDS", ((ValuePair) event.getProperty().getValue()).getValue());
+                                        for (ValuePair value : v_values) {
+                                            optiongroup.addItem(value);
+                                        }
+
+                                    }
+                                }
+                            });
+                        }
                     }
                     break;
                 default:
@@ -172,7 +197,11 @@ public class ParametersComponent extends VerticalLayout {
                 Label label = (Label) parameterComponent;
                 String caption = ((ValuePair) label.getValue()).getDisplayName();
                 result.add(caption.replaceAll("<h1>", "").replace("</h1>", ""));
-            } else {
+            } else if (parameterComponent instanceof OptionGroup) {
+                OptionGroup optionGroup = (OptionGroup) parameterComponent;
+                result.add(optionGroup.getValue().toString().replace("[", "").replace("]", ""));
+            }
+            else {
                 result.add(null);
             }
         }
@@ -197,6 +226,8 @@ public class ParametersComponent extends VerticalLayout {
                     item = getValue((TextField) parameterComponent);
                 } else if (parameterComponent instanceof Label) {
                     item = getValue((Label) parameterComponent);
+                } else if (parameterComponent instanceof  OptionGroup) {
+                    item = getValue((OptionGroup) parameterComponent);
                 }
                 result.add(item);
             } catch (ParameterException pe) {
@@ -227,6 +258,9 @@ public class ParametersComponent extends VerticalLayout {
 
     private Object getValue(Label label) {
         return ((ValuePair) label.getValue()).getValue();
+    }
+    private Object getValue(OptionGroup optionGroup) {
+        return optionGroup.getValue().toString().replace("[", "").replace("]", "");
     }
 
     private Object getValue(ComboBox comboBox) throws ParameterException {

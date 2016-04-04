@@ -2,8 +2,7 @@ package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.IBatchService;
 import kz.bsbnb.usci.core.service.IEntityService;
-import kz.bsbnb.usci.eav.Errors;
-import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
@@ -98,8 +97,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
                     entityStatus.setEntityId(-1);
                     entityStatus.setStatus(EntityStatuses.ERROR);
                     entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity));
-                    entityStatus.setErrorCode(String.valueOf(Errors.E195));
-                    entityStatus.setDevDescription(error.length() > 255 ? error.substring(0, 255) : error);
+                    entityStatus.setErrorCode(Errors.getMessage(Errors.E195));
+                    entityStatus.setDevDescription(Errors.checkLength(error));
                     entityStatus.setIndex(mockEntity.getBatchIndex() - 1);
                     entityStatus.setReceiptDate(new Date());
 
@@ -112,13 +111,13 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
                 entityStatus.setStatus(EntityStatuses.ERROR);
                 entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity));
 
-                String[] params = e.getMessage().split("\\|");
+                String[] params = e.getMessage().split(Errors.SEPARATOR);
                 if (params[0].length() > 4) {
-                    entityStatus.setErrorCode(params[0].length() > 255 ? params[0].substring(0, 255) : params[0]);
+                    entityStatus.setErrorCode(Errors.checkLength(params[0]));
                 } else {
                     entityStatus.setErrorCode(params[0]);
                     if (params.length > 1)
-                        entityStatus.setDevDescription(StringUtils.join(Arrays.copyOfRange(params, 1, params.length), "|"));
+                        entityStatus.setDevDescription(StringUtils.join(Arrays.copyOfRange(params, 1, params.length), Errors.SEPARATOR));
                 }
 
                 entityStatus.setIndex(mockEntity.getBatchIndex() - 1);
@@ -160,10 +159,12 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
         Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(baseEntity.getId(), baseEntity.getReportDate());
 
-        if (maxReportDate == null)
-            throw new UnsupportedOperationException("Запись не была найдена в базе; \n" + baseEntity);
+        if (maxReportDate == null){
+            logger.error("Запись не была найдена в базе; \n" + baseEntity);
+            throw new UnsupportedOperationException(Errors.getMessage(Errors.E234));
+        }
 
-        return (BaseEntity) baseEntityLoadDao.load(baseEntity.getId(), maxReportDate, baseEntity.getReportDate());
+        return (BaseEntity) baseEntityLoadDao.load(baseEntity.getId(), maxReportDate);
     }
 
     @Override

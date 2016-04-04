@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.slf4j.Logger;
@@ -14,31 +14,33 @@ public final class BasicOptimizer {
 
     private static final Logger logger = LoggerFactory.getLogger(BasicOptimizer.class);
 
-    static {
-        metaList.add("subject");
-        metaList.add("document");
-        metaList.add("credit");
-        metaList.add("primary_contract");
-    }
+    public static final String META_CREDIT = "credit";
+    public static final String META_SUBJECT = "subject";
+    public static final String META_DOCUMENT = "document";
+    public static final String META_PRIMARY_CONTRACT = "primary_contract";
 
-    private BasicOptimizer() {
+    static {
+        metaList.add(META_SUBJECT);
+        metaList.add(META_DOCUMENT);
+        metaList.add(META_CREDIT);
+        metaList.add(META_PRIMARY_CONTRACT);
     }
 
     public static String getKeyString(final IBaseEntity iBaseEntity) {
         MetaClass meta = iBaseEntity.getMeta();
 
         switch (meta.getClassName()) {
-            case "subject":
+            case META_SUBJECT:
                 return SubjectOptimizer.getKeyString(iBaseEntity);
-            case "document":
+            case META_DOCUMENT:
                 return DocumentOptimizer.getKeyString(iBaseEntity);
-            case "primary_contract":
+            case META_PRIMARY_CONTRACT:
                 return PrimaryContractOptimizer.getKeyString(iBaseEntity);
-            case "credit":
+            case META_CREDIT:
                 return CreditOptimizer.getKeyString(iBaseEntity);
             default:
-                logger.error(Errors.getError(String.valueOf(Errors.E183))+ " : \n"+iBaseEntity);
-                throw new IllegalStateException(String.valueOf(Errors.E183));
+                logger.error(Errors.getError(Errors.getMessage(Errors.E183)) + " : \n" + iBaseEntity);
+                throw new IllegalStateException(Errors.getMessage(Errors.E183));
         }
     }
 }

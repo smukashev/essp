@@ -20,6 +20,7 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.porltet.meta_editor.model.json.MetaClassList;
 import kz.bsbnb.usci.porltet.meta_editor.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
@@ -31,6 +32,7 @@ import java.util.List;
 public class MainPortlet extends MVCPortlet {
     private XSDGenerator xsdGenerator = new XSDGenerator();
     private IMetaFactoryService metaFactoryService;
+    private Logger logger = Logger.getLogger(MainPortlet.class);
 
     public void connectToServices() {
         try {
@@ -43,7 +45,7 @@ public class MainPortlet extends MVCPortlet {
             metaFactoryServiceFactoryBean.afterPropertiesSet();
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
         } catch (Exception e) {
-            System.out.println("Can't initialise services: " + e.getMessage());
+            logger.error("Can't initialise services: " + e.getMessage());
         }
     }
 
@@ -70,13 +72,13 @@ public class MainPortlet extends MVCPortlet {
                 }
             }
         } catch (PortalException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         } catch (SystemException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         } catch (com.liferay.portal.kernel.exception.PortalException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         } catch (com.liferay.portal.kernel.exception.SystemException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
         if(!hasRights)

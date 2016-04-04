@@ -19,11 +19,12 @@ import java.util.Map;
  */
 @Service
 public class BatchServiceImpl implements IBatchService {
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     @Qualifier(value = "remoteBatchService")
     RmiProxyFactoryBean rmiProxyFactoryBean;
 
-    kz.bsbnb.usci.core.service.IBatchService remoteBatchService;
+    private kz.bsbnb.usci.core.service.IBatchService remoteBatchService;
 
     @PostConstruct
     public void init() {
@@ -90,7 +91,7 @@ public class BatchServiceImpl implements IBatchService {
         return remoteBatchService.getAll(repDate);
     }
 
-   @Override
+    @Override
     public boolean incrementActualCounts(Map<Long, Long> batchesToUpdate) {
         return remoteBatchService.incrementActualCounts(batchesToUpdate);
     }

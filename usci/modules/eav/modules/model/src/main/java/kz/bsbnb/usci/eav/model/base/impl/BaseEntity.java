@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -22,13 +23,13 @@ import java.util.regex.Pattern;
 public class BaseEntity extends BaseContainer implements IBaseEntity {
     private static final long serialVersionUID = 1L;
 
-    Logger logger = LoggerFactory.getLogger(BaseEntity.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseEntity.class);
 
     private UUID uuid = UUID.randomUUID();
 
     private MetaClass meta;
 
-    OperationType operationType;
+    private OperationType operationType;
 
     private IBaseEntityReportDate baseEntityReportDate;
 
@@ -40,7 +41,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     private Long index;
 
-    private final List<BaseEntity> keyElements = new ArrayList<>();
+    private final List<IBaseEntity> keyElements = new ArrayList<>();
 
     private boolean keyElementsInstalled = false;
 
@@ -140,7 +141,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
             IMetaType metaType = meta.getMemberType(parentAttribute);
             if (metaType == null)
-                throw new IllegalArgumentException(Errors.E12 + "|" + meta.getClassName() + "|" + parentAttribute);
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E12,meta.getClassName(),parentAttribute));
 
             if (metaType.isComplex() && !metaType.isSet()) {
                 IBaseValue baseValue = values.get(parentAttribute);
@@ -161,7 +162,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             IMetaType metaType = meta.getMemberType(attribute);
 
             if (metaType == null)
-                throw new IllegalArgumentException(Errors.E12 + "|" + meta.getClassName() + "|" + attribute);
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E12,meta.getClassName(),attribute));
 
             return values.get(attribute);
         }
@@ -182,10 +183,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         IMetaType type = metaAttribute.getMetaType();
 
         if (type == null)
-            throw new IllegalArgumentException(Errors.E25 + "|" + attribute + "|" + meta.getClassName());
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E25,attribute,meta.getClassName()));
 
         if (baseValue == null)
-            throw new IllegalArgumentException(String.valueOf(Errors.E26));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E26));
 
         if (baseValue.getValue() != null) {
             Class<?> valueClass = baseValue.getValue().getClass();
@@ -218,8 +219,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             }
 
             if (expValueClass == null || !expValueClass.isAssignableFrom(valueClass))
-                throw new IllegalArgumentException(Errors.E27+"|" +
-                        meta.getClassName() + "|" + expValueClass + "|" +valueClass);
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E27,
+                        meta.getClassName(),expValueClass,valueClass));
         }
 
         baseValue.setBaseContainer(this);
@@ -278,7 +279,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     public Date getReportDate() {
         if (baseEntityReportDate == null)
-            throw new RuntimeException(String.valueOf(Errors.E11));
+            throw new RuntimeException(Errors.getMessage(Errors.E11));
 
         return baseEntityReportDate.getReportDate();
     }
@@ -286,7 +287,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     @Override
     public IBaseEntityReportDate getBaseEntityReportDate() {
         if (baseEntityReportDate == null) {
-            throw new RuntimeException(String.valueOf(Errors.E11));
+            throw new RuntimeException(Errors.getMessage(Errors.E11));
         }
         return baseEntityReportDate;
     }
@@ -308,7 +309,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
         if (baseEntityLoaded != null) {
             if (baseEntityLoaded.getBaseEntityReportDate() == null)
-                throw new IllegalStateException(String.valueOf(Errors.E6));
+                throw new IllegalStateException(Errors.getMessage(Errors.E6));
 
             integerValuesCount = baseEntityLoaded.getBaseEntityReportDate().getIntegerValuesCount();
             dateValuesCount = baseEntityLoaded.getBaseEntityReportDate().getDateValuesCount();
@@ -350,7 +351,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                             doubleValuesCount++;
                             break;
                         default:
-                            throw new RuntimeException(String.valueOf(Errors.E7));
+                            throw new RuntimeException(Errors.getMessage(Errors.E7));
                     }
 
                 }
@@ -367,7 +368,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         baseEntityReportDate.setComplexSetsCount(complexSetsCount);
     }
 
-    public List<BaseEntity> getKeyElements() {
+    public List<IBaseEntity> getKeyElements() {
         if (!keyElementsInstalled) {
             if (!this.containsComplexKey() && meta.isSearchable())
                 keyElements.add(this);
@@ -384,11 +385,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     if (baseValue == null || baseValue.getValue() == null) continue;
 
                     if (!metaType.isSet()) {
-                        keyElements.addAll(((BaseEntity) baseValue.getValue()).getKeyElements());
+                        keyElements.addAll(((IBaseEntity) baseValue.getValue()).getKeyElements());
                     } else {
                         BaseSet baseSet = (BaseSet) baseValue.getValue();
                         for (IBaseValue childBaseValue : baseSet.get())
-                            keyElements.addAll(((BaseEntity) childBaseValue.getValue()).getKeyElements());
+                            keyElements.addAll(((IBaseEntity) childBaseValue.getValue()).getKeyElements());
                     }
                 }
             }
@@ -397,6 +398,95 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         }
 
         return keyElements;
+    }
+
+    @Override
+    public boolean equalsByReference(IBaseEntity baseEntity) {
+        if (meta == null)
+            throw new IllegalStateException(Errors.getMessage(Errors.E176));
+
+        if (this.meta.getId() != baseEntity.getMeta().getId())
+            return false;
+
+        for (String attrName : meta.getAttributeNames()) {
+            IMetaAttribute metaAttribute = meta.getMetaAttribute(attrName);
+            IMetaType metaType = metaAttribute.getMetaType();
+
+            if (metaAttribute.isOptionalKey()) {
+                IBaseValue thisValue = this.getBaseValue(attrName);
+                IBaseValue thatValue = baseEntity.getBaseValue(attrName);
+
+                if (thisValue == null || thatValue == null || thisValue.getValue() == null || thatValue.getValue() == null)
+                    continue;
+
+                if (thisValue.getValue().equals(thatValue.getValue()))
+                    return true;
+            }
+
+            if (metaAttribute.isKey()) {
+                IBaseValue thisValue = this.getBaseValue(attrName);
+                IBaseValue thatValue =  baseEntity.getBaseValue(attrName);
+
+                if (metaType.isComplex()) {
+                    if (!metaType.isSet()) {
+                        IBaseEntity thisBaseEntity = (IBaseEntity) thisValue.getValue();
+                        IBaseEntity thatBaseEntity = (IBaseEntity) thatValue.getValue();
+
+                        if (!thisBaseEntity.equalsByReference(thatBaseEntity))
+                            return false;
+                    } else {
+                        BaseSet thisSet = (BaseSet) thisValue.getValue();
+                        BaseSet thatSet = (BaseSet) thatValue.getValue();
+
+                        MetaSet metaSet = (MetaSet) metaType;
+
+                        if (metaSet.getArrayKeyType() == ComplexKeyTypes.ANY) {
+                            boolean found = false;
+
+                            for (IBaseValue thisChildValue : thisSet.get()) {
+                                IBaseEntity thisChildEntity = (IBaseEntity) thisChildValue.getValue();
+
+                                for (IBaseValue thatChildValue : thatSet.get()) {
+                                    IBaseEntity thatChildEntity = (IBaseEntity) thatChildValue.getValue();
+
+                                    if (thisChildEntity.equalsByReference(thatChildEntity)) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!found)
+                                return false;
+                        } else {
+                            for (IBaseValue thisChildValue : thisSet.get()) {
+                                boolean found  = false;
+
+                                IBaseEntity thisChildEntity = (IBaseEntity) thisChildValue.getValue();
+
+                                for ( IBaseValue thatChildValue : thatSet.get()) {
+                                    IBaseEntity thatChildEntity = (IBaseEntity) thatChildValue.getValue();
+                                    if (thisChildEntity.equalsByReference(thatChildEntity)) {
+                                        found = true;
+                                    }
+                                }
+
+                                if (!found)
+                                    return false;
+                            }
+                        }
+                    }
+                } else {
+                    if (metaType.isSet())
+                        throw new IllegalStateException(Errors.getMessage(Errors.E285));
+
+                    if (!thisValue.getValue().equals(thatValue.getValue()))
+                        return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -564,19 +654,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return result;
     }
 
-    public int hashCode2() {
-        int result = 31 * meta.hashCode();
-
-        for (String name : meta.getAttributeNames()) {
-            IMetaAttribute metaAttribute = meta.getMetaAttribute(name);
-            if (metaAttribute.isKey()) {
-                result += values.get(name).getValue().toString().hashCode();
-            }
-        }
-
-        return result;
-    }
-
     public Object getEls(String path){
         return getEls(path, false);
     }
@@ -589,7 +666,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         boolean[] isFilter = new boolean[500];
         String function = null;
 
-        if (!path.startsWith("{")) throw new RuntimeException(String.valueOf(Errors.E14));
+        if (!path.startsWith("{")) throw new RuntimeException(Errors.getMessage(Errors.E14));
         for (int i = 0; i < path.length(); i++) {
             if (path.charAt(i) == '}') {
                 function = path.substring(1, i);
@@ -598,7 +675,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             }
         }
 
-        if (function == null) throw new RuntimeException(String.valueOf(Errors.E15));
+        if (function == null) throw new RuntimeException(Errors.getMessage(Errors.E15));
 
         Set<Object> allowedSet = new TreeSet<>();
 
@@ -628,7 +705,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             if (m.find()) {
                 downPath = m.group(1);
             } else {
-                throw new RuntimeException(String.valueOf(Errors.E16));
+                throw new RuntimeException(Errors.getMessage(Errors.E16));
             }
 
             LinkedList list = (LinkedList) getEls("{get}" + downPath, false);
@@ -642,7 +719,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             else if (fields.length == 2)
                 controlSet = new HashSet<>();
             else
-                throw new RuntimeException(String.valueOf(Errors.E17));
+                throw new RuntimeException(Errors.getMessage(Errors.E17));
 
             for (Object o : list) {
                 BaseEntity entity = (BaseEntity) o;
@@ -672,20 +749,20 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         for (int i = 0; i <= path.length(); i++) {
             if (i == path.length()) {
                 if (open != 0)
-                    throw new RuntimeException(String.valueOf(Errors.E18));
+                    throw new RuntimeException(Errors.getMessage(Errors.E18));
                 break;
             }
             if (path.charAt(i) == '=') eqCnt++;
             if (path.charAt(i) == '!' && (i + 1 == path.length() || path.charAt(i + 1) != '='))
-                throw new RuntimeException(String.valueOf(Errors.E21));
+                throw new RuntimeException(Errors.getMessage(Errors.E21));
 
             if (path.charAt(i) == '[') open++;
             if (path.charAt(i) == ']') {
                 open--;
-                if (eqCnt != 1) throw new RuntimeException(String.valueOf(Errors.E20));
+                if (eqCnt != 1) throw new RuntimeException(Errors.getMessage(Errors.E20));
                 eqCnt = 0;
             }
-            if (open < 0 || open > 1) throw new RuntimeException(String.valueOf(Errors.E22));
+            if (open < 0 || open > 1) throw new RuntimeException(Errors.getMessage(Errors.E22));
         }
 
         for (int i = 0; i <= path.length(); i++) {
@@ -849,7 +926,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             valueOut = value.getValue();
 
             if (type == null)
-                throw new IllegalStateException(String.valueOf(Errors.E46));
+                throw new IllegalStateException(Errors.getMessage(Errors.E46));
 
             if (type.isSet()) {
                 if (arrayIndexes != null) {
@@ -865,7 +942,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 theMeta = (MetaClass) type;
             } else {
                 if (tokenizer.hasMoreTokens()) {
-                    throw new IllegalArgumentException(String.valueOf(Errors.E13));
+                    throw new IllegalArgumentException(Errors.getMessage(Errors.E13));
                 }
             }
         }
@@ -913,11 +990,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     } else {
                         if (tokenizer.hasMoreTokens()) {
                             if (!set.getMemberType().isComplex()) {
-                                throw new IllegalArgumentException(String.valueOf(Errors.E23));
+                                throw new IllegalArgumentException(Errors.getMessage(Errors.E23));
                             }
 
                             if (set.getMemberType().isSet()) {
-                                throw new IllegalArgumentException(String.valueOf(Errors.E23));
+                                throw new IllegalArgumentException(Errors.getMessage(Errors.E23));
                             }
 
                             String restOfPath = "";
@@ -950,7 +1027,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     theMeta = (MetaClass) type;
                 } else {
                     if (tokenizer.hasMoreTokens()) {
-                        throw new IllegalArgumentException(String.valueOf(Errors.E13));
+                        throw new IllegalArgumentException(Errors.getMessage(Errors.E13));
                     }
                 }
 
@@ -966,7 +1043,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return valueOut;
     }
 
-    public boolean equalsToString(HashMap<String, String> params) {
+    boolean equalsToString(HashMap<String, String> params) {
         for (String fieldName : params.keySet()) {
             String ownFieldName;
             String innerPath = null;
@@ -980,10 +1057,10 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             IMetaType mtype = meta.getMemberType(ownFieldName);
 
             if (mtype == null)
-                throw new IllegalArgumentException(Errors.E9 + "|" + fieldName);
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E9,fieldName));
 
             if (mtype.isSet())
-                throw new IllegalArgumentException(Errors.E10 + "|" + fieldName);
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E10,fieldName));
 
             BaseValue baseValue = (BaseValue) getBaseValue(ownFieldName);
 
@@ -1023,11 +1100,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             baseEntityCloned.setBaseEntityReportDate(baseEntityReportDateCloned);
 
             HashMap<String, IBaseValue> valuesCloned = new HashMap<>();
-            Iterator<String> attributesIt = values.keySet().iterator();
 
-            while (attributesIt.hasNext()) {
-                String attribute = attributesIt.next();
-
+            for (String attribute : values.keySet()) {
                 IBaseValue baseValue = values.get(attribute);
                 IBaseValue baseValueCloned = ((BaseValue) baseValue).clone();
                 baseValueCloned.setBaseContainer(baseEntityCloned);
@@ -1036,7 +1110,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
             baseEntityCloned.values = valuesCloned;
         } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException(String.valueOf(Errors.E8));
+            throw new RuntimeException(Errors.getMessage(Errors.E8));
         }
 
         return baseEntityCloned;

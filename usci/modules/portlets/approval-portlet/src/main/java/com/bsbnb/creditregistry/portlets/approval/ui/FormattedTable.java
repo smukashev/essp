@@ -1,6 +1,5 @@
 package com.bsbnb.creditregistry.portlets.approval.ui;
 
-import static com.bsbnb.creditregistry.portlets.approval.ApprovalApplication.log;
 import com.vaadin.data.Property;
 import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.StreamResource;
@@ -25,6 +24,7 @@ import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -33,6 +33,7 @@ import jxl.write.WriteException;
 public class FormattedTable extends Table {
     private static final long serialVersionUID = 804740605642799781L;
     private HashMap<Object, String> formatData = new HashMap<Object, String>();
+    private final Logger logger = org.apache.log4j.Logger.getLogger(AttachmentUpload.class);
 
     public FormattedTable() {
         alwaysRecalculateColumnWidths = true;
@@ -116,7 +117,7 @@ public class FormattedTable extends Table {
                         String componentCaption = ((Component) value).getCaption();
                         sheet.addCell(new Label(columnIndex, rowCounter, componentCaption, times12format));
                     } else {
-                        log.log(Level.WARNING, "Unpredicted column type. Couldn export class: {0}", value.getClass().getCanonicalName());
+                        logger.warn("Unpredicted column type. Couldn export class: "+value.getClass().getCanonicalName());
                     }
                 }
                 sheet.setColumnView(columnIndex, cellView);

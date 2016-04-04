@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.eav.persistance.generated.tables.records.EavMClassesRecord;
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaContainer;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -26,9 +26,6 @@ import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
-//TODO: refactor all id casts!
-//TODO: refactor all field names. Get field names from generated classes.
-
 @Repository
 public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
     private final Logger logger = LoggerFactory.getLogger(MetaClassDaoImpl.class);
@@ -41,38 +38,44 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         SelectForUpdateStep select;
 
         select = context.select(
-                EAV_M_CLASSES.IS_DISABLED,
-                EAV_M_CLASSES.BEGIN_DATE,
                 EAV_M_CLASSES.ID,
+                EAV_M_CLASSES.BEGIN_DATE,
                 EAV_M_CLASSES.NAME,
                 EAV_M_CLASSES.TITLE,
                 EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                 EAV_M_CLASSES.PARENT_IS_KEY,
-                EAV_M_CLASSES.IS_REFERENCE
-        ).from(EAV_M_CLASSES).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc());
+                EAV_M_CLASSES.IS_DISABLED,
+                EAV_M_CLASSES.IS_REFERENCE)
+                .from(EAV_M_CLASSES)
+                .orderBy(EAV_M_CLASSES.BEGIN_DATE.desc());
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        if (rows.size() < 1)
-            return;
+        if (rows.size() < 1) return;
 
         for (Map<String, Object> row : rows) {
             MetaClass metaClass = new MetaClass();
 
-            metaClass.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
-            metaClass.setBeginDate(DataUtils.convert((Timestamp) row.get("begin_date")));
-            metaClass.setId(((BigDecimal) row.get("id")).longValue());
-            metaClass.setClassName((String) row.get("name"));
-            metaClass.setClassTitle((String) row.get("title"));
-            metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String) row.get("complex_key_type")));
-            metaClass.setReference(((BigDecimal) row.get("is_reference")).longValue() == 1);
+            setMetaProperties(metaClass, row);
             loadAttributes(metaClass);
+
             metaClassList.add(metaClass);
         }
     }
 
+    private void setMetaProperties(MetaClass metaClass, Map<String, Object> row) {
+        metaClass.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
+        metaClass.setBeginDate(DataUtils.convert((Timestamp) row.get("begin_date")));
+        metaClass.setId(((BigDecimal) row.get("id")).longValue());
+        metaClass.setClassName((String) row.get("name"));
+        metaClass.setClassTitle((String) row.get("title"));
+        metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String) row.get("complex_key_type")));
+        metaClass.setReference(((BigDecimal) row.get("is_reference")).longValue() == 1);
+        metaClass.setParentIsKey(((BigDecimal) row.get("parent_is_key")).longValue() == 1);
+    }
+
     public List<MetaClass> loadAll() {
-        List<MetaClass> metaClassList = new ArrayList<MetaClass>();
+        List<MetaClass> metaClassList = new ArrayList<>();
         loadAllClasses(metaClassList);
 
         return metaClassList;
@@ -83,7 +86,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         if (metaClass.getId() < 1) {
             if (metaClass.getClassName() == null)
-                throw new IllegalArgumentException(String.valueOf(Errors.E162));
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E162));
 
             if (beginDateStrict) {
                 select = context.select(
@@ -94,15 +97,12 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.TITLE,
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
-                        EAV_M_CLASSES.IS_REFERENCE
-                ).from(EAV_M_CLASSES).
-                        where(
-                                EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
-                        ).and(
-                        EAV_M_CLASSES.BEGIN_DATE.eq(DataUtils.convert(metaClass.getBeginDate()))
-                ).and(
-                        EAV_M_CLASSES.IS_DISABLED.equal(DataUtils.convert(false))
-                ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
+                        EAV_M_CLASSES.IS_REFERENCE)
+                        .from(EAV_M_CLASSES)
+                        .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
+                        .and(EAV_M_CLASSES.BEGIN_DATE.equal(DataUtils.convert(metaClass.getBeginDate())))
+                        .and(EAV_M_CLASSES.IS_DISABLED.equal(DataUtils.convert(false)))
+                        .orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
             } else {
                 select = context.select(
                         EAV_M_CLASSES.IS_DISABLED,
@@ -112,15 +112,12 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.TITLE,
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
-                        EAV_M_CLASSES.IS_REFERENCE
-                ).from(EAV_M_CLASSES).
-                        where(
-                                EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
-                        ).and(
-                        EAV_M_CLASSES.BEGIN_DATE.le(DataUtils.convert(metaClass.getBeginDate()))
-                ).and(
-                        EAV_M_CLASSES.IS_DISABLED.equal(DataUtils.convert(false))
-                ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
+                        EAV_M_CLASSES.IS_REFERENCE)
+                        .from(EAV_M_CLASSES)
+                        .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
+                        .and(EAV_M_CLASSES.BEGIN_DATE.le(DataUtils.convert(metaClass.getBeginDate())))
+                        .and(EAV_M_CLASSES.IS_DISABLED.equal(DataUtils.convert(false)))
+                        .orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
             }
 
         } else {
@@ -132,47 +129,38 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_CLASSES.TITLE,
                     EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                     EAV_M_CLASSES.PARENT_IS_KEY,
-                    EAV_M_CLASSES.IS_REFERENCE
-            ).from(EAV_M_CLASSES).
-                    where(
-                            EAV_M_CLASSES.ID.equal(metaClass.getId())
-                    ).limit(1).offset(0);
+                    EAV_M_CLASSES.IS_REFERENCE)
+                    .from(EAV_M_CLASSES)
+                    .where(EAV_M_CLASSES.ID.equal(metaClass.getId()))
+                    .limit(1)
+                    .offset(0);
         }
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException(Errors.E82 + "|" + metaClass.getClassName());
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E82, metaClass.getClassName()));
 
         if (rows.size() < 1)
-            throw new IllegalArgumentException(Errors.E163 + "|" + metaClass.getClassName());
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E163, metaClass.getClassName()));
 
         Map<String, Object> row = rows.get(0);
 
         if (row != null) {
-
-
-            metaClass.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
-            metaClass.setBeginDate(DataUtils.convert((Timestamp) row.get("begin_date")));
-            metaClass.setId(((BigDecimal) row.get("id")).longValue());
-            metaClass.setClassName((String) row.get("name"));
-            metaClass.setClassTitle((String) row.get("title"));
-            metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String) row.get("complex_key_type")));
-            metaClass.setReference(((BigDecimal) row.get("is_reference")).longValue() == 1);
-            metaClass.setParentIsKey(((BigDecimal) row.get("parent_is_key")).longValue() == 1);
+            setMetaProperties(metaClass, row);
         } else {
             logger.error("Can't load metaClass, empty data set.");
         }
     }
 
-    //This method only for meta editor portlet
+    // This method only for meta editor portlet
     private void loadAllClass(MetaClass metaClass, boolean beginDateStrict) {
         SelectForUpdateStep select;
 
         if (metaClass.getId() < 1) {
             if (metaClass.getClassName() == null)
-                throw new IllegalArgumentException(String.valueOf(Errors.E162));
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E162));
 
             if (beginDateStrict) {
                 select = context.select(
@@ -183,13 +171,13 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.TITLE,
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
-                        EAV_M_CLASSES.IS_REFERENCE
-                ).from(EAV_M_CLASSES).
-                        where(
-                                EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
-                        ).and(
-                        EAV_M_CLASSES.BEGIN_DATE.eq(DataUtils.convert(metaClass.getBeginDate()))
-                ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
+                        EAV_M_CLASSES.IS_REFERENCE)
+                        .from(EAV_M_CLASSES)
+                        .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
+                        .and(EAV_M_CLASSES.BEGIN_DATE.eq(DataUtils.convert(metaClass.getBeginDate())))
+                        .orderBy(EAV_M_CLASSES.BEGIN_DATE.desc())
+                        .limit(1)
+                        .offset(0);
             } else {
                 select = context.select(
                         EAV_M_CLASSES.IS_DISABLED,
@@ -199,13 +187,11 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.TITLE,
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
-                        EAV_M_CLASSES.IS_REFERENCE
-                ).from(EAV_M_CLASSES).
-                        where(
-                                EAV_M_CLASSES.NAME.equal(metaClass.getClassName())
-                        ).and(
-                        EAV_M_CLASSES.BEGIN_DATE.le(DataUtils.convert(metaClass.getBeginDate()))
-                ).orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
+                        EAV_M_CLASSES.IS_REFERENCE)
+                        .from(EAV_M_CLASSES)
+                        .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
+                        .and(EAV_M_CLASSES.BEGIN_DATE.le(DataUtils.convert(metaClass.getBeginDate())))
+                        .orderBy(EAV_M_CLASSES.BEGIN_DATE.desc()).limit(1).offset(0);
             }
 
         } else {
@@ -217,42 +203,32 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_CLASSES.TITLE,
                     EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                     EAV_M_CLASSES.PARENT_IS_KEY,
-                    EAV_M_CLASSES.IS_REFERENCE
-            ).from(EAV_M_CLASSES).
-                    where(
-                            EAV_M_CLASSES.ID.equal(metaClass.getId())
-                    ).limit(1).offset(0);
+                    EAV_M_CLASSES.IS_REFERENCE)
+                    .from(EAV_M_CLASSES)
+                    .where(EAV_M_CLASSES.ID.equal(metaClass.getId()))
+                    .limit(1)
+                    .offset(0);
         }
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException(Errors.E83 + "|" + metaClass.getClassName());
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E83, metaClass.getClassName()));
 
         if (rows.size() < 1)
-            throw new IllegalArgumentException(Errors.E163 + "|" + metaClass.getClassName());
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E163, metaClass.getClassName()));
 
         Map<String, Object> row = rows.get(0);
 
         if (row != null) {
-
-
-            metaClass.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
-            metaClass.setBeginDate(DataUtils.convert((Timestamp) row.get("begin_date")));
-            metaClass.setId(((BigDecimal) row.get("id")).longValue());
-            metaClass.setClassName((String) row.get("name"));
-            metaClass.setClassTitle((String) row.get("title"));
-            metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String) row.get("complex_key_type")));
-            metaClass.setReference(((BigDecimal) row.get("is_reference")).longValue() == 1);
-            metaClass.setParentIsKey(((BigDecimal) row.get("parent_is_key")).longValue() == 1);
+            setMetaProperties(metaClass, row);
         } else {
             logger.error("Can't load metaClass, empty data set.");
         }
     }
 
     private long createClass(MetaClass metaClass) {
-
         InsertOnDuplicateStep insert = context.insertInto(
                 EAV_M_CLASSES,
                 EAV_M_CLASSES.NAME,
@@ -273,7 +249,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         long metaId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
         if (metaId < 1)
-            throw new IllegalStateException(String.valueOf(Errors.E158));
+            throw new IllegalStateException(Errors.getMessage(Errors.E158));
 
         metaClass.setId(metaId);
 
@@ -282,7 +258,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     private void updateClass(MetaClass metaClass) {
         if (metaClass.getId() < 1)
-            throw new IllegalArgumentException(String.valueOf(Errors.E170));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E170));
 
         UpdateConditionStep update = context.update(EAV_M_CLASSES).
                 set(EAV_M_CLASSES.NAME, metaClass.getClassName()).
@@ -297,17 +273,14 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
     }
 
-    private long saveSet(IMetaType type, long parentId, int parentType, IMetaAttribute metaAttribute,
-                         String attributeName) {
+    private long saveSet(IMetaType type, long parentId, int parentType, IMetaAttribute metaAttribute, String attributeName) {
         InsertOnDuplicateStep insert;
         long id;
 
-        if (!type.isSet()) {
-            throw new IllegalStateException(Errors.E168+"|"+attributeName);
-        }
+        if (!type.isSet())
+            throw new IllegalStateException(Errors.getMessage(Errors.E168, attributeName));
 
         MetaSet metaSet = (MetaSet) type;
-
 
         if (metaSet.isComplex()) {
             long innerId = save((MetaClass) metaSet.getMemberType());
@@ -355,9 +328,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                                String attributeName, String attributeTitle) {
         InsertOnDuplicateStep insert;
 
-        if (type.isSet()) {
-            throw new IllegalStateException(Errors.E167 + "|" + attributeName);
-        }
+        if (type.isSet())
+            throw new IllegalStateException(Errors.getMessage(Errors.E167, attributeName));
 
         if (type.isComplex()) {
             long innerId = save((MetaClass) type);
@@ -369,14 +341,21 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_COMPLEX_ATTRIBUTES.NAME,
                     EAV_M_COMPLEX_ATTRIBUTES.TITLE,
                     EAV_M_COMPLEX_ATTRIBUTES.IS_KEY,
+                    EAV_M_COMPLEX_ATTRIBUTES.IS_OPTIONAL_KEY,
                     EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE,
                     EAV_M_COMPLEX_ATTRIBUTES.IS_IMMUTABLE,
                     EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL,
                     EAV_M_COMPLEX_ATTRIBUTES.IS_REQUIRED,
                     EAV_M_COMPLEX_ATTRIBUTES.IS_DISABLED,
                     EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID
-            ).values(parentId, parentType, attributeName, attributeTitle,
-                    DataUtils.convert(metaAttribute.isKey()), DataUtils.convert(metaAttribute.isNullable()),
+            ).values(
+                    parentId,
+                    parentType,
+                    attributeName,
+                    attributeTitle,
+                    DataUtils.convert(metaAttribute.isKey()),
+                    DataUtils.convert(metaAttribute.isOptionalKey()),
+                    DataUtils.convert(metaAttribute.isNullable()),
                     DataUtils.convert(metaAttribute.isImmutable()),
                     DataUtils.convert(metaAttribute.isFinal()),
                     DataUtils.convert(metaAttribute.isRequired()),
@@ -391,28 +370,32 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_SIMPLE_ATTRIBUTES.TITLE,
                     EAV_M_SIMPLE_ATTRIBUTES.TYPE_CODE,
                     EAV_M_SIMPLE_ATTRIBUTES.IS_KEY,
+                    EAV_M_SIMPLE_ATTRIBUTES.IS_OPTIONAL_KEY,
                     EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE,
                     EAV_M_SIMPLE_ATTRIBUTES.IS_IMMUTABLE,
                     EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL,
                     EAV_M_SIMPLE_ATTRIBUTES.IS_REQUIRED,
                     EAV_M_SIMPLE_ATTRIBUTES.IS_DISABLED
-            ).values(parentId, parentType, attributeName, attributeTitle,
+            ).values(parentId,
+                    parentType,
+                    attributeName,
+                    attributeTitle,
                     ((MetaValue) type).getTypeCode().toString(),
-                    DataUtils.convert(metaAttribute.isKey()), DataUtils.convert(metaAttribute.isNullable()),
+                    DataUtils.convert(metaAttribute.isKey()),
+                    DataUtils.convert(metaAttribute.isOptionalKey()),
+                    DataUtils.convert(metaAttribute.isNullable()),
                     DataUtils.convert(metaAttribute.isImmutable()),
                     DataUtils.convert(metaAttribute.isFinal()),
                     DataUtils.convert(metaAttribute.isRequired()),
-                    DataUtils.convert(metaAttribute.isDisabled())
-            );
+                    DataUtils.convert(metaAttribute.isDisabled()));
         }
 
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     private void insertAttributes(Set<String> addNames, MetaClass meta) {
-        if (meta.getId() < 1) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E161));
-        }
+        if (meta.getId() < 1)
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E161));
 
         for (String typeName : addNames) {
             IMetaAttribute metaAttribute = meta.getMetaAttribute(typeName);
@@ -421,15 +404,17 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
             if (metaType.isSet()) {
                 saveSet(metaType, meta.getId(), MetaContainerTypes.META_CLASS, metaAttribute, typeName);
             } else {
-                metaAttribute.setId(saveAttribute(metaType, meta.getId(), MetaContainerTypes.META_CLASS,
-                        metaAttribute, typeName, metaAttribute.getTitle()));
+                long attributeId = saveAttribute(metaType, meta.getId(), MetaContainerTypes.META_CLASS,
+                        metaAttribute, typeName, metaAttribute.getTitle());
+
+                metaAttribute.setId(attributeId);
             }
         }
     }
 
     private void updateAttributes(Set<String> updateNames, MetaClass meta, MetaClass dbMeta) {
         if (dbMeta.getId() < 1) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E169));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E169));
         }
 
         UpdateConditionStep update;
@@ -439,113 +424,113 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
             if (meta.getMemberType(typeName).isSet()) {
                 if (meta.getMemberType(typeName).isComplex()) {
-                    update = context.update(EAV_M_COMPLEX_SET
-                    ).set(EAV_M_COMPLEX_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey())
-                    ).set(EAV_M_COMPLEX_SET.TITLE, metaAttribute.getTitle()
-                    ).set(EAV_M_COMPLEX_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
-                    ).set(EAV_M_COMPLEX_SET.IS_CUMULATIVE, DataUtils.convert(metaAttribute.isCumulative())
-                    ).set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
-                    ).set(EAV_M_COMPLEX_SET.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled())
-                    ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(dbMeta.getId())
-                    ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
-                    ).and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
+                    update = context.update(EAV_M_COMPLEX_SET)
+                            .set(EAV_M_COMPLEX_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
+                            .set(EAV_M_COMPLEX_SET.TITLE, metaAttribute.getTitle())
+                            .set(EAV_M_COMPLEX_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                            .set(EAV_M_COMPLEX_SET.IS_CUMULATIVE, DataUtils.convert(metaAttribute.isCumulative()))
+                            .set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
+                            .set(EAV_M_COMPLEX_SET.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
+                            .where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(dbMeta.getId()))
+                            .and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
+                            .and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
                 } else {
-                    update = context.update(EAV_M_SIMPLE_SET
-                    ).set(EAV_M_SIMPLE_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey())
-                    ).set(EAV_M_SIMPLE_SET.TITLE, metaAttribute.getTitle()
-                    ).set(EAV_M_SIMPLE_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
-                    ).set(EAV_M_SIMPLE_SET.IS_CUMULATIVE, DataUtils.convert(metaAttribute.isCumulative())
-                    ).set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
-                    ).set(EAV_M_SIMPLE_SET.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled())
-                    ).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(dbMeta.getId())
-                    ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
-                    ).and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
+                    update = context.update(EAV_M_SIMPLE_SET)
+                            .set(EAV_M_SIMPLE_SET.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
+                            .set(EAV_M_SIMPLE_SET.TITLE, metaAttribute.getTitle())
+                            .set(EAV_M_SIMPLE_SET.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                            .set(EAV_M_SIMPLE_SET.IS_CUMULATIVE, DataUtils.convert(metaAttribute.isCumulative()))
+                            .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
+                            .set(EAV_M_SIMPLE_SET.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
+                            .where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(dbMeta.getId()))
+                            .and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
+                            .and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
                 }
             } else {
                 if (meta.getMemberType(typeName).isComplex()) {
-                    update = context.update(EAV_M_COMPLEX_ATTRIBUTES
-                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, DataUtils.convert(metaAttribute.isKey())
-                    ).set(EAV_M_COMPLEX_ATTRIBUTES.TITLE, metaAttribute.getTitle()
-                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
-                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
-                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL, DataUtils.convert(metaAttribute.isFinal())
-                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_REQUIRED, DataUtils.convert(metaAttribute.isRequired())
-                    ).set(EAV_M_COMPLEX_ATTRIBUTES.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled())
-                    ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
-                    ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
-                    ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
+                    update = context.update(EAV_M_COMPLEX_ATTRIBUTES)
+                            .set(EAV_M_COMPLEX_ATTRIBUTES.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
+                            .set(EAV_M_COMPLEX_ATTRIBUTES.IS_OPTIONAL_KEY, DataUtils.convert(metaAttribute.isOptionalKey()))
+                            .set(EAV_M_COMPLEX_ATTRIBUTES.TITLE, metaAttribute.getTitle())
+                            .set(EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                            .set(EAV_M_COMPLEX_ATTRIBUTES.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
+                            .set(EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
+                            .set(EAV_M_COMPLEX_ATTRIBUTES.IS_REQUIRED, DataUtils.convert(metaAttribute.isRequired()))
+                            .set(EAV_M_COMPLEX_ATTRIBUTES.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
+                            .where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId()))
+                            .and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
+                            .and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
                 } else {
-                    update = context.update(EAV_M_SIMPLE_ATTRIBUTES
-                    ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_KEY, DataUtils.convert(metaAttribute.isKey())
-                    ).set(EAV_M_SIMPLE_ATTRIBUTES.TITLE, metaAttribute.getTitle()
-                    ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable())
-                    ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable())
-                    ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL, DataUtils.convert(metaAttribute.isFinal())
-                    ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_REQUIRED, DataUtils.convert(metaAttribute.isRequired())
-                    ).set(EAV_M_SIMPLE_ATTRIBUTES.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled())
-                    ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId())
-                    ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
-                    ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
+                    update = context.update(EAV_M_SIMPLE_ATTRIBUTES)
+                            .set(EAV_M_SIMPLE_ATTRIBUTES.IS_KEY, DataUtils.convert(metaAttribute.isKey()))
+                            .set(EAV_M_SIMPLE_ATTRIBUTES.IS_OPTIONAL_KEY, DataUtils.convert(metaAttribute.isOptionalKey()))
+                            .set(EAV_M_SIMPLE_ATTRIBUTES.TITLE, metaAttribute.getTitle())
+                            .set(EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE, DataUtils.convert(metaAttribute.isNullable()))
+                            .set(EAV_M_SIMPLE_ATTRIBUTES.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
+                            .set(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
+                            .set(EAV_M_SIMPLE_ATTRIBUTES.IS_REQUIRED, DataUtils.convert(metaAttribute.isRequired()))
+                            .set(EAV_M_SIMPLE_ATTRIBUTES.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
+                            .where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId()))
+                            .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
+                            .and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
                 }
             }
 
             logger.debug(update.toString());
 
             long t = 0;
-            if (sqlStats != null) {
-                t = System.nanoTime();
-            }
+            if (sqlStats != null) t = System.nanoTime();
+
             jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
-            if (sqlStats != null) {
+
+            if (sqlStats != null)
                 sqlStats.put(update.getSQL(), (System.nanoTime() - t) / 1000000);
-            }
+
         }
     }
 
     private void deleteAttributes(Set<String> deleteNames, MetaClass meta) {
         DeleteConditionStep delete;
 
-        if (meta.getId() < 1) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E159));
-        }
+        if (meta.getId() < 1)
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E159));
 
         for (String typeName : deleteNames) {
             if (meta.getMemberType(typeName).isComplex()) {
                 if (!meta.getMemberType(typeName).isSet()) {
-                    delete = context.delete(EAV_M_COMPLEX_ATTRIBUTES
-                    ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
-                    ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
-                    ).and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
+                    delete = context.delete(EAV_M_COMPLEX_ATTRIBUTES)
+                            .where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId()))
+                            .and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
+                            .and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
                 } else {
-                    delete = context.delete(EAV_M_COMPLEX_SET
-                    ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(meta.getId())
-                    ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
-                    ).and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
+                    delete = context.delete(EAV_M_COMPLEX_SET)
+                            .where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(meta.getId()))
+                            .and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
+                            .and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
                 }
             } else {
                 if (!meta.getMemberType(typeName).isSet()) {
-                    delete = context.delete(EAV_M_SIMPLE_ATTRIBUTES
-                    ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
-                    ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
-                    ).and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
+                    delete = context.delete(EAV_M_SIMPLE_ATTRIBUTES)
+                            .where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId()))
+                            .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
+                            .and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
                 } else {
-                    delete = context.delete(EAV_M_SIMPLE_SET
-                    ).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(meta.getId())
-                    ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS)
-                    ).and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
+                    delete = context.delete(EAV_M_SIMPLE_SET)
+                            .where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(meta.getId()))
+                            .and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
+                            .and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
                 }
             }
 
             logger.debug(delete.toString());
 
             long t = 0;
-            if (sqlStats != null) {
-                t = System.nanoTime();
-            }
+            if (sqlStats != null) t = System.nanoTime();
+
             jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
-            if (sqlStats != null) {
+
+            if (sqlStats != null)
                 sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
-            }
         }
     }
 
@@ -558,44 +543,41 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE,
                 EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID,
                 EAV_M_SIMPLE_ATTRIBUTES.IS_KEY,
+                EAV_M_SIMPLE_ATTRIBUTES.IS_OPTIONAL_KEY,
                 EAV_M_SIMPLE_ATTRIBUTES.IS_NULLABLE,
                 EAV_M_SIMPLE_ATTRIBUTES.IS_IMMUTABLE,
                 EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL,
                 EAV_M_SIMPLE_ATTRIBUTES.IS_REQUIRED,
-                EAV_M_SIMPLE_ATTRIBUTES.IS_DISABLED
-        ).from(EAV_M_SIMPLE_ATTRIBUTES
-        ).where(
-                EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
-        ).and(
-                EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType())
-        );
+                EAV_M_SIMPLE_ATTRIBUTES.IS_DISABLED)
+                .from(EAV_M_SIMPLE_ATTRIBUTES)
+                .where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.equal(meta.getId()))
+                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.equal(meta.getType()));
 
         logger.debug(select.toString());
 
         long t = 0;
-        if (sqlStats != null) {
-            t = System.nanoTime();
-        }
+        if (sqlStats != null) t = System.nanoTime();
+
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
-        if (sqlStats != null) {
+
+        if (sqlStats != null)
             sqlStats.put(select.getSQL(), (System.nanoTime() - t) / 1000000);
-        }
 
         for (Map<String, Object> row : rows) {
-            MetaAttribute metaAttirubute = new MetaAttribute(
+            MetaAttribute metaAttribute = new MetaAttribute(
                     ((BigDecimal) row.get("id")).longValue(),
                     ((BigDecimal) row.get("is_key")).longValue() == 1,
                     ((BigDecimal) row.get("is_nullable")).longValue() == 1);
 
-            metaAttirubute.setFinal(((BigDecimal) row.get("is_final")).longValue() == 1);
-            metaAttirubute.setRequired(((BigDecimal) row.get("is_required")).longValue() == 1);
-            metaAttirubute.setImmutable(((BigDecimal) row.get("is_immutable")).longValue() == 1);
-            metaAttirubute.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
+            metaAttribute.setOptionalKey(((BigDecimal) row.get("is_optional_key")).longValue() == 1);
+            metaAttribute.setFinal(((BigDecimal) row.get("is_final")).longValue() == 1);
+            metaAttribute.setRequired(((BigDecimal) row.get("is_required")).longValue() == 1);
+            metaAttribute.setImmutable(((BigDecimal) row.get("is_immutable")).longValue() == 1);
+            metaAttribute.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
+            metaAttribute.setMetaType(new MetaValue(DataTypes.valueOf((String) row.get("type_code"))));
+            metaAttribute.setTitle((String) row.get("title"));
 
-            metaAttirubute.setMetaType(new MetaValue(DataTypes.valueOf((String) row.get("type_code"))));
-            metaAttirubute.setTitle((String) row.get("title"));
-
-            meta.setMetaAttribute((String) row.get("name"), metaAttirubute);
+            meta.setMetaAttribute((String) row.get("name"), metaAttribute);
         }
     }
 
@@ -613,22 +595,21 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_SIMPLE_SET.TYPE_CODE,
                 EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE,
                 EAV_M_SIMPLE_SET.IS_REFERENCE,
-                EAV_M_SIMPLE_SET.IS_DISABLED
-        ).from(EAV_M_SIMPLE_SET
-        ).where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(meta.getId())
-        ).and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(meta.getType()));
+                EAV_M_SIMPLE_SET.IS_DISABLED)
+                .from(EAV_M_SIMPLE_SET)
+                .where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(meta.getId()))
+                .and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(meta.getType()));
 
         long t = 0;
 
         logger.debug(select.toString());
 
-        if (sqlStats != null) {
-            t = System.nanoTime();
-        }
+        if (sqlStats != null) t = System.nanoTime();
+
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
-        if (sqlStats != null) {
+
+        if (sqlStats != null)
             sqlStats.put(select.getSQL(), (System.nanoTime() - t) / 1000000);
-        }
 
         for (Map<String, Object> row : rows) {
 
@@ -659,6 +640,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         SelectForUpdateStep select = context.select(
                 EAV_M_COMPLEX_ATTRIBUTES.ID,
                 EAV_M_COMPLEX_ATTRIBUTES.IS_KEY,
+                EAV_M_COMPLEX_ATTRIBUTES.IS_OPTIONAL_KEY,
                 EAV_M_COMPLEX_ATTRIBUTES.IS_NULLABLE,
                 EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL,
                 EAV_M_COMPLEX_ATTRIBUTES.IS_REQUIRED,
@@ -669,24 +651,22 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID,
                 EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID,
                 EAV_M_CLASSES.NAME.as("cname"),
-                EAV_M_COMPLEX_ATTRIBUTES.IS_DISABLED
-        ).from(EAV_M_COMPLEX_ATTRIBUTES).leftOuterJoin(EAV_M_CLASSES
-        ).on(EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID.eq(EAV_M_CLASSES.ID)
-        ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId())
-        ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType()));
+                EAV_M_COMPLEX_ATTRIBUTES.IS_DISABLED)
+                .from(EAV_M_COMPLEX_ATTRIBUTES).leftOuterJoin(EAV_M_CLASSES)
+                .on(EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID.eq(EAV_M_CLASSES.ID))
+                .where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId()))
+                .and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType()));
 
         long t = 0;
 
         logger.debug(select.toString());
 
-        if (sqlStats != null) {
-            t = System.nanoTime();
-        }
+        if (sqlStats != null) t = System.nanoTime();
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
-        if (sqlStats != null) {
+
+        if (sqlStats != null)
             sqlStats.put(select.getSQL(), (System.nanoTime() - t) / 1000000);
-        }
 
         for (Map<String, Object> row : rows) {
             MetaClass metaClass = load(((BigDecimal) row.get("class_id")).longValue());
@@ -695,12 +675,12 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     ((BigDecimal) row.get("id")).longValue(),
                     ((BigDecimal) row.get("is_key")).longValue() == 1,
                     ((BigDecimal) row.get("is_nullable")).longValue() == 1);
-            metaAttribute.setImmutable(((BigDecimal) row.get("is_immutable")).longValue() == 1);
 
+            metaAttribute.setOptionalKey(((BigDecimal) row.get("is_optional_key")).longValue() == 1);
+            metaAttribute.setImmutable(((BigDecimal) row.get("is_immutable")).longValue() == 1);
             metaAttribute.setFinal(((BigDecimal) row.get("is_final")).longValue() == 1);
             metaAttribute.setRequired(((BigDecimal) row.get("is_required")).longValue() == 1);
             metaAttribute.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
-
             metaAttribute.setMetaType(metaClass);
             metaAttribute.setTitle((String) row.get("title"));
 
@@ -724,22 +704,22 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_COMPLEX_SET.CONTAINING_ID,
                 EAV_M_COMPLEX_SET.IS_REFERENCE,
                 EAV_M_CLASSES.NAME.as("cname"),
-                EAV_M_COMPLEX_SET.IS_DISABLED
-        ).from(EAV_M_COMPLEX_SET
-        ).leftOuterJoin(EAV_M_CLASSES).on(EAV_M_COMPLEX_SET.CLASS_ID.eq(EAV_M_CLASSES.ID)
-        ).where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(meta.getId())
-        ).and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(meta.getType()));
+                EAV_M_COMPLEX_SET.IS_DISABLED)
+                .from(EAV_M_COMPLEX_SET)
+                .leftOuterJoin(EAV_M_CLASSES).on(EAV_M_COMPLEX_SET.CLASS_ID.equal(EAV_M_CLASSES.ID))
+                .where(EAV_M_COMPLEX_SET.CONTAINING_ID.equal(meta.getId()))
+                .and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.equal(meta.getType()));
+
         long t = 0;
 
         logger.debug(select.toString());
 
-        if (sqlStats != null) {
-            t = System.nanoTime();
-        }
+        if (sqlStats != null) t = System.nanoTime();
+
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
-        if (sqlStats != null) {
+
+        if (sqlStats != null)
             sqlStats.put(select.getSQL(), (System.nanoTime() - t) / 1000000);
-        }
 
         for (Map<String, Object> row : rows) {
             MetaClass metaClass = load(((BigDecimal) row.get("class_id")).longValue());
@@ -768,7 +748,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     void loadAttributes(MetaClass meta) {
         if (meta.getId() < 1)
-            throw new IllegalStateException(String.valueOf(Errors.E164));
+            throw new IllegalStateException(Errors.getMessage(Errors.E164));
 
         meta.removeMembers();
 
@@ -796,7 +776,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         }
 
         if (dbMeta.getId() < 1) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E166));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E166));
         }
 
         Set<String> oldNames = dbMeta.getMemberNames();
@@ -873,65 +853,65 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     @Override
     public List<Long> loadContaining(long id) {
-        List<Long> l = new ArrayList<>();
+        List<Long> containingList = new ArrayList<>();
+
         if (id < 1)
             return null;
 
-        Select selectComplexSetIds = context.select(
-                EAV_M_COMPLEX_SET.CONTAINING_ID).from(EAV_M_COMPLEX_SET).
-                where(EAV_M_COMPLEX_SET.CLASS_ID.eq(id));
+        Select selectComplexSetIds = context
+                .select(EAV_M_COMPLEX_SET.CONTAINING_ID)
+                .from(EAV_M_COMPLEX_SET)
+                .where(EAV_M_COMPLEX_SET.CLASS_ID.equal(id));
 
         List<Map<String, Object>> complexSetIds = jdbcTemplate.queryForList(selectComplexSetIds.getSQL(),
                 selectComplexSetIds.getBindValues().toArray());
 
-
-        Select selectComplexIds = context.select(
-                EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID).from(EAV_M_COMPLEX_ATTRIBUTES).
-                where(EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID.eq(id));
+        Select selectComplexIds = context
+                .select(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID)
+                .from(EAV_M_COMPLEX_ATTRIBUTES)
+                .where(EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID.equal(id));
 
         List<Map<String, Object>> complexIds = jdbcTemplate.queryForList(selectComplexIds.getSQL(),
                 selectComplexIds.getBindValues().toArray());
 
-        for (Map<String, Object> complexSetId : complexSetIds) {
-            l.add(Long.parseLong(complexSetId.get("CONTAINING_ID").toString()));
-        }
-        for (Map<String, Object> complexId : complexIds) {
-            l.add(Long.parseLong(complexId.get("CONTAINING_ID").toString()));
-        }
+        for (Map<String, Object> complexSetId : complexSetIds)
+            containingList.add(Long.parseLong(complexSetId.get("CONTAINING_ID").toString()));
 
-        return l;
+        for (Map<String, Object> complexId : complexIds)
+            containingList.add(Long.parseLong(complexId.get("CONTAINING_ID").toString()));
+
+        return containingList;
     }
 
     private void removeAllAttributes(long id, int type) {
-        DeleteConditionStep delete = context.delete(EAV_M_SIMPLE_ATTRIBUTES
-        ).where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(id)
-        ).and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(type));
+        DeleteConditionStep delete = context
+                .delete(EAV_M_SIMPLE_ATTRIBUTES)
+                .where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.equal(id))
+                .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.equal(type));
 
         logger.debug(delete.toString());
 
         long t = 0;
-        if (sqlStats != null) {
-            t = System.nanoTime();
-        }
-        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
-        if (sqlStats != null) {
-            sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
-        }
 
-        delete = context.delete(EAV_M_COMPLEX_ATTRIBUTES
-        ).where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(id)
-        ).and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(type));
+        if (sqlStats != null) t = System.nanoTime();
+
+        jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
+
+        if (sqlStats != null) sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
+
+        delete = context
+                .delete(EAV_M_COMPLEX_ATTRIBUTES)
+                .where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.equal(id))
+                .and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.equal(type));
 
         logger.debug(delete.toString());
 
         t = 0;
-        if (sqlStats != null) {
-            t = System.nanoTime();
-        }
+        if (sqlStats != null) t = System.nanoTime();
+
         jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
-        if (sqlStats != null) {
-            sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
-        }
+
+        if (sqlStats != null) sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
     }
 
     private void removeSet(MetaSet set) {
@@ -948,37 +928,23 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
     @Override
     @Transactional
     public void remove(MetaClass metaClass) {
-        if (metaClass.getId() < 1) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E165));
-        }
+        if (metaClass.getId() < 1)
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E165));
 
         long t = 0;
-
-        /*for (String arrayName : metaClass.getArrayArrayAttributesNames())
-        {
-            removeSet(((MetaSet) metaClass.getMemberType(arrayName)));
-        }
-
-        //delete all class attributes
-        removeAllAttributes(metaClass.getId(), MetaContainerTypes.META_CLASS);
-
-        //delete class
-        DeleteConditionStep delete = context.delete(EAV_M_CLASSES).where(EAV_M_CLASSES.ID.eq(metaClass.getId()));*/
 
         UpdateConditionStep<EavMClassesRecord> delete = context
                 .update(EAV_M_CLASSES)
                 .set(EAV_M_CLASSES.IS_DISABLED, new Byte("1"))
-                .where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
+                .where(EAV_M_CLASSES.ID.equal(metaClass.getId()));
 
         logger.debug(delete.toString());
 
-        if (sqlStats != null) {
-            t = System.nanoTime();
-        }
+        if (sqlStats != null) t = System.nanoTime();
+
         jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
-        if (sqlStats != null) {
-            sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
-        }
+
+        if (sqlStats != null) sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -1003,17 +969,18 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     public List<MetaClassName> getMetaClassesNames(boolean refs) {
 
-        ArrayList<MetaClassName> metaClassNameList = new ArrayList<MetaClassName>();
+        ArrayList<MetaClassName> metaClassNameList = new ArrayList<>();
         SelectForUpdateStep select;
         SelectJoinStep join;
 
-        join = context.select(
-                EAV_M_CLASSES.ID,
-                EAV_M_CLASSES.NAME,
-                EAV_M_CLASSES.TITLE,
-                EAV_M_CLASSES.IS_DISABLED,
-                EAV_M_CLASSES.IS_REFERENCE
-        ).from(EAV_M_CLASSES);
+        join = context
+                .select(
+                        EAV_M_CLASSES.ID,
+                        EAV_M_CLASSES.NAME,
+                        EAV_M_CLASSES.TITLE,
+                        EAV_M_CLASSES.IS_DISABLED,
+                        EAV_M_CLASSES.IS_REFERENCE)
+                .from(EAV_M_CLASSES);
 
         if (refs)
             select = join.where(EAV_M_CLASSES.IS_REFERENCE.eq((byte) 1));
@@ -1023,9 +990,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-
         if (rows.size() < 1)
-            throw new IllegalArgumentException(String.valueOf(Errors.E160));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E160));
 
         for (Map<String, Object> row : rows) {
 

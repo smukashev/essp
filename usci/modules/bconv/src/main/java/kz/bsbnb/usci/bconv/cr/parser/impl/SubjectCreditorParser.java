@@ -35,29 +35,45 @@ public class SubjectCreditorParser extends BatchParser {
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if (localName.equals("creditor")) {
-        } else if (localName.equals("code")) {
-            event = (XMLEvent) xmlReader.next();
-            creditorInfo.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-        } else if (localName.equals("docs")) {
-            docs = new BaseSet(metaClassRepository.getMetaClass("document"));
-        } else if (localName.equals("doc")) {
-            currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate(), creditorId);
-            BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), batch.getRepDate(), creditorId);
-            docType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
-            currentDoc.put("doc_type", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), docType, false, true));
-        } else if (localName.equals("name")) {
-            event = (XMLEvent) xmlReader.next();
-            currentDoc.put("name", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-        } else if (localName.equals("no")) {
-            event = (XMLEvent) xmlReader.next();
-            currentDoc.put("no", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                    event.asCharacters().getData(), false, true));
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "creditor":
+                break;
+            case "code":
+                event = (XMLEvent) xmlReader.next();
+                creditorInfo.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
+                        event.asCharacters().getData(), false, true));
+                break;
+            case "docs":
+                docs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
+                break;
+            case "doc":
+                currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),
+                        batch.getRepDate(), creditorId);
+
+                BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
+                        batch.getRepDate(), creditorId);
+
+                docType.put("code",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
+                                event.asStartElement().getAttributeByName(new QName("doc_type")).getValue(), false, true));
+
+                currentDoc.put("doc_type",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), docType, false, true));
+                break;
+            case "name":
+                event = (XMLEvent) xmlReader.next();
+
+                currentDoc.put("name",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                break;
+            case "no":
+                event = (XMLEvent) xmlReader.next();
+
+                currentDoc.put("no",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -65,25 +81,35 @@ public class SubjectCreditorParser extends BatchParser {
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("creditor")) {
-            currentBaseEntity.put("creditor_info", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(),
-                    creditorInfo, false, true));
-            currentBaseEntity.put("is_person", new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(),
-                    false, true, false));
-            currentBaseEntity.put("is_organization", new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(),
-                    false, true, false));
-            currentBaseEntity.put("is_creditor", new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(),
-                    true, true, false));
-            return true;
-        } else if (localName.equals("code")) {
-        } else if (localName.equals("docs")) {
-            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), docs, false, true));
-        } else if (localName.equals("doc")) {
-            docs.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentDoc, false, true));
-        } else if (localName.equals("name")) {
-        } else if (localName.equals("no")) {
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "creditor":
+                currentBaseEntity.put("creditor_info",
+                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditorInfo, false, true));
+
+                currentBaseEntity.put("is_person",
+                        new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(), false, true, false));
+
+                currentBaseEntity.put("is_organization",
+                        new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(), false, true, false));
+
+                currentBaseEntity.put("is_creditor",
+                        new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(), true, true, false));
+                return true;
+            case "code":
+                break;
+            case "docs":
+                currentBaseEntity.put("docs",
+                        new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), docs, false, true));
+                break;
+            case "doc":
+                docs.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentDoc, false, true));
+                break;
+            case "name":
+                break;
+            case "no":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;

@@ -1,7 +1,6 @@
 package com.bsbnb.creditregistry.portlets.queue.ui;
 
 import com.bsbnb.creditregistry.portlets.queue.PortalEnvironmentFacade;
-import static com.bsbnb.creditregistry.portlets.queue.QueueApplication.log;
 import com.bsbnb.creditregistry.portlets.queue.data.DataProvider;
 import com.bsbnb.creditregistry.portlets.queue.data.QueueFileInfo;
 import com.bsbnb.creditregistry.portlets.queue.thread.ConfigurationException;
@@ -20,7 +19,9 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,6 +40,7 @@ public class AdministratorComponent extends VerticalLayout {
     private ComboBox orderBox;
     private TwinColSelect creditorsSelect;
     private VerticalLayout previewLayout;
+    public final Logger logger = Logger.getLogger(AdministratorComponent.class);
 
     public AdministratorComponent(PortalEnvironmentFacade environment, DataProvider dataProvider) {
         this.environment = environment;
@@ -52,7 +54,7 @@ public class AdministratorComponent extends VerticalLayout {
 
     public void initializeUI() {
         removeAllComponents();
-        log.log(Level.INFO, "Loading admin interface");
+        logger.info("Loading admin interface");
         try {
             DatabaseQueueConfiguration config = new DatabaseQueueConfiguration(dataProvider);
             Button manageButton = new Button(environment.getString(Localization.START_QUEUE_PROCESSING), new Button.ClickListener() {
@@ -75,7 +77,7 @@ public class AdministratorComponent extends VerticalLayout {
             orderBox.setValue(config.getOrderType());
 
             List<Creditor> creditors = dataProvider.getCreditors(environment.getUserId(), environment.isUserAdmin());
-            log.log(Level.INFO, "Creditors number: {0}", creditors.size());
+            logger.info("Creditors number: "+ creditors.size());
             final HashMap<Long, Creditor> creditorsById = new HashMap<>();
             for (Creditor creditor : creditors) {
                 creditorsById.put(creditor.getId(), creditor);
@@ -135,12 +137,12 @@ public class AdministratorComponent extends VerticalLayout {
             addComponent(previewLayout);
             setSpacing(true);
         } catch (Exception ce) {
-            log.log(Level.WARNING, "", ce);
+            logger.warn(null, ce);
         }
     }
 
     private void showPreview() {
-        log.log(Level.INFO, "Showing queue preview");
+        logger.info("Showing queue preview");
         previewLayout.removeAllComponents();
         QueueConfiguration selectedConfiguration = new QueueConfiguration() {
             /*
@@ -167,12 +169,14 @@ public class AdministratorComponent extends VerticalLayout {
 
             @Override
             public void setOrderType(QueueOrderType orderType) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                logger.error(Errors.getError(String.valueOf(Errors.E253)));
+                throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
             }
 
             @Override
             public void setPriorityCreditorIds(List<Integer> ids) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                logger.error(Errors.getError(String.valueOf(Errors.E206)));
+                throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
             }
         };
         List<Creditor> creditors = dataProvider.getCreditors(environment.getUserId(), environment.isUserAdmin());
@@ -184,7 +188,7 @@ public class AdministratorComponent extends VerticalLayout {
         QueueTable previewTable = new QueueTable(environment);
         previewTable.load(files);
         previewLayout.addComponent(previewTable);
-        log.log(Level.INFO, "Queue preview showed active");
+        logger.info("Queue preview showed active");
     }
 
     private List<Integer> getSelectedCreditorIds() {

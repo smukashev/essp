@@ -27,24 +27,29 @@ public class ChangeRemainsDiscountedValueParser extends BatchParser {
 
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
-        if (localName.equals("discounted_value")) {
-        } else if (localName.equals("value")) {
-            event = (XMLEvent) xmlReader.next();
-            currentBaseEntity.put("value", new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                    new Double(event.asCharacters().getData()), false, true));
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "discounted_value":
+                break;
+            case "value":
+                event = (XMLEvent) xmlReader.next();
+                currentBaseEntity.put("value", new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
+                        new Double(event.asCharacters().getData()), false, true));
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
         return false;
     }
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("discounted_value")) {
-            return true;
-        } else if (localName.equals("value")) {
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "discounted_value":
+                return true;
+            case "value":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
         return false;
     }

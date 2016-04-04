@@ -35,32 +35,39 @@ public class SubjectOrganizationHeadParser extends BatchParser {
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
-        if (localName.equals("head")) {
-        } else if (localName.equals("names")) {
-            BaseSet headNames = new BaseSet(metaClassRepository.getMetaClass("person_name"));
-            while (true) {
-                subjectOrganizationHeadNamesParser.parse(xmlReader, batch, index, creditorId);
-                if (subjectOrganizationHeadNamesParser.hasMore()) {
-                    headNames.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
-                            subjectOrganizationHeadNamesParser.getCurrentBaseEntity(), false, true));
-                } else break;
-            }
-            currentBaseEntity.put("names", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), headNames, false, true));
-        } else if (localName.equals("docs")) {
-            BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("document"));
-            while (true) {
-                subjectOrganizationHeadDocsParser.parse(xmlReader, batch, index, creditorId);
-                if (subjectOrganizationHeadDocsParser.hasMore()) {
-                    docs.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
-                            subjectOrganizationHeadDocsParser.getCurrentBaseEntity(), false, true));
-                } else {
-                    break;
+        switch (localName) {
+            case "head":
+                break;
+            case "names":
+                BaseSet headNames = new BaseSet(metaClassRepository.getMetaClass("person_name"), creditorId);
+                while (true) {
+                    subjectOrganizationHeadNamesParser.parse(xmlReader, batch, index, creditorId);
+                    if (subjectOrganizationHeadNamesParser.hasMore()) {
+                        headNames.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
+                                subjectOrganizationHeadNamesParser.getCurrentBaseEntity(), false, true));
+                    } else break;
                 }
-            }
-            currentBaseEntity.put("docs", new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), docs, false, true));
 
-        } else {
-            throw new UnknownTagException(localName);
+                currentBaseEntity.put("names",
+                        new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), headNames, false, true));
+                break;
+            case "docs":
+                BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
+
+                while (true) {
+                    subjectOrganizationHeadDocsParser.parse(xmlReader, batch, index, creditorId);
+
+                    if (subjectOrganizationHeadDocsParser.hasMore()) {
+                        docs.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
+                                subjectOrganizationHeadDocsParser.getCurrentBaseEntity(), false, true));
+                    } else break;
+                }
+
+                currentBaseEntity.put("docs",
+                        new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), docs, false, true));
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;
@@ -68,12 +75,15 @@ public class SubjectOrganizationHeadParser extends BatchParser {
 
     @Override
     public boolean endElement(String localName) throws SAXException {
-        if (localName.equals("head")) {
-            return true;
-        } else if (localName.equals("names")) {
-        } else if (localName.equals("docs")) {
-        } else {
-            throw new UnknownTagException(localName);
+        switch (localName) {
+            case "head":
+                return true;
+            case "names":
+                break;
+            case "docs":
+                break;
+            default:
+                throw new UnknownTagException(localName);
         }
 
         return false;

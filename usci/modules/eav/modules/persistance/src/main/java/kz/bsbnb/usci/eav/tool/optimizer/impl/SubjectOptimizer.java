@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.tool.optimizer.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.model.exceptions.KnownException;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -13,11 +14,14 @@ import java.util.Comparator;
 import java.util.List;
 
 public class SubjectOptimizer {
-
     private static Logger logger = LoggerFactory.getLogger(SubjectOptimizer.class);
 
-    private SubjectOptimizer() {
-        super();
+    private static List<String> identificationCodes = new ArrayList<>();
+
+    static {
+        identificationCodes.add("06"); // ИНН
+        identificationCodes.add("07"); // РНН
+        identificationCodes.add("11"); // БИН
     }
 
     public static String getKeyString(final IBaseEntity iBaseEntity) {
@@ -25,10 +29,8 @@ public class SubjectOptimizer {
 
         IBaseValue docsBaseValue = iBaseEntity.getBaseValue("docs");
 
-        if (docsBaseValue == null || docsBaseValue.getValue() == null){
-            logger.error(Errors.getError(String.valueOf(Errors.E188)) +" : "+iBaseEntity);
-            throw new IllegalStateException(String.valueOf(Errors.E188));
-        }
+        if (docsBaseValue == null || docsBaseValue.getValue() == null)
+            throw new KnownException(Errors.getMessage(Errors.E188));
 
         BaseSet docSet = (BaseSet) docsBaseValue.getValue();
 
@@ -38,9 +40,9 @@ public class SubjectOptimizer {
             IBaseEntity document = (IBaseEntity) docValue.getValue();
 
             IBaseEntity docType = (IBaseEntity) document.getBaseValue("doc_type").getValue();
-            boolean isIdentification = (boolean) docType.getBaseValue("is_identification").getValue();
+            String docTypeCode = (String) docType.getBaseValue("code").getValue();
 
-            if (isIdentification) {
+            if (identificationCodes.contains(docTypeCode)) {
                 if (document.getId() == 0)
                     return null;
 
@@ -48,11 +50,8 @@ public class SubjectOptimizer {
             }
         }
 
-        if (documents.size() == 0){
-            logger.error(Errors.getError(String.valueOf(Errors.E189)) +" : "+iBaseEntity);
-            throw new IllegalStateException(String.valueOf(Errors.E189));
-        }
-
+        if (documents.size() == 0)
+            throw new KnownException(Errors.getMessage(Errors.E189));
 
         Collections.sort(documents, new Comparator<IBaseEntity>() {
             @Override

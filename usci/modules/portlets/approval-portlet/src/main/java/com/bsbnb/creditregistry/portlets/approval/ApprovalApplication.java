@@ -1,5 +1,6 @@
 package com.bsbnb.creditregistry.portlets.approval;
 
+import com.bsbnb.creditregistry.portlets.approval.bpm.ApprovalBusiness;
 import com.bsbnb.creditregistry.portlets.approval.data.BeanDataProvider;
 import com.bsbnb.creditregistry.portlets.approval.ui.MainLayout;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -12,9 +13,10 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import kz.bsbnb.usci.eav.util.Errors;
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
@@ -29,8 +31,8 @@ import javax.portlet.ResourceResponse;
 
 public class ApprovalApplication extends Application {
     private static final long serialVersionUID = 2096197512742005243L;
-    
-    public static final Logger log = Logger.getLogger(ApprovalApplication.class.getCanonicalName());
+
+    private final Logger logger = org.apache.log4j.Logger.getLogger(ApprovalApplication.class);
 
     @Override
     public void init() {
@@ -61,22 +63,24 @@ public class ApprovalApplication extends Application {
                     }
                 }
             } catch (PortalException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(),e);
             } catch (SystemException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(),e);
             }
 
             if(!hasRights)
                 return;
 
-            setTheme("custom");
+            try {
+                setTheme("custom");
 
-            Window mainWindow = new Window();
-
-            mainWindow.addComponent(new MainLayout(new BeanDataProvider(),
-                    new ApprovalPortletEnvironmentFacade(user)));
-
-            setMainWindow(mainWindow);
+                Window mainWindow = new Window();
+                mainWindow.addComponent(new MainLayout(new BeanDataProvider(),
+                        new ApprovalPortletEnvironmentFacade(user)));
+                setMainWindow(mainWindow);
+            } catch (Exception e) {
+                logger.error(Errors.unmarshall(e.getMessage()));
+            }
 
         }
 

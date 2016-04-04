@@ -13,7 +13,10 @@ import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.porltet.entity_merge.model.json.JsonMaker;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -30,35 +33,40 @@ public class RulesPortlet extends MVCPortlet{
     private IPackageService batchService;
     private IEntityService entityService;
     private boolean retry;
+    private static final Logger logger = Logger.getLogger(RulesPortlet.class);
 
     @Override
     public void init() throws PortletException {
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContextPortlet.xml");
+        try {
+            ApplicationContext context = new ClassPathXmlApplicationContext("applicationContextPortlet.xml");
 
-        RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
-        entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1098/entityService");
-        entityServiceFactoryBean.setServiceInterface(IEntityService.class);
-        entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+            RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
+            entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1098/entityService");
+            entityServiceFactoryBean.setServiceInterface(IEntityService.class);
+            entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
-        entityServiceFactoryBean.afterPropertiesSet();
-        entityService = (IEntityService) entityServiceFactoryBean.getObject();
+            entityServiceFactoryBean.afterPropertiesSet();
+            entityService = (IEntityService) entityServiceFactoryBean.getObject();
 
 
-        RmiProxyFactoryBean ruleServiceFactoryBean = new RmiProxyFactoryBean();
-        ruleServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/ruleService");
-        ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
+            RmiProxyFactoryBean ruleServiceFactoryBean = new RmiProxyFactoryBean();
+            ruleServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/ruleService");
+            ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
 
-        ruleServiceFactoryBean.afterPropertiesSet();
-        ruleService = (IRuleService) ruleServiceFactoryBean.getObject();
+            ruleServiceFactoryBean.afterPropertiesSet();
+            ruleService = (IRuleService) ruleServiceFactoryBean.getObject();
 
-        RmiProxyFactoryBean batchServiceFactoryBean = new RmiProxyFactoryBean();
-        batchServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchService");
-        batchServiceFactoryBean.setServiceInterface(IPackageService.class);
+            RmiProxyFactoryBean batchServiceFactoryBean = new RmiProxyFactoryBean();
+            batchServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchService");
+            batchServiceFactoryBean.setServiceInterface(IPackageService.class);
 
-        batchServiceFactoryBean.afterPropertiesSet();
+            batchServiceFactoryBean.afterPropertiesSet();
 
-        batchService = (IPackageService) batchServiceFactoryBean.getObject();
-        super.init();
+            batchService = (IPackageService) batchServiceFactoryBean.getObject();
+            super.init();
+        } catch (Exception e) {
+            logger.error("Can't initialise services: " + e.getMessage());
+        }
     }
 
     @Override
@@ -79,9 +87,9 @@ public class RulesPortlet extends MVCPortlet{
 
             }
         } catch (PortalException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         } catch (SystemException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);
         }
 
         if(!hasRights)
@@ -127,8 +135,11 @@ public class RulesPortlet extends MVCPortlet{
             }
         } catch (Exception e) {}
 
-        if(!writeAccessGranted)
-            throw new RuntimeException("нет прав");
+        if(!writeAccessGranted){
+            logger.error(Errors.getError(String.valueOf(Errors.E238)));
+            throw new RuntimeException(Errors.getMessage(Errors.E238));
+        }
+
     }
 
     @Override
@@ -145,7 +156,7 @@ public class RulesPortlet extends MVCPortlet{
             long baseEntityId;
 
             if(resourceRequest.getParameterMap().containsKey("fail"))
-               throw new RuntimeException("some error Message");
+               throw new RuntimeException(Errors.getMessage(Errors.E258));
 
             switch(operationType){
                 case PACKAGE_ALL:
@@ -269,11 +280,12 @@ public class RulesPortlet extends MVCPortlet{
                 case NEW_PACKAGE_VERSION:
                     getWriteAccess(resourceRequest);
                     packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
-                    date = (Date) DataTypes.fromString(DataTypes.DATE, resourceRequest.getParameter("date"));
+                    date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
                     ruleService.insertBatchVersion(packageId, date);
                     break;
                 default:
-                    throw new UnsupportedOperationException("Операция не поддерживается(" + operationType + ");");
+                    logger.error(Errors.getMessage(Errors.E118, operationType));
+                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E118, operationType));
             }
 
         } catch (Exception e) {

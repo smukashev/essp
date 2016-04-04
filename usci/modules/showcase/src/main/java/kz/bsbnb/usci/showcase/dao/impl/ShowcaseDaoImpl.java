@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.showcase.dao.CommonDao;
 import org.jooq.DSLContext;
 import org.jooq.Insert;
@@ -47,6 +48,9 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
         this.jdbcTemplateSC = new JdbcTemplate(dataSourceSC);
     }
 
+    public DataSource getDataSourceSc() {
+        return jdbcTemplateSC.getDataSource();
+    }
     @Override
     public void afterPropertiesSet() throws Exception {
         showCases = populateShowCases();
@@ -206,22 +210,12 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             column.setType("DATE");
             table.addColumn(column);
 
-            Index indexOD = new NonUniqueIndex();
-            indexOD.setName("ind_" + tableName + "_OPEN_DATE");
-            indexOD.addColumn(new IndexColumn("OPEN_DATE"));
-            table.addIndex(indexOD);
-
             column = new Column();
             column.setName("CLOSE_DATE");
             column.setPrimaryKey(false);
             column.setRequired(false);
             column.setType("DATE");
             table.addColumn(column);
-
-            Index indexCD = new NonUniqueIndex();
-            indexCD.setName("ind_" + tableName + "_CLOSE_DATE");
-            indexCD.addColumn(new IndexColumn("CLOSE_DATE"));
-            table.addIndex(indexCD);
         } else {
             column = new Column();
             column.setName("REP_DATE");
@@ -229,11 +223,6 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             column.setRequired(false);
             column.setType("DATE");
             table.addColumn(column);
-
-            Index indexRD = new NonUniqueIndex();
-            indexRD.setName("ind_" + tableName + "_REP_DATE");
-            indexRD.addColumn(new IndexColumn("REP_DATE"));
-            table.addIndex(indexRD);
         }
 
         for (Index index : showCase.getIndexes())
@@ -253,8 +242,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             type = ((MetaSet) type).getMemberType();
 
         if (type.isSet())
-            throw new IllegalArgumentException("showCase can't contain set columns: " +
-                    type.toString());
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E277, type.toString()));
 
         MetaValue metaValue = (MetaValue) type;
 
@@ -270,7 +258,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             case DOUBLE:
                 return "NUMERIC";
             default:
-                throw new IllegalArgumentException("Unknown simple type code");
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E276));
         }
     }
 
@@ -282,7 +270,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             type = ((MetaSet) type).getMemberType();
 
         if (type.isSet())
-            throw new IllegalArgumentException("showCase can't contain set columns");
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E275));
 
         MetaValue metaValue = (MetaValue) type;
 
@@ -298,7 +286,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             case DOUBLE:
                 return "17,3";
             default:
-                throw new IllegalArgumentException("Unknown simple type code");
+                throw new IllegalArgumentException(Errors.getMessage(Errors.E276));
         }
     }
 
@@ -320,10 +308,10 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
         List<Map<String, Object>> rows = jdbcTemplateSC.queryForList(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for showCase return more than one row.");
+            throw new RuntimeException(Errors.getMessage(Errors.E278));
 
         if (rows.size() < 1)
-            throw new RuntimeException("showCase not found.");
+            throw new RuntimeException(Errors.getMessage(Errors.E279));
 
         Map<String, Object> row = rows.iterator().next();
 
@@ -430,7 +418,7 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
                 select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new RuntimeException("Query for showCase return more than one row.");
+            throw new RuntimeException(Errors.getMessage(Errors.E278));
 
         if (rows.size() < 1)
             return 0;

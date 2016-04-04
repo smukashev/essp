@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.pool.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -20,8 +20,7 @@ public class PersistableDaoPool implements IPersistableDaoPool {
     @Autowired
     private ApplicationContext applicationContext;
 
-    private Map<Class<? extends IPersistable>, Class<? extends IPersistableDao>> persistableDaoMap =
-            new HashMap<>();
+    private Map<Class<? extends IPersistable>, Class<? extends IPersistableDao>> persistableDaoMap = new HashMap<>();
 
     public PersistableDaoPool() {
         persistableDaoMap.put(BaseEntity.class, IBaseEntityDao.class);
@@ -32,7 +31,6 @@ public class PersistableDaoPool implements IPersistableDaoPool {
         persistableDaoMap.put(BaseEntityIntegerValue.class, IBaseEntityIntegerValueDao.class);
         persistableDaoMap.put(BaseEntityStringValue.class, IBaseEntityStringValueDao.class);
         persistableDaoMap.put(BaseEntityComplexValue.class, IBaseEntityComplexValueDao.class);
-        persistableDaoMap.put(BaseSet.class, IBaseSetDao.class);
         persistableDaoMap.put(BaseEntitySimpleSet.class, IBaseEntitySimpleSetDao.class);
         persistableDaoMap.put(BaseEntityComplexSet.class, IBaseEntityComplexSetDao.class);
         persistableDaoMap.put(BaseSetBooleanValue.class, IBaseSetBooleanValueDao.class);
@@ -45,28 +43,26 @@ public class PersistableDaoPool implements IPersistableDaoPool {
 
     public IPersistableDao getPersistableDao(Class<? extends IPersistable> persistableClass) {
         if (persistableClass == null)
-            throw new RuntimeException(String.valueOf(Errors.E172));
+            throw new RuntimeException(Errors.getMessage(Errors.E172));
 
         Class<? extends IPersistableDao> persistableDaoClass = persistableDaoMap.get(persistableClass);
 
         if (persistableDaoClass != null)
             return applicationContext.getBean(persistableDaoClass);
 
-        throw new RuntimeException(Errors.E173 + "|" + persistableClass.getName());
+        throw new RuntimeException(Errors.getMessage(Errors.E173, persistableClass.getName()));
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IPersistableDao> T getPersistableDao(Class<? extends IPersistable> persistableClass,
-                                                           Class<T> extendedPersistableDaoClass) {
+    public <T extends IPersistableDao> T getPersistableDao(Class<? extends IPersistable> persistableClass, Class<T> extendedPersistableDaoClass) {
         if (persistableClass == null)
-            throw new RuntimeException(String.valueOf(Errors.E172));
+            throw new RuntimeException(Errors.getMessage(Errors.E172));
 
         Class<? extends IPersistableDao> persistableDaoClass = persistableDaoMap.get(persistableClass);
 
         if (persistableDaoClass != null && extendedPersistableDaoClass.isAssignableFrom(persistableDaoClass))
             return (T) applicationContext.getBean(persistableDaoClass);
 
-        throw new RuntimeException(Errors.E173 + "|" + persistableClass.getName());
+        throw new RuntimeException(Errors.getMessage(Errors.E173, persistableClass.getName()));
     }
-
 }

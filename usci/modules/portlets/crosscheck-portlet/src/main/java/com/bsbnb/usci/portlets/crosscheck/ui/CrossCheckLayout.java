@@ -31,6 +31,7 @@ import jxl.format.Border;
 import jxl.format.BorderLineStyle;
 import jxl.format.Colour;
 import jxl.write.*;
+import org.apache.log4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,7 +44,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 
-import static com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication.log;
 
 public class CrossCheckLayout extends VerticalLayout {
     private List<Creditor> creditorsList;
@@ -73,12 +73,13 @@ public class CrossCheckLayout extends VerticalLayout {
     private Label helpMessage;
     private String viewType;
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+    private final Logger logger = Logger.getLogger(CrossCheckLayout.class);
 
     public CrossCheckLayout(String viewType, PortletEnvironmentFacade facade, DataProvider provider) {
         this.viewType = viewType;
         this.facade = facade;
         this.provider = provider;
-        log.log(Level.INFO, "User ID: {0}", facade.getUserID());
+        logger.info("User ID: "+ facade.getUserID());
     }
    
     @Override
@@ -192,9 +193,9 @@ public class CrossCheckLayout extends VerticalLayout {
                             Localization.CROSS_CHECK_TABLE_COLUMNS.getValue().split(","));
                     downloadXLS(exportBytes, "crosschecks.xls");
                 } catch (WriteException ex) {
-                    log.log(Level.WARNING, null, ex);
+                    logger.warn(null, ex);
                 } catch (IOException ex) {
-                    log.log(Level.WARNING, null, ex);
+                    logger.warn(null, ex);
                 }
             }
         });
@@ -363,34 +364,34 @@ public class CrossCheckLayout extends VerticalLayout {
                     String[] tokens = fragment.split("/");
 
                     for (String token : tokens) {
-                        log.log(Level.INFO, "Token: {0}", token);
+                        logger.info("Token: "+ token);
 
                         if (token.matches(creditorIdMatcher)) {
                             try {
                                 creditorId = BigInteger.valueOf(Long.parseLong(token));
-                                log.log(Level.INFO, "Got creditor id: {0}", creditorId);
+                                logger.info("Got creditor id: "+ creditorId);
                             } catch (NumberFormatException nfe) {
 
                             }
                         } else {
                             try {
                                 reportDate = DEFAULT_DATE_FORMAT.parse(token);
-                                log.log(Level.INFO, "Got report date: {0}", reportDate);
+                                logger.info("Got report date: "+ reportDate);
                             } catch (ParseException pe) {
                             }
                         }
                     }
-                    log.log(Level.INFO, "Creditor id from fragment: {0}", creditorId);
-                    log.log(Level.INFO, "Report date: {0}", reportDate);
+                    logger.info("Creditor id from fragment: "+ creditorId);
+                    logger.info("Report date: "+ reportDate);
 
                     if (creditorId != null && reportDate != null && creditorsSelector.containsElement(creditorId)) {
-                        log.log(Level.INFO, "Selecting");
+                        logger.info("Selecting");
                         creditorsSelector.selectElements(new Object[]{creditorId});
                         dateField.setValue(reportDate);
                         showCrossCheck();
                     }
                 } catch (Exception e) {
-                    log.log(Level.INFO, "Exception in uri handling", e);
+                    logger.error("Exception in uri handling", e);
                 }
             }
         });
@@ -407,7 +408,7 @@ public class CrossCheckLayout extends VerticalLayout {
         List<CrossCheck> crossChecks = provider.getCrossChecks(selectedItems.toArray(new Creditor[0]),
                 (Date) dateField.getValue());
 
-        log.log(Level.INFO, "SIZE: " + crossChecks.size());
+        logger.info("SIZE: " + crossChecks.size());
 
         Set<String> creditorNames = new HashSet<String>();
         List<CrossCheck> uniqueCreditorsCrossChecks = new ArrayList<CrossCheck>();
@@ -419,7 +420,7 @@ public class CrossCheckLayout extends VerticalLayout {
             }
         }
 
-        log.log(Level.INFO, "UNIQUE SIZE: " + crossChecks.size());
+        logger.info("UNIQUE SIZE: " + crossChecks.size());
 
         exportToExcel(uniqueCreditorsCrossChecks);
     }
@@ -555,7 +556,7 @@ public class CrossCheckLayout extends VerticalLayout {
             CrossCheckExecutor.get().crossCheck(facade.getUserID(), selectedCreditors, reportDate);
             showCrossCheck();
         } catch (SQLException sqle) {
-            log.log(Level.SEVERE, "Cross check failed", sqle);
+            logger.error("Cross check failed", sqle);
             String message = String.format(Localization.MESSAGE_CROSS_CHECK_FAILED.getValue(), sqle.getMessage());
             MessageBox.Show(message, getWindow());
         }
@@ -630,10 +631,10 @@ public class CrossCheckLayout extends VerticalLayout {
             workbook.close();
             downloadXLS(baos.toByteArray(), getFilenameXLS(uniqueCreditorsCrossChecks));
         } catch (IOException ioe) {
-            log.log(Level.WARNING, "Exception on cross check loading", ioe);
+            logger.warn("Exception on cross check loading", ioe);
             MessageBox.Show(Localization.MESSAGE_FAILED_TO_LOAD_CROSS_CHECK.getValue(), getWindow());
         } catch (WriteException we) {
-            log.log(Level.WARNING, "Exception occured while writing cross check", we);
+            logger.warn("Exception occured while writing cross check", we);
             MessageBox.Show(Localization.MESSAGE_FAILED_TO_LOAD_CROSS_CHECK.getValue(), getWindow());
         }
     }
@@ -696,7 +697,7 @@ public class CrossCheckLayout extends VerticalLayout {
         try {
             longValue = Long.parseLong(value);
         } catch (NumberFormatException nfe) {
-            log.log(Level.WARNING, nfe.getMessage());
+            logger.warn(nfe.getMessage());
         }
 
         if (longValue != null)

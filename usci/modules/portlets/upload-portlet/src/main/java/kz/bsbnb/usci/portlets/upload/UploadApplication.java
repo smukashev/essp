@@ -1,7 +1,5 @@
 package kz.bsbnb.usci.portlets.upload;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -24,14 +22,17 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import org.apache.log4j.Logger;
 
 public class UploadApplication extends Application {
 
     private static final long serialVersionUID = 2096197512742005243L;
-    public static final Logger log = Logger.getLogger(SingleUploadComponent.class.getCanonicalName());
+
+    private final Logger logger = Logger.getLogger(UploadApplication.class);
 
     @Override
     public void init() {
+        logger.info("upload portlet init");
         setMainWindow(new Window());
 
         if (getContext() instanceof PortletApplicationContext2) {
@@ -69,10 +70,8 @@ public class UploadApplication extends Application {
                             }
                         }
                     }
-                } catch (PortalException e) {
-                    e.printStackTrace();
-                } catch (SystemException e) {
-                    e.printStackTrace();
+                } catch (PortalException | SystemException e) {
+                    logger.error("", e);
                 }
 
                 if(!hasRights)
@@ -82,10 +81,8 @@ public class UploadApplication extends Application {
                 mainWindow.addComponent(new MainLayout(
                         new UploadPortletEnvironmentFacade(PortalUtil.getUser(request), isNB)));
                 setMainWindow(mainWindow);
-            } catch (PortalException pe) {
-                log.log(Level.SEVERE, "", pe);
-            } catch (SystemException se) {
-                log.log(Level.SEVERE, "", se);
+            } catch (PortalException | SystemException pe) {
+                logger.error("", pe);
             }
         }
 

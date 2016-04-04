@@ -22,6 +22,7 @@ import jxl.format.BorderLineStyle;
 import jxl.write.*;
 import jxl.write.Label;
 import kz.bsbnb.usci.cr.model.Creditor;
+import org.apache.log4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,8 +34,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
-
-import static com.bsbnb.creditregistry.portlets.approval.ApprovalApplication.log;
 
 /**
  *
@@ -51,6 +50,7 @@ public class CreditorsListLayout extends VerticalLayout implements ReportDisplay
     private VerticalLayout listLayout;
     private VerticalLayout reportDateLayout;
     private BeanItemContainer<ReportDisplayBean> reportsContainer;
+    private final Logger logger = org.apache.log4j.Logger.getLogger(AttachmentUpload.class);
 
     public CreditorsListLayout(DataProvider provider, PortletEnvironmentFacade environment) {
         this.provider = provider;
@@ -174,9 +174,9 @@ public class CreditorsListLayout extends VerticalLayout implements ReportDisplay
                 try {
                     downloadXls("approval.xls");
                 } catch (WriteException we) {
-                    log.log(Level.SEVERE, null, we);
+                    logger.error(null, we);
                 } catch (IOException ioe) {
-                    log.log(Level.SEVERE, null, ioe);
+                    logger.error(null, ioe);
                 } 
             }
         });

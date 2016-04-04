@@ -17,6 +17,7 @@ import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.IBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,7 +53,7 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
     @Override
     public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix, long creditorId) {
         if(!metaClass.getClassName().equals("credit"))
-            throw new RuntimeException("incorrect use");
+            throw new RuntimeException(Errors.getMessage(Errors.E231));
         Date reportDate = new Date();
         IBaseEntitySearcher searcher = searcherPool.getSearcher("credit");
         ISearchResult result = new PaginableSearchResult();
@@ -62,7 +63,7 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
                 reportDate, creditorId);
         primaryContract.put("no", new BaseValue(creditorId, reportDate, parameters.get("no")));
         primaryContract.put("date", new BaseValue(creditorId, reportDate,
-                DataTypes.fromString(DataTypes.DATE, parameters.get("date"))));
+                DataTypes.getCastObject(DataTypes.DATE, parameters.get("date"))));
         credit.put("primary_contract", new BaseValue(creditorId, reportDate, primaryContract));
         Long id = searcher.findSingle(credit, creditorId);
 

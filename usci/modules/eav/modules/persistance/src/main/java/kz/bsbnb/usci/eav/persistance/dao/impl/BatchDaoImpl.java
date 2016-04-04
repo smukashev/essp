@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.Errors;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +66,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
     @Override
     public List<Batch> getPendingBatchList() {
         EavGlobal statusCompleted = eavGlobalDao.get(BatchStatuses.COMPLETED.type(), BatchStatuses.COMPLETED.code());
+        EavGlobal statusError = eavGlobalDao.get(BatchStatuses.ERROR.type(), BatchStatuses.ERROR.code());
 
         Select select = context.select(
                 EAV_BATCHES.ID,
@@ -82,18 +82,19 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 EAV_BATCHES.ACTUAL_COUNT,
                 EAV_BATCHES.REPORT_ID,
                 DSL.field("\"bs\".STATUS_ID")
-        ).from(EAV_BATCHES).join(context.select(
+        ).from(EAV_BATCHES).join(
+                context.select(
                         EAV_BATCH_STATUSES.BATCH_ID,
                         EAV_BATCH_STATUSES.STATUS_ID,
                         DSL.rowNumber().over()
                                 .partitionBy(EAV_BATCH_STATUSES.BATCH_ID)
-                                .orderBy(EAV_BATCH_STATUSES.RECEIPT_DATE.desc(),
-                                        EAV_BATCH_STATUSES.STATUS_ID.desc()).as("num")).
-                        from(EAV_BATCH_STATUSES).asTable("bs")).
+                                .orderBy(EAV_BATCH_STATUSES.STATUS_ID.desc()).as("num"))
+                        .from(EAV_BATCH_STATUSES).asTable("bs")).
                 on(EAV_BATCHES.ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class)))
-                .where(DSL.field("\"bs\".\"num\"").eq(1)).
-                        and(DSL.field("\"bs\".STATUS_ID").ne(statusCompleted.getId())).
-                        and(EAV_BATCHES.IS_DISABLED.eq(DataUtils.convert(false))).orderBy(EAV_BATCHES.ID);
+                .where(DSL.field("\"bs\".\"num\"").eq(1))
+                .and(DSL.field("\"bs\".STATUS_ID").ne(statusCompleted.getId())
+                        .and(DSL.field("\"bs\".STATUS_ID").ne(statusError.getId())))
+                .and(EAV_BATCHES.IS_DISABLED.eq(DataUtils.convert(false))).orderBy(EAV_BATCHES.ID);
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
@@ -206,11 +207,11 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E149));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E149));
         }
 
         if (rows.size() < 1) {
-            throw new IllegalArgumentException(String.valueOf(Errors.E150));
+            throw new IllegalArgumentException(Errors.getMessage(Errors.E150));
         }
 
         Map<String, Object> row = rows.get(0);
