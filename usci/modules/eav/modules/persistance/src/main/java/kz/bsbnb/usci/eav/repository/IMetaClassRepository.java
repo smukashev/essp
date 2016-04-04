@@ -5,9 +5,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 import java.util.List;
 
-/**
- * Caches crud operations with MetaClass objects.
- */
+
 public interface IMetaClassRepository {
     MetaClass getMetaClass(String className);
 
