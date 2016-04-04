@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 import java.util.Map;
 
 @Component
-public class CustomJdbcTemplate {
+public class ShowCaseJdbcTemplate {
     private JdbcTemplate jdbcTemplateSC;
 
     @Autowired

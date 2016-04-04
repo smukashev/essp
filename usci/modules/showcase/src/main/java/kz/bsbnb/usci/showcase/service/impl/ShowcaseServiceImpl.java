@@ -3,7 +3,7 @@ package kz.bsbnb.usci.showcase.service.impl;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;
-import kz.bsbnb.usci.showcase.driver.CustomJdbcTemplate;
+import kz.bsbnb.usci.showcase.driver.ShowCaseJdbcTemplate;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.Map;
 @Service
 public class ShowcaseServiceImpl implements ShowcaseService {
     @Autowired
-    private CustomJdbcTemplate jdbcTemplateSC;
+    private ShowCaseJdbcTemplate jdbcTemplateSC;
 
     @Autowired
     private ShowcaseDaoImpl showcaseDao;
