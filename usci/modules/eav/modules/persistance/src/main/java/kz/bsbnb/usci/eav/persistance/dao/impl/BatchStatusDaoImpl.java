@@ -68,7 +68,7 @@ public class BatchStatusDaoImpl extends JDBCSupport implements IBatchStatusDao {
         batchStatus.setStatusId(getNullSafeLong(row, EAV_BATCH_STATUSES.STATUS_ID));
         batchStatus.setDescription((String) row.get(EAV_BATCH_STATUSES.DESCRIPTION.getName()));
         batchStatus.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_BATCH_STATUSES.RECEIPT_DATE.getName())));
-        batchStatus.setStatus(BatchStatuses.valueOf(EAV_GLOBAL.CODE.getName()));
+        batchStatus.setStatus(BatchStatuses.valueOf((String) row.get(EAV_GLOBAL.CODE.getName())));
         return batchStatus;
     }
 
