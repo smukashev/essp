@@ -126,7 +126,7 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
                 .from(LOGIC_RULES)
                 .join(LOGIC_RULE_PACKAGE).on(LOGIC_RULE_PACKAGE.RULE_ID.eq(LOGIC_RULES.ID))
                 .where(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(packageId))
-                .and(LOGIC_RULES.OPEN_DATE.lessOrEqual(DataUtils.convert(reportDate)))
+                .and(LOGIC_RULES.OPEN_DATE.eq(DataUtils.convert(reportDate)))
                 .and(LOGIC_RULES.CLOSE_DATE.greaterThan(DataUtils.convert(reportDate)).or(LOGIC_RULES.CLOSE_DATE.isNull()));
 
 
@@ -155,11 +155,11 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
                 .from(LOGIC_RULES)
                 .join(LOGIC_RULE_PACKAGE).on(LOGIC_RULES.ID.eq(LOGIC_RULE_PACKAGE.RULE_ID))
                 .where(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(packageId))
-                .and(LOGIC_RULES.OPEN_DATE.lessOrEqual(DataUtils.convert(reportDate)))
+                .and(LOGIC_RULES.OPEN_DATE.eq(DataUtils.convert(reportDate)))
                 .and(LOGIC_RULES.CLOSE_DATE.greaterThan(DataUtils.convert(reportDate)).or(LOGIC_RULES.CLOSE_DATE.isNull()))
                 .and(LOGIC_RULES.RULE.lower().like("%" + searchText + "%").or(LOGIC_RULES.TITLE.lower().like("%" + searchText + "%")));
 
-        return jdbcTemplate.query(select.getSQL(), select.getBindValues().toArray(), new BeanPropertyRowMapper<SimpleTrack>(SimpleTrack.class));
+        return jdbcTemplate.query(select.getSQL(), select.getBindValues().toArray(), new BeanPropertyRowMapper<>(SimpleTrack.class));
     }
 
     public long save(Rule rule, PackageVersion packageVersion){
@@ -343,6 +343,13 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
         for(Date date: dates) {
             ret.add(new PackageVersion(rulePackage, date));
         }
+
+        Collections.sort(ret, new Comparator<PackageVersion>() {
+            @Override
+            public int compare(PackageVersion o1, PackageVersion o2) {
+                return o1.getReportDate().compareTo(o2.getReportDate());
+            }
+        });
 
         return ret;
     }

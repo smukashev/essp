@@ -219,8 +219,9 @@ public class RuleService implements IRuleService {
         List<Pair> ret = new LinkedList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 
+        long id = 1L;
         for(PackageVersion packageVersion: versions) {
-            Pair p = new Pair(packageVersion.getRulePackage().getId(), sdf.format(packageVersion.getReportDate()));
+            Pair p = new Pair(id++, sdf.format(packageVersion.getReportDate()));
             ret.add(p);
         }
 
