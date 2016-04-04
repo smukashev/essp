@@ -73,7 +73,7 @@ public class RulesSingleton
             if (!(getClass() == obj.getClass()))
                 return 0;
 
-            return -(repDate.compareTo(((RuleCasheEntry)obj).getRepDate()));
+            return (repDate.compareTo(((RuleCasheEntry)obj).getRepDate()));
         }
 
         private Date getRepDate()
@@ -310,7 +310,16 @@ public class RulesSingleton
         ksession.setGlobal("entityService", entityService);
         ksession.setGlobal("metaService", metaFactoryService);
 
-        String packageName = pkgName + "_" + ruleDateFormat.format(repDate);
+        ArrayList<RuleCasheEntry> versions = ruleCache.get(pkgName);
+        String packageName = null;
+
+        for(RuleCasheEntry version: versions) {
+            if(version.getRepDate().compareTo(repDate) <= 0) {
+                packageName = pkgName +"_" + ruleDateFormat.format(version.getRepDate());
+            } else {
+                break;
+            }
+        }
 
         @SuppressWarnings("rawtypes")
         List<Command> commands = new ArrayList<Command>();
