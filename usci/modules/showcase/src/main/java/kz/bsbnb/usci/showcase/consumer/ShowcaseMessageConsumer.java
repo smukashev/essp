@@ -71,6 +71,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     throw new IllegalStateException(Errors.getMessage(Errors.E271));
 
                 currentEntity = queueEntry.getBaseEntityApplied();
+                currentEntity.getKeyElements();
 
                 synchronized (entities) {
                     boolean found;
@@ -79,7 +80,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                         for (IBaseEntity entity : entities) {
                             for (IBaseEntity keyEntity : entity.getKeyElements()) {
                                 for (IBaseEntity currentKeyEntity : currentEntity.getKeyElements()) {
-                                    if (keyEntity.getMeta().getId() == currentEntity.getMeta().getId() && keyEntity.equalsByKey(currentEntity)) {
+                                    if (keyEntity.getMeta().getId() == currentKeyEntity.getMeta().getId() && keyEntity.equalsByKey(currentKeyEntity)) {
                                         found = true;
                                         break;
                                     }
@@ -88,7 +89,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                         }
 
                         if (found)
-                            Thread.sleep(30);
+                            Thread.sleep(10);
                     } while(found);
                 }
 
