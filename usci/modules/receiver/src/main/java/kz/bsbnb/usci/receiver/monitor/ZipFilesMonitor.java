@@ -161,7 +161,6 @@ public class ZipFilesMonitor {
 		}
 
 		public void run() {
-			long sleepCounter = 0;
             //noinspection InfiniteLoopStatement
             while (true) {
 				JobInfo nextJob;
@@ -172,13 +171,8 @@ public class ZipFilesMonitor {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					sleepCounter++;
-					if (sleepCounter > WAIT_TIMEOUT) {
-						throw new IllegalStateException(Errors.getMessage(Errors.E192));
-					}
 					continue;
 				}
-				sleepCounter = 0;
 
 				if ((nextJob = jobLauncherQueue.getNextJob()) != null) {
 					System.out.println("Отправка батча на обработку : " + nextJob.getBatchId());
