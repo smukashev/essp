@@ -11,7 +11,6 @@ import java.util.Map;
 @Component
 @Scope
 public class SQLQueriesStats implements InitializingBean {
-    private final static boolean statsEnabled = StaticRouter.isDevMode();
     private volatile boolean flag = false;
 
     private final Map<String, QueryEntry> stats = new HashMap<>();
@@ -34,8 +33,7 @@ public class SQLQueriesStats implements InitializingBean {
     }
 
     public void put(String query, long time) {
-        if (statsEnabled)
-            statsWorker.addData(query, time);
+        statsWorker.addData(query, time);
     }
 
     public HashMap<String, QueryEntry> getStats() {

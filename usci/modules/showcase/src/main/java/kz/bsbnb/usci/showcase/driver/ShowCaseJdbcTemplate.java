@@ -13,6 +13,8 @@ import java.util.Map;
 public class ShowCaseJdbcTemplate {
     private JdbcTemplate jdbcTemplateSC;
 
+    private static final boolean statsEnabled = false;
+
     @Autowired
     private SQLQueriesStats sqlStats;
 
@@ -22,17 +24,25 @@ public class ShowCaseJdbcTemplate {
     }
 
     public Map<String, Object> queryForMap(String sql, Object values[]) {
-        long t1 = System.currentTimeMillis();
-        Map<String, Object> map = jdbcTemplateSC.queryForMap(sql, values);
-        sqlStats.put(sql, (System.currentTimeMillis() - t1));
-        return map;
+        if (statsEnabled) {
+            long t1 = System.currentTimeMillis();
+            Map<String, Object> map = jdbcTemplateSC.queryForMap(sql, values);
+            sqlStats.put(sql, (System.currentTimeMillis() - t1));
+            return map;
+        } else {
+            return jdbcTemplateSC.queryForMap(sql, values);
+        }
     }
 
     public int update(String sql, Object values[]) {
-        long t1 = System.currentTimeMillis();
-        int rows = jdbcTemplateSC.update(sql, values);
-        sqlStats.put(sql, (System.currentTimeMillis() - t1));
-        return rows;
+        if(statsEnabled) {
+            long t1 = System.currentTimeMillis();
+            int rows = jdbcTemplateSC.update(sql, values);
+            sqlStats.put(sql, (System.currentTimeMillis() - t1));
+            return rows;
+        } else {
+            return jdbcTemplateSC.update(sql, values);
+        }
     }
 
     public Map<String, QueryEntry> getSqlStats() {
