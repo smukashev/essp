@@ -23,22 +23,22 @@ public class ShowCaseJdbcTemplate {
         this.jdbcTemplateSC = new JdbcTemplate(dataSourceSC);
     }
 
-    public Map<String, Object> queryForMap(String sql, Object values[]) {
+    public Map<String, Object> queryForMap(String description, String sql, Object values[]) {
         if (statsEnabled) {
             long t1 = System.currentTimeMillis();
             Map<String, Object> map = jdbcTemplateSC.queryForMap(sql, values);
-            sqlStats.put(sql, (System.currentTimeMillis() - t1));
+            sqlStats.put(description, (System.currentTimeMillis() - t1));
             return map;
         } else {
             return jdbcTemplateSC.queryForMap(sql, values);
         }
     }
 
-    public int update(String sql, Object values[]) {
+    public int update(String description, String sql, Object values[]) {
         if(statsEnabled) {
             long t1 = System.currentTimeMillis();
             int rows = jdbcTemplateSC.update(sql, values);
-            sqlStats.put(sql, (System.currentTimeMillis() - t1));
+            sqlStats.put(description, (System.currentTimeMillis() - t1));
             return rows;
         } else {
             return jdbcTemplateSC.update(sql, values);

@@ -86,7 +86,7 @@ public class CortegeDaoImpl extends CommonDao {
                     sql = "SELECT MAX(open_date) AS open_date FROM %s WHERE " + historyKeyElement.queryKeys;
                     sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                    maxOpenDate = (Date) jdbcTemplateSC.queryForMap(sql, historyKeyElement.values).get("OPEN_DATE");
+                    maxOpenDate = (Date) jdbcTemplateSC.queryForMap("SELECT MAX(open_date) AS open_date FROM %s WHERE  + historyKeyElement.queryKeys", sql, historyKeyElement.values).get("OPEN_DATE");
                 } catch (EmptyResultDataAccessException e) {
                     maxOpenDate = null;
                 }
@@ -99,7 +99,7 @@ public class CortegeDaoImpl extends CommonDao {
                     sql = "SELECT * FROM %s WHERE " + historyKeyElement.queryKeys;
                     sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                    Map<String, Object> dbMap = jdbcTemplateSC.queryForMap(sql, historyKeyElement.values);
+                    Map<String, Object> dbMap = jdbcTemplateSC.queryForMap("SELECT * FROM %s WHERE + historyKeyElement.queryKeys", sql, historyKeyElement.values);
                     dbMap.remove("CDC");
                     dbMap.remove("ID");
 
@@ -111,7 +111,7 @@ public class CortegeDaoImpl extends CommonDao {
                         sql = "DELETE FROM %s WHERE " + historyKeyElement.queryKeys;
                         sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                        jdbcTemplateSC.update(sql, historyKeyElement.values);
+                        jdbcTemplateSC.update("DELETE FROM %s WHERE + historyKeyElement.queryKeys", sql, historyKeyElement.values);
 
                         entryMap.put(new ValueElement("OPEN_DATE", 0L, 0), entity.getReportDate());
                         simpleInsertValueElement(entryMap, getActualTableName(showCase));
@@ -121,13 +121,15 @@ public class CortegeDaoImpl extends CommonDao {
                     sql = "SELECT MIN(open_date) as open_date FROM %s WHERE " + historyKeyElement.queryKeys + " AND open_date > ? ";
                     sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
 
-                    Date historyMin = (Date) jdbcTemplateSC.queryForMap(sql, getObjectArray(false, historyKeyElement.values, entity.getReportDate())).get("OPEN_DATE");
+                    Date historyMin = (Date) jdbcTemplateSC.queryForMap("SELECT MIN(open_date) as open_date FROM %s WHERE + historyKeyElement.queryKeys + AND open_date > ?",
+                            sql, getObjectArray(false, historyKeyElement.values, entity.getReportDate())).get("OPEN_DATE");
 
                     /* Closest lower date */
                     sql = "SELECT MAX(open_date) as open_date FROM %s WHERE " + historyKeyElement.queryKeys + " AND open_date < ? ";
                     sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
 
-                    Date historyMax = (Date) jdbcTemplateSC.queryForMap(sql, getObjectArray(false, historyKeyElement.values, entity.getReportDate())).get("OPEN_DATE");
+                    Date historyMax = (Date) jdbcTemplateSC.queryForMap("SELECT MAX(open_date) as open_date FROM %s WHERE + historyKeyElement.queryKeys +  AND open_date < ?",
+                            sql, getObjectArray(false, historyKeyElement.values, entity.getReportDate())).get("OPEN_DATE");
 
                     /* No data in history */
                     if (historyMin == null && historyMax == null) {
@@ -135,14 +137,15 @@ public class CortegeDaoImpl extends CommonDao {
                         sql = "SELECT * FROM %s WHERE " + historyKeyElement.queryKeys;
                         sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                        Map<String, Object> dbMap = jdbcTemplateSC.queryForMap(sql, historyKeyElement.values);
+                        Map<String, Object> dbMap = jdbcTemplateSC.queryForMap("SELECT * FROM %s WHERE + historyKeyElement.queryKeys", sql, historyKeyElement.values);
 
                         if (checkMaps(entryMap, dbMap)) {
                             /* Data's are same, update report date */
                             sql = "UPDATE %s SET open_date = ? WHERE " + historyKeyElement.queryKeys;
                             sql = String.format(sql, getActualTableName(showCase));
 
-                            jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate()));
+                            jdbcTemplateSC.update("UPDATE %s SET open_date = ? WHERE + historyKeyElement.queryKeys", sql,
+                                    getObjectArray(true, historyKeyElement.values, entity.getReportDate()));
                         } else {
                             /* Data's are not same, insert to history table */
                             entryMap.put(new ValueElement("OPEN_DATE", 0L, 0), entity.getReportDate());
@@ -153,20 +156,21 @@ public class CortegeDaoImpl extends CommonDao {
                         sql = "SELECT * FROM %s WHERE open_date = ? AND " + historyKeyElement.queryKeys;
                         sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                        Map<String, Object> dbMapHistoryMax = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMax));
+                        Map<String, Object> dbMapHistoryMax = jdbcTemplateSC.queryForMap("SELECT * FROM %s WHERE open_date = ? AND + historyKeyElement.queryKeys",
+                                sql, getObjectArray(true, historyKeyElement.values, historyMax));
 
                         if (!checkMaps(entryMap, dbMapHistoryMax)) {
                             sql = "SELECT * FROM %s WHERE open_date = ? AND " + historyKeyElement.queryKeys;
                             sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                            Map<String, Object> dbMapHistoryMin = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMin));
+                            Map<String, Object> dbMapHistoryMin = jdbcTemplateSC.queryForMap("SELECT * FROM %s WHERE open_date = ? AND  + historyKeyElement.queryKeys", sql, getObjectArray(true, historyKeyElement.values, historyMin));
 
                             if (checkMaps(entryMap, dbMapHistoryMin)) {
                                 /* Data's are same, update report date */
                                 sql = "UPDATE %s SET open_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
                                 sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                                jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMin));
+                                jdbcTemplateSC.update("UPDATE %s SET open_date = ? WHERE open_date = ? AND + historyKeyElement.queryKeys", sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMin));
                             } else {
                                 /* Upper and lower data exists in history and they're different */
                                 /* Update close_date lower data */
@@ -174,7 +178,7 @@ public class CortegeDaoImpl extends CommonDao {
                                 sql = String.format(sql, getHistoryTableName(showCase));
 
                                 /* Insert to history table, close_date to historyMin */
-                                jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMax));
+                                jdbcTemplateSC.update("UPDATE %s SET close_date = ? WHERE open_date = ? AND + historyKeyElement.queryKeys", sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMax));
                                 entryMap.put(new ValueElement("OPEN_DATE", 0L, 0), entity.getReportDate());
                                 entryMap.put(new ValueElement("CLOSE_DATE", 0L, 0), historyMin);
                                 simpleInsertValueElement(entryMap, getHistoryTableName(showCase));
@@ -184,21 +188,21 @@ public class CortegeDaoImpl extends CommonDao {
                             sql = "UPDATE %s SET close_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
                             sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                            jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, historyMin, historyMax));
+                            jdbcTemplateSC.update("UPDATE %s SET close_date = ? WHERE open_date = ? AND + historyKeyElement.queryKeys", sql, getObjectArray(true, historyKeyElement.values, historyMin, historyMax));
                         }
                     } else if (historyMin != null) {
                         /* Compare with upper data */
                         sql = "SELECT * FROM %s WHERE open_date = ? AND " + historyKeyElement.queryKeys;
                         sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                        Map<String, Object> dbMap = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMin));
+                        Map<String, Object> dbMap = jdbcTemplateSC.queryForMap("SELECT * FROM %s WHERE open_date = ? AND + historyKeyElement.queryKeys", sql, getObjectArray(true, historyKeyElement.values, historyMin));
 
                         if (checkMaps(entryMap, dbMap)) {
                             /* Data's are same, update report date */
                             sql = "UPDATE %s SET open_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
                             sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                            jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMin));
+                            jdbcTemplateSC.update("UPDATE %s SET open_date = ? WHERE open_date = ? AND + historyKeyElement.queryKeys", sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMin));
                         } else {
                             /* Data's are not same, insert to history table */
                             entryMap.put(new ValueElement("OPEN_DATE", 0L, 0), entity.getReportDate());
@@ -210,14 +214,14 @@ public class CortegeDaoImpl extends CommonDao {
                         sql = "SELECT * FROM %s WHERE open_date = ? AND " + historyKeyElement.queryKeys;
                         sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                        Map<String, Object> dbMap = jdbcTemplateSC.queryForMap(sql, getObjectArray(true, historyKeyElement.values, historyMax));
+                        Map<String, Object> dbMap = jdbcTemplateSC.queryForMap("SELECT * FROM %s WHERE open_date = ? AND + historyKeyElement.queryKeys", sql, getObjectArray(true, historyKeyElement.values, historyMax));
 
                         if (!checkMaps(entryMap, dbMap)) {
                             /* Data's are not same, insert to history table */
                             sql = "UPDATE %s SET close_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
                             sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                            jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMax));
+                            jdbcTemplateSC.update("UPDATE %s SET close_date = ? WHERE open_date = ? AND + historyKeyElement.queryKeys", sql, getObjectArray(true, historyKeyElement.values, entity.getReportDate(), historyMax));
 
                             entryMap.put(new ValueElement("OPEN_DATE", 0L, 0), entity.getReportDate());
                             entryMap.put(new ValueElement("CLOSE_DATE", 0L, 0), maxOpenDate);
@@ -227,7 +231,7 @@ public class CortegeDaoImpl extends CommonDao {
                             sql = "UPDATE %s SET close_date = ? WHERE open_date = ? AND " + historyKeyElement.queryKeys;
                             sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                            jdbcTemplateSC.update(sql, getObjectArray(true, historyKeyElement.values, maxOpenDate, historyMax));
+                            jdbcTemplateSC.update("UPDATE %s SET close_date = ? WHERE open_date = ? AND + historyKeyElement.queryKeys", sql, getObjectArray(true, historyKeyElement.values, maxOpenDate, historyMax));
                         }
                     }
                 }
@@ -237,7 +241,7 @@ public class CortegeDaoImpl extends CommonDao {
                     sql = "SELECT MAX(rep_date) AS REP_DATE FROM %s WHERE " + historyKeyElement.queryKeys;
                     sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                    maxOpenDate = (Date) jdbcTemplateSC.queryForMap(sql, historyKeyElement.values).get("REP_DATE");
+                    maxOpenDate = (Date) jdbcTemplateSC.queryForMap("SELECT MAX(rep_date) AS REP_DATE FROM %s WHERE + historyKeyElement.queryKeys", sql, historyKeyElement.values).get("REP_DATE");
                 } catch (EmptyResultDataAccessException e) {
                     maxOpenDate = null;
                 }
@@ -570,18 +574,18 @@ public class CortegeDaoImpl extends CommonDao {
         String sql;
         if (!showCase.isFinal()) {
             sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys + " and open_date = ?";
+
+            jdbcTemplateSC.update("DELETE FROM ACTUAL WHERE  + rootKeyElement.queryKeys +  and open_date = ?", String.format(sql, getActualTableName(showCase), COLUMN_PREFIX,
+                    showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
+
+            jdbcTemplateSC.update("DELETE FROM HISTORY WHERE  + rootKeyElement.queryKeys +  and open_date = ?", String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX,
+                    showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
         } else {
             sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys + " and rep_date = ?";
-        }
 
-                    /* Deletes from actual table */
-        jdbcTemplateSC.update(String.format(sql, getActualTableName(showCase), COLUMN_PREFIX,
-                showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
-
-                    /* Deletes from history table */
-        if (!showCase.isFinal())
-            jdbcTemplateSC.update(String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX,
+            jdbcTemplateSC.update("DELETE FROM %s WHERE + rootKeyElement.queryKeys + and rep_date = ?", String.format(sql, getActualTableName(showCase), COLUMN_PREFIX,
                     showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
+        }
     }
 
     /* Returns array elementArray + elements in  both order */
@@ -681,7 +685,7 @@ public class CortegeDaoImpl extends CommonDao {
 
         sql.append(") VALUES ").append(values);
 
-        jdbcTemplateSC.update(sql.toString(), valueArray);
+        jdbcTemplateSC.update("SIMPLE INSERT VALUE ELEMENT " + tableName, sql.toString(), valueArray);
     }
 
     @Transactional
@@ -704,6 +708,6 @@ public class CortegeDaoImpl extends CommonDao {
 
         sql.append(") VALUES ").append(values);
 
-        jdbcTemplateSC.update(sql.toString(), valueArray);
+        jdbcTemplateSC.update("SIMPLE INSERT STRING " + tableName, sql.toString(), valueArray);
     }
 }
