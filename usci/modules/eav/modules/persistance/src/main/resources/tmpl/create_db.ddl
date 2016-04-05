@@ -960,6 +960,17 @@
 		<column name="close_date" primaryKey="false" required="false" type="TIMESTAMP" autoIncrement="false"/>
 	</table>
 
+	<table name="logic_rules_his">
+		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
+		<column name="rule_id" required="true" type="NUMERIC" size="14,0"/>
+		<column name="rule" primaryKey="false" required="false" type="VARCHAR" size="4000" autoIncrement="false"/>
+		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="title_ru" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="title_kz" primaryKey="false" required="false" type="VARCHAR" size="1024" autoIncrement="false"/>
+		<column name="open_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+		<column name="close_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+	</table>
+
 	<table name="logic_rule_package">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
 		<column name="rule_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
