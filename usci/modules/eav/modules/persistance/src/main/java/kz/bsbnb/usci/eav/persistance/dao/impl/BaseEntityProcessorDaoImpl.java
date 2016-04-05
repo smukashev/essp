@@ -105,9 +105,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         creditorId = isReference ? 0 : creditorId;
 
         if (isReference) {
+            long refRepositoryTime = System.currentTimeMillis();
             IBaseEntity referenceEntity = refRepository.findRef(baseEntity);
 
             if (referenceEntity != null) {
+                sqlStats.put("java::refRepositoryTime", (System.currentTimeMillis() - refRepositoryTime));
                 baseEntity.setId(referenceEntity.getId());
                 return baseEntity;
             }

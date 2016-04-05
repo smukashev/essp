@@ -4,7 +4,6 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
-import kz.bsbnb.usci.eav.util.DataUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -37,7 +36,7 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
                     e1.printStackTrace();
                 }
             }
-        } while(synced && syncCounter++ < 1000);
+        } while (synced && syncCounter++ < 1000);
 
 
         return null;
