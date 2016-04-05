@@ -11,7 +11,5 @@ public interface IRefRepository {
 
     void setRef(long id, Date reportDate, IBaseEntity baseEntity);
 
-    void delRef(long id, Date reportDate);
-
     void delRef(long id);
 }

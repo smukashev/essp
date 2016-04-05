@@ -1,42 +1,30 @@
 package kz.bsbnb.usci.eav.showcase;
 
-import kz.bsbnb.usci.eav.util.Errors;
-import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EntityProcessorListenerImpl implements IDaoListener {
     @Autowired
-    ShowcaseMessageProducer producer;
+    private ShowcaseMessageProducer producer;
 
     @Autowired
-    SQLQueriesStats stats;
+    private SQLQueriesStats stats;
 
     @Override
-    public void applyToDBEnded(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded,
-                               IBaseEntity baseEntityApplied, IBaseEntityManager entityManager) {
-        long t1 = System.currentTimeMillis();
+    public void applyToDBEnded(IBaseEntity baseEntityApplied) {
+        final long t1 = System.currentTimeMillis();
 
-        final QueueEntry queueEntry = new QueueEntry()
-                .setBaseEntityApplied(baseEntityApplied);
-                /*.setBaseEntityLoaded(baseEntityLoaded)
-                .setBaseEntitySaving(baseEntitySaving)
-                .setEntityManager(entityManager);*/
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    producer.produce(queueEntry);
-                } catch (Exception e) {
-                    throw new RuntimeException(Errors.getMessage(Errors.E181,e.getMessage()));
-                }
-            }
-        }).start();
+        final QueueEntry queueEntry = new QueueEntry(baseEntityApplied);
+        try {
+            producer.produce(queueEntry);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException(Errors.getMessage(Errors.E286));
+        }
 
         stats.put("producer.produce(queueEntry)", (System.currentTimeMillis() - t1));
     }

@@ -16,13 +16,15 @@ import java.util.Map;
 public class RefRepository extends JDBCSupport implements IRefRepository {
     private final HashMap<BaseEntityKey, IBaseEntity> cache = new HashMap<>();
 
+    @Override
     public IBaseEntity findRef(IBaseEntity baseEntity) {
         boolean synced;
         int syncCounter = 0;
         do {
             try {
                 for (Map.Entry<BaseEntityKey, IBaseEntity> entry : cache.entrySet()) {
-                    if (baseEntity.getReportDate().compareTo(entry.getValue().getReportDate()) == 0 && baseEntity.equalsByReference(entry.getValue())) {
+                    if (baseEntity.getReportDate().compareTo(entry.getValue().getReportDate()) == 0
+                            && baseEntity.equalsByReference(entry.getValue())) {
                         return entry.getValue();
                     }
                 }
@@ -41,6 +43,7 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
         return null;
     }
 
+    @Override
     public IBaseEntity getRef(long id, Date reportDate) {
         return cache.get(new BaseEntityKey(id, reportDate));
     }
@@ -49,10 +52,7 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
         cache.put(new BaseEntityKey(id, reportDate), baseEntity);
     }
 
-    public void delRef(long id, Date reportDate) {
-        cache.remove(new BaseEntityKey(id, reportDate));
-    }
-
+    @Override
     public void delRef(long id) {
         Iterator<Map.Entry<BaseEntityKey, IBaseEntity>> entryIterator = cache.entrySet().iterator();
         while (entryIterator.hasNext()) {

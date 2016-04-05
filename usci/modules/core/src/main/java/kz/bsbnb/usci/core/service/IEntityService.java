@@ -7,10 +7,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public interface IEntityService {
     BaseEntity load(long id);
@@ -31,9 +28,7 @@ public interface IEntityService {
 
     RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis);
 
-    HashMap<String, QueryEntry> getSQLStats();
-
-    void clearSQLStats();
+    Map<String, QueryEntry> getSQLStats();
 
     void remove(long id);
 

@@ -17,6 +17,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -36,12 +37,16 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
     private final Logger logger = LoggerFactory.getLogger(ShowcaseDaoImpl.class);
 
+    private final List<IBaseEntity> entities = new LinkedList<>();
+
     @Override
     @Transactional
     public void onMessage(Message message) {
         if (message instanceof ObjectMessage) {
             ObjectMessage om = (ObjectMessage) message;
             QueueEntry queueEntry;
+
+            IBaseEntity currentEntity = null;
 
             try {
                 queueEntry = (QueueEntry) om.getObject();
@@ -56,7 +61,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
             }
 
             try {
-                if (queueEntry.getBaseEntityApplied() != null && queueEntry.getBaseEntityApplied().getOperation() != null)
+                if (queueEntry.getBaseEntityApplied().getOperation() != null)
                     return;
 
                 final Map<ShowCase, Future> showCaseFutureMap = new HashMap<>();
@@ -64,6 +69,28 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
                 if (showCases.size() == 0)
                     throw new IllegalStateException(Errors.getMessage(Errors.E271));
+
+                currentEntity = queueEntry.getBaseEntityApplied();
+
+                synchronized (entities) {
+                    boolean found;
+                    do {
+                        found = false;
+                        for (IBaseEntity entity : entities) {
+                            for (IBaseEntity keyEntity : entity.getKeyElements()) {
+                                for (IBaseEntity currentKeyEntity : currentEntity.getKeyElements()) {
+                                    if (keyEntity.getMeta().getId() == currentEntity.getMeta().getId() && keyEntity.equalsByKey(currentEntity)) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (found)
+                            Thread.sleep(30);
+                    } while(found);
+                }
 
                 boolean found = false;
 
@@ -103,6 +130,10 @@ public class ShowcaseMessageConsumer implements MessageListener {
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e.getMessage());
+            } finally {
+                synchronized (entities) {
+                    if (currentEntity != null) entities.remove(currentEntity);
+                }
             }
         }
     }

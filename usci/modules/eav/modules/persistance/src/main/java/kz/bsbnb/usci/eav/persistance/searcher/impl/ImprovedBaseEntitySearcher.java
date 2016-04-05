@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.searcher.impl;
 
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -12,12 +11,11 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
-import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.tool.struct.StructType;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -27,7 +25,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
@@ -39,12 +40,6 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
     private final Logger logger = LoggerFactory.getLogger(ImprovedBaseEntitySearcher.class);
 
-    @Autowired
-    private BasicBaseEntitySearcherPool searcherPool;
-
-    @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
-
     @Override
     public String getClassName() {
         return null;
@@ -55,9 +50,6 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         if (entity.getId() > 0)
             return entity.getId();
 
-        if (entity.getValueCount() == 0)
-            return null;
-
         SelectConditionStep select = generateSQL(entity, creditorId, null);
 
         if (select != null) {
@@ -65,7 +57,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
             if (rows.size() > 1)
-                throw new IllegalStateException(Errors.getMessage(Errors.E83,entity.getMeta().getClassName()));
+                throw new IllegalStateException(Errors.getMessage(Errors.E83, entity.getMeta().getClassName()));
 
             if (rows.size() < 1)
                 return null;
@@ -74,6 +66,27 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         }
 
         return null;
+    }
+
+    @Override
+    public ArrayList<Long> findAll(BaseEntity baseEntity, Long creditorId) {
+        ArrayList<Long> result = new ArrayList<>();
+
+        if (baseEntity.getValueCount() == 0)
+            return result;
+
+        SelectConditionStep select = generateSQL(baseEntity, creditorId, null);
+
+        if (select != null) {
+            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+            for (Map<String, Object> row : rows)
+                result.add(((BigDecimal) row.get("inner_id")).longValue());
+        }
+
+        Collections.sort(result);
+
+        return result;
     }
 
     @SuppressWarnings("unchecked")
@@ -112,7 +125,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             }
 
             if (metaAttribute.isKey()) {
-                if ((baseValue == null || baseValue.getValue() == null) && metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
+                if (baseValue == null || baseValue.getValue() == null)
                     throw new KnownException(Errors.getMessage(Errors.E177, name, entity.getMeta().getClassName()));
 
                 if ((baseValue == null || baseValue.getValue() == null) && (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY))
@@ -129,31 +142,30 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL) {
                             String valueAlias = "v_" + name;
                             condition = condition == null ?
-                                simpleTable.as(valueAlias).field("VALUE").equal(simpleValue)
-                                    .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
-                                    .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true)))
-                                :
-                                condition.and(simpleTable.as(valueAlias).field("VALUE").equal(simpleValue))
-                                    .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
-                                    .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true)));
+                                    simpleTable.as(valueAlias).field("VALUE").equal(simpleValue)
+                                            .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
+                                            .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true)))
+                                    :
+                                    condition.and(simpleTable.as(valueAlias).field("VALUE").equal(simpleValue))
+                                            .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
+                                            .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true)));
                         } else {
                             String valueAlias = "v";
                             Select select = context
-                                .select(simpleTable.as(valueAlias).field("ID"))
-                                .from(simpleTable.as(valueAlias))
-                                .where(simpleTable.as(valueAlias).field("ENTITY_ID").equal(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                    .and(simpleTable.as(valueAlias).field("VALUE").equal(simpleValue))
-                                    .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
-                                    .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true))));
+                                    .select(simpleTable.as(valueAlias).field("ID"))
+                                    .from(simpleTable.as(valueAlias))
+                                    .where(simpleTable.as(valueAlias).field("ENTITY_ID").equal(EAV_BE_ENTITIES.as(entityAlias).ID)
+                                            .and(simpleTable.as(valueAlias).field("VALUE").equal(simpleValue))
+                                            .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
+                                            .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true))));
 
                             condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
                         }
                     } else {
                         BaseEntity childBaseEntity = (BaseEntity) baseValue.getValue();
-                        Long childBaseEntityId = searcherPool.getSearcher(childBaseEntity.getMeta().getClassName()).
-                                findSingle(childBaseEntity, creditorId);
+                        Long childBaseEntityId = childBaseEntity.getId();
 
-                        if (childBaseEntityId == null) {
+                        if (childBaseEntityId == 0L) {
                             if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL)
                                 return null;
                         } else {
@@ -181,9 +193,6 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         }
                     }
                 } else {
-                    if (baseValue == null)
-                        throw new UnsupportedOperationException(Errors.getMessage(Errors.E177, metaAttribute.getName(), metaClass.getClassName()));
-
                     BaseSet baseSet = (BaseSet) baseValue.getValue();
                     MetaSet metaSet = (MetaSet) memberType;
                     MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
@@ -221,12 +230,12 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                 .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                 .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
                                 .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.eq(metaAttribute.getId()))
-                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).CREDITOR_ID.eq(creditorId)) // KT: checkme!
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).CREDITOR_ID.eq(creditorId))
                                 .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ID))
                                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds))
-                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.eq(DataUtils.convert(false)))
-                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.eq(DataUtils.convert(true))));
+                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds))
+                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.eq(DataUtils.convert(false)))
+                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.eq(DataUtils.convert(true))));
 
                         condition = condition == null ? DSL.exists(select) :
                                 metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
@@ -236,15 +245,15 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                         String sChildBaseEntityIds = StringUtils.arrayToDelimitedString(childBaseEntityIds.toArray(), ", ");
 
                         select = context.select(DSL.field("listagg(\"" + setValueAlias + "\".\"ENTITY_VALUE_ID\", ', ') " +
-                                        "within group (order by \"" + setValueAlias + "\".\"ENTITY_VALUE_ID\" asc)"))
+                                "within group (order by \"" + setValueAlias + "\".\"ENTITY_VALUE_ID\" asc)"))
                                 .from(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias))
                                 .join(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias))
                                 .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.eq(metaAttribute.getId()))
-                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).CREDITOR_ID.eq(creditorId)) // KT: checkme!
+                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).CREDITOR_ID.eq(creditorId))
                                 .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ID))
                                 .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
-                                .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.equal(DataUtils.convert(true))));
+                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
+                                        .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.equal(DataUtils.convert(true))));
 
                         Condition setCondition = select.asField().eq(sChildBaseEntityIds);
 
@@ -278,38 +287,16 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 joins = joins.join(simpleTable.as(valueAlias))
                         .on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(simpleTable.as(valueAlias).field("ENTITY_ID"))
-                        .and(simpleTable.as(valueAlias).field("CREDITOR_ID").equal(creditorId)
-                        .and(simpleTable.as(valueAlias).field("ATTRIBUTE_ID").equal(attribute.getId()))));
+                                .and(simpleTable.as(valueAlias).field("CREDITOR_ID").equal(creditorId)
+                                        .and(simpleTable.as(valueAlias).field("ATTRIBUTE_ID").equal(attribute.getId()))));
             } else {
                 joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias))
                         .on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID)
-                        .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).CREDITOR_ID.equal(creditorId))
-                        .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ATTRIBUTE_ID.equal(attribute.getId())));
+                                .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).CREDITOR_ID.equal(creditorId))
+                                .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ATTRIBUTE_ID.equal(attribute.getId())));
             }
         }
 
         return joins;
-    }
-
-    @Override
-    public ArrayList<Long> findAll(BaseEntity baseEntity, Long creditorId) {
-        ArrayList<Long> result = new ArrayList<>();
-
-        if (baseEntity.getValueCount() == 0)
-            return result;
-
-        SelectConditionStep select = generateSQL(baseEntity, creditorId, null);
-
-        if (select != null) {
-            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
-                    select.getBindValues().toArray());
-
-            for (Map<String, Object> row : rows)
-                result.add(((BigDecimal) row.get("inner_id")).longValue());
-        }
-
-        Collections.sort(result);
-
-        return result;
     }
 }

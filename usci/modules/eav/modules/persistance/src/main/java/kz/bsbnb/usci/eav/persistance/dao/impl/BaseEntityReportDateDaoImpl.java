@@ -23,7 +23,6 @@ import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITY_REPORT_DAT
 
 @Repository
 public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEntityReportDateDao {
-
     private final Logger logger = LoggerFactory.getLogger(BaseEntityReportDateDaoImpl.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")

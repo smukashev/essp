@@ -74,7 +74,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             baseEntity.setBatchId(mockEntity.getBatchId());
             baseEntity.setIndex(mockEntity.getBatchIndex());
 
-            stats.put("core.EntityService.process()", t2);
+            stats.put("process(" + mockEntity.getMeta().getClassName() + ")", t2);
 
             EntityStatus entityStatus = new EntityStatus();
             entityStatus.setBatchId(baseEntity.getBatchId());
@@ -192,13 +192,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
-    public HashMap<String, QueryEntry> getSQLStats() {
+    public Map<String, QueryEntry> getSQLStats() {
         return stats.getStats();
-    }
-
-    @Override
-    public void clearSQLStats() {
-        stats.clear();
     }
 
     @Override

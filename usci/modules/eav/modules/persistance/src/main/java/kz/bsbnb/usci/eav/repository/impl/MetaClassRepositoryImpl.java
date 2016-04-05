@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Repository
 public class MetaClassRepositoryImpl implements IMetaClassRepository, InitializingBean {
     @Autowired
-    IMetaClassDao metaClassDao;
+    private IMetaClassDao metaClassDao;
 
     private HashMap<String, MetaClass> cache = new HashMap<>();
     private HashMap<Long, String> names = new HashMap<>();

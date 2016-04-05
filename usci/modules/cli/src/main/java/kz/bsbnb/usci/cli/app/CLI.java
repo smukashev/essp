@@ -1531,7 +1531,7 @@ public class CLI {
             while (true) {
                 ReceiverStatus receiverStatus = batchProcessService.getStatus();
                 SyncStatus syncStatus = entityServiceSync.getStatus();
-                HashMap<String, QueryEntry> map = entityServiceCore.getSQLStats();
+                Map<String, QueryEntry> map = entityServiceCore.getSQLStats();
 
                 double totalInserts = 0;
                 double totalSelects = 0;
@@ -1572,8 +1572,6 @@ public class CLI {
                     coreStatus.setAvgDeletes(totalDeletes / totalProcessCount);
                     coreStatus.setAvgUpdates(totalUpdates / totalProcessCount);
                 }
-
-                entityServiceCore.clearSQLStats();
 
                 SystemStatus systemStatus = new SystemStatus(receiverStatus, syncStatus, coreStatus);
 
@@ -1669,7 +1667,7 @@ public class CLI {
                 System.out.println("Can't connect to receiver service: " + e.getMessage());
             }
 
-            HashMap<String, QueryEntry> map = entityService.getSQLStats();
+            Map<String, QueryEntry> map = entityService.getSQLStats();
 
             System.out.println();
             System.out.println("+---------+------------------+------------------------+");
@@ -1684,15 +1682,14 @@ public class CLI {
             for (String query : map.keySet()) {
                 QueryEntry qe = map.get(query);
 
-                System.out.printf("| %7d | %16.6f | %22.6f | %s%n", qe.count,
-                        qe.totalTime / qe.count, qe.totalTime, query);
+                System.out.printf("| %7d | %16d | %22d | %s%n", qe.count, (qe.totalTime / qe.count), qe.totalTime, query);
 
-                if (query.startsWith("insert")) {
+                if (query.startsWith("insert"))
                     totalInserts += qe.totalTime;
-                }
-                if (query.startsWith("select")) {
+
+                if (query.startsWith("select"))
                     totalSelects += qe.totalTime;
-                }
+
                 if (query.startsWith("coreService")) {
                     totalProcess += qe.totalTime;
                     totalProcessCount += qe.count;
@@ -1706,9 +1703,6 @@ public class CLI {
                 System.out.println("AVG inserts per process: " + totalInserts / totalProcessCount);
                 System.out.println("AVG selects per process: " + totalSelects / totalProcessCount);
             }
-
-            entityService.clearSQLStats();
-
         } else {
             System.out.println("Argument needed: <core_url>");
             System.out.println("Example: sqlstat rmi://127.0.0.1:1099/entityService");
@@ -1842,7 +1836,7 @@ public class CLI {
     public void commandSql() throws FileNotFoundException, SQLException {
         StringBuilder str = new StringBuilder();
         if(args.get(0).equals("run")){
-            System.out.println("ЗапускаюЗапускаю скрипт " + args.get(1));
+            System.out.println("Запускаю скрипт " + args.get(1));
             long t1 = System.currentTimeMillis();
             SqlRunner runner = new SqlRunner(storage.getConnection(),  true);
             runner.runScript(args.get(1), StaticRouter.getCoreSchemaName());
@@ -2121,7 +2115,7 @@ public class CLI {
             System.out.println("Can't connect to receiver service: " + e.getMessage());
         }
 
-        HashMap<String, QueryEntry> map = showcaseService.getSQLStats();
+        Map<String, QueryEntry> map = showcaseService.getSQLStats();
 
         System.out.println();
         System.out.println("+---------+------------------+------------------------+");
@@ -2136,8 +2130,7 @@ public class CLI {
         for (String query : map.keySet()) {
             QueryEntry qe = map.get(query);
 
-            System.out.printf("| %7d | %16.6f | %22.6f | %s%n", qe.count,
-                    qe.totalTime / qe.count, qe.totalTime, query);
+            System.out.printf("| %7d | %16d | %22d | %s%n", qe.count, (qe.totalTime / qe.count), qe.totalTime, query);
 
             if (query.startsWith("insert")) {
                 totalInserts += qe.totalTime;

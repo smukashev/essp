@@ -30,21 +30,31 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
 
     @Override
     public RefColumnsResponse getRefColumns(long metaClassId) {
-        Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).
-                where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
-        Select complexAttrsSelect = context.select().from(EAV_M_COMPLEX_ATTRIBUTES).
-                where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
-        Select simpleSetsSelect = context.select().from(EAV_M_SIMPLE_SET).
-                where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(metaClassId));
-        Select complexSetsSelect = context.select().from(EAV_M_COMPLEX_SET).
-                where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(metaClassId));
+        Select simpleAttrsSelect = context.select()
+                .from(EAV_M_SIMPLE_ATTRIBUTES)
+                .where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
+
+        Select complexAttrsSelect = context.select()
+                .from(EAV_M_COMPLEX_ATTRIBUTES)
+                .where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
+
+        Select simpleSetsSelect = context.select()
+                .from(EAV_M_SIMPLE_SET)
+                .where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(metaClassId));
+
+        Select complexSetsSelect = context.select()
+                .from(EAV_M_COMPLEX_SET)
+                .where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(metaClassId));
 
         List<Map<String, Object>> simpleAttrs = queryForListWithStats(simpleAttrsSelect.getSQL(),
                 simpleAttrsSelect.getBindValues().toArray());
+
         List<Map<String, Object>> complexAttrs = queryForListWithStats(complexAttrsSelect.getSQL(),
                 complexAttrsSelect.getBindValues().toArray());
+
         List<Map<String, Object>> simpleSets = queryForListWithStats(simpleSetsSelect.getSQL(),
                 simpleSetsSelect.getBindValues().toArray());
+
         List<Map<String, Object>> complexSets = queryForListWithStats(complexSetsSelect.getSQL(),
                 complexSetsSelect.getBindValues().toArray());
 
@@ -102,19 +112,17 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
     }
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId) {
-        List<RefListItem> items = getRefsByMetaclassInner(metaClassId, false);
-        return items;
+        return getRefsByMetaclassInner(metaClassId, false);
     }
 
     public List<RefListItem> getRefsByMetaclassRaw(long metaClassId) {
-        List<RefListItem> items = getRefsByMetaclassInner(metaClassId, true);
-        return items;
+        return getRefsByMetaclassInner(metaClassId, true);
     }
 
     private List<RefListItem> getRefsByMetaclassInner(long metaClassId, boolean raw) {
         List<Map<String, Object>> rows = getRefListResponseWithoutHis(metaClassId, null);
 
-        List<RefListItem> items = new ArrayList<RefListItem>();
+        List<RefListItem> items = new ArrayList<>();
 
         String titleKey = null;
 
@@ -143,12 +151,14 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
     }
 
     private List<Map<String, Object>> getRefListResponseWithHis(long metaClassId, Long entityId) {
-        Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).
-                where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
+        Select simpleAttrsSelect = context.select()
+                .from(EAV_M_SIMPLE_ATTRIBUTES)
+                .where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
 
         Collection<Field> complexAttrsFields = new ArrayList<>();
 
-        Field keyAttrField = context.select(DSL.field("id")).from(EAV_M_SIMPLE_ATTRIBUTES)
+        Field keyAttrField = context.select(DSL.field("id"))
+                .from(EAV_M_SIMPLE_ATTRIBUTES)
                 .where(EAV_M_COMPLEX_ATTRIBUTES.as("m1").CLASS_ID.eq(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID))
                 .and(EAV_M_SIMPLE_ATTRIBUTES.IS_KEY.eq(DataUtils.convert(true))).asField("KEY_ATTR");
 
@@ -165,7 +175,8 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
         complexAttrsFields.add(keyAttrField);
         complexAttrsFields.add(settingAttrField);
 
-        Select complexAttrsSelect = context.select(complexAttrsFields.toArray(new Field[]{})).from(EAV_M_COMPLEX_ATTRIBUTES.as("m1"))
+        Select complexAttrsSelect = context.select(complexAttrsFields.toArray(new Field[]{}))
+                .from(EAV_M_COMPLEX_ATTRIBUTES.as("m1"))
                 .where(EAV_M_COMPLEX_ATTRIBUTES.as("m1").CONTAINING_ID.eq(metaClassId));
 
         List<Map<String, Object>> simpleAttrs = queryForListWithStats(simpleAttrsSelect.getSQL(),
@@ -174,12 +185,12 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
         List<Map<String, Object>> complexAttrs = queryForListWithStats(complexAttrsSelect.getSQL(),
                 complexAttrsSelect.getBindValues().toArray());
 
-        Collection<Field> fields = new ArrayList<Field>();
+        Collection<Field> fields = new ArrayList<>();
         fields.add(DSL.field("id"));
         fields.add(DSL.min(DSL.field("report_date")).as("report_date"));
         fields.add(DSL.field("\"closed_date\""));
 
-        Collection<Field> groupByFields = new ArrayList<Field>();
+        Collection<Field> groupByFields = new ArrayList<>();
         groupByFields.add(DSL.field("id"));
         groupByFields.add(DSL.field("\"closed_date\""));
 
@@ -190,7 +201,7 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
             groupByFields.add(DSL.field(attrName));
         }
 
-        Collection<Field> fieldsInner = new ArrayList<Field>();
+        Collection<Field> fieldsInner = new ArrayList<>();
 
         fieldsInner.add(DSL.field("\"dat\".id"));
         fieldsInner.add(DSL.field("\"dat\".report_date"));
@@ -219,10 +230,10 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
             }
 
 
-            Field fieldInner = context.select(DSL.field("value")).from(valuesTable)
-                    .where(DSL.field("attribute_id").eq(attrId)).and(DSL.field("report_date").eq(
-                            selectMaxRepDate
-                    ).and(DSL.field("entity_id").eq(DSL.field("\"dat\".id"))))
+            Field fieldInner = context.select(DSL.field("value"))
+                    .from(valuesTable)
+                    .where(DSL.field("attribute_id").eq(attrId)).and(DSL.field("report_date").eq(selectMaxRepDate)
+                    .and(DSL.field("entity_id").eq(DSL.field("\"dat\".id"))))
                     .asField(attrName);
 
             fieldsInner.add(fieldInner);
@@ -270,16 +281,14 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
         }
 
         SelectLimitStep select = context.select(fields.toArray(new Field[]{})).from(
-                context.select(fieldsInner.toArray(new Field[]{})).from(
-                        context.select(EAV_BE_ENTITIES.ID, EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
+                context.select(fieldsInner.toArray(new Field[]{}))
+                        .from(context.select(EAV_BE_ENTITIES.ID, EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
                                 .from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES)
                                 .on(EAV_BE_ENTITIES.ID.eq(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID))
                                 .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
                                 .and(entityId != null ? EAV_BE_ENTITIES.ID.eq(entityId) : DSL.trueCondition())
                                 .and(EAV_BE_ENTITY_REPORT_DATES.IS_CLOSED.ne(DataUtils.convert(true)))
-                                .asTable("dat")
-                )
-        ).groupBy(groupByFields).orderBy(DSL.field("id"), DSL.min(DSL.field("report_date")));
+                                .asTable("dat"))).groupBy(groupByFields).orderBy(DSL.field("id"), DSL.min(DSL.field("report_date")));
 
         return queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
     }
@@ -288,17 +297,17 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
     private List<Map<String, Object>> getRefListResponseWithoutHis(long metaClassId, Date date) {
         java.sql.Date dt = null;
 
-        if (date != null) {
+        if (date != null)
             dt = new java.sql.Date(date.getTime());
-        }
 
-        Select simpleAttrsSelect = context.select().from(EAV_M_SIMPLE_ATTRIBUTES).
-                where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
+        Select simpleAttrsSelect = context.select()
+                .from(EAV_M_SIMPLE_ATTRIBUTES)
+                .where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(metaClassId));
 
         List<Map<String, Object>> simpleAttrs = queryForListWithStats(simpleAttrsSelect.getSQL(),
                 simpleAttrsSelect.getBindValues().toArray());
 
-        Collection<Field> fields = new ArrayList<Field>();
+        Collection<Field> fields = new ArrayList<>();
 
         fields.add(DSL.field("\"enr\".id"));
         fields.add(DSL.field("\"enr\".report_date"));
@@ -313,16 +322,15 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
                         context.select(
                                 EAV_BE_ENTITIES.ID,
                                 EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE,
-                                DSL.rowNumber().over().partitionBy(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID).
-                                        orderBy(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.desc()).as("p")
-                        ).from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES).
-                                on(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
+                                DSL.rowNumber().over().partitionBy(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID)
+                                .orderBy(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.desc()).as("p"))
+                                .from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES)
+                                .on(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
                                 .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
                                 .and(dt != null ? EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.le(dt) : DSL.trueCondition())
                                 .and(EAV_BE_ENTITY_REPORT_DATES.IS_CLOSED.ne(DataUtils.convert(true)))
-                                .asTable("sub")
-                ).where(DSL.field("\"sub\".\"p\"").eq(1)).asTable("enr")
-        );
+                                .asTable("sub"))
+                        .where(DSL.field("\"sub\".\"p\"").eq(1)).asTable("enr"));
 
         for (Map<String, Object> attr : simpleAttrs) {
             String attrName = (String) attr.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
@@ -337,15 +345,15 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
                                     valuesTable.field("ENTITY_ID"),
                                     valuesTable.field("VALUE"),
                                     valuesTable.field("REPORT_DATE"),
-                                    DSL.rowNumber().over().partitionBy(valuesTable.field("ENTITY_ID")).
-                                            orderBy(valuesTable.field("REPORT_DATE").desc()).as("p")
-                            ).from(valuesTable)
+                                    DSL.rowNumber().over().partitionBy(valuesTable.field("ENTITY_ID"))
+                                            .orderBy(valuesTable.field("REPORT_DATE").desc()).as("p"))
+                                    .from(valuesTable)
                                     .where(valuesTable.field("ATTRIBUTE_ID").eq(attr.get("ID")))
                                     .and(dt != null ? valuesTable.field("REPORT_DATE").le(dt) : DSL.trueCondition())
-                                    .asTable("sub")
-                    ).where(DSL.field("\"sub\".\"p\"").eq(1))
-                            .asTable(attrSubTable)
-            ).on("\"" + attrSubTable + "\"" + "." + "ENTITY_ID = \"enr\".id");
+                                    .asTable("sub"))
+                            .where(DSL.field("\"sub\".\"p\"").eq(1))
+                            .asTable(attrSubTable))
+                    .on("\"" + attrSubTable + "\"" + "." + "ENTITY_ID = \"enr\".id");
         }
 
         return queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
