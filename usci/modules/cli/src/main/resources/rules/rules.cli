@@ -7,7 +7,6 @@ rule set date 01.04.2001
 rule create package credit_parser
 rule rc
 rule set package credit_parser
-rule set version
 
 rule import usci/modules/cli/src/main/resources/rules/imports.cli
 rule import usci/modules/cli/src/main/resources/rules/rule_functions.cli
@@ -37,7 +36,6 @@ rule set date 01.04.2001
 rule create package credit_process
 rule rc
 rule set package credit_process
-rule set version
 
 rule import usci/modules/cli/src/main/resources/rules/imports.cli
 rule import usci/modules/cli/src/main/resources/rules/rule_functions.cli
@@ -52,7 +50,6 @@ rule set date 01.04.2001
 rule create package ref_creditor_parser
 rule rc
 rule set package ref_creditor_parser
-rule set version
 
 rule import usci/modules/cli/src/main/resources/rules/imports.cli
 rule import usci/modules/cli/src/main/resources/rules/rule_functions.cli
@@ -66,7 +63,6 @@ rule set date 01.04.2001
 rule create package ref_creditor_process
 rule rc
 rule set package ref_creditor_process
-rule set version
 
 #no rules
 
@@ -90,7 +86,6 @@ rule set date 01.04.2001
 rule create package ref_creditor_branch_process
 rule rc
 rule set package ref_creditor_branch_process
-rule set version
 
 #no rules
 
@@ -101,7 +96,6 @@ rule set date 01.04.2001
 rule create package ref_exclusive_doc_parser
 rule rc
 rule set package ref_exclusive_doc_parser
-rule set version
 
 rule import usci/modules/cli/src/main/resources/rules/imports.cli
 rule import usci/modules/cli/src/main/resources/rules/rule_functions.cli
@@ -117,7 +111,6 @@ rule set date 01.04.2001
 rule create package ref_exclusive_doc_process
 rule rc
 rule set package ref_exclusive_doc_process
-rule set version
 
 #no rules
 
