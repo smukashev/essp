@@ -15,6 +15,13 @@ exception when others then
 end;
 
 DBMS_REDEFINITION.can_redef_table(USER, 'EAV_BE_ENTITIES');
+select dbms_metadata.get_ddl('TRIGGER', 'TRG_EAV_BE_ENTITIES_ID', 'CORE') --change schema
+into v_trigger_ddl
+from dual;
+execute immediate 'drop trigger TRG_EAV_BE_ENTITIES_ID';
+v_trigger_enable_ddl:= substr(v_trigger_ddl, instr(v_trigger_ddl, 'ALTER'), length(v_trigger_ddl) - instr(v_trigger_ddl, 'ALTER') + 1);
+v_trigger_ddl := substr(v_trigger_ddl, 1, instr(v_trigger_ddl, 'ALTER') - 1);
+
 
 execute immediate 'CREATE TABLE EAV_BE_ENTITIES_NEW
    (	"ID" NUMBER(14,0) NOT NULL ENABLE,
@@ -86,9 +93,9 @@ DBMS_REDEFINITION.copy_table_dependents(
     uname            => USER,
     orig_table       => 'EAV_BE_ENTITIES',
     int_table        => 'EAV_BE_ENTITIES_NEW',
-    copy_indexes     => DBMS_REDEFINITION.cons_orig_params,
-    copy_triggers    => TRUE,
-    copy_constraints => TRUE,
+    copy_indexes     => 0,
+    copy_triggers    => false,
+    copy_constraints => false,
     copy_privileges  => TRUE,
     ignore_errors    => FALSE,
     num_errors       => l_errors,
@@ -107,5 +114,7 @@ exception when others then
                                           int_table  => 'EAV_BE_ENTITIES_NEW');
 end;
 execute immediate 'DROP TABLE EAV_BE_ENTITIES_NEW';
+execute immediate v_trigger_ddl;
+execute immediate v_trigger_enable_ddl;
 
  end;
