@@ -174,9 +174,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
 
-        long t1 = System.currentTimeMillis();
+        long prepareTime = System.currentTimeMillis();
         baseEntityPostPrepared = prepare(((BaseEntity) baseEntity).clone(), creditorId);
-        sqlStats.put("prepare(" + baseEntity.getMeta().getClassName() + ")", (System.currentTimeMillis() - t1));
+        sqlStats.put("java::prepare", (System.currentTimeMillis() - prepareTime));
 
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
@@ -269,7 +269,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     throw new UnsupportedOperationException(Errors.getMessage(Errors.E118, baseEntityPostPrepared.getOperation()));
             }
         } else {
+            long applyTime = System.currentTimeMillis();
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager, entityHolder);
+            sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
             baseEntityApplyDao.applyToDb(baseEntityManager);
         }

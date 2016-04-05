@@ -26,6 +26,6 @@ public class EntityProcessorListenerImpl implements IDaoListener {
             throw new UnsupportedOperationException(Errors.getMessage(Errors.E286));
         }
 
-        stats.put("producer.produce(queueEntry)", (System.currentTimeMillis() - t1));
+        stats.put("java::produce", (System.currentTimeMillis() - t1));
     }
 }
