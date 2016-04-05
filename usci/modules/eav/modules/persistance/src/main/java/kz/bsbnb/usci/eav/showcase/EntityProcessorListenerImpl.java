@@ -20,11 +20,17 @@ public class EntityProcessorListenerImpl implements IDaoListener {
         final long t1 = System.currentTimeMillis();
 
         final QueueEntry queueEntry = new QueueEntry(baseEntityApplied);
-        try {
-            producer.produce(queueEntry);
-        } catch (Exception e) {
-            throw new UnsupportedOperationException(Errors.getMessage(Errors.E286));
-        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    producer.produce(queueEntry);
+                } catch (Exception e) {
+                    throw new RuntimeException(Errors.getMessage(Errors.E181, e.getMessage()));
+                }
+            }
+        }).start();
 
         stats.put("java::produce", (System.currentTimeMillis() - t1));
     }
