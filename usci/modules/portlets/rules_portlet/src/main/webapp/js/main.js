@@ -204,7 +204,7 @@ function initGrid(){
                     newRuleForm().show();
 
                     require(['ace/ace'],function(ace){
-                        ace.edit('bknew-rule');
+                        newRuleEditor = ace.edit('bknew-rule');
                     });
 
                     /*Ext.getCmp('txtTitle').show();
@@ -212,7 +212,7 @@ function initGrid(){
                     Ext.getCmp('btnAddGreen').show();
                     Ext.EventObject.stopPropagation();*/
                 }
-            },{
+            }/*,{
                 xtype: 'textfield',
                 id: 'txtTitle',
                 hidden: true,
@@ -231,7 +231,7 @@ function initGrid(){
                         }
                     }
                 }
-            },{
+            }*//*,{
                 id: 'btnAddGreen',
                 text: '',
                 icon: contextPathUrl + '/pics/addgreen.png',
@@ -264,7 +264,7 @@ function initGrid(){
 
                     Ext.EventObject.stopPropagation();
                 }
-            }/*,{
+            }*//*,{
                 text: 'запуск',
                 id:    'btnRun',
                 icon: contextPathUrl + '/pics/run.png',

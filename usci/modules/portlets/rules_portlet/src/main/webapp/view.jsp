@@ -53,6 +53,7 @@
     });
 
     var editor;
+    var newRuleEditor;
 
     require(['ace/ace'],function(ace){
         console.log("ace code")
