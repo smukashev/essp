@@ -25,11 +25,11 @@ public interface IRuleDao extends IDao{
     void updateBody(Long ruleId, String body);
     void copyExistingRule(long ruleId, long batchVersionId);
     long createCopy(long ruleId, String title);
-    long createRule(Rule rule);
+    long createRule(Rule rule, PackageVersion packageVersion);
     void renameRule(long ruleId, String title);
     void clearAllRules();
     List<SimpleTrack> getRuleTitles(Long batchVersionId, Date reportDate, String searchText);
     List<PackageVersion> getPackageVersions(RulePackage rulePackage);
-    void saveInPackage(Rule rule, RulePackage rulePackage);
+    void saveInPackage(Rule rule, PackageVersion packageVersion);
     RulePackage getPackage(String name);
 }

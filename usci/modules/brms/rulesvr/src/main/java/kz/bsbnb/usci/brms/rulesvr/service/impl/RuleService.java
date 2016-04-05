@@ -131,11 +131,11 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public long createNewRuleInBatch(Rule rule, RulePackage rulePackage) {
-        long ruleId = ruleDao.createRule(rule);
+    public long createNewRuleInPackage(Rule rule, PackageVersion packageVersion) {
+        long ruleId = ruleDao.createRule(rule, packageVersion);
         rule.setId(ruleId);
         //ruleDao.save(ruleId, packageVersion.getId());
-        ruleDao.saveInPackage(rule, rulePackage);
+        ruleDao.saveInPackage(rule, packageVersion);
         return ruleId;
     }
 
@@ -228,6 +228,15 @@ public class RuleService implements IRuleService {
         return ret;
     }
 
+    @Override
+    public String getPackageErrorsOnRuleInsert(PackageVersion packageVersion, String title, String ruleBody) {
+        return rulesSingleton.getPackageErrorsOnRuleInsert(packageVersion, title, ruleBody);
+    }
+
+    @Override
+    public boolean insertRule(PackageVersion packageVersion, String title, String ruleBody) {
+        return rulesSingleton.insertRule(packageVersion, title, ruleBody);
+    }
 
     //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;

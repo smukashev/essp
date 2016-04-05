@@ -335,4 +335,36 @@ public class RulesSingleton
 
         ksession.execute(entity);
     }
+
+
+    public String getPackageErrorsOnRuleInsert(PackageVersion packageVersion, String title, String ruleBody) {
+        List<Rule> rules = ruleDao.load(packageVersion);
+
+        String packages = "";
+
+        packages += "package test\n";
+        packages += "dialect \"mvel\"\n";
+        packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
+        packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+
+        for (Rule r : rules)
+            packages += r.getRule() + "\n";
+
+        packages += ruleBody + "\n";
+
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+
+        kbuilder.add(ResourceFactory.newInputStreamResource(new ByteArrayInputStream(packages.getBytes())),
+                ResourceType.DRL);
+
+        if ( kbuilder.hasErrors() ) {
+            return kbuilder.getErrors().toString();
+        }
+
+        return null;
+    }
+
+    public boolean insertRule(PackageVersion packageVersion, String title, String ruleBody) {
+        return false;
+    }
 }

@@ -6,6 +6,7 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
@@ -203,9 +204,22 @@ public class RulesPortlet extends MVCPortlet{
                     break;
                 case NEW_RULE:
                     getWriteAccess(resourceRequest);
-                    batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
+                    pkgName = resourceRequest.getParameter("pkgName");
                     title = resourceRequest.getParameter("title");
-                    writer.write(JsonMaker.getJson(ruleService.saveEmptyRule(title, batchVersionId)));
+                    date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
+                    ruleBody = resourceRequest.getParameter("ruleBody");
+                    errors = ruleService.getPackageErrorsOnRuleInsert(
+                            new PackageVersion(new RulePackage(packageId, pkgName), date),
+                            title,
+                            ruleBody);
+                    if(errors != null)
+                        throw new RuntimeException(errors);
+                    writer.write(JsonMaker.getJson(ruleService.insertRule(
+                            new PackageVersion(new RulePackage(packageId, pkgName), date),
+                            title,
+                            ruleBody)
+                    ));
                     break;
                 case COPY_EXISTING_RULE:
                     getWriteAccess(resourceRequest);
@@ -290,6 +304,10 @@ public class RulesPortlet extends MVCPortlet{
 
         } catch (Exception e) {
             String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : "";
+
+            if(StaticRouter.isDevMode())
+                e.printStackTrace();
+
             if(!retry) {
                 retry = true;
                 try {

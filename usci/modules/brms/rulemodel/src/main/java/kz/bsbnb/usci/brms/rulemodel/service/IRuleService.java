@@ -83,7 +83,7 @@ public interface IRuleService {
      * Create new rule with given title and body into batchVersion
      * @return id of created rule
      */
-    public long createNewRuleInBatch(Rule rule, RulePackage rulePackage);
+    public long createNewRuleInPackage(Rule rule, PackageVersion packageVersion);
 
     public void renameRule(long ruleId, String title);
 
@@ -114,6 +114,10 @@ public interface IRuleService {
     public boolean activateRule(Long ruleId);
 
     public boolean disableRule(Long ruleId);
+
+    String getPackageErrorsOnRuleInsert(PackageVersion packageVersion, String title, String ruleBody);
+
+    boolean insertRule(PackageVersion packageVersion, String title, String ruleBody);
 
     /**
      * =============================

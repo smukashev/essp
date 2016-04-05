@@ -163,18 +163,25 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
     }
 
     public long save(Rule rule, PackageVersion packageVersion){
-        String SQL = "INSERT INTO " + PREFIX_ + "rules(title, rule) VALUES(?, ?)";
+        /*String SQL = "INSERT INTO " + PREFIX_ + "rules(title, rule) VALUES(?, ?)";
         jdbcTemplate.update(SQL,rule.getTitle(),rule.getRule());
 
         SQL = "SELECT id FROM " + PREFIX_ + "rules WHERE rule = ?";
-        long id = jdbcTemplate.queryForLong(SQL,rule.getRule());
+        long id = jdbcTemplate.queryForLong(SQL,rule.getRule());*/
 
 //        if (batchVersion.getId() > 0){
 //            SQL = "Insert into rule_package_versions(rule_id,package_versions_id) values(?,?)";
 //            jdbcTemplate.update(SQL,id,batchVersion.getId());
 //        }
 
-        return id;
+        //return id;
+
+        Insert insert = context.insertInto(LOGIC_RULES)
+                .set(LOGIC_RULES.TITLE, rule.getTitle())
+                .set(LOGIC_RULES.RULE, rule.getRule())
+                .set(LOGIC_RULES.OPEN_DATE, DataUtils.convert(packageVersion.getReportDate()));
+
+        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     @Override
@@ -217,10 +224,10 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
     }
 
     @Override
-    public void saveInPackage(Rule rule, RulePackage rulePackage) {
+    public void saveInPackage(Rule rule, PackageVersion packageVersion) {
         Insert insert = context.insertInto(LOGIC_RULE_PACKAGE)
                 .set(LOGIC_RULE_PACKAGE.RULE_ID, rule.getId())
-                .set(LOGIC_RULE_PACKAGE.PACKAGE_ID, rulePackage.getId());
+                .set(LOGIC_RULE_PACKAGE.PACKAGE_ID, packageVersion.getRulePackage().getId());
 
         insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
@@ -272,11 +279,11 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
     }
 
     @Override
-    public long createRule(Rule rule) {
+    public long createRule(Rule rule, PackageVersion packageVersion) {
         Insert insert = context.insertInto(LOGIC_RULES)
                 .set(LOGIC_RULES.TITLE, rule.getTitle())
                 .set(LOGIC_RULES.RULE, rule.getRule())
-                .set(LOGIC_RULES.OPEN_DATE, DataUtils.convert(rule.getOpenDate()));
+                .set(LOGIC_RULES.OPEN_DATE, DataUtils.convert(packageVersion.getReportDate()));
 
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 

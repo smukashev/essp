@@ -27,9 +27,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.dao.*;
@@ -71,7 +69,6 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -1994,7 +1991,7 @@ public class CLI {
                     System.out.println(currentBaseEntity);
                 else throw new IllegalArgumentException();
             } else if (args.get(0).equals("save")) {
-                long ruleId = ruleService.createNewRuleInBatch(currentRule, currentRulePackage);
+                long ruleId = ruleService.createNewRuleInPackage(currentRule, currentPackageVersion);
                 System.out.println("ok saved: ruleId = " + ruleId);
             } else if (args.get(0).equals("run")) {
 
@@ -2024,11 +2021,13 @@ public class CLI {
                 } else */if (args.size() < 3) throw new IllegalArgumentException();
                 else if (args.get(1).equals("package")) {
                     currentRulePackage = ruleService.getPackage(args.get(2));
+                    currentPackageVersion = new PackageVersion(currentRulePackage, currentDate);
                     //ruleService.getRulePackageName(args.get(2), currentDate);
                     currentPackageName = args.get(2);
                 } else if (args.get(1).equals("date")) {
                     DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
                     currentDate = formatter.parse(args.get(2));
+                    currentPackageVersion = new PackageVersion(currentRulePackage, currentDate);
                 } else throw new IllegalArgumentException();
             } else if (args.get(0).equals("create")) {
                 try {
