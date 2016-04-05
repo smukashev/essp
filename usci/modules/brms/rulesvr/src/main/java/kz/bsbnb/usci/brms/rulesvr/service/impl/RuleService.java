@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.brms.rulesvr.service.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.IPackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
@@ -102,8 +101,8 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public boolean deleteRule(long ruleId, long batchVersionId) {
-        return ruleDao.deleteRule(ruleId, batchVersionId);
+    public boolean deleteRule(long ruleId, RulePackage rulePackage) {
+        return ruleDao.deleteRule(ruleId, rulePackage);
     }
 
     @Override
@@ -231,11 +230,6 @@ public class RuleService implements IRuleService {
     @Override
     public String getPackageErrorsOnRuleInsert(PackageVersion packageVersion, String title, String ruleBody) {
         return rulesSingleton.getPackageErrorsOnRuleInsert(packageVersion, title, ruleBody);
-    }
-
-    @Override
-    public boolean insertRule(PackageVersion packageVersion, String title, String ruleBody) {
-        return rulesSingleton.insertRule(packageVersion, title, ruleBody);
     }
 
     //    public ListenerSingleton getListenerSingleton() {

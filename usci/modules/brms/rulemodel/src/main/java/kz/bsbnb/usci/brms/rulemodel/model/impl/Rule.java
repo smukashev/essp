@@ -3,12 +3,14 @@ package kz.bsbnb.usci.brms.rulemodel.model.impl;
 import kz.bsbnb.usci.brms.rulemodel.model.IRule;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author abukabayev
  */
-public class Rule extends Persistable implements IRule {
+public class Rule extends Persistable implements IRule, Serializable {
+    private static final long serialVersionId = 1L;
     private String rule;
     private String title;
     private boolean isActive;
@@ -16,6 +18,11 @@ public class Rule extends Persistable implements IRule {
 
     public Rule(){
 
+    }
+
+    public Rule(String title, String rule){
+        this.title = title;
+        this.rule = rule;
     }
 
     public Rule(String rule){

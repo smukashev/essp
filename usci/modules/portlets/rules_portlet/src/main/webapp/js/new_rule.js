@@ -99,13 +99,13 @@ function newRuleForm(){
                                             pkgName: Ext.getCmp('elemComboPackage').getRawValue()
                                         },
                                         success: function(response){
-                                            var ruleId = Ext.decode(response.responseText).data;
-                                            ruleListGrid.store.add({id: ruleId, name : Ext.getCmp('txtTitle').value });
-                                            ruleListGrid.getSelectionModel().select(ruleListGrid.store.indexOfId(ruleId));
-                                            ruleListGrid.fireEvent('cellclick', ruleListGrid, null, 1, ruleListGrid.getSelectionModel().getLastSelected());
-                                            Ext.getCmp('btnAddGreen').hide();
-                                            Ext.getCmp('txtTitle').hide();
-                                            editor.focus();
+											var r = JSON.parse(response.responseText);
+
+											if(!r.success) {
+											  Ext.Msg.alert('ошибка',r.errorMessage);
+											} else {
+											  Ext.Msg.alert('', 'Правило добавлено');
+											}
                                         },
                                         failure: function(response){
                                             Ext.Msg.alert('ошибка',Ext.decode(response.responseText).errorMessage);

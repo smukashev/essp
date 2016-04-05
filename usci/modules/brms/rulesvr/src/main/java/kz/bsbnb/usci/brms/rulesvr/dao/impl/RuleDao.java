@@ -7,10 +7,7 @@ import kz.bsbnb.usci.brms.rulemodel.model.impl.SimpleTrack;
 import kz.bsbnb.usci.brms.rulesvr.persistable.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Errors;
-import org.jooq.DSLContext;
-import org.jooq.Delete;
-import org.jooq.Insert;
-import org.jooq.Select;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +24,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.Comparator;
 
 import static kz.bsbnb.usci.brms.rulesvr.generated.Tables.*;
 
@@ -194,9 +192,15 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
     }
 
     @Override
-    public boolean deleteRule(long ruleId, long batchVersionId) {
-        jdbcTemplate.update("DELETE FROM " + PREFIX_ + "rule_package_versions WHERE rule_id = ? " +
-                "AND package_versions_id = ?", ruleId, batchVersionId);
+    public boolean deleteRule(long ruleId, RulePackage rulePackage) {
+        /*jdbcTemplate.update("DELETE FROM " + PREFIX_ + "rule_package_versions WHERE rule_id = ? " +
+                "AND package_versions_id = ?", ruleId, packageVersion);*/
+        Delete delete = context.delete(LOGIC_RULE_PACKAGE)
+                .where(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(rulePackage.getId()))
+                .and(LOGIC_RULE_PACKAGE.RULE_ID.eq(ruleId));
+
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+
         return true;
     }
 

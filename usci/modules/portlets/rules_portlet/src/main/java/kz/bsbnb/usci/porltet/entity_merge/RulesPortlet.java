@@ -7,6 +7,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
@@ -198,8 +199,10 @@ public class RulesPortlet extends MVCPortlet{
                 case DEL_RULE:
                     getWriteAccess(resourceRequest);
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
-                    long packageVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
-                    ruleService.deleteRule(ruleId, packageVersionId);
+                    pkgName = resourceRequest.getParameter("pkgName");
+                    packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
+                    //long packageVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    ruleService.deleteRule(ruleId, new RulePackage(packageId, pkgName));
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case NEW_RULE:
@@ -215,10 +218,9 @@ public class RulesPortlet extends MVCPortlet{
                             ruleBody);
                     if(errors != null)
                         throw new RuntimeException(errors);
-                    writer.write(JsonMaker.getJson(ruleService.insertRule(
-                            new PackageVersion(new RulePackage(packageId, pkgName), date),
-                            title,
-                            ruleBody)
+                    writer.write(JsonMaker.getJson(ruleService.createNewRuleInPackage(
+                            new Rule(title, ruleBody),
+                            new PackageVersion(new RulePackage(packageId, pkgName), date))
                     ));
                     break;
                 case COPY_EXISTING_RULE:

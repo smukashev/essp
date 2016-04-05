@@ -19,7 +19,9 @@ function deleteRule(rowIndex){
         params : {
             op : 'DEL_RULE',
             ruleId: editor.ruleId,
-            batchVersionId: editor.batchVersionId //Ext.getCmp("elemCombokage").value
+            //batchVersionId: editor.batchVersionId //Ext.getCmp("elemCombokage").value
+            packageId: Ext.getCmp('elemComboPackage').value,
+            pkgName: Ext.getCmp('elemComboPackage').getRawValue()
         },
         reader: {
             type: 'json'
@@ -460,11 +462,11 @@ function updateRules(searchText){
 }
 
 
-Ext.getDoc().on('click',function(){
+/*Ext.getDoc().on('click',function(){
         Ext.getCmp('btnAddGreen').hide();
         Ext.getCmp('txtTitle').hide();
     }
-);
+);*/
 
 
 Ext.onReady(function(){

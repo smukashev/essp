@@ -45,7 +45,7 @@ public interface IRuleService {
     public Rule getRule(Long ruleId);
 
 
-    public boolean deleteRule(long ruleId, long batchVersionId );
+    public boolean deleteRule(long ruleId, RulePackage rulePackage);
 
     /**
      * Creates new rule with given title and empty body <br/>
@@ -116,8 +116,6 @@ public interface IRuleService {
     public boolean disableRule(Long ruleId);
 
     String getPackageErrorsOnRuleInsert(PackageVersion packageVersion, String title, String ruleBody);
-
-    boolean insertRule(PackageVersion packageVersion, String title, String ruleBody);
 
     /**
      * =============================

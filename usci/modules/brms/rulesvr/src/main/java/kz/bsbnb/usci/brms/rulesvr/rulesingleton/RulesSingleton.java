@@ -363,8 +363,4 @@ public class RulesSingleton
 
         return null;
     }
-
-    public boolean insertRule(PackageVersion packageVersion, String title, String ruleBody) {
-        return false;
-    }
 }
