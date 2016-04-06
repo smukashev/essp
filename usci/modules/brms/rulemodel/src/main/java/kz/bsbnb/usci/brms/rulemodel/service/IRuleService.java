@@ -59,11 +59,10 @@ public interface IRuleService {
 
     /**
      * Sets new body to rule with given <b>ruleId</b>
+     *  @param rule - rule id <br/>
      *
-     * @param ruleId - rule id <br/>
-     * @param body - new body of rule <br/>
      */
-    public void updateBody(Long ruleId, String body);
+    public void updateBody(Rule rule);
 
     /**
      * Copy rule to batch version

@@ -194,10 +194,12 @@ public class RulesPortlet extends MVCPortlet{
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     String pkgName = resourceRequest.getParameter("pkgName");
                     date =  df.parse(resourceRequest.getParameter("date"));
+                    rule = new Rule("", ruleBody, date);
+                    rule.setId(ruleId);
                     String errors = ruleService.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, date);
                     if(errors != null)
                         throw new RuntimeException(errors);
-                    ruleService.updateBody(ruleId, ruleBody);
+                    ruleService.updateBody(rule);
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case DEL_RULE:

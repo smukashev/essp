@@ -113,8 +113,8 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public void updateBody(Long ruleId, String body) {
-        ruleDao.updateBody(ruleId,body);
+    public void updateBody(Rule rule) {
+        ruleDao.updateBody(rule);
     }
 
     @Override

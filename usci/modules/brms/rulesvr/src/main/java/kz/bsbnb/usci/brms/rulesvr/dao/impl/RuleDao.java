@@ -283,9 +283,32 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
     }
 
     @Override
-    public void updateBody(Long ruleId, String body) {
-        String sql = "UPDATE " + PREFIX_ + "rules SET rule = ? WHERE id=?";
-        jdbcTemplate.update(sql, new Object[]{body, ruleId});
+    public void updateBody(Rule rule) {
+        /*String sql = "UPDATE " + PREFIX_ + "rules SET rule = ? WHERE id=?";
+        jdbcTemplate.update(sql, new Object[]{body, rule});*/
+
+        Select select = context.select(LOGIC_RULES.ID)
+                .from(LOGIC_RULES)
+                .where(LOGIC_RULES.ID.eq(rule.getId()))
+                .and(LOGIC_RULES.OPEN_DATE.eq(DataUtils.convert(rule.getOpenDate())));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        Table table = LOGIC_RULES;
+        Field field = LOGIC_RULES.ID;
+
+        if(rows.size() < 1) {
+            table = LOGIC_RULES_HIS;
+            field = LOGIC_RULES_HIS.RULE_ID;
+        }
+
+        Update update = context.update(table).
+                set(DSL.field("RULE"), rule.getRule())
+                .where(field.eq(rule.getId()))
+                .and(DSL.field("OPEN_DATE").eq(rule.getOpenDate()));
+
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+
     }
 
     @Override

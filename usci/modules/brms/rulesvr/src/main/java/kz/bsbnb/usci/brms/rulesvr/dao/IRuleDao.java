@@ -22,7 +22,7 @@ public interface IRuleDao extends IDao{
     boolean deleteRule(long ruleId, RulePackage rulePackage);
     void save(long ruleId, long BatchVersionId);
     long createEmptyRule(String title);
-    void updateBody(Long ruleId, String body);
+    void updateBody(Rule rule);
     void copyExistingRule(long ruleId, long batchVersionId);
     long createCopy(long ruleId, String title);
     long createRule(Rule rule, PackageVersion packageVersion);
