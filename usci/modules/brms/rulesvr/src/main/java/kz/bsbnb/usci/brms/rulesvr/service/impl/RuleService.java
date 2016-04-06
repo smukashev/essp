@@ -96,8 +96,8 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public Rule getRule(Long ruleId) {
-        return ruleDao.getRule(ruleId);
+    public Rule getRule(Rule rule) {
+        return ruleDao.getRule(rule);
     }
 
     @Override
@@ -234,7 +234,7 @@ public class RuleService implements IRuleService {
 
     @Override
     public boolean insertHistory(Rule rule) {
-        Rule ruleInDb = ruleDao.getRule(rule.getId());
+        Rule ruleInDb = ruleDao.getRule(rule);
 
         if(ruleInDb.getOpenDate().compareTo(rule.getOpenDate()) >=0 )
             throw new RuntimeException("Дата должна быть позднее");

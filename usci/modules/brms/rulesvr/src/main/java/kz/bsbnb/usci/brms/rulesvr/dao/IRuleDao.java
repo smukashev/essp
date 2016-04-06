@@ -18,7 +18,7 @@ public interface IRuleDao extends IDao{
     long update(Rule rule);
     List<Rule> getAllRules();
     List<SimpleTrack> getRuleTitles(Long packageId, Date repDate);
-    Rule getRule(Long ruleId);
+    Rule getRule(Rule rule);
     boolean deleteRule(long ruleId, RulePackage rulePackage);
     void save(long ruleId, long BatchVersionId);
     long createEmptyRule(String title);

@@ -39,10 +39,10 @@ public interface IRuleService {
     /**
      * Retrieves single rule by ruleId
      *
-     * @param ruleId
+     * @param rule
      * @return
      */
-    public Rule getRule(Long ruleId);
+    public Rule getRule(Rule rule);
 
 
     public boolean deleteRule(long ruleId, RulePackage rulePackage);

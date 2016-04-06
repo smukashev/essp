@@ -196,12 +196,28 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
     }
 
     @Override
-    public Rule getRule(Long ruleId) {
+    public Rule getRule(Rule rule) {
+
+        if(rule.getId()< 1 || rule.getOpenDate() == null)
+            throw new RuntimeException("Ид или отчетная дата указаны неверно");
+
+        Table ruleHistory = getRuleHistoryTable();
+
+        Select select = context.selectFrom(ruleHistory)
+                .where(ruleHistory.field("ID").eq(rule.getId()))
+                .and(ruleHistory.field("OPEN_DATE").lessOrEqual(rule.getOpenDate()))
+                .and(ruleHistory.field("CLOSE_DATE").greaterThan(rule.getOpenDate()).or(ruleHistory.field("CLOSE_DATE").isNull()));
+
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        return getRule(rows.iterator().next());
+        /*
         String SQL = "SELECT * FROM " + PREFIX_ + "rules WHERE id = ?";
-        List<Rule> rules = jdbcTemplate.query(SQL, new Object[]{ruleId}, new BeanPropertyRowMapper<Rule>(Rule.class));
+        List<Rule> rules = jdbcTemplate.query(SQL, new Object[]{rule}, new BeanPropertyRowMapper<Rule>(Rule.class));
         if(rules.size() > 1)
             throw new RuntimeException(Errors.getMessage(Errors.E264));
-        return rules.get(0);
+        return rules.get(0);*/
     }
 
     @Override
@@ -401,18 +417,22 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
 
         long t = 1;
         for(Map<String,Object> row : rows) {
-            Rule rule = new Rule();
-            //id - уникальный, требование extjs грида
-            //rule.setId(((BigDecimal) row.get(LOGIC_RULES.ID.getName())).longValue());
-            rule.setId(t++);
-            rule.setRule(((String) row.get(LOGIC_RULES.RULE.getName())));
-            rule.setOpenDate(((Date) row.get(LOGIC_RULES.OPEN_DATE.getName())));
-            rule.setTitle(((String) row.get(LOGIC_RULES.TITLE.getName())));
-            rule.setCloseDate((Date) row.get(LOGIC_RULES.CLOSE_DATE.getName()));
+            Rule rule = getRule(row);
+            rule.setId(t++ );
             ruleList.add(rule);
         }
         
         return ruleList;
+    }
+
+    private Rule getRule(Map<String,Object> row){
+        Rule rule = new Rule();
+        rule.setId(((BigDecimal) row.get(LOGIC_RULES.ID.getName())).longValue());
+        rule.setRule(((String) row.get(LOGIC_RULES.RULE.getName())));
+        rule.setOpenDate(((Date) row.get(LOGIC_RULES.OPEN_DATE.getName())));
+        rule.setTitle(((String) row.get(LOGIC_RULES.TITLE.getName())));
+        rule.setCloseDate((Date) row.get(LOGIC_RULES.CLOSE_DATE.getName()));
+        return rule;
     }
 
     private Table getRuleHistoryTable(){

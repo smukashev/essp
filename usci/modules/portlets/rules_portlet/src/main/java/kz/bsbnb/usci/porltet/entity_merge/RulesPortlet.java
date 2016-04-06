@@ -181,8 +181,12 @@ public class RulesPortlet extends MVCPortlet{
                         writer.write(JsonMaker.getJson(ruleService.getRuleTitles(packageId,date)));
                     break;
                 case GET_RULE:
+                    date = df.parse(resourceRequest.getParameter("date"));
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
-                    writer.write(JsonMaker.getJson(ruleService.getRule(ruleId)));
+                    Rule rule = new Rule();
+                    rule.setId(ruleId);
+                    rule.setOpenDate(date);
+                    writer.write(JsonMaker.getJson(ruleService.getRule(rule)));
                     break;
                 case UPDATE_RULE:
                     getWriteAccess(resourceRequest);
@@ -304,7 +308,7 @@ public class RulesPortlet extends MVCPortlet{
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
                     ruleBody = resourceRequest.getParameter("ruleBody");
-                    Rule rule = new Rule("", ruleBody, date);
+                    rule = new Rule("", ruleBody, date);
                     rule.setId(ruleId);
                     ruleService.insertHistory(rule);
                     break;

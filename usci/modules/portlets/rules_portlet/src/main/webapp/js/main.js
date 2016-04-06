@@ -166,7 +166,8 @@ function initGrid(){
                     waitMsg: 'adding',
                     params : {
                         op : 'GET_RULE',
-                        ruleId: newValue.data.id
+                        ruleId: newValue.data.id,
+                        date: Ext.getCmp('elemPackageVersionCombo').value
                     },
                     reader: {
                         type: 'json'
