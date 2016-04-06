@@ -96,8 +96,19 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
         if (rule.getId() < 1){
             throw new IllegalArgumentException(Errors.getMessage(Errors.E266));
         }
-        String SQL = "UPDATE " + PREFIX_ + "rules SET title=?, rule=? WHERE id=?";
+
+        Update update = context.update(LOGIC_RULES)
+                .set(LOGIC_RULES.TITLE, rule.getTitle())
+                .set(LOGIC_RULES.RULE, rule.getRule())
+                .set(LOGIC_RULES.OPEN_DATE, DataUtils.convert(rule.getOpenDate()))
+                .where(LOGIC_RULES.ID.eq(rule.getId()));
+
+        /*String SQL = "UPDATE " + PREFIX_ + "rules SET title=?, rule=? WHERE id=?";
         jdbcTemplate.update(SQL,rule.getTitle(),rule.getRule(),rule.getId());
+        return rule.getId();*/
+
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+
         return rule.getId();
     }
 
@@ -363,5 +374,17 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
         });
 
         return ret;
+    }
+
+    @Override
+    public void insertHistory(Rule rule, Date closeDate) {
+        Insert insert = context.insertInto(LOGIC_RULES_HIS)
+                .set(LOGIC_RULES_HIS.RULE_ID, rule.getId())
+                .set(LOGIC_RULES_HIS.TITLE, rule.getTitle())
+                .set(LOGIC_RULES_HIS.RULE, rule.getRule())
+                .set(LOGIC_RULES_HIS.OPEN_DATE, DataUtils.convert(rule.getOpenDate()))
+                .set(LOGIC_RULES_HIS.CLOSE_DATE, DataUtils.convert(closeDate));
+
+        updateWithStats(insert.getSQL(), insert.getBindValues().toArray());
     }
 }

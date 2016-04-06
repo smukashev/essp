@@ -122,7 +122,8 @@ public class RulesPortlet extends MVCPortlet{
         DEL_CLASS,
         SAVE_ATTR,
         GET_ATTR,
-        DEL_ATTR
+        DEL_ATTR,
+        NEW_RULE_HISTORY;
     }
 
     public void getWriteAccess(ResourceRequest resourceRequest){
@@ -298,6 +299,13 @@ public class RulesPortlet extends MVCPortlet{
                     packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
                     date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
                     ruleService.insertBatchVersion(packageId, date);
+                    break;
+                case NEW_RULE_HISTORY:
+                    getWriteAccess(resourceRequest);
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
+                    ruleBody = resourceRequest.getParameter("ruleBody");
+                    ruleService.insertHistory(new Rule("", ruleBody, date));
                     break;
                 default:
                     logger.error(Errors.getMessage(Errors.E118, operationType));

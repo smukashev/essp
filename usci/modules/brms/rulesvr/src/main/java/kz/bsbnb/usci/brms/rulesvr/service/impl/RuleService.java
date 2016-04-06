@@ -232,6 +232,19 @@ public class RuleService implements IRuleService {
         return rulesSingleton.getPackageErrorsOnRuleInsert(packageVersion, title, ruleBody);
     }
 
+    @Override
+    public boolean insertHistory(Rule rule) {
+        Rule ruleInDb = ruleDao.getRule(rule.getId());
+
+        if(ruleInDb.getOpenDate().compareTo(rule.getOpenDate()) >=0 )
+            throw new RuntimeException("Дата должна быть позднее");
+
+        ruleDao.insertHistory(ruleInDb, ruleInDb.getOpenDate());
+        ruleDao.update(rule);
+
+        return true;
+    }
+
     //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;
 //    }

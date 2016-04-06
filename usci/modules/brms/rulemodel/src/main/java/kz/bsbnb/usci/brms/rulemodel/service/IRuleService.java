@@ -117,6 +117,8 @@ public interface IRuleService {
 
     String getPackageErrorsOnRuleInsert(PackageVersion packageVersion, String title, String ruleBody);
 
+    public boolean insertHistory(Rule rule);
+
     /**
      * =============================
      *   Developer tools

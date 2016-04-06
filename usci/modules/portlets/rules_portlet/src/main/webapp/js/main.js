@@ -333,13 +333,14 @@ function initGrid(){
                     });
                 }
             },{
-                text: 'копировать',
-                id: 'btnCopy',
+                text: 'история',
+                id: 'btnHistory',
                 icon: contextPathUrl + '/pics/copy2.png',
                 hidden: readOnly,
                 //disabled: true,
                 handler: function(){
-                    createRuleForm().show();
+                    //createRuleForm().show();
+                    historyForm().show();
                 }
             },{
                 text: 'обновить',
@@ -422,7 +423,7 @@ function reset(){
     Ext.getCmp('btnCancel').setDisabled(true);
     Ext.getCmp('btnSave').setDisabled(true);
     Ext.getCmp('btnDel').setDisabled(true);
-    Ext.getCmp('btnCopy').setDisabled(true);
+    //Ext.getCmp('btnCopy').setDisabled(true);
     ruleListGrid.store.loadData([],false);
 }
 
@@ -450,14 +451,14 @@ function updateRules(searchText){
                     reset();
                 }else{
                     editor.batchVersionId = Ext.decode(b.response.responseText).batchVersionId;
-                    Ext.getCmp('btnCopy').setDisabled(false);
+                    //Ext.getCmp('btnCopy').setDisabled(false);
                 }
             },
             scope: this
         }
     );
 
-    Ext.getCmp('btnCopy').setDisabled(false);
+    //Ext.getCmp('btnCopy').setDisabled(false);
     ruleListGrid.getView().refresh();
 }
 

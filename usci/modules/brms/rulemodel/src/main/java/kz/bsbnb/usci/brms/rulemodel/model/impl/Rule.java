@@ -10,7 +10,7 @@ import java.util.Date;
  * @author abukabayev
  */
 public class Rule extends Persistable implements IRule, Serializable {
-    private static final long serialVersionId = 1L;
+    private static final long serialVersionUID = 1L;
     private String rule;
     private String title;
     private boolean isActive;
@@ -23,6 +23,12 @@ public class Rule extends Persistable implements IRule, Serializable {
     public Rule(String title, String rule){
         this.title = title;
         this.rule = rule;
+    }
+
+    public Rule(String title, String rule, Date openDate) {
+        this.title = title;
+        this.rule = rule;
+        this.openDate = openDate;
     }
 
     public Rule(String rule){
