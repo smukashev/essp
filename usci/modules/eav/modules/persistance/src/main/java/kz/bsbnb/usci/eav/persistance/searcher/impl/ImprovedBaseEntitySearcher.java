@@ -128,7 +128,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 if (baseValue == null || baseValue.getValue() == null)
                     throw new KnownException(Errors.getMessage(Errors.E177, name, entity.getMeta().getClassName()));
 
-                if ((baseValue == null || baseValue.getValue() == null) && (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY))
+                if (baseValue.getValue() == null && (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY))
                     continue;
 
                 if (!memberType.isSet()) {
@@ -187,8 +187,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                                 .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
                                                 .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).IS_LAST.equal(DataUtils.convert(true))));
 
-                                condition = condition == null ? DSL.exists(select) :
-                                        condition.or(DSL.exists(select));
+                                condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
                             }
                         }
                     }
