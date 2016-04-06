@@ -11,12 +11,12 @@
  v_index_ddl_table string_table := string_table();
  begin
  for rec_table in (select t.table_name, tc.column_name, tg.trigger_name
-                      from user_tab_columns tc, user_tables t, user_triggers tg
-                     where ((t.table_name like 'R_CORE%'
-                       and (tc.column_name = 'OPEN_DATE')))
-                       and tc.table_name = t.table_name
-                       and t.partitioned = 'NO'
-                       and tg.table_name = t.table_name) loop
+                   from user_tab_columns tc, user_tables t, user_triggers tg
+                   where ((t.table_name like 'R_CORE%'
+                           and ((tc.column_name = 'OPEN_DATE') or (tc.COLUMN_NAME='REP_DATE'))))
+                         and tc.table_name = t.table_name
+                         and t.partitioned = 'NO'
+                         and tg.table_name = t.table_name) loop
 
      select dbms_metadata.get_ddl('TABLE', rec_table.table_name, v_schema)
       into v_table_ddl
