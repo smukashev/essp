@@ -28,9 +28,6 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
     private DSLContext context;
 
     @Autowired
-    IBaseEntityProcessorDao baseEntityProcessorDao;
-
-    @Autowired
     private IEavGlobalRepository eavGlobalRepository;
 
     public Long insertReport(Report report, String username) {
@@ -69,31 +66,29 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                     .set(EAV_REPORT.BEG_DATE, DataUtils.convertToTimestamp(report.getBeginningDate()))
                     .set(EAV_REPORT.END_DATE, DataUtils.convertToTimestamp(report.getEndDate()))
                     .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convertToTimestamp(report.getLastManualEditDate()))
-                    .where(EAV_REPORT.USERNAME.equal(username)).
-                            and(EAV_REPORT.REPORT_DATE.eq(DataUtils.convert(report.getBeginningDate())));
+                    .where(EAV_REPORT.USERNAME.equal(username))
+                    .and(EAV_REPORT.REPORT_DATE.eq(DataUtils.convert(report.getBeginningDate())));
 
             updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
             SelectForUpdateStep select = context
                     .select()
                     .from(EAV_REPORT)
-                    .where(EAV_REPORT.USERNAME.equal(username)).
-                            and(EAV_REPORT.REPORT_DATE.eq(DataUtils.convert(report.getBeginningDate())));
+                    .where(EAV_REPORT.USERNAME.equal(username))
+                    .and(EAV_REPORT.REPORT_DATE.eq(DataUtils.convert(report.getBeginningDate())));
 
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-            for (Map<String, Object> row : rows) {
-                reportId = ((BigDecimal) row.get(EAV_REPORT.ID.getName())).longValue();
-                break;
-            }
+            return ((BigDecimal) rows.get(0).get(EAV_REPORT.ID.getName())).longValue();
         }
 
         return reportId;
     }
 
     public List<Report> getReportsByReportDateAndCreditors(Date reportDate, List<Creditor> creditors) {
-        ArrayList<Report> reports = new ArrayList<Report>();
-        HashMap<Long, Creditor> creditorMap = new HashMap<Long, Creditor>();
+        ArrayList<Report> reports = new ArrayList<>();
+        HashMap<Long, Creditor> creditorMap = new HashMap<>();
+
         for (Creditor creditor : creditors) {
             creditorMap.put(creditor.getId(), creditor);
         }
@@ -120,6 +115,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
             reports.add(report);
 
             EavGlobal global = eavGlobalRepository.getGlobal(report.getStatusId());
+
             {
                 Shared shared = new Shared();
                 shared.setId(global.getId());
@@ -150,9 +146,10 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         Date date = null;
-        if (!rows.isEmpty()) {
+
+        if (!rows.isEmpty())
             date = DataUtils.convert((Timestamp) rows.get(0).get("FIRST_NOT_APPROVED_DATE"));
-        }
+
         return date;
     }
 
@@ -167,14 +164,15 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                 .from(EAV_REPORT)
                 .where(EAV_REPORT.CREDITOR_ID.eq(creditorId))
                 .and(EAV_REPORT.STATUS_ID.eq(completed.getId())
-                        .or(EAV_REPORT.STATUS_ID.eq(organizationApproved.getId())));
+                .or(EAV_REPORT.STATUS_ID.eq(organizationApproved.getId())));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         Date date = null;
-        if (!rows.isEmpty()) {
+
+        if (!rows.isEmpty())
             date = DataUtils.convert((Timestamp) rows.get(0).get("LAST_APPROVED_DATE"));
-        }
+
         return date;
     }
 
@@ -190,9 +188,10 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         Date date = null;
-        if (!rows.isEmpty()) {
+
+        if (!rows.isEmpty())
             date = DataUtils.convert((Timestamp)rows.get(0).get("LAST_REPORT_DATE"));
-        }
+
         return date;
     }
 
@@ -257,35 +256,35 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
     @Override
     public void addNewMessage(ReportMessage message, Report report, List<ReportMessageAttachment> attachments) {
         try {
-            InsertOnDuplicateStep insert = context.insertInto(
-                    EAV_REPORT_MESSAGE,
-                    EAV_REPORT_MESSAGE.REPORT_ID,
-                    EAV_REPORT_MESSAGE.SEND_DATE,
-                    EAV_REPORT_MESSAGE.TEXT,
-                    EAV_REPORT_MESSAGE.USERNAME
-            ).values(report.getId(),
-                    DataUtils.convert(message.getSendDate()),
-                    message.getText(),
-                    message.getUsername());
+            InsertOnDuplicateStep insert = context
+                    .insertInto(
+                        EAV_REPORT_MESSAGE,
+                        EAV_REPORT_MESSAGE.REPORT_ID,
+                        EAV_REPORT_MESSAGE.SEND_DATE,
+                        EAV_REPORT_MESSAGE.TEXT,
+                        EAV_REPORT_MESSAGE.USERNAME)
+                    .values(report.getId(),
+                        DataUtils.convert(message.getSendDate()),
+                        message.getText(),
+                        message.getUsername());
 
             Long messageId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
             for (ReportMessageAttachment attachment : attachments) {
                 insert = context.insertInto(
-                        EAV_REPORT_MESSAGE_ATTACHMENT,
-                        EAV_REPORT_MESSAGE_ATTACHMENT.CONTENT,
-                        EAV_REPORT_MESSAGE_ATTACHMENT.FILENAME,
-                        EAV_REPORT_MESSAGE_ATTACHMENT.REPORT_MESSAGE_ID
-                ).values(attachment.getContent(),
-                        attachment.getFilename(),
-                        messageId);
+                            EAV_REPORT_MESSAGE_ATTACHMENT,
+                            EAV_REPORT_MESSAGE_ATTACHMENT.CONTENT,
+                            EAV_REPORT_MESSAGE_ATTACHMENT.FILENAME,
+                            EAV_REPORT_MESSAGE_ATTACHMENT.REPORT_MESSAGE_ID)
+                        .values(attachment.getContent(),
+                            attachment.getFilename(),
+                            messageId);
+
                 insertWithId(insert.getSQL(), insert.getBindValues().toArray());
             }
         } catch (DuplicateKeyException e) {
             throw new IllegalArgumentException(Errors.getMessage(Errors.E171));
         }
-
-
     }
 
     @Override
@@ -297,9 +296,8 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                 .set(EAV_REPORT.LAST_MANUAL_EDIT_DATE, DataUtils.convertToTimestamp(report.getLastManualEditDate()))
                 .set(EAV_REPORT.END_DATE, DataUtils.convertToTimestamp(report.getEndDate()));
 
-        if (username != null) {
+        if (username != null)
             update.set(EAV_REPORT.USERNAME, username);
-        }
 
         update.where(EAV_REPORT.ID.equal(report.getId()));
 
@@ -317,6 +315,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                 .update(EAV_REPORT)
                 .set(EAV_REPORT.TOTAL_COUNT, totalCount)
                 .where(EAV_REPORT.ID.equal(reportId));
+
         updateWithStats(update.getSQL(), update.getBindValues().toArray());
     }
 
@@ -344,8 +343,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
         report.setActualCount(((BigDecimal) row.get(EAV_REPORT.ACTUAL_COUNT.getName())).longValue());
         report.setBeginningDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.BEG_DATE.getName())));
         report.setEndDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.END_DATE.getName())));
-        report.setLastManualEditDate(DataUtils.convertToTimestamp((Timestamp)
-                row.get(EAV_REPORT.LAST_MANUAL_EDIT_DATE.getName())));
+        report.setLastManualEditDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.LAST_MANUAL_EDIT_DATE.getName())));
 
         report.setStatusId(((BigDecimal) row.get(EAV_REPORT.STATUS_ID.getName())).longValue());
         report.setReportDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.REPORT_DATE.getName())));

@@ -10,12 +10,10 @@ import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
 @Component
 public class ShowcaseMessageProducer {
-
     final static Logger logger = Logger.getLogger(ShowcaseMessageProducer.class);
 
     private JmsTemplate jmsTemplate;
@@ -34,8 +32,7 @@ public class ShowcaseMessageProducer {
             MessageCreator mc = new MessageCreator() {
                 public Message createMessage(Session session) throws JMSException {
                     try {
-                        ObjectMessage message = session.createObjectMessage(queueEntry);
-                        return message;
+                        return session.createObjectMessage(queueEntry);
                     }
                     catch (JMSException je) {
                         logger.error("JMS Exception : ", je);

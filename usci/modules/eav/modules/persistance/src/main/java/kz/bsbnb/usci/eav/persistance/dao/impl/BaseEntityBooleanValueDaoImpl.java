@@ -10,7 +10,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityBooleanValueDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
@@ -37,9 +36,6 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
     @Autowired
     private DSLContext context;
 
-    @Autowired
-    IBatchRepository batchRepository;
-
     @Override
     public long insert(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
@@ -58,7 +54,8 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         return baseValueId;
     }
 
-    protected long insert(long baseEntityId, long creditorId, long metaAttributeId, Date reportDate, Object value, boolean closed, boolean last) {
+    protected long insert(long baseEntityId, long creditorId, long metaAttributeId, Date reportDate, Object value,
+                          boolean closed, boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_BOOLEAN_VALUES)
                 .set(EAV_BE_BOOLEAN_VALUES.ENTITY_ID, baseEntityId)
@@ -86,7 +83,8 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 baseValue.isLast());
     }
 
-    protected void update(long id, long baseEntityId, long creditorId, long metaAttributeId, Date reportDate, Object value, boolean closed, boolean last) {
+    protected void update(long id, long baseEntityId, long creditorId, long metaAttributeId, Date reportDate,
+                          Object value, boolean closed, boolean last) {
         String tableAlias = "sv";
         Update update = context
                 .update(EAV_BE_BOOLEAN_VALUES.as(tableAlias))

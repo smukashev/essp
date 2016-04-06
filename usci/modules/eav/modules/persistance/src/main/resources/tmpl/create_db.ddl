@@ -171,19 +171,19 @@
 			<unique-column name="report_date"/>
 		</unique>
     <!-- closed value -->
-		<!--<index name="ebbv_IN_ei_ai_ci_rd_ic">
+		<index name="ebbv_IN_ei_ai_ci_rd_ic">
 			<index-column name="entity_id"/>
 			<index-column name="attribute_id"/>
 			<index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="is_closed"/>
-		</index>-->
+		</index>
     <!-- last value -->
 		<index name="ebbv_IN_ei_ai_ci_il">
 			<index-column name="entity_id"/>
       <index-column name="creditor_id"/>
       <index-column name="attribute_id"/>
-			<!--<index-column name="is_last"/>-->
+			<index-column name="is_last"/>
 		</index>
     <!-- load values -->
 		<index name="ebbv_IN_ei_rd">
@@ -195,8 +195,8 @@
       <index-column name="creditor_id"/>
       <index-column name="attribute_id"/>
 			<index-column name="value"/>
-      <!--<index-column name="is_closed"/>-->
-      <!--<index-column name="is_last"/>-->
+      <index-column name="is_closed"/>
+      <index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_complex_set_values">
@@ -236,6 +236,7 @@
 			<index-column name="entity_value_id"/>
 			<index-column name="is_last"/>
 		</index>
+		<!-- improved searcher -->
 		<index name="ebcsv_IN_si_ci_v_il_ic">
 			<index-column name="set_id"/>
 			<index-column name="creditor_id"/>
@@ -929,7 +930,7 @@
   </table>
 	<table name="eav_optimizer">
 	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
-	  <column name="creditor_id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false" />
 	  <column name="meta_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 	  <column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 	  <column name="key_string" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>

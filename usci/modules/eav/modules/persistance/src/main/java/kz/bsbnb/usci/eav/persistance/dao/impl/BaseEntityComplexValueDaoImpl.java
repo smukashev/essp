@@ -39,16 +39,10 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     private DSLContext context;
 
     @Autowired
-    IBatchRepository batchRepository;
+    private IBaseEntityDao baseEntityDao;
 
     @Autowired
-    IBaseEntityDao baseEntityDao;
-
-    @Autowired
-    IBaseEntityProcessorDao baseEntityProcessorDao;
-
-    @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
+    private IBaseEntityLoadDao baseEntityLoadDao;
 
     @Override
     public long insert(IPersistable persistable) {
@@ -135,9 +129,9 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         IBaseValue nextBaseValue = null;
 
         String tableAlias = "bv";
-        String subqueryAlias = "bvn";
+        String subQueryAlias = "bvn";
 
-        Table subqueryTable = context
+        Table subQueryTable = context
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).ID,
@@ -152,17 +146,17 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
 
-                .asTable(subqueryAlias);
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_COMPLEX_VALUES.ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.CREDITOR_ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_COMPLEX_VALUES.ID),
+                        subQueryTable.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_COMPLEX_VALUES.CREDITOR_ID),
+                        subQueryTable.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
+                        subQueryTable.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());
@@ -233,9 +227,9 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         IBaseValue previousBaseValue = null;
 
         String tableAlias = "bv";
-        String subqueryAlias = "bvn";
+        String subQueryAlias = "bvn";
 
-        Table subqueryTable = context
+        Table subQueryTable = context
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.desc()).as("num_pp"),
                         EAV_BE_COMPLEX_VALUES.as(tableAlias).ID,
@@ -249,17 +243,17 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_COMPLEX_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
-                .asTable(subqueryAlias);
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_COMPLEX_VALUES.ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.CREDITOR_ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_COMPLEX_VALUES.ID),
+                        subQueryTable.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_COMPLEX_VALUES.CREDITOR_ID),
+                        subQueryTable.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
+                        subQueryTable.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());
@@ -574,7 +568,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     public Set<Long> getChildBaseEntityIdsWithoutRefs(long parentBaseEntityId) {
-        Set<Long> baseEntityIds = new HashSet<Long>();
+        Set<Long> baseEntityIds = new HashSet<>();
 
         String entitiesTableAlias = "e";
         String classesTableAlias = "c";
@@ -585,8 +579,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .join(EAV_M_CLASSES.as(classesTableAlias))
                 .on(EAV_BE_ENTITIES.as(entitiesTableAlias).CLASS_ID.equal(EAV_M_CLASSES.as(classesTableAlias).ID))
                 .join(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                .on(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID
-                        .equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
+                .on(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
                 .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.equal(parentBaseEntityId))
                 .and(EAV_M_CLASSES.as(classesTableAlias).IS_REFERENCE.equal(DataUtils.convert(false)))
                 .groupBy(EAV_BE_ENTITIES.as(entitiesTableAlias).ID);
@@ -596,8 +589,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
         if (rows.size() > 0) {
             for (Map<String, Object> row : rows) {
-                long childBaseEntityId = ((BigDecimal) row
-                        .get(EAV_BE_ENTITIES.ID.getName())).longValue();
+                long childBaseEntityId = ((BigDecimal) row.get(EAV_BE_ENTITIES.ID.getName())).longValue();
                 baseEntityIds.add(childBaseEntityId);
             }
         }

@@ -338,7 +338,7 @@ public enum Errors {
         errors.put("E283", "Метакласс не содержит атрибутов");//MetaClass with no members
         errors.put("E284", "Неизвестный тип;");
         errors.put("E285", "Ключевые простые массивы не поддерживются;");
-        errors.put("E286", "");
+        errors.put("E286", "Не получилось отправить в витрину;");
         errors.put("E287", "");
         errors.put("E288", "");
         errors.put("E289", "");

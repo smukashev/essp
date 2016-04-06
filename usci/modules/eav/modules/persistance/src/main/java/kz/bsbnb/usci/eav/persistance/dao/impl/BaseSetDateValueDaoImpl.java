@@ -212,8 +212,8 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         IBaseValue nextBaseValue = null;
 
         String tableAlias = "bsv";
-        String subqueryAlias = "bsvn";
-        Table subqueryTable = context
+        String subQueryAlias = "bsvn";
+        Table subQueryTable = context
                 .select(DSL.rank()
                                 .over().orderBy(EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).ID,
@@ -225,15 +225,15 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
                 .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).VALUE.equal(DataUtils.convert((Date) baseValue.getValue())))
                 .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
-                .asTable(subqueryAlias);
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_DATE_SET_VALUES.ID),
-                        subqueryTable.field(EAV_BE_DATE_SET_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_DATE_SET_VALUES.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_DATE_SET_VALUES.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_DATE_SET_VALUES.ID),
+                        subQueryTable.field(EAV_BE_DATE_SET_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_DATE_SET_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_DATE_SET_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());

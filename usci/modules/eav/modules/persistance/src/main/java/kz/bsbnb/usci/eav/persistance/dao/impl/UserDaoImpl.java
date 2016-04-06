@@ -37,17 +37,15 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
     private DSLContext context;
 
     @Autowired
-    IBaseEntityProcessorDao baseEntityProcessorDao;
-
-    @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
+    private IBaseEntityLoadDao baseEntityLoadDao;
 
     @Override
     public boolean hasPortalUserCreditor(long userId, long creditorId) {
         SelectForUpdateStep select;
 
-        select = context.select(EAV_A_CREDITOR_USER.ID).from(EAV_A_CREDITOR_USER).
-                where(EAV_A_CREDITOR_USER.USER_ID.eq(userId)).and(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(creditorId));
+        select = context.select(EAV_A_CREDITOR_USER.ID)
+                .from(EAV_A_CREDITOR_USER)
+                .where(EAV_A_CREDITOR_USER.USER_ID.eq(userId)).and(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(creditorId));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
@@ -59,17 +57,17 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
         InsertOnDuplicateStep insert = context.insertInto(
                 EAV_A_CREDITOR_USER,
                 EAV_A_CREDITOR_USER.USER_ID,
-                EAV_A_CREDITOR_USER.CREDITOR_ID
-        ).values(userId, creditorId);
+                EAV_A_CREDITOR_USER.CREDITOR_ID)
+                .values(userId, creditorId);
 
         insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     @Override
     public void unsetPortalUserCreditors(long userId, long creditorId) {
-        DeleteConditionStep deleteFilter = context.delete(EAV_A_CREDITOR_USER).
-                where(EAV_A_CREDITOR_USER.USER_ID.eq(userId)).
-                and(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(creditorId));
+        DeleteConditionStep deleteFilter = context.delete(EAV_A_CREDITOR_USER)
+                .where(EAV_A_CREDITOR_USER.USER_ID.eq(userId))
+                .and(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(creditorId));
 
         jdbcTemplate.update(deleteFilter.getSQL(), deleteFilter.getBindValues().toArray());
     }
@@ -80,8 +78,9 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
 
         SelectForUpdateStep select;
 
-        select = context.select(EAV_A_CREDITOR_USER.CREDITOR_ID).from(EAV_A_CREDITOR_USER).
-                where(EAV_A_CREDITOR_USER.USER_ID.eq(userId));
+        select = context.select(EAV_A_CREDITOR_USER.CREDITOR_ID)
+                .from(EAV_A_CREDITOR_USER)
+                .where(EAV_A_CREDITOR_USER.USER_ID.eq(userId));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
@@ -143,21 +142,26 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
 
                 for (String s : stEntity.getAttributes()) {
                     Object obj = stEntity.getBaseValue(s).getValue();
-                    if (obj == null) {
+
+                    if (obj == null)
                         continue;
-                    }
-                    if (s.equals("code")) {
-                        st.setCode((String) obj);
-                    } else if (s.equals("name_ru")) {
-                        st.setNameRu((String) obj);
-                    } else if (s.equals("name_kz")) {
-                        st.setNameKz((String) obj);
-                    } else if (s.equals("kind_id")) {
-//                        Shared kind = new Shared();
-//                        kind.setId(((Integer) obj).longValue());
-//                        st.setKind(kind);
-                    } else if (s.equals("report_period_duration_months")) {
-                        st.setReportPeriodDurationMonths((Integer) obj);
+
+                    switch (s) {
+                        case "code":
+                            st.setCode((String) obj);
+                            break;
+                        case "name_ru":
+                            st.setNameRu((String) obj);
+                            break;
+                        case "name_kz":
+                            st.setNameKz((String) obj);
+                            break;
+                        case "kind_id":
+
+                            break;
+                        case "report_period_duration_months":
+                            st.setReportPeriodDurationMonths((Integer) obj);
+                            break;
                     }
                 }
             } else {
@@ -215,9 +219,8 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
         Set<Long> toUpdate = SetUtils.intersection(usersFromPortal.keySet(), usersFromDB.keySet());
 
         for (Long id : toDelete) {
-            DeleteConditionStep deleteFilter =
-                    context.delete(EAV_A_CREDITOR_USER).
-                            where(EAV_A_CREDITOR_USER.USER_ID.eq(id));
+            DeleteConditionStep deleteFilter = context.delete(EAV_A_CREDITOR_USER)
+                    .where(EAV_A_CREDITOR_USER.USER_ID.eq(id));
 
             jdbcTemplate.update(deleteFilter.getSQL(), deleteFilter.getBindValues().toArray());
 
@@ -230,23 +233,22 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
             PortalUser pu = usersFromPortal.get(id);
 
             InsertOnDuplicateStep insert = context.insertInto(
-                    EAV_A_USER,
-                    EAV_A_USER.USER_ID,
-                    EAV_A_USER.FIRST_NAME,
-                    EAV_A_USER.LAST_NAME,
-                    EAV_A_USER.MIDDLE_NAME,
-                    EAV_A_USER.SCREEN_NAME,
-                    EAV_A_USER.EMAIL,
-                    EAV_A_USER.MODIFIED_DATE
-            ).values(
-                    pu.getUserId(),
-                    pu.getFirstName(),
-                    pu.getLastName(),
-                    pu.getMiddleName(),
-                    pu.getScreenName(),
-                    pu.getEmailAddress(),
-                    DataUtils.convert(pu.getModifiedDate())
-            );
+                        EAV_A_USER,
+                        EAV_A_USER.USER_ID,
+                        EAV_A_USER.FIRST_NAME,
+                        EAV_A_USER.LAST_NAME,
+                        EAV_A_USER.MIDDLE_NAME,
+                        EAV_A_USER.SCREEN_NAME,
+                        EAV_A_USER.EMAIL,
+                        EAV_A_USER.MODIFIED_DATE)
+                    .values(
+                        pu.getUserId(),
+                        pu.getFirstName(),
+                        pu.getLastName(),
+                        pu.getMiddleName(),
+                        pu.getScreenName(),
+                        pu.getEmailAddress(),
+                        DataUtils.convert(pu.getModifiedDate()));
 
             insertWithId(insert.getSQL(), insert.getBindValues().toArray());
         }
@@ -351,10 +353,7 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
                 .where(root.field(EAV_A_USER.IS_ACTIVE).eq(DataUtils.convert(true))
                         .and(creditors.field(EAV_A_CREDITOR_USER.CREDITOR_ID).eq(creditor.getId())));
 
-
-        List<PortalUser> ret = jdbcTemplate.query(select.getSQL(),
+        return jdbcTemplate.query(select.getSQL(),
                 select.getBindValues().toArray(), new BeanPropertyRowMapper(PortalUser.class));
-
-        return ret;
     }
 }

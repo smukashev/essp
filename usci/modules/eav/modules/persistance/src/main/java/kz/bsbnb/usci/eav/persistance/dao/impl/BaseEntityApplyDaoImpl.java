@@ -2217,6 +2217,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     @Transactional
     public void applyToDb(IBaseEntityManager baseEntityManager) {
+        long applyToDbTime = System.currentTimeMillis();
         for (int i = 0; i < BaseEntityManager.CLASS_PRIORITY.size(); i++) {
             Class objectClass = BaseEntityManager.CLASS_PRIORITY.get(i);
             List<IPersistable> insertedObjects = baseEntityManager.getInsertedObjects(objectClass);
@@ -2294,6 +2295,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             eod.setId(eavOptimizerDao.find(entry.getValue().getId()));
             eavOptimizerDao.update(eod);
         }
+        sqlStats.put("java::applyToDb", (System.currentTimeMillis() - applyToDbTime));
     }
 
     private Object returnCastedValue(IMetaValue metaValue, IBaseValue baseValue) {
