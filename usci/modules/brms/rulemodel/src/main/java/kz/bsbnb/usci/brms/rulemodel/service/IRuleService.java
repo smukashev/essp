@@ -119,6 +119,8 @@ public interface IRuleService {
 
     public boolean insertHistory(Rule rule);
 
+    List<Rule> getRuleHistory(long ruleId);
+
     /**
      * =============================
      *   Developer tools

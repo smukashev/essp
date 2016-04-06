@@ -340,7 +340,7 @@ function initGrid(){
                 //disabled: true,
                 handler: function(){
                     //createRuleForm().show();
-                    historyForm().show();
+                    historyForm(ruleListGrid.getSelectionModel().getLastSelected().data.id).show();
                 }
             },{
                 text: 'обновить',

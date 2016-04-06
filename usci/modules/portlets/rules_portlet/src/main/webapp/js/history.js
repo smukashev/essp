@@ -1,42 +1,51 @@
 var historyEditor;
 
-function historyForm(){
-    var cars = [
-        [10, '01.02.2001', ''],
-        [15, '01.01.2001', '01.02.2001']
-    ];
+function historyForm(ruleId){
 
-    var carsStore = Ext.create('Ext.data.ArrayStore', {
-        fields: ['id','open_date','close_date'],
-        data: cars
-    });
-    /*
-    var store = Ext.create('Ext.data.ArrayStore', {
-        fields: ['id','open_date','close_date'],
+    var historyStore = Ext.create('Ext.data.ArrayStore', {
+        fields: ['openDate','closeDate','rule'],
         proxy: {
             type: 'ajax',
             url : dataUrl,
+            extraParams: {
+                op: 'RULE_HISTORY',
+                ruleId: ruleId
+            },
             reader: {
                 type: 'json',
                 root: 'data'
             }
+        },
+        autoLoad: true,
+        listeners: {
+          load: function(me, records, success, eOpts){
+             historyEditor.setValue(records[0].data.rule, -1)
+          }
         }
         //data: myData
-    });*/
+    });
 
     ruleHistoryGrid = Ext.create('Ext.grid.Panel', {
-        store: carsStore,
+        store: historyStore,
         columns: [
             {
                 text: 'Дата открытия',
                 width: '50%',
-                dataIndex: 'open_date'
+                dataIndex: 'openDate',
+                renderer: Ext.util.Format.dateRenderer('d.m.Y')
             },
             {
                 text: 'Дата закрытия',
                 width: '50%',
-                dataIndex: 'close_date'
-            }]
+                dataIndex: 'closeDate',
+                renderer: Ext.util.Format.dateRenderer('d.m.Y')
+            }],
+         listeners: {
+           cellclick: function(grid, td, cellIndex, newValue, tr, rowIndex, e, eOpts) {
+              //console.log(newValue.data.rule);
+              historyEditor.setValue(newValue.data.rule, -1);
+           }
+         }
     });
 
     return new Ext.Window({

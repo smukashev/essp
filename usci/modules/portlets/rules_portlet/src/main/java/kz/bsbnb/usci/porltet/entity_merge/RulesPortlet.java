@@ -18,7 +18,6 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.porltet.entity_merge.model.json.JsonMaker;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -123,7 +122,7 @@ public class RulesPortlet extends MVCPortlet{
         SAVE_ATTR,
         GET_ATTR,
         DEL_ATTR,
-        NEW_RULE_HISTORY;
+        NEW_RULE_HISTORY, RULE_HISTORY;
     }
 
     public void getWriteAccess(ResourceRequest resourceRequest){
@@ -305,7 +304,13 @@ public class RulesPortlet extends MVCPortlet{
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
                     ruleBody = resourceRequest.getParameter("ruleBody");
-                    ruleService.insertHistory(new Rule("", ruleBody, date));
+                    Rule rule = new Rule("", ruleBody, date);
+                    rule.setId(ruleId);
+                    ruleService.insertHistory(rule);
+                    break;
+                case RULE_HISTORY:
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    writer.write(JsonMaker.getJson(ruleService.getRuleHistory(ruleId)));
                     break;
                 default:
                     logger.error(Errors.getMessage(Errors.E118, operationType));

@@ -245,6 +245,11 @@ public class RuleService implements IRuleService {
         return true;
     }
 
+    @Override
+    public List<Rule> getRuleHistory(long ruleId) {
+        return ruleDao.getRuleHistory(ruleId);
+    }
+
     //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;
 //    }

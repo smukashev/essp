@@ -15,6 +15,7 @@ public class Rule extends Persistable implements IRule, Serializable {
     private String title;
     private boolean isActive;
     protected Date openDate;
+    protected Date closeDate;
 
     public Rule(){
 
@@ -65,5 +66,11 @@ public class Rule extends Persistable implements IRule, Serializable {
 
     public void setOpenDate(Date openDate) {
         this.openDate = openDate;
+    }
+
+    public Date getCloseDate() {return closeDate; }
+
+    public void setCloseDate(Date closeDate) {
+        this.closeDate = closeDate;
     }
 }

@@ -8,6 +8,7 @@ import kz.bsbnb.usci.brms.rulesvr.persistable.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -386,5 +387,43 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
                 .set(LOGIC_RULES_HIS.CLOSE_DATE, DataUtils.convert(closeDate));
 
         updateWithStats(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    @Override
+    public List<Rule> getRuleHistory(long ruleId) {
+
+        Select ruleSelect = context.select(LOGIC_RULES.ID,
+                LOGIC_RULES.RULE,
+                LOGIC_RULES.TITLE,
+                LOGIC_RULES.OPEN_DATE,
+                LOGIC_RULES.CLOSE_DATE)
+                .from(LOGIC_RULES);
+
+        Select ruleHistorySelect = context.select(LOGIC_RULES_HIS.RULE_ID.as("ID"),
+                LOGIC_RULES_HIS.RULE,
+                LOGIC_RULES_HIS.TITLE,
+                LOGIC_RULES_HIS.OPEN_DATE,
+                LOGIC_RULES_HIS.CLOSE_DATE)
+                .from(LOGIC_RULES_HIS);
+
+        Select select = context.selectFrom(ruleSelect.unionAll(ruleHistorySelect).asTable()).where(DSL.field("ID").eq(ruleId));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        List<Rule> ruleList = new ArrayList<>();
+
+        long t = 1;
+        for(Map<String,Object> row : rows) {
+            Rule rule = new Rule();
+            //id - уникальный, требование extjs грида
+            //rule.setId(((BigDecimal) row.get(LOGIC_RULES.ID.getName())).longValue());
+            rule.setId(t++);
+            rule.setRule(((String) row.get(LOGIC_RULES.RULE.getName())));
+            rule.setOpenDate(((Date) row.get(LOGIC_RULES.OPEN_DATE.getName())));
+            rule.setTitle(((String) row.get(LOGIC_RULES.TITLE.getName())));
+            rule.setCloseDate((Date) row.get(LOGIC_RULES.CLOSE_DATE.getName()));
+            ruleList.add(rule);
+        }
+        
+        return ruleList;
     }
 }

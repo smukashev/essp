@@ -33,4 +33,5 @@ public interface IRuleDao extends IDao{
     void saveInPackage(Rule rule, PackageVersion packageVersion);
     RulePackage getPackage(String name);
     void insertHistory(Rule rule, Date closeDate);
+    List<Rule> getRuleHistory(long ruleId);
 }
