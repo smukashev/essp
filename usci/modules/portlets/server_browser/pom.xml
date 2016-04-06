@@ -95,7 +95,7 @@
         </dependency>
         <dependency>
             <groupId>kz.bsbnb.usci.eav</groupId>
-            <artifactId>persistance</artifactId>
+            <artifactId>model</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
