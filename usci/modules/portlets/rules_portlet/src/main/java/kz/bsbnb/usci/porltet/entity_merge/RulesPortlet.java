@@ -193,10 +193,12 @@ public class RulesPortlet extends MVCPortlet{
                     String ruleBody = resourceRequest.getParameter("ruleBody");
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     String pkgName = resourceRequest.getParameter("pkgName");
+                    packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
                     date =  df.parse(resourceRequest.getParameter("date"));
+                    PackageVersion packageVersion = new PackageVersion(new RulePackage(packageId, pkgName), date);
                     rule = new Rule("", ruleBody, date);
                     rule.setId(ruleId);
-                    String errors = ruleService.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, date);
+                    String errors = ruleService.getPackageErrorsOnRuleUpdate(rule, packageVersion);
                     if(errors != null)
                         throw new RuntimeException(errors);
                     ruleService.updateBody(rule);

@@ -594,7 +594,8 @@ Ext.onReady(function(){
                                         ruleBody: editor.getSession().getValue(),
                                         ruleId: editor.ruleId,
                                         date: Ext.getCmp('elemPackageVersionCombo').value,
-                                        pkgName: Ext.getCmp('elemComboPackage').getRawValue()
+                                        pkgName: Ext.getCmp('elemComboPackage').getRawValue(),
+                                        packageId: Ext.getCmp('elemComboPackage').value
                                     },
                                     reader: {
                                         type: 'json'

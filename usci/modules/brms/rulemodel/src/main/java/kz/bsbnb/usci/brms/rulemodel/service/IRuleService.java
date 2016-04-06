@@ -102,7 +102,7 @@ public interface IRuleService {
 
     public String getRuleErrors(String rule);
 
-    public String getPackageErrorsOnRuleUpdate(String ruleBody, Long ruleId, String pkgName, Date repDate);
+    public String getPackageErrorsOnRuleUpdate(Rule rule, PackageVersion packageVersion);
 
     public String getPackageErrorsOnRuleActivate(String ruleBody, Long ruleId, String pkgName, Date repDate, boolean ruleEdited);
 

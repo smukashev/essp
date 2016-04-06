@@ -165,24 +165,9 @@ public class RulesSingleton
         return null;
     }
 
-    public String getPackageErrorsOnRuleUpdate(String ruleBody, long ruleId,
-                                               String pkgName, Date repDate,
-                                               boolean makeActive,
-                                               boolean makeInActive,
-                                               boolean ruleEdited)
+    public String getPackageErrorsOnRuleUpdate(Rule rule, PackageVersion packageVersion)
     {
-
-        if(makeActive && makeInActive)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E267));
-
-        //if(!makeActive && ruleEdited)
-        //    throw new IllegalArgumentException("non proper method call");
-
-        //BatchVersion batchVersion = ruleBatchVersionService.getBatchVersion(pkgName, repDate);
-        //if(batchVersion == null)
-        //    return "Версия пакета правил остутвует на текущую дату";
-
-        List<Rule> rules = ruleDao.load(new PackageVersion(new RulePackage(1L, pkgName), repDate));
+        List<Rule> rules = ruleDao.load(packageVersion);
 
         String packages = "";
 
@@ -193,16 +178,10 @@ public class RulesSingleton
 
         for (Rule r : rules)
         {
-            if(!r.isActive() && !(r.getId() == ruleId && makeActive))
-                continue;
-
-            if(r.getId() == ruleId && makeInActive)
-                continue;
-
-            if(r.getId() != ruleId)
+            if(r.getId() != rule.getId())
                 packages += r.getRule() + "\n";
             else {
-                packages += (ruleEdited ? ruleBody : r.getRule() ) + "\n";
+                packages += rule.getRule() + "\n";
             }
         }
 
