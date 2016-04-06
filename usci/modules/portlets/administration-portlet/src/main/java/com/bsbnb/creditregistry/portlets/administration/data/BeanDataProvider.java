@@ -52,7 +52,7 @@ public class BeanDataProvider implements DataProvider {
             remoteCreditorBusinessFactoryBean.afterPropertiesSet();
             creditorBusiness = (RemoteCreditorBusiness) remoteCreditorBusinessFactoryBean.getObject();
         } catch (Exception e) {
-            logger.error("Can't initialise services: " + e.getMessage());
+            throw new RuntimeException(Errors.compose(Errors.E286,e));
         }
     }
 

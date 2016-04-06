@@ -23,6 +23,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import javax.portlet.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.AccessControlException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -33,9 +34,9 @@ public class RulesPortlet extends MVCPortlet{
     private IEntityService entityService;
     private boolean retry;
     private static final Logger logger = Logger.getLogger(RulesPortlet.class);
+    private Exception currentException;
 
-    @Override
-    public void init() throws PortletException {
+    public void connectToServices() throws PortletException {
         try {
             ApplicationContext context = new ClassPathXmlApplicationContext("applicationContextPortlet.xml");
 
@@ -62,9 +63,8 @@ public class RulesPortlet extends MVCPortlet{
             batchServiceFactoryBean.afterPropertiesSet();
 
             batchService = (IBatchService) batchServiceFactoryBean.getObject();
-            super.init();
         } catch (Exception e) {
-            logger.error("Can't initialise services: " + e.getMessage());
+            throw new RuntimeException(Errors.compose(Errors.E286,e.getMessage()),e);
         }
     }
 
@@ -73,9 +73,8 @@ public class RulesPortlet extends MVCPortlet{
                        RenderResponse renderResponse) throws IOException, PortletException {
         //renderRequest.setAttribute("entityList", baseEntityList);
 
-        boolean hasRights = false;
-
         try {
+            boolean hasRights = false;
             User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
             if(user != null) {
                 for (Role role : user.getRoles()) {
@@ -83,16 +82,15 @@ public class RulesPortlet extends MVCPortlet{
                             || role.getName().equals("BankUser"))
                         hasRights = true;
                 }
-
             }
-        } catch (PortalException e) {
-            logger.error(e.getMessage(),e);
-        } catch (SystemException e) {
+
+            if (!hasRights)
+                throw new AccessControlException(Errors.compose(Errors.E238));
+
+        } catch (Exception e) {
+            currentException = e;
             logger.error(e.getMessage(),e);
         }
-
-        if(!hasRights)
-            return;
 
         super.doView(renderRequest, renderResponse);
     }
@@ -148,6 +146,12 @@ public class RulesPortlet extends MVCPortlet{
         PrintWriter writer = resourceResponse.getWriter();
 
         try {
+            if(currentException != null)
+                throw currentException;
+
+            if(batchService == null ||ruleService ==null || entityService == null)
+                connectToServices();
+
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
             long ruleId, batchVersionId, batchId;
             String title;
@@ -285,24 +289,11 @@ public class RulesPortlet extends MVCPortlet{
             }
 
         } catch (Exception e) {
-            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : "";
-            if(!retry) {
-                retry = true;
-                try {
-                    init();
-                    serveResource(resourceRequest, resourceResponse);
-                } catch (PortletException e1) {
-                    //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
-                    writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError + e1.getMessage()
-                            .replaceAll("\"","").replaceAll("\n","")+"\"}");
-                } finally {
-                    retry = false;
-                    return;
-                }
-            }
-
-            //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
-            writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError +"\"}");
+            logger.error(e.getMessage(),e);
+            currentException = null;
+            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
+            originalError = Errors.decompose(originalError);
+            writer.write("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}");
         }
 
     }

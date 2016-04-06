@@ -13,6 +13,7 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
 
 import javax.portlet.ActionRequest;
@@ -23,6 +24,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import java.security.AccessControlException;
 
 public class QueueApplication extends Application {
 
@@ -39,9 +41,8 @@ public class QueueApplication extends Application {
 
             ctx.addPortletListener(this, new SamplePortletListener());
         } else {
-            getMainWindow().showNotification("Not inited via Portal!", Notification.TYPE_ERROR_MESSAGE);
+            getMainWindow().showNotification(Errors.getError(Errors.E287), Window.Notification.TYPE_ERROR_MESSAGE);
         }
-
     }
 
     private class SamplePortletListener implements PortletListener {
@@ -52,35 +53,29 @@ public class QueueApplication extends Application {
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
             setTheme("custom");
             Window mainWindow = new Window();
-            User user = null;
-
-            boolean hasRights = false;
 
             try {
-                user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
-                if(user != null) {
+                boolean hasRights = false;
+
+                User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                if (user != null) {
                     for (Role role : user.getRoles()) {
                         if (role.getName().equals("Administrator") || role.getName().equals("NationalBankEmployee"))
                             hasRights = true;
                     }
                 }
-            } catch (PortalException e) {
-                logger.error(null,e);
-            } catch (SystemException e) {
-                logger.error(null,e);
-            }
 
-            if(!hasRights)
-                return;
+                if (!hasRights)
+                    throw new AccessControlException(Errors.compose(Errors.E238));
 
-            if(user == null) {
-                Label errorMessageLabel = new Label("Нет прав для просмотра");
-                mainWindow.addComponent(errorMessageLabel);
-            } else {
                 QueuePortalEnvironmentFacade queuePortalEnvironmentFacade = new QueuePortalEnvironmentFacade(user);
                 BeanDataProvider dataProvider = new BeanDataProvider();
                 mainWindow.addComponent(new MainLayout(queuePortalEnvironmentFacade, dataProvider));
                 setMainWindow(mainWindow);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
+                getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
             }
         }
 

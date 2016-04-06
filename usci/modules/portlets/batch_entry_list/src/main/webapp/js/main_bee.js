@@ -180,6 +180,14 @@ Ext.onReady(function() {
         }
     });
 
+    grid.getStore().load({
+        callback: function (records, operation, success) {
+            if (!success) {
+                Ext.MessageBox.alert(label_ERROR, operation.request.proxy.reader.rawData.errorMessage);
+            }
+        }
+    });
+
     mainEntityEditorPanel = Ext.create('Ext.panel.Panel', {
         title : 'Панель данных',
         preventHeader: true,

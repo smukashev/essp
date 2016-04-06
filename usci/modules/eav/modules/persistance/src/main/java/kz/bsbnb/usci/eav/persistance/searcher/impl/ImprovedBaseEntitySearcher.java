@@ -182,7 +182,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     }
                 } else {
                     if (baseValue == null)
-                        throw new UnsupportedOperationException(Errors.getMessage(Errors.E177, metaAttribute.getName(), metaClass.getClassName()));
+                        throw new UnsupportedOperationException(Errors.compose(Errors.E177, metaAttribute.getName(), metaClass.getClassName()));
 
                     BaseSet baseSet = (BaseSet) baseValue.getValue();
                     MetaSet metaSet = (MetaSet) memberType;

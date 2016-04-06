@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.portlet.report;
 
 import com.liferay.portal.model.Role;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlet.report.dm.DatabaseConnect;
 import kz.bsbnb.usci.portlet.report.ui.MainLayout;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -16,6 +17,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import org.apache.log4j.Logger;
 
+import java.security.AccessControlException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -82,7 +84,7 @@ public class ReportApplication extends Application {
 
             ctx.addPortletListener(this, new SamplePortletListener());
         } else {
-            getMainWindow().showNotification("Not inited via Portal!", Notification.TYPE_ERROR_MESSAGE);
+            getMainWindow().showNotification(Errors.getError(Errors.E287), Window.Notification.TYPE_ERROR_MESSAGE);
         }
 
     }
@@ -96,54 +98,44 @@ public class ReportApplication extends Application {
             setTheme("custom");
             Window mainWindow = new Window();
             try {
-                User user = null;
                 boolean hasRights = false;
 
-                try {
-                    user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
-                    if(user != null) {
-                        for (Role role : user.getRoles()) {
-                            if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
-                                    || role.getName().equals("NationalBankEmployee"))
-                                hasRights = true;
-                        }
-                    }
-                } catch (PortalException e) {
-                    logger.error(e.getMessage(),e);
-                } catch (SystemException e) {
-                    logger.error(e.getMessage(),e);
-                }
-
-                if(!hasRights)
-                    return;
-
+                User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
                 if (user != null) {
-                    try {
-                        String portletInstanceId = (String) request.getAttribute(WebKeys.PORTLET_ID);
-
-                        PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(request, portletInstanceId);
-
-                        viewType = prefs.getValue("type", "REPORT");
-                        String defaultReportDateString = prefs.getValue("defaultreportdate", "01.04.2013");
-                        try {
-                            defaultReportDate = DEFAULT_DATE_FORMAT.parse(defaultReportDateString);
-                            logger.info("Parsed default date: "+ defaultReportDate);
-                        } catch (ParseException pe) {
-                            logger.info("Failed to parse date config", pe);
-                        }
-                        logger.info("Items view type: "+ viewType);
-                    } catch (SystemException se) {
-                        logger.warn(null, se);
+                    for (Role role : user.getRoles()) {
+                        if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
+                                || role.getName().equals("NationalBankEmployee"))
+                            hasRights = true;
                     }
-                    bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
-                    DatabaseConnect connect = new DatabaseConnect(user);
-                    MainLayout layout = new MainLayout(connect);
-                    layout.setWidth("100%");
-                    mainWindow.addComponent(layout);
-                    setMainWindow(mainWindow);
                 }
-            } catch (PortalException pe) {
-                logger.error("Failed to access user", pe);
+
+                if (!hasRights)
+                    throw new AccessControlException(Errors.compose(Errors.E238));
+
+                String portletInstanceId = (String) request.getAttribute(WebKeys.PORTLET_ID);
+
+                PortletPreferences prefs = PortletPreferencesFactoryUtil.getPortletSetup(request, portletInstanceId);
+
+                viewType = prefs.getValue("type", "REPORT");
+                String defaultReportDateString = prefs.getValue("defaultreportdate", "01.04.2013");
+                try {
+                    defaultReportDate = DEFAULT_DATE_FORMAT.parse(defaultReportDateString);
+                    logger.info("Parsed default date: " + defaultReportDate);
+                } catch (ParseException pe) {
+                    logger.info("Failed to parse date config", pe);
+                }
+                logger.info("Items view type: " + viewType);
+
+                bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
+                DatabaseConnect connect = new DatabaseConnect(user);
+                MainLayout layout = new MainLayout(connect);
+                layout.setWidth("100%");
+                mainWindow.addComponent(layout);
+                setMainWindow(mainWindow);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
+                getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
             }
         }
 

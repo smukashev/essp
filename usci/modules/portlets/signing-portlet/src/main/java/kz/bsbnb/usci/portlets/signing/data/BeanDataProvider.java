@@ -6,6 +6,7 @@ import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputFile;
 import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -49,7 +50,7 @@ public class BeanDataProvider implements DataProvider {
             batchProcessServiceFactoryBean.afterPropertiesSet();
             batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
         } catch (Exception e) {
-            logger.error("Can't initialise services: " + e.getMessage());
+            throw new RuntimeException(Errors.compose(Errors.E286,e));
         }
     }
 

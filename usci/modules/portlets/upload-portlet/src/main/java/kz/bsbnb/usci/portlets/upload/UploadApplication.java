@@ -12,6 +12,7 @@ import javax.portlet.ResourceResponse;
 
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlets.upload.ui.MainLayout;
 import kz.bsbnb.usci.portlets.upload.ui.SingleUploadComponent;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -23,6 +24,8 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import org.apache.log4j.Logger;
+
+import java.security.AccessControlException;
 
 public class UploadApplication extends Application {
 
@@ -41,7 +44,7 @@ public class UploadApplication extends Application {
 
             ctx.addPortletListener(this, new SamplePortletListener());
         } else {
-            getMainWindow().showNotification("Not inited via Portal!", Notification.TYPE_ERROR_MESSAGE);
+            getMainWindow().showNotification(Errors.getError(Errors.E287), Window.Notification.TYPE_ERROR_MESSAGE);
         }
     }
 
@@ -56,33 +59,31 @@ public class UploadApplication extends Application {
                 boolean hasRights = false;
                 boolean isNB = false;
 
-                try {
-                    User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
-                    if(user != null) {
-                        for (Role role : user.getRoles()) {
-                            if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
-                                    || role.getName().equals("NationalBankEmployee")) {
-                                hasRights = true;
+                User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                if (user != null) {
+                    for (Role role : user.getRoles()) {
+                        if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
+                                || role.getName().equals("NationalBankEmployee")) {
+                            hasRights = true;
 
-                                if (role.getName().equals("NationalBankEmployee")) {
-                                    isNB = true;
-                                }
+                            if (role.getName().equals("NationalBankEmployee")) {
+                                isNB = true;
                             }
                         }
                     }
-                } catch (PortalException | SystemException e) {
-                    logger.error("", e);
                 }
 
-                if(!hasRights)
-                    return;
+                if (!hasRights)
+                    throw new AccessControlException(Errors.compose(Errors.E238));
 
                 Window mainWindow = new Window();
                 mainWindow.addComponent(new MainLayout(
                         new UploadPortletEnvironmentFacade(PortalUtil.getUser(request), isNB)));
                 setMainWindow(mainWindow);
-            } catch (PortalException | SystemException pe) {
-                logger.error("", pe);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
+                getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
             }
         }
 

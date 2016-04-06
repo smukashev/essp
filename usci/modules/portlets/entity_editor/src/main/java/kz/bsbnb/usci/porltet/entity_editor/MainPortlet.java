@@ -33,6 +33,7 @@ import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.AccessControlException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -43,6 +44,7 @@ public class MainPortlet extends MVCPortlet {
     private ISearcherFormService searcherFormService;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private final Logger logger = Logger.getLogger(MainPortlet.class);
+    private Exception currentException;
 
     public void connectToServices() {
         try {
@@ -89,7 +91,7 @@ public class MainPortlet extends MVCPortlet {
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         } catch (Exception e) {
-            logger.error("Can\"t initialise services: " + e.getMessage());
+            throw new RuntimeException(Errors.compose(Errors.E286,e.getMessage()),e);
         }
     }
 
@@ -97,14 +99,10 @@ public class MainPortlet extends MVCPortlet {
 
     @Override
     public void init() throws PortletException {
-        connectToServices();
-
         classesFilter = new LinkedList<>();
-
         for(String s : PortletProps.get("classes.filter").split(",")) {
             classesFilter.add(s);
         }
-
         super.init();
     }
 
@@ -115,32 +113,28 @@ public class MainPortlet extends MVCPortlet {
         HttpServletRequest httpReq = PortalUtil.getOriginalServletRequest(
                 PortalUtil.getHttpServletRequest(renderRequest));
 
-        boolean hasRights = false;
-
         try {
+            boolean hasRights = false;
+
             User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
-            if(user != null) {
+            if (user != null) {
                 for (Role role : user.getRoles()) {
                     if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
                             || role.getName().equals("NationalBankEmployee"))
                         hasRights = true;
                 }
             }
-        } catch (PortalException e) {
-            logger.error(e.getMessage(),e);
-        } catch (SystemException e) {
-            logger.error(e.getMessage(),e);
+
+            if (!hasRights)
+                throw new AccessControlException(Errors.compose(Errors.E238));
+
+            String entityId = httpReq.getParameter("entityId");
+            String sRepDate = httpReq.getParameter("repDate");
+            renderRequest.setAttribute("entityId", entityId);
+            renderRequest.setAttribute("repDate", sRepDate);
+        } catch (Exception e) {
+            currentException = e;
         }
-
-        if(!hasRights)
-            return;
-
-
-        String entityId = httpReq.getParameter("entityId");
-        String sRepDate = httpReq.getParameter("repDate");
-        renderRequest.setAttribute("entityId", entityId);
-        renderRequest.setAttribute("repDate", sRepDate);
-
         super.doView(renderRequest, renderResponse);
     }
 
@@ -424,22 +418,20 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
-    boolean retry = false;
-
     @Override
     public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException
     {
 
-        if (metaFactoryService == null) {
-            connectToServices();
-            //todo: add error message here
-            if (metaFactoryService == null)
-                return;
-        }
-
         OutputStream out = resourceResponse.getPortletOutputStream();
 
         try {
+
+            if(currentException != null)
+                throw currentException;
+
+            if (metaFactoryService == null)
+                connectToServices();
+
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
             User currentUser = PortalUtil.getUser(resourceRequest);
             List<Creditor> creditors;
@@ -681,28 +673,10 @@ public class MainPortlet extends MVCPortlet {
                     break;
             }
         } catch (Exception e) {
-            //e.printStackTrace();
+            currentException = null;
+            logger.error(e.getMessage(),e);
             String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
-            if(originalError.contains("connect") || originalError.contains("rmi"))
-                if(!retry) {
-                    retry = true;
-                    logger.info("connect failed, reconnect triggered");
-                    try {
-                        init();
-                        serveResource(resourceRequest, resourceResponse);
-                    } catch (PortletException e1) {
-                        //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
-                        out.write(("{ \"success\": false, \"errorMessage\": \""+ originalError + e1.getMessage()
-                                .replaceAll("\"","").replaceAll("\n","")+"\"}").getBytes());
-
-                    } catch(Exception ex){
-                        logger.error(Errors.decompose(ex.getMessage()));
-                    } finally {
-                        retry = false;
-                        return;
-                    }
-                }
-
+            originalError = Errors.decompose(originalError);
             out.write(("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}").getBytes());
         }
     }
