@@ -132,14 +132,15 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
                 " )) order by id";*/
 
 
-        Select select = context.select(LOGIC_RULES.ID, LOGIC_RULES.TITLE)
-                .from(LOGIC_RULES)
-                .join(LOGIC_RULE_PACKAGE).on(LOGIC_RULE_PACKAGE.RULE_ID.eq(LOGIC_RULES.ID))
+        Table ruleHistory = getRuleHistoryTable();
+
+
+        Select select = context.select(ruleHistory.field("ID"), ruleHistory.field("TITLE"))
+                .from(ruleHistory)
+                .join(LOGIC_RULE_PACKAGE).on(LOGIC_RULE_PACKAGE.RULE_ID.eq(ruleHistory.field("ID")))
                 .where(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(packageId))
-                .and(LOGIC_RULES.OPEN_DATE.lessOrEqual(DataUtils.convert(reportDate)))
-                .and(LOGIC_RULES.CLOSE_DATE.greaterThan(DataUtils.convert(reportDate)).or(LOGIC_RULES.CLOSE_DATE.isNull()));
-
-
+                .and(ruleHistory.field("OPEN_DATE").lessOrEqual(DataUtils.convert(reportDate)))
+                .and(ruleHistory.field("CLOSE_DATE").greaterThan(DataUtils.convert(reportDate)).or(ruleHistory.field("CLOSE_DATE").isNull()));
 
 
         //List<SimpleTrack> ret = jdbcTemplate.query(SQL, new Object[]{packageId, reportDate, packageId}, new BeanPropertyRowMapper(SimpleTrack.class));
@@ -334,9 +335,12 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
 
     @Override
     public List<PackageVersion> getPackageVersions(RulePackage rulePackage) {
-        Select select = context.select(LOGIC_RULES.OPEN_DATE)
-                .from(LOGIC_RULES)
-                .join(LOGIC_RULE_PACKAGE).on(LOGIC_RULES.ID.eq(LOGIC_RULE_PACKAGE.RULE_ID))
+
+        Table rulesTable = getRuleHistoryTable();
+
+        Select select = context.selectDistinct(rulesTable.field("OPEN_DATE"))
+                .from(rulesTable)
+                .join(LOGIC_RULE_PACKAGE).on(rulesTable.field("ID").eq(LOGIC_RULE_PACKAGE.RULE_ID))
                 .and(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(rulePackage.getId()));
 
         List<Map<String,Object>> rows
@@ -345,15 +349,14 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
         Set<Date> dates = new HashSet<>();
 
         for(Map<String,Object> row: rows) {
-            dates.add((Date)row.get(LOGIC_RULES.OPEN_DATE.getName()));
+            dates.add((Date)row.get("OPEN_DATE"));
         }
 
-        select = context.select(LOGIC_RULES.CLOSE_DATE)
-                .from(LOGIC_RULES)
-                .join(LOGIC_RULE_PACKAGE).on(LOGIC_RULES.ID.eq(LOGIC_RULE_PACKAGE.RULE_ID))
+        select = context.selectDistinct(rulesTable.field("CLOSE_DATE"))
+                .from(rulesTable)
+                .join(LOGIC_RULE_PACKAGE).on(rulesTable.field("ID").eq(LOGIC_RULE_PACKAGE.RULE_ID))
                 .and(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(rulePackage.getId()))
-                .and(LOGIC_RULES.CLOSE_DATE.isNotNull());
-
+                .and(rulesTable.field("CLOSE_DATE").isNotNull());
 
         rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
@@ -391,22 +394,7 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
 
     @Override
     public List<Rule> getRuleHistory(long ruleId) {
-
-        Select ruleSelect = context.select(LOGIC_RULES.ID,
-                LOGIC_RULES.RULE,
-                LOGIC_RULES.TITLE,
-                LOGIC_RULES.OPEN_DATE,
-                LOGIC_RULES.CLOSE_DATE)
-                .from(LOGIC_RULES);
-
-        Select ruleHistorySelect = context.select(LOGIC_RULES_HIS.RULE_ID.as("ID"),
-                LOGIC_RULES_HIS.RULE,
-                LOGIC_RULES_HIS.TITLE,
-                LOGIC_RULES_HIS.OPEN_DATE,
-                LOGIC_RULES_HIS.CLOSE_DATE)
-                .from(LOGIC_RULES_HIS);
-
-        Select select = context.selectFrom(ruleSelect.unionAll(ruleHistorySelect).asTable()).where(DSL.field("ID").eq(ruleId));
+        Select select = context.selectFrom(getRuleHistoryTable()).where(DSL.field("ID").eq(ruleId));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
         List<Rule> ruleList = new ArrayList<>();
@@ -425,5 +413,24 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
         }
         
         return ruleList;
+    }
+
+    private Table getRuleHistoryTable(){
+        Select ruleSelect = context.select(LOGIC_RULES.ID,
+                LOGIC_RULES.RULE,
+                LOGIC_RULES.TITLE,
+                LOGIC_RULES.OPEN_DATE,
+                LOGIC_RULES.CLOSE_DATE)
+                .from(LOGIC_RULES);
+
+        Select ruleHistorySelect = context.select(LOGIC_RULES_HIS.RULE_ID.as("ID"),
+                LOGIC_RULES_HIS.RULE,
+                LOGIC_RULES_HIS.TITLE,
+                LOGIC_RULES_HIS.OPEN_DATE,
+                LOGIC_RULES_HIS.CLOSE_DATE)
+                .from(LOGIC_RULES_HIS);
+
+
+        return ruleSelect.unionAll(ruleHistorySelect).asTable("v_rule_his");
     }
 }
