@@ -64,28 +64,20 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
         //if (packageVersion.getId() < 1)
         //    throw new IllegalArgumentException("Batchversion has no id.");
 
-        Select select = context.select(LOGIC_RULES.ID,
-                LOGIC_RULES.RULE,LOGIC_RULES.TITLE, LOGIC_RULES.OPEN_DATE)
-                .from(LOGIC_RULES).join(LOGIC_RULE_PACKAGE)
-                .on(LOGIC_RULE_PACKAGE.RULE_ID.eq(LOGIC_RULES.ID))
-                .where(LOGIC_RULES.OPEN_DATE.lessOrEqual(DataUtils.convert(packageVersion.getReportDate())))
-                .and(LOGIC_RULES.CLOSE_DATE.greaterThan(DataUtils.convert(packageVersion.getReportDate()))
-                        .or(LOGIC_RULES.CLOSE_DATE.isNull()))
-                .and(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(packageVersion.getRulePackage().getId()));
+        Table ruleHistory = getRuleHistoryTable(packageVersion.getReportDate());
 
-        //List<Rule> ruleList = jdbcTemplate.query(select.getSQL(),select.getBindValues().toArray(),
-        //        new BeanPropertyRowMapper(Rule.class));
+        Select select = context.select(ruleHistory.fields())
+                .from(ruleHistory)
+                .join(LOGIC_RULE_PACKAGE)
+                .on(ruleHistory.field("ID").eq(LOGIC_RULE_PACKAGE.RULE_ID))
+                .and(LOGIC_RULE_PACKAGE.PACKAGE_ID.eq(packageVersion.getRulePackage().getId()));
 
         List<Rule> ruleList = new ArrayList<>();
 
         List<Map<String,Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         for(Map<String,Object> row : rows) {
-            Rule rule = new Rule();
-            rule.setId(((BigDecimal) row.get(LOGIC_RULES.ID.getName())).longValue());
-            rule.setRule(((String) row.get(LOGIC_RULES.RULE.getName())));
-            rule.setOpenDate(((Date) row.get(LOGIC_RULES.OPEN_DATE.getName())));
-            rule.setTitle(((String) row.get(LOGIC_RULES.TITLE.getName())));
+            Rule rule = getRule(row);
             ruleList.add(rule);
         }
 
@@ -475,5 +467,14 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
 
 
         return ruleSelect.unionAll(ruleHistorySelect).asTable("v_rule_his");
+    }
+
+    private Table getRuleHistoryTable(Date date){
+        Table t = getRuleHistoryTable();
+        return context.selectFrom(t).where(t.field("OPEN_DATE")
+                .lessOrEqual(DataUtils.convert(date)))
+                .and(t.field("CLOSE_DATE").greaterThan(DataUtils.convert(date))
+                        .or(t.field("CLOSE_DATE").isNull())).asTable("v_rule_snap");
+
     }
 }
