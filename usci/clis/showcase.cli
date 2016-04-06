@@ -751,7 +751,7 @@ showcase list addRootKey credit_id credit_id
 
 showcase list addHistoryKey credit_id credit_id
 
-showcase addIndex nonunique creditor_id credit_id
+showcase addIndex nonunique credit_id
 
 showcase save
 
@@ -776,7 +776,7 @@ showcase list addRootKey pledge_id pledge_id
 showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey pledge_id pledge_id
 
-showcase addIndex nonunique creditor_id credit_id
+showcase addIndex nonunique credit_id
 
 showcase save
 

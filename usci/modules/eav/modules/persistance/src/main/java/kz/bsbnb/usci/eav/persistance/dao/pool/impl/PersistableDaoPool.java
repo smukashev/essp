@@ -54,7 +54,8 @@ public class PersistableDaoPool implements IPersistableDaoPool {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IPersistableDao> T getPersistableDao(Class<? extends IPersistable> persistableClass, Class<T> extendedPersistableDaoClass) {
+    public <T extends IPersistableDao> T getPersistableDao(Class<? extends IPersistable> persistableClass,
+                                                           Class<T> extendedPersistableDaoClass) {
         if (persistableClass == null)
             throw new RuntimeException(Errors.compose(Errors.E172));
 

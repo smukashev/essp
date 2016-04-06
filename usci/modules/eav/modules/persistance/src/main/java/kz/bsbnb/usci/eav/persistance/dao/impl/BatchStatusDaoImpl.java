@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchStatusDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
+import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BATCH_STATUSES;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_GLOBAL;
 
 @Repository
 public class BatchStatusDaoImpl extends JDBCSupport implements IBatchStatusDao {
@@ -27,23 +29,25 @@ public class BatchStatusDaoImpl extends JDBCSupport implements IBatchStatusDao {
 
     @Override
     public Long insert(BatchStatus batchStatus) {
-        Insert insert = context.insertInto(EAV_BATCH_STATUSES,
-                EAV_BATCH_STATUSES.BATCH_ID,
-                EAV_BATCH_STATUSES.STATUS_ID,
-                EAV_BATCH_STATUSES.RECEIPT_DATE,
-                EAV_BATCH_STATUSES.DESCRIPTION
-        ).values(
-                batchStatus.getBatchId(),
-                batchStatus.getStatusId(),
-                DataUtils.convertToTimestamp(batchStatus.getReceiptDate()),
-                batchStatus.getDescription()
-        );
+        Insert insert = context
+                .insertInto(EAV_BATCH_STATUSES,
+                    EAV_BATCH_STATUSES.BATCH_ID,
+                    EAV_BATCH_STATUSES.STATUS_ID,
+                    EAV_BATCH_STATUSES.RECEIPT_DATE,
+                    EAV_BATCH_STATUSES.DESCRIPTION)
+                .values(
+                    batchStatus.getBatchId(),
+                    batchStatus.getStatusId(),
+                    DataUtils.convertToTimestamp(batchStatus.getReceiptDate()),
+                    batchStatus.getDescription());
+
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
 
     @Override
     public List<BatchStatus> getList(long batchId) {
-        Select select = context.selectFrom(EAV_BATCH_STATUSES)
+        Select select = context.selectFrom(EAV_BATCH_STATUSES
+                .join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_BATCH_STATUSES.STATUS_ID)))
                 .where(EAV_BATCH_STATUSES.BATCH_ID.eq(batchId))
                 .orderBy(EAV_BATCH_STATUSES.RECEIPT_DATE.desc(), EAV_BATCH_STATUSES.STATUS_ID.asc());
 
@@ -62,16 +66,11 @@ public class BatchStatusDaoImpl extends JDBCSupport implements IBatchStatusDao {
     private BatchStatus toBatchStatus(Map<String, Object> row) {
         BatchStatus batchStatus = new BatchStatus();
         batchStatus.setId(((BigDecimal) row.get(EAV_BATCH_STATUSES.ID.getName())).longValue());
-        batchStatus.setBatchId(getNullSafeLong(row, EAV_BATCH_STATUSES.BATCH_ID));
-        batchStatus.setStatusId(getNullSafeLong(row, EAV_BATCH_STATUSES.STATUS_ID));
+        batchStatus.setBatchId(((BigDecimal) row.get(EAV_BATCH_STATUSES.BATCH_ID.getName())).longValue());
+        batchStatus.setStatusId(((BigDecimal) row.get(EAV_BATCH_STATUSES.STATUS_ID.getName())).longValue());
         batchStatus.setDescription((String) row.get(EAV_BATCH_STATUSES.DESCRIPTION.getName()));
         batchStatus.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_BATCH_STATUSES.RECEIPT_DATE.getName())));
+        batchStatus.setStatus(BatchStatuses.valueOf((String) row.get(EAV_GLOBAL.CODE.getName())));
         return batchStatus;
     }
-
-    private Long getNullSafeLong(Map<String, Object> row, Field field) {
-        Object o = row.get(field.getName());
-        return o == null ? null : ((BigDecimal) o).longValue();
-    }
-
 }

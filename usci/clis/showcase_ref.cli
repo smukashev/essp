@@ -189,6 +189,29 @@ showcase addIndex nonunique ref_creditor_branch_id
 showcase save
 
 #=================================================================================
+# REF_CREDITOR_BRANCH_DOC
+#=================================================================================
+showcase set meta ref_creditor_branch
+showcase set name REF_CREDITOR_BRANCH_DOC
+showcase set tableName REF_CREDITOR_BRANCH_DOC
+
+showcase list add docs document_id
+showcase list add docs.doc_type doc_type_id
+showcase list add docs.no no
+showcase list add docs.doc_type.code doc_type_code
+showcase list add docs.name name
+
+showcase list addRootKey ref_creditor_branch_id ref_creditor_branch_id
+showcase list addHistoryKey ref_creditor_branch_id ref_creditor_branch_id
+showcase list addHistoryKey document_id document_id
+
+showcase addIndex nonunique ref_creditor_branch_id
+showcase addIndex nonunique ref_creditor_branch_id document_id
+showcase addIndex nonunique document_id
+
+showcase save
+
+#=================================================================================
 # REF_CREDIT_PURPOSE
 #=================================================================================
 showcase set meta ref_credit_purpose

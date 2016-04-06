@@ -60,15 +60,6 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
         return showCases;
     }
 
-    public ShowCase getHolderByClassName(String className) {
-        for (ShowCase showCase : showCases) {
-            if (showCase.getMeta().getClassName().equals(className))
-                return showCase;
-        }
-
-        throw new UnknownError("showCase with name: " + className + " not found");
-    }
-
     public void reloadCache() {
         showCases = populateShowCases();
     }
@@ -225,8 +216,35 @@ public class ShowcaseDaoImpl extends CommonDao implements InitializingBean {
             table.addColumn(column);
         }
 
-        for (Index index : showCase.getIndexes())
+        for (Index index : showCase.getIndexes()) {
+            if (historyState == HistoryState.ACTUAL) {
+                if (!showCase.isFinal()) {
+                    Column openDateColumn = new Column();
+                    openDateColumn.setName("OPEN_DATE");
+                    openDateColumn.setPrimaryKey(false);
+                    openDateColumn.setRequired(true);
+                    openDateColumn.setType("DATE");
+
+                    IndexColumn openDateIndexColumn = new IndexColumn();
+                    openDateIndexColumn.setColumn(openDateColumn);
+                    index.addColumn(openDateIndexColumn);
+                } else {
+                    Column repDateColumn = new Column();
+                    repDateColumn.setName("REP_DATE");
+                    repDateColumn.setPrimaryKey(false);
+                    repDateColumn.setRequired(true);
+                    repDateColumn.setType("DATE");
+
+                    IndexColumn repDateIndexColumn = new IndexColumn();
+                    repDateIndexColumn.setColumn(repDateColumn);
+                    index.addColumn(repDateIndexColumn);
+                }
+            } else {
+                index.setName(index.getName() + "_HIS");
+            }
+
             table.addIndex(index);
+        }
 
         model.addTable(table);
 

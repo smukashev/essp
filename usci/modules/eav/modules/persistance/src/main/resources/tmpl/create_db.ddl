@@ -236,6 +236,14 @@
 			<index-column name="entity_value_id"/>
 			<index-column name="is_last"/>
 		</index>
+		<!-- improved searcher -->
+		<index name="ebcsv_IN_si_ci_v_il_ic">
+			<index-column name="set_id"/>
+			<index-column name="creditor_id"/>
+			<index-column name="entity_value_id"/>
+			<index-column name="is_last"/>
+			<index-column name="is_closed"/>
+		</index>
 		<!-- load values -->
 		<index name="ebcsv_IN_si_rd_ic">
 			<index-column name="set_id"/>
@@ -535,6 +543,16 @@
 			<index-column name="is_last"/>
 		</index>
 		<!-- load values -->
+    <index name="ebecs_IN_id_ai_ci">
+			<index-column name="attribute_id"/>
+			<index-column name="id"/>
+		</index>
+    <unique name="ebecs_IN_ei_ci_ai_rd">
+			<unique-column name="entity_id"/>
+			<unique-column name="creditor_id"/>
+			<unique-column name="attribute_id"/>
+			<unique-column name="report_date"/>
+		</unique>
 		<index name="ebecs_IN_ei_il">
 			<index-column name="entity_id"/>
 			<index-column name="creditor_id"/>
@@ -912,7 +930,7 @@
   </table>
 	<table name="eav_optimizer">
 	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
-	  <column name="creditor_id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="creditor_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false" />
 	  <column name="meta_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="false"/>
 	  <column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 	  <column name="key_string" primaryKey="false" required="true" type="VARCHAR" size="128" autoIncrement="false"/>

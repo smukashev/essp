@@ -85,8 +85,7 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
                     (String) rows.get(0).get(EAV_GLOBAL.TYPE.getName()),
                     (String) rows.get(0).get(EAV_GLOBAL.CODE.getName()),
                     (String) rows.get(0).get(EAV_GLOBAL.VALUE.getName()),
-                    (String) rows.get(0).get(EAV_GLOBAL.DESCRIPTION.getName())
-            );
+                    (String) rows.get(0).get(EAV_GLOBAL.DESCRIPTION.getName()));
         }
 
         return null;
@@ -105,8 +104,7 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
                     (String) rows.get(0).get(EAV_GLOBAL.TYPE.getName()),
                     (String) rows.get(0).get(EAV_GLOBAL.CODE.getName()),
                     (String) rows.get(0).get(EAV_GLOBAL.VALUE.getName()),
-                    (String) rows.get(0).get(EAV_GLOBAL.DESCRIPTION.getName())
-            );
+                    (String) rows.get(0).get(EAV_GLOBAL.DESCRIPTION.getName()));
         }
 
         return null;
@@ -154,9 +152,8 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        for (Map<String, Object> row : rows) {
-            return (String)row.get("VALUE");
-        }
+        if (rows.size() > 0)
+            return rows.get(0).get("VALUE").toString();
 
         throw new RuntimeException(Errors.compose(Errors.E155));
     }

@@ -1,9 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.dao.listener;
 
-import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 
 public interface IDaoListener {
-    void applyToDBEnded(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntity baseEntityApplied,
-                               IBaseEntityManager entityManager);
+    void applyToDBEnded(IBaseEntity baseEntityApplied);
 }

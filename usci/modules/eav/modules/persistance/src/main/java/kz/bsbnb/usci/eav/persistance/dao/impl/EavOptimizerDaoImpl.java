@@ -44,8 +44,8 @@ public class EavOptimizerDaoImpl extends JDBCSupport implements IEavOptimizerDao
                 .select(EAV_OPTIMIZER.as(tableAlias).ENTITY_ID)
                 .from(EAV_OPTIMIZER.as(tableAlias))
                 .where(EAV_OPTIMIZER.as(tableAlias).CREDITOR_ID.equal(creditorId)
-                        .and(EAV_OPTIMIZER.as(tableAlias).META_ID.equal(metaId))
-                        .and(EAV_OPTIMIZER.as(tableAlias).KEY_STRING.equal(keyString)));
+                .and(EAV_OPTIMIZER.as(tableAlias).META_ID.equal(metaId))
+                .and(EAV_OPTIMIZER.as(tableAlias).KEY_STRING.equal(keyString)));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

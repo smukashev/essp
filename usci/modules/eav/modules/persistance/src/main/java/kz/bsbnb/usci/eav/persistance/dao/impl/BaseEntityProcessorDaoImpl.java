@@ -105,9 +105,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         creditorId = isReference ? 0 : creditorId;
 
         if (isReference) {
+            long refRepositoryTime = System.currentTimeMillis();
             IBaseEntity referenceEntity = refRepository.findRef(baseEntity);
 
             if (referenceEntity != null) {
+                sqlStats.put("java::refRepositoryTime", (System.currentTimeMillis() - refRepositoryTime));
                 baseEntity.setId(referenceEntity.getId());
                 return baseEntity;
             }
@@ -174,7 +176,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
 
+        long prepareTime = System.currentTimeMillis();
         baseEntityPostPrepared = prepare(((BaseEntity) baseEntity).clone(), creditorId);
+        sqlStats.put("java::prepare", (System.currentTimeMillis() - prepareTime));
 
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
@@ -267,13 +271,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     throw new UnsupportedOperationException(Errors.compose(Errors.E118, baseEntityPostPrepared.getOperation()));
             }
         } else {
+            long applyTime = System.currentTimeMillis();
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager, entityHolder);
+            sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
             baseEntityApplyDao.applyToDb(baseEntityManager);
         }
 
         if (applyListener != null)
-            applyListener.applyToDBEnded(entityHolder.getSaving(), entityHolder.getLoaded(), entityHolder.getApplied(), baseEntityManager);
+            applyListener.applyToDBEnded(entityHolder.getApplied());
 
         if (baseEntityApplied.getMeta().isReference() && baseEntityApplied.getId() > 0)
             refRepository.setRef(baseEntityApplied.getId(), baseEntityApplied.getReportDate(), baseEntityApplied);

@@ -3,6 +3,10 @@
 # Recreate DB
 # init
 
+# !!! ATTENTION !!!
+# DO NOT CHANGE THE ORDER OF META CLASSES
+# PARTITIONS LOOK FOR SPECIFIC HARD CODED IDS
+
 #====================================
 #= REF_DEBTOR_TYPE
 #====================================
@@ -951,6 +955,6 @@ sql update eav_m_complex_set  set title='Адрес' where name='addresses'
 sql update eav_m_complex_set  set title='Контакты' where name='contacts'
 
 #----------------------------------------------------------------------------------------------
-sql run usci/db_oracle_scripts/eav_table_range_partitioning.sql
+sql run usci/db_oracle_scripts/eav_tables_partitioning.sql
 
 quit

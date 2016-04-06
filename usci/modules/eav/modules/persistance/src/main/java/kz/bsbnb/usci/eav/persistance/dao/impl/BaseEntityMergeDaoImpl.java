@@ -32,12 +32,12 @@ import java.util.*;
 @Component
 public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 	@Autowired
-	IPersistableDaoPool persistableDaoPool;
+	private IPersistableDaoPool persistableDaoPool;
 
 	@Autowired
-	IBaseEntityApplyDao baseEntityApplyDao;
+	private IBaseEntityApplyDao baseEntityApplyDao;
 
-	IDaoListener applyListener;
+	private IDaoListener applyListener;
 
 	@Autowired
 	public void setApplyListener(IDaoListener applyListener) {
@@ -65,7 +65,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 
 		baseEntityApplyDao.applyToDb(baseEntityManager);
 
-		applyListener.applyToDBEnded(null, baseEntityRight, resultingBaseEntity, baseEntityManager);
+		applyListener.applyToDBEnded(resultingBaseEntity);
 
 
 		return resultingBaseEntity;

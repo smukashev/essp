@@ -10,7 +10,6 @@ import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchStatusDao;
 import kz.bsbnb.usci.eav.persistance.dao.IEntityStatusDao;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
-import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,6 @@ import java.util.Map;
  */
 @Service
 public class BatchServiceImpl implements IBatchService {
-
     @Autowired
     private IBatchDao batchDao;
 
@@ -55,7 +53,7 @@ public class BatchServiceImpl implements IBatchService {
         return batchDao.save(batch);
     }
 
-    Logger logger = LoggerFactory.getLogger(BatchServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(BatchServiceImpl.class);
 
     @Override
     public Batch getBatch(long batchId) {
@@ -177,30 +175,12 @@ public class BatchServiceImpl implements IBatchService {
 
     @Override
     public List<EntityStatus> getEntityStatusList(long batchId) {
-        List<EntityStatus> entityStatusList = entityStatusDao.getList(batchId);
-
-        for (EntityStatus entityStatus : entityStatusList) {
-            if (entityStatus.getStatusId() > 0 && entityStatus.getStatus() == null) {
-                EavGlobal status = globalService.getGlobal(entityStatus.getStatusId());
-                entityStatus.setStatus(EntityStatuses.valueOf(status.getCode()));
-            }
-        }
-
-        return entityStatusList;
+        return entityStatusDao.getList(batchId);
     }
 
     @Override
     public List<BatchStatus> getBatchStatusList(long batchId) {
-        List<BatchStatus> batchStatusList = batchStatusDao.getList(batchId);
-
-        for (BatchStatus batchStatus : batchStatusList) {
-            if (batchStatus.getStatusId() > 0 && batchStatus.getStatus() == null) {
-                EavGlobal status = globalService.getGlobal(batchStatus.getStatusId());
-                batchStatus.setStatus(BatchStatuses.valueOf(status.getCode()));
-            }
-        }
-
-        return batchStatusList;
+        return batchStatusDao.getList(batchId);
     }
 
     @Override
@@ -225,7 +205,7 @@ public class BatchServiceImpl implements IBatchService {
         return batchDao.getAll(repDate);
     }
 
-    public void setHash(Batch batch) {
+    private void setHash(Batch batch) {
         String hash = DigestUtils.md5DigestAsHex(batch.getContent());
         batch.setHash(hash);
     }

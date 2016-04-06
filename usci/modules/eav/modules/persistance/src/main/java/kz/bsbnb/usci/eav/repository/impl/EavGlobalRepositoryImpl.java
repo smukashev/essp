@@ -18,7 +18,7 @@ public class EavGlobalRepositoryImpl implements IEavGlobalRepository, Initializi
 
     private HashMap<String, EavGlobal> cache = new HashMap<>();
 
-    Logger logger = LoggerFactory.getLogger(EavGlobalRepositoryImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(EavGlobalRepositoryImpl.class);
 
     @Autowired
     private IEavGlobalDao eavGlobalDao;

@@ -39,9 +39,6 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
     @Autowired
     private DSLContext context;
 
-    @Autowired
-    IBatchRepository batchRepository;
-
     @Override
     public long insert(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
@@ -154,9 +151,9 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         IBaseValue nextBaseValue = null;
 
         String tableAlias = "bv";
-        String subqueryAlias = "bvn";
+        String subQueryAlias = "bvn";
 
-        Table subqueryTable = context
+        Table subQueryTable = context
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).ID,
@@ -171,17 +168,17 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                 .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
                         DataUtils.convert(baseValue.getRepDate())))
-                .asTable(subqueryAlias);
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_DOUBLE_VALUES.ID),
-                        subqueryTable.field(EAV_BE_DOUBLE_VALUES.CREDITOR_ID),
-                        subqueryTable.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_DOUBLE_VALUES.VALUE),
-                        subqueryTable.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_DOUBLE_VALUES.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_DOUBLE_VALUES.ID),
+                        subQueryTable.field(EAV_BE_DOUBLE_VALUES.CREDITOR_ID),
+                        subQueryTable.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_DOUBLE_VALUES.VALUE),
+                        subQueryTable.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_DOUBLE_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());
@@ -246,9 +243,9 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         IBaseValue previousBaseValue = null;
 
         String tableAlias = "bv";
-        String subqueryAlias = "bvn";
+        String subQueryAlias = "bvn";
 
-        Table subqueryTable = context
+        Table subQueryTable = context
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE.desc()).as("num_pp"),
                         EAV_BE_DOUBLE_VALUES.as(tableAlias).ID,
@@ -263,17 +260,17 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                 .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_DOUBLE_VALUES.as(tableAlias).REPORT_DATE.lessThan(
                         DataUtils.convert(baseValue.getRepDate())))
-                .asTable(subqueryAlias);
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_DOUBLE_VALUES.ID),
-                        subqueryTable.field(EAV_BE_DOUBLE_VALUES.CREDITOR_ID),
-                        subqueryTable.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_DOUBLE_VALUES.VALUE),
-                        subqueryTable.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_DOUBLE_VALUES.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_DOUBLE_VALUES.ID),
+                        subQueryTable.field(EAV_BE_DOUBLE_VALUES.CREDITOR_ID),
+                        subQueryTable.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_DOUBLE_VALUES.VALUE),
+                        subQueryTable.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_DOUBLE_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());
@@ -503,10 +500,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        Iterator<Map<String, Object>> it = rows.iterator();
-        while (it.hasNext()) {
-            Map<String, Object> row = it.next();
-
+        for (Map<String, Object> row : rows) {
             long id = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.ID.getName())).longValue();
 
             long creditorId = ((BigDecimal) row.get(EAV_BE_DOUBLE_VALUES.CREDITOR_ID.getName())).longValue();
