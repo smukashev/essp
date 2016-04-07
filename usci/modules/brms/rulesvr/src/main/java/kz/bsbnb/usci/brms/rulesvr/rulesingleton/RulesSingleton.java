@@ -1,10 +1,9 @@
 package kz.bsbnb.usci.brms.rulesvr.rulesingleton;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulemodel.service.IBatchService;
-import kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService;
+import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
@@ -31,6 +30,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component
@@ -45,6 +46,9 @@ public class RulesSingleton
     @Qualifier(value = "remoteEntityService")
     private RmiProxyFactoryBean entityRmiService;
     private IEntityService entityService;
+
+
+    public static DateFormat ruleDateFormat = new SimpleDateFormat("dd_MM_yyyy");
 
     @Autowired
     @Qualifier(value = "remoteMetaService")
@@ -69,7 +73,7 @@ public class RulesSingleton
             if (!(getClass() == obj.getClass()))
                 return 0;
 
-            return -(repDate.compareTo(((RuleCasheEntry)obj).getRepDate()));
+            return (repDate.compareTo(((RuleCasheEntry)obj).getRepDate()));
         }
 
         private Date getRepDate()
@@ -98,11 +102,11 @@ public class RulesSingleton
     private ArrayList<RulePackageError> rulePackageErrors = new ArrayList<RulePackageError>();
 
     @Autowired
-    private IBatchService ruleBatchService;
+    private IPackageService ruleBatchService;
     @Autowired
     private IRuleDao ruleDao;
-    @Autowired
-    private IBatchVersionService ruleBatchVersionService;
+    //@Autowired
+    //private IBatchVersionService ruleBatchVersionService;
 
     public StatelessKnowledgeSession getSession()
     {
@@ -161,24 +165,9 @@ public class RulesSingleton
         return null;
     }
 
-    public String getPackageErrorsOnRuleUpdate(String ruleBody, long ruleId,
-                                               String pkgName, Date repDate,
-                                               boolean makeActive,
-                                               boolean makeInActive,
-                                               boolean ruleEdited)
+    public String getPackageErrorsOnRuleUpdate(Rule rule, PackageVersion packageVersion)
     {
-
-        if(makeActive && makeInActive)
-            throw new IllegalArgumentException(Errors.compose(Errors.E267));
-
-        //if(!makeActive && ruleEdited)
-        //    throw new IllegalArgumentException("non proper method call");
-
-        BatchVersion batchVersion = ruleBatchVersionService.getBatchVersion(pkgName, repDate);
-        if(batchVersion == null)
-            return "Версия пакета правил остутвует на текущую дату";
-
-        List<Rule> rules = ruleDao.load(batchVersion);
+        List<Rule> rules = ruleDao.load(packageVersion);
 
         String packages = "";
 
@@ -189,16 +178,10 @@ public class RulesSingleton
 
         for (Rule r : rules)
         {
-            if(!r.isActive() && !(r.getId() == ruleId && makeActive))
-                continue;
-
-            if(r.getId() == ruleId && makeInActive)
-                continue;
-
-            if(r.getId() != ruleId)
+            if(r.getId() != rule.getId())
                 packages += r.getRule() + "\n";
             else {
-                packages += (ruleEdited ? ruleBody : r.getRule() ) + "\n";
+                packages += rule.getRule() + "\n";
             }
         }
 
@@ -236,51 +219,51 @@ public class RulesSingleton
 
     synchronized public void fillPackagesCache() {
         kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        List<Batch> allBatches = ruleBatchService.getAllBatches();
+        List<RulePackage> packages = ruleBatchService.getAllPackages();
 
         rulePackageErrors.clear();
         ruleCache.clear();
 
-        for (Batch curBatch : allBatches) {
-            List<BatchVersion> versions = ruleBatchVersionService.getBatchVersions(curBatch);
+        for (RulePackage curPackage : packages) {
+            List<PackageVersion> versions = ruleDao.getPackageVersions(curPackage);
 
             ArrayList<RuleCasheEntry> ruleCasheEntries = new ArrayList<RuleCasheEntry>();
 
-            for (BatchVersion curVersion : versions) {
-                List<Rule> rules = ruleDao.load(curVersion);
+            for (PackageVersion version : versions) {
+                List<Rule> rules = ruleDao.load(version);
 
-                String packages = "";
+                StringBuilder droolPackage = new StringBuilder();
 
-                packages += "package " + curBatch.getName() + "_" + curVersion.getId() + "\n";
-                packages += "dialect \"mvel\"\n";
-                packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
-                packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+                droolPackage.append("package " + curPackage.getName() + "_" + ruleDateFormat.format(version.getReportDate()) + "\n");
+                droolPackage.append("dialect \"mvel\"\n");
+                droolPackage.append("import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n");
+                droolPackage.append("import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n");
 
                 for (Rule r : rules)
                 {
-                    if(r.isActive())
-                        packages += r.getRule() + "\n";
+                    if(r.isActive() || true)
+                        droolPackage.append(r.getRule() + "\n");
                 }
 
-                logger.debug(packages);
+                logger.debug(droolPackage.toString());
                 //System.out.println("%%%%%%%%%%%%%%%%% packages:" + packages);
                 try {
-                    setRules(packages);
+                    setRules(droolPackage.toString());
                 } catch (Exception e) {
-                    rulePackageErrors.add(new RulePackageError(curBatch.getName() + "_" + curVersion.getId(),
+                    rulePackageErrors.add(new RulePackageError(curPackage.getName() + "_" + version,
                             e.getMessage()));
                 }
 
-                ruleCasheEntries.add(new RuleCasheEntry(curVersion.getOpenDate(),
-                        curBatch.getName() + "_" + curVersion.getId()));
+                ruleCasheEntries.add(new RuleCasheEntry(version.getReportDate(),
+                        curPackage.getName() + "_" + version));
             }
 
             Collections.sort(ruleCasheEntries);
-            ruleCache.put(curBatch.getName(), ruleCasheEntries);
+            ruleCache.put(curPackage.getName(), ruleCasheEntries);
         }
     }
 
-    public String getRulePackageName(String pkgName, Date repDate)
+    /*public String getRulePackageName(String pkgName, Date repDate)
     {
         List<RuleCasheEntry> versions = ruleCache.get(pkgName);
 
@@ -298,7 +281,7 @@ public class RulesSingleton
         }
 
         return result.getRules();
-    }
+    }*/
 
     public void runRules(BaseEntity entity, String pkgName, Date repDate)
     {
@@ -306,11 +289,22 @@ public class RulesSingleton
         ksession.setGlobal("entityService", entityService);
         ksession.setGlobal("metaService", metaFactoryService);
 
+        ArrayList<RuleCasheEntry> versions = ruleCache.get(pkgName);
+        String packageName = null;
+
+        for(RuleCasheEntry version: versions) {
+            if(version.getRepDate().compareTo(repDate) <= 0) {
+                packageName = pkgName +"_" + ruleDateFormat.format(version.getRepDate());
+            } else {
+                break;
+            }
+        }
+
         @SuppressWarnings("rawtypes")
         List<Command> commands = new ArrayList<Command>();
         commands.add(CommandFactory.newInsert(entity));
         commands.add(new FireAllRulesCommand(new PackageAgendaFilter(
-                getRulePackageName(pkgName, repDate))));
+                packageName)));
         ksession.execute(CommandFactory.newBatchExecution(commands));
     }
 
@@ -320,4 +314,87 @@ public class RulesSingleton
 
         ksession.execute(entity);
     }
+
+
+    public String getPackageErrorsOnRuleInsert(PackageVersion packageVersion, String title, String ruleBody) {
+        List<Rule> rules = ruleDao.load(packageVersion);
+
+        String packages = "";
+
+        packages += "package test\n";
+        packages += "dialect \"mvel\"\n";
+        packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
+        packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+
+        for (Rule r : rules)
+            packages += r.getRule() + "\n";
+
+        packages += ruleBody + "\n";
+
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+
+        kbuilder.add(ResourceFactory.newInputStreamResource(new ByteArrayInputStream(packages.getBytes())),
+                ResourceType.DRL);
+
+        if ( kbuilder.hasErrors() ) {
+            return kbuilder.getErrors().toString();
+        }
+
+        return null;
+    }
+
+    public String getPackageErrors(List<Rule> rules){
+        String packages = "";
+
+        packages += "package test\n";
+        packages += "dialect \"mvel\"\n";
+        packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
+        packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+
+        for (Rule r : rules)
+            packages += r.getRule() + "\n";
+
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+
+        kbuilder.add(ResourceFactory.newInputStreamResource(new ByteArrayInputStream(packages.getBytes())),
+                ResourceType.DRL);
+
+        if ( kbuilder.hasErrors() ) {
+            return kbuilder.getErrors().toString();
+        }
+
+        return null;
+    }
+
+
+
+    public String getPackageErrorsOnRuleDelete(Rule rule) {
+        List<RulePackage> rulePackages = ruleDao.getRulePackages(rule);
+
+        for (RulePackage rulePackage : rulePackages) {
+            List<PackageVersion> packageVersions = ruleDao.getPackageVersions(rulePackage);
+
+            for (PackageVersion packageVersion : packageVersions) {
+                if(packageVersion.getReportDate().compareTo(rule.getOpenDate()) > 0)
+                    continue;
+
+                List<Rule> rules = ruleDao.load(packageVersion);
+
+                for (Rule ruleInPackage : rules) {
+                    if(ruleInPackage.getId() == rule.getId())
+                        rules.iterator().remove();
+                    break;
+                }
+
+                String curResult = getPackageErrors(rules);
+
+                if(curResult != null)
+                    return curResult;
+            }
+        }
+
+        return null;
+    }
+
+
 }

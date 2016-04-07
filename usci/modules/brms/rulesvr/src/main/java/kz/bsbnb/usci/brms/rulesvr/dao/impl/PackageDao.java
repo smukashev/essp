@@ -1,22 +1,21 @@
 package kz.bsbnb.usci.brms.rulesvr.dao.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.IBatchVersion;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Batch;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
-import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
+import kz.bsbnb.usci.brms.rulemodel.model.IPackageVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
+import kz.bsbnb.usci.brms.rulesvr.dao.IPackageDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.mapper.BatchMapper;
+import kz.bsbnb.usci.brms.rulesvr.persistable.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.DSLContext;
+import org.jooq.Insert;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -29,17 +28,15 @@ import static kz.bsbnb.usci.brms.rulesvr.generated.Tables.*;
  */
 
 
-public class BatchDao implements IBatchDao
+public class PackageDao extends JDBCSupport implements IPackageDao
 {
-    private JdbcTemplate jdbcTemplate;
-
     private final String PREFIX_ = "LOGIC_";
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
 
-    public BatchDao() {
+    public PackageDao() {
     }
 
     public boolean testConnection()
@@ -54,71 +51,71 @@ public class BatchDao implements IBatchDao
         }
     }
 
-
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
-
     @Override
-    public Batch loadBatch(long id) {
+    public RulePackage loadBatch(long id) {
 
         if(id < 1)
             throw new IllegalArgumentException(Errors.compose(Errors.E259));
 
         String SQL = "SELECT * FROM " + PREFIX_ + "packages WHERE id  = ?";
-        Batch batch = jdbcTemplate.queryForObject(SQL,new Object[]{id},new BatchMapper());
+        RulePackage batch = jdbcTemplate.queryForObject(SQL,new Object[]{id},new BatchMapper());
         return batch;
     }
 
 
-    private long saveBatch(Batch batch){
-
-        if (batch.getRepDate() == null)
+    private long savePackage(RulePackage rulePackage){
+        /*
+        if (rulePackage.getReportDate() == null)
         {
-            throw new IllegalArgumentException(Errors.compose(Errors.E260));
-        }
+            throw new IllegalArgumentException("Report date must be set before instance " +
+                    "of Batch saving to the DB.");
+        }*/
 
-        String SQL = "INSERT INTO " + PREFIX_ + "packages(NAME, REPORT_DATE) VALUES (?, ?)";
-        jdbcTemplate.update(SQL,batch.getName(),batch.getRepDate());
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        System.out.println("Created batch with repdate "+dateFormat.format(batch.getRepDate())+" called "+batch.getName());
+        Insert insert = context.insertInto(LOGIC_PACKAGES)
+                .set(LOGIC_PACKAGES.NAME, rulePackage.getName());
+
+
+        //jdbcTemplate.update(insert.getSQL(),insert.getBindValues().toArray());
+        return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        /*DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        System.out.println("Created batch with repdate "+dateFormat.format(rulePackage.getReportDate())+" called "+rulePackage.getName());
 
         SQL = "SELECT id FROM " + PREFIX_ + "packages WHERE NAME = ?";
-        long id = jdbcTemplate.queryForLong(SQL,batch.getName());
-        return id;
+        long id = jdbcTemplate.queryForLong(SQL,rulePackage.getName());
+        return id;*/
     }
 
-    private void saveBatchVersion(Batch batch,long batchId){
+    private void saveBatchVersion(RulePackage batch, long batchId){
 
+        /*
         if(batchId < 1)
         {
             throw new IllegalArgumentException(Errors.compose(Errors.E261));
         }
 
        String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";
-        jdbcTemplate.update(SQL,batchId,batch.getRepDate());
+        jdbcTemplate.update(SQL,batchId,batch.getReportDate());*/
     }
 
 
     @Override
-    public long save(Batch batch) {
-        long batchId = saveBatch(batch);
+    public long save(RulePackage rulePackage) {
+        long batchId = savePackage(rulePackage);
 //        saveBatchVersion(batch,batchId);
         return batchId;
     }
 
     @Override
-    public List<Batch> getAllBatches() {
+    public List<RulePackage> getAllPackages() {
         Select select = context.selectFrom(LOGIC_PACKAGES);
 
         List<Map<String,Object> > rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
-        List<Batch> batchList = new ArrayList<>();
+        List<RulePackage> batchList = new ArrayList<>();
 
         for(Map<String,Object> row: rows) {
-            Batch b = new Batch();
+            RulePackage b = new RulePackage();
             b.setId(((BigDecimal) row.get(LOGIC_PACKAGES.ID.getName())).longValue());
             b.setName(((String) row.get(LOGIC_PACKAGES.NAME.getName())));
-            b.setRepDate(DataUtils.convert((Timestamp) row.get(LOGIC_PACKAGES.REPORT_DATE.getName())));
             batchList.add(b);
         }
 
@@ -134,8 +131,8 @@ public class BatchDao implements IBatchDao
         return jdbcTemplate.queryForLong(SQL, batchId, repDate, batchId);
     }
 
-    @Override
-    public List<IBatchVersion> getBatchVersions(long batchId) {
+    /*@Override
+    public List<IPackageVersion> getBatchVersions(long batchId) {
         Select select = context.select(LOGIC_PACKAGE_VERSIONS.ID, LOGIC_PACKAGE_VERSIONS.OPEN_DATE)
                 .from(LOGIC_PACKAGE_VERSIONS)
                 .where(LOGIC_PACKAGE_VERSIONS.PACKAGE_ID.eq(batchId))
@@ -148,10 +145,10 @@ public class BatchDao implements IBatchDao
             IBatchVersion batchVersion = new BatchVersion();
             batchVersion.setId(((BigDecimal)row.get(LOGIC_PACKAGE_VERSIONS.ID.getName())).longValue());
             batchVersion.setPackageId(batchId);
-            batchVersion.setOpenDate((Date)row.get(LOGIC_PACKAGE_VERSIONS.OPEN_DATE.getName()));
+            batchVersion.setReportDate((Date)row.get(LOGIC_PACKAGE_VERSIONS.OPEN_DATE.getName()));
             ret.add(batchVersion);
         }
 
         return ret;
-    }
+    }*/
 }

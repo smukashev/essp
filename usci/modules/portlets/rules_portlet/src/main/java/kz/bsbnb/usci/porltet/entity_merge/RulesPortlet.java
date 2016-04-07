@@ -6,7 +6,10 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
-import kz.bsbnb.usci.brms.rulemodel.service.IBatchService;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
+import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.StaticRouter;
@@ -15,7 +18,6 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.porltet.entity_merge.model.json.JsonMaker;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -30,7 +32,7 @@ import java.util.*;
 
 public class RulesPortlet extends MVCPortlet{
     private IRuleService ruleService;
-    private IBatchService batchService;
+    private IPackageService batchService;
     private IEntityService entityService;
     private boolean retry;
     private static final Logger logger = Logger.getLogger(RulesPortlet.class);
@@ -58,11 +60,12 @@ public class RulesPortlet extends MVCPortlet{
 
             RmiProxyFactoryBean batchServiceFactoryBean = new RmiProxyFactoryBean();
             batchServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchService");
-            batchServiceFactoryBean.setServiceInterface(IBatchService.class);
+            batchServiceFactoryBean.setServiceInterface(IPackageService.class);
 
             batchServiceFactoryBean.afterPropertiesSet();
 
-            batchService = (IBatchService) batchServiceFactoryBean.getObject();
+            batchService = (IPackageService) batchServiceFactoryBean.getObject();
+
         } catch (Exception e) {
             throw new RuntimeException(Errors.compose(Errors.E286));
         }
@@ -117,7 +120,8 @@ public class RulesPortlet extends MVCPortlet{
         DEL_CLASS,
         SAVE_ATTR,
         GET_ATTR,
-        DEL_ATTR
+        DEL_ATTR,
+        NEW_RULE_HISTORY, RULE_HISTORY;
     }
 
     public void getWriteAccess(ResourceRequest resourceRequest){
@@ -163,11 +167,14 @@ public class RulesPortlet extends MVCPortlet{
 
             switch(operationType){
                 case PACKAGE_ALL:
-                       writer.write(JsonMaker.getJson(batchService.getAllBatches()));
+                       writer.write(JsonMaker.getJson(batchService.getAllPackages()));
                     break;
                 case PACKAGE_VERSIONS:
                     batchId = Long.parseLong(resourceRequest.getParameter("packageId"));
-                    writer.write(JsonMaker.getJson(batchService.getBatchVersions(batchId)));
+                    //writer.write(JsonMaker.getJson(batchService.getBatchVersions(batchId)));
+                    RulePackage r = new RulePackage();
+                    r.setId(batchId);
+                    writer.write(JsonMaker.getJson(ruleService.getPackageVersions(r)));
                     break;
                 case GET_RULE_TITLES:
                     long packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
@@ -179,33 +186,60 @@ public class RulesPortlet extends MVCPortlet{
                         writer.write(JsonMaker.getJson(ruleService.getRuleTitles(packageId,date)));
                     break;
                 case GET_RULE:
+                    date = df.parse(resourceRequest.getParameter("date"));
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
-                    writer.write(JsonMaker.getJson(ruleService.getRule(ruleId)));
+                    Rule rule = new Rule();
+                    rule.setId(ruleId);
+                    rule.setOpenDate(date);
+                    writer.write(JsonMaker.getJson(ruleService.getRule(rule)));
                     break;
                 case UPDATE_RULE:
                     getWriteAccess(resourceRequest);
                     String ruleBody = resourceRequest.getParameter("ruleBody");
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
                     String pkgName = resourceRequest.getParameter("pkgName");
+                    packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
                     date =  df.parse(resourceRequest.getParameter("date"));
-                    String errors = ruleService.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, date);
+                    PackageVersion packageVersion = new PackageVersion(new RulePackage(packageId, pkgName), date);
+                    rule = new Rule("", ruleBody, date);
+                    rule.setId(ruleId);
+                    String errors = ruleService.getPackageErrorsOnRuleUpdate(rule, packageVersion);
                     if(errors != null)
                         throw new RuntimeException(errors);
-                    ruleService.updateBody(ruleId, ruleBody);
+                    ruleService.updateBody(rule);
                     writer.write(JsonMaker.getJson(true));
                     break;
                 case DEL_RULE:
                     getWriteAccess(resourceRequest);
                     ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
-                    long packageVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
-                    ruleService.deleteRule(ruleId, packageVersionId);
-                    writer.write(JsonMaker.getJson(true));
+                    pkgName = resourceRequest.getParameter("pkgName");
+                    packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
+                    //long packageVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    date = df.parse(resourceRequest.getParameter("date"));
+                    errors = ruleService.getPackageErrorsOnRuleDelete(new Rule(ruleId, date));
+                    if(errors != null)
+                        throw new RuntimeException(errors);
+                    //ruleService.deleteRule(ruleId, new RulePackage(packageId, pkgName));
+                    //writer.write(JsonMaker.getJson(true));
+                    writer.write(JsonMaker.getNegativeJson("Настройки отключены для удаления"));
                     break;
                 case NEW_RULE:
                     getWriteAccess(resourceRequest);
-                    batchVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
+                    pkgName = resourceRequest.getParameter("pkgName");
                     title = resourceRequest.getParameter("title");
-                    writer.write(JsonMaker.getJson(ruleService.saveEmptyRule(title, batchVersionId)));
+                    date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
+                    ruleBody = resourceRequest.getParameter("ruleBody");
+                    errors = ruleService.getPackageErrorsOnRuleInsert(
+                            new PackageVersion(new RulePackage(packageId, pkgName), date),
+                            title,
+                            ruleBody);
+                    if(errors != null)
+                        throw new RuntimeException(errors);
+                    writer.write(JsonMaker.getJson(ruleService.createNewRuleInPackage(
+                            new Rule(title, ruleBody),
+                            new PackageVersion(new RulePackage(packageId, pkgName), date))
+                    ));
                     break;
                 case COPY_EXISTING_RULE:
                     getWriteAccess(resourceRequest);
@@ -282,6 +316,19 @@ public class RulesPortlet extends MVCPortlet{
                     packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
                     date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
                     ruleService.insertBatchVersion(packageId, date);
+                    break;
+                case NEW_RULE_HISTORY:
+                    getWriteAccess(resourceRequest);
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    date = (Date) DataTypes.getCastObject(DataTypes.DATE, resourceRequest.getParameter("date"));
+                    ruleBody = resourceRequest.getParameter("ruleBody");
+                    rule = new Rule("", ruleBody, date);
+                    rule.setId(ruleId);
+                    ruleService.insertHistory(rule);
+                    break;
+                case RULE_HISTORY:
+                    ruleId = Long.parseLong(resourceRequest.getParameter("ruleId"));
+                    writer.write(JsonMaker.getJson(ruleService.getRuleHistory(ruleId)));
                     break;
                 default:
                     logger.error(Errors.compose(Errors.E118, operationType));

@@ -1,8 +1,9 @@
 package kz.bsbnb.usci.brms.rulemodel.model.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.IBatch;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -10,24 +11,24 @@ import java.util.Date;
  */
 
 @Component
-public class Batch extends Persistable implements IBatch
+public class RulePackage extends Persistable implements Serializable
 {
-    private Date repDate;
+    private static final long serialVersionUID = 1L;
+
     private String name;
     private String description;
 
 
-    public Batch(){
-
-    }
-
-    public Batch(String name,Date repDate){
+    public RulePackage(String name){
         this.name = name;
-        this.repDate = repDate;
     }
 
-    public Batch(Date repoDate){
-        this.repDate = repoDate;
+    public RulePackage() {
+    }
+
+    public RulePackage(Long id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public String getName() {
@@ -38,19 +39,16 @@ public class Batch extends Persistable implements IBatch
         this.name = name;
     }
 
-    public void setRepDate(Date repoDate) {
-        this.repDate = repoDate;
-    }
-
-    public Date getRepDate() {
-        return repDate;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "name: " + name + ", id: " + id;
     }
 }
