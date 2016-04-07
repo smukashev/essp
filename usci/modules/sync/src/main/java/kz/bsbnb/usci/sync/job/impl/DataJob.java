@@ -149,7 +149,7 @@ public final class DataJob extends AbstractDataJob {
                 }
 
                 if (!found)
-                    throw new IllegalStateException(Errors.getMessage(Errors.E280));
+                    throw new IllegalStateException(Errors.compose(Errors.E280));
 
                 processJobIterator.remove();
             }

@@ -49,8 +49,8 @@ public class ZippedProtocolExporter extends ProtocolExporter {
             zos.write(unzippedExporter.export());
             zos.closeEntry();
         } catch (IOException ioe) {
-            logger.error(Errors.getMessage(Errors.E252, ioe));
-            throw new ExportException(Errors.getMessage(Errors.E252, ioe));
+            logger.error(Errors.compose(Errors.E252, ioe));
+            throw new ExportException(Errors.compose(Errors.E252, ioe));
         } finally {
             try {
                 zos.close();

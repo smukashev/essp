@@ -39,8 +39,8 @@ public final class BasicOptimizer {
             case META_CREDIT:
                 return CreditOptimizer.getKeyString(iBaseEntity);
             default:
-                logger.error(Errors.getError(Errors.getMessage(Errors.E183)) + " : \n" + iBaseEntity);
-                throw new IllegalStateException(Errors.getMessage(Errors.E183));
+                logger.error(Errors.getError(Errors.E183) + " : \n" + iBaseEntity);
+                throw new IllegalStateException(Errors.compose(Errors.E183));
         }
     }
 }

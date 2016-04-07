@@ -1,6 +1,5 @@
 package com.bsbnb.creditregistry.portlets.approval;
 
-import com.bsbnb.creditregistry.portlets.approval.bpm.ApprovalBusiness;
 import com.bsbnb.creditregistry.portlets.approval.data.BeanDataProvider;
 import com.bsbnb.creditregistry.portlets.approval.ui.MainLayout;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -16,23 +15,14 @@ import com.vaadin.ui.Window.Notification;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.EventRequest;
-import javax.portlet.EventResponse;
-import javax.portlet.PortletContext;
-import javax.portlet.PortletException;
-import javax.portlet.PortletRequestDispatcher;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
+import javax.portlet.*;
+import java.security.AccessControlException;
 
 public class ApprovalApplication extends Application {
     private static final long serialVersionUID = 2096197512742005243L;
 
     private final Logger logger = org.apache.log4j.Logger.getLogger(ApprovalApplication.class);
+    private Exception currentException;
 
     @Override
     public void init() {
@@ -42,7 +32,7 @@ public class ApprovalApplication extends Application {
             PortletApplicationContext2 ctx = (PortletApplicationContext2) getContext();
             ctx.addPortletListener(this, new SamplePortletListener());
         } else {
-            getMainWindow().showNotification("Not inited via Portal!", Notification.TYPE_ERROR_MESSAGE);
+            getMainWindow().showNotification(Errors.getError(Errors.E287), Window.Notification.TYPE_ERROR_MESSAGE);
         }
     }
 
@@ -51,37 +41,34 @@ public class ApprovalApplication extends Application {
 
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
-            User user = null;
-            boolean hasRights = false;
             try {
-                user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
-                if(user != null) {
+                boolean hasRights = false;
+
+                User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                if (user != null) {
                     for (Role role : user.getRoles()) {
                         if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
                                 || role.getName().equals("NationalBankEmployee"))
                             hasRights = true;
                     }
                 }
-            } catch (PortalException e) {
-                logger.error(e.getMessage(),e);
-            } catch (SystemException e) {
-                logger.error(e.getMessage(),e);
-            }
 
-            if(!hasRights)
-                return;
+                if (!hasRights) {
+                    throw new AccessControlException(Errors.compose(Errors.E238));
+                }
 
-            try {
                 setTheme("custom");
 
                 Window mainWindow = new Window();
                 mainWindow.addComponent(new MainLayout(new BeanDataProvider(),
                         new ApprovalPortletEnvironmentFacade(user)));
                 setMainWindow(mainWindow);
-            } catch (Exception e) {
-                logger.error(Errors.unmarshall(e.getMessage()));
-            }
 
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
+                getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
+            }
         }
 
         @Override

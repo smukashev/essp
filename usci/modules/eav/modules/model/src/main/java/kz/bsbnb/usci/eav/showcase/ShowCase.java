@@ -136,12 +136,12 @@ public class ShowCase extends Persistable {
 
     public void addField(String attributePath, String columnName) {
         if (meta == null)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E52));
+            throw new IllegalArgumentException(Errors.compose(Errors.E52));
 
         IMetaAttribute attr = getActualMeta().getElAttribute(attributePath);
 
         if (attr == null)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E51,getName(),attributePath));
+            throw new IllegalArgumentException(Errors.compose(Errors.E51,getName(),attributePath));
 
         ShowCaseField showCaseField = new ShowCaseField();
         showCaseField.setMetaId(this.getActualMeta().getId());
@@ -154,14 +154,14 @@ public class ShowCase extends Persistable {
 
     public void addCustomField(String attributePath, String columnName, MetaClass customMeta) {
         if (customMeta == null)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E50));
+            throw new IllegalArgumentException(Errors.compose(Errors.E50));
 
         IMetaAttribute attr = null;
         if (!attributePath.equals("root"))
             attr = customMeta.getElAttribute(attributePath);
 
         if (attr == null && !attributePath.equals("root"))
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E51,getName(),attributePath));
+            throw new IllegalArgumentException(Errors.compose(Errors.E51,getName(),attributePath));
 
         ShowCaseField showCaseField = new ShowCaseField();
 

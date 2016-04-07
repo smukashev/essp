@@ -85,7 +85,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E138, count, baseValue.getId()));
+            throw new IllegalStateException(Errors.compose(Errors.E138, count, baseValue.getId()));
     }
 
     @Override
@@ -98,7 +98,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E133, count, persistable.getId()));
+            throw new IllegalStateException(Errors.compose(Errors.E133, count, persistable.getId()));
     }
 
     private IBaseValue constructValue (Map<String, Object> row, IMetaType metaType, IBaseEntity childBaseEntity) {
@@ -129,7 +129,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -172,7 +172,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E137, childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
+            throw new IllegalStateException(Errors.compose(Errors.E137, childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -187,7 +187,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -231,7 +231,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E136, childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
+            throw new IllegalStateException(Errors.compose(Errors.E136, childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
 
         if (rows.size() >= 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -246,7 +246,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @SuppressWarnings("unchecked")
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -257,7 +257,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         IMetaType metaType = baseSet.getMemberType();
 
         if (baseContainer.getId() == 0)
-            throw new RuntimeException(Errors.getMessage(Errors.E134));
+            throw new RuntimeException(Errors.compose(Errors.E134));
 
         IBaseValue closedBaseValue = null;
 
@@ -278,7 +278,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E135,
+            throw new IllegalStateException(Errors.compose(Errors.E135,
                     childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
 
         if (rows.size() == 1) {
@@ -309,7 +309,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         if (baseValue.getBaseContainer() == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseValue.getBaseContainer().getId() == 0)
             return null;
@@ -337,7 +337,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E83, select.toString()));
+            throw new IllegalStateException(Errors.compose(Errors.E83, select.toString()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -432,8 +432,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
     @Override
     public void deleteAll(long baseSetId) {
-        Set<Long> childBaseEntityIds = getChildBaseEntityIds(baseSetId);
-
         String tableAlias = "cv";
         Delete delete = context
                 .delete(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
@@ -441,54 +439,5 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-
-        for (long childBaseEntityId : childBaseEntityIds)
-            baseEntityDao.deleteRecursive(childBaseEntityId);
-    }
-
-    @Override
-    public Set<Long> getChildBaseEntityIds(long baseSetId) {
-        Set<Long> childBaseEntityIds = new HashSet<>();
-
-        String tableAlias = "bv";
-        Select select = context
-                .select(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID)
-                .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
-                .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID.equal(baseSetId))
-                .groupBy(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID);
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        if (rows.size() > 0) {
-            for (Map<String, Object> row : rows)
-                childBaseEntityIds.add(((BigDecimal) row
-                        .get(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID.getName())).longValue());
-        }
-
-        return childBaseEntityIds;
-    }
-
-    public boolean isSingleBaseValue(IBaseValue baseValue) {
-        IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
-
-        String entitiesTableAlias = "e";
-        String complexSetValuesTableAlias = "csv";
-        Select select = context
-                .select(EAV_BE_ENTITIES.as(entitiesTableAlias).ID)
-                .from(EAV_BE_ENTITIES.as(entitiesTableAlias))
-                .where(EAV_BE_ENTITIES.as(entitiesTableAlias).ID.equal(childBaseEntity.getId()))
-                .and(DSL.exists(context
-                        .select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
-                        .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias))
-                        .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID
-                                .equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
-                        .and(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID.
-                                notEqual(baseValue.getId()))));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        return rows.size() == 0;
     }
 }

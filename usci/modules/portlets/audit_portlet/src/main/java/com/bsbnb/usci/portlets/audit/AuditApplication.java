@@ -19,7 +19,10 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
+
+import java.security.AccessControlException;
 
 public class AuditApplication extends Application {
     
@@ -39,7 +42,7 @@ public class AuditApplication extends Application {
 
             ctx.addPortletListener(this, new SamplePortletListener());
         } else {
-            getMainWindow().showNotification("Not inited via Portal!", Notification.TYPE_ERROR_MESSAGE);
+            getMainWindow().showNotification(Errors.getError(Errors.E287), Window.Notification.TYPE_ERROR_MESSAGE);
         }
 
     }
@@ -49,32 +52,30 @@ public class AuditApplication extends Application {
 
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
-
-            boolean hasRights = false;
             try {
+                boolean hasRights = false;
+
                 User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
-                if(user != null) {
+                if (user != null) {
                     for (Role role : user.getRoles()) {
                         if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
                                 || role.getName().equals("NationalBankEmployee"))
                             hasRights = true;
                     }
                 }
-            } catch (PortalException e) {
-                logger.error(e.getMessage(),e);
-            } catch (SystemException e) {
-                logger.error(e.getMessage(),e);
-            }
 
-            if(!hasRights)
-                return;
-            try{
+                if (!hasRights) {
+                    throw new AccessControlException(Errors.compose(Errors.E238));
+                }
+
                 Window mainWindow = new Window();
                 mainWindow.setTheme("custom");
                 mainWindow.addComponent(new AuditLayout(request.getLocale()));
                 setMainWindow(mainWindow);
-            }catch(Exception e){
-                logger.error(e.getMessage(),e);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
+                getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
             }
         }
 

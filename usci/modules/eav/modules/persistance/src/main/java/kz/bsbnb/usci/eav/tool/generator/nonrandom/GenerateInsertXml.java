@@ -94,13 +94,13 @@ public class GenerateInsertXml {
             if (isWindows()) {
                 filePath = FILE_PATH_WINDOWS;
             } else if (isMac()) {
-                throw new RuntimeException(Errors.getMessage(Errors.E182));
+                throw new RuntimeException(Errors.compose(Errors.E182));
             } else if (isUnix()) {
                 filePath = FILE_PATH_UNIX;
             } else if (isSolaris()) {
-                throw new RuntimeException(Errors.getMessage(Errors.E182));
+                throw new RuntimeException(Errors.compose(Errors.E182));
             } else {
-                throw new RuntimeException(Errors.getMessage(Errors.E182));
+                throw new RuntimeException(Errors.compose(Errors.E182));
             }
 
             baseEntityXmlGenerator.writeToXml(document, filePath);

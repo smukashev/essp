@@ -86,7 +86,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E88, count, baseValue.getId()));
+            throw new IllegalStateException(Errors.compose(Errors.E88, count, baseValue.getId()));
     }
 
     @Override
@@ -101,7 +101,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E87, count, persistable.getId()));
+            throw new IllegalStateException(Errors.compose(Errors.E87, count, persistable.getId()));
     }
 
     @Override
@@ -109,14 +109,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E80));
+            throw new IllegalStateException(Errors.compose(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E81));
+            throw new IllegalStateException(Errors.compose(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseContainer.getId() < 1)
             return null;
@@ -163,7 +163,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E83, metaAttribute.getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -207,14 +207,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E80));
+            throw new IllegalStateException(Errors.compose(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E81));
+            throw new IllegalStateException(Errors.compose(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseContainer.getId() < 1)
             return null;
@@ -260,7 +260,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E83, metaAttribute.getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -304,14 +304,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E80));
+            throw new IllegalStateException(Errors.compose(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E81));
+            throw new IllegalStateException(Errors.compose(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseContainer.getId() < 1)
             return null;
@@ -336,7 +336,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E83, metaAttribute.getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -374,14 +374,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         if (metaAttribute == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E80));
+            throw new IllegalStateException(Errors.compose(Errors.E80));
 
         if (metaAttribute.getId() < 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E81));
+            throw new IllegalStateException(Errors.compose(Errors.E81));
 
         IBaseContainer baseContainer = baseValue.getBaseContainer();
         if (baseContainer == null)
-            throw new IllegalStateException(Errors.getMessage(Errors.E82, baseValue.getMetaAttribute().getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseContainer.getId() < 1)
             return null;
@@ -407,7 +407,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E83, metaAttribute.getName()));
+            throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
@@ -596,31 +596,4 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
         return baseEntityIds;
     }
-
-    public boolean isSingleBaseValue(IBaseValue baseValue) {
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
-
-        String entitiesTableAlias = "e";
-        String complexValuesTableAlias = "cv";
-        Select select = context
-                .select(EAV_BE_ENTITIES.as(entitiesTableAlias).ID)
-                .from(EAV_BE_ENTITIES.as(entitiesTableAlias))
-                .where(EAV_BE_ENTITIES.as(entitiesTableAlias).ID.equal(childBaseEntity.getId()))
-                .and(DSL.exists(context
-                        .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
-                        .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                        .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ATTRIBUTE_ID.
-                                equal(metaAttribute.getId()))
-                        .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID
-                                .equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
-                        .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID.
-                                notEqual(baseValue.getId()))));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        return rows.size() == 0;
-    }
-
 }

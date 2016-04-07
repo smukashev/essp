@@ -86,7 +86,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         if (metaClass.getId() < 1) {
             if (metaClass.getClassName() == null)
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E162));
+                throw new IllegalArgumentException(Errors.compose(Errors.E162));
 
             if (beginDateStrict) {
                 select = context.select(
@@ -140,10 +140,10 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E82, metaClass.getClassName()));
+            throw new IllegalArgumentException(Errors.compose(Errors.E82, metaClass.getClassName()));
 
         if (rows.size() < 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E163, metaClass.getClassName()));
+            throw new IllegalArgumentException(Errors.compose(Errors.E163, metaClass.getClassName()));
 
         Map<String, Object> row = rows.get(0);
 
@@ -160,7 +160,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         if (metaClass.getId() < 1) {
             if (metaClass.getClassName() == null)
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E162));
+                throw new IllegalArgumentException(Errors.compose(Errors.E162));
 
             if (beginDateStrict) {
                 select = context.select(
@@ -214,10 +214,10 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() > 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E83, metaClass.getClassName()));
+            throw new IllegalArgumentException(Errors.compose(Errors.E83, metaClass.getClassName()));
 
         if (rows.size() < 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E163, metaClass.getClassName()));
+            throw new IllegalArgumentException(Errors.compose(Errors.E163, metaClass.getClassName()));
 
         Map<String, Object> row = rows.get(0);
 
@@ -249,7 +249,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         long metaId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
         if (metaId < 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E158));
+            throw new IllegalStateException(Errors.compose(Errors.E158));
 
         metaClass.setId(metaId);
 
@@ -258,7 +258,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     private void updateClass(MetaClass metaClass) {
         if (metaClass.getId() < 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E170));
+            throw new IllegalArgumentException(Errors.compose(Errors.E170));
 
         UpdateConditionStep update = context.update(EAV_M_CLASSES).
                 set(EAV_M_CLASSES.NAME, metaClass.getClassName()).
@@ -278,7 +278,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         long id;
 
         if (!type.isSet())
-            throw new IllegalStateException(Errors.getMessage(Errors.E168, attributeName));
+            throw new IllegalStateException(Errors.compose(Errors.E168, attributeName));
 
         MetaSet metaSet = (MetaSet) type;
 
@@ -329,7 +329,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         InsertOnDuplicateStep insert;
 
         if (type.isSet())
-            throw new IllegalStateException(Errors.getMessage(Errors.E167, attributeName));
+            throw new IllegalStateException(Errors.compose(Errors.E167, attributeName));
 
         if (type.isComplex()) {
             long innerId = save((MetaClass) type);
@@ -395,7 +395,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     private void insertAttributes(Set<String> addNames, MetaClass meta) {
         if (meta.getId() < 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E161));
+            throw new IllegalArgumentException(Errors.compose(Errors.E161));
 
         for (String typeName : addNames) {
             IMetaAttribute metaAttribute = meta.getMetaAttribute(typeName);
@@ -414,7 +414,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     private void updateAttributes(Set<String> updateNames, MetaClass meta, MetaClass dbMeta) {
         if (dbMeta.getId() < 1) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E169));
+            throw new IllegalArgumentException(Errors.compose(Errors.E169));
         }
 
         UpdateConditionStep update;
@@ -493,7 +493,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         DeleteConditionStep delete;
 
         if (meta.getId() < 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E159));
+            throw new IllegalArgumentException(Errors.compose(Errors.E159));
 
         for (String typeName : deleteNames) {
             if (meta.getMemberType(typeName).isComplex()) {
@@ -748,7 +748,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
     private void loadAttributes(MetaClass meta) {
         if (meta.getId() < 1)
-            throw new IllegalStateException(Errors.getMessage(Errors.E164));
+            throw new IllegalStateException(Errors.compose(Errors.E164));
 
         meta.removeMembers();
 
@@ -776,7 +776,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         }
 
         if (dbMeta.getId() < 1) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E166));
+            throw new IllegalArgumentException(Errors.compose(Errors.E166));
         }
 
         Set<String> oldNames = dbMeta.getMemberNames();
@@ -887,7 +887,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
     @Transactional
     public void remove(MetaClass metaClass) {
         if (metaClass.getId() < 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E165));
+            throw new IllegalArgumentException(Errors.compose(Errors.E165));
 
         long t = 0;
 
@@ -947,7 +947,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         if (rows.size() < 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E160));
+            throw new IllegalArgumentException(Errors.compose(Errors.E160));
 
         for (Map<String, Object> row : rows) {
 

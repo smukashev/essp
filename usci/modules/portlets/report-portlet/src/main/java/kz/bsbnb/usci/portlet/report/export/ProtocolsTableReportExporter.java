@@ -153,8 +153,8 @@ public class ProtocolsTableReportExporter {
 
         // validation
         if (headers == null || data == null) {
-            logger.error(Errors.getError(String.valueOf(Errors.E255)));
-            throw new Exception(Errors.getMessage(Errors.E255));
+            logger.error(Errors.getError(Errors.E255));
+            throw new Exception(Errors.compose(Errors.E255));
         }
 
         //  if (headers.size() != data.size()) {

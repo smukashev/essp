@@ -21,8 +21,8 @@ public final class PrimaryContractOptimizer {
 
         if (noBaseValue == null || dateBaseValue == null ||
                 noBaseValue.getValue() == null || dateBaseValue.getValue() == null) {
-            logger.error(Errors.getError(Errors.getMessage(Errors.E187)) + " : \n" + iBaseEntity);
-            throw new IllegalStateException(Errors.getMessage(Errors.E187));
+            logger.error(Errors.getError(Errors.E187) + " : \n" + iBaseEntity);
+            throw new IllegalStateException(Errors.compose(Errors.E187));
         }
 
         stringBuilder.append(noBaseValue.getValue());

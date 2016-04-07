@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.portlets.signing;
 
 import com.liferay.portal.model.Role;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlets.signing.data.BeanDataProvider;
 import kz.bsbnb.usci.portlets.signing.data.DataProvider;
 import kz.bsbnb.usci.portlets.signing.data.FileSignatureRecord;
@@ -29,7 +30,7 @@ import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
-public class SigningPortlet extends GenericPortlet {
+    public class SigningPortlet extends GenericPortlet {
 
     private final Logger logger = Logger.getLogger(SigningPortlet.class);
 
@@ -75,37 +76,37 @@ public class SigningPortlet extends GenericPortlet {
             RenderRequest renderRequest, RenderResponse renderResponse)
             throws IOException, PortletException {
         logger.info("View");
-        User user = null;
-        boolean hasRights = false;
+
         try {
-            user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
-            if(user != null) {
+
+            boolean hasRights = false;
+            User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
+            if (user != null) {
                 for (Role role : user.getRoles()) {
                     if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
                             || role.getName().equals("NationalBankEmployee"))
                         hasRights = true;
                 }
             }
-        } catch (PortalException e) {
+
+            if (hasRights) {
+                renderRequest.setAttribute("UserId", user.getUserId());
+                DataProvider provider = new BeanDataProvider();
+                renderRequest.setAttribute("PortalUrl", provider.getBaseUrl());
+                renderRequest.setAttribute("ContextPath", renderRequest.getContextPath());
+                List<Creditor> userCreditors = provider.getCreditorsList(user.getUserId());
+                renderRequest.setAttribute("hasAccess", userCreditors.size() == 1);
+                List<FileSignatureRecord> filesToSign = provider.getFilesToSign(user.getUserId());
+                renderRequest.setAttribute("noFilesToSign", filesToSign.isEmpty());
+                renderRequest.setAttribute("inputFiles", filesToSign);
+                renderRequest.setAttribute("actionUrl", renderResponse.createActionURL());
+            }
+        } catch (Exception e) {
             logger.error(e.getMessage(),e);
-        } catch (SystemException e) {
-            logger.error(e.getMessage(),e);
+            String errorMessage = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
+            errorMessage = Errors.decompose(errorMessage);
+            renderRequest.setAttribute("errorMessage", errorMessage);
         }
-
-        if(!hasRights)
-            return;
-
-
-        renderRequest.setAttribute("UserId", user.getUserId());
-        DataProvider provider = new BeanDataProvider();
-        renderRequest.setAttribute("PortalUrl", provider.getBaseUrl());
-        renderRequest.setAttribute("ContextPath", renderRequest.getContextPath());
-        List<Creditor> userCreditors = provider.getCreditorsList(user.getUserId());
-        renderRequest.setAttribute("hasAccess", userCreditors.size() == 1);
-        List<FileSignatureRecord> filesToSign = provider.getFilesToSign(user.getUserId());
-        renderRequest.setAttribute("noFilesToSign", filesToSign.isEmpty());
-        renderRequest.setAttribute("inputFiles", filesToSign);
-        renderRequest.setAttribute("actionUrl", renderResponse.createActionURL());
 
         include(viewJSP, renderRequest, renderResponse);
     }
@@ -114,58 +115,65 @@ public class SigningPortlet extends GenericPortlet {
     public void processAction(
             ActionRequest actionRequest, ActionResponse actionResponse)
             throws IOException, PortletException {
-        String command = actionRequest.getParameter("COMMAND");
-        logger.info("Command: "+ command);
 
-        DataProvider provider = new BeanDataProvider();
-        long userId = PortalUtil.getUserId(actionRequest);
-        List<FileSignatureRecord> filesList = provider.getFilesToSign(userId);
-        Map<BigInteger, FileSignatureRecord> filesById = new HashMap<BigInteger, FileSignatureRecord>();
-        for (FileSignatureRecord fileSignatureRecord : filesList) {
-            filesById.put(fileSignatureRecord.getInputFileId(), fileSignatureRecord);
-        }
+        try {
+            String command = actionRequest.getParameter("COMMAND");
+            logger.info("Command: " + command);
 
-        Map<String, String[]> parameterMap = actionRequest.getParameterMap();
+            DataProvider provider = new BeanDataProvider();
+            long userId = PortalUtil.getUserId(actionRequest);
+            List<FileSignatureRecord> filesList = provider.getFilesToSign(userId);
+            Map<BigInteger, FileSignatureRecord> filesById = new HashMap<BigInteger, FileSignatureRecord>();
+            for (FileSignatureRecord fileSignatureRecord : filesList) {
+                filesById.put(fileSignatureRecord.getInputFileId(), fileSignatureRecord);
+            }
 
-        if (parameterMap.containsKey("certificateInfo")) {
-            String certificate = parameterMap.get("certificateInfo")[0];
-            actionRequest.setAttribute("certificate", new String[]{certificate});
+            Map<String, String[]> parameterMap = actionRequest.getParameterMap();
 
-            actionRequest.setAttribute("certificateSuccess", true);
-            List<FileSignatureRecord> processedFiles = new ArrayList<FileSignatureRecord>();
-            for (Entry<String, String[]> entry : parameterMap.entrySet()) {
-                logger.info("Entry key: "+ entry.getKey());
-                logger.info("Entry value: "+ Arrays.toString(entry.getValue()));
-                String key = entry.getKey();
-                if (key != null && key.startsWith("sign") && entry.getValue().length > 0
-                        && StringUtils.isNotEmpty(entry.getValue()[0])) {
+            if (parameterMap.containsKey("certificateInfo")) {
+                String certificate = parameterMap.get("certificateInfo")[0];
+                actionRequest.setAttribute("certificate", new String[]{certificate});
 
-                    BigInteger signId = new BigInteger(key.substring(4));
-                    FileSignatureRecord record = filesById.get(signId);
-                    if (record != null) {
-                        record.setSignature(entry.getValue()[0]);
-                        provider.addInputFileToQueue(record);
-                        processedFiles.add(record);
+                actionRequest.setAttribute("certificateSuccess", true);
+                List<FileSignatureRecord> processedFiles = new ArrayList<FileSignatureRecord>();
+                for (Entry<String, String[]> entry : parameterMap.entrySet()) {
+                    logger.info("Entry key: " + entry.getKey());
+                    logger.info("Entry value: " + Arrays.toString(entry.getValue()));
+                    String key = entry.getKey();
+                    if (key != null && key.startsWith("sign") && entry.getValue().length > 0
+                            && StringUtils.isNotEmpty(entry.getValue()[0])) {
+
+                        BigInteger signId = new BigInteger(key.substring(4));
+                        FileSignatureRecord record = filesById.get(signId);
+                        if (record != null) {
+                            record.setSignature(entry.getValue()[0]);
+                            provider.addInputFileToQueue(record);
+                            processedFiles.add(record);
+                        }
                     }
                 }
-            }
-            actionRequest.setAttribute("processedFiles", processedFiles);
-            StringBuilder processedFileNames = new StringBuilder();
-            for (FileSignatureRecord processedFile : processedFiles) {
-                processedFileNames.append("<br />");
-                processedFileNames.append(processedFile.getFilename());
+                actionRequest.setAttribute("processedFiles", processedFiles);
+                StringBuilder processedFileNames = new StringBuilder();
+                for (FileSignatureRecord processedFile : processedFiles) {
+                    processedFileNames.append("<br />");
+                    processedFileNames.append(processedFile.getFilename());
 
-                provider.signFile(Long.parseLong(processedFile.getId()), processedFile.getSignature());
-            }
-            logger.info("Processed file names: "+ processedFileNames.toString());
-            actionRequest.setAttribute("processedFilenames", new String[]{processedFileNames.toString()});
-            actionRequest.setAttribute("hasInfoOnProcessedFiles", true);
+                    provider.signFile(Long.parseLong(processedFile.getId()), processedFile.getSignature());
+                }
+                logger.info("Processed file names: " + processedFileNames.toString());
+                actionRequest.setAttribute("processedFilenames", new String[]{processedFileNames.toString()});
+                actionRequest.setAttribute("hasInfoOnProcessedFiles", true);
 
-            actionRequest.setAttribute("noCertificate", false);
-        } else {
-            actionRequest.setAttribute("noCertificate", true);
+                actionRequest.setAttribute("noCertificate", false);
+            } else {
+                actionRequest.setAttribute("noCertificate", true);
+            }
+        } catch (Exception e){
+            logger.error(e.getMessage(),e);
+            String errorMessage = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
+            errorMessage = Errors.decompose(errorMessage);
+            actionRequest.setAttribute("errorMessage", errorMessage);
         }
-
     }
 
     protected void include(

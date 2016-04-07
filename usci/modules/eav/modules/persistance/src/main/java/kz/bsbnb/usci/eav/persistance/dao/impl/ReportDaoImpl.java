@@ -283,7 +283,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                 insertWithId(insert.getSQL(), insert.getBindValues().toArray());
             }
         } catch (DuplicateKeyException e) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E171));
+            throw new IllegalArgumentException(Errors.compose(Errors.E171));
         }
     }
 

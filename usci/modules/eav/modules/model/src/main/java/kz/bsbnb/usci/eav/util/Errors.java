@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.util;
 
+import org.apache.commons.lang.enums.EnumUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -338,8 +340,8 @@ public enum Errors {
         errors.put("E283", "Метакласс не содержит атрибутов");//MetaClass with no members
         errors.put("E284", "Неизвестный тип;");
         errors.put("E285", "Ключевые простые массивы не поддерживются;");
-        errors.put("E286", "Не получилось отправить в витрину;");
-        errors.put("E287", "");
+        errors.put("E286", "Невозможно подключиться к сервису #e_message");
+        errors.put("E287", "Не запущено через портал Liferay!");
         errors.put("E288", "");
         errors.put("E289", "");
         errors.put("E290", "");
@@ -409,16 +411,16 @@ public enum Errors {
 
     }
 
-    public static String getError(String code) {
+    public static String getError(Errors code) {
         if (errors.get(code + "_" + LOCALE) == null)
             return errors.get(code + "");
         return errors.get(code + "_" + LOCALE);
     }
 
-    public static String getMessage(Enum error, Object... params) {
+    public static String compose(Errors error, Object... params) {
         String message = String.valueOf(error);
         for (Object obj : params) {
-            if (obj instanceof String && String.valueOf(obj).length() > 255) {
+            if (String.valueOf(obj).length() > 255) {
                 obj = String.valueOf(obj).substring(0, 255);
             }
             message += "|~~~|" + obj;
@@ -426,30 +428,40 @@ public enum Errors {
         return message;
     }
 
-    public static String unmarshall(String message) {
-        if (message == null) return null;
+    public static String replaceTags(Errors code, Object... params){
+        String error = getError(code);
 
-        String[] paramArr = message.split(Errors.SEPARATOR);
-        String error = Errors.getError(paramArr[0]);
-        List<String> params = Arrays.asList(Arrays.copyOfRange(paramArr, 1, paramArr.length));
-
-        if (error == null) // DT:checkme!
-            return message;
-
-        Matcher matcher = Pattern.compile("#\\s*(\\w+)").matcher(error);
+        Matcher matcher = Pattern.compile("#\\s*(\\w+)")
+                .matcher(error);
         List<String> matches = new ArrayList<>();
         while (matcher.find()) {
             matches.add("#" + matcher.group(1));
         }
 
-        for (int i = 0; i < params.size(); i++) {
+        for (int i = 0; i < params.length; i++) {
             try {
-                error = error.replaceFirst(matches.get(i), params.get(i));
+                error = error.replaceFirst(matches.get(i), (String) params[i]);
             } catch (Exception ex) {
-                throw new RuntimeException(getMessage(E199));
+                throw new RuntimeException(compose(E199));
             }
         }
         return error;
+    }
+    public static String decompose(String message) {
+        if (message == null) return null;
+
+        String[] paramArr = message.split(Errors.SEPARATOR);
+
+        try{// DT:checkme!
+            Errors.valueOf(paramArr[0]);
+        }catch(Exception e){
+            return message;
+        }
+
+        String[] params = new String[paramArr.length-1];
+        System.arraycopy(paramArr,1,params,0,params.length);
+
+        return replaceTags(Errors.valueOf(paramArr[0]), params);
     }
 
     public static String checkLength(String message){
@@ -458,4 +470,5 @@ public enum Errors {
         }
         return message;
     }
+
 }

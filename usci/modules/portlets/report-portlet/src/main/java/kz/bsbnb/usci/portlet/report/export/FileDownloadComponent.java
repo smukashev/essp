@@ -123,8 +123,8 @@ public class FileDownloadComponent extends Button {
 
     public void addAllFiles(Collection<String> filenames, Collection<File> files) {
         if (filenames.size() != files.size()) {
-            logger.error(Errors.getError(String.valueOf(Errors.E254)));
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E254));
+            logger.error(Errors.getError(Errors.E254));
+            throw new IllegalArgumentException(Errors.compose(Errors.E254));
         }
         this.entryNames.addAll(filenames);
         this.files.addAll(files);

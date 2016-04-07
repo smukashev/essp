@@ -54,7 +54,7 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
         int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException(Errors.getMessage(Errors.E156, count));
+            throw new RuntimeException(Errors.compose(Errors.E156, count));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count != 1)
-            throw new RuntimeException(Errors.getMessage(Errors.E154, count));
+            throw new RuntimeException(Errors.compose(Errors.E154, count));
     }
 
     @Override
@@ -155,6 +155,6 @@ public class EavGlobalDaoImpl extends JDBCSupport implements IEavGlobalDao {
         if (rows.size() > 0)
             return rows.get(0).get("VALUE").toString();
 
-        throw new RuntimeException(Errors.getMessage(Errors.E155));
+        throw new RuntimeException(Errors.compose(Errors.E155));
     }
 }

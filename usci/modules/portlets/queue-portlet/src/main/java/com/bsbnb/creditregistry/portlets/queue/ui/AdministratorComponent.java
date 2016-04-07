@@ -169,14 +169,14 @@ public class AdministratorComponent extends VerticalLayout {
 
             @Override
             public void setOrderType(QueueOrderType orderType) {
-                logger.error(Errors.getError(String.valueOf(Errors.E253)));
-                throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+                logger.error(Errors.getError(Errors.E253));
+                throw new UnsupportedOperationException(Errors.compose(Errors.E206));
             }
 
             @Override
             public void setPriorityCreditorIds(List<Integer> ids) {
-                logger.error(Errors.getError(String.valueOf(Errors.E206)));
-                throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+                logger.error(Errors.getError(Errors.E206));
+                throw new UnsupportedOperationException(Errors.compose(Errors.E206));
             }
         };
         List<Creditor> creditors = dataProvider.getCreditors(environment.getUserId(), environment.isUserAdmin());

@@ -68,7 +68,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 final List<ShowCase> showCases = showcaseDao.getShowCases();
 
                 if (showCases.size() == 0)
-                    throw new IllegalStateException(Errors.getMessage(Errors.E271));
+                    throw new IllegalStateException(Errors.compose(Errors.E271));
 
                 currentEntity = queueEntry.getBaseEntityApplied();
                 currentEntity.getKeyElements();

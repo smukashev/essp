@@ -31,7 +31,9 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.security.AccessControlException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,7 +46,7 @@ public class MainPortlet extends MVCPortlet {
 	private PortalUserBeanRemoteBusiness portalUserBeanRemoteBusiness;
 	private ISearcherFormService searcherFormService;
 	private PortalUserBeanRemoteBusiness portalUserBusiness;
-
+	private Exception currentException;
 
 	void connectToServices() {
 		try {
@@ -101,7 +103,7 @@ public class MainPortlet extends MVCPortlet {
 			portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
 			portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 		} catch (Exception e) {
-			System.out.println("Can\"t initialise services: " + e.getMessage());
+			throw new RuntimeException(Errors.compose(Errors.E286,e.getMessage()),e);
 		}
 	}
 
@@ -109,14 +111,10 @@ public class MainPortlet extends MVCPortlet {
 
 	@Override
 	public void init() throws PortletException {
-		connectToServices();
-
 		classesFilter = new LinkedList<>();
-
 		for (String s : PortletProps.get("classes.filter").split(",")) {
 			classesFilter.add(s);
 		}
-
 		super.init();
 	}
 
@@ -124,12 +122,10 @@ public class MainPortlet extends MVCPortlet {
 	public void doView(RenderRequest renderRequest, RenderResponse renderResponse)
 			throws IOException, PortletException {
 		String entityId = getParam("entityId", renderRequest);
-
 		renderRequest.setAttribute("entityId", entityId);
 
-		boolean hasRights = false;
-
 		try {
+			boolean hasRights = false;
 			User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
 			if (user != null) {
 				for (Role role : user.getRoles()) {
@@ -138,14 +134,13 @@ public class MainPortlet extends MVCPortlet {
 						hasRights = true;
 				}
 			}
-		} catch (PortalException e) {
-			e.printStackTrace();
-		} catch (SystemException e) {
-			e.printStackTrace();
-		}
 
-		if (!hasRights)
-			return;
+			if (!hasRights) {
+				throw new AccessControlException(Errors.compose(Errors.E238));
+			}
+		} catch (Exception e) {
+			currentException = e;
+		}
 
 		super.doView(renderRequest, renderResponse);
 	}
@@ -426,7 +421,7 @@ public class MainPortlet extends MVCPortlet {
 		if (meta.getClassName().equals("credit") && !isNb) {
 			BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
 			if (creditor.getId() != creditorId)
-				throw new RuntimeException(Errors.getMessage(Errors.E238));
+				throw new RuntimeException(Errors.compose(Errors.E238));
 		}
 
 		if (title == null) {
@@ -567,7 +562,7 @@ public class MainPortlet extends MVCPortlet {
 			title = code;
 
 		if (meta == null)
-			throw new NullPointerException(Errors.getMessage(Errors.E243));
+			throw new NullPointerException(Errors.compose(Errors.E243));
 
 		Boolean isSearchable = false;
 		if (meta.isComplex())
@@ -828,7 +823,7 @@ public class MainPortlet extends MVCPortlet {
 			title = code;
 
 		if (type == null)
-			throw new NullPointerException(Errors.getMessage(Errors.E245));
+			throw new NullPointerException(Errors.compose(Errors.E245));
 
 		Boolean isSearchable = false;
 		if (type.isComplex()) {
@@ -1008,13 +1003,17 @@ public class MainPortlet extends MVCPortlet {
 	@Override
 	public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException {
 
-		if (metaFactoryService == null || entityService == null || entityMergeService == null)
-			throw new NullPointerException(Errors.getMessage(Errors.E244));
-
-
 		PrintWriter writer = resourceResponse.getWriter();
-		List<Creditor> creditors;
+
 		try {
+
+			if(currentException != null)
+				throw currentException;
+
+			if (metaFactoryService == null || entityService == null || entityMergeService == null)
+				connectToServices();
+
+			List<Creditor> creditors;
 			OperationTypes operationType = OperationTypes.valueOf(getParam("op", resourceRequest));
 			User currentUser = PortalUtil.getUser(resourceRequest);
 
@@ -1091,7 +1090,7 @@ public class MainPortlet extends MVCPortlet {
 					ISearchResult searchResult = searcherFormService.search(searchClassName, parameters, metaClass, prefix, creditorId);
 
 					if (searchResult.getData() == null)
-						throw new RuntimeException(Errors.getMessage(Errors.E242));
+						throw new RuntimeException(Errors.compose(Errors.E242));
 
 					Iterator<BaseEntity> cursor = searchResult.iterator();
 
@@ -1115,7 +1114,7 @@ public class MainPortlet extends MVCPortlet {
 					List<String[]> classes = searcherFormService.getMetaClasses(userId);
 
 					if (classes.size() < 1)
-						throw new RuntimeException(Errors.getMessage(Errors.E239));
+						throw new RuntimeException(Errors.compose(Errors.E239));
 
 					List<String[]> afterFilter = new LinkedList<>();
 
@@ -1150,10 +1149,10 @@ public class MainPortlet extends MVCPortlet {
 
 					if (!isNb) {
 						if (creditors.size() > 1)
-							throw new RuntimeException(Errors.getMessage(Errors.E240));
+							throw new RuntimeException(Errors.compose(Errors.E240));
 
 						if (creditors.size() == 0)
-							throw new RuntimeException(Errors.getMessage(Errors.E241));
+							throw new RuntimeException(Errors.compose(Errors.E241));
 
 						creditorId = creditors.get(0).getId();
 					}
@@ -1229,10 +1228,10 @@ public class MainPortlet extends MVCPortlet {
 
 					if (!isNb) {
 						if (creditors.size() > 1)
-							throw new RuntimeException(Errors.getMessage(Errors.E240));
+							throw new RuntimeException(Errors.compose(Errors.E240));
 
 						if (creditors.size() == 0)
-							throw new RuntimeException(Errors.getMessage(Errors.E241));
+							throw new RuntimeException(Errors.compose(Errors.E241));
 
 						creditorId = creditors.get(0).getId();
 					}
@@ -1347,8 +1346,11 @@ public class MainPortlet extends MVCPortlet {
 					break;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			writer.write("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}");
+			logger.error(e.getMessage(),e);
+			currentException = null;
+			String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
+			originalError = Errors.decompose(originalError);
+			writer.write("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}");
 		}
 	}
 

@@ -46,7 +46,7 @@ public abstract class AbstractDataGenerator {
             case DOUBLE:
                 return rand.nextDouble()*10000;
             default:
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E49));
+                throw new IllegalArgumentException(Errors.compose(Errors.E49));
         }
     }
 }

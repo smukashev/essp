@@ -77,7 +77,7 @@ public class MetaShowCommand extends AbstractCommand implements IMetaCommand {
 
         if (metaClassRepository == null)
         {
-            throw new RuntimeException(Errors.getMessage(Errors.E221));
+            throw new RuntimeException(Errors.compose(Errors.E221));
         }
 
         MetaClass meta = null;

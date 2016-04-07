@@ -2,8 +2,6 @@ package com.bsbnb.creditregistry.portlets.notifications;
 
 import com.bsbnb.creditregistry.portlets.notifications.data.BeanDataProvider;
 import com.bsbnb.creditregistry.portlets.notifications.ui.MainLayout;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.vaadin.Application;
@@ -11,7 +9,7 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
 
 import javax.portlet.ActionRequest;
@@ -22,6 +20,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import java.security.AccessControlException;
 
 public class NotificationsApplication extends Application {
 
@@ -38,7 +37,7 @@ public class NotificationsApplication extends Application {
 
             ctx.addPortletListener(this, new SamplePortletListener());
         } else {
-            getMainWindow().showNotification("Not inited via Portal!", Notification.TYPE_ERROR_MESSAGE);
+            getMainWindow().showNotification(Errors.getError(Errors.E287), Window.Notification.TYPE_ERROR_MESSAGE);
         }
     }
 
@@ -52,20 +51,18 @@ public class NotificationsApplication extends Application {
                 Window mainWindow = new Window();
                 User user = PortalUtil.getUser(request);
 
-                Label errorMessageLabel = new Label("Нет прав для просмотра");
+                if (user == null)
+                    throw new AccessControlException(Errors.compose(Errors.E238));
 
-                if(user == null) {
-                    mainWindow.addComponent(errorMessageLabel);
-                } else {
-                    NotificationsPortalEnvironmentFacade queuePortalEnvironmentFacade = new NotificationsPortalEnvironmentFacade(user);
-                    BeanDataProvider dataProvider = new BeanDataProvider();
-                    mainWindow.addComponent(new MainLayout(queuePortalEnvironmentFacade, dataProvider));
-                }
+                NotificationsPortalEnvironmentFacade queuePortalEnvironmentFacade = new NotificationsPortalEnvironmentFacade(user);
+                BeanDataProvider dataProvider = new BeanDataProvider();
+                mainWindow.addComponent(new MainLayout(queuePortalEnvironmentFacade, dataProvider));
+
                 setMainWindow(mainWindow);
-            } catch (PortalException pe) {
-                logger.error(null, pe);
-            } catch (SystemException se) {
-                logger.error(null, se);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
+                getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
             }
         }
 

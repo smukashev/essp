@@ -30,7 +30,7 @@ public class BeanDataProvider implements DataProvider {
         try{
             synchronizePortalUsersWithDatabase();
         }catch (Exception e){
-            logger.error(Errors.unmarshall(e.getMessage()));
+            logger.error(Errors.decompose(e.toString()));
         }
     }
 
@@ -52,7 +52,7 @@ public class BeanDataProvider implements DataProvider {
             remoteCreditorBusinessFactoryBean.afterPropertiesSet();
             creditorBusiness = (RemoteCreditorBusiness) remoteCreditorBusinessFactoryBean.getObject();
         } catch (Exception e) {
-            logger.error("Can't initialise services: " + e.getMessage());
+            throw new RuntimeException(Errors.compose(Errors.E286,e));
         }
     }
 
@@ -90,7 +90,7 @@ public class BeanDataProvider implements DataProvider {
 
     private PortalUser convert(User liferayUser) throws IllegalArgumentException {
         if (liferayUser == null)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E200));
+            throw new IllegalArgumentException(Errors.compose(Errors.E200));
 
         PortalUser portalUser = new PortalUser();
         portalUser.setUserId(liferayUser.getUserId());

@@ -2,8 +2,7 @@ package kz.bsbnb.usci.porltet.meta_editor;
 
 
 import com.google.gson.Gson;
-import com.liferay.portal.PortalException;
-import com.liferay.portal.SystemException;
+import com.liferay.portal.kernel.io.WriterOutputStream;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
@@ -17,6 +16,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.porltet.meta_editor.model.json.MetaClassList;
 import kz.bsbnb.usci.porltet.meta_editor.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
@@ -27,12 +27,14 @@ import javax.portlet.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.AccessControlException;
 import java.util.List;
 
 public class MainPortlet extends MVCPortlet {
     private XSDGenerator xsdGenerator = new XSDGenerator();
     private IMetaFactoryService metaFactoryService;
     private Logger logger = Logger.getLogger(MainPortlet.class);
+    private Exception currentException;
 
     public void connectToServices() {
         try {
@@ -45,15 +47,8 @@ public class MainPortlet extends MVCPortlet {
             metaFactoryServiceFactoryBean.afterPropertiesSet();
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
         } catch (Exception e) {
-            logger.error("Can't initialise services: " + e.getMessage());
+            throw new RuntimeException(Errors.compose(Errors.E286,e.getMessage()),e);
         }
-    }
-
-    @Override
-    public void init() throws PortletException {
-        connectToServices();
-
-        super.init();
     }
 
     @Override
@@ -61,9 +56,8 @@ public class MainPortlet extends MVCPortlet {
                        RenderResponse renderResponse) throws IOException, PortletException {
        //renderRequest.setAttribute("entityList", baseEntityList);
 
-        boolean hasRights = false;
-
         try {
+            boolean hasRights = false;
             User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
             if(user != null) {
                 for (Role role : user.getRoles()) {
@@ -71,18 +65,13 @@ public class MainPortlet extends MVCPortlet {
                         hasRights = true;
                 }
             }
-        } catch (PortalException e) {
-            logger.error(e.getMessage(),e);
-        } catch (SystemException e) {
-            logger.error(e.getMessage(),e);
-        } catch (com.liferay.portal.kernel.exception.PortalException e) {
-            logger.error(e.getMessage(),e);
-        } catch (com.liferay.portal.kernel.exception.SystemException e) {
-            logger.error(e.getMessage(),e);
-        }
 
-        if(!hasRights)
-            return;
+            if (!hasRights)
+                throw new AccessControlException(Errors.compose(Errors.E238));
+
+        } catch (Exception e) {
+            currentException = e;
+        }
 
         super.doView(renderRequest, renderResponse);
     }
@@ -102,27 +91,27 @@ public class MainPortlet extends MVCPortlet {
     public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException
     {
 
-        if (metaFactoryService == null) {
-            connectToServices();
-            //todo: add error message here
-            if (metaFactoryService == null)
-                return;
-        }
         PrintWriter writer = resourceResponse.getWriter();
 
         try {
-            OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
 
+            if(currentException != null)
+                throw currentException;
+
+            if (metaFactoryService == null)
+                connectToServices();
+
+            OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
             Gson gson = new Gson();
 
             switch (operationType) {
                 case DOWNLOAD_XSD:
                     List<MetaClass> metaClasses = metaFactoryService.getMetaClasses();
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    xsdGenerator.generate(out, metaClasses);
+                    ByteArrayOutputStream baus = new ByteArrayOutputStream();
+                    xsdGenerator.generate(baus, metaClasses);
 
                     resourceResponse.setContentType("text/plain");
-                    writer.write(new String(out.toByteArray()));
+                    writer.write(new String(baus.toByteArray()));
 
                     break;
                 case LIST_ALL:
@@ -568,7 +557,12 @@ public class MainPortlet extends MVCPortlet {
                     break;
             }
         } catch (Exception e) {
-            writer.write("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}");
+            logger.error(e.getMessage(),e);
+            currentException = null;
+            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
+            originalError = Errors.decompose(originalError);
+            writer.write("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}");
         }
+
     }
 }

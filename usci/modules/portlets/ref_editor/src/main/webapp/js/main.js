@@ -996,6 +996,14 @@ Ext.onReady(function() {
         }
     });
 
+    entityGrid.getStore().load({
+        callback: function (records, operation, success) {
+            if (!success) {
+                Ext.MessageBox.alert(label_ERROR, operation.request.proxy.reader.rawData.errorMessage);
+            }
+        }
+    });
+
     // --------------------------------------------
     var today = new Date();
     var dd = today.getDate();

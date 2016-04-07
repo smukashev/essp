@@ -29,7 +29,7 @@ public class StructType {
                 table =  EAV_BE_DATE_VALUES;
                 break;
             default:
-                throw new java.lang.IllegalStateException(Errors.getMessage(Errors.E190, dataTypes));
+                throw new java.lang.IllegalStateException(Errors.compose(Errors.E190, dataTypes));
 
         }
 
@@ -56,7 +56,7 @@ public class StructType {
                 obj =  DataUtils.convert((java.util.Date) value);
                 break;
             default:
-                throw new java.lang.IllegalStateException(Errors.getMessage(Errors.E190, dataTypes));
+                throw new java.lang.IllegalStateException(Errors.compose(Errors.E190, dataTypes));
 
         }
 

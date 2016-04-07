@@ -26,6 +26,7 @@ import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.porltet.ref_portlet.model.json.MetaClassList;
 import kz.bsbnb.usci.porltet.ref_portlet.model.json.MetaClassListEntry;
 import kz.bsbnb.usci.sync.service.IEntityService;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.Boolean;
 import java.lang.Number;
+import java.security.AccessControlException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,6 +54,7 @@ public class MainPortlet extends MVCPortlet {
     private IBatchEntryService batchEntryService;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     public final Logger logger = Logger.getLogger(MainPortlet.class);
+    private Exception currentException;
 
     public void connectToServices() {
         try {
@@ -89,14 +92,8 @@ public class MainPortlet extends MVCPortlet {
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         } catch (Exception e) {
-            logger.error("Can\"t initialise services: " + e.getMessage());
+            throw new RuntimeException(Errors.compose(Errors.E286,e.getMessage()),e);
         }
-    }
-
-    @Override
-    public void init() throws PortletException {
-        connectToServices();
-        super.init();
     }
 
     @Override
@@ -113,20 +110,20 @@ public class MainPortlet extends MVCPortlet {
 
         try {
             User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
-            if(user != null) {
+            if (user != null) {
                 for (Role role : user.getRoles()) {
                     if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
                             || role.getName().equals("NationalBankEmployee"))
                         hasRights = true;
                 }
             }
-        } catch (PortalException | SystemException e) {
-            logger.error(e.getMessage(),e);
+
+            if (!hasRights)
+                throw new AccessControlException(Errors.compose(Errors.E238));
+
+        } catch (Exception e) {
+            currentException = e;
         }
-
-        if(!hasRights)
-            return;
-
 
         super.doView(renderRequest, renderResponse);
     }
@@ -384,17 +381,16 @@ public class MainPortlet extends MVCPortlet {
     @Override
     public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws IOException
     {
-
-        if (metaFactoryService == null) {
-            connectToServices();
-            //todo: add error message here
-            if (metaFactoryService == null)
-                return;
-        }
-
         OutputStream out = resourceResponse.getPortletOutputStream();
 
         try {
+
+            if(currentException !=null)
+                throw currentException;
+
+            if (metaFactoryService == null)
+                connectToServices();
+
             OperationTypes operationType = OperationTypes.valueOf(getParam("op", resourceRequest));
 
             Gson gson = new Gson();
@@ -544,7 +540,10 @@ public class MainPortlet extends MVCPortlet {
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            out.write(("{\"success\": false, \"errorMessage\": \"" + e.getMessage() + "\"}").getBytes());
+            currentException = null;
+            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
+            originalError = Errors.decompose(originalError);
+            out.write(("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}").getBytes());
         }
     }
 

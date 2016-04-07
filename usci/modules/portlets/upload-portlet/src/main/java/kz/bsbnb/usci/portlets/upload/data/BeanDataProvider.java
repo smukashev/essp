@@ -5,6 +5,7 @@ import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.RemoteCreditorBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
@@ -54,7 +55,7 @@ public class BeanDataProvider implements DataProvider {
             globalServiceFactoryBean.afterPropertiesSet();
             globalService = (IGlobalService) globalServiceFactoryBean.getObject();
         } catch (Exception e) {
-            logger.error("Can't initialise services: " + e.getMessage());
+            throw new RuntimeException(Errors.compose(Errors.E286,e));
         }
     }
 

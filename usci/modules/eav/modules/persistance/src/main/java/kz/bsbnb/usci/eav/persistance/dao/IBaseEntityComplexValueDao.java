@@ -8,6 +8,4 @@ public interface IBaseEntityComplexValueDao extends IBaseEntityValueDao {
     Set<Long> getChildBaseEntityIds(long parentBaseEntityId);
 
     Set<Long> getChildBaseEntityIdsWithoutRefs(long parentBaseEntityId);
-
-    boolean isSingleBaseValue(IBaseValue baseValue);
 }

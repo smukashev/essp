@@ -56,9 +56,9 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
         if(entityStatus.getErrorCode()!=null) {
             if(entityStatus.getDevDescription()!=null)
-                err = Errors.unmarshall(entityStatus.getErrorCode()+"|~~~|"+entityStatus.getDevDescription());
+                err = Errors.decompose(entityStatus.getErrorCode()+"|~~~|"+entityStatus.getDevDescription());
             else
-                err = Errors.unmarshall(entityStatus.getErrorCode());
+                err = Errors.decompose(entityStatus.getErrorCode());
             /*err = Errors.getError(entityStatus.getErrorCode());
             if(entityStatus.getDevDescription()!=null) {
                 String[] params = entityStatus.getDevDescription().split("\\|~~~|");

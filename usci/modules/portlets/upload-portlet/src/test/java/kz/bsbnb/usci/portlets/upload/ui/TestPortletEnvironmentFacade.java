@@ -34,11 +34,11 @@ public class TestPortletEnvironmentFacade implements PortletEnvironmentFacade {
     }
 
     public boolean isUsingDigitalSign() {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E206));
     }
 
     public void setUsingDigitalSign(boolean value) {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E206));
     }
 
     @Override
