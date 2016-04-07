@@ -109,84 +109,101 @@
 
 
 <div id="hello">
+
     <c:choose>
-        <c:when test="${noCertificate}">
-            <div class="portlet-msg-error">
-                <liferay-ui:message key="message-files-no-certificate"/>
-            </div>
+        <c:when test="${not empty errorMessage}">
+            ${errorMessage}
+            <br/>
         </c:when>
         <c:otherwise>
             <c:choose>
-                <c:when test="${hasInfoOnProcessedFiles}">
+                <c:when test="${noCertificate}">
+                    <div class="portlet-msg-error">
+                        <liferay-ui:message key="message-files-no-certificate"/>
+                    </div>
+                </c:when>
+                <c:otherwise>
                     <c:choose>
-                        <c:when test="${certificateSuccess}">
-                            <div class="portlet-msg-info">
-                                <liferay-ui:message key="message-files-certificate-success" arguments="${certificate}"/>
-                            </div>
-                            <div class="portlet-msg-info">
-                                <liferay-ui:message key="message-files-signed-and-queued" arguments="${processedFilenames}"/>
-                            </div>
+                        <c:when test="${hasInfoOnProcessedFiles}">
+                            <c:choose>
+                                <c:when test="${certificateSuccess}">
+                                    <div class="portlet-msg-info">
+                                        <liferay-ui:message key="message-files-certificate-success"
+                                                            arguments="${certificate}"/>
+                                    </div>
+                                    <div class="portlet-msg-info">
+                                        <liferay-ui:message key="message-files-signed-and-queued"
+                                                            arguments="${processedFilenames}"/>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="portlet-msg-error">
+                                        <liferay-ui:message key="message-files-certificate-fail"
+                                                            arguments="${certificate}"/>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:when>
+                    </c:choose>
+                </c:otherwise>
+            </c:choose>
+            <c:choose>
+                <c:when test="${hasAccess}">
+                    <c:choose>
+                        <c:when test="${noFilesToSign}">
+                            <h2>Нет файлов, ожидающих подписи</h2>
                         </c:when>
                         <c:otherwise>
-                            <div class="portlet-msg-error">
-                                <liferay-ui:message key="message-files-certificate-fail" arguments="${certificate}"/>
-                            </div>
+                            <form action="<portlet:actionURL><portlet:param name="COMMAND" value="SIGN"/>
+                          </portlet:actionURL>" method="post">
+                                <b>Список профилей: </b><select id="profilesSelect" name="profiles"></select>
+
+                                <input type="button" value="Загрузить профили" onclick="loadProfiles();"/>
+                                <br/>
+                                <b>Пароль профиля: </b><input type="password" value="" id="profilePassword"/>
+                                <br/>
+                                <input type="button" value="Получить сертификаты из профайла" id="getCertificatesButton"
+                                       onClick="loadCertificates();"/>
+                                <br/>
+                                <select name="certificateInfo" id="certificatesSelect"></select>
+                                <br/>
+                                <input type="button" id="signButton" value="Подписать все файлы"
+                                       onclick="signAllFiles();"/>
+
+                                <hr/>
+
+
+                                <table border="2" width="100%">
+                                    <tr>
+                                        <th>Имя файла</th>
+                                        <th>Дата отправки</th>
+                                        <th>Подписан</th>
+                                    </tr>
+                                    <c:forEach var="fileSignatureRecord" items="${inputFiles}">
+                                        <tr>
+                                            <td>${fileSignatureRecord.filename}</td>
+                                            <td>
+                                                    ${fileSignatureRecord.sentDate}
+                                                <input id="hash${fileSignatureRecord.id}" type="hidden"
+                                                       name="hash${fileSignatureRecord.id}"
+                                                       value="${fileSignatureRecord.hash}"/>
+                                                <input id="sign${fileSignatureRecord.id}" type="hidden"
+                                                       name="sign${fileSignatureRecord.id}"/>
+                                            </td>
+                                            <td id="signSymbol${fileSignatureRecord.id}"></td>
+                                        </tr>
+                                    </c:forEach>
+                                </table>
+                                <input type="submit" value="Сохранить"/>
+                            </form>
+                            <hr/>
                         </c:otherwise>
                     </c:choose>
                 </c:when>
-            </c:choose>
-        </c:otherwise>
-    </c:choose>
-    <c:choose>
-        <c:when test="${hasAccess}">
-            <c:choose>
-                <c:when test="${noFilesToSign}">
-                    <h2>Нет файлов, ожидающих подписи</h2>
-                </c:when>
                 <c:otherwise>
-                    <form action="<portlet:actionURL><portlet:param name="COMMAND" value="SIGN"/>
-                          </portlet:actionURL>" method="post">
-                        <b>Список профилей: </b><select id="profilesSelect" name="profiles"></select>
-
-                        <input type="button" value="Загрузить профили" onclick="loadProfiles();"/>
-                        <br/>
-                        <b>Пароль профиля: </b><input type="password" value="" id="profilePassword"/>
-                        <br/>
-                        <input type="button" value="Получить сертификаты из профайла" id="getCertificatesButton" onClick="loadCertificates();"/>
-                        <br/>
-                        <select name="certificateInfo" id="certificatesSelect"></select>
-                        <br/>
-                        <input type="button" id="signButton" value="Подписать все файлы" onclick="signAllFiles();"/>
-
-                        <hr/>
-
-
-                        <table border="2" width="100%">
-                            <tr>
-                                <th>Имя файла</th>
-                                <th>Дата отправки</th>
-                                <th>Подписан</th>
-                            </tr>
-                            <c:forEach var="fileSignatureRecord" items="${inputFiles}">
-                                <tr>
-                                    <td>${fileSignatureRecord.filename}</td>
-                                    <td>
-                                        ${fileSignatureRecord.sentDate}
-                                        <input id="hash${fileSignatureRecord.id}" type="hidden" name="hash${fileSignatureRecord.id}" value="${fileSignatureRecord.hash}"/>
-                                        <input id="sign${fileSignatureRecord.id}" type="hidden" name="sign${fileSignatureRecord.id}"/>
-                                    </td>
-                                    <td id="signSymbol${fileSignatureRecord.id}"></td>
-                                </tr>
-                            </c:forEach>
-                        </table>
-                        <input type="submit" value="Сохранить"/>
-                    </form>
-                    <hr/>
+                    <h2>У вас нет доступа к подписыванию файлов</h2>
                 </c:otherwise>
             </c:choose>
-        </c:when>
-        <c:otherwise>
-            <h2>У вас нет доступа к подписыванию файлов</h2>
         </c:otherwise>
     </c:choose>
 </div>
