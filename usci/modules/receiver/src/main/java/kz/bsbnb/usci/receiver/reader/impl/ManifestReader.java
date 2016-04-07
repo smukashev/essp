@@ -1,30 +1,14 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
-import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
-import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.receiver.reader.impl.beans.InfoData;
 import kz.bsbnb.usci.receiver.reader.impl.beans.ManifestData;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-@Component
-@Scope("prototype")
-public class ManifestReader extends MainReader{
-
+public class ManifestReader extends MainReader {
     private ManifestData manifestData = new ManifestData();
     private String currentName;
 
@@ -79,7 +63,7 @@ public class ManifestReader extends MainReader{
                 data.setLength(0);
                 break;
             case "value":
-                manifestData.getAdditionalParams().put(currentName,data.toString());
+                manifestData.getAdditionalParams().put(currentName, data.toString());
                 data.setLength(0);
                 break;
         }
