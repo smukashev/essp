@@ -58,7 +58,6 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
             if (rows.size() > 1)
                 throw new IllegalStateException(Errors.compose(Errors.E83,entity.getMeta().getClassName()));
-                throw new IllegalStateException(Errors.getMessage(Errors.E83, entity.getMeta().getClassName()));
 
             if (rows.size() < 1)
                 return null;
