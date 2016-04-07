@@ -58,9 +58,9 @@ function historyForm(ruleId){
                 width: 1200,
                 height: 700,
                 layout: 'border',
-                tbar: [{
+                /*tbar: [{
                     text: 'text_001'
-                }],
+                }],*/
                 items: [
                     {
                         region: 'west',

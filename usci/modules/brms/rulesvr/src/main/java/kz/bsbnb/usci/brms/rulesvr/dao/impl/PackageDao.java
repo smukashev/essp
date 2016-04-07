@@ -55,7 +55,7 @@ public class PackageDao extends JDBCSupport implements IPackageDao
     public RulePackage loadBatch(long id) {
 
         if(id < 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E259));
+            throw new IllegalArgumentException(Errors.compose(Errors.E259));
 
         String SQL = "SELECT * FROM " + PREFIX_ + "packages WHERE id  = ?";
         RulePackage batch = jdbcTemplate.queryForObject(SQL,new Object[]{id},new BatchMapper());
@@ -90,7 +90,7 @@ public class PackageDao extends JDBCSupport implements IPackageDao
         /*
         if(batchId < 1)
         {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E261));
+            throw new IllegalArgumentException(Errors.compose(Errors.E261));
         }
 
        String SQL = "INSERT INTO " + PREFIX_ + "package_versions(package_id, REPORT_DATE) VALUES(?, ?)";

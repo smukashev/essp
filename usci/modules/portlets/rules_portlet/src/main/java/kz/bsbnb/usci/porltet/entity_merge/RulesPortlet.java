@@ -138,8 +138,8 @@ public class RulesPortlet extends MVCPortlet{
         } catch (Exception e) {}
 
         if(!writeAccessGranted){
-            logger.error(Errors.getError(String.valueOf(Errors.E238)));
-            throw new RuntimeException(Errors.getMessage(Errors.E238));
+            logger.error(Errors.getError(Errors.E238));
+            throw new RuntimeException(Errors.compose(Errors.E238));
         }
 
     }
@@ -158,7 +158,7 @@ public class RulesPortlet extends MVCPortlet{
             long baseEntityId;
 
             if(resourceRequest.getParameterMap().containsKey("fail"))
-               throw new RuntimeException(Errors.getMessage(Errors.E258));
+               throw new RuntimeException(Errors.compose(Errors.E258));
 
             switch(operationType){
                 case PACKAGE_ALL:
@@ -214,8 +214,9 @@ public class RulesPortlet extends MVCPortlet{
                     errors = ruleService.getPackageErrorsOnRuleDelete(new Rule(ruleId, date));
                     if(errors != null)
                         throw new RuntimeException(errors);
-                    ruleService.deleteRule(ruleId, new RulePackage(packageId, pkgName));
-                    writer.write(JsonMaker.getJson(true));
+                    //ruleService.deleteRule(ruleId, new RulePackage(packageId, pkgName));
+                    //writer.write(JsonMaker.getJson(true));
+                    writer.write(JsonMaker.getNegativeJson("Настройки отключены для удаления"));
                     break;
                 case NEW_RULE:
                     getWriteAccess(resourceRequest);
@@ -325,8 +326,8 @@ public class RulesPortlet extends MVCPortlet{
                     writer.write(JsonMaker.getJson(ruleService.getRuleHistory(ruleId)));
                     break;
                 default:
-                    logger.error(Errors.getMessage(Errors.E118, operationType));
-                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E118, operationType));
+                    logger.error(Errors.compose(Errors.E118, operationType));
+                    throw new UnsupportedOperationException(Errors.compose(Errors.E118, operationType));
             }
 
         } catch (Exception e) {

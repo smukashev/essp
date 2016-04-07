@@ -87,7 +87,7 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
     @Override
     public long update(Rule rule) {
         if (rule.getId() < 1){
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E266));
+            throw new IllegalArgumentException(Errors.compose(Errors.E266));
         }
 
         Update update = context.update(LOGIC_RULES)
@@ -208,7 +208,7 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
         String SQL = "SELECT * FROM " + PREFIX_ + "rules WHERE id = ?";
         List<Rule> rules = jdbcTemplate.query(SQL, new Object[]{rule}, new BeanPropertyRowMapper<Rule>(Rule.class));
         if(rules.size() > 1)
-            throw new RuntimeException(Errors.getMessage(Errors.E264));
+            throw new RuntimeException(Errors.compose(Errors.E264));
         return rules.get(0);*/
     }
 

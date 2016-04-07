@@ -268,9 +268,9 @@ public class RulesSingleton
         List<RuleCasheEntry> versions = ruleCache.get(pkgName);
 
         if (versions == null)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E268, pkgName));
+            throw new IllegalArgumentException(Errors.compose(Errors.E268, pkgName));
         if (versions.size() < 1)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E269, pkgName));
+            throw new IllegalArgumentException(Errors.compose(Errors.E269, pkgName));
 
         RuleCasheEntry result = versions.get(0);
         for (RuleCasheEntry entry : versions)
