@@ -6,6 +6,4 @@ import java.util.Set;
 
 public interface IBaseSetComplexValueDao extends IBaseSetValueDao {
     Set<Long> getChildBaseEntityIds(long baseSetId);
-
-    boolean isSingleBaseValue(IBaseValue baseValue);
 }

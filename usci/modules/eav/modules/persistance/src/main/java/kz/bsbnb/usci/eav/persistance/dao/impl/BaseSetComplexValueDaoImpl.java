@@ -468,27 +468,4 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         return childBaseEntityIds;
     }
-
-    public boolean isSingleBaseValue(IBaseValue baseValue) {
-        IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
-
-        String entitiesTableAlias = "e";
-        String complexSetValuesTableAlias = "csv";
-        Select select = context
-                .select(EAV_BE_ENTITIES.as(entitiesTableAlias).ID)
-                .from(EAV_BE_ENTITIES.as(entitiesTableAlias))
-                .where(EAV_BE_ENTITIES.as(entitiesTableAlias).ID.equal(childBaseEntity.getId()))
-                .and(DSL.exists(context
-                        .select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
-                        .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias))
-                        .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID
-                                .equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
-                        .and(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID.
-                                notEqual(baseValue.getId()))));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        return rows.size() == 0;
-    }
 }
