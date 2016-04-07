@@ -82,7 +82,7 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
         entityStatus.setDevDescription((String) row.get(EAV_ENTITY_STATUSES.DEV_DESCRIPTION.getName()));
         entityStatus.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_ENTITY_STATUSES.RECEIPT_DATE.getName())));
 
-        if (row.get(EAV_ENTITY_STATUSES.INDEX_.getName()) == null)
+        if (row.get(EAV_ENTITY_STATUSES.INDEX_.getName()) != null)
             entityStatus.setIndex(((BigDecimal) row.get(EAV_ENTITY_STATUSES.INDEX_.getName())).longValue());
 
         entityStatus.setStatus(EntityStatuses.valueOf((String) row.get(EAV_GLOBAL.CODE.getName())));
