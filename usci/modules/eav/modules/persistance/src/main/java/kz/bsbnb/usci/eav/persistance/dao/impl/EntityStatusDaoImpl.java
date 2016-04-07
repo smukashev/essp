@@ -6,7 +6,6 @@ import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import org.jooq.DSLContext;
-import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,22 +29,22 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
     public Long insert(EntityStatus entityStatus) {
         Insert insert = context
                 .insertInto(EAV_ENTITY_STATUSES,
-                    EAV_ENTITY_STATUSES.BATCH_ID,
-                    EAV_ENTITY_STATUSES.ENTITY_ID,
-                    EAV_ENTITY_STATUSES.STATUS_ID,
-                    EAV_ENTITY_STATUSES.DESCRIPTION,
-                    EAV_ENTITY_STATUSES.ERROR_CODE,
-                    EAV_ENTITY_STATUSES.DEV_DESCRIPTION,
-                    EAV_ENTITY_STATUSES.RECEIPT_DATE,
-                    EAV_ENTITY_STATUSES.INDEX_)
+                        EAV_ENTITY_STATUSES.BATCH_ID,
+                        EAV_ENTITY_STATUSES.ENTITY_ID,
+                        EAV_ENTITY_STATUSES.STATUS_ID,
+                        EAV_ENTITY_STATUSES.DESCRIPTION,
+                        EAV_ENTITY_STATUSES.ERROR_CODE,
+                        EAV_ENTITY_STATUSES.DEV_DESCRIPTION,
+                        EAV_ENTITY_STATUSES.RECEIPT_DATE,
+                        EAV_ENTITY_STATUSES.INDEX_)
                 .values(entityStatus.getBatchId(),
-                    entityStatus.getEntityId(),
-                    entityStatus.getStatusId(),
-                    entityStatus.getDescription(),
-                    entityStatus.getErrorCode(),
-                    entityStatus.getDevDescription(),
-                    DataUtils.convertToTimestamp(entityStatus.getReceiptDate()),
-                    entityStatus.getIndex());
+                        entityStatus.getEntityId(),
+                        entityStatus.getStatusId(),
+                        entityStatus.getDescription(),
+                        entityStatus.getErrorCode(),
+                        entityStatus.getDevDescription(),
+                        DataUtils.convertToTimestamp(entityStatus.getReceiptDate()),
+                        entityStatus.getIndex());
 
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
     }
@@ -54,7 +53,7 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
     public List<EntityStatus> getList(long batchId) {
         Select select = context
                 .selectFrom(EAV_ENTITY_STATUSES
-                .join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID)))
+                        .join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID)))
                 .where(EAV_ENTITY_STATUSES.BATCH_ID.eq(batchId))
                 .orderBy(EAV_ENTITY_STATUSES.STATUS_ID, EAV_ENTITY_STATUSES.RECEIPT_DATE);
 
@@ -82,7 +81,7 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
         entityStatus.setDevDescription((String) row.get(EAV_ENTITY_STATUSES.DEV_DESCRIPTION.getName()));
         entityStatus.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_ENTITY_STATUSES.RECEIPT_DATE.getName())));
 
-        if (row.get(EAV_ENTITY_STATUSES.INDEX_.getName()) == null)
+        if (row.get(EAV_ENTITY_STATUSES.INDEX_.getName()) != null)
             entityStatus.setIndex(((BigDecimal) row.get(EAV_ENTITY_STATUSES.INDEX_.getName())).longValue());
 
         entityStatus.setStatus(EntityStatuses.valueOf((String) row.get(EAV_GLOBAL.CODE.getName())));
