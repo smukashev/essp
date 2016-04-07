@@ -1,21 +1,20 @@
 package kz.bsbnb.usci.brms.rulesvr.service.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
-import kz.bsbnb.usci.brms.rulesvr.dao.IBatchDao;
-import kz.bsbnb.usci.brms.rulesvr.dao.IBatchVersionDao;
+import kz.bsbnb.usci.brms.rulesvr.dao.IPackageDao;
 import kz.bsbnb.usci.brms.rulesvr.dao.IRuleDao;
 import kz.bsbnb.usci.brms.rulesvr.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.util.Errors;
+import kz.bsbnb.usci.eav.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 //import kz.bsbnb.usci.brms.rulesvr.service.ListenerSingleton;
 
@@ -30,10 +29,10 @@ public class RuleService implements IRuleService {
     private IRuleDao ruleDao;
 
     @Autowired
-    private IBatchDao batchDao;
+    private IPackageDao batchDao;
 
-    @Autowired
-    private IBatchVersionDao batchVersionDao;
+    //@Autowired
+    //private IBatchVersionDao batchVersionDao;
 
 //    @Autowired
 //    private ListenerSingleton listenerSingleton;
@@ -43,12 +42,12 @@ public class RuleService implements IRuleService {
     private RulesSingleton rulesSingleton;
 
     @Override
-    public long save(Rule rule, BatchVersion batchVersion) {
+    public long save(Rule rule, PackageVersion packageVersion) {
 
 //        Batch batch = batchDao.loadBatch(batchVersion.getPackageId());
 //
 //        listenerSingleton.callListeners(batchVersion.getId(),batchVersion.getReport_date(), batch.getName());
-        long id = ruleDao.save(rule,batchVersion);
+        long id = ruleDao.save(rule, packageVersion);
 
 //        listenerSingleton.callListeners(batchVersion.getId(), batchVersion.getReport_date(), batch.getName());
 
@@ -56,13 +55,18 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public List<Rule> load(BatchVersion batchVersion) {
-        return ruleDao.load(batchVersion);
+    public List<Rule> load(PackageVersion packageVersion) {
+        return ruleDao.load(packageVersion);
     }
 
     @Override
     public void update(Rule rule) {
         ruleDao.update(rule);
+    }
+
+    @Override
+    public RulePackage getPackage(String name) {
+        return ruleDao.getPackage(name);
     }
 
     @Override
@@ -72,33 +76,33 @@ public class RuleService implements IRuleService {
 
     @Override
     public Map getRuleTitles(Long packageId, Date repDate) {
-        long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
+        //long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
         Map m = new HashMap();
-        m.put("batchVersionId",batchVersionId);
+        //m.put("batchVersionId",batchVersionId);
         m.put("data",ruleDao.getRuleTitles(packageId,repDate));
         return m;
     }
 
     @Override
-    public Map getRuleTitles(Long packageId, Date repDate, String searchText) {
+    public Map getRuleTitles(Long packageId, Date reportDate, String searchText) {
         if(searchText == null || searchText.length() < 1)
             throw new IllegalArgumentException(Errors.compose(Errors.E270));
 
-        long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
+        //long batchVersionId = batchDao.getBatchVersionId(packageId, repDate);
         Map m = new HashMap();
-        m.put("batchVersionId", batchVersionId);
-        m.put("data",ruleDao.getRuleTitles(batchVersionId, searchText));
+        //m.put("batchVersionId", batchVersionId);
+        m.put("data",ruleDao.getRuleTitles(packageId, reportDate, searchText));
         return m;
     }
 
     @Override
-    public Rule getRule(Long ruleId) {
-        return ruleDao.getRule(ruleId);
+    public Rule getRule(Rule rule) {
+        return ruleDao.getRule(rule);
     }
 
     @Override
-    public boolean deleteRule(long ruleId, long batchVersionId) {
-        return ruleDao.deleteRule(ruleId, batchVersionId);
+    public boolean deleteRule(long ruleId, RulePackage rulePackage) {
+        return ruleDao.deleteRule(ruleId, rulePackage);
     }
 
     @Override
@@ -109,8 +113,8 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public void updateBody(Long ruleId, String body) {
-        ruleDao.updateBody(ruleId,body);
+    public void updateBody(Rule rule) {
+        ruleDao.updateBody(rule);
     }
 
     @Override
@@ -126,10 +130,12 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public long createNewRuleInBatch(Rule rule, BatchVersion batchVersion) {
-          long ruleId = ruleDao.createRule(rule);
-          ruleDao.save(ruleId, batchVersion.getId());
-          return ruleId;
+    public long createNewRuleInPackage(Rule rule, PackageVersion packageVersion) {
+        long ruleId = ruleDao.createRule(rule, packageVersion);
+        rule.setId(ruleId);
+        //ruleDao.save(ruleId, packageVersion.getId());
+        ruleDao.saveInPackage(rule, packageVersion);
+        return ruleId;
     }
 
     @Override
@@ -139,7 +145,8 @@ public class RuleService implements IRuleService {
 
     @Override
     public long insertBatchVersion(long packageId, Date date) {
-        return batchVersionDao.insertBatchVersion(packageId, date);
+        //return batchVersionDao.insertBatchVersion(packageId, date);
+        return -1L;
     }
 
     @Override
@@ -156,10 +163,10 @@ public class RuleService implements IRuleService {
         return list;
     }
 
-    @Override
+    /*@Override
     public String getRulePackageName(String pkgName, Date repDate) {
         return rulesSingleton.getRulePackageName(pkgName, repDate);
-    }
+    }*/
 
     @Override
     public String getRuleErrors(String rule) {
@@ -167,33 +174,38 @@ public class RuleService implements IRuleService {
     }
 
     @Override
-    public String getPackageErrorsOnRuleUpdate(String ruleBody, Long ruleId, String pkgName, Date repDate) {
-        return rulesSingleton.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, repDate, false, false, true);
+    public String getPackageErrorsOnRuleUpdate(Rule rule, PackageVersion packageVersion) {
+        return rulesSingleton.getPackageErrorsOnRuleUpdate(rule, packageVersion);
     }
 
     @Override
     public String getPackageErrorsOnRuleActivate(String ruleBody, Long ruleId, String pkgName, Date repDate, boolean ruleEdited) {
-        return rulesSingleton.getPackageErrorsOnRuleUpdate(ruleBody, ruleId, pkgName, repDate, true, false, ruleEdited);
+        //return rulesSingleton.getPackageErrorsOnRuleUpdate(ruleBody, ruleId);
+        return null;
     }
 
     @Override
     public String getPackageErrorsOnRuleDisable(Long ruleId, String pkgName, Date repDate) {
-        return rulesSingleton.getPackageErrorsOnRuleUpdate("", ruleId, pkgName, repDate, false, true, false);
+        //return rulesSingleton.getPackageErrorsOnRuleUpdate("", ruleId);
+        return null;
     }
 
     @Override
     public boolean activateRule(String ruleBody, Long ruleId) {
-        return ruleDao.activateRule(ruleBody, ruleId);
+        //return ruleDao.activateRule(ruleBody, ruleId);
+        return true;
     }
 
     @Override
     public boolean activateRule(Long ruleId) {
-        return ruleDao.activateRule(ruleId);
+        //return ruleDao.activateRule(ruleId);
+        return true;
     }
 
     @Override
     public boolean disableRule(Long ruleId) {
-        return ruleDao.disableRule(ruleId);
+        //return ruleDao.disableRule(ruleId);
+        return true;
     }
 
     @Override
@@ -201,6 +213,49 @@ public class RuleService implements IRuleService {
         ruleDao.clearAllRules();
     }
 
+    @Override
+    public List<Pair> getPackageVersions(RulePackage rulePackage) {
+        List<PackageVersion> versions = ruleDao.getPackageVersions(rulePackage);
+
+        List<Pair> ret = new LinkedList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+
+        long id = 1L;
+        for(PackageVersion packageVersion: versions) {
+            Pair p = new Pair(id++, sdf.format(packageVersion.getReportDate()));
+            ret.add(p);
+        }
+
+        return ret;
+    }
+
+    @Override
+    public String getPackageErrorsOnRuleInsert(PackageVersion packageVersion, String title, String ruleBody) {
+        return rulesSingleton.getPackageErrorsOnRuleInsert(packageVersion, title, ruleBody);
+    }
+
+    @Override
+    public boolean insertHistory(Rule rule) {
+        Rule ruleInDb = ruleDao.getRule(rule);
+
+        if(ruleInDb.getOpenDate().compareTo(rule.getOpenDate()) >=0 )
+            throw new RuntimeException("Дата должна быть позднее");
+
+        ruleDao.insertHistory(ruleInDb, ruleInDb.getOpenDate());
+        ruleDao.update(rule);
+
+        return true;
+    }
+
+    @Override
+    public List<Rule> getRuleHistory(long ruleId) {
+        return ruleDao.getRuleHistory(ruleId);
+    }
+
+    @Override
+    public String getPackageErrorsOnRuleDelete(Rule rule) {
+        return rulesSingleton.getPackageErrorsOnRuleDelete(rule);
+    }
 
     //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;

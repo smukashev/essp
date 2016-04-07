@@ -26,8 +26,8 @@ public class Main {
 
 //        BatchDao batchDao = (BatchDao)context.getBean("BatchDao");
 //
-//        System.out.println(batchDao.getAllBatches().size());
-//        for (Batch s : batchDao.getAllBatches()){
+//        System.out.println(batchDao.getAllPackages().size());
+//        for (Batch s : batchDao.getAllPackages()){
 //            System.out.println(s.getName()+" "+s.getId());
 //        }
 //        BatchVersionDao batchVersionDao = (BatchVersionDao)context.getBean("BatchVersionDao");

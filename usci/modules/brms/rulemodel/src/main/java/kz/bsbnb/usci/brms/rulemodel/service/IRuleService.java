@@ -1,8 +1,11 @@
 package kz.bsbnb.usci.brms.rulemodel.service;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.BatchVersion;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
 import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
+import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.util.Pair;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +14,11 @@ import java.util.Map;
  * @author abukabayev
  */
 public interface IRuleService {
-    public long save(Rule rule,BatchVersion batchVersion);
-    public List<Rule> load(BatchVersion batchVersion);
-    public void update(Rule rule);
+    long save(Rule rule,PackageVersion packageVersion);
+    List<Rule> load(PackageVersion packageVersion);
+    void update(Rule rule);
+    RulePackage getPackage(String name);
+    List<Pair> getPackageVersions(RulePackage rulePackage);
 
     /**
      * Select * from rules
@@ -34,13 +39,13 @@ public interface IRuleService {
     /**
      * Retrieves single rule by ruleId
      *
-     * @param ruleId
+     * @param rule
      * @return
      */
-    public Rule getRule(Long ruleId);
+    public Rule getRule(Rule rule);
 
 
-    public boolean deleteRule(long ruleId, long batchVersionId );
+    public boolean deleteRule(long ruleId, RulePackage rulePackage);
 
     /**
      * Creates new rule with given title and empty body <br/>
@@ -54,11 +59,10 @@ public interface IRuleService {
 
     /**
      * Sets new body to rule with given <b>ruleId</b>
+     *  @param rule - rule id <br/>
      *
-     * @param ruleId - rule id <br/>
-     * @param body - new body of rule <br/>
      */
-    public void updateBody(Long ruleId, String body);
+    public void updateBody(Rule rule);
 
     /**
      * Copy rule to batch version
@@ -78,7 +82,7 @@ public interface IRuleService {
      * Create new rule with given title and body into batchVersion
      * @return id of created rule
      */
-    public long createNewRuleInBatch(Rule rule, BatchVersion batchVersion);
+    public long createNewRuleInPackage(Rule rule, PackageVersion packageVersion);
 
     public void renameRule(long ruleId, String title);
 
@@ -94,11 +98,11 @@ public interface IRuleService {
 
     //public List<String> runRules(BaseEntity entity, String pkgName, Date repDate);
 
-    public String getRulePackageName(String pkgName, Date repDate);
+    //public String getRulePackageName(String pkgName, Date repDate);
 
     public String getRuleErrors(String rule);
 
-    public String getPackageErrorsOnRuleUpdate(String ruleBody, Long ruleId, String pkgName, Date repDate);
+    public String getPackageErrorsOnRuleUpdate(Rule rule, PackageVersion packageVersion);
 
     public String getPackageErrorsOnRuleActivate(String ruleBody, Long ruleId, String pkgName, Date repDate, boolean ruleEdited);
 
@@ -109,6 +113,14 @@ public interface IRuleService {
     public boolean activateRule(Long ruleId);
 
     public boolean disableRule(Long ruleId);
+
+    String getPackageErrorsOnRuleInsert(PackageVersion packageVersion, String title, String ruleBody);
+
+    public boolean insertHistory(Rule rule);
+
+    List<Rule> getRuleHistory(long ruleId);
+
+    String getPackageErrorsOnRuleDelete(Rule rule);
 
     /**
      * =============================

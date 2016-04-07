@@ -19,7 +19,9 @@ function deleteRule(rowIndex){
         params : {
             op : 'DEL_RULE',
             ruleId: editor.ruleId,
-            batchVersionId: editor.batchVersionId //Ext.getCmp("elemCombokage").value
+            //batchVersionId: editor.batchVersionId //Ext.getCmp("elemCombokage").value
+            packageId: Ext.getCmp('elemComboPackage').value,
+            pkgName: Ext.getCmp('elemComboPackage').getRawValue()
         },
         reader: {
             type: 'json'
@@ -94,7 +96,7 @@ function initGrid(){
                 field: {
                     allowBlank: false
                 }
-            },{
+            }/*,{
                 xtype: 'checkcolumn',
                 id: 'my-check',
                 text: 'активность',
@@ -150,7 +152,8 @@ function initGrid(){
                         return t;
                     }
                 }
-            }/* ,
+            }*/
+            /* ,
             {
                 text : 'Id6nik',
                 dataIndex: 'id',
@@ -163,7 +166,8 @@ function initGrid(){
                     waitMsg: 'adding',
                     params : {
                         op : 'GET_RULE',
-                        ruleId: newValue.data.id
+                        ruleId: newValue.data.id,
+                        date: Ext.getCmp('elemPackageVersionCombo').value
                     },
                     reader: {
                         type: 'json'
@@ -200,12 +204,18 @@ function initGrid(){
                 id: 'btnNewRule',
                 hidden: readOnly,
                 handler: function(e1,e2){
-                    Ext.getCmp('txtTitle').show();
+                    newRuleForm().show();
+
+                    require(['ace/ace'],function(ace){
+                        newRuleEditor = ace.edit('bknew-rule');
+                    });
+
+                    /*Ext.getCmp('txtTitle').show();
                     Ext.getCmp('txtTitle').focus(false,200);
                     Ext.getCmp('btnAddGreen').show();
-                    Ext.EventObject.stopPropagation();
+                    Ext.EventObject.stopPropagation();*/
                 }
-            },{
+            }/*,{
                 xtype: 'textfield',
                 id: 'txtTitle',
                 hidden: true,
@@ -224,7 +234,7 @@ function initGrid(){
                         }
                     }
                 }
-            },{
+            }*//*,{
                 id: 'btnAddGreen',
                 text: '',
                 icon: contextPathUrl + '/pics/addgreen.png',
@@ -257,7 +267,7 @@ function initGrid(){
 
                     Ext.EventObject.stopPropagation();
                 }
-            }/*,{
+            }*//*,{
                 text: 'запуск',
                 id:    'btnRun',
                 icon: contextPathUrl + '/pics/run.png',
@@ -324,13 +334,14 @@ function initGrid(){
                     });
                 }
             },{
-                text: 'копировать',
-                id: 'btnCopy',
+                text: 'история',
+                id: 'btnHistory',
                 icon: contextPathUrl + '/pics/copy2.png',
                 hidden: readOnly,
                 //disabled: true,
                 handler: function(){
-                    createRuleForm().show();
+                    //createRuleForm().show();
+                    historyForm(ruleListGrid.getSelectionModel().getLastSelected().data.id).show();
                 }
             },{
                 text: 'обновить',
@@ -413,7 +424,7 @@ function reset(){
     Ext.getCmp('btnCancel').setDisabled(true);
     Ext.getCmp('btnSave').setDisabled(true);
     Ext.getCmp('btnDel').setDisabled(true);
-    Ext.getCmp('btnCopy').setDisabled(true);
+    //Ext.getCmp('btnCopy').setDisabled(true);
     ruleListGrid.store.loadData([],false);
 }
 
@@ -441,43 +452,30 @@ function updateRules(searchText){
                     reset();
                 }else{
                     editor.batchVersionId = Ext.decode(b.response.responseText).batchVersionId;
-                    Ext.getCmp('btnCopy').setDisabled(false);
+                    //Ext.getCmp('btnCopy').setDisabled(false);
                 }
             },
             scope: this
         }
     );
 
-    Ext.getCmp('btnCopy').setDisabled(false);
+    //Ext.getCmp('btnCopy').setDisabled(false);
     ruleListGrid.getView().refresh();
 }
 
 
-Ext.getDoc().on('click',function(){
+/*Ext.getDoc().on('click',function(){
         Ext.getCmp('btnAddGreen').hide();
         Ext.getCmp('txtTitle').hide();
     }
-);
+);*/
 
 
 Ext.onReady(function(){
     Ext.define('packageListModel',{
         extend: 'Ext.data.Model',
-        fields: ['id','name']
+        fields: ['name']
     });
-
-    var myData = [
-        {
-            id : '12',
-            name: 'Alex',
-            surname: 'Brown'
-        },
-        {
-            id: '14',
-            name: 'Bruce',
-            surname : 'Gordon'
-        }
-    ];
 
     var map1 = new Ext.util.KeyMap(document,{
             key: "s",
@@ -596,7 +594,8 @@ Ext.onReady(function(){
                                         ruleBody: editor.getSession().getValue(),
                                         ruleId: editor.ruleId,
                                         date: Ext.getCmp('elemPackageVersionCombo').value,
-                                        pkgName: Ext.getCmp('elemComboPackage').getRawValue()
+                                        pkgName: Ext.getCmp('elemComboPackage').getRawValue(),
+                                        packageId: Ext.getCmp('elemComboPackage').value
                                     },
                                     reader: {
                                         type: 'json'

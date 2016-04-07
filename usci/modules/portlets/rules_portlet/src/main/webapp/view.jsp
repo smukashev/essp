@@ -40,6 +40,8 @@
 <script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/rform.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/package_control.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/new_rule.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/history.js" type="text/javascript"></script>
 
 <script>
     require.config({
@@ -52,6 +54,7 @@
     });
 
     var editor;
+    var newRuleEditor;
 
     require(['ace/ace'],function(ace){
         console.log("ace code")

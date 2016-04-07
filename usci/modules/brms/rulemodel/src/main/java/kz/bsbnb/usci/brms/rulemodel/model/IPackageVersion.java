@@ -7,17 +7,17 @@ import java.util.Date;
 /**
  * @author abukabayev
  */
-public interface IBatchVersion  extends IPersistable
+public interface IPackageVersion extends IPersistable
 {
-    public Date getOpenDate();
+    public Date getReportDate();
 
-    public void setOpenDate(Date reportDate);
+    public void setReportDate(Date reportDate);
 
     public long getPackageId();
 
     public void setPackageId(long packageId);
 
-    public String getName();
+    public String getPackageName();
 
     public void setName(String name);
 }
