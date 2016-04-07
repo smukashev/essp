@@ -432,8 +432,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
     @Override
     public void deleteAll(long baseSetId) {
-        Set<Long> childBaseEntityIds = getChildBaseEntityIds(baseSetId);
-
         String tableAlias = "cv";
         Delete delete = context
                 .delete(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
@@ -441,31 +439,5 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-
-        for (long childBaseEntityId : childBaseEntityIds)
-            baseEntityDao.deleteRecursive(childBaseEntityId);
-    }
-
-    @Override
-    public Set<Long> getChildBaseEntityIds(long baseSetId) {
-        Set<Long> childBaseEntityIds = new HashSet<>();
-
-        String tableAlias = "bv";
-        Select select = context
-                .select(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID)
-                .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
-                .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID.equal(baseSetId))
-                .groupBy(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID);
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        if (rows.size() > 0) {
-            for (Map<String, Object> row : rows)
-                childBaseEntityIds.add(((BigDecimal) row
-                        .get(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID.getName())).longValue());
-        }
-
-        return childBaseEntityIds;
     }
 }
