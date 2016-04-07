@@ -1905,6 +1905,8 @@ public class CLI {
                 currentRulePackage = ruleService.getPackage(currentPackageName);
             } catch (ParseException e) {
                 e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                System.err.println(e.getMessage() + ", если скрипт выполняется первый раз - игнор");
             }
         }
 
