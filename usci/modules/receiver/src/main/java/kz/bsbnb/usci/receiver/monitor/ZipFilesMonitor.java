@@ -326,7 +326,7 @@ public class ZipFilesMonitor {
                 DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
 
 		String[] orgIds = digitalSignArguments.split(",");
-		if(batch.getCreditorId() > 0 && Arrays.asList(orgIds).contains(batch.getCreditorId() + "")) {
+		if(batch.getCreditorId() > 0 && Arrays.asList(orgIds).contains(String.valueOf(batch.getCreditorId()))) {
 			batchService.addBatchStatus(new BatchStatus()
 					.setBatchId(batch.getId())
 					.setStatus(BatchStatuses.WAITING_FOR_SIGNATURE)
@@ -381,26 +381,23 @@ public class ZipFilesMonitor {
 			if (docValue == null) docValue = "";
 
 			for (Creditor creditor : creditors) {
-				if (creditor.getBIK() != null && docType.equals("15") &&
-						creditor.getBIK().equals(docValue)) {
+				if (creditor.getBIK() != null && docType.equals("15") && creditor.getBIK().equals(docValue)) {
 					cId = creditor.getId();
 					break;
 				}
 
-				if (creditor.getBIN() != null && docType.equals("07") &&
-						creditor.getBIN().equals(docValue)) {
+				if (creditor.getBIN() != null && docType.equals("07") && creditor.getBIN().equals(docValue)) {
 					cId = creditor.getId();
 					break;
 				}
 
-				if (creditor.getRNN() != null && docType.equals("11") &&
-						creditor.getRNN().equals(docValue)) {
+				if (creditor.getRNN() != null && docType.equals("11") && creditor.getRNN().equals(docValue)) {
 					cId = creditor.getId();
 					break;
 				}
 
 				if (code != null && code.length() > 0 && creditor.getCode() != null
-						&& creditor.getCode().length() > 0 && code.equals(creditor.getCode())) {
+                        && creditor.getCode().length() > 0 && code.equals(creditor.getCode())) {
 					cId = creditor.getId();
 					break;
 				}
