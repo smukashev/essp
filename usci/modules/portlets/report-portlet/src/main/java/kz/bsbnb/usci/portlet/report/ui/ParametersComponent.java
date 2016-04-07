@@ -100,8 +100,8 @@ public class ParametersComponent extends VerticalLayout {
                             }
 
                             public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
-                                logger.error(Errors.getError(String.valueOf(Errors.E206)));
-                                throw new UnsupportedOperationException(Errors.getMessage(Errors.E206));
+                                logger.error(Errors.getError(Errors.E206));
+                                throw new UnsupportedOperationException(Errors.compose(Errors.E206));
                             }
 
                             public Class<?> getType() {

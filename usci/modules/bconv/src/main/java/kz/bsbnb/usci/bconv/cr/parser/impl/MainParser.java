@@ -102,7 +102,7 @@ public class MainParser extends BatchParser {
                         pkg.setOperation(OperationType.UPDATE);
                         break;
                     default:
-                        throw new IllegalStateException(Errors.getMessage(Errors.E118, strOperationType));
+                        throw new IllegalStateException(Errors.compose(Errors.E118, strOperationType));
                 }
 
                 packageParser.setCurrentBaseEntity(pkg);

@@ -41,7 +41,7 @@ public class CreditSearcher extends JDBCSupport implements IBaseEntitySearcher {
         List<Long> ids = searcherPool.getSearcher(entity.getMeta().getClassName()).findAll(entity, creditorId);
 
         if (ids.size() > 1)
-            throw new RuntimeException(Errors.getMessage(Errors.E174));
+            throw new RuntimeException(Errors.compose(Errors.E174));
 
         if (ids.size() < 1)
             return null;

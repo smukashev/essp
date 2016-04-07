@@ -1,7 +1,5 @@
 package kz.bsbnb.usci.porltet.batch_entry;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
@@ -11,15 +9,16 @@ import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchEntry;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.w3c.dom.Document;
 
 import javax.portlet.*;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import java.io.*;
+import java.security.AccessControlException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,8 +35,7 @@ public class MainPortlet extends MVCPortlet {
 
     private IBatchEntryService batchEntryService;
     private Logger logger = Logger.getLogger(MainPortlet.class);
-
-    private boolean retry;
+    private Exception currentException;
 
     public void connectToServices() {
         try {
@@ -66,46 +64,33 @@ public class MainPortlet extends MVCPortlet {
 
             portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
-
         } catch (Exception e) {
-            logger.error("Can\"t initialise services: " + e.getMessage());
+            throw new RuntimeException(Errors.compose(Errors.E286,e));
         }
-    }
-
-    @Override
-    public void init() throws PortletException {
-        connectToServices();
-
-        super.init();
     }
 
     @Override
     public void doView(RenderRequest renderRequest,
                        RenderResponse renderResponse) throws IOException, PortletException {
-
-        HttpServletRequest httpReq = PortalUtil.getOriginalServletRequest(
-                PortalUtil.getHttpServletRequest(renderRequest));
-
-        boolean hasRights = false;
-
         try {
+            boolean hasRights = false;
+
             User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(renderRequest));
-            if(user != null) {
+            if (user != null) {
                 for (Role role : user.getRoles()) {
                     if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
                             || role.getName().equals("NationalBankEmployee"))
                         hasRights = true;
                 }
             }
-        } catch (PortalException e) {
-            logger.error(null,e);
-        } catch (SystemException e) {
-            logger.error(null,e);
+
+            if (!hasRights) {
+                throw new AccessControlException(Errors.compose(Errors.E238));
+            }
+
+        } catch (Exception e) {
+            currentException = e;
         }
-
-        if(!hasRights)
-            return;
-
         super.doView(renderRequest, renderResponse);
     }
 
@@ -122,6 +107,14 @@ public class MainPortlet extends MVCPortlet {
         PrintWriter writer = resourceResponse.getWriter();
 
         try {
+
+            if(currentException != null)
+                throw currentException;
+
+            if(batchEntryService == null || portalUserBusiness == null || batchProcessService == null){
+                connectToServices();
+            }
+
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
 
             boolean isNB = false;
@@ -269,26 +262,10 @@ public class MainPortlet extends MVCPortlet {
                     break;
             }
         } catch (Exception e) {
-            //e.printStackTrace();
+            currentException = null;
+            logger.error(e.getMessage(),e);
             String originalError = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
-            retry = false;
-            if(originalError.contains("connect") || originalError.contains("rmi"))
-                if(!retry) {
-                    retry = true;
-                    logger.info("connect failed, reconnect triggered");
-                    try {
-                        init();
-                        serveResource(resourceRequest, resourceResponse);
-                    } catch (PortletException e1) {
-                        //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
-                        writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError + e1.getMessage()
-                                .replaceAll("\"","").replaceAll("\n","")+"\"}");
-                    } finally {
-                        retry = false;
-                        return;
-                    }
-                }
-
+            originalError = Errors.decompose(originalError);
             writer.write("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}");
         }
     }

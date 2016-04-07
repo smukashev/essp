@@ -64,7 +64,7 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public void registerAsInserted(IPersistable insertedObject) {
         if (insertedObject == null)
-            throw new RuntimeException(Errors.getMessage(Errors.E54));
+            throw new RuntimeException(Errors.compose(Errors.E54));
 
         registerEntity(insertedObjects, insertedObject);
     }
@@ -72,7 +72,7 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public void registerAsUpdated(IPersistable updatedObject) {
         if (updatedObject == null)
-            throw new RuntimeException(Errors.getMessage(Errors.E55));
+            throw new RuntimeException(Errors.compose(Errors.E55));
 
         registerEntity(updatedObjects, updatedObject);
     }
@@ -80,7 +80,7 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public void registerAsDeleted(IPersistable deletedObject) {
         if (deletedObject == null)
-            throw new RuntimeException(Errors.getMessage(Errors.E53));
+            throw new RuntimeException(Errors.compose(Errors.E53));
 
         registerEntity(deletedObjects, deletedObject);
     }

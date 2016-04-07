@@ -105,8 +105,8 @@ public class DatabaseQueueConfiguration implements QueueConfiguration {
                 try {
                     ids.add(Integer.parseInt(idValue));
                 }catch (NumberFormatException nfe) {
-                    logger.error(Errors.unmarshall(Errors.getMessage(Errors.E253, nfe)));
-                    throw new ConfigurationException(Errors.getMessage(Errors.E253, nfe));
+                    logger.error(Errors.replaceTags(Errors.E253, nfe));
+                    throw new ConfigurationException(Errors.compose(Errors.E253, nfe));
                 }
             }
             return ids;

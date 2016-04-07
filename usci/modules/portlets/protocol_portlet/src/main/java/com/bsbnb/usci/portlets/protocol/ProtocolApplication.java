@@ -1,6 +1,7 @@
 package com.bsbnb.usci.portlets.protocol;
 
 import java.io.IOException;
+import java.security.AccessControlException;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -16,7 +17,9 @@ import javax.portlet.ResourceResponse;
 
 import com.bsbnb.usci.portlets.protocol.data.BeanDataProvider;
 import com.bsbnb.usci.portlets.protocol.data.DataProvider;
+import com.bsbnb.usci.portlets.protocol.ui.Localization;
 import com.bsbnb.usci.portlets.protocol.ui.ProtocolLayout;
+import com.bsbnb.vaadin.messagebox.MessageBox;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.process.ExceptionProcessCallable;
@@ -28,6 +31,7 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
 
 public class ProtocolApplication extends Application {
@@ -50,7 +54,7 @@ public class ProtocolApplication extends Application {
             PortletApplicationContext2 ctx = (PortletApplicationContext2) getContext();
             ctx.addPortletListener(this, new SamplePortletListener());
         } else {
-            getMainWindow().showNotification("Not inited via Portal!", Notification.TYPE_ERROR_MESSAGE);
+            getMainWindow().showNotification(Errors.getError(Errors.E287), Window.Notification.TYPE_ERROR_MESSAGE);
         }
     }
 
@@ -60,14 +64,12 @@ public class ProtocolApplication extends Application {
 
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
-
-            boolean hasRights = false;
-            boolean isNB = false;
-            User user = null;
-
             try {
-                user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
-                if(user != null) {
+                boolean hasRights = false;
+                boolean isNB = false;
+
+                User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                if (user != null) {
                     for (Role role : user.getRoles()) {
                         if (role.getName().equals("Administrator") || role.getName().equals("BankUser")
                                 || role.getName().equals("NationalBankEmployee")) {
@@ -79,16 +81,10 @@ public class ProtocolApplication extends Application {
                         }
                     }
                 }
-            } catch (PortalException e) {
-                logger.error(null,e);
-            } catch (SystemException e) {
-                logger.error(null,e);
-            }
 
-            if(!hasRights)
-                return;
+                if (!hasRights)
+                    throw new AccessControlException(Errors.compose(Errors.E238));
 
-            try {
                 setTheme("custom");
                 logger.info("User ID: " + user.getUserId());
                 Window mainWindow = new Window();
@@ -96,8 +92,10 @@ public class ProtocolApplication extends Application {
                 DataProvider provider = new BeanDataProvider();
                 mainWindow.addComponent(new ProtocolLayout(provider));
                 setMainWindow(mainWindow);
-            }catch (Exception e){
-                logger.error(e.getMessage(),e);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
+                getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
             }
         }
 

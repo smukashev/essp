@@ -130,7 +130,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
     public Object getElSimple(String filter) {
         if (metaType.isComplex() || metaType.isSet()) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E35));
+            throw new IllegalArgumentException(Errors.compose(Errors.E35));
         }
 
         for (IBaseValue value : values.values()) {
@@ -148,7 +148,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
     public Object getElComplex(String filter) {
         if (!metaType.isComplex() || metaType.isSet()) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E33));
+            throw new IllegalArgumentException(Errors.compose(Errors.E33));
         }
 
         StringTokenizer tokenizer = new StringTokenizer(filter, ",");
@@ -163,7 +163,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
             String fieldName = innerTokenizer.nextToken().trim();
             if (!innerTokenizer.hasMoreTokens())
-                throw new IllegalStateException(Errors.getMessage(Errors.E34));
+                throw new IllegalStateException(Errors.compose(Errors.E34));
 
             String fieldValue = innerTokenizer.nextToken().trim();
 
@@ -231,12 +231,12 @@ public class BaseSet extends BaseContainer implements IBaseSet {
                 if (!uuids.contains(thatBaseValue.getUuid())) {
                     Object thisObject = thisBaseValue.getValue();
                     if (thisObject == null) {
-                        throw new RuntimeException(Errors.getMessage(Errors.E32));
+                        throw new RuntimeException(Errors.compose(Errors.E32));
                     }
 
                     Object thatObject = thatBaseValue.getValue();
                     if (thatObject == null) {
-                        throw new RuntimeException(Errors.getMessage(Errors.E32));
+                        throw new RuntimeException(Errors.compose(Errors.E32));
                     }
 
                     if (date) {
@@ -277,7 +277,7 @@ public class BaseSet extends BaseContainer implements IBaseSet {
 
             baseSetCloned.values = valuesCloned;
         } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException(Errors.getMessage(Errors.E31));
+            throw new RuntimeException(Errors.compose(Errors.E31));
         }
         return baseSetCloned;
     }

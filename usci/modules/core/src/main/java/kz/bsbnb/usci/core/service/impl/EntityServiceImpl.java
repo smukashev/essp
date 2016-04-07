@@ -97,7 +97,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
                     entityStatus.setEntityId(-1);
                     entityStatus.setStatus(EntityStatuses.ERROR);
                     entityStatus.setDescription(StatusProperties.getSpecificParams(mockEntity));
-                    entityStatus.setErrorCode(Errors.getMessage(Errors.E195));
+                    entityStatus.setErrorCode(Errors.compose(Errors.E195));
                     entityStatus.setDevDescription(Errors.checkLength(error));
                     entityStatus.setIndex(mockEntity.getBatchIndex() - 1);
                     entityStatus.setReceiptDate(new Date());
@@ -161,7 +161,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
         if (maxReportDate == null){
             logger.error("Запись не была найдена в базе; \n" + baseEntity);
-            throw new UnsupportedOperationException(Errors.getMessage(Errors.E234));
+            throw new UnsupportedOperationException(Errors.compose(Errors.E234));
         }
 
         return (BaseEntity) baseEntityLoadDao.load(baseEntity.getId(), maxReportDate);

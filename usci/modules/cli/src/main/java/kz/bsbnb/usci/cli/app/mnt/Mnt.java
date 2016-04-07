@@ -447,7 +447,7 @@ public class Mnt {
                 File tempDir = new File(path);
 
                 if(!tempDir.isDirectory())
-                    throw new RuntimeException(Errors.getMessage(Errors.E223));
+                    throw new RuntimeException(Errors.compose(Errors.E223));
 
                 mntThread = new MntThread(conn, creditorId, reportDate, editId, limit,  path);
                 mntThread.setBaseEntityProcessorDao(baseEntityProcessorDao);

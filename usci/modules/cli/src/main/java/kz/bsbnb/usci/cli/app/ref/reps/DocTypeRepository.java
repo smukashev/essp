@@ -74,7 +74,7 @@ public class DocTypeRepository extends BaseRepository {
                 return dt;
         }
 
-        throw new RuntimeException(Errors.getMessage(Errors.E228,code));
+        throw new RuntimeException(Errors.compose(Errors.E228,code));
     }
 
     public void rc(){

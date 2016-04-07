@@ -12,6 +12,7 @@ import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
@@ -63,7 +64,7 @@ public class BeanDataProvider implements DataProvider {
             portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
         } catch (Exception e) {
-            logger.error("Can't initialise services: " + e.getMessage());
+            throw new RuntimeException(Errors.compose(Errors.E286,e));
         }
     }
 

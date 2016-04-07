@@ -27,7 +27,7 @@ public class MetaSet extends MetaContainer implements IMetaSet {
         super(MetaContainerTypes.META_SET);
 
         if (metaType == null) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E46));
+            throw new IllegalArgumentException(Errors.compose(Errors.E46));
         }
         this.metaType = metaType;
     }
@@ -53,17 +53,17 @@ public class MetaSet extends MetaContainer implements IMetaSet {
 
     public void setMetaType(IMetaType metaType) {
         if (metaType == null) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E46));
+            throw new IllegalArgumentException(Errors.compose(Errors.E46));
         }
         this.metaType = metaType;
     }
 
     public DataTypes getTypeCode() {
         if (isComplex())
-            throw new NotImplementedException(Errors.getMessage(Errors.E2));
+            throw new NotImplementedException(Errors.compose(Errors.E2));
 
         if (metaType.isSet())
-            throw new NotImplementedException(Errors.getMessage(Errors.E2));
+            throw new NotImplementedException(Errors.compose(Errors.E2));
 
         return ((MetaValue) metaType).getTypeCode();
     }
@@ -95,7 +95,7 @@ public class MetaSet extends MetaContainer implements IMetaSet {
     @Override
     public void setMetaAttribute(String name, IMetaAttribute metaAttribute) {
         if (metaAttribute.getMetaType() == null) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E46));
+            throw new IllegalArgumentException(Errors.compose(Errors.E46));
         }
         setMetaType(metaAttribute.getMetaType());
     }

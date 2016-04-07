@@ -52,7 +52,7 @@ public class SubjectDocFormImpl extends JDBCSupport implements ISearcherForm {
     @Override
     public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix, long creditorId) {
         if( !"subject".equals(metaClass.getClassName()))
-            throw new RuntimeException(Errors.getMessage(Errors.E231));
+            throw new RuntimeException(Errors.compose(Errors.E231));
 
         long numDocs = Long.parseLong(parameters.get("childCnt"));
         Date reportDate = reportDate = (Date) DataTypes.getCastObject(DataTypes.DATE, parameters.get("date"));

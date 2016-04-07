@@ -12,10 +12,12 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletRequestListener;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 
 import javax.portlet.*;
+import java.security.AccessControlException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
@@ -36,7 +38,7 @@ public class AdministrationApplication extends Application implements PortletReq
 
             ctx.addPortletListener(this, new SamplePortletListener());
         } else {
-            getMainWindow().showNotification("Not inited via Portal!", Window.Notification.TYPE_ERROR_MESSAGE);
+            getMainWindow().showNotification(Errors.getError(Errors.E287), Window.Notification.TYPE_ERROR_MESSAGE);
         }
 
         setMainWindow(new Window());
@@ -57,35 +59,30 @@ public class AdministrationApplication extends Application implements PortletReq
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
             try {
+                boolean hasRights = false;
 
-                User user = PortalUtil.getUser(request);
-                Window mainWindow = new Window();
-                Label errorMessageLabel = new Label("Нет прав для просмотра");
-
-                if(user == null) {
-                    mainWindow.addComponent(errorMessageLabel);
-                } else {
-                    boolean hasRights = false;
-                    for(Role role : user.getRoles()) {
-                        if(role.getDescriptiveName().equals("Administrator") || role.getName().equals("NationalBankEmployee"))
+                User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
+                if (user != null) {
+                    for (Role role : user.getRoles()) {
+                        if (role.getName().equals("Administrator") || role.getName().equals("NationalBankEmployee"))
                             hasRights = true;
-                    }
-
-                    if(!hasRights) {
-                        mainWindow.addComponent(errorMessageLabel);
-                    } else {
-                        BeanDataProvider provider = new BeanDataProvider();
-                        MainSplitPanel sp = new MainSplitPanel(bundle, provider);
-                        mainWindow.addComponent(sp);
                     }
                 }
 
-                setMainWindow(mainWindow);
+                if (!hasRights)
+                    throw new AccessControlException(Errors.compose(Errors.E238));
 
-            } catch (PortalException pe) {
-                logger.fatal("",pe);
-            } catch (SystemException se) {
-                logger.fatal("", se);
+
+                setTheme("custom");
+                Window mainWindow = new Window();
+                BeanDataProvider provider = new BeanDataProvider();
+                MainSplitPanel sp = new MainSplitPanel(bundle, provider);
+                mainWindow.addComponent(sp);
+                setMainWindow(mainWindow);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
+                getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
             }
         }
 

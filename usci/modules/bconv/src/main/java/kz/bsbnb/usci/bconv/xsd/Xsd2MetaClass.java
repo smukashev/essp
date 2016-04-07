@@ -33,7 +33,7 @@ public class Xsd2MetaClass
         XSSchema xsSchema;
 
         if (schema == null) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E207));
+            throw new IllegalArgumentException(Errors.compose(Errors.E207));
         }
 
         try {
@@ -44,7 +44,7 @@ public class Xsd2MetaClass
         }
         catch (Exception exp) {
             logger.error("Can't open schema");
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E208));
+            throw new IllegalArgumentException(Errors.compose(Errors.E208));
         }
 
         Map<String, XSComplexType> types = xsSchema.getComplexTypes();
@@ -62,7 +62,7 @@ public class Xsd2MetaClass
         XSSchema xsSchema;
 
         if (schema == null) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E207));
+            throw new IllegalArgumentException(Errors.compose(Errors.E207));
         }
 
         try {
@@ -73,7 +73,7 @@ public class Xsd2MetaClass
         }
         catch (Exception exp) {
             logger.error("Can't open schema");
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E208));
+            throw new IllegalArgumentException(Errors.compose(Errors.E208));
         }
 
         usedClassesNames.clear();
@@ -81,7 +81,7 @@ public class Xsd2MetaClass
         XSComplexType ct = xsSchema.getComplexType(metaClassName);
 
         if (ct == null) {
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E282, metaClassName));
+            throw new IllegalArgumentException(Errors.compose(Errors.E282, metaClassName));
         }
 
         return (MetaClass)processComplexType(metaClassName, ct, 1, "");
@@ -111,7 +111,7 @@ public class Xsd2MetaClass
                 else if(attributes.getDecl().getType().getPrimitiveType().getName().equals("integer"))
                     members.put(attributes.getDecl().getName(), new MetaValue(DataTypes.INTEGER));
                 else
-                    throw new IllegalStateException(Errors.getMessage(Errors.E209,
+                    throw new IllegalStateException(Errors.compose(Errors.E209,
                             attributes.getDecl().getType().getPrimitiveType().getName()));
 
                 if(first) {
@@ -222,7 +222,7 @@ public class Xsd2MetaClass
                 return new MetaSet(metaClass);
         } else {
             if (members.size() < 1)
-                throw new IllegalStateException(Errors.getMessage(Errors.E283, name));
+                throw new IllegalStateException(Errors.compose(Errors.E283, name));
             if (itIsArray) {
                 return new MetaSet(members.get(members.keySet().toArray()[0]));
             } else {
@@ -290,7 +290,7 @@ public class Xsd2MetaClass
             else if(ct.getPrimitiveType().getName().equals("integer"))
                 return new MetaValue(DataTypes.INTEGER);
             else
-                throw new IllegalStateException(Errors.getMessage(Errors.E209, ct.getPrimitiveType().getName()));
+                throw new IllegalStateException(Errors.compose(Errors.E209, ct.getPrimitiveType().getName()));
         } else {
             if (maxOccurs == -1) {
                 System.out.println(prefix + name + "[] : " + ct.getPrimitiveType().getName());
@@ -309,7 +309,7 @@ public class Xsd2MetaClass
             else if(ct.getPrimitiveType().getName().equals("integer"))
                 return new MetaSet(new MetaValue(DataTypes.INTEGER));
             else
-                throw new IllegalStateException(Errors.getMessage(Errors.E209,ct.getPrimitiveType().getName()));
+                throw new IllegalStateException(Errors.compose(Errors.E209,ct.getPrimitiveType().getName()));
         }
     }
 
@@ -332,7 +332,7 @@ public class Xsd2MetaClass
             return processSimpleType(name, type.asSimpleType(), maxOccurs, prefix);
         }
 
-        throw new IllegalStateException(Errors.getMessage(Errors.E210));
+        throw new IllegalStateException(Errors.compose(Errors.E210));
     }
 
     private XSParticle[] getParticles(XSParticle particle)

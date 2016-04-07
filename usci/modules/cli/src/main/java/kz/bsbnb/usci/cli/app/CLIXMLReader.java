@@ -138,7 +138,7 @@ class CLIXMLReader {
             case DOUBLE:
                 return Double.parseDouble(value);
             default:
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E127));
+                throw new IllegalArgumentException(Errors.compose(Errors.E127));
         }
     }
 

@@ -225,7 +225,7 @@ function loadSubEntity(subNode, idSuffix) {
         },
         callback: function (records, operation, success) {
             if (!success) {
-                Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
+                Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
             } else {
                 subNode.data.value = records[0].data.value;
 
@@ -1048,7 +1048,7 @@ Ext.onReady(function () {
                 },
                 callback: function (records, operation, success) {
                     if (!success) {
-                        Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
+                        Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
                     }
                 }
             });
@@ -1245,6 +1245,14 @@ Ext.onReady(function () {
                  */
             }],
         listeners: {}
+    });
+
+    entityGrid.getStore().load({
+        callback: function (records, operation, success) {
+            if (!success) {
+                Ext.MessageBox.alert(label_ERROR, operation.request.proxy.reader.rawData.errorMessage);
+            }
+        }
     });
 
     mainEntityEditorPanel = Ext.create('Ext.panel.Panel', {

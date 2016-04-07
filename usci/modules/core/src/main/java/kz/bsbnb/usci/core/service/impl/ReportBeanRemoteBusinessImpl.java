@@ -37,7 +37,7 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             return dateFormat.parse(Report.INITIAL_REPORT_DATE_STR);
         } catch (ParseException pe) {
-            throw new RuntimeException(Errors.getMessage(Errors.E235));
+            throw new RuntimeException(Errors.compose(Errors.E235));
         }
     }
 

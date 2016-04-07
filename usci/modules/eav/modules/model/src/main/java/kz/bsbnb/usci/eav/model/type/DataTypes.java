@@ -33,7 +33,7 @@ public enum DataTypes {
             case DOUBLE:
                 return Double.class;
             default:
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E49));
+                throw new IllegalArgumentException(Errors.compose(Errors.E49));
         }
     }
 
@@ -67,7 +67,7 @@ public enum DataTypes {
             case DOUBLE:
                 return Double.parseDouble(value);
             default:
-                throw new IllegalArgumentException(Errors.getMessage(Errors.E127));
+                throw new IllegalArgumentException(Errors.compose(Errors.E127));
         }
     }
 

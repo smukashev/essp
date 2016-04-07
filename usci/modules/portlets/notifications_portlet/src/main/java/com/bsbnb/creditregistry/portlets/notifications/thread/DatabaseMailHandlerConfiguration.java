@@ -28,7 +28,7 @@ public class DatabaseMailHandlerConfiguration implements MailHandlerConfiguratio
             //return Long.parseLong(dataProvider.getConfig(LAST_MAIL_HANDLER_LAUNCH_TIME_CODE).getValue());
             return lastLaunchMillis;
         } catch (NumberFormatException nfe) {
-            throw new ConfigurationException(Errors.getMessage(Errors.E246, LAST_MAIL_HANDLER_LAUNCH_TIME_CODE , nfe));
+            throw new ConfigurationException(Errors.compose(Errors.E246, LAST_MAIL_HANDLER_LAUNCH_TIME_CODE , nfe));
         }
     }
 

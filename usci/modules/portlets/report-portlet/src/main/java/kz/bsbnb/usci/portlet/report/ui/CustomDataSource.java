@@ -87,15 +87,15 @@ public class CustomDataSource extends IndexedContainer implements JRDataSource {
     @Override
     public Object getFieldValue(JRField jrf) throws JRException {
         if (currentRecordIndex >= dataSet.size()) {
-            logger.error(Errors.getError(String.valueOf(Errors.E256)));
-            throw new JRException(Errors.getMessage(Errors.E256));
+            logger.error(Errors.getError(Errors.E256));
+            throw new JRException(Errors.compose(Errors.E256));
         }
         String name = jrf.getName();
         try {
             return getFieldValue(name);
         } catch (NoSuchFieldException nsfe) {
-            logger.error(Errors.getMessage(Errors.E257, name));
-            throw new JRException(Errors.getMessage(Errors.E257, name));
+            logger.error(Errors.compose(Errors.E257, name));
+            throw new JRException(Errors.compose(Errors.E257, name));
         }
     }
 

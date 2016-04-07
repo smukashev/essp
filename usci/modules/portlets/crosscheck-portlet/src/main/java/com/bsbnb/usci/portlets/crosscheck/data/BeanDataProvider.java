@@ -305,7 +305,7 @@ public class BeanDataProvider implements DataProvider {
                 Creditor targetCreditor = DbHelper.getCreditor(conn, creditorId);
 
                 if (targetCreditor == null)
-                    throw new RuntimeException(Errors.getMessage(Errors.E236));
+                    throw new RuntimeException(Errors.compose(Errors.E236));
 
                 if (targetCreditor.getSubjectType() == null)
                     throw new RuntimeException("Subject type of the creditor with ID " + creditorId + " is null");

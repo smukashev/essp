@@ -7,6 +7,7 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
 
 import javax.portlet.ActionRequest;
@@ -36,7 +37,7 @@ public abstract class BaseApplication extends Application implements PortletList
 
             ctx.addPortletListener(this, this);
         } else {
-            getMainWindow().showNotification("Not inited via Portal!", Notification.TYPE_ERROR_MESSAGE);
+            getMainWindow().showNotification(Errors.getError(Errors.E287), Window.Notification.TYPE_ERROR_MESSAGE);
         }
 
     }
@@ -47,10 +48,10 @@ public abstract class BaseApplication extends Application implements PortletList
             PortletEnvironment env = new PortletEnvironmentImpl(request);
             Window appWindow = createWindow(env);
             setMainWindow(appWindow);
-        } catch (PortalException pe) {
-            logger.error(null, pe);
-        } catch (SystemException se) {
-            logger.error(null, se);
+        } catch(Exception e){
+            logger.error(e.getMessage(), e);
+            String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
+            getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
         }
     }
 

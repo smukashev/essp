@@ -169,7 +169,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         /* Все данные кроме справочников должны иметь кредитора */
         if (!baseEntity.getMeta().isReference() && baseEntity.getBaseEntityReportDate().getCreditorId() == 0)
-            throw new IllegalStateException(Errors.getMessage(Errors.E197));
+            throw new IllegalStateException(Errors.compose(Errors.E197));
 
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
@@ -182,11 +182,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             switch (baseEntityPostPrepared.getOperation()) {
                 case DELETE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new KnownException(Errors.getMessage(Errors.E112));
+                        throw new KnownException(Errors.compose(Errors.E112));
 
                     if (baseEntity.getMeta().isReference() &&
                             refProcessorDao.historyExists(baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId())) {
-                        throw new KnownException(Errors.getMessage(Errors.E113));
+                        throw new KnownException(Errors.compose(Errors.E113));
                     }
 
                     if (baseEntity.getMeta().isReference())
@@ -199,7 +199,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case CLOSE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new KnownException(Errors.getMessage(Errors.E114));
+                        throw new KnownException(Errors.compose(Errors.E114));
 
                     IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool.getPersistableDao(
                             BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
@@ -208,7 +208,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             baseEntityPostPrepared.getReportDate())) {
                         logger.error("Дата закрытия не может быть одинаковой с датой открытия; \n"
                                 + baseEntityPostPrepared);
-                        throw new IllegalStateException(Errors.getMessage(Errors.E115));
+                        throw new IllegalStateException(Errors.compose(Errors.E115));
                     }
 
 
@@ -240,7 +240,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case INSERT:
                     if (baseEntityPostPrepared.getId() > 0)
-                        throw new KnownException(Errors.getMessage(Errors.E196, baseEntityPostPrepared.getId()));
+                        throw new KnownException(Errors.compose(Errors.E196, baseEntityPostPrepared.getId()));
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
 
@@ -251,7 +251,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     break;
                 case UPDATE:
                     if (baseEntityPostPrepared.getId() <= 0)
-                        throw new KnownException(Errors.getMessage(Errors.E198));
+                        throw new KnownException(Errors.compose(Errors.E198));
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
 
@@ -261,7 +261,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
                 default:
-                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E118, baseEntityPostPrepared.getOperation()));
+                    throw new UnsupportedOperationException(Errors.compose(Errors.E118, baseEntityPostPrepared.getOperation()));
             }
         } else {
             long applyTime = System.currentTimeMillis();
@@ -319,7 +319,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             }
 
             if (rows.size() > 0) {
-                throw new IllegalStateException(Errors.getMessage(Errors.E109, baseEntity.getId(), sbUsages.toString()));
+                throw new IllegalStateException(Errors.compose(Errors.E109, baseEntity.getId(), sbUsages.toString()));
             }
         }
 
@@ -332,7 +332,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         select.getBindValues().toArray());
 
                 if (rows.size() > 0) {
-                    throw new RuntimeException(Errors.getMessage(Errors.E110, baseEntity.getId()));
+                    throw new RuntimeException(Errors.compose(Errors.E110, baseEntity.getId()));
                 }
             }
         }

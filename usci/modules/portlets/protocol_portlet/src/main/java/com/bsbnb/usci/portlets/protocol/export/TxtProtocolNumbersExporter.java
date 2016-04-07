@@ -41,8 +41,8 @@ public class TxtProtocolNumbersExporter extends ProtocolExporter {
             ps.close();
             return baos.toByteArray();
         } catch (UnsupportedEncodingException uee) {
-            logger.error(Errors.getMessage(Errors.E248, uee));
-            throw new ExportException(Errors.getMessage(Errors.E248, uee));
+            logger.error(Errors.compose(Errors.E248, uee));
+            throw new ExportException(Errors.compose(Errors.E248, uee));
         }
     }
 

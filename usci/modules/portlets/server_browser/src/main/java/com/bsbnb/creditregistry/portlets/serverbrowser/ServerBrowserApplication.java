@@ -5,6 +5,9 @@ import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
+import kz.bsbnb.usci.eav.util.Errors;
+import org.apache.log4j.Logger;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.EventRequest;
@@ -17,6 +20,7 @@ import javax.portlet.ResourceResponse;
 public class ServerBrowserApplication extends Application {
 
     private static final long serialVersionUID = 2096197512742005243L;
+    public final Logger logger = Logger.getLogger(ServerBrowserApplication.class);
 
     @Override
     public void init() {
@@ -28,7 +32,7 @@ public class ServerBrowserApplication extends Application {
 
             ctx.addPortletListener(this, new SamplePortletListener());
         } else {
-            getMainWindow().showNotification("Not inited via Portal!", Notification.TYPE_ERROR_MESSAGE);
+            getMainWindow().showNotification(Errors.getError(Errors.E287), Window.Notification.TYPE_ERROR_MESSAGE);
         }
 
     }
@@ -40,7 +44,13 @@ public class ServerBrowserApplication extends Application {
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
             Window mainWindow = new Window();
-            mainWindow.addComponent(new ServerBrowserComponent());
+            try {
+                mainWindow.addComponent(new ServerBrowserComponent());
+            }catch(Exception  e){
+                logger.error(e.getMessage(), e);
+                String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
+                getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
+            }
             setMainWindow(mainWindow);
         }
 

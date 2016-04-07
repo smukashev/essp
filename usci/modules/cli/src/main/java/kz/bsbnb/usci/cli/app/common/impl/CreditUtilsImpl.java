@@ -120,7 +120,7 @@ public class CreditUtilsImpl implements ICreditUtils {
         if (crCreditors.containsKey(creditorId))
             return crCreditors.get(creditorId);
 
-        throw new IllegalArgumentException(Errors.getMessage(Errors.E2));
+        throw new IllegalArgumentException(Errors.compose(Errors.E2));
     }
 
     @Override
@@ -207,7 +207,7 @@ public class CreditUtilsImpl implements ICreditUtils {
                 result = preparedStatement.executeQuery();
                 tryCount++;
                 if (tryCount > 2400) {//20 minutes
-                    throw new TimeoutException(Errors.getMessage(Errors.E222));
+                    throw new TimeoutException(Errors.compose(Errors.E222));
                 }
             }
 

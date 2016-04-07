@@ -109,7 +109,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                 if (validateSchema(true, new ByteArrayInputStream(out.toByteArray()))) {
                     xmlEventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(out.toByteArray()));
                 } else {
-                    throw new RuntimeException(Errors.getMessage(Errors.E193));
+                    throw new RuntimeException(Errors.compose(Errors.E193));
                 }
             }
         } catch (XMLStreamException | SAXException | IOException e) {
@@ -182,7 +182,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     obj = DataTypes.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData());
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
-                    throw new RuntimeException(Errors.getMessage(Errors.E194, localName, n.getMessage()));
+                    throw new RuntimeException(Errors.compose(Errors.E194, localName, n));
                 } catch (ClassCastException ex) {
                     logger.debug("Empty tag: " + localName);
                     level--;

@@ -444,7 +444,7 @@ public class CortegeDaoImpl extends CommonDao {
                                     readMap(curPath + "." + attribute.elementPath, (BaseEntity) iBaseValue.getValue(), paths));
                         } else if (iBaseValue != null && iBaseValue.getMetaAttribute().getMetaType().isComplex() &&
                                 iBaseValue.getMetaAttribute().getMetaType().isSet()) {
-                            throw new UnsupportedOperationException(Errors.getMessage(Errors.E274));
+                            throw new UnsupportedOperationException(Errors.compose(Errors.E274));
                         } else if (iBaseValue != null && iBaseValue.getValue() instanceof BaseSet) {
                             BaseSet bSet = (BaseSet) iBaseValue.getValue();
 
@@ -560,7 +560,7 @@ public class CortegeDaoImpl extends CommonDao {
                 if (customObject instanceof BaseEntity) {
                     entryMap.put(new ValueElement(sf.getColumnName(), ((BaseEntity) customObject).getId(), 0), ((BaseEntity) customObject).getId());
                 } else if (customObject instanceof BaseSet) {
-                    throw new UnsupportedOperationException(Errors.getMessage(Errors.E272));
+                    throw new UnsupportedOperationException(Errors.compose(Errors.E272));
                 } else {
                     entryMap.put(new ValueElement(sf.getColumnName(), 0L, 0), customObject);
                 }

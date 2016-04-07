@@ -577,7 +577,7 @@ public class ZipFilesMonitor {
 				}
 
 				if (extractedBytes == null)
-					throw new IOException(Errors.getMessage(Errors.E191));
+					throw new IOException(Errors.compose(Errors.E191));
 
 				if (userId == null)
 					userId = 100500L;

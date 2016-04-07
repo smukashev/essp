@@ -10,7 +10,7 @@ public final class StaticRouter {
     }
 
     /* Set up before compiling */
-    private static final MODE mode = MODE.PROD;
+    private static final MODE mode = MODE.DEV;
 
     /* Application Server IP */
     private final static String stendAsIP = "10.10.20.28";
@@ -86,7 +86,7 @@ public final class StaticRouter {
             case PROD:
                 return prodAsIP;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -99,7 +99,7 @@ public final class StaticRouter {
             case PROD:
                 return prodDBCoreIp;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -112,7 +112,7 @@ public final class StaticRouter {
             case PROD:
                 return prodDBShowcaseIP;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -125,7 +125,7 @@ public final class StaticRouter {
             case PROD:
                 return prodDBReporterIP;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -138,7 +138,7 @@ public final class StaticRouter {
             case PROD:
                 return prodPortalUrl;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -151,7 +151,7 @@ public final class StaticRouter {
             case PROD:
                 return prodPortalPort;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -164,7 +164,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCoreSchemaName;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -177,7 +177,7 @@ public final class StaticRouter {
             case PROD:
                 return prodShowcaseSchemaName;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -190,7 +190,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCRDBIP;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -203,7 +203,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCRDBUsername;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -216,7 +216,7 @@ public final class StaticRouter {
             case PROD:
                 return prodCRDBPassword;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -229,7 +229,7 @@ public final class StaticRouter {
             case PROD:
                 return prodReportFilesCatalog;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 
@@ -242,7 +242,7 @@ public final class StaticRouter {
             case PROD:
                 return prodReportFilesFolder;
             default:
-                throw new IllegalStateException(Errors.getMessage(Errors.E284));
+                throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
 

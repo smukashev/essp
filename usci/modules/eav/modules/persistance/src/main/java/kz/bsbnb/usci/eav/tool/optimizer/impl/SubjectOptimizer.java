@@ -30,7 +30,7 @@ public class SubjectOptimizer {
         IBaseValue docsBaseValue = iBaseEntity.getBaseValue("docs");
 
         if (docsBaseValue == null || docsBaseValue.getValue() == null)
-            throw new KnownException(Errors.getMessage(Errors.E188));
+            throw new KnownException(Errors.compose(Errors.E188));
 
         BaseSet docSet = (BaseSet) docsBaseValue.getValue();
 
@@ -51,7 +51,7 @@ public class SubjectOptimizer {
         }
 
         if (documents.size() == 0)
-            throw new KnownException(Errors.getMessage(Errors.E189));
+            throw new KnownException(Errors.compose(Errors.E189));
 
         Collections.sort(documents, new Comparator<IBaseEntity>() {
             @Override

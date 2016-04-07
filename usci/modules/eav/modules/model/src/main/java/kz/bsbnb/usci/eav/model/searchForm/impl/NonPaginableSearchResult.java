@@ -28,16 +28,16 @@ public class NonPaginableSearchResult extends AbstractSearchResult implements IS
 
     @Override
     public SearchPagination getPagination() {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E47));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E47));
     }
 
     @Override
     public void setTotalCount(int totalCount) {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E48));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E48));
     }
 
     @Override
     public void setPagination(SearchPagination searchPagination) {
-        throw new UnsupportedOperationException(Errors.getMessage(Errors.E48));
+        throw new UnsupportedOperationException(Errors.compose(Errors.E48));
     }
 }

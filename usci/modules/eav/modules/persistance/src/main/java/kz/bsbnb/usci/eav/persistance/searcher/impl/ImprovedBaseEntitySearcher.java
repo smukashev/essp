@@ -57,7 +57,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
             if (rows.size() > 1)
-                throw new IllegalStateException(Errors.getMessage(Errors.E83, entity.getMeta().getClassName()));
+                throw new IllegalStateException(Errors.compose(Errors.E83,entity.getMeta().getClassName()));
 
             if (rows.size() < 1)
                 return null;
@@ -98,7 +98,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 .from(EAV_BE_ENTITIES.as(entityAlias));
 
         if (metaClass == null)
-            throw new IllegalArgumentException(Errors.getMessage(Errors.E176));
+            throw new IllegalArgumentException(Errors.compose(Errors.E176));
 
         Condition condition = null;
         for (String name : metaClass.getMemberNames()) {
@@ -126,7 +126,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
             if (metaAttribute.isKey()) {
                 if (baseValue == null || baseValue.getValue() == null)
-                    throw new KnownException(Errors.getMessage(Errors.E177, name, entity.getMeta().getClassName()));
+                    throw new KnownException(Errors.compose(Errors.E177, name, entity.getMeta().getClassName()));
 
                 if (baseValue.getValue() == null && (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY))
                     continue;
@@ -197,10 +197,10 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     MetaClass childMetaClass = (MetaClass) metaSet.getMemberType();
 
                     if (baseSet == null || baseSet.get().size() == 0)
-                        throw new UnsupportedOperationException(Errors.getMessage(Errors.E178, (childMetaClass).getClassName()));
+                        throw new UnsupportedOperationException(Errors.compose(Errors.E178, (childMetaClass).getClassName()));
 
                     if (!memberType.isComplex())
-                        throw new UnsupportedOperationException(Errors.getMessage(Errors.E179, childMetaClass.getClassName()));
+                        throw new UnsupportedOperationException(Errors.compose(Errors.E179, childMetaClass.getClassName()));
 
                     List<Long> childBaseEntityIds = new ArrayList<>();
 
