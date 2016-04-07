@@ -120,6 +120,8 @@ public interface IRuleService {
 
     List<Rule> getRuleHistory(long ruleId);
 
+    String getPackageErrorsOnRuleDelete(Rule rule);
+
     /**
      * =============================
      *   Developer tools

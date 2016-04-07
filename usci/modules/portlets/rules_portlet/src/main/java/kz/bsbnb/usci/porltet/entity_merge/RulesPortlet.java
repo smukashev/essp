@@ -210,6 +210,10 @@ public class RulesPortlet extends MVCPortlet{
                     pkgName = resourceRequest.getParameter("pkgName");
                     packageId = Long.parseLong(resourceRequest.getParameter("packageId"));
                     //long packageVersionId = Long.parseLong(resourceRequest.getParameter("batchVersionId"));
+                    date = df.parse(resourceRequest.getParameter("date"));
+                    errors = ruleService.getPackageErrorsOnRuleDelete(new Rule(ruleId, date));
+                    if(errors != null)
+                        throw new RuntimeException(errors);
                     ruleService.deleteRule(ruleId, new RulePackage(packageId, pkgName));
                     writer.write(JsonMaker.getJson(true));
                     break;

@@ -73,7 +73,6 @@ rule set date 01.04.2001
 rule create package ref_creditor_branch_parser
 rule rc
 rule set package ref_creditor_branch_parser
-rule set version
 
 rule import usci/modules/cli/src/main/resources/rules/imports.cli
 rule import usci/modules/cli/src/main/resources/rules/rule_functions.cli

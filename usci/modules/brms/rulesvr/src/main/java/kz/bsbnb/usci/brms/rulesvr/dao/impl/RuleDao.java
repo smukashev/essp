@@ -440,6 +440,24 @@ public class RuleDao extends JDBCSupport implements IRuleDao {
         return ruleList;
     }
 
+    @Override
+    public List<RulePackage> getRulePackages(Rule rule) {
+        Select select = context.selectDistinct(LOGIC_RULE_PACKAGE.PACKAGE_ID)
+                .from(LOGIC_RULE_PACKAGE)
+                .where(LOGIC_RULE_PACKAGE.RULE_ID.eq(rule.getId()));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        List<RulePackage> rulePackageList = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            RulePackage rulePackage = new RulePackage();
+            rulePackage.setId(((BigDecimal) row.get(LOGIC_RULE_PACKAGE.PACKAGE_ID.getName())).longValue());
+            rulePackageList.add(rulePackage);
+        }
+        return rulePackageList;
+    }
+
     private Rule getRule(Map<String,Object> row){
         Rule rule = new Rule();
         rule.setId(((BigDecimal) row.get(LOGIC_RULES.ID.getName())).longValue());

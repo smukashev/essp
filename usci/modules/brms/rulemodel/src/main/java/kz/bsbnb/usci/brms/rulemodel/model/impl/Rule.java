@@ -21,6 +21,11 @@ public class Rule extends Persistable implements IRule, Serializable {
 
     }
 
+    public Rule(long ruleId, Date date) {
+        this.id = ruleId;
+        this.openDate = date;
+    }
+
     public Rule(String title, String rule){
         this.title = title;
         this.rule = rule;

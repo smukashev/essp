@@ -252,6 +252,11 @@ public class RuleService implements IRuleService {
         return ruleDao.getRuleHistory(ruleId);
     }
 
+    @Override
+    public String getPackageErrorsOnRuleDelete(Rule rule) {
+        return rulesSingleton.getPackageErrorsOnRuleDelete(rule);
+    }
+
     //    public ListenerSingleton getListenerSingleton() {
 //        return listenerSingleton;
 //    }

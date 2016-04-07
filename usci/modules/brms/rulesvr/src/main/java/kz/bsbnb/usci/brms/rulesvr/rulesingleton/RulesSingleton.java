@@ -342,4 +342,59 @@ public class RulesSingleton
 
         return null;
     }
+
+    public String getPackageErrors(List<Rule> rules){
+        String packages = "";
+
+        packages += "package test\n";
+        packages += "dialect \"mvel\"\n";
+        packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
+        packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+
+        for (Rule r : rules)
+            packages += r.getRule() + "\n";
+
+        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+
+        kbuilder.add(ResourceFactory.newInputStreamResource(new ByteArrayInputStream(packages.getBytes())),
+                ResourceType.DRL);
+
+        if ( kbuilder.hasErrors() ) {
+            return kbuilder.getErrors().toString();
+        }
+
+        return null;
+    }
+
+
+
+    public String getPackageErrorsOnRuleDelete(Rule rule) {
+        List<RulePackage> rulePackages = ruleDao.getRulePackages(rule);
+
+        for (RulePackage rulePackage : rulePackages) {
+            List<PackageVersion> packageVersions = ruleDao.getPackageVersions(rulePackage);
+
+            for (PackageVersion packageVersion : packageVersions) {
+                if(packageVersion.getReportDate().compareTo(rule.getOpenDate()) > 0)
+                    continue;
+
+                List<Rule> rules = ruleDao.load(packageVersion);
+
+                for (Rule ruleInPackage : rules) {
+                    if(ruleInPackage.getId() == rule.getId())
+                        rules.iterator().remove();
+                    break;
+                }
+
+                String curResult = getPackageErrors(rules);
+
+                if(curResult != null)
+                    return curResult;
+            }
+        }
+
+        return null;
+    }
+
+
 }
