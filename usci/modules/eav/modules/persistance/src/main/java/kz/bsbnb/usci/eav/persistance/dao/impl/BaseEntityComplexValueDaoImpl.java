@@ -596,31 +596,4 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
         return baseEntityIds;
     }
-
-    public boolean isSingleBaseValue(IBaseValue baseValue) {
-        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
-        IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
-
-        String entitiesTableAlias = "e";
-        String complexValuesTableAlias = "cv";
-        Select select = context
-                .select(EAV_BE_ENTITIES.as(entitiesTableAlias).ID)
-                .from(EAV_BE_ENTITIES.as(entitiesTableAlias))
-                .where(EAV_BE_ENTITIES.as(entitiesTableAlias).ID.equal(childBaseEntity.getId()))
-                .and(DSL.exists(context
-                        .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
-                        .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                        .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ATTRIBUTE_ID.
-                                equal(metaAttribute.getId()))
-                        .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID
-                                .equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
-                        .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID.
-                                notEqual(baseValue.getId()))));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        return rows.size() == 0;
-    }
-
 }

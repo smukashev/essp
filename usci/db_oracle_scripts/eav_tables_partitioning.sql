@@ -234,5 +234,22 @@ begin
   begin
     execute immediate 'alter table eav_entity_statuses nologging';
     execute immediate 'alter table eav_batch_statuses nologging';
+    execute immediate 'alter table EAV_BE_BOOLEAN_SET_VALUES enable row movement';
+    execute immediate 'alter table EAV_BE_BOOLEAN_VALUES enable row movement';
+    execute immediate 'alter table EAV_BE_COMPLEX_SET_VALUES enable row movement';
+    execute immediate 'alter table EAV_BE_COMPLEX_VALUES enable row movement';
+    execute immediate 'alter table EAV_BE_DATE_SET_VALUES enable row movement';
+    execute immediate 'alter table EAV_BE_DATE_VALUES enable row movement';
+    execute immediate 'alter table EAV_BE_DOUBLE_SET_VALUES enable row movement';
+    execute immediate 'alter table EAV_BE_DOUBLE_VALUES enable row movement';
+    execute immediate 'alter table EAV_BE_ENTITIES enable row movement';
+    execute immediate 'alter table EAV_BE_ENTITY_COMPLEX_SETS enable row movement';
+    execute immediate 'alter table EAV_BE_ENTITY_REPORT_DATES enable row movement';
+    execute immediate 'alter table EAV_BE_ENTITY_SIMPLE_SETS enable row movement';
+    execute immediate 'alter table EAV_BE_INTEGER_SET_VALUES enable row movement';
+    execute immediate 'alter table EAV_BE_INTEGER_VALUES enable row movement';
+    execute immediate 'alter table EAV_BE_STRING_SET_VALUES enable row movement';
+    execute immediate 'alter table EAV_BE_STRING_VALUES enable row movement';
+    execute immediate 'alter table EAV_OPTIMIZER enable row movement';
   end;
 end;
