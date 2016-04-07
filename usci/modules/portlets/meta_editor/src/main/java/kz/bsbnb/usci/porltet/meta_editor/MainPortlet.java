@@ -47,7 +47,7 @@ public class MainPortlet extends MVCPortlet {
             metaFactoryServiceFactoryBean.afterPropertiesSet();
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
         } catch (Exception e) {
-            throw new RuntimeException(Errors.compose(Errors.E286,e.getMessage()),e);
+            throw new RuntimeException(Errors.getError(Errors.E286));
         }
     }
 

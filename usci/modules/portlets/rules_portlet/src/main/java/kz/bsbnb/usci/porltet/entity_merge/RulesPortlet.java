@@ -64,7 +64,7 @@ public class RulesPortlet extends MVCPortlet{
 
             batchService = (IBatchService) batchServiceFactoryBean.getObject();
         } catch (Exception e) {
-            throw new RuntimeException(Errors.compose(Errors.E286,e.getMessage()),e);
+            throw new RuntimeException(Errors.compose(Errors.E286));
         }
     }
 

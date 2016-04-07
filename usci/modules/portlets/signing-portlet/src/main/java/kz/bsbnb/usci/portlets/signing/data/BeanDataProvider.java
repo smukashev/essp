@@ -50,7 +50,7 @@ public class BeanDataProvider implements DataProvider {
             batchProcessServiceFactoryBean.afterPropertiesSet();
             batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
         } catch (Exception e) {
-            throw new RuntimeException(Errors.compose(Errors.E286,e));
+            throw new RuntimeException(Errors.compose(Errors.E286));
         }
     }
 

@@ -91,7 +91,7 @@ public class MainPortlet extends MVCPortlet {
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
         } catch (Exception e) {
-            throw new RuntimeException(Errors.compose(Errors.E286,e.getMessage()),e);
+            throw new RuntimeException(Errors.getError(Errors.E286));
         }
     }
 

@@ -92,7 +92,7 @@ public class BeanDataProvider implements DataProvider {
             mailBusinessFactoryBean.afterPropertiesSet();
             mailMessageBusiness = (MailMessageBeanCommonBusiness) mailBusinessFactoryBean.getObject();
         } catch (Exception e) {
-            throw new RuntimeException(Errors.compose(Errors.E286,e));
+            throw new RuntimeException(Errors.getError(Errors.E286));
         }
 
         /*

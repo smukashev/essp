@@ -52,7 +52,7 @@ public class BeanDataProvider implements DataProvider {
             remoteCreditorBusinessFactoryBean.afterPropertiesSet();
             creditorBusiness = (RemoteCreditorBusiness) remoteCreditorBusinessFactoryBean.getObject();
         } catch (Exception e) {
-            throw new RuntimeException(Errors.compose(Errors.E286,e));
+            throw new RuntimeException(Errors.getError(Errors.E286));
         }
     }
 

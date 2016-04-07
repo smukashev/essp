@@ -64,7 +64,7 @@ public class BeanDataProvider implements DataProvider {
             portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
         } catch (Exception e) {
-            throw new RuntimeException(Errors.compose(Errors.E286,e));
+            throw new RuntimeException(Errors.getError(Errors.E286));
         }
     }
 
