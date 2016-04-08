@@ -48,6 +48,14 @@ public class JDBCSupport {
         }
     }
 
+    public boolean testConnection() {
+        try {
+            return !jdbcTemplate.getDataSource().getConnection().isClosed();
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
     protected JDBCConfig getConfig() {
         return config;
     }
