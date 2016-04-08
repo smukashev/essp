@@ -19,7 +19,8 @@ public class SQLQueriesStats implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        new Thread(statsWorker).start();
+        if (StaticRouter.getStatsEnabled())
+            new Thread(statsWorker).start();
     }
 
     private class QueryData {
@@ -33,7 +34,8 @@ public class SQLQueriesStats implements InitializingBean {
     }
 
     public void put(String query, long time) {
-        statsWorker.addData(query, time);
+        if (StaticRouter.getStatsEnabled())
+            statsWorker.addData(query, time);
     }
 
     public HashMap<String, QueryEntry> getStats() {

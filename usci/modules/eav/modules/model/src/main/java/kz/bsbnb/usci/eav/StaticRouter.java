@@ -77,6 +77,10 @@ public final class StaticRouter {
     private final static String devReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
     private final static String prodReportFilesFolder = "C:\\Portal_afn\\generated_reports\\";
 
+    private final static boolean stendStatsEnabled = false;
+    private final static boolean devStatsEnabled = true;
+    private final static boolean prodStatsEnabled = false;
+
     public static String getAsIP() {
         switch(mode) {
             case STEND:
@@ -241,6 +245,19 @@ public final class StaticRouter {
                 return devReportFilesFolder;
             case PROD:
                 return prodReportFilesFolder;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
+    public static boolean getStatsEnabled() {
+        switch(mode) {
+            case STEND:
+                return stendStatsEnabled;
+            case DEV:
+                return devStatsEnabled;
+            case PROD:
+                return prodStatsEnabled;
             default:
                 throw new IllegalStateException(Errors.compose(Errors.E284));
         }

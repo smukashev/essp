@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.showcase.driver;
 
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.stats.QueryEntry;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,6 @@ import java.util.Map;
 public class ShowCaseJdbcTemplate {
     private JdbcTemplate jdbcTemplateSC;
 
-    private static final boolean statsEnabled = false;
-
     @Autowired
     private SQLQueriesStats sqlStats;
 
@@ -24,7 +23,7 @@ public class ShowCaseJdbcTemplate {
     }
 
     public Map<String, Object> queryForMap(String description, String sql, Object values[]) {
-        if (statsEnabled) {
+        if (StaticRouter.getStatsEnabled()) {
             long t1 = System.currentTimeMillis();
             Map<String, Object> map = jdbcTemplateSC.queryForMap(sql, values);
             sqlStats.put(description, (System.currentTimeMillis() - t1));
@@ -35,7 +34,7 @@ public class ShowCaseJdbcTemplate {
     }
 
     public int update(String description, String sql, Object values[]) {
-        if(statsEnabled) {
+        if(StaticRouter.getStatsEnabled()) {
             long t1 = System.currentTimeMillis();
             int rows = jdbcTemplateSC.update(sql, values);
             sqlStats.put(description, (System.currentTimeMillis() - t1));

@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.db;
 
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -47,15 +48,6 @@ public class JDBCSupport {
         }
     }
 
-
-    public boolean testConnection() {
-        try {
-            return !jdbcTemplate.getDataSource().getConnection().isClosed();
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
     protected JDBCConfig getConfig() {
         return config;
     }
@@ -66,28 +58,41 @@ public class JDBCSupport {
     }
 
     protected int updateWithStats(String sql, Object... args) {
-        long t1 = System.currentTimeMillis();
-        int count = jdbcTemplate.update(sql, args);
-        sqlStats.put(sql, (System.currentTimeMillis() - t1));
+        if (StaticRouter.getStatsEnabled()) {
+            long t1 = System.currentTimeMillis();
+            int count = jdbcTemplate.update(sql, args);
+            sqlStats.put(sql, (System.currentTimeMillis() - t1));
 
-        return count;
+            return count;
+        } else {
+            return jdbcTemplate.update(sql, args);
+        }
     }
 
     protected List<Map<String, Object>> queryForListWithStats(String sql, Object... args) {
-        long t1 = System.currentTimeMillis();
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, args);
-        sqlStats.put(sql, (System.currentTimeMillis() - t1));
+        if (StaticRouter.getStatsEnabled()) {
+            long t1 = System.currentTimeMillis();
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, args);
+            sqlStats.put(sql, (System.currentTimeMillis() - t1));
 
-        return rows;
+            return rows;
+        } else {
+            return jdbcTemplate.queryForList(sql, args);
+        }
     }
 
     protected long insertWithId(String query, Object[] values) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        long t1 = System.currentTimeMillis();
-        jdbcTemplate.update(new GenericInsertPreparedStatementCreator(query, values), keyHolder);
-        sqlStats.put(query, (System.currentTimeMillis() - t1));
+        if(StaticRouter.getStatsEnabled()) {
+            long t1 = System.currentTimeMillis();
+            jdbcTemplate.update(new GenericInsertPreparedStatementCreator(query, values), keyHolder);
+            sqlStats.put(query, (System.currentTimeMillis() - t1));
 
-        return keyHolder.getKey().longValue();
+            return keyHolder.getKey().longValue();
+        } else {
+            jdbcTemplate.update(new GenericInsertPreparedStatementCreator(query, values), keyHolder);
+            return keyHolder.getKey().longValue();
+        }
     }
 }
