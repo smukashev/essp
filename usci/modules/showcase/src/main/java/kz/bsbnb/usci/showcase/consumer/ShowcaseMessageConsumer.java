@@ -37,7 +37,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
     private final Logger logger = LoggerFactory.getLogger(ShowcaseDaoImpl.class);
 
-    private final List<IBaseEntity> entities = new LinkedList<>();
+    private final static List<IBaseEntity> entities = new LinkedList<>();
 
     @Override
     @Transactional
@@ -46,7 +46,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
             ObjectMessage om = (ObjectMessage) message;
             QueueEntry queueEntry;
 
-            IBaseEntity currentEntity = null;
+            IBaseEntity currentEntity;
 
             try {
                 queueEntry = (QueueEntry) om.getObject();
@@ -55,13 +55,15 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 return;
             }
 
-            if (queueEntry.getBaseEntityApplied() == null) {
+            currentEntity = queueEntry.getBaseEntityApplied();
+
+            if (currentEntity == null) {
                 logger.error("Переданный объект пустой;");
                 return;
             }
 
             try {
-                if (queueEntry.getBaseEntityApplied().getOperation() != null)
+                if (currentEntity.getOperation() != null)
                     return;
 
                 final Map<ShowCase, Future> showCaseFutureMap = new HashMap<>();
@@ -70,11 +72,11 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 if (showCases.size() == 0)
                     throw new IllegalStateException(Errors.compose(Errors.E271));
 
-                currentEntity = queueEntry.getBaseEntityApplied();
                 currentEntity.getKeyElements();
 
                 synchronized (entities) {
                     boolean found;
+
                     do {
                         found = false;
                         for (IBaseEntity entity : entities) {
@@ -91,15 +93,17 @@ public class ShowcaseMessageConsumer implements MessageListener {
                         if (found)
                             Thread.sleep(10);
                     } while(found);
+
+                    entities.add(currentEntity);
                 }
 
                 boolean found = false;
 
-                final String metaClassName = queueEntry.getBaseEntityApplied().getMeta().getClassName();
+                final String metaClassName = currentEntity.getMeta().getClassName();
 
                 for (ShowCase showCase : showCases) {
                     if (showCase.getMeta().getClassName().equals(metaClassName)) {
-                        Future future = exec.submit(new CortegeGenerator(queueEntry.getBaseEntityApplied(), showCase));
+                        Future future = exec.submit(new CortegeGenerator(currentEntity, showCase));
                         showCaseFutureMap.put(showCase, future);
                         found = true;
                     }
@@ -109,7 +113,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     for (ShowCase showCase : showCases) {
                         for (ShowCase childShowCase : showCase.getChildShowCases()) {
                             if (childShowCase.getMeta().getClassName().equals(metaClassName)) {
-                                Future future = exec.submit(new CortegeGenerator(queueEntry.getBaseEntityApplied(), childShowCase));
+                                Future future = exec.submit(new CortegeGenerator(currentEntity, childShowCase));
 
                                 showCaseFutureMap.put(childShowCase, future);
                                 found = true;
