@@ -79,7 +79,7 @@ public final class StaticRouter {
 
     private final static boolean stendStatsEnabled = false;
     private final static boolean devStatsEnabled = true;
-    private final static boolean prodStatsEnabled = false;
+    private final static boolean prodStatsEnabled = true;
 
     public static String getAsIP() {
         switch(mode) {

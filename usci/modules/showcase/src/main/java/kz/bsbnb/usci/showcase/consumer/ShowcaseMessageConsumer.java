@@ -74,28 +74,33 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
                 currentEntity.getKeyElements();
 
-                synchronized (entities) {
-                    boolean found;
-
-                    do {
-                        found = false;
+                boolean entityFound;
+                int failCounter = 0;
+                do {
+                    synchronized (entities) {
+                        entityFound = false;
                         for (IBaseEntity entity : entities) {
                             for (IBaseEntity keyEntity : entity.getKeyElements()) {
                                 for (IBaseEntity currentKeyEntity : currentEntity.getKeyElements()) {
-                                    if (keyEntity.getMeta().getId() == currentKeyEntity.getMeta().getId() && keyEntity.equalsByKey(currentKeyEntity)) {
-                                        found = true;
+                                    if (keyEntity.getMeta().getId() == currentKeyEntity.getMeta().getId()
+                                            && keyEntity.equalsByKey(currentKeyEntity)) {
+                                        entityFound = true;
                                         break;
                                     }
                                 }
                             }
                         }
 
-                        if (found)
-                            Thread.sleep(10);
-                    } while(found);
+                        if (!entityFound)
+                            entities.add(currentEntity);
 
-                    entities.add(currentEntity);
-                }
+                        if (entityFound)
+                            Thread.sleep(50);
+
+                        if (entityFound && failCounter++ >= 1000)
+                            throw new IllegalStateException(Errors.compose(Errors.E288));
+                    }
+                } while(entityFound);
 
                 boolean found = false;
 
@@ -137,7 +142,8 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 throw new RuntimeException(e.getMessage());
             } finally {
                 synchronized (entities) {
-                    if (currentEntity != null) entities.remove(currentEntity);
+                    if (!entities.remove(currentEntity))
+                        throw new IllegalStateException(Errors.compose(Errors.E289));
                 }
             }
         }
