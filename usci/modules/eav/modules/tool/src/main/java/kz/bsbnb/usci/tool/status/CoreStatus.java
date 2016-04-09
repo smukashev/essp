@@ -4,12 +4,17 @@ import java.io.Serializable;
 
 public class CoreStatus implements Serializable
 {
-    double avgProcessed;
-    double avgInserts;
-    double avgSelects;
-    double avgDeletes;
-    double avgUpdates;
-    long totalProcessed;
+    private double avgProcessed;
+
+    private double avgInserts;
+
+    private double avgSelects;
+
+    private double avgDeletes;
+
+    private double avgUpdates;
+
+    private long totalProcessed;
 
     public double getAvgProcessed()
     {

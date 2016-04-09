@@ -10,32 +10,32 @@ public class ReceiverStatus implements Serializable
     private long rulesEvaluationTimeAvg;
     private String jobLauncherStatus;
 
-    public long getQueueSize()
+    long getQueueSize()
     {
         return queueSize;
     }
 
-    public void setQueueSize(long queueSize)
+    void setQueueSize(long queueSize)
     {
         this.queueSize = queueSize;
     }
 
-    public long getBatchesInProgress()
+    long getBatchesInProgress()
     {
         return batchesInProgress;
     }
 
-    public void setBatchesInProgress(long batchesInProgress)
+    void setBatchesInProgress(long batchesInProgress)
     {
         this.batchesInProgress = batchesInProgress;
     }
 
-    public long getBatchesCompleted()
+    long getBatchesCompleted()
     {
         return batchesCompleted;
     }
 
-    public void setBatchesCompleted(long batchesCompleted)
+    void setBatchesCompleted(long batchesCompleted)
     {
         this.batchesCompleted = batchesCompleted;
     }

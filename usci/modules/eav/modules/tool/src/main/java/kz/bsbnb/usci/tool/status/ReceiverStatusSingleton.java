@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReceiverStatusSingleton
 {
-    ReceiverStatus status = new ReceiverStatus();
+    private ReceiverStatus status = new ReceiverStatus();
 
     public synchronized void batchStarted() {
         status.setBatchesInProgress(status.getBatchesInProgress() + 1);
