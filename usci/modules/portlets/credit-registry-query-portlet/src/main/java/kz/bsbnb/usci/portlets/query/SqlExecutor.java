@@ -36,8 +36,8 @@ class SqlExecutor {
             + "END;";
 
     private final ObjectProperty<String> connectionStringProperty = new ObjectProperty<String>("jdbc:oracle:thin:@10.8.1.200:1521:essp");
-    private final ObjectProperty<String> usernameProperty = new ObjectProperty<String>("CORE");
-    private final ObjectProperty<String> passwordProperty = new ObjectProperty<String>("CORE_2013");
+    private final ObjectProperty<String> usernameProperty = new ObjectProperty<String>("core");
+    private final ObjectProperty<String> passwordProperty = new ObjectProperty<String>("core");
     private final ObjectProperty<Integer> limitProperty = new ObjectProperty<Integer>(1000);
     private final ObjectProperty<Integer> timeoutProperty = new ObjectProperty<Integer>(300);
     private final QuerySettings settings;

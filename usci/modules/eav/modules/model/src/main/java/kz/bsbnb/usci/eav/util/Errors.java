@@ -342,8 +342,8 @@ public enum Errors {
         errors.put("E285", "Ключевые простые массивы не поддерживются;");
         errors.put("E286", "Невозможно подключиться к сервисам");
         errors.put("E287", "Не запущено через портал Liferay!");
-        errors.put("E288", "");
-        errors.put("E289", "");
+        errors.put("E288", "Загрузка на витрину не доступна");
+        errors.put("E289", "Запись не удалена из очереди");
         errors.put("E290", "");
         errors.put("E291", "");
         errors.put("E292", "");
