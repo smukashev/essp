@@ -27,6 +27,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
@@ -34,6 +35,7 @@ import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.showcase.EntityProcessorListenerImpl;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.showcase.ShowCaseIndex;
@@ -112,6 +114,10 @@ public class CLI {
     @Autowired ApplicationContext context;
 
     @Autowired EntityExporter entityExporter;
+
+    @Autowired
+    EntityProcessorListenerImpl entityProcessorListener;
+
 
     private IEntityService entityServiceCore = null;
 
@@ -2322,8 +2328,121 @@ public class CLI {
               runner.runScript(args.get(2), StaticRouter.getShowcaseSchemaName());
               System.out.println("Скрипт отработан за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
           }
+        } else if (args.get(0).equals("generate")) {
+            System.out.println("Запускаю генерацию в showcase...");
+            long t1 = System.currentTimeMillis();
+            String token = args.get(1);
+
+            if (token.matches("\\d+")) { // showcase generate entityId
+                Long enityId = Long.parseLong(token);
+                sendToShowcaseEntity(enityId);
+            } else if (token.matches("\\w+")) { // showcase generate metaClass ...
+                String metaClass = token;
+
+                if (args.size() < 3) {
+                    sendToShowcaseMeta(metaClass);
+                    return;
+                }
+
+                token = args.get(2);
+                if (token.matches("\\d{2}.\\d{2}.\\d{4}")) {
+                    Date reportDate = null;
+                    try {
+                        reportDate = simpleDateFormat.parse(token);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (args.size() < 4) {
+                        sendToShowcaseMeta(metaClass, reportDate);
+                        return;
+                    }
+
+                    token = args.get(3);
+                    if (token.matches("\\d+")) {
+                        Long creditorId = Long.parseLong(token);
+                        sendToShowcaseMeta(metaClass, reportDate, creditorId);
+                        return;
+                    } else {
+                        System.out.println("Usage: generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
+                        return;
+                    }
+                } else {
+                    System.out.println("Usage: generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
+                    return;
+                }
+            } else {
+                System.out.println("Usage: generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
+                return;
+            }
+
+            System.out.println("Генерация отработана за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
         } else {
             throw new IllegalArgumentException(Errors.compose(Errors.E219));
+        }
+    }
+
+    private void sendToShowcaseEntity(Long enityId) {
+        IBaseEntity entity = baseEntityLoadDao.load(enityId);
+        entityProcessorListener.applyToDBEnded(entity);
+    }
+
+    /**
+     * Gets entities from metaClass. Then send to showcase each entity in cycle
+     *
+     * @param metaClassName
+     */
+    private void sendToShowcaseMeta(String metaClassName) {
+        MetaClass metaClass = metaClassRepository.getMetaClass(metaClassName);
+        List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaclass(metaClass.getId());
+        for (Long entityId : entityIdList) {
+            sendToShowcaseEntity(entityId);
+        }
+    }
+
+    private void sendToShowcaseEntity(Long enityId, Date reportDate) {
+        IBaseEntity entity = baseEntityLoadDao.load(enityId, reportDate);
+        entityProcessorListener.applyToDBEnded(entity);
+    }
+
+    /**
+     * Gets entities from metaClass. Then send to showcase each entity in cycle
+     *
+     * @param metaClassName
+     * @param reportDate
+     */
+    private void sendToShowcaseMeta(String metaClassName, Date reportDate) {
+        MetaClass metaClass = metaClassRepository.getMetaClass(metaClassName);
+        List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaclass(metaClass.getId());
+        for (Long entityId : entityIdList) {
+            sendToShowcaseEntity(entityId, reportDate);
+        }
+    }
+
+    private void sendToShowcaseEntity(Long enityId, Date reportDate, Long creditorId) {
+        IBaseEntity entity = baseEntityLoadDao.load(enityId, reportDate);
+
+        // filter by creditorId
+        if (getCreditorId(entity) == creditorId.longValue())
+            entityProcessorListener.applyToDBEnded(entity);
+    }
+
+    private long getCreditorId(IBaseEntity entity) {
+        return ((BaseEntityComplexValue) (((BaseEntity) entity).getBaseValue("creditor"))).getValue().getId();
+    }
+
+    /**
+     * Gets entities from metaClass. Then send to showcase each entity in cycle
+     *
+     * @param metaClassName
+     * @param reportDate
+     * @param creditorId
+     */
+    private void sendToShowcaseMeta(String metaClassName, Date reportDate, Long creditorId) {
+        MetaClass metaClass = metaClassRepository.getMetaClass(metaClassName);
+        List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaclass(metaClass.getId());
+        for (Long entityId : entityIdList) {
+            sendToShowcaseEntity(entityId, reportDate, creditorId);
         }
     }
 
