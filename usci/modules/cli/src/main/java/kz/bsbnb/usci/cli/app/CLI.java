@@ -2320,62 +2320,35 @@ public class CLI {
         } else if (args.get(0).equals("stats")) {
             showcaseStat();
         } else if(args.get(0).equals("sql")) {
-          if(args.get(1).equals("run")) {
-              System.out.println("Запускаю скрипт " + args.get(2));
-              long t1 = System.currentTimeMillis();
-              InitDataSourceSC(showcaseService.getDriverSc(), showcaseService.getSchemaSc(), showcaseService.getPasswordSc(), showcaseService.getUrlSc());
-              SqlRunner runner = new SqlRunner(jdbcTemplateSC.getDataSource().getConnection(),  true);
-              runner.runScript(args.get(2), StaticRouter.getShowcaseSchemaName());
-              System.out.println("Скрипт отработан за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
-          }
+            if (args.get(1).equals("run")) {
+                System.out.println("Запускаю скрипт " + args.get(2));
+                long t1 = System.currentTimeMillis();
+                InitDataSourceSC(showcaseService.getDriverSc(), showcaseService.getSchemaSc(), showcaseService.getPasswordSc(), showcaseService.getUrlSc());
+                SqlRunner runner = new SqlRunner(jdbcTemplateSC.getDataSource().getConnection(), true);
+                runner.runScript(args.get(2), StaticRouter.getShowcaseSchemaName());
+                System.out.println("Скрипт отработан за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
+            }
         } else if (args.get(0).equals("generate")) {
             System.out.println("Запускаю генерацию в showcase...");
             long t1 = System.currentTimeMillis();
             String token = args.get(1);
 
-            if (token.matches("\\d+")) { // showcase generate entityId
-                Long enityId = Long.parseLong(token);
-                sendToShowcaseEntity(enityId);
-            } else if (token.matches("\\w+")) { // showcase generate metaClass ...
-                String metaClass = token;
+            Map<String, Object> options = parse(args.subList(1, args.size()));
+            if (options == null || !options.containsKey("creditor_id")) {
+                printUsageShowcaseGenerate();
+                return;
+            }
 
-                if (args.size() < 3) {
-                    sendToShowcaseMeta(metaClass);
-                    System.out.println("Генерация отработана за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
-                    return;
-                }
+            Long creditorId = (Long) options.get("creditor_id");
 
-                token = args.get(2);
-                if (token.matches("\\d{2}.\\d{2}.\\d{4}")) {
-                    Date reportDate = null;
-                    try {
-                        reportDate = simpleDateFormat.parse(token);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (args.size() < 4) {
-                        sendToShowcaseMeta(metaClass, reportDate);
-                        System.out.println("Генерация отработана за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
-                        return;
-                    }
-
-                    token = args.get(3);
-                    if (token.matches("\\d+")) {
-                        Long creditorId = Long.parseLong(token);
-                        sendToShowcaseMeta(metaClass, reportDate, creditorId);
-                        System.out.println("Генерация отработана за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
-                        return;
-                    } else {
-                        System.out.println("Usage: showcase generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
-                        return;
-                    }
-                } else {
-                    System.out.println("Usage: showcase generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
-                    return;
-                }
-            } else {
-                System.out.println("Usage: showcase generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
+            if (options.containsKey("entity_id")) {
+                sendToShowcaseEntity(creditorId, (Long) options.get("entity_id"), null);
+            } else if (options.containsKey("metaclass") && !options.containsKey("report_date")) {
+                sendToShowcase(creditorId, (String) options.get("metaclass"), null);
+            } else if (options.containsKey("metaclass") && options.containsKey("report_date")) {
+                sendToShowcase(creditorId, (String) options.get("metaclass"), (Date) options.get("report_date"));
+            } else if (!options.containsKey("metaclass") && !options.containsKey("report_date")) {
+                printUsageShowcaseGenerate();
                 return;
             }
 
@@ -2385,63 +2358,72 @@ public class CLI {
         }
     }
 
-    private void sendToShowcaseEntity(Long enityId) {
-        IBaseEntity entity = baseEntityLoadDao.load(enityId);
-        entityProcessorListener.applyToDBEnded(entity);
+    private void printUsageShowcaseGenerate() {
+        System.out.println("Usage: showcase generate  creditor_id <NNN> [entity_id <NNN>] [metaclass <AAA>] [report_date <dd.mm.yyyy>]");
     }
 
-    /**
-     * Gets entities from metaClass. Then send to showcase each entity in cycle
-     *
-     * @param metaClassName
-     */
-    private void sendToShowcaseMeta(String metaClassName) {
+    private Map<String, Object> parse(List<String> args) {
+        if (args.size() % 2 != 0) {
+            return null;
+        }
+
+        Map<String, Object> opt = new HashMap<String, Object>();
+        for (int i = 0; i < args.size() - 1; i += 2) {
+            if ("creditor_id".equals(args.get(i))) {
+                if (!("" + args.get(i + 1)).matches("\\d+"))
+                    return null;
+                opt.put("" + args.get(i), Long.parseLong(args.get(i + 1)));
+            }
+            if ("entity_id".equals(args.get(i))) {
+                if (!("" + args.get(i + 1)).matches("\\d+"))
+                    return null;
+                opt.put("" + args.get(i), Long.parseLong(args.get(i + 1)));
+            }
+            if ("report_date".equals(args.get(i))) {
+                if (!("" + args.get(i + 1)).matches("\\d{2}\\.\\d{2}\\.\\d{4}"))
+                    return null;
+                try {
+                    opt.put("" + args.get(i), simpleDateFormat.parse("" + args.get(i + 1)));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+            if ("metaclass".equals(args.get(i))) {
+                if (!("" + args.get(i + 1)).matches("\\w+"))
+                    return null;
+                opt.put("" + args.get(i), "" + args.get(i + 1));
+            }
+        }
+
+        return opt;
+    }
+
+    private void sendToShowcase(Long creditorId, String metaClassName, Date reportDate) {
         MetaClass metaClass = metaClassRepository.getMetaClass(metaClassName);
         List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaclass(metaClass.getId());
         for (Long entityId : entityIdList) {
-            sendToShowcaseEntity(entityId);
+            sendToShowcaseEntity(creditorId, entityId, reportDate);
         }
     }
 
-    private void sendToShowcaseEntity(Long enityId, Date reportDate) {
-        IBaseEntity entity = baseEntityLoadDao.loadByMaxReportDate(enityId, reportDate);
-        entityProcessorListener.applyToDBEnded(entity);
-    }
-
-    /**
-     * Gets entities from metaClass. Then send to showcase each entity in cycle
-     *
-     * @param metaClassName
-     * @param reportDate
-     */
-    private void sendToShowcaseMeta(String metaClassName, Date reportDate) {
-        MetaClass metaClass = metaClassRepository.getMetaClass(metaClassName);
-        List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaclass(metaClass.getId());
-        for (Long entityId : entityIdList) {
-            sendToShowcaseEntity(entityId, reportDate);
+    private void sendToShowcaseEntity(Long creditorId, Long enityId, Date reportDate) {
+        //System.out.print("Sending entity_id=" + enityId + "? ");
+        long entityCreditorId = 0;
+        IBaseEntity entity = null;
+        try {
+            entity = (reportDate == null) ? baseEntityLoadDao.load(enityId) : baseEntityLoadDao.loadByMaxReportDate(enityId, reportDate);
+            entityCreditorId = getCreditorId(entity);
+        } catch (Exception e) { //  TODO: Then cancel creditor checking...? "Справочник ... не доступен на отчётный период dd.mm.yyyy", "Атрибут: creditor не найден в мета классе: ..."
+            System.out.println(e.getMessage());
+            entityCreditorId = -1;
         }
-    }
-
-    private void sendToShowcaseEntity(Long enityId, Date reportDate, Long creditorId) {
-        IBaseEntity entity = baseEntityLoadDao.loadByMaxReportDate(enityId, reportDate);
 
         // filter by creditorId
-        if (getCreditorId(entity) == creditorId.longValue())
+        if (entityCreditorId > 0 && entityCreditorId == creditorId.longValue()) {
             entityProcessorListener.applyToDBEnded(entity);
-    }
-
-    /**
-     * Gets entities from metaClass. Then send to showcase each entity in cycle
-     *
-     * @param metaClassName
-     * @param reportDate
-     * @param creditorId
-     */
-    private void sendToShowcaseMeta(String metaClassName, Date reportDate, Long creditorId) {
-        MetaClass metaClass = metaClassRepository.getMetaClass(metaClassName);
-        List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaclass(metaClass.getId());
-        for (Long entityId : entityIdList) {
-            sendToShowcaseEntity(entityId, reportDate, creditorId);
+            //System.out.println("OK");
+        } else {
+            //System.out.println("NO");
         }
     }
 
