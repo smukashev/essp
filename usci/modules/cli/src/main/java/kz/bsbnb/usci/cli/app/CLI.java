@@ -2404,7 +2404,7 @@ public class CLI {
     }
 
     private void sendToShowcaseEntity(Long enityId, Date reportDate) {
-        IBaseEntity entity = baseEntityLoadDao.load(enityId, reportDate);
+        IBaseEntity entity = baseEntityLoadDao.loadByMaxReportDate(enityId, reportDate);
         entityProcessorListener.applyToDBEnded(entity);
     }
 
@@ -2423,7 +2423,7 @@ public class CLI {
     }
 
     private void sendToShowcaseEntity(Long enityId, Date reportDate, Long creditorId) {
-        IBaseEntity entity = baseEntityLoadDao.load(enityId, reportDate);
+        IBaseEntity entity = baseEntityLoadDao.loadByMaxReportDate(enityId, reportDate);
 
         // filter by creditorId
         if (getCreditorId(entity) == creditorId.longValue())
