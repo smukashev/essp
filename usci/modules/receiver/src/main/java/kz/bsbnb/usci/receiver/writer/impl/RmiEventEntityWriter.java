@@ -73,67 +73,6 @@ public class RmiEventEntityWriter<T> implements IWriter<T> {
 
     @Override
     public void write(List items) throws Exception {
-        logger.info("Writer write: " + items.size());
-
-        Iterator<BaseEntity> iterator = items.iterator();
-
-        ArrayList<BaseEntity> entitiesToSave = new ArrayList<>(items.size());
-
-        while(iterator.hasNext()) {
-            BaseEntity entity = iterator.next();
-
-            List<String> errors = new LinkedList<>(entity.getValidationErrors());
-            String ruleRuntimeException = null;
-
-            // Fixme!
-            if(global.isRulesEnabled() && entity.getMeta() != null &&
-                    metaRules.contains(entity.getMeta().getClassName()) && (entity.getOperation() != null
-            && (entity.getOperation().equals(OperationType.INSERT) || entity.getOperation().equals(OperationType.UPDATE)))) {
-                try {
-                    long t1 = System.currentTimeMillis();
-
-                    errors = ruleService.runRules(entity, entity.getMeta().getClassName() + "_parser",
-                            entity.getReportDate());
-
-                    sqlStats.put(entity.getMeta().getClassName() + "_parser", System.currentTimeMillis() - t1);
-                } catch (Exception e) {
-                    logger.error("Не могу применить бизнес правила: " + e.getMessage());
-                    ruleRuntimeException = e.getMessage();
-                }
-            }
-
-            if(ruleRuntimeException != null) {
-                EntityStatus entityStatus = new EntityStatus()
-                        .setBatchId(entity.getBatchId())
-                        .setEntityId(entity.getId())
-                        .setStatus(EntityStatuses.ERROR)
-                        .setDescription(StatusProperties.getSpecificParams(entity))
-                        .setErrorCode(String.valueOf(Errors.E195))
-                        .setDevDescription(Errors.checkLength(ruleRuntimeException))
-                        .setReceiptDate(new Date())
-                        .setIndex(entity.getBatchIndex() - 1);
-
-
-                batchService.addEntityStatus(entityStatus);
-            } else if (errors != null && errors.size() > 0) {
-                for (String errorMsg : errors) {
-                    EntityStatus entityStatus = new EntityStatus()
-                            .setBatchId(entity.getBatchId())
-                            .setEntityId(entity.getId())
-                            .setStatus(EntityStatuses.ERROR)
-                            .setDescription(StatusProperties.getSpecificParams(entity))
-                            .setErrorCode(String.valueOf(Errors.E195))
-                            .setDevDescription(Errors.checkLength(errorMsg))
-                            .setReceiptDate(new Date())
-                            .setIndex(entity.getBatchIndex() - 1);
-
-                    batchService.addEntityStatus(entityStatus);
-                }
-            } else {
-                entitiesToSave.add(entity);
-            }
-        }
-
-        entityService.process(entitiesToSave);
+        entityService.process(items);
     }
 }

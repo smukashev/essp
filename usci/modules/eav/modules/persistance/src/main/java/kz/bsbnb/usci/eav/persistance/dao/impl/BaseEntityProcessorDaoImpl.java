@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.model.exceptions.KnownIterativeException;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -159,9 +160,41 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntity;
     }
 
+    public void checkForRules(BaseEntity baseEntity) {
+        if (metaRules == null) {
+            String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
+            metaRules = new HashSet<>(Arrays.asList(metaArray));
+        }
+
+        List<String> errors = new LinkedList<>(baseEntity.getValidationErrors());
+
+        if(rulesEnabled && baseEntity.getMeta() != null &&
+                metaRules.contains(baseEntity.getMeta().getClassName()) && (baseEntity.getOperation() != null
+                && (baseEntity.getOperation().equals(OperationType.INSERT) || baseEntity.getOperation().equals(OperationType.UPDATE)))) {
+            try {
+                long t1 = System.currentTimeMillis();
+
+                errors = ruleServicePool.getRuleService().runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser",
+                        baseEntity.getReportDate());
+
+                sqlStats.put(baseEntity.getMeta().getClassName() + "_parser", System.currentTimeMillis() - t1);
+            } catch (Exception e) {
+                logger.error(Errors.compose(Errors.E290,e));
+                new RuntimeException(Errors.compose(Errors.E290,e));
+            }
+
+            if (errors.size() > 0) {
+                throw new KnownIterativeException(errors);
+            }
+        }
+    }
+
     @Override
     @Transactional
     public IBaseEntity process(final IBaseEntity baseEntity) {
+
+        checkForRules((BaseEntity)baseEntity);
+
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
 
         IBaseEntity baseEntityPostPrepared;
