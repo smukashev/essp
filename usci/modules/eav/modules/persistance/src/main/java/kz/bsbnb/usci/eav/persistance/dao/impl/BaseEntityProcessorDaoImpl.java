@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.model.exceptions.KnownIterativeException;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -159,9 +160,37 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntity;
     }
 
+    public void checkForRules(BaseEntity baseEntity) {
+        if (metaRules == null) {
+            String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
+            metaRules = new HashSet<>(Arrays.asList(metaArray));
+        }
+
+        if(rulesEnabled && baseEntity.getMeta() != null &&
+                metaRules.contains(baseEntity.getMeta().getClassName()) && (baseEntity.getOperation() != null
+                && (baseEntity.getOperation().equals(OperationType.INSERT) || baseEntity.getOperation().equals(OperationType.UPDATE)))) {
+            List<String> errors;
+            try {
+                long t1 = System.currentTimeMillis();
+                errors = ruleServicePool.getRuleService().runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
+                sqlStats.put("java::rule(" + baseEntity.getMeta().getClassName()+")", System.currentTimeMillis() - t1);
+            } catch (Exception e) {
+                logger.error(Errors.compose(Errors.E290,e));
+                throw new RuntimeException(Errors.compose(Errors.E290,e));
+            }
+
+            if (errors.size() > 0) {
+                throw new KnownIterativeException(errors);
+            }
+        }
+    }
+
     @Override
     @Transactional
     public IBaseEntity process(final IBaseEntity baseEntity) {
+        /* Проверка сущности на бизнес правила */
+        checkForRules((BaseEntity)baseEntity);
+
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
 
         IBaseEntity baseEntityPostPrepared;
@@ -176,7 +205,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         long prepareTime = System.currentTimeMillis();
         baseEntityPostPrepared = prepare(((BaseEntity) baseEntity).clone(), creditorId);
-        sqlStats.put("java::prepare", (System.currentTimeMillis() - prepareTime));
+        sqlStats.put("java::prepare(" + baseEntity.getMeta().getClassName() + ")", (System.currentTimeMillis() - prepareTime));
 
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
@@ -206,11 +235,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     if (baseEntityReportDateDao.getMinReportDate(baseEntityPostPrepared.getId()).equals(
                             baseEntityPostPrepared.getReportDate())) {
-                        logger.error("Дата закрытия не может быть одинаковой с датой открытия; \n"
-                                + baseEntityPostPrepared);
+                        logger.error("Дата закрытия не может быть одинаковой с датой открытия; \n" + baseEntityPostPrepared);
                         throw new IllegalStateException(Errors.compose(Errors.E115));
                     }
-
 
                     boolean reportDateExists = baseEntityReportDateDao.exists(baseEntityPostPrepared.getId(),
                             baseEntityPostPrepared.getReportDate());
@@ -266,7 +293,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         } else {
             long applyTime = System.currentTimeMillis();
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
-            sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
+            sqlStats.put("java::apply(" + baseEntity.getMeta().getClassName() + ")", (System.currentTimeMillis() - applyTime));
 
             baseEntityApplyDao.applyToDb(baseEntityManager);
         }
