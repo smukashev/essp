@@ -2341,6 +2341,7 @@ public class CLI {
 
                 if (args.size() < 3) {
                     sendToShowcaseMeta(metaClass);
+                    System.out.println("Генерация отработана за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
                     return;
                 }
 
@@ -2355,6 +2356,7 @@ public class CLI {
 
                     if (args.size() < 4) {
                         sendToShowcaseMeta(metaClass, reportDate);
+                        System.out.println("Генерация отработана за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
                         return;
                     }
 
@@ -2362,17 +2364,18 @@ public class CLI {
                     if (token.matches("\\d+")) {
                         Long creditorId = Long.parseLong(token);
                         sendToShowcaseMeta(metaClass, reportDate, creditorId);
+                        System.out.println("Генерация отработана за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
                         return;
                     } else {
-                        System.out.println("Usage: generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
+                        System.out.println("Usage: showcase generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
                         return;
                     }
                 } else {
-                    System.out.println("Usage: generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
+                    System.out.println("Usage: showcase generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
                     return;
                 }
             } else {
-                System.out.println("Usage: generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
+                System.out.println("Usage: showcase generate  <metaclass_name>|<entity_id> {report_date} {creditor_id}");
                 return;
             }
 
@@ -2427,10 +2430,6 @@ public class CLI {
             entityProcessorListener.applyToDBEnded(entity);
     }
 
-    private long getCreditorId(IBaseEntity entity) {
-        return ((BaseEntityComplexValue) (((BaseEntity) entity).getBaseValue("creditor"))).getValue().getId();
-    }
-
     /**
      * Gets entities from metaClass. Then send to showcase each entity in cycle
      *
@@ -2444,6 +2443,10 @@ public class CLI {
         for (Long entityId : entityIdList) {
             sendToShowcaseEntity(entityId, reportDate, creditorId);
         }
+    }
+
+    private long getCreditorId(IBaseEntity entity) {
+        return ((BaseEntityComplexValue) (entity.getBaseValue("creditor"))).getValue().getId();
     }
 
     public Exception getLastException() {
