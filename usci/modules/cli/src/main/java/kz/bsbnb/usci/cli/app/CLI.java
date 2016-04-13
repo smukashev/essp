@@ -27,6 +27,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.output.BaseEntityOutput;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
@@ -34,6 +35,7 @@ import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.showcase.EntityProcessorListenerImpl;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
 import kz.bsbnb.usci.eav.showcase.ShowCaseIndex;
@@ -112,6 +114,10 @@ public class CLI {
     @Autowired ApplicationContext context;
 
     @Autowired EntityExporter entityExporter;
+
+    @Autowired
+    EntityProcessorListenerImpl entityProcessorListener;
+
 
     private IEntityService entityServiceCore = null;
 
@@ -2314,17 +2320,115 @@ public class CLI {
         } else if (args.get(0).equals("stats")) {
             showcaseStat();
         } else if(args.get(0).equals("sql")) {
-          if(args.get(1).equals("run")) {
-              System.out.println("Запускаю скрипт " + args.get(2));
-              long t1 = System.currentTimeMillis();
-              InitDataSourceSC(showcaseService.getDriverSc(), showcaseService.getSchemaSc(), showcaseService.getPasswordSc(), showcaseService.getUrlSc());
-              SqlRunner runner = new SqlRunner(jdbcTemplateSC.getDataSource().getConnection(),  true);
-              runner.runScript(args.get(2), StaticRouter.getShowcaseSchemaName());
-              System.out.println("Скрипт отработан за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
-          }
+            if (args.get(1).equals("run")) {
+                System.out.println("Запускаю скрипт " + args.get(2));
+                long t1 = System.currentTimeMillis();
+                InitDataSourceSC(showcaseService.getDriverSc(), showcaseService.getSchemaSc(), showcaseService.getPasswordSc(), showcaseService.getUrlSc());
+                SqlRunner runner = new SqlRunner(jdbcTemplateSC.getDataSource().getConnection(), true);
+                runner.runScript(args.get(2), StaticRouter.getShowcaseSchemaName());
+                System.out.println("Скрипт отработан за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
+            }
+        } else if (args.get(0).equals("generate")) {
+            System.out.println("Запускаю генерацию в showcase...");
+            long t1 = System.currentTimeMillis();
+            String token = args.get(1);
+
+            Map<String, Object> options = parse(args.subList(1, args.size()));
+            if (options == null || !options.containsKey("creditor_id")) {
+                printUsageShowcaseGenerate();
+                return;
+            }
+
+            Long creditorId = (Long) options.get("creditor_id");
+
+            if (options.containsKey("entity_id")) {
+                sendToShowcaseEntity(creditorId, (Long) options.get("entity_id"), null);
+            } else if (options.containsKey("metaclass") && !options.containsKey("report_date")) {
+                sendToShowcase(creditorId, (String) options.get("metaclass"), null);
+            } else if (options.containsKey("metaclass") && options.containsKey("report_date")) {
+                sendToShowcase(creditorId, (String) options.get("metaclass"), (Date) options.get("report_date"));
+            } else if (!options.containsKey("metaclass") && !options.containsKey("report_date")) {
+                printUsageShowcaseGenerate();
+                return;
+            }
+
+            System.out.println("Генерация отработана за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
         } else {
             throw new IllegalArgumentException(Errors.compose(Errors.E219));
         }
+    }
+
+    private void printUsageShowcaseGenerate() {
+        System.out.println("Usage: showcase generate  creditor_id <NNN> [entity_id <NNN>] [metaclass <AAA>] [report_date <dd.mm.yyyy>]");
+    }
+
+    private Map<String, Object> parse(List<String> args) {
+        if (args.size() % 2 != 0) {
+            return null;
+        }
+
+        Map<String, Object> opt = new HashMap<String, Object>();
+        for (int i = 0; i < args.size() - 1; i += 2) {
+            if ("creditor_id".equals(args.get(i))) {
+                if (!("" + args.get(i + 1)).matches("\\d+"))
+                    return null;
+                opt.put("" + args.get(i), Long.parseLong(args.get(i + 1)));
+            }
+            if ("entity_id".equals(args.get(i))) {
+                if (!("" + args.get(i + 1)).matches("\\d+"))
+                    return null;
+                opt.put("" + args.get(i), Long.parseLong(args.get(i + 1)));
+            }
+            if ("report_date".equals(args.get(i))) {
+                if (!("" + args.get(i + 1)).matches("\\d{2}\\.\\d{2}\\.\\d{4}"))
+                    return null;
+                try {
+                    opt.put("" + args.get(i), simpleDateFormat.parse("" + args.get(i + 1)));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+            if ("metaclass".equals(args.get(i))) {
+                if (!("" + args.get(i + 1)).matches("\\w+"))
+                    return null;
+                opt.put("" + args.get(i), "" + args.get(i + 1));
+            }
+        }
+
+        return opt;
+    }
+
+    private void sendToShowcase(Long creditorId, String metaClassName, Date reportDate) {
+        MetaClass metaClass = metaClassRepository.getMetaClass(metaClassName);
+        List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaclass(metaClass.getId());
+        for (Long entityId : entityIdList) {
+            sendToShowcaseEntity(creditorId, entityId, reportDate);
+        }
+    }
+
+    private void sendToShowcaseEntity(Long creditorId, Long enityId, Date reportDate) {
+        //System.out.print("Sending entity_id=" + enityId + "? ");
+        long entityCreditorId = 0;
+        IBaseEntity entity = null;
+        try {
+            entity = (reportDate == null) ? baseEntityLoadDao.load(enityId) : baseEntityLoadDao.loadByMaxReportDate(enityId, reportDate);
+            entityCreditorId = getCreditorId(entity);
+        } catch (Exception e) { //  TODO: Then cancel creditor checking...? "Справочник ... не доступен на отчётный период dd.mm.yyyy", "Атрибут: creditor не найден в мета классе: ..."
+            System.out.println(e.getMessage());
+            entityCreditorId = -1;
+        }
+
+        // filter by creditorId
+        if (entityCreditorId > 0 && entityCreditorId == creditorId.longValue()) {
+            entityProcessorListener.applyToDBEnded(entity);
+            //System.out.println("OK");
+        } else {
+            //System.out.println("NO");
+        }
+    }
+
+    private long getCreditorId(IBaseEntity entity) {
+        return ((BaseEntityComplexValue) (entity.getBaseValue("creditor"))).getValue().getId();
     }
 
     public Exception getLastException() {
