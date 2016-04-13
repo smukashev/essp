@@ -14,5 +14,8 @@
 			<taglib-location>/WEB-INF/tld/aui.tld</taglib-location>
 		</taglib>
 	</jsp-config>
-	
+
+	<session-config>
+		<session-timeout>15</session-timeout>
+	</session-config>
 </web-app>
