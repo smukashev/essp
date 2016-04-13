@@ -15,6 +15,8 @@
 
     <aop:aspectj-autoproxy/>
 
+    <context:component-scan base-package="kz.bsbnb.usci.eav" />
+
     <!-- Add this tag to enable annotations transactions -->
     <tx:annotation-driven transaction-manager="txManager"/>
 
@@ -32,25 +34,20 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <context:component-scan base-package="kz.bsbnb.usci.eav" />
-
-    <bean id="BatchReporsitory" class="kz.bsbnb.usci.eav.repository.impl.BatchRepository"/>
-
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="${jdbc.driver}"/>
-        <property name="url" value="${jdbc.url}"/>
-        <property name="username" value="${jdbc.user}"/>
-        <property name="password" value="${jdbc.password}"/>
-        <property name="initialSize" value="${jdbc.initialSize}"/>
-        <property name="maxActive" value="${jdbc.maxActive}"/>
-        <!--<property name="validationQuery" value="${jdbc.validationQuery}"/>
-        <property name="testOnBorrow" value="${jdbc.testOnBorrow}"/>
-        <property name="testOnReturn" value="${jdbc.testOnReturn}"/>-->
+        <property name="driverClassName" value="${jdbcPersistance.driver}"/>
+        <property name="url" value="${jdbcPersistance.url}"/>
+        <property name="username" value="${jdbcPersistance.user}"/>
+        <property name="password" value="${jdbcPersistance.password}"/>
+        <property name="initialSize" value="${jdbcPersistance.initialSize}"/>
+        <property name="maxIdle" value="${jdbcPersistance.maxIdle}"/>
+        <property name="maxActive" value="${jdbcPersistance.maxActive}"/>
+        <property name="connectionProperties" value="PERSISTANCE" />
     </bean>
 
     <bean id="context" class="org.jooq.impl.DSL" factory-method="using">
         <constructor-arg name="dialect">
-            <value type="org.jooq.SQLDialect">${jooq.executor.constructor.args.first}</value>
+            <value type="org.jooq.SQLDialect">${jooqPersistance.executor.constructor.args.first}</value>
         </constructor-arg>
         <!-- <constructor-arg index="0" value="${jooq.executor.constructor.args.first}"/> -->
     </bean>
@@ -64,14 +61,10 @@
     <!--<amq:broker useJmx="true" />-->
 
     <!-- Spring JMS ConnectionFactory -->
-    <bean id="singleConnectionFactory"
-          class="org.springframework.jms.connection.SingleConnectionFactory"
-          p:targetConnectionFactory-ref="jmsFactory"/>
+    <bean id="singleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory" p:targetConnectionFactory-ref="jmsFactory"/>
 
     <!-- Spring JMS Producer Configuration -->
-    <bean id="jmsProducerTemplate" class="org.springframework.jms.core.JmsTemplate"
-          p:connectionFactory-ref="singleConnectionFactory"
-          p:defaultDestination-ref="destination"/>
+    <bean id="jmsProducerTemplate" class="org.springframework.jms.core.JmsTemplate" p:connectionFactory-ref="singleConnectionFactory" p:defaultDestination-ref="destination"/>
 
     <!-- datasource to the database -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">

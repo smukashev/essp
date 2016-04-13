@@ -19,12 +19,13 @@
     </bean>
 
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="${jdbc.driver}"/>
-        <property name="url" value="${jdbc.url}"/>
-        <property name="username" value="${jdbc.user}"/>
-        <property name="password" value="${jdbc.password}"/>
-        <property name="initialSize" value="${jdbc.initialSize}"/>
-        <property name="maxActive" value="${jdbc.maxActive}"/>
+        <property name="driverClassName" value="${jdbcTool.driver}"/>
+        <property name="url" value="${jdbcTool.url}"/>
+        <property name="username" value="${jdbcTool.user}"/>
+        <property name="password" value="${jdbcTool.password}"/>
+        <property name="initialSize" value="${jdbcTool.initialSize}"/>
+        <property name="maxIdle" value="${jdbcTool.maxIdle}"/>
+        <property name="maxActive" value="${jdbcTool.maxActive}"/>
     </bean>
 
 
