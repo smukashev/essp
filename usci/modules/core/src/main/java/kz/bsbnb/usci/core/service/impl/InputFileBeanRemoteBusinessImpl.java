@@ -5,9 +5,6 @@ import kz.bsbnb.usci.core.service.InputFileBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.InputFile;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.eav.model.Batch;
-import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
-import kz.bsbnb.usci.eav.model.json.BatchFullStatusJModel;
-import kz.bsbnb.usci.eav.model.json.BatchSign;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,8 +34,8 @@ public class InputFileBeanRemoteBusinessImpl implements InputFileBeanRemoteBusin
     }
 
     @Override
-    public List<InputFile> getFilesForSigning(long userId) {
-        List<Batch> batchListToSign = batchService.getBatchListToSign(userId);
+    public List<InputFile> getFilesForSigning(long creditorId) {
+        List<Batch> batchListToSign = batchService.getBatchListToSign(creditorId);
 
         ArrayList<InputFile> files = new ArrayList<InputFile>();
 
@@ -47,6 +44,10 @@ public class InputFileBeanRemoteBusinessImpl implements InputFileBeanRemoteBusin
             inputFile.setId(batch.getId());
             inputFile.setFilePath(batch.getFileName());
             inputFile.setMd5(batch.getHash());
+            InputInfo inputInfo = new InputInfo();
+            inputInfo.setFileName(batch.getFileName());
+            inputInfo.setReceiverDate(batch.getReceiptDate());
+            inputFile.setInputInfo(inputInfo);
             files.add(inputFile);
         }
 

@@ -189,8 +189,8 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
-    public List<Batch> getBatchListToSign(long userId) {
-        return batchDao.getBatchListToSign(userId);
+    public List<Batch> getBatchListToSign(long creditorId) {
+        return batchDao.getBatchListToSign(creditorId);
     }
 
     @Override

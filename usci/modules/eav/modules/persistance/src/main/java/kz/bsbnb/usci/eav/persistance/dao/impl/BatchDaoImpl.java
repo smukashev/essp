@@ -107,9 +107,9 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
     }
 
     @Override
-    public List<Batch> getBatchListToSign(long userId) {
+    public List<Batch> getBatchListToSign(long creditorId) {
         Select select = context.selectFrom(EAV_BATCHES)
-                .where(EAV_BATCHES.USER_ID.eq(userId)).and(EAV_BATCHES.SIGN.isNull());
+                .where(EAV_BATCHES.CREDITOR_ID.eq(creditorId)).and(EAV_BATCHES.SIGN.isNull());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         List<Batch> batchListToSign = new ArrayList<>();
