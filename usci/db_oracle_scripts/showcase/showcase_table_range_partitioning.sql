@@ -183,6 +183,45 @@ end;
 --DBMS_STATS.gather_table_stats(USER, rec_table.table_name, cascade => TRUE);
 
 end loop;
-
+-- todo:: B.I nado pofixed zdes. tablici zahardcodeni. Nujno sdelat universalny
+begin
+  execute immediate 'alter table R_CORE_CREDIT enable row movement';
+  execute immediate 'alter table R_CORE_CREDIT_FLOW enable row movement';
+  execute immediate 'alter table R_CORE_CREDIT_HIS enable row movement';
+  execute immediate 'alter table R_CORE_DEBTOR enable row movement';
+  execute immediate 'alter table R_CORE_DEBTOR_HIS enable row movement';
+  execute immediate 'alter table R_CORE_ORG enable row movement';
+  execute immediate 'alter table R_CORE_ORG_ADDRESS enable row movement';
+  execute immediate 'alter table R_CORE_ORG_ADDRESS_HIS enable row movement';
+  execute immediate 'alter table R_CORE_ORG_CONTACTS enable row movement';
+  execute immediate 'alter table R_CORE_ORG_CONTACTS_HIS enable row movement';
+  execute immediate 'alter table R_CORE_ORG_DI enable row movement';
+  execute immediate 'alter table R_CORE_ORG_DI_HIS enable row movement';
+  execute immediate 'alter table R_CORE_ORG_HEAD_DOCS enable row movement';
+  execute immediate 'alter table R_CORE_ORG_HEAD_DOCS_HIS enable row movement';
+  execute immediate 'alter table R_CORE_ORG_HEAD_NAMES enable row movement';
+  execute immediate 'alter table R_CORE_ORG_HEAD_NAMES_HIS enable row movement';
+  execute immediate 'alter table R_CORE_ORG_HIS enable row movement';
+  execute immediate 'alter table R_CORE_ORG_NAME enable row movement';
+  execute immediate 'alter table R_CORE_ORG_NAME_HIS enable row movement';
+  execute immediate 'alter table R_CORE_PERSON enable row movement';
+  execute immediate 'alter table R_CORE_PERSON_ADDRESS enable row movement';
+  execute immediate 'alter table R_CORE_PERSON_ADDRESS_HIS enable row movement';
+  execute immediate 'alter table R_CORE_PERSON_CONTACTS enable row movement';
+  execute immediate 'alter table R_CORE_PERSON_CONTACTS_HIS enable row movement';
+  execute immediate 'alter table R_CORE_PERSON_DI enable row movement';
+  execute immediate 'alter table R_CORE_PERSON_DI_HIS enable row movement';
+  execute immediate 'alter table R_CORE_PERSON_HIS enable row movement';
+  execute immediate 'alter table R_CORE_PERSON_NAME enable row movement';
+  execute immediate 'alter table R_CORE_PERSON_NAME_HIS enable row movement';
+  execute immediate 'alter table R_CORE_PLEDGE enable row movement';
+  execute immediate 'alter table R_CORE_PLEDGE_HIS enable row movement';
+  execute immediate 'alter table R_CORE_PORTFOLIO_FLOW_KFN enable row movement';
+  execute immediate 'alter table R_CORE_PORTFOLIO_FLOW_MSFO enable row movement';
+  execute immediate 'alter table R_CORE_REMAINS enable row movement';
+  execute immediate 'alter table R_CORE_SUBJECT_DOC enable row movement';
+  execute immediate 'alter table R_CORE_SUBJECT_DOC_HIS enable row movement';
+  execute immediate 'alter table R_CORE_TURNOVER enable row movement';
+end;
 
 end;
