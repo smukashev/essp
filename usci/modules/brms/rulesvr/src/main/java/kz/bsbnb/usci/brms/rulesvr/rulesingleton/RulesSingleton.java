@@ -300,6 +300,9 @@ public class RulesSingleton
             }
         }
 
+        if(packageName == null)
+            return;
+
         @SuppressWarnings("rawtypes")
         List<Command> commands = new ArrayList<Command>();
         commands.add(CommandFactory.newInsert(entity));

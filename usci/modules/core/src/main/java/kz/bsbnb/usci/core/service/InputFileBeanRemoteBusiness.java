@@ -8,7 +8,7 @@ import java.util.List;
 public interface InputFileBeanRemoteBusiness {
     InputFile getInputFileByInputInfo(InputInfo inputInfo);
 
-    List<InputFile> getFilesForSigning(long userId);
+    List<InputFile> getFilesForSigning(long creditorId);
 
     void signFile(long fileId, String sign);
 }
