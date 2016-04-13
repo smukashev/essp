@@ -34,8 +34,9 @@
         <property name="username" value="${jdbcRule.user}"/>
         <property name="password" value="${jdbcRule.password}"/>
         <property name="initialSize" value="${jdbcRule.initialSize}"/>
-        <property name="maxIdle" value="${jdbcRule.maxIdle}"/>
+        <property name="minIdle" value="${jdbcRule.minIdle}"/>
         <property name="maxActive" value="${jdbcRule.maxActive}"/>
+        <property name="maxIdle" value="${jdbcRule.maxIdle}"/>
     </bean>
 
     <bean class="kz.bsbnb.usci.brms.rulesvr.dao.impl.PackageDao">

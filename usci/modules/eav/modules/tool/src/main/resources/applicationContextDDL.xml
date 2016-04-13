@@ -24,8 +24,9 @@
         <property name="username" value="${jdbcTool.user}"/>
         <property name="password" value="${jdbcTool.password}"/>
         <property name="initialSize" value="${jdbcTool.initialSize}"/>
-        <property name="maxIdle" value="${jdbcTool.maxIdle}"/>
+        <property name="minIdle" value="${jdbcTool.minIdle}"/>
         <property name="maxActive" value="${jdbcTool.maxActive}"/>
+        <property name="maxIdle" value="${jdbcTool.maxIdle}"/>
     </bean>
 
 

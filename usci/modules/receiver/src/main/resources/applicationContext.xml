@@ -36,8 +36,9 @@
         <property name="username" value="${jdbcReceiver.user}"/>
         <property name="password" value="${jdbcReceiver.password}"/>
         <property name="initialSize" value="${jdbcReceiver.initialSize}"/>
-        <property name="maxIdle" value="${jdbcReceiver.maxIdle}"/>
+        <property name="minIdle" value="${jdbcReceiver.minIdle}"/>
         <property name="maxActive" value="${jdbcReceiver.maxActive}"/>
+        <property name="maxIdle" value="${jdbcReceiver.maxIdle}"/>
     </bean>
 
     <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">

@@ -29,20 +29,20 @@
         </property>
     </bean>
 
-    <!-- spring transaction manager -->
-    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
-
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${jdbcPersistance.driver}"/>
         <property name="url" value="${jdbcPersistance.url}"/>
         <property name="username" value="${jdbcPersistance.user}"/>
         <property name="password" value="${jdbcPersistance.password}"/>
         <property name="initialSize" value="${jdbcPersistance.initialSize}"/>
-        <property name="maxIdle" value="${jdbcPersistance.maxIdle}"/>
+        <property name="minIdle" value="${jdbcPersistance.minIdle}"/>
         <property name="maxActive" value="${jdbcPersistance.maxActive}"/>
-        <property name="connectionProperties" value="PERSISTANCE" />
+        <property name="maxIdle" value="${jdbcPersistance.maxIdle}"/>
+    </bean>
+
+    <!-- spring transaction manager -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 
     <bean id="context" class="org.jooq.impl.DSL" factory-method="using">
