@@ -1,16 +1,7 @@
 package kz.bsbnb.usci.receiver.writer.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
-import kz.bsbnb.usci.eav.model.EntityStatus;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
-import kz.bsbnb.usci.eav.util.EntityStatuses;
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.common.Global;
-import kz.bsbnb.usci.receiver.repository.IServiceRepository;
-import kz.bsbnb.usci.sync.service.IBatchService;
-import kz.bsbnb.usci.tool.status.StatusProperties;
 import kz.bsbnb.usci.receiver.writer.IWriter;
 import kz.bsbnb.usci.sync.service.IEntityService;
 import org.apache.log4j.Logger;
@@ -21,7 +12,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.List;
 
 /**
  * @author k.tulbassiyev
@@ -29,111 +20,20 @@ import java.util.*;
 @Component
 @Scope("step")
 public class RmiEventEntityWriter<T> implements IWriter<T> {
-    public static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
-    public static final String LOGIC_RULE_META = "LOGIC_RULE_META";
-
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     @Qualifier(value = "remoteEntityService")
     private RmiProxyFactoryBean rmiProxyFactoryBean;
 
-    @SuppressWarnings("SpringJavaAutowiringInspection")
-    @Autowired
-    @Qualifier(value="remoteRuleService")
-    private RmiProxyFactoryBean rmiProxyRuleService;
-
-    @Autowired
-    private IServiceRepository serviceFactory;
-
     private IEntityService entityService;
-    private Logger logger = Logger.getLogger(RmiEventEntityWriter.class);
-    private IRuleService ruleService;
-
-    private IBatchService batchService;
-
-    @Autowired
-    protected SQLQueriesStats sqlStats;
-
-    @Autowired
-    protected Global global;
-
-    private Set<String> metaRules = new HashSet<>();
 
     @PostConstruct
     public void init() {
-        logger.info("Writer init");
-
         entityService = (IEntityService) rmiProxyFactoryBean.getObject();
-        ruleService = (IRuleService) rmiProxyRuleService.getObject();
-        batchService = serviceFactory.getBatchService();
-
-        String[] metas = serviceFactory.getGlobalService().getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
-        Collections.addAll(metaRules, metas);
     }
 
     @Override
     public void write(List items) throws Exception {
-        logger.info("Writer write: " + items.size());
-
-        Iterator<BaseEntity> iterator = items.iterator();
-
-        ArrayList<BaseEntity> entitiesToSave = new ArrayList<>(items.size());
-
-        while(iterator.hasNext()) {
-            BaseEntity entity = iterator.next();
-
-            List<String> errors = new LinkedList<>(entity.getValidationErrors());
-            String ruleRuntimeException = null;
-
-            // Fixme!
-            if(global.isRulesEnabled() && entity.getMeta() != null &&
-                    metaRules.contains(entity.getMeta().getClassName()) && (entity.getOperation() != null
-            && (entity.getOperation().equals(OperationType.INSERT) || entity.getOperation().equals(OperationType.UPDATE)))) {
-                try {
-                    long t1 = System.currentTimeMillis();
-
-                    errors = ruleService.runRules(entity, entity.getMeta().getClassName() + "_parser",
-                            entity.getReportDate());
-
-                    sqlStats.put(entity.getMeta().getClassName() + "_parser", System.currentTimeMillis() - t1);
-                } catch (Exception e) {
-                    logger.error("Не могу применить бизнес правила: " + e.getMessage());
-                    ruleRuntimeException = e.getMessage();
-                }
-            }
-
-            if(ruleRuntimeException != null) {
-                EntityStatus entityStatus = new EntityStatus()
-                        .setBatchId(entity.getBatchId())
-                        .setEntityId(entity.getId())
-                        .setStatus(EntityStatuses.ERROR)
-                        .setDescription(StatusProperties.getSpecificParams(entity))
-                        .setErrorCode(String.valueOf(Errors.E195))
-                        .setDevDescription(Errors.checkLength(ruleRuntimeException))
-                        .setReceiptDate(new Date())
-                        .setIndex(entity.getBatchIndex() - 1);
-
-
-                batchService.addEntityStatus(entityStatus);
-            } else if (errors != null && errors.size() > 0) {
-                for (String errorMsg : errors) {
-                    EntityStatus entityStatus = new EntityStatus()
-                            .setBatchId(entity.getBatchId())
-                            .setEntityId(entity.getId())
-                            .setStatus(EntityStatuses.ERROR)
-                            .setDescription(StatusProperties.getSpecificParams(entity))
-                            .setErrorCode(String.valueOf(Errors.E195))
-                            .setDevDescription(Errors.checkLength(errorMsg))
-                            .setReceiptDate(new Date())
-                            .setIndex(entity.getBatchIndex() - 1);
-
-                    batchService.addEntityStatus(entityStatus);
-                }
-            } else {
-                entitiesToSave.add(entity);
-            }
-        }
-
-        entityService.process(entitiesToSave);
+        entityService.process(items);
     }
 }
