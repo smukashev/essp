@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.receiver.reader.impl.beans.ManifestData;
 import org.xml.sax.SAXException;
 
@@ -53,8 +54,9 @@ public class ManifestReader extends MainReader {
                 break;
             case "date":
                 try {
-                    manifestData.setReportDate(new SimpleDateFormat("dd.MM.yyyy").parse(data.toString()));
+                    manifestData.setReportDate(DataTypes.dateFormatDot.parse(data.toString()));
                 } catch (ParseException e) {
+                    e.printStackTrace();
                 }
                 data.setLength(0);
                 break;

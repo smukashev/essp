@@ -1,10 +1,8 @@
 package kz.bsbnb.usci.portlets.signing.data;
 
 import kz.bsbnb.usci.core.service.InputFileBeanRemoteBusiness;
-import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
-import kz.bsbnb.usci.cr.model.Creditor;
-import kz.bsbnb.usci.cr.model.InputFile;
+import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
@@ -58,8 +56,8 @@ public class BeanDataProvider implements DataProvider {
         return portalUserBusiness.getMainCreditorsInAlphabeticalOrder(userId);
     }
 
-    public List<FileSignatureRecord> getFilesToSign(long userId) {
-        List<InputFile> inputFiles = inputFileBusiness.getFilesForSigning(userId);
+    public List<FileSignatureRecord> getFilesToSign(long creditorId) {
+        List<InputFile> inputFiles = inputFileBusiness.getFilesForSigning(creditorId);
 
         List<FileSignatureRecord> resultList = new ArrayList<FileSignatureRecord>(inputFiles.size());
         for (InputFile inputFile : inputFiles) {
@@ -74,8 +72,48 @@ public class BeanDataProvider implements DataProvider {
     }
 
     public String getBaseUrl() {
-        return "http://localhost:8085";
+        return StaticRouter.isDevMode() ? "http://localhost:8083" : "http://essp.nationalbank.kz";
     }
+
+    @Override
+    public String getCreditorsBinNumber(Creditor creditor) {
+        /*for (CreditorDoc doc : creditorDocBusiness.getCreditorDocsList(creditor)) {
+            if ("07".equals(doc.getType().getCode())) {
+                return doc.getNo();
+            }
+        }*/
+        return "123123123123";
+        //return null;
+    }
+
+    @Override
+    public void cancelFile(FileSignatureRecord file) {
+        InputInfo inputInfo = file.getInputFile().getInputInfo();
+        inputInfo.setStatus(getFileStatus(InputInfoStatus.REJECTED));
+        //inputInfoBusiness.update(inputInfo);
+    }
+
+    public String getOcspServiceUrl() {
+        return "http://91.195.226.34:62255";
+        /*try {
+            return sysconfigBusiness.getSysconfigByKey(OCSP_SERVICE_URL_CONFIG_KEY).getValue();
+        } catch (ResultInconsistentException ex) {
+            throw new RuntimeException(ex);
+        } catch (ResultNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }*/
+    }
+
+    private Shared getFileStatus(InputInfoStatus status) {
+        try {
+            //return sharedBusiness.find(status, SharedType.INPUT_INFO_STATUS);
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
     public void addInputFileToQueue(FileSignatureRecord record) {
         batchProcessService.restartBatch(record.getInputFile().getId());
