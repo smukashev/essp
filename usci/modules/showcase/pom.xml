@@ -95,10 +95,10 @@
                     <generator>
                         <name>org.jooq.util.DefaultGenerator</name>
                         <database>
-                            <name>${jooq.db.name}</name>
+                            <name>${jooqSC.db.name}</name>
                             <includes>(EAV_SC_.*)</includes>
                             <excludes/>
-                            <inputSchema>${jooq.db.schema}</inputSchema>
+                            <inputSchema>${jooqSC.db.schema}</inputSchema>
                             <customTypes>
                                 <customType>
                                     <name>java.lang.Integer</name>

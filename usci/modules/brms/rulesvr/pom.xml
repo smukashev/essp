@@ -114,18 +114,18 @@
                 </dependencies>
                 <configuration>
                     <jdbc>
-                        <driver>${ds.driver}</driver>
-                        <url>${ds.url}</url>
-                        <user>${ds.user}</user>
-                        <password>${ds.password}</password>
+                        <driver>${jdbcRule.driver}</driver>
+                        <url>${jdbcRule.url}</url>
+                        <user>${jdbcRule.user}</user>
+                        <password>${jdbcRule.password}</password>
                     </jdbc>
                     <generator>
                         <name>org.jooq.util.DefaultGenerator</name>
                         <database>
-                            <name>${jooq.db.name}</name>
+                            <name>${jooqRule.db.name}</name>
                             <includes>(LOGIC_.*)</includes>
                             <excludes></excludes>
-                            <inputSchema>${jooq.db.schema}</inputSchema>
+                            <inputSchema>${jooqRule.db.schema}</inputSchema>
                             <customTypes>
                                 <customType>
                                     <name>java.lang.Integer</name>
