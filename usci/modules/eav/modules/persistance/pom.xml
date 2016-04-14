@@ -134,18 +134,18 @@
                 </dependencies>
                 <configuration>
                     <jdbc>
-                        <driver>${jdbc.driver}</driver>
-                        <url>${jdbc.url}</url>
-                        <user>${jdbc.user}</user>
-                        <password>${jdbc.password}</password>
+                        <driver>${jdbcPersistance.driver}</driver>
+                        <url>${jdbcPersistance.url}</url>
+                        <user>${jdbcPersistance.user}</user>
+                        <password>${jdbcPersistance.password}</password>
                     </jdbc>
                     <generator>
                         <name>org.jooq.util.DefaultGenerator</name>
                         <database>
-                            <name>${jooq.db.name}</name>
+                            <name>${jooqPersistance.db.name}</name>
                             <includes>(SC_.*)|(EAV_.*)|(BATCH_.*)|(LOGIC_.*)|(MNT_.*)|(MAIL_.*)</includes>
                             <excludes>(SYS.*)</excludes>
-                            <inputSchema>${jooq.db.schema}</inputSchema>
+                            <inputSchema>${jooqPersistance.db.schema}</inputSchema>
                             <customTypes>
                                 <customType>
                                     <name>java.lang.Integer</name>
