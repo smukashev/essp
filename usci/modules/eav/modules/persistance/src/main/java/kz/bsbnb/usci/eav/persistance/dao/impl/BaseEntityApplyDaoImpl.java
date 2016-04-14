@@ -2211,7 +2211,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
                     } catch (Exception e) {
-                        throw new IllegalStateException(Errors.compose(Errors.E76, e.getMessage()));
+                        throw new IllegalStateException(Errors.compose(Errors.E76, insertedObject));
                     }
                 }
             }
@@ -2227,7 +2227,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     try {
                         persistableDao.update(updatedObject);
                     } catch (Exception e) {
-                        throw new IllegalStateException(Errors.compose(Errors.E77, e.getMessage()));
+                        throw new IllegalStateException(Errors.compose(Errors.E77, updatedObject));
                     }
                 }
             }
@@ -2247,7 +2247,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         }
                         persistableDao.delete(deletedObject);
                     } catch (Exception e) {
-                        throw new IllegalStateException(Errors.compose(Errors.E78, e.getMessage()));
+                        throw new IllegalStateException(Errors.compose(Errors.E78, deletedObject));
                     }
                 }
             }

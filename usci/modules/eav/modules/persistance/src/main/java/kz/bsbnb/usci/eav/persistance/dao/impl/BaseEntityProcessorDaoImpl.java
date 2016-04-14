@@ -188,9 +188,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     @Transactional
     public IBaseEntity process(final IBaseEntity baseEntity) {
-        /* Проверка сущности на бизнес правила */
-        checkForRules((BaseEntity)baseEntity);
-
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
 
         IBaseEntity baseEntityPostPrepared;
@@ -199,6 +196,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         /* Все данные кроме справочников должны иметь кредитора */
         if (!baseEntity.getMeta().isReference() && baseEntity.getBaseEntityReportDate().getCreditorId() == 0)
             throw new IllegalStateException(Errors.compose(Errors.E197));
+
+        /* Проверка сущности на бизнес правила */
+        if (!baseEntity.getMeta().isReference())
+            checkForRules((BaseEntity)baseEntity);
 
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);

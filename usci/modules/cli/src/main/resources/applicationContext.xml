@@ -7,8 +7,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
 
-    <import resource="applicationContextEAVPersistanse.xml"></import>
-    <import resource="applicationContextDDL.xml"></import>
+    <import resource="applicationContextEAVPersistance.xml" />
 
     <context:component-scan base-package="kz.bsbnb.usci.bconv" />
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
@@ -26,12 +25,13 @@
         </property>
     </bean>
 
-    <bean id="dataSourceRef" class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
+    <!--<bean id="dataSourceRef" class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
         <property name="driverClassName" value="${jdbc.ref.driver}" />
         <property name="url" value="${jdbc.ref.url}" />
         <property name="username" value="${jdbc.ref.user}" />
         <property name="password" value="${jdbc.ref.password}" />
-    </bean>
+    </bean>-->
+
     <bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchService"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IPackageService"/>

@@ -1,5 +1,5 @@
 <%-- 
-    Document   : index
+    Document   : view
     Created on : Sep 12, 2013, 5:33:16 PM
     Author     : Aidar.Myrzahanov
 --%>
@@ -7,52 +7,71 @@
 <%@page import="kz.bsbnb.usci.portlets.signing.data.DataProvider"%>
 <%@page import="kz.bsbnb.usci.portlets.signing.data.BeanDataProvider"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
-<%@ taglib prefix="liferay-ui" uri="http://liferay.com/tld/ui" %>
-<portlet:defineObjects />
+<%@ taglib uri="http://java.sun.com/portlet" prefix="portlet"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui"%>
+<portlet:defineObjects/>
 
-<link type="text/css" rel="stylesheet" src="/signing-portlet/css/style.css" />
+<link type="text/css" rel="stylesheet" href="${PortalUrl}${ContextPath}/css/style.css" />
 <script type="text/javascript">
 
-    function loadProfiles() {
+    function isEmpty(value) {
+        return value === undefined || value === null || value.length === 0;
+    }
+
+    function getSelectedProfileName() {
+        var profilesSelect = document.getElementById("profilesSelect");
+        var profile = profilesSelect.options[profilesSelect.selectedIndex];
+        if (!profile) {
+            return "";
+        }
+        return profile.text;
+    }
+
+    function getProfiles() {
         var profilesString = document.app.getProfileNames('|');
+        return profilesString.split('|');
+    }
+
+    function getCertificates(profile, password) {
+        var certificatesInfo = document.app.getCertificatesInfo(profile, password, 0, '', true, false, '|');
+        return certificatesInfo.split('|');
+    }
+
+    function signHash(value, certificate, profile, password) {
+        return document.app.createPKCS7(value, 0, null, certificate, true, profile, password, '1.3.6.1.4.1.6801.1.5.8', true);
+    }
+
+    function loadProfiles() {
         var profilesSelect = document.getElementById("profilesSelect");
         profilesSelect.length = 0;
-        var profiles = profilesString.split('|');
-
+        var profiles = getProfiles();
+        var selectedValue = '';
         for (var i = 0; i < profiles.length; i++) {
             var opt = document.createElement('option');
             opt.value = profiles[i];
             opt.text = profiles[i];
             profilesSelect.add(opt, null);
+            if (opt.value === 'profile://FSystem') {
+                selectedValue = opt.value;
+            }
         }
-    }
-
-    function performAppletCode(count) {
-        var applet = document.app;
-
-        if (!applet.getProfileNames && count > 0) {
-            setTimeout(function() {
-                performAppletCode(--count);
-            }, 2000);
-        }
-        else if (applet.getProfileNames) {
-            loadProfiles();
-        }
-        else {
-            alert('applet failed to load');
+        document.getElementById('profilePassword').value = '';
+        if (!isEmpty(selectedValue)) {
+            profilesSelect.value = selectedValue;
         }
     }
 
     function loadCertificates() {
-        var profile = document.getElementById('profilesSelect').options[document.getElementById('profilesSelect').selectedIndex].text;
-        var password = document.getElementById('profilePassword').value;
-        var sCertificates = document.app.getCertificatesInfo(profile, password, 0, '', true, false, '|');
-        var certificates = [];
-        if (sCertificates) {
-            certificates = sCertificates.split('|');
+        var profile = getSelectedProfileName();
+        var password = '';
+        if (document.getElementById('passwordCheck').checked) {
+            password = document.getElementById('profilePassword').value;
+        }
+        var certificates = getCertificates(profile, password);
+        if (!certificates || (certificates.length === 0)) {
+            alert('Не удалось получить список сертификатов');
+            return;
         }
         var certificatesSelect = document.getElementById('certificatesSelect');
         certificatesSelect.length = 0;
@@ -64,34 +83,60 @@
         }
     }
 
+    function signInput(input, certificate, profile, password) {
+        var inputName = input.getAttribute('name');
+        if (isEmpty(inputName) || inputName.indexOf('hash', 0) !== 0) {
+            return;
+        }
+        var id = inputName.substring(4);
+        var check = document.getElementById('check' + id);
+        if (!check.checked) {
+            return;
+        }
+        var pkcs7 = signHash(input.value, certificate, profile, password);
+        var sign = document.getElementById('sign' + id);
+        sign.value = pkcs7;
+
+        var acceptImage = document.createElement('img');
+        acceptImage.src = '${PortalUrl}${ContextPath}/accept.png';
+        var signSymbolCell = document.getElementById('signSymbol' + id);
+        if (signSymbolCell.childNodes.length === 0) {
+            signSymbolCell.appendChild(acceptImage);
+        }
+    }
+
     function signAllFiles() {
+        var profileName = getSelectedProfileName();
+        if (isEmpty(profileName)) {
+            alert('Выберите профиль');
+            return;
+        }
+        var selectedCertificate = document.getElementById('certificatesSelect').options[document.getElementById('certificatesSelect').selectedIndex];
+        if (!selectedCertificate || isEmpty(selectedCertificate.text)) {
+            alert('Выберите сертификат');
+            return;
+        }
+        var certificateName = selectedCertificate.text;
+        var profilePassword = document.getElementById('profilePassword').value;
         var inputs = document.getElementsByTagName('input');
         for (var i = 0; i < inputs.length; i++) {
-            var inputName = inputs[i].getAttribute('name');
-            if (inputName != null && inputName.indexOf("hash") == 0) {
-                var valueToSign = inputs[i].value;
-                var profileName = document.getElementById('profilesSelect').options[document.getElementById('profilesSelect').selectedIndex].text;
-                var certificateName = document.getElementById('certificatesSelect').options[document.getElementById('certificatesSelect').selectedIndex].text;
-                var profilePassword = document.getElementById('profilePassword').value;
-                var algorithmId = '1.3.6.1.4.1.6801.1.5.8';
-                var pkcs7 = document.app.createPKCS7(valueToSign, 0, null, certificateName, true, profileName, profilePassword, algorithmId, true);
-                var id = inputName.substring(4);
-                var sign = document.getElementById("sign" + id);
-                sign.value = pkcs7;
+            signInput(inputs[i], certificateName, profileName, profilePassword);
+        }
+    }
 
-                var image = document.createElement('img');
-                image.src = pkcs7 != null && pkcs7.length > 0 ?
-                        '/signing-portlet/accept.png' : '/signing-portlet/error.png';
-                var signSymbolCell = document.getElementById("signSymbol" + id);
-                signSymbolCell.appendChild(image);
-            }
+    function showHidePasswordDisplay() {
+        var passwordDisplay = document.getElementById('passwordDisplay');
+        if (document.getElementById('passwordCheck').checked) {
+            passwordDisplay.style.display = 'table-row';
+        } else {
+            passwordDisplay.style.display = 'none';
         }
     }
 
 </script>
-<script type="text/javascript" src="/signing-portlet/js/deployJava.js"></script>
+<script type="text/javascript" src="${PortalUrl}${ContextPath}/js/deployJava.js"></script>
 <script type="text/javascript">
-        var contextPath = '/signing-portlet';
+    var contextPath = '${PortalUrl}${ContextPath}';
     var attributes = {
         codebase: './',
         code: 'kz.gamma.TumarCSP.class',
@@ -111,99 +156,102 @@
 <div id="hello">
 
     <c:choose>
-        <c:when test="${not empty errorMessage}">
-            ${errorMessage}
-            <br/>
+        <c:when test="${noCertificate}">
+            <div class="portlet-msg-error">
+                <liferay-ui:message key="message-files-no-certificate"/>
+            </div>
         </c:when>
         <c:otherwise>
             <c:choose>
-                <c:when test="${noCertificate}">
-                    <div class="portlet-msg-error">
-                        <liferay-ui:message key="message-files-no-certificate"/>
-                    </div>
-                </c:when>
-                <c:otherwise>
+                <c:when test="${hasInfoOnProcessedFiles}">
                     <c:choose>
-                        <c:when test="${hasInfoOnProcessedFiles}">
-                            <c:choose>
-                                <c:when test="${certificateSuccess}">
-                                    <div class="portlet-msg-info">
-                                        <liferay-ui:message key="message-files-certificate-success"
-                                                            arguments="${certificate}"/>
-                                    </div>
-                                    <div class="portlet-msg-info">
-                                        <liferay-ui:message key="message-files-signed-and-queued"
-                                                            arguments="${processedFilenames}"/>
-                                    </div>
-                                </c:when>
-                                <c:otherwise>
-                                    <div class="portlet-msg-error">
-                                        <liferay-ui:message key="message-files-certificate-fail"
-                                                            arguments="${certificate}"/>
-                                    </div>
-                                </c:otherwise>
-                            </c:choose>
+                        <c:when test="${hasSuccessfullySignedFiles}">
+                            <div class="portlet-msg-info">
+                                <liferay-ui:message key="message-files-signed-and-queued" arguments="${signedFilenames}"/>
+                            </div>
                         </c:when>
                     </c:choose>
-                </c:otherwise>
+
+                    <c:choose>
+                        <c:when test="${hasFilesWithErrors}">
+                            <div class="portlet-msg-info">
+                                <liferay-ui:message key="message-files-signing-errors" arguments="${filesWithErrors}"/>
+                            </div>
+                        </c:when>
+                    </c:choose>
+
+                </c:when>
             </c:choose>
+        </c:otherwise>
+    </c:choose>
+    <c:choose>
+        <c:when test="${hasCanceledFiles}">
+            <div class="portlet-msg-info">
+                <liferay-ui:message key="message-files-canceled" arguments="${canceledFilesCount}"/>
+            </div>
+        </c:when>
+    </c:choose>
+    <c:choose>
+        <c:when test="${hasAccess}">
             <c:choose>
-                <c:when test="${hasAccess}">
-                    <c:choose>
-                        <c:when test="${noFilesToSign}">
-                            <h2>Нет файлов, ожидающих подписи</h2>
-                        </c:when>
-                        <c:otherwise>
-                            <form action="<portlet:actionURL><portlet:param name="COMMAND" value="SIGN"/>
-                          </portlet:actionURL>" method="post">
-                                <b>Список профилей: </b><select id="profilesSelect" name="profiles"></select>
-
-                                <input type="button" value="Загрузить профили" onclick="loadProfiles();"/>
-                                <br/>
-                                <b>Пароль профиля: </b><input type="password" value="" id="profilePassword"/>
-                                <br/>
-                                <input type="button" value="Получить сертификаты из профайла" id="getCertificatesButton"
-                                       onClick="loadCertificates();"/>
-                                <br/>
-                                <select name="certificateInfo" id="certificatesSelect"></select>
-                                <br/>
-                                <input type="button" id="signButton" value="Подписать все файлы"
-                                       onclick="signAllFiles();"/>
-
-                                <hr/>
-
-
-                                <table border="2" width="100%">
-                                    <tr>
-                                        <th>Имя файла</th>
-                                        <th>Дата отправки</th>
-                                        <th>Подписан</th>
-                                    </tr>
-                                    <c:forEach var="fileSignatureRecord" items="${inputFiles}">
-                                        <tr>
-                                            <td>${fileSignatureRecord.filename}</td>
-                                            <td>
-                                                    ${fileSignatureRecord.sentDate}
-                                                <input id="hash${fileSignatureRecord.id}" type="hidden"
-                                                       name="hash${fileSignatureRecord.id}"
-                                                       value="${fileSignatureRecord.hash}"/>
-                                                <input id="sign${fileSignatureRecord.id}" type="hidden"
-                                                       name="sign${fileSignatureRecord.id}"/>
-                                            </td>
-                                            <td id="signSymbol${fileSignatureRecord.id}"></td>
-                                        </tr>
-                                    </c:forEach>
-                                </table>
-                                <input type="submit" value="Сохранить"/>
-                            </form>
-                            <hr/>
-                        </c:otherwise>
-                    </c:choose>
+                <c:when test="${noFilesToSign}">
+                    <h2>Нет файлов, ожидающих подписи</h2>
                 </c:when>
                 <c:otherwise>
-                    <h2>У вас нет доступа к подписыванию файлов</h2>
+                    <form action="<portlet:actionURL><portlet:param name="COMMAND" value="SIGN" /></portlet:actionURL>" method="post">
+                        <div class='form-table'>
+                            <p>
+                                <label for='profilesSelect'>Список профилей: </label>
+                                <select id='profilesSelect' name="profiles"></select>
+                                <input class='form-element' type="button" value="Загрузить профили" onclick="loadProfiles();"/>
+                            </p>
+                            <p>
+                                <label><input id='passwordCheck' type='checkbox' onclick='showHidePasswordDisplay();' value='false'>Профиль защищен паролем</label>
+                            </p>
+                            <div id='passwordDisplay' style='display:none'>
+                                <label for='profilePassword'>Пароль профиля: </label>
+                                <input class='form-element' type="password" value="" id="profilePassword"/>
+                            </div>
+                            <p>
+                                <label for='certificatesSelect'>Сертификат: </label>
+                                <select name="certificateInfo" id="certificatesSelect"></select>
+                                <input class='form-element' type="button" value="Получить сертификаты из профиля" id="getCertificatesButton" onClick="loadCertificates();"/>
+                            </p>
+                            <p>
+                                <input class='form-element' type="button" id="signButton" value="Подписать выбранные файлы" onclick="signAllFiles();"/>
+                            </p>
+                        </div>
+                        <hr/>
+
+
+                        <table border="2" width="100%">
+                            <tr>
+                                <th></th>
+                                <th>Имя файла</th>
+                                <th>Дата отправки</th>
+                                <th>Подписан</th>
+                            </tr>
+                            <c:forEach var="fileSignatureRecord" items="${inputFiles}">
+                                <tr>
+                                    <td align='center'><input id="check${fileSignatureRecord.id}" name="check${fileSignatureRecord.id}" type="checkbox" checked="true"/></td>
+                                    <td>${fileSignatureRecord.filename}</td>
+                                    <td align='center'>
+                                            ${fileSignatureRecord.sentDate}
+                                        <input id='hash${fileSignatureRecord.id}' type="hidden" name="hash${fileSignatureRecord.id}" value="${fileSignatureRecord.hash}"/>
+                                        <input id="sign${fileSignatureRecord.id}" type="hidden" name="sign${fileSignatureRecord.id}"/>
+                                    </td>
+                                    <td id="signSymbol${fileSignatureRecord.id}"  align='center'></td>
+                                </tr>
+                            </c:forEach>
+                        </table>
+                        <input type='submit' name='saveSignatures' value='Сохранить'/>
+                        <input type='submit' id='cancelButton' name='cancel' value='Отменить загрузку выбранных файлов'/>
+                    </form>
                 </c:otherwise>
             </c:choose>
+        </c:when>
+        <c:otherwise>
+            <h2>У вас нет доступа к подписыванию файлов</h2>
         </c:otherwise>
     </c:choose>
 </div>
