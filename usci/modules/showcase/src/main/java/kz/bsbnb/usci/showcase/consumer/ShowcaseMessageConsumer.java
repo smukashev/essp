@@ -82,10 +82,8 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 boolean entityFound;
                 int failCounter = 0;
                 do {
+                    entityFound = false;
                     synchronized (entities) {
-                        entityFound = false;
-
-                        long searchTime = System.currentTimeMillis();
                         for (IBaseEntity entity : entities) {
                             for (IBaseEntity keyEntity : entity.getKeyElements()) {
                                 for (IBaseEntity currentKeyEntity : currentEntity.getKeyElements()) {
@@ -97,17 +95,16 @@ public class ShowcaseMessageConsumer implements MessageListener {
                                 }
                             }
                         }
-                        sqlQueriesStats.put("java::searchCross", (System.currentTimeMillis() - searchTime));
-
-                        if (entityFound && failCounter++ >= 1000)
-                            throw new IllegalStateException(Errors.compose(Errors.E288));
-
-                        if (entityFound)
-                            Thread.sleep(5);
 
                         if (!entityFound)
                             entities.add(currentEntity);
                     }
+
+                    if (entityFound)
+                        Thread.sleep(100);
+
+                    if (entityFound && failCounter++ >= 1000)
+                        throw new IllegalStateException(Errors.compose(Errors.E288));
                 } while(entityFound);
 
                 boolean found = false;
