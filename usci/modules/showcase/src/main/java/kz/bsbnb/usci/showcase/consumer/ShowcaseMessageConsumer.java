@@ -3,6 +3,7 @@ package kz.bsbnb.usci.showcase.consumer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
+import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.showcase.dao.impl.CortegeDaoImpl;
 import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;
@@ -33,6 +34,9 @@ public class ShowcaseMessageConsumer implements MessageListener {
     @Autowired
     private CortegeDaoImpl cortegeDao;
 
+    @Autowired
+    private SQLQueriesStats sqlQueriesStats;
+
     private final ExecutorService exec = Executors.newCachedThreadPool();
 
     private final Logger logger = LoggerFactory.getLogger(ShowcaseDaoImpl.class);
@@ -43,6 +47,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
     @Transactional
     public void onMessage(Message message) {
         if (message instanceof ObjectMessage) {
+            long onMessageTime = System.currentTimeMillis();
             ObjectMessage om = (ObjectMessage) message;
             QueueEntry queueEntry;
 
@@ -77,8 +82,8 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 boolean entityFound;
                 int failCounter = 0;
                 do {
+                    entityFound = false;
                     synchronized (entities) {
-                        entityFound = false;
                         for (IBaseEntity entity : entities) {
                             for (IBaseEntity keyEntity : entity.getKeyElements()) {
                                 for (IBaseEntity currentKeyEntity : currentEntity.getKeyElements()) {
@@ -93,13 +98,13 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
                         if (!entityFound)
                             entities.add(currentEntity);
-
-                        if (entityFound)
-                            Thread.sleep(50);
-
-                        if (entityFound && failCounter++ >= 1000)
-                            throw new IllegalStateException(Errors.compose(Errors.E288));
                     }
+
+                    if (entityFound)
+                        Thread.sleep(10);
+
+                    if (entityFound && failCounter++ >= 1000)
+                        throw new IllegalStateException(Errors.compose(Errors.E288));
                 } while(entityFound);
 
                 boolean found = false;
@@ -130,20 +135,32 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 if (found) {
                     for (Map.Entry<ShowCase, Future> entry : showCaseFutureMap.entrySet()) {
                         try {
-                            entry.getValue().get(60, TimeUnit.SECONDS);
+                            entry.getValue().get(600, TimeUnit.SECONDS);
                         } catch (Exception e) {
                             System.err.println(entry.getKey().toString());
                             throw e;
                         }
                     }
                 }
+
+                if(!found)
+                    message.acknowledge();
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e.getMessage());
             } finally {
                 synchronized (entities) {
-                    if (!entities.remove(currentEntity))
+                    boolean deleted;
+                    try {
+                        deleted = entities.remove(currentEntity);
+                    } catch (Exception e) {
+                        throw e;
+                    }
+
+                    if (!deleted)
                         throw new IllegalStateException(Errors.compose(Errors.E289));
+
+                    sqlQueriesStats.put("java::onMessage", (System.currentTimeMillis() - onMessageTime));
                 }
             }
         }
