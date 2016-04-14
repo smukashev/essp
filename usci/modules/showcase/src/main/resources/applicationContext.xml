@@ -29,7 +29,9 @@
         <property name="username" value="${jdbcSC.user}"/>
         <property name="password" value="${jdbcSC.password}"/>
         <property name="initialSize" value="${jdbcSC.initialSize}"/>
+        <property name="minIdle" value="${jdbcSC.minIdle}"/>
         <property name="maxActive" value="${jdbcSC.maxActive}"/>
+        <property name="maxIdle" value="${jdbcSC.maxIdle}"/>
     </bean>
 
     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
