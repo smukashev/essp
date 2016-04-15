@@ -145,7 +145,7 @@ public class CLI {
 
     private IBatchService batchService;
 
-    private IPackageService ruleBatchService;
+    private IPackageService packageService;
 
     //private IBatchVersionService batchVersionService;
 
@@ -1875,11 +1875,11 @@ public class CLI {
             entityServiceFactoryBean.afterPropertiesSet();
 
             RmiProxyFactoryBean ruleBatchServiceFactoryBean = new RmiProxyFactoryBean();
-            ruleBatchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
+            ruleBatchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/packageService");
             ruleBatchServiceFactoryBean.setServiceInterface(IPackageService.class);
 
             ruleBatchServiceFactoryBean.afterPropertiesSet();
-            ruleBatchService = (IPackageService) ruleBatchServiceFactoryBean.getObject();
+            packageService = (IPackageService) ruleBatchServiceFactoryBean.getObject();
 
             initBatchService();
 
@@ -1891,7 +1891,7 @@ public class CLI {
             batchVersionService = (IBatchVersionService) batchVersionServiceFactoryBean.getObject();*/
 
             RmiProxyFactoryBean ruleServiceFactoryBean = new RmiProxyFactoryBean();
-            ruleServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/ruleService");
+            ruleServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/ruleService");
             ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
 
             ruleServiceFactoryBean.afterPropertiesSet();
@@ -2041,7 +2041,7 @@ public class CLI {
 
                 boolean exists = false;
                 Long id;
-                for (RulePackage ruleBatch : ruleBatchService.getAllPackages()) {
+                for (RulePackage ruleBatch : packageService.getAllPackages()) {
                     if (ruleBatch.getName().equals(batch.getName())) {
                         exists = true;
                         break;
@@ -2049,7 +2049,7 @@ public class CLI {
                 }
 
                 if (!exists) {
-                    id = ruleBatchService.save(batch);
+                    id = packageService.save(batch);
                     batch.setId(id);
                     //batchVersionService.save(batch);
                     System.out.println("ok package created with id:" + id);
