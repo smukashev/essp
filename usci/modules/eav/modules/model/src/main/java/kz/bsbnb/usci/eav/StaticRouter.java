@@ -81,6 +81,10 @@ public final class StaticRouter {
     private final static boolean devStatsEnabled = true;
     private final static boolean prodStatsEnabled = true;
 
+    private final static int stendThreadLimit = 10;
+    private final static int devThreadLimit = 5;
+    private final static int prodThreadLimit = 20;
+
     public static String getAsIP() {
         switch(mode) {
             case STEND:
@@ -258,6 +262,19 @@ public final class StaticRouter {
                 return devStatsEnabled;
             case PROD:
                 return prodStatsEnabled;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
+    public static int getThreadLimit() {
+        switch(mode) {
+            case STEND:
+                return stendThreadLimit;
+            case DEV:
+                return devThreadLimit;
+            case PROD:
+                return prodThreadLimit;
             default:
                 throw new IllegalStateException(Errors.compose(Errors.E284));
         }
