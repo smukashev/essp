@@ -228,8 +228,8 @@ public class RulesSingleton {
     public void runRules(IBaseEntity entity, String pkgName, Date repDate) {
         StatelessKnowledgeSession ksession = getSession();
         // todo: rule
-        /*ksession.setGlobal("entityService", entityService);
-        ksession.setGlobal("metaService", metaFactoryService);*/
+        ksession.setGlobal("entityService", null);
+        ksession.setGlobal("metaService", null);
 
         ArrayList<RuleCacheEntry> versions = ruleCache.get(pkgName);
         String packageName = null;

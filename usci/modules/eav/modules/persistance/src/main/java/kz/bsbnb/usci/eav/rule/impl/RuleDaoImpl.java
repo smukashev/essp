@@ -10,11 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -26,12 +25,9 @@ import java.util.Comparator;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
-@Component
+@Repository
 public class RuleDaoImpl extends JDBCSupport implements IRuleDao {
-
     private final String PREFIX_ = "LOGIC_";
-
-    private final Logger logger = LoggerFactory.getLogger(RuleDaoImpl.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -48,12 +44,6 @@ public class RuleDaoImpl extends JDBCSupport implements IRuleDao {
             return false;
         }
     }
-
-
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
-
 
     public List<Rule> load(PackageVersion packageVersion) {
         //if (packageVersion.getId() < 1)
