@@ -7,13 +7,12 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
 
-    <import resource="applicationContextEAVPersistance.xml"></import>
-    <import resource="applicationContextDDL.xml"></import>
+    <import resource="applicationContextEAVPersistance.xml" />
+    <import resource="applicationContextDDL.xml" />
 
     <context:component-scan base-package="kz.bsbnb.usci.bconv" />
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.cli" />
-    <context:component-scan base-package="kz.bsbnb.usci.brms" />
 
     <context:annotation-config/>
 
