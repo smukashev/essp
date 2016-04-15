@@ -115,7 +115,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
                 protocol.setNote(entityStatus.getEntityId() + "");
             }
 
-            protocol.setTypeDescription(entityStatus.getContractNumber());
+            protocol.setTypeDescription(entityStatus.getDescription());
         }
 
         list.add(protocol);
