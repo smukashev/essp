@@ -543,8 +543,12 @@ rule save
 rule read $$$
 title: функций проверки филиала
 
-function boolean creditorBranchIsGood(IEntityService entityService, BaseEntity entity) {
+function boolean creditorBranchIsGood(BaseEntity entity) {
    try {
+
+      if(entity == null || entity.getId() < 0L || entity.getId() >= 0)
+         return true;
+
       //Извлечь филиал
       BaseEntity creditorBranch = (BaseEntity) entity.getEl("creditor_branch");
 
@@ -574,8 +578,7 @@ title: проверка филиала
 rule "проверка филиала"
 //Проверка принадлежности филиала кредитору
 when:
- $entity: BaseEntity( getMeta().getClassName == "credit"
-                 &&  !creditorBranchIsGood(entityService, $entity) )
+ $entity: BaseEntity( getMeta().getClassName == "credit" &&  !creditorBranchIsGood($entity) )
 then
  $entity.addValidationError("филиал заполнен не верно");
 end

@@ -5,7 +5,7 @@ rule clear
 #===========================================================================================
 rule set date 01.04.2001
 rule create package credit_parser
-rule rc
+
 rule set package credit_parser
 
 rule import usci/clis/rules/imports.cli
@@ -34,7 +34,7 @@ rule import usci/clis/rules/docs/rule_bin.cli
 #===========================================================================================
 rule set date 01.04.2001
 rule create package credit_process
-rule rc
+
 rule set package credit_process
 
 rule import usci/clis/rules/imports.cli
@@ -48,7 +48,7 @@ rule import usci/clis/rules/rule_cr.cli
 #===========================================================================================
 rule set date 01.04.2001
 rule create package ref_creditor_parser
-rule rc
+
 rule set package ref_creditor_parser
 
 rule import usci/clis/rules/imports.cli
@@ -61,7 +61,7 @@ rule import usci/clis/rules/docs/ref_creditor.cli
 #===========================================================================================
 rule set date 01.04.2001
 rule create package ref_creditor_process
-rule rc
+
 rule set package ref_creditor_process
 
 #no rules
@@ -71,7 +71,7 @@ rule set package ref_creditor_process
 #===========================================================================================
 rule set date 01.04.2001
 rule create package ref_creditor_branch_parser
-rule rc
+
 rule set package ref_creditor_branch_parser
 
 rule import usci/clis/rules/imports.cli
@@ -83,7 +83,7 @@ rule import usci/clis/rules/docs/ref_creditor_branch.cli
 #===========================================================================================
 rule set date 01.04.2001
 rule create package ref_creditor_branch_process
-rule rc
+
 rule set package ref_creditor_branch_process
 
 #no rules
@@ -93,7 +93,7 @@ rule set package ref_creditor_branch_process
 #===========================================================================================
 rule set date 01.04.2001
 rule create package ref_exclusive_doc_parser
-rule rc
+
 rule set package ref_exclusive_doc_parser
 
 rule import usci/clis/rules/imports.cli
@@ -108,7 +108,7 @@ rule import usci/clis/rules/rule_ref_exclusive_doc.cli
 #===========================================================================================
 rule set date 01.04.2001
 rule create package ref_exclusive_doc_process
-rule rc
+
 rule set package ref_exclusive_doc_process
 
 #no rules

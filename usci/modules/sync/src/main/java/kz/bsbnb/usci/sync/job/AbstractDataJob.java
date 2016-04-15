@@ -31,9 +31,6 @@ public abstract class AbstractDataJob extends Thread {
     /* Number of processed entities to show stats */
     protected final int STAT_INTERVAL = 1000;
 
-    /* Number of max processing threads */
-    protected final int THREAD_MAX_LIMIT = 20;
-
     public final synchronized void addAll(List<BaseEntity> entities) {
         this.entities.addAll(entities);
     }

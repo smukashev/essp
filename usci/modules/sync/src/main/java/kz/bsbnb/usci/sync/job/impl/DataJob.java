@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.sync.job.impl;
 
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.util.Errors;
@@ -92,7 +93,7 @@ public final class DataJob extends AbstractDataJob {
         //noinspection InfiniteLoopStatement
         while (true) {
             try {
-                if (entities.size() > 0 && entitiesInProcess.size() < THREAD_MAX_LIMIT)
+                if (entities.size() > 0 && entitiesInProcess.size() < StaticRouter.getThreadLimit())
                     processNewEntities();
 
                 if (processingJobs.size() > 0)

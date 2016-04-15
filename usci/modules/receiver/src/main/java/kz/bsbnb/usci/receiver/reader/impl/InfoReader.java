@@ -2,8 +2,6 @@ package kz.bsbnb.usci.receiver.reader.impl;
 
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.receiver.reader.impl.beans.InfoData;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
@@ -11,10 +9,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.text.ParseException;
 
-@Component
-@Scope("prototype")
 public class InfoReader extends MainReader {
-
     private InfoData infoData = new InfoData();
 
     @Override
@@ -26,6 +21,8 @@ public class InfoReader extends MainReader {
                 infoData.setDocType(event.asStartElement().getAttributeByName(new QName("doc_type")).getValue());
                 break;
             case "no":
+                break;
+            case "account_date":
                 break;
             case "report_date":
                 break;
@@ -51,11 +48,19 @@ public class InfoReader extends MainReader {
                 infoData.setDocValue(data.toString());
                 data.setLength(0);
                 break;
+            case "account_date":
+                try {
+                    infoData.setAccountDate(DataTypes.dateFormatSlash.parse(data.toString()));
+                } catch (ParseException e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+                data.setLength(0);
+                break;
             case "report_date":
                 try {
                     infoData.setReportDate(DataTypes.dateFormatSlash.parse(data.toString()));
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e.getMessage());
                 }
                 data.setLength(0);
                 break;

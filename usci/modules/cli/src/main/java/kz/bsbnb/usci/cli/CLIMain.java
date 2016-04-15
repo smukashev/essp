@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.cli;
 
 import kz.bsbnb.usci.cli.app.CLI;
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -9,23 +8,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.ConnectException;
 
 public class CLIMain {
     public static void main(String args[]) {
-        ApplicationContext ctx = null;
-        try {
-            ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-        } catch (BeanCreationException exception) {
-            if (exception.contains(ConnectException.class)) {
-                System.out.println("WARN: Error connecting to remote services: " + exception.getBeanName());
-                System.out.println("All related functions disabled.");
-                System.out.println("Reloading config for offline mode.");
-                ctx = new ClassPathXmlApplicationContext("applicationContextOffline.xml");
-            } else {
-                throw new RuntimeException(exception);
-            }
-        }
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
         System.out.println("Started.");
 

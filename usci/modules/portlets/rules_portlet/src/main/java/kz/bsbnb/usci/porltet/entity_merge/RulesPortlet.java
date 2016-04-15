@@ -1,20 +1,18 @@
 package kz.bsbnb.usci.porltet.entity_merge;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
-import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
-import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.core.service.IPackageService;
+import kz.bsbnb.usci.core.service.IRuleService;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
+import kz.bsbnb.usci.eav.rule.PackageVersion;
+import kz.bsbnb.usci.eav.rule.Rule;
+import kz.bsbnb.usci.eav.rule.RulePackage;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.porltet.entity_merge.model.json.JsonMaker;
 import org.apache.log4j.Logger;
