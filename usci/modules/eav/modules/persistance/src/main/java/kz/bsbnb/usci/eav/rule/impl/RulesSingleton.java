@@ -72,9 +72,9 @@ public class RulesSingleton {
         }
     }
 
-    private HashMap<String, ArrayList<RuleCacheEntry>> ruleCache = new HashMap<String, ArrayList<RuleCacheEntry>>();
+    private HashMap<String, ArrayList<RuleCacheEntry>> ruleCache = new HashMap<>();
 
-    private ArrayList<RulePackageError> rulePackageErrors = new ArrayList<RulePackageError>();
+    private ArrayList<RulePackageError> rulePackageErrors = new ArrayList<>();
 
     @Autowired
     private IRuleDao ruleDao;
@@ -115,7 +115,7 @@ public class RulesSingleton {
         packages += "package test \n";
         packages += "dialect \"mvel\"\n";
         packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
-        packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+        packages += "import kz.bsbnb.usci.eav.rule.impl.BRMSHelper;\n";
 
         rule = packages + rule;
 
@@ -139,7 +139,7 @@ public class RulesSingleton {
         packages += "package test\n";
         packages += "dialect \"mvel\"\n";
         packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
-        packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+        packages += "import kz.bsbnb.usci.eav.rule.impl.BRMSHelper;\n";
 
         for (Rule r : rules) {
             if (r.getId() != rule.getId())
@@ -200,7 +200,7 @@ public class RulesSingleton {
 
                 droolPackage.append("dialect \"mvel\"\n");
                 droolPackage.append("import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n");
-                droolPackage.append("import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n");
+                droolPackage.append("import kz.bsbnb.usci.eav.rule.impl.BRMSHelper;\n");
 
                 for (Rule r : rules) {
                     if (r.isActive() || true)
@@ -268,7 +268,7 @@ public class RulesSingleton {
         packages += "package test\n";
         packages += "dialect \"mvel\"\n";
         packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
-        packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+        packages += "import kz.bsbnb.usci.eav.rule.impl.BRMSHelper;\n";
 
         for (Rule r : rules)
             packages += r.getRule() + "\n";
@@ -288,23 +288,23 @@ public class RulesSingleton {
     }
 
     public String getPackageErrors(List<Rule> rules) {
-        String packages = "";
+        StringBuilder packages = new StringBuilder();
 
-        packages += "package test\n";
-        packages += "dialect \"mvel\"\n";
-        packages += "import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n";
-        packages += "import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n";
+        packages.append("package test\n");
+        packages.append("dialect \"mvel\"\n");
+        packages.append("import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n");
+        packages.append("import kz.bsbnb.usci.eav.rule.impl.BRMSHelper;\n");
 
         for (Rule r : rules)
-            packages += r.getRule() + "\n";
+            packages.append(r.getRule()).append("\n");
 
-        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+        KnowledgeBuilder kBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
-        kbuilder.add(ResourceFactory.newInputStreamResource(new ByteArrayInputStream(packages.getBytes())),
+        kBuilder.add(ResourceFactory.newInputStreamResource(new ByteArrayInputStream(packages.toString().getBytes())),
                 ResourceType.DRL);
 
-        if (kbuilder.hasErrors()) {
-            return kbuilder.getErrors().toString();
+        if (kBuilder.hasErrors()) {
+            return kBuilder.getErrors().toString();
         }
 
         return null;
@@ -324,9 +324,10 @@ public class RulesSingleton {
                 List<Rule> rules = ruleDao.load(packageVersion);
 
                 for (Rule ruleInPackage : rules) {
-                    if (ruleInPackage.getId() == rule.getId())
+                    if (ruleInPackage.getId() == rule.getId()) {
                         rules.iterator().remove();
-                    break;
+                        break;
+                    }
                 }
 
                 String curResult = getPackageErrors(rules);
