@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.core.rulesingleton;
+package kz.bsbnb.usci.eav.rule.impl;
 
 public class RulePackageError {
     private String packageName;

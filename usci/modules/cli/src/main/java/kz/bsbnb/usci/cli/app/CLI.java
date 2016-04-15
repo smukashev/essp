@@ -11,7 +11,7 @@ import kz.bsbnb.usci.cli.app.exporter.EntityExporter;
 import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
-import kz.bsbnb.usci.core.rulesingleton.RulesSingleton;
+import kz.bsbnb.usci.eav.rule.impl.RulesSingleton;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.core.service.IPackageService;
 import kz.bsbnb.usci.core.service.IRuleService;

@@ -8,13 +8,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * @author abukabayev
- */
 @Service
 public class PackageService implements IPackageService {
     @Autowired
-    private IPackageDao batchDao;
+    private IPackageDao packageDao;
 
     public PackageService() {
         super();
@@ -22,17 +19,17 @@ public class PackageService implements IPackageService {
 
     @Override
     public long save(RulePackage batch) {
-        return batchDao.save(batch);
+        return packageDao.save(batch);
     }
 
     @Override
     public RulePackage load(long id) {
-        RulePackage batch = batchDao.loadBatch(id);
+        RulePackage batch = packageDao.loadBatch(id);
         return batch;
     }
 
     @Override
     public List<RulePackage> getAllPackages() {
-        return batchDao.getAllPackages();
+        return packageDao.getAllPackages();
     }
 }

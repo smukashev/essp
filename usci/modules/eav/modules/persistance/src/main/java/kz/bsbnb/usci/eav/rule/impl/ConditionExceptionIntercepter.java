@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.core.rulesingleton;
+package kz.bsbnb.usci.eav.rule.impl;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

@@ -1,6 +1,6 @@
 package kz.bsbnb.usci.core.service.impl;
 
-import kz.bsbnb.usci.core.rulesingleton.RulesSingleton;
+import kz.bsbnb.usci.eav.rule.impl.RulesSingleton;
 import kz.bsbnb.usci.core.service.IRuleService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.rule.*;
@@ -128,7 +128,7 @@ public class RuleService implements IRuleService {
     @Override
     public List<String> runRules(BaseEntity entity, String pkgName, Date repDate) {
         rulesSingleton.runRules(entity,pkgName,repDate);
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for(String s : entity.getValidationErrors())
             list.add(s);
         return list;

@@ -17,11 +17,11 @@ import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.persistance.logic.IRuleServicePool;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
+import kz.bsbnb.usci.eav.rule.impl.RulesSingleton;
 import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.DSLContext;
@@ -67,7 +67,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private BasicBaseEntitySearcherPool searcherPool;
 
     @Autowired
-    private IRuleServicePool ruleServicePool;
+    private RulesSingleton rulesSingleton;
 
     private IDaoListener applyListener;
 
@@ -169,10 +169,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if(rulesEnabled && baseEntity.getMeta() != null &&
                 metaRules.contains(baseEntity.getMeta().getClassName()) && (baseEntity.getOperation() != null
                 && (baseEntity.getOperation().equals(OperationType.INSERT) || baseEntity.getOperation().equals(OperationType.UPDATE)))) {
-            List<String> errors;
+            List<String> errors = new ArrayList<>();
             try {
                 long t1 = System.currentTimeMillis();
-                errors = ruleServicePool.getRuleService().runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
+                rulesSingleton.runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
+
+                for(String s : baseEntity.getValidationErrors())
+                    errors.add(s);
+
                 sqlStats.put("java::rule(" + baseEntity.getMeta().getClassName()+")", System.currentTimeMillis() - t1);
             } catch (Exception e) {
                 logger.error(Errors.compose(Errors.E290,e));
@@ -315,11 +319,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
 
         if (metaRules.contains(baseEntityApplied.getMeta().getClassName())) {
-            List<String> errors = ruleServicePool.getRuleService().runRules((BaseEntity) baseEntityApplied,
-                    baseEntityApplied.getMeta().getClassName() + "_process", baseEntityApplied.getReportDate());
+            rulesSingleton.runRules(baseEntityApplied, baseEntityApplied.getMeta().getClassName() + "_parser", baseEntityApplied.getReportDate());
 
-            if (errors.size() > 0) {
-                throw new KnownIterativeException(errors);
+            if (baseEntityApplied.getValidationErrors().size() > 0) {
+                throw new KnownIterativeException(baseEntityApplied.getValidationErrors());
             }
         }
     }

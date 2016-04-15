@@ -1,6 +1,5 @@
-package kz.bsbnb.usci.core.rulesingleton;
+package kz.bsbnb.usci.eav.rule.impl;
 
-import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,20 +15,8 @@ import java.util.*;
 public class BRMSHelper {
     private static JdbcTemplate jdbcTemplate;
 
-    private static IMetaFactoryService metaService;
-
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
-
-    @Autowired
-    @Qualifier("remoteMetaService")
-    public void setMetaService(RmiProxyFactoryBean entityServiceProxy) {
-        metaService = (IMetaFactoryService) entityServiceProxy.getObject();
-    }
-
-    public static IMetaFactoryService getMetaService() {
-        return metaService;
     }
 
 

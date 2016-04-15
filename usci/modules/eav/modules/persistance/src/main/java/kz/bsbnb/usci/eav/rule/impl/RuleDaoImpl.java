@@ -1,11 +1,7 @@
 package kz.bsbnb.usci.eav.rule.impl;
 
-import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.SimpleTrack;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.rule.IRuleDao;
+import kz.bsbnb.usci.eav.rule.*;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;

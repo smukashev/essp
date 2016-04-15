@@ -1,12 +1,8 @@
-package kz.bsbnb.usci.core.rulesingleton;
+package kz.bsbnb.usci.eav.rule.impl;
 
-import kz.bsbnb.usci.core.service.IMetaFactoryService;
-import kz.bsbnb.usci.core.service.IPackageService;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.rule.IRuleDao;
-import kz.bsbnb.usci.eav.rule.PackageVersion;
-import kz.bsbnb.usci.eav.rule.Rule;
-import kz.bsbnb.usci.eav.rule.RulePackage;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.rule.*;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
@@ -21,8 +17,6 @@ import org.drools.runtime.rule.AgendaFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -37,22 +31,16 @@ public class RulesSingleton {
 
     private KnowledgeBase knowledgeBase;
 
-    @Autowired
-    @Qualifier(value = "remoteEntityService")
-    private RmiProxyFactoryBean entityRmiService;
-
     public static DateFormat ruleDateFormat = new SimpleDateFormat("dd_MM_yyyy");
 
     @Autowired
-    @Qualifier(value = "remoteMetaService")
-    private RmiProxyFactoryBean metaRmiService;
-    private IMetaFactoryService metaFactoryService;
+    private IPackageDao packageDao;
 
-    private class RuleCasheEntry implements Comparable {
+    private class RuleCacheEntry implements Comparable {
         private Date repDate;
         private String rules;
 
-        private RuleCasheEntry(Date repDate, String rules) {
+        private RuleCacheEntry(Date repDate, String rules) {
             this.repDate = repDate;
             this.rules = rules;
         }
@@ -64,7 +52,7 @@ public class RulesSingleton {
             if (!(getClass() == obj.getClass()))
                 return 0;
 
-            return (repDate.compareTo(((RuleCasheEntry) obj).getRepDate()));
+            return (repDate.compareTo(((RuleCacheEntry) obj).getRepDate()));
         }
 
         private Date getRepDate() {
@@ -84,12 +72,9 @@ public class RulesSingleton {
         }
     }
 
-    private HashMap<String, ArrayList<RuleCasheEntry>> ruleCache = new HashMap<String, ArrayList<RuleCasheEntry>>();
+    private HashMap<String, ArrayList<RuleCacheEntry>> ruleCache = new HashMap<String, ArrayList<RuleCacheEntry>>();
 
     private ArrayList<RulePackageError> rulePackageErrors = new ArrayList<RulePackageError>();
-
-    @Autowired
-    private IPackageService ruleBatchService;
 
     @Autowired
     private IRuleDao ruleDao;
@@ -195,7 +180,7 @@ public class RulesSingleton {
 
     synchronized public void fillPackagesCache() {
         knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase();
-        List<RulePackage> packages = ruleBatchService.getAllPackages();
+        List<RulePackage> packages = packageDao.getAllPackages();
 
         rulePackageErrors.clear();
         ruleCache.clear();
@@ -203,21 +188,23 @@ public class RulesSingleton {
         for (RulePackage curPackage : packages) {
             List<PackageVersion> versions = ruleDao.getPackageVersions(curPackage);
 
-            ArrayList<RuleCasheEntry> ruleCasheEntries = new ArrayList<RuleCasheEntry>();
+            ArrayList<RuleCacheEntry> ruleCacheEntries = new ArrayList<>();
 
             for (PackageVersion version : versions) {
                 List<Rule> rules = ruleDao.load(version);
 
                 StringBuilder droolPackage = new StringBuilder();
 
-                droolPackage.append("package " + curPackage.getName() + "_" + ruleDateFormat.format(version.getReportDate()) + "\n");
+                droolPackage.append("package ").append(curPackage.getName()).append("_")
+                        .append(ruleDateFormat.format(version.getReportDate())).append("\n");
+
                 droolPackage.append("dialect \"mvel\"\n");
                 droolPackage.append("import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n");
                 droolPackage.append("import kz.bsbnb.usci.brms.rulesvr.rulesingleton.BRMSHelper;\n");
 
                 for (Rule r : rules) {
                     if (r.isActive() || true)
-                        droolPackage.append(r.getRule() + "\n");
+                        droolPackage.append(r.getRule()).append("\n");
                 }
 
                 logger.debug(droolPackage.toString());
@@ -229,25 +216,25 @@ public class RulesSingleton {
                             e.getMessage()));
                 }
 
-                ruleCasheEntries.add(new RuleCasheEntry(version.getReportDate(),
+                ruleCacheEntries.add(new RuleCacheEntry(version.getReportDate(),
                         curPackage.getName() + "_" + version));
             }
 
-            Collections.sort(ruleCasheEntries);
-            ruleCache.put(curPackage.getName(), ruleCasheEntries);
+            Collections.sort(ruleCacheEntries);
+            ruleCache.put(curPackage.getName(), ruleCacheEntries);
         }
     }
 
-    public void runRules(BaseEntity entity, String pkgName, Date repDate) {
+    public void runRules(IBaseEntity entity, String pkgName, Date repDate) {
         StatelessKnowledgeSession ksession = getSession();
         // todo: rule
         /*ksession.setGlobal("entityService", entityService);
         ksession.setGlobal("metaService", metaFactoryService);*/
 
-        ArrayList<RuleCasheEntry> versions = ruleCache.get(pkgName);
+        ArrayList<RuleCacheEntry> versions = ruleCache.get(pkgName);
         String packageName = null;
 
-        for (RuleCasheEntry version : versions) {
+        for (RuleCacheEntry version : versions) {
             if (version.getRepDate().compareTo(repDate) <= 0) {
                 packageName = pkgName + "_" + ruleDateFormat.format(version.getRepDate());
             } else {
