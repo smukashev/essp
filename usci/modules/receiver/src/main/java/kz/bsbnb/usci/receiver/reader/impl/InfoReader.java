@@ -52,7 +52,7 @@ public class InfoReader extends MainReader {
                 try {
                     infoData.setAccountDate(DataTypes.dateFormatSlash.parse(data.toString()));
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e.getMessage());
                 }
                 data.setLength(0);
                 break;
@@ -60,7 +60,7 @@ public class InfoReader extends MainReader {
                 try {
                     infoData.setReportDate(DataTypes.dateFormatSlash.parse(data.toString()));
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e.getMessage());
                 }
                 data.setLength(0);
                 break;
