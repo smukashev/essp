@@ -82,7 +82,7 @@ public final class StaticRouter {
     private final static boolean prodStatsEnabled = true;
 
     private final static int stendThreadLimit = 10;
-    private final static int devThreadLimit = 5;
+    private final static int devThreadLimit = 10;
     private final static int prodThreadLimit = 20;
 
     public static String getAsIP() {
