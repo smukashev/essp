@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class PackageService implements IPackageService {
+public class PackageServiceImpl implements IPackageService {
     @Autowired
     private IPackageDao packageDao;
 
-    public PackageService() {
+    public PackageServiceImpl() {
         super();
     }
 

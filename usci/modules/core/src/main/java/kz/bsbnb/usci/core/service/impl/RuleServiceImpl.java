@@ -17,7 +17,7 @@ import java.util.*;
  */
 
 @Service
-public class RuleService implements IRuleService {
+public class RuleServiceImpl implements IRuleService {
     @Autowired
     private IRuleDao ruleDao;
 

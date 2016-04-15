@@ -127,4 +127,18 @@
         <property name="registryPort" value="1099"/>
     </bean>
 
+    <bean id="packageServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="packageService"/>
+        <property name="service" ref="packageServiceImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IPackageService"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
+    <bean id="ruleServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="ruleService"/>
+        <property name="service" ref="ruleServiceImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IRuleService"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
 </beans>
