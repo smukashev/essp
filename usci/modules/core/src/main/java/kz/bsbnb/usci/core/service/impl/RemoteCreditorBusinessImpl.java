@@ -24,7 +24,7 @@ public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness {
 
     @Override
     public List<Creditor> findMainOfficeCreditors() {
-        List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaclass(
+        List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaClass(
                 metaClassRepository.getMetaClass("ref_creditor"));
 
         ArrayList<Creditor> creditors = new ArrayList<>();

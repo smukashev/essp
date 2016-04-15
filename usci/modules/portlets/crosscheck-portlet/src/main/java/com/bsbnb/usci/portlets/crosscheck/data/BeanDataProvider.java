@@ -52,14 +52,14 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public List<Creditor> getCreditorsList(String CreditorId) {
-        List<Creditor> creditorList = new ArrayList<Creditor>();
+        List<Creditor> creditorList = new ArrayList<>();
 
         Connection conn = getConnection();
         Statement stmt = null;
         String query = "SELECT t0.REF_CREDITOR_ID AS ID, t0.OPEN_DATE AS CHANGE_DATE, t0.CODE, t0.NAME, t0.SHORT_NAME, " +
                 "t0.CLOSE_DATE AS SHUTDOWN_DATE, 0 AS MAIN_OFFICE_ID, t0.SUBJECT_TYPE_ID " +
-                "FROM " + StaticRouter.getShowcaseSchemaName() + ".R_REF_CREDITOR t0, " + StaticRouter.getCoreSchemaName() +
-                ".EAV_A_CREDITOR_USER t2, " + StaticRouter.getCoreSchemaName() + ".EAV_A_USER t1 " +
+                "FROM " + StaticRouter.getShowcaseSchemaName() + ".R_REF_CREDITOR t0, " +
+                "EAV_A_CREDITOR_USER@" + StaticRouter.getCoreSchemaName() + " t2, " + "EAV_A_USER@" + StaticRouter.getCoreSchemaName() + " t1 " +
                 "WHERE ((t1.USER_ID = " + BigInteger.valueOf(facade.getUserID()) +") " +
                 "AND ((t2.CREDITOR_ID = t0.REF_CREDITOR_ID) AND (t1.USER_ID = t2.USER_ID))) " +
                 "AND (t0.REF_CREDITOR_ID = "+CreditorId+" OR "+CreditorId+" is NULL )"+

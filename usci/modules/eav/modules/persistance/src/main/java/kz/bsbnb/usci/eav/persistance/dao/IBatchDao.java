@@ -5,7 +5,6 @@ import kz.bsbnb.usci.eav.model.Batch;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public interface IBatchDao {
 
@@ -15,7 +14,7 @@ public interface IBatchDao {
 
     List<Batch> getPendingBatchList();
 
-    List<Batch> getBatchListToSign(long userId);
+    List<Batch> getBatchListToSign(long creditorId);
 
     List<Batch> getAll(Date repDate);
 

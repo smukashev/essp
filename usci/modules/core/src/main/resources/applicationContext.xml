@@ -5,11 +5,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
-    <import resource="applicationContextEAVPersistanse.xml"></import>
+    <import resource="applicationContextEAVPersistance.xml" />
 
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.core.service" />
-    <context:component-scan base-package="kz.bsbnb.usci.tool" />
 
     <context:annotation-config/>
 
@@ -22,7 +21,7 @@
         </property>
     </bean>
 
-    <!-- services -->
+    <!-- available services -->
     <bean id="entityRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
         <property name="serviceName" value="entityService"/>
         <property name="service" ref="entityServiceImpl"/>
@@ -125,6 +124,20 @@
         <property name="serviceName" value="globalService"/>
         <property name="service" ref="globalServiceImpl"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IGlobalService"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
+    <bean id="packageServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="packageService"/>
+        <property name="service" ref="packageServiceImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IPackageService"/>
+        <property name="registryPort" value="1099"/>
+    </bean>
+
+    <bean id="ruleServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="ruleService"/>
+        <property name="service" ref="ruleServiceImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.core.service.IRuleService"/>
         <property name="registryPort" value="1099"/>
     </bean>
 

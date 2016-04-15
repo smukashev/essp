@@ -14,7 +14,7 @@ import java.text.ParseException;
 public class Main {
     public static void main(String args[]) throws IOException, ParserConfigurationException,
             SAXException, ParseException, InterruptedException {
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContextZip.xml");
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
         Global b = ctx.getBean(Global.class);
 

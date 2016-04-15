@@ -29,7 +29,9 @@
         <property name="username" value="${jdbcSC.user}"/>
         <property name="password" value="${jdbcSC.password}"/>
         <property name="initialSize" value="${jdbcSC.initialSize}"/>
+        <property name="minIdle" value="${jdbcSC.minIdle}"/>
         <property name="maxActive" value="${jdbcSC.maxActive}"/>
+        <property name="maxIdle" value="${jdbcSC.maxIdle}"/>
     </bean>
 
     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
@@ -56,7 +58,7 @@
 
     <bean id="context" class="org.jooq.impl.DSL" factory-method="using">
         <constructor-arg name="dialect">
-            <value type="org.jooq.SQLDialect">${jooq.executor.constructor.args.first}</value>
+            <value type="org.jooq.SQLDialect">${jooqSC.executor.constructor.args.first}</value>
         </constructor-arg>
     </bean>
 
@@ -81,16 +83,10 @@
     <amq:connectionFactory id="jmsFactory" brokerURL="${jms.brokerURL}" />
 
     <!-- JMS Consumer Configuration -->
-    <bean id="jmsConsumerConnectionFactory"
-          class="org.springframework.jms.connection.SingleConnectionFactory"
-          p:targetConnectionFactory-ref="jmsFactory" />
+    <bean id="jmsConsumerConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory" p:targetConnectionFactory-ref="jmsFactory" />
 
-    <jms:listener-container container-type="default"
-                            connection-factory="jmsConsumerConnectionFactory"
-                            acknowledge="client"
-                            concurrency="${jms.consumerCount}"
-                            prefetch="1000">
-                            <!--acknowledge="auto">-->
+    <jms:listener-container container-type="default" connection-factory="jmsConsumerConnectionFactory"
+                            acknowledge="client" concurrency="${jms.consumerCount}" prefetch="1000">
         <jms:listener destination="showcaseQueue" ref="showcaseMessageConsumer" />
     </jms:listener-container>
 </beans>

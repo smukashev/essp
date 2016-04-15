@@ -16,7 +16,7 @@ public interface IBaseEntityProcessorDao {
 
     List<Long> getEntityIDsByMetaclass(long metaClassId);
 
-    List<BaseEntity> getEntityByMetaclass(MetaClass meta);
+    List<BaseEntity> getEntityByMetaClass(MetaClass meta);
 
     boolean isApproved(long id);
 

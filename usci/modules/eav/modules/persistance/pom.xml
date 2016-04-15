@@ -2,7 +2,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>kz.bsbnb.usci.eav</groupId>
     <artifactId>persistance</artifactId>
     <name>EAV persistance</name>
     <version>0.0.1-SNAPSHOT</version>
@@ -14,6 +13,7 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <activemq.version>5.10.0</activemq.version>
+        <drools.version>5.5.0.Final</drools.version>
     </properties>
 
     <parent>
@@ -55,11 +55,6 @@
             <version>3.1.0</version>
         </dependency>
         <dependency>
-            <groupId>kz.bsbnb.ddlutils</groupId>
-            <artifactId>ddlutils</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
             <version>1.7.3</version>
@@ -75,9 +70,19 @@
             <version>5.2.0</version>
         </dependency>
         <dependency>
-            <groupId>kz.bsbnb.usci.brms</groupId>
-            <artifactId>rulemodel</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-spring</artifactId>
+            <version>${drools.version}</version>
         </dependency>
     </dependencies>
 
@@ -140,27 +145,19 @@
                 </dependencies>
                 <configuration>
                     <jdbc>
-                        <driver>${jdbc.driver}</driver>
-                        <url>${jdbc.url}</url>
-                        <user>${jdbc.user}</user>
-                        <password>${jdbc.password}</password>
+                        <driver>${jdbcPersistance.driver}</driver>
+                        <url>${jdbcPersistance.url}</url>
+                        <user>${jdbcPersistance.user}</user>
+                        <password>${jdbcPersistance.password}</password>
                     </jdbc>
                     <generator>
                         <name>org.jooq.util.DefaultGenerator</name>
                         <database>
-                            <name>${jooq.db.name}</name>
+                            <name>${jooqPersistance.db.name}</name>
                             <includes>(SC_.*)|(EAV_.*)|(BATCH_.*)|(LOGIC_.*)|(MNT_.*)|(MAIL_.*)</includes>
                             <excludes>(SYS.*)</excludes>
-                            <inputSchema>${jooq.db.schema}</inputSchema>
+                            <inputSchema>${jooqPersistance.db.schema}</inputSchema>
                             <customTypes>
-                                <!--<customType>
-                                    <name>java.lang.Long</name>
-                                    <converter>kz.bsbnb.usci.tool.jooq.OracleLongConverter</converter>
-                                </customType>-->
-                                <!--<customType>
-                                    <name>java.lang.Boolean</name>
-                                    <converter>kz.bsbnb.usci.tool.jooq.OracleBooleanConverter</converter>
-                                </customType>-->
                                 <customType>
                                     <name>java.lang.Integer</name>
                                     <converter>kz.bsbnb.usci.tool.jooq.OracleIntegerConverter</converter>
@@ -175,14 +172,6 @@
                                 </customType>
                             </customTypes>
                             <forcedTypes>
-                                <!--<forcedType>
-                                    <name>java.lang.Long</name>
-                                    <expressions>(.*\..*_ID)|(.*\.ID)|(.*\..*_COUNT)|(.*\.INDEX_)|(.*\.LEVEL_)</expressions>
-                                </forcedType>-->
-                                <!--<forcedType>
-                                    <name>java.lang.Boolean</name>
-                                    <expressions>(.*BOOLEAN.*\.VALUE)|(.*\.IS_CLOSED)|(.*\.IS_LAST)|(.*\.IS_KEY)|(.*\.IS_NULLABLE)|(.*\.IS_IMMUTABLE)|(.*\.IS_REFERENCE)|(.*\.IS_DISABLED)</expressions>
-                                </forcedType>-->
                                 <forcedType>
                                     <name>java.lang.Integer</name>
                                     <expressions>(.*\.CONTAINER_TYPE)|(.*INTEGER.*\.VALUE)</expressions>

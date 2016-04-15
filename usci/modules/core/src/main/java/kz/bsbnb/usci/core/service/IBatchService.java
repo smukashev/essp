@@ -28,7 +28,7 @@ public interface IBatchService {
 
     List<Batch> getPendingBatchList();
 
-    List<Batch> getBatchListToSign(long userId);
+    List<Batch> getBatchListToSign(long creditorId);
 
     void signBatch(long batchId, String sign);
 
