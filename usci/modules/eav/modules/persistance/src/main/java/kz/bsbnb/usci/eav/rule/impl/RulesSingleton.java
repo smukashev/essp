@@ -2,6 +2,8 @@ package kz.bsbnb.usci.eav.rule.impl;
 
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
+import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.rule.*;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -31,10 +33,16 @@ public class RulesSingleton {
 
     private KnowledgeBase knowledgeBase;
 
-    public static DateFormat ruleDateFormat = new SimpleDateFormat("dd_MM_yyyy");
+    public static final DateFormat ruleDateFormat = new SimpleDateFormat("dd_MM_yyyy");
 
     @Autowired
     private IPackageDao packageDao;
+
+    @Autowired
+    private IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Autowired
+    private IMetaClassRepository metaClassRepository;
 
     private class RuleCacheEntry implements Comparable {
         private Date repDate;
@@ -226,10 +234,10 @@ public class RulesSingleton {
     }
 
     public void runRules(IBaseEntity entity, String pkgName, Date repDate) {
-        StatelessKnowledgeSession ksession = getSession();
+        StatelessKnowledgeSession kSession = getSession();
         // todo: rule
-        ksession.setGlobal("entityService", null);
-        ksession.setGlobal("metaService", null);
+        kSession.setGlobal("baseEntityProcessorDao", baseEntityProcessorDao);
+        kSession.setGlobal("metaClassRepository", metaClassRepository);
 
         ArrayList<RuleCacheEntry> versions = ruleCache.get(pkgName);
         String packageName = null;
@@ -246,19 +254,17 @@ public class RulesSingleton {
             return;
 
         @SuppressWarnings("rawtypes")
-        List<Command> commands = new ArrayList<Command>();
+        List<Command> commands = new ArrayList<>();
         commands.add(CommandFactory.newInsert(entity));
-        commands.add(new FireAllRulesCommand(new PackageAgendaFilter(
-                packageName)));
-        ksession.execute(CommandFactory.newBatchExecution(commands));
+        commands.add(new FireAllRulesCommand(new PackageAgendaFilter(packageName)));
+        kSession.execute(CommandFactory.newBatchExecution(commands));
     }
 
     public void runRules(BaseEntity entity) {
-        StatelessKnowledgeSession ksession = getSession();
+        StatelessKnowledgeSession kSession = getSession();
 
-        ksession.execute(entity);
+        kSession.execute(entity);
     }
-
 
     public String getPackageErrorsOnRuleInsert(PackageVersion packageVersion, String title, String ruleBody) {
         List<Rule> rules = ruleDao.load(packageVersion);
@@ -275,13 +281,12 @@ public class RulesSingleton {
 
         packages += ruleBody + "\n";
 
-        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+        KnowledgeBuilder kBuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 
-        kbuilder.add(ResourceFactory.newInputStreamResource(new ByteArrayInputStream(packages.getBytes())),
-                ResourceType.DRL);
+        kBuilder.add(ResourceFactory.newInputStreamResource(new ByteArrayInputStream(packages.getBytes())), ResourceType.DRL);
 
-        if (kbuilder.hasErrors()) {
-            return kbuilder.getErrors().toString();
+        if (kBuilder.hasErrors()) {
+            return kBuilder.getErrors().toString();
         }
 
         return null;
@@ -339,6 +344,4 @@ public class RulesSingleton {
 
         return null;
     }
-
-
 }
