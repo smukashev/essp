@@ -1099,7 +1099,7 @@ public class CLI {
             return;
         }
 
-        List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaclass(meta);
+        List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaClass(meta);
 
         if (entities.size() == 0) {
             System.out.println("No such entities with class: " + name);

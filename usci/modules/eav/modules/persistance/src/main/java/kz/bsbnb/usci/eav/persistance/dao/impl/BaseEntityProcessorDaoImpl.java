@@ -387,7 +387,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return entityIds;
     }
 
-    public List<BaseEntity> getEntityByMetaclass(MetaClass meta) {
+    public List<BaseEntity> getEntityByMetaClass(MetaClass meta) {
         List<Long> ids = getEntityIDsByMetaclass(meta.getId());
 
         ArrayList<BaseEntity> entities = new ArrayList<>();

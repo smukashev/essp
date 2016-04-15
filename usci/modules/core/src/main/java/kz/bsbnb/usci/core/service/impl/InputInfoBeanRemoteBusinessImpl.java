@@ -80,12 +80,16 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             ii.setCreditor(currentCreditor);
             ii.setFileName(batch.getFileName());
 
-            if (lastStatus.equals("COMPLETED")) {
-                lastStatus = "Завершён";
-            } else if (lastStatus.equals("ERROR")) {
-                lastStatus = "Ошибка";
-            } else if(lastStatus.equals("WAITING_FOR_SIGNATURE")) {
-                lastStatus = "Ожидает подписи";
+            switch (lastStatus) {
+                case "COMPLETED":
+                    lastStatus = "Завершён";
+                    break;
+                case "ERROR":
+                    lastStatus = "Ошибка";
+                    break;
+                case "WAITING_FOR_SIGNATURE":
+                    lastStatus = "Ожидает подписи";
+                    break;
             }
 
             Shared s = new Shared();
