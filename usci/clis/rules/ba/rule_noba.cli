@@ -1,11 +1,13 @@
 rule read $$$
 title: Функция для работы c типом субъекта
-function String getSubjectTypeCodeOfCredit(IEntityService entityService, BaseEntity credit){
+function String getSubjectTypeCodeOfCredit(IBaseEntityProcessorDao entityService, BaseEntity credit){
   try{
-        BaseEntity creditor = (BaseEntity)credit.getEl("creditor");
-        creditor = entityService.prepare(creditor);
-        creditor = entityService.getActualBaseEntity(creditor);
-        return (String) creditor.getEl("subject_type.code");
+  		if(credit == null || credit.getId() < 1 || credit.getId() > 0)
+  		    return "";
+        //BaseEntity creditor = (BaseEntity)credit.getEl("creditor");
+        //creditor = (BaseEntity)entityService.prepare(creditor, 0L);
+        //creditor = entityService.getActualBaseEntity(creditor);
+        return ""; //(String) creditor.getEl("subject_type.code");
     } catch (Exception e) {
         credit.addValidationError(e.getMessage());
     }

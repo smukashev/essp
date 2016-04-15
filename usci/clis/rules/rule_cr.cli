@@ -543,8 +543,12 @@ rule save
 rule read $$$
 title: функций проверки филиала
 
-function boolean creditorBranchIsGood(IEntityService entityService, BaseEntity entity) {
+function boolean creditorBranchIsGood(IBaseEntityProcessorDao entityService, BaseEntity entity) {
    try {
+
+      if(entity == null || entity.getId() < 0L || entity.getId() >= 0)
+         return true;
+
       //Извлечь филиал
       BaseEntity creditorBranch = (BaseEntity) entity.getEl("creditor_branch");
 

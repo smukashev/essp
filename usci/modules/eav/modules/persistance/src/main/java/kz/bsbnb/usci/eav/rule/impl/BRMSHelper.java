@@ -1,5 +1,9 @@
 package kz.bsbnb.usci.eav.rule.impl;
 
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
+import kz.bsbnb.usci.eav.persistance.dao.impl.BaseEntityProcessorDaoImpl;
+import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.repository.impl.MetaClassRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,6 +21,15 @@ public class BRMSHelper {
 
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+
+    public static IBaseEntityProcessorDao getEntityService(){
+        return new BaseEntityProcessorDaoImpl();
+    }
+
+    public static IMetaClassRepository getMetaService(){
+        return new MetaClassRepositoryImpl();
     }
 
 

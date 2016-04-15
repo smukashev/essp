@@ -200,6 +200,7 @@ public class RulesSingleton {
 
                 droolPackage.append("dialect \"mvel\"\n");
                 droolPackage.append("import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;\n");
+                droolPackage.append("import kz.bsbnb.usci.eav.model.base.IBaseEntity;\n");
                 droolPackage.append("import kz.bsbnb.usci.eav.rule.impl.BRMSHelper;\n");
 
                 for (Rule r : rules) {
