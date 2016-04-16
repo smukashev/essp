@@ -130,27 +130,7 @@ public class SigningPortlet extends GenericPortlet {
             }
 
         } catch (Exception e) {
-            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
-            if(originalError.contains("connect") || originalError.contains("rmi"))
-                if(!retry) {
-                    retry = true;
-                    try {
-                        init();
-                        //serveResource(resourceRequest, resourceResponse);
-                        processAction(request, response);
-                    } catch (PortletException e1) {
-                        //resourceResponse.setProperty(ResourceResponse.HTTP_STATUS_CODE, "400");
-                        /*out.write(("{ \"success\": false, \"errorMessage\": \""+ originalError + e1.getMessage()
-                                .replaceAll("\"","").replaceAll("\n","")+"\"}").getBytes());*/
-                    } finally {
-                        retry = false;
-                        return;
-                    }
-                }
-
-           // out.write(("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}").getBytes());
-
-
+            e.printStackTrace();
         }
     }
 
@@ -171,7 +151,7 @@ public class SigningPortlet extends GenericPortlet {
                     continue;
                 }
                 checker.checkAndUpdate(record, entry.getValue()[0]);
-                //provider.addInputFileToQueue(record);
+                provider.addInputFileToQueue(record);
                 signedFiles.add(record);
             } catch (SignatureValidationException sve) {
                 signatureErrors.append("<br />");

@@ -82,7 +82,7 @@ public class BeanDataProvider implements DataProvider {
                 return doc.getNo();
             }
         }*/
-        return "123123123123";
+        return creditor.getBIN();
         //return null;
     }
 
@@ -116,6 +116,7 @@ public class BeanDataProvider implements DataProvider {
 
 
     public void addInputFileToQueue(FileSignatureRecord record) {
+        signFile(record.getInputFile().getId(), record.getSignature());
         batchProcessService.restartBatch(record.getInputFile().getId());
         /*try {
             final InputFileSignature inputFileSignature = new InputFileSignature();

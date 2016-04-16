@@ -158,7 +158,8 @@
     <c:choose>
         <c:when test="${noCertificate}">
             <div class="portlet-msg-error">
-                <liferay-ui:message key="message-files-no-certificate"/>
+                Отсутвтует сертификат
+                <%--<liferay-ui:message key="message-files-no-certificate"/>--%>
             </div>
         </c:when>
         <c:otherwise>
@@ -167,7 +168,8 @@
                     <c:choose>
                         <c:when test="${hasSuccessfullySignedFiles}">
                             <div class="portlet-msg-info">
-                                <liferay-ui:message key="message-files-signed-and-queued" arguments="${signedFilenames}"/>
+                                Подписано добавелно в очередь: ${signedFilenames}
+                                <%-- <liferay-ui:message key="message-files-signed-and-queued" arguments="${signedFilenames}"/> --%>
                             </div>
                         </c:when>
                     </c:choose>
@@ -175,7 +177,8 @@
                     <c:choose>
                         <c:when test="${hasFilesWithErrors}">
                             <div class="portlet-msg-info">
-                                <liferay-ui:message key="message-files-signing-errors" arguments="${filesWithErrors}"/>
+                                Ошибки подписи ${filesWithErrors}
+                                <%--<liferay-ui:message key="message-files-signing-errors" arguments="${filesWithErrors}"/>--%>
                             </div>
                         </c:when>
                     </c:choose>
