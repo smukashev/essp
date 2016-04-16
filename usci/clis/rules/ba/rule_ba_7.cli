@@ -7,7 +7,7 @@ when
 			&& $r != null
 			&& $c : getEl("currency.short_name")
 			&& $c != null
-			&& !isBA7thSymbolCorrect((String)$r, (String)$c, getReportDate()))
+			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
 then
 	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
 end
@@ -24,7 +24,7 @@ when
 			&& $r != null
 			&& $c : getEl("currency.short_name")
 			&& $c != null
-			&& !isBA7thSymbolCorrect((String)$r, (String)$c, getReportDate()))
+			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
 then
 	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
 end
@@ -41,7 +41,7 @@ when
 			&& $r != null
 			&& $c : getEl("currency.short_name")
 			&& $c != null
-			&& !isBA7thSymbolCorrect((String)$r, (String)$c, getReportDate()))
+			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
 then
 	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
 end
@@ -58,7 +58,7 @@ when
 			&& $r != null
 			&& $c : getEl("currency.short_name")
 			&& $c != null
-			&& !isBA7thSymbolCorrect((String)$r, (String)$c, getReportDate()))
+			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
 then
 	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
 end
@@ -75,7 +75,7 @@ when
 			&& $r != null
 			&& $c : getEl("currency.short_name")
 			&& $c != null
-			&& !isBA7thSymbolCorrect((String)$r, (String)$c, getReportDate()))
+			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
 then
 	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
 end
@@ -92,7 +92,7 @@ when
 			&& $r != null
 			&& $c : getEl("currency.short_name")
 			&& $c != null
-			&& !isBA7thSymbolCorrect((String)$r, (String)$c, getReportDate()))
+			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
 then
 	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
 end
@@ -109,7 +109,7 @@ when
 			&& $r != null
 			&& $c : getEl("currency.short_name")
 			&& $c != null
-			&& !isBA7thSymbolCorrect((String)$r, (String)$c, getReportDate()))
+			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
 then
 	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
 end
@@ -126,7 +126,7 @@ when
 			&& $r != null
 			&& $c : getEl("currency.short_name")
 			&& $c != null
-			&& !isBA7thSymbolCorrect((String)$r, (String)$c, getReportDate()))
+			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
 then
 	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
 end
@@ -143,7 +143,7 @@ when
 			&& $r != null
 			&& $c : getEl("currency.short_name")
 			&& $c != null
-			&& !isBA7thSymbolCorrect((String)$r, (String)$c, getReportDate()))
+			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
 then
 	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
 end
@@ -160,7 +160,7 @@ when
 			&& $r != null
 			&& $c : getEl("currency.short_name")
 			&& $c != null
-			&& !isBA7thSymbolCorrect((String)$r, (String)$c, getReportDate()))
+			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
 then
 	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
 end
@@ -177,7 +177,7 @@ when
 			&& $r != null
 			&& $c : getEl("currency.short_name")
 			&& $c != null
-			&& !isBA7thSymbolCorrect((String)$r, (String)$c, getReportDate()))
+			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
 then
 	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
 end
