@@ -17,7 +17,7 @@ title: бин у юр лиц с кодам 05 является иином
 rule "бин у юр лиц с кодам 05 является иином"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                && getInvalidIINs((List) getEls("{get}subject[organization_info.enterprise_type.code=08]docs[doc_type.code=07]no"), $entity).size() > 0)
+                && getInvalidIINs((List) getEls("{get}subject[organization_info.enterprise_type.code=08]docs[doc_type.code=07]no")).size() > 0)
 then
  //$entity.addValidationError("Не правильный БИН у юр лица" );
 end
