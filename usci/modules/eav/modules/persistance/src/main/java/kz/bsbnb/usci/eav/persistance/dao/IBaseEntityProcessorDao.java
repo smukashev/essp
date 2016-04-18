@@ -14,13 +14,13 @@ public interface IBaseEntityProcessorDao {
 
     IBaseEntity process(IBaseEntity baseEntity);
 
-    List<Long> getEntityIDsByMetaclass(long metaClassId);
+    List<Long> getEntityIDsByMetaClass(long metaClassId);
 
     List<BaseEntity> getEntityByMetaClass(MetaClass meta);
 
-    boolean isApproved(long id);
+    boolean isApproved(long creditorId);
 
     boolean remove(long baseEntityId);
 
-    Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
+    IBaseEntityLoadDao getBaseEntityLoadDao();
 }

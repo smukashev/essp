@@ -10,29 +10,15 @@ import kz.bsbnb.usci.eav.stats.QueryEntry;
 import java.util.*;
 
 public interface IEntityService {
+    void process(BaseEntity mockEntity);
+
     BaseEntity load(long id);
 
     BaseEntity load(long id, Date date);
 
-    void process(BaseEntity baseEntity);
-
-    BaseEntity search(BaseEntity baseEntity);
-
-    BaseEntity prepare(BaseEntity baseEntity, long creditorId);
-
-    BaseEntity getActualBaseEntity(BaseEntity baseEntity);
-
-    List<Long> getEntityIDsByMetaclass(long id);
-
-    List<RefListItem> getRefsByMetaclass(long metaClassId);
+    RefColumnsResponse getRefColumns(long metaClassId);
 
     RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis);
 
     Map<String, QueryEntry> getSQLStats();
-
-    void remove(long id);
-
-    Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
-
-    RefColumnsResponse getRefColumns(long metaClassId);
 }

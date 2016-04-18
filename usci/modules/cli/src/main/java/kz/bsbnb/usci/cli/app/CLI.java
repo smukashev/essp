@@ -44,7 +44,6 @@ import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerato
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.eav.util.Errors;
-import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
 import kz.bsbnb.usci.sync.service.IBatchService;
@@ -855,7 +854,7 @@ public class CLI {
     }
 
     public void removeEntityById(long id, String url) {
-        jobDispatcher.addThread(new DeleteJob(getEntityService(url), id));
+        // todo: remove
     }
 
     public void dumpEntityToXML(String ids, String fileName) {
@@ -2400,7 +2399,7 @@ public class CLI {
 
     private void sendToShowcase(Long creditorId, String metaClassName, Date reportDate) {
         MetaClass metaClass = metaClassRepository.getMetaClass(metaClassName);
-        List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaclass(metaClass.getId());
+        List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaClass(metaClass.getId());
         for (Long entityId : entityIdList) {
             sendToShowcaseEntity(creditorId, entityId, reportDate);
         }
@@ -2984,48 +2983,4 @@ public class CLI {
             }
         }
     }
-
-    class DeleteJob extends Thread implements DispatcherJob {
-
-        private IEntityService entityServiceCore = null;
-        private long id;
-        private Set<Long> ids = null;
-
-        DeleteJob(IEntityService entityServiceCore, long id) {
-            this.entityServiceCore = entityServiceCore;
-            this.id = id;
-        }
-
-        @Override
-        public void run() {
-            try {
-                System.out.println("Deleting entity with id: " + id);
-                entityServiceCore.remove(id);
-                System.out.println("Deleted entity with id: " + id);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        @Override
-        public boolean intersects(DispatcherJob job) {
-            if (job instanceof DeleteJob) {
-                if (ids == null || ((DeleteJob) job).ids == null)
-                    throw new RuntimeException(Errors.compose(Errors.E210));
-
-                Set<Long> inter = SetUtils.intersection(ids, ((DeleteJob) job).ids);
-
-                return inter.size() > 0;
-            }
-
-            return false;
-        }
-
-        @Override
-        public void prepare() {
-            ids = entityServiceCore.getChildBaseEntityIds(id);
-        }
-    }
-
 }

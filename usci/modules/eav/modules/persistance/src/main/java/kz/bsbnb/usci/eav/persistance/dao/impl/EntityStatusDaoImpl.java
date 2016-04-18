@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_ENTITY_STATUSES;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_GLOBAL;
+import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Repository
 public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao {
@@ -52,8 +51,16 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
     @Override
     public List<EntityStatus> getList(long batchId) {
         Select select = context
-                .selectFrom(EAV_ENTITY_STATUSES
-                        .join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID)))
+                .select(EAV_ENTITY_STATUSES.ID, EAV_ENTITY_STATUSES.BATCH_ID, EAV_ENTITY_STATUSES.ENTITY_ID, EAV_ENTITY_STATUSES.STATUS_ID, EAV_ENTITY_STATUSES.DESCRIPTION, EAV_ENTITY_STATUSES.ERROR_CODE, EAV_ENTITY_STATUSES.DEV_DESCRIPTION, EAV_ENTITY_STATUSES.ENTITY_ID, EAV_ENTITY_STATUSES.RECEIPT_DATE, EAV_ENTITY_STATUSES.INDEX_, EAV_GLOBAL.CODE, EAV_BE_STRING_VALUES.VALUE)
+                .from(EAV_ENTITY_STATUSES
+                                .join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID))
+                                .leftOuterJoin(EAV_BE_STRING_VALUES)
+                                .on((EAV_BE_STRING_VALUES.ENTITY_ID.eq(EAV_ENTITY_STATUSES.ENTITY_ID))/*.and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(new Long(153)))*/)
+                                .leftOuterJoin(EAV_M_SIMPLE_ATTRIBUTES)
+                                .on(EAV_M_SIMPLE_ATTRIBUTES.ID.eq(EAV_BE_STRING_VALUES.ATTRIBUTE_ID))
+                                .leftOuterJoin(EAV_M_CLASSES)
+                                .on((EAV_M_CLASSES.ID.eq(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID)).and(EAV_M_CLASSES.TITLE.eq("primary_contract")))
+                )
                 .where(EAV_ENTITY_STATUSES.BATCH_ID.eq(batchId))
                 .orderBy(EAV_ENTITY_STATUSES.STATUS_ID, EAV_ENTITY_STATUSES.RECEIPT_DATE);
 
@@ -80,6 +87,7 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
         entityStatus.setErrorCode((String) row.get(EAV_ENTITY_STATUSES.ERROR_CODE.getName()));
         entityStatus.setDevDescription((String) row.get(EAV_ENTITY_STATUSES.DEV_DESCRIPTION.getName()));
         entityStatus.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_ENTITY_STATUSES.RECEIPT_DATE.getName())));
+        entityStatus.setContractNumber((String) row.get(EAV_BE_STRING_VALUES.VALUE.getName()));
 
         if (row.get(EAV_ENTITY_STATUSES.INDEX_.getName()) != null)
             entityStatus.setIndex(((BigDecimal) row.get(EAV_ENTITY_STATUSES.INDEX_.getName())).longValue());

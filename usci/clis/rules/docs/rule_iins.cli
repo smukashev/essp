@@ -17,14 +17,15 @@ title: бин у юр лиц с кодам 05 является иином
 rule "бин у юр лиц с кодам 05 является иином"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                && $r: getInvalidIINs((List) getEls("{get}subject[organization_info.enterprise_type.code=05]docs[doc_type.code=07]no") )
-                && $r.size() > 0 )
+                && getInvalidIINs((List) getEls("{get}subject[organization_info.enterprise_type.code=08]docs[doc_type.code=07]no")).size() > 0)
 then
- $entity.addValidationError("Не правильный БИН у юр лица" + $r);
+ //$entity.addValidationError("Не правильный БИН у юр лица" );
 end
 $$$
 
 rule save
+
+quit
 
 rule read $$$
 title: бин у юр лиц с кодам 08 является иином
@@ -45,9 +46,9 @@ title: иин физ лицо
 rule "иин физ лицо"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ( $r : getInvalidIINs((List)getEls("{get}subject[is_person=true]docs[doc_type.code=06]no")) && $r.size() > 0))
+			&& getInvalidIINs((List)getEls("{get}subject[is_person=true]docs[doc_type.code=06]no")).size() > 0)
 then
-	$entity.addValidationError("обнаружен некорректный иин: " + $r);
+	$entity.addValidationError("обнаружен некорректный иин: ");
 end
 $$$
 

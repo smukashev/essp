@@ -478,14 +478,11 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
             logger.debug(update.toString());
 
-            long t = 0;
-            if (sqlStats != null) t = System.nanoTime();
+            long t = System.currentTimeMillis();
 
             jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
 
-            if (sqlStats != null)
-                sqlStats.put(update.getSQL(), (System.nanoTime() - t) / 1000000);
-
+            sqlStats.put(update.getSQL(), (System.currentTimeMillis() - t));
         }
     }
 
@@ -525,12 +522,12 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
             logger.debug(delete.toString());
 
             long t = 0;
-            if (sqlStats != null) t = System.nanoTime();
+            if (sqlStats != null) t = System.currentTimeMillis();
 
             jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
 
             if (sqlStats != null)
-                sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
+                sqlStats.put(delete.getSQL(), (System.currentTimeMillis() - t));
         }
     }
 
@@ -555,13 +552,11 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         logger.debug(select.toString());
 
-        long t = 0;
-        if (sqlStats != null) t = System.nanoTime();
+        long t = System.currentTimeMillis();
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
 
-        if (sqlStats != null)
-            sqlStats.put(select.getSQL(), (System.nanoTime() - t) / 1000000);
+       sqlStats.put(select.getSQL(), (System.currentTimeMillis() - t));
 
         for (Map<String, Object> row : rows) {
             MetaAttribute metaAttribute = new MetaAttribute(
@@ -600,16 +595,13 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 .where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(meta.getId()))
                 .and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(meta.getType()));
 
-        long t = 0;
+        long t = System.nanoTime();
 
         logger.debug(select.toString());
 
-        if (sqlStats != null) t = System.nanoTime();
-
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
 
-        if (sqlStats != null)
-            sqlStats.put(select.getSQL(), (System.nanoTime() - t) / 1000000);
+        sqlStats.put(select.getSQL(), (System.currentTimeMillis() - t));
 
         for (Map<String, Object> row : rows) {
 
@@ -657,16 +649,13 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 .where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId()))
                 .and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType()));
 
-        long t = 0;
+        long t = System.nanoTime();;
 
         logger.debug(select.toString());
 
-        if (sqlStats != null) t = System.nanoTime();
-
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
 
-        if (sqlStats != null)
-            sqlStats.put(select.getSQL(), (System.nanoTime() - t) / 1000000);
+        sqlStats.put(select.getSQL(), (System.currentTimeMillis() - t));
 
         for (Map<String, Object> row : rows) {
             MetaClass metaClass = load(((BigDecimal) row.get("class_id")).longValue());
@@ -710,16 +699,13 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 .where(EAV_M_COMPLEX_SET.CONTAINING_ID.equal(meta.getId()))
                 .and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.equal(meta.getType()));
 
-        long t = 0;
+        long t = System.currentTimeMillis();
 
         logger.debug(select.toString());
 
-        if (sqlStats != null) t = System.nanoTime();
-
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
 
-        if (sqlStats != null)
-            sqlStats.put(select.getSQL(), (System.nanoTime() - t) / 1000000);
+        sqlStats.put(select.getSQL(), (System.currentTimeMillis() - t));
 
         for (Map<String, Object> row : rows) {
             MetaClass metaClass = load(((BigDecimal) row.get("class_id")).longValue());
@@ -889,7 +875,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         if (metaClass.getId() < 1)
             throw new IllegalArgumentException(Errors.compose(Errors.E165));
 
-        long t = 0;
+        long t = System.currentTimeMillis();
 
         UpdateConditionStep<EavMClassesRecord> delete = context
                 .update(EAV_M_CLASSES)
@@ -898,11 +884,9 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         logger.debug(delete.toString());
 
-        if (sqlStats != null) t = System.nanoTime();
-
         jdbcTemplate.update(delete.getSQL(), delete.getBindValues().toArray());
 
-        if (sqlStats != null) sqlStats.put(delete.getSQL(), (System.nanoTime() - t) / 1000000);
+        if (sqlStats != null) sqlStats.put(delete.getSQL(), (System.currentTimeMillis() - t));
     }
 
     @SuppressWarnings("UnusedDeclaration")
