@@ -5,7 +5,7 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.debt.current.balance_account.no_")
 			&& $r != null
-			&& !BRMSHelper.hasBADRT((String)$r, "1"))
+			&& !hasBADRT((String)$r, "1", $entity))
 then
 	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
 end
@@ -20,7 +20,7 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.debt.pastdue.balance_account.no_")
 			&& $r != null
-			&& !BRMSHelper.hasBADRT((String)$r, "2"))
+			&& !hasBADRT((String)$r, "2", $entity))
 then
 	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
 end
@@ -35,7 +35,7 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.debt.write_off.balance_account.no_")
 			&& $r != null
-			&& !BRMSHelper.hasBADRT((String)$r, "3"))
+			&& !hasBADRT((String)$r, "3", $entity))
 then
 	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
 end
@@ -50,7 +50,7 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.interest.current.balance_account.no_")
 			&& $r != null
-			&& !BRMSHelper.hasBADRT((String)$r, "4"))
+			&& !hasBADRT((String)$r, "4", $entity))
 then
 	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
 end
@@ -65,7 +65,7 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.interest.pastdue.balance_account.no_")
 			&& $r != null
-			&& !BRMSHelper.hasBADRT((String)$r, "5"))
+			&& !hasBADRT((String)$r, "5", $entity))
 then
 	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
 end
@@ -80,7 +80,7 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.credit_flow.provision.provision_kfn.balance_account.no_")
 			&& $r != null
-			&& !BRMSHelper.hasBADRT((String)$r, "11"))
+			&& !hasBADRT((String)$r, "11", $entity))
 then
 	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
 end
@@ -95,7 +95,7 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.credit_flow.provision.provision_msfo.balance_account.no_")
 			&& $r != null
-			&& !BRMSHelper.hasBADRT((String)$r, "12"))
+			&& !hasBADRT((String)$r, "12", $entity))
 then
 	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
 end
@@ -110,7 +110,7 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.credit_flow.provision.provision_msfo_over_balance.balance_account.no_")
 			&& $r != null
-			&& !BRMSHelper.hasBADRT((String)$r, "13"))
+			&& !hasBADRT((String)$r, "13", $entity))
 then
 	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
 end
@@ -125,7 +125,7 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.correction.balance_account.no_")
 			&& $r != null
-			&& !BRMSHelper.hasBADRT((String)$r, "8"))
+			&& !hasBADRT((String)$r, "8", $entity))
 then
 	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
 end
@@ -140,7 +140,7 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.discount.balance_account.no_")
 			&& $r != null
-			&& !BRMSHelper.hasBADRT((String)$r, "7"))
+			&& !hasBADRT((String)$r, "7", $entity))
 then
 	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
 end
@@ -155,7 +155,7 @@ when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
 			&& $r : getEl("change.remains.limit.balance_account.no_")
 			&& $r != null
-			&& !BRMSHelper.hasBADRT((String)$r, "10"))
+			&& !hasBADRT((String)$r, "10", $entity))
 then
 	$entity.addValidationError("балансовый счет не соответствует типу остатка: " + $r);
 end
