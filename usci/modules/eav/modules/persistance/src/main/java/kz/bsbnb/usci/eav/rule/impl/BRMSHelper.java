@@ -1,64 +1,89 @@
 package kz.bsbnb.usci.eav.rule.impl;
 
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
-import kz.bsbnb.usci.eav.persistance.dao.impl.BaseEntityProcessorDaoImpl;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
+import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
-import kz.bsbnb.usci.eav.repository.impl.MetaClassRepositoryImpl;
+import org.jooq.DSLContext;
+import org.jooq.Select;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@Component
-public class BRMSHelper {
-    private static JdbcTemplate jdbcTemplate;
+import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
+@Component
+public class BRMSHelper extends JDBCSupport implements InitializingBean {
+
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @Autowired
+    private DSLContext context;
+
+    @Autowired
+    private IMetaClassRepository metaClassRepository;
+
+    private Map<BalDebtRemains, IBaseEntity> refsMap = new HashMap<>();
+
+    @Autowired
+    private IBaseEntityLoadDao baseEntityLoadDao;
+
+    private class BalDebtRemains {
+        private final String no_;
+        private final String code;
+
+        public BalDebtRemains(String code, String no_) {
+            this.code = code;
+            this.no_ = no_;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            BalDebtRemains balDebtRemains = (BalDebtRemains) o;
+
+            if (!no_.equals(balDebtRemains.no_)) return false;
+            return code.equals(balDebtRemains.code);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = no_.hashCode();
+            result = 31 * result + code.hashCode();
+            return result;
+        }
     }
 
-    public static boolean hasBADRT(String balanceAccountNo, String debtRemainTypeCode) {
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        long t1 = System.currentTimeMillis();
+        final String ebe = "EBE";
+        IMetaClass refBaDrtMetaClass = metaClassRepository.getMetaClass("ref_ba_drt");
+        long val1 = 1;
+        Select select = context.select(EAV_BE_ENTITIES.as(ebe).ID)
+                .from(EAV_BE_ENTITIES.as(ebe))
+                .where(EAV_BE_ENTITIES.as(ebe).CLASS_ID.equal(val1));
 
-        String select = "select count(1)\n" +
-                "  from eav_be_entities ent,\n" +
-                "       eav_be_complex_values cba,\n" +
-                "       eav_be_string_values sba,\n" +
-                "       eav_be_complex_values cdrt,\n" +
-                "       eav_be_string_values sdrt\n" +
-                "   where ent.id = cba.entity_id\n" +
-                "     and cba.attribute_id = (select ct.id from vw_complex_attribute ct \n" +
-                "                                    where ct.attribute_name = 'balance_account'\n" +
-                "                                       and ct.containing_name = 'ref_ba_drt'\n" +
-                "                                       and ct.class_name = 'ref_balance_account')\n" +
-                "     and cba.entity_value_id = sba.entity_id\n" +
-                "     and sba.attribute_id = (select st.id from vw_simple_attribute st\n" +
-                "                                    where st.class_name = 'ref_balance_account'\n" +
-                "                                      and st.attribute_name = 'no_')\n" +
-                "     and sba.value = ?\n" +
-                "     and ent.id = cdrt.entity_id\n" +
-                "     and cdrt.entity_value_id = sdrt.entity_id\n" +
-                "     and sdrt.value = ?\n" +
-                "     and cdrt.attribute_id = (select ct.id from vw_complex_attribute ct \n" +
-                "                                    where ct.attribute_name = 'debt_remains_type'\n" +
-                "                                       and ct.containing_name = 'ref_ba_drt'\n" +
-                "                                       and ct.class_name = 'ref_debt_remains_type')\n" +
-                "     and sdrt.attribute_id = (select st.id from vw_simple_attribute st\n" +
-                "                                    where st.class_name = 'ref_debt_remains_type'\n" +
-                "                                      and st.attribute_name = 'code')\n" +
-                "     and rownum = 1\n" +
-                "\n";
+        List<Map<String, Object>> refList = jdbcTemplate.queryForList(select.getSQL(), refBaDrtMetaClass.getId());
 
-        int ans = jdbcTemplate.queryForInt(select, new String[]{balanceAccountNo, debtRemainTypeCode});
+        for (Map<String, Object> innerMap : refList) {
+            IBaseEntity entity = baseEntityLoadDao.load(((BigDecimal) innerMap.get(EAV_BE_ENTITIES.ID.getName())).longValue());
+            refsMap.put(new BalDebtRemains(entity.getEl("balance_account.no_").toString(), entity.getEl("debt_remains_type.code").toString()), entity);
+        }
 
-        return ans > 0;
+        System.out.println("Initialization time for ref_ba_dtr: " + (System.currentTimeMillis() - t1));
+    }
 
-
+    public boolean hasBADRT(String balanceAccountNo, String debtRemainTypeCode) {
+         return refsMap.get(new BalDebtRemains(balanceAccountNo, debtRemainTypeCode)) != null;
     }
 
     public static boolean isValidRNN(String rnn) {
