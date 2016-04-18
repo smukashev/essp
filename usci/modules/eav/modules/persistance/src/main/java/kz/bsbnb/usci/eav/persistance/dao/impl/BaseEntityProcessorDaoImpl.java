@@ -105,12 +105,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         final boolean isReference = metaClass.isReference();
         creditorId = isReference ? 0 : creditorId;
 
+        baseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
+
         if (isReference) {
-            long refRepositoryTime = System.currentTimeMillis();
             IBaseEntity referenceEntity = refRepository.findRef(baseEntity);
 
             if (referenceEntity != null) {
-                sqlStats.put("java::refRepositoryTime", (System.currentTimeMillis() - refRepositoryTime));
                 baseEntity.setId(referenceEntity.getId());
                 return baseEntity;
             }
@@ -124,8 +124,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 if (baseValue.getValue() != null) {
                     if (metaType.isSet()) {
                         IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
+                        childBaseSet.setCreditorId(creditorId);
                         for (IBaseValue childBaseValue : childBaseSet.get()) {
                             IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
+
+                            childBaseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
 
                             if (childBaseEntity.getValueCount() != 0)
                                 prepare((IBaseEntity) childBaseValue.getValue(), creditorId);
@@ -133,12 +136,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     } else {
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
+                        childBaseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
+
                         if (childBaseEntity.getValueCount() != 0) prepare(childBaseEntity, creditorId);
                     }
                 }
             }
 
-            if (isReference) baseValue.setCreditorId(creditorId);
+            baseValue.setCreditorId(creditorId);
         }
 
         if (metaClass.isSearchable()) {
@@ -153,9 +158,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             if (baseEntityId > 0)
                 baseEntity.setId(baseEntityId);
         }
-
-        if (isReference)
-            baseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
 
         return baseEntity;
     }
@@ -369,7 +371,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    public List<Long> getEntityIDsByMetaclass(long metaClassId) {
+    public List<Long> getEntityIDsByMetaClass(long metaClassId) {
         ArrayList<Long> entityIds = new ArrayList<>();
 
         Select select = context
@@ -380,15 +382,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        for (Map<String, Object> row : rows) {
+        for (Map<String, Object> row : rows)
             entityIds.add(((BigDecimal) row.get(EAV_BE_ENTITIES.ID.getName())).longValue());
-        }
 
         return entityIds;
     }
 
     public List<BaseEntity> getEntityByMetaClass(MetaClass meta) {
-        List<Long> ids = getEntityIDsByMetaclass(meta.getId());
+        List<Long> ids = getEntityIDsByMetaClass(meta.getId());
 
         ArrayList<BaseEntity> entities = new ArrayList<>();
 
@@ -399,11 +400,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public boolean isApproved(long id) {
+    public boolean isApproved(long creditorId) {
         Select select = context
                 .select(EAV_A_CREDITOR_STATE.ID)
                 .from(EAV_A_CREDITOR_STATE)
-                .where(EAV_A_CREDITOR_STATE.CREDITOR_ID.equal(id));
+                .where(EAV_A_CREDITOR_STATE.CREDITOR_ID.equal(creditorId));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -416,12 +417,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public boolean remove(long baseEntityId) {
         IBaseEntityDao baseEntityDao = persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
         return baseEntityDao.deleteRecursive(baseEntityId);
-    }
-
-    @Override
-    public Set<Long> getChildBaseEntityIds(long parentBaseEntityIds) {
-        IBaseEntityDao baseEntityDao = persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
-        return baseEntityDao.getChildBaseEntityIds(parentBaseEntityIds);
     }
 
     public IBaseEntityLoadDao getBaseEntityLoadDao() {

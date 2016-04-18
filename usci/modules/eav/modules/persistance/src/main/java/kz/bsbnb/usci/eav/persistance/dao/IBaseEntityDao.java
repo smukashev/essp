@@ -13,13 +13,5 @@ public interface IBaseEntityDao extends IPersistableDao {
 
     IMetaClass getMetaClass(long baseEntityId);
 
-    boolean isUsed(long baseEntityId);
-
-    boolean isUsed(long baseEntityId, long exceptContainingId);
-
     boolean deleteRecursive(long baseEntityId);
-
-    boolean deleteRecursive(long baseEntityId, IMetaClass metaClass);
-
-    Set<Long> getChildBaseEntityIds(long parentBaseEntityId);
 }

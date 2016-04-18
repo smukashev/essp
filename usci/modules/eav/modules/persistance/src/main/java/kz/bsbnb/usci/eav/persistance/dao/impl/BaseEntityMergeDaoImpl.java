@@ -632,10 +632,11 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 					if (deleteUnused) {
 						BaseEntity be = (BaseEntity) baseValueRight.getValue();
 
-						if (!isEntityUsedElse(be.getId(), baseValueRight.getBaseContainer().getId())) {
+						// todo
+						/*if (!isEntityUsedElse(be.getId(), baseValueRight.getBaseContainer().getId())) {
 							be.setOperation(OperationType.DELETE);
 							registerAsDeleted(baseEntityManager, metaType, baseValueRight);
-						}
+						}*/
 					}
 				}
 
@@ -666,10 +667,11 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 					if (deleteUnused) {
 						BaseEntity be = (BaseEntity) baseValueLeft.getValue();
 
-						if (!isEntityUsedElse(be.getId(), baseValueLeft.getBaseContainer().getId())) {
+						// todo
+						/*if (!isEntityUsedElse(be.getId(), baseValueLeft.getBaseContainer().getId())) {
 							be.setOperation(OperationType.DELETE);
 							registerAsDeleted(baseEntityManager, metaType, baseValueLeft);
-						}
+						}*/
 					}
 				}
 
@@ -725,12 +727,5 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 				}
 			}
 		}
-	}
-
-	private boolean isEntityUsedElse(long entityIdToCheck, long entityIdContaining) {
-		IBaseEntityDao baseEntityDao = persistableDaoPool
-				.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
-		boolean used = baseEntityDao.isUsed(entityIdToCheck, entityIdContaining);
-		return used;
 	}
 }
