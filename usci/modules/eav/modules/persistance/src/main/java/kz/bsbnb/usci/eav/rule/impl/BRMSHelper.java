@@ -1,8 +1,11 @@
 package kz.bsbnb.usci.eav.rule.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.jooq.DSLContext;
@@ -27,6 +30,9 @@ public class BRMSHelper extends JDBCSupport implements InitializingBean {
 
     @Autowired
     private IMetaClassRepository metaClassRepository;
+
+    @Autowired
+    private IBaseEntityProcessorDao baseEntityProcessorDao;
 
     private Map<BalDebtRemains, IBaseEntity> refsMap = new HashMap<>();
 
@@ -65,19 +71,13 @@ public class BRMSHelper extends JDBCSupport implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         long t1 = System.currentTimeMillis();
-        final String ebe = "EBE";
-        IMetaClass refBaDrtMetaClass = metaClassRepository.getMetaClass("ref_ba_drt");
-        long val1 = 1;
-        Select select = context.select(EAV_BE_ENTITIES.as(ebe).ID)
-                .from(EAV_BE_ENTITIES.as(ebe))
-                .where(EAV_BE_ENTITIES.as(ebe).CLASS_ID.equal(val1));
 
-        List<Map<String, Object>> refList = jdbcTemplate.queryForList(select.getSQL(), refBaDrtMetaClass.getId());
+        MetaClass refBaDrtMetaClass = metaClassRepository.getMetaClass("ref_ba_drt");
 
-        for (Map<String, Object> innerMap : refList) {
-            IBaseEntity entity = baseEntityLoadDao.load(((BigDecimal) innerMap.get(EAV_BE_ENTITIES.ID.getName())).longValue());
+        List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaClass(refBaDrtMetaClass);
+
+        for (BaseEntity entity : entities)
             refsMap.put(new BalDebtRemains(entity.getEl("balance_account.no_").toString(), entity.getEl("debt_remains_type.code").toString()), entity);
-        }
 
         System.out.println("Initialization time for ref_ba_dtr: " + (System.currentTimeMillis() - t1));
     }

@@ -34,31 +34,28 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     private final Logger logger = LoggerFactory.getLogger(EntityServiceImpl.class);
 
     @Autowired
-    IBaseEntityProcessorDao baseEntityProcessorDao;
+    private IBaseEntityProcessorDao baseEntityProcessorDao;
 
     @Autowired
-    IRefProcessorDao refProcessorDao;
+    private IRefProcessorDao refProcessorDao;
 
     @Autowired
-    IBaseEntitySearcherPool searcherPool;
+    private IBaseEntitySearcherPool searcherPool;
 
     @Autowired
-    IMetaClassDao metaClassDao;
+    private SQLQueriesStats stats;
 
     @Autowired
-    SQLQueriesStats stats;
+    private IMailDao mailDao;
 
     @Autowired
-    IMailDao mailDao;
+    private IBaseEntityLoadDao baseEntityLoadDao;
 
     @Autowired
-    IBaseEntityLoadDao baseEntityLoadDao;
+    private IBatchService batchService;
 
     @Autowired
-    IBatchService batchService;
-
-    @Autowired
-    IPersistableDaoPool persistableDaoPool;
+    private IPersistableDaoPool persistableDaoPool;
 
     public EntityServiceImpl() throws RemoteException {
         super();
