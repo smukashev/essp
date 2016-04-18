@@ -425,10 +425,4 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
 
         return filtered;
     }
-
-    @Override
-    public boolean historyExists(long metaId, long entityId) {
-        List<Map<String, Object>> rows = getRefListResponseWithHis(metaId, entityId);
-        return rows.size() > 1;
-    }
 }
