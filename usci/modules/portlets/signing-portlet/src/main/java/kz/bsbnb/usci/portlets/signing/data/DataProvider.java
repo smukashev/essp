@@ -11,11 +11,19 @@ import java.util.List;
 public interface DataProvider {
    List<Creditor> getCreditorsList(long userId);
     
-    List<FileSignatureRecord> getFilesToSign(long userId);
+    List<FileSignatureRecord> getFilesToSign(long creditorId);
 
     String getBaseUrl();
     
     void addInputFileToQueue(FileSignatureRecord record);
 
     void signFile(long fileId, String sign);
+
+    public String getCreditorsBinNumber(Creditor creditor);
+
+    public void cancelFile(FileSignatureRecord file);
+    
+    public String getOcspServiceUrl();
+
+
 }

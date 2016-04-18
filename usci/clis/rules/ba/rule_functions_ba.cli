@@ -1,0 +1,77 @@
+rule read $$$
+title: функций проверки балансовых счетов
+
+function boolean isCurrencyConvertible(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaClassRepository metaClassRepository, String currencyCode, Date reportDate){
+    try{
+        if( currencyCode == null || currencyCode.length() > 5 || currencyCode.length() <=5)
+              return true;
+
+        //Инициализавать сущность, тип <валюта> - для поиска
+        BaseEntity be = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"), reportDate);
+
+        //заполнять параметры поиска
+        be.put("short_name",new BaseValue(currencyCode));
+
+        //находить все иденификаторы сущности (проставлять идшники)
+        IBaseEntity preparedBe  = baseEntityProcessorDao.prepare(be, be.getBaseEntityReportDate().getCreditorId());
+
+        //подгружать остальные поля сущности
+        IBaseEntity loadedBe = baseEntityProcessorDao.getBaseEntityLoadDao().loadByMaxReportDate(preparedBe.getId(), preparedBe.getReportDate());
+
+        //возратить признак
+        return loadedBe.getEl("is_convertible").equals(true);
+
+    } catch(Exception e){
+        return false;
+    }
+}
+
+function boolean isBA5thSymbolCorrect(String ba, BaseEntity entity){
+    if(ba.length() < 5) return true;
+    if(ba.length() == 7 && ba.endsWith("000")) return true;
+
+    List subjects = (List) entity.getEls("{get}subject.organization_info");
+    boolean isResident = false;
+
+    if(subjects.size() > 0) {
+        BaseEntity subject = (BaseEntity) subjects.get(0);
+        isResident = isResident || (Integer)subject.getEls("{count}country[code_numeric=398]") > 0;
+    }
+
+    subjects = (List) entity.getEls("{get}subject.person_info");
+
+    if(subjects.size() > 0) {
+        BaseEntity subject = (BaseEntity) subjects.get(0);
+        isResident = isResident || (Integer)subject.getEls("{count}country[code_numeric=398]") > 0;
+    }
+
+    if(isResident && ba.charAt(4) == '1')
+        return true;
+    if(!isResident && ba.charAt(4) == '2')
+        return true;
+
+    return false;
+}
+
+function boolean isBA7thSymbolCorrect(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaClassRepository metaClassRepository, String ba,String currencyCode, Date reportDate){
+    if(ba.length() < 7) return true;
+    if(ba.length() == 7 && ba.endsWith("000")) return true;
+
+    if(currencyCode.equals("KZT"))
+       return ba.charAt(6) == '1';
+
+    boolean isConvertible = isCurrencyConvertible(baseEntityProcessorDao, metaClassRepository, currencyCode, reportDate);
+
+    if(isConvertible)
+        return ba.charAt(6) == '2';
+
+    return ba.charAt(6) == '3';
+
+}
+
+$$$
+
+rule save
+
+
+quit

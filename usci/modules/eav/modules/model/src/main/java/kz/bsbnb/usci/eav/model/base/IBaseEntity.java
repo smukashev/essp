@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface IBaseEntity extends IBaseContainer {
@@ -50,4 +51,6 @@ public interface IBaseEntity extends IBaseContainer {
     List<IBaseEntity> getKeyElements();
 
     boolean equalsByReference(IBaseEntity baseEntity);
+
+    Set<String> getValidationErrors();
 }

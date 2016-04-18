@@ -5,19 +5,16 @@ import com.google.gson.stream.JsonReader;
 import kz.bsbnb.usci.bconv.cr.parser.impl.MainParser;
 import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.bconv.xsd.Xsd2MetaClass;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.PackageVersion;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.Rule;
-import kz.bsbnb.usci.brms.rulemodel.model.impl.RulePackage;
-import kz.bsbnb.usci.brms.rulemodel.service.IPackageService;
-import kz.bsbnb.usci.brms.rulemodel.service.IRuleService;
-import kz.bsbnb.usci.brms.rulesvr.rulesingleton.RulesSingleton;
 import kz.bsbnb.usci.cli.app.command.impl.*;
 import kz.bsbnb.usci.cli.app.common.impl.SqlRunner;
 import kz.bsbnb.usci.cli.app.exporter.EntityExporter;
 import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
+import kz.bsbnb.usci.eav.rule.impl.RulesSingleton;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.core.service.IPackageService;
+import kz.bsbnb.usci.core.service.IRuleService;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
@@ -35,6 +32,9 @@ import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.searcher.impl.ImprovedBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.storage.IStorage;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.rule.PackageVersion;
+import kz.bsbnb.usci.eav.rule.Rule;
+import kz.bsbnb.usci.eav.rule.RulePackage;
 import kz.bsbnb.usci.eav.showcase.EntityProcessorListenerImpl;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
@@ -44,7 +44,6 @@ import kz.bsbnb.usci.eav.tool.generator.nonrandom.xml.impl.BaseEntityXmlGenerato
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.eav.util.Errors;
-import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;
 import kz.bsbnb.usci.sync.service.IBatchService;
@@ -145,7 +144,7 @@ public class CLI {
 
     private IBatchService batchService;
 
-    private IPackageService ruleBatchService;
+    private IPackageService packageService;
 
     //private IBatchVersionService batchVersionService;
 
@@ -855,7 +854,7 @@ public class CLI {
     }
 
     public void removeEntityById(long id, String url) {
-        jobDispatcher.addThread(new DeleteJob(getEntityService(url), id));
+        // todo: remove
     }
 
     public void dumpEntityToXML(String ids, String fileName) {
@@ -1099,7 +1098,7 @@ public class CLI {
             return;
         }
 
-        List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaclass(meta);
+        List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaClass(meta);
 
         if (entities.size() == 0) {
             System.out.println("No such entities with class: " + name);
@@ -1875,11 +1874,11 @@ public class CLI {
             entityServiceFactoryBean.afterPropertiesSet();
 
             RmiProxyFactoryBean ruleBatchServiceFactoryBean = new RmiProxyFactoryBean();
-            ruleBatchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchService");
+            ruleBatchServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/packageService");
             ruleBatchServiceFactoryBean.setServiceInterface(IPackageService.class);
 
             ruleBatchServiceFactoryBean.afterPropertiesSet();
-            ruleBatchService = (IPackageService) ruleBatchServiceFactoryBean.getObject();
+            packageService = (IPackageService) ruleBatchServiceFactoryBean.getObject();
 
             initBatchService();
 
@@ -1891,7 +1890,7 @@ public class CLI {
             batchVersionService = (IBatchVersionService) batchVersionServiceFactoryBean.getObject();*/
 
             RmiProxyFactoryBean ruleServiceFactoryBean = new RmiProxyFactoryBean();
-            ruleServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/ruleService");
+            ruleServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1099/ruleService");
             ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
 
             ruleServiceFactoryBean.afterPropertiesSet();
@@ -2041,7 +2040,7 @@ public class CLI {
 
                 boolean exists = false;
                 Long id;
-                for (RulePackage ruleBatch : ruleBatchService.getAllPackages()) {
+                for (RulePackage ruleBatch : packageService.getAllPackages()) {
                     if (ruleBatch.getName().equals(batch.getName())) {
                         exists = true;
                         break;
@@ -2049,7 +2048,7 @@ public class CLI {
                 }
 
                 if (!exists) {
-                    id = ruleBatchService.save(batch);
+                    id = packageService.save(batch);
                     batch.setId(id);
                     //batchVersionService.save(batch);
                     System.out.println("ok package created with id:" + id);
@@ -2400,7 +2399,7 @@ public class CLI {
 
     private void sendToShowcase(Long creditorId, String metaClassName, Date reportDate) {
         MetaClass metaClass = metaClassRepository.getMetaClass(metaClassName);
-        List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaclass(metaClass.getId());
+        List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaClass(metaClass.getId());
         for (Long entityId : entityIdList) {
             sendToShowcaseEntity(creditorId, entityId, reportDate);
         }
@@ -2984,48 +2983,4 @@ public class CLI {
             }
         }
     }
-
-    class DeleteJob extends Thread implements DispatcherJob {
-
-        private IEntityService entityServiceCore = null;
-        private long id;
-        private Set<Long> ids = null;
-
-        DeleteJob(IEntityService entityServiceCore, long id) {
-            this.entityServiceCore = entityServiceCore;
-            this.id = id;
-        }
-
-        @Override
-        public void run() {
-            try {
-                System.out.println("Deleting entity with id: " + id);
-                entityServiceCore.remove(id);
-                System.out.println("Deleted entity with id: " + id);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        @Override
-        public boolean intersects(DispatcherJob job) {
-            if (job instanceof DeleteJob) {
-                if (ids == null || ((DeleteJob) job).ids == null)
-                    throw new RuntimeException(Errors.compose(Errors.E210));
-
-                Set<Long> inter = SetUtils.intersection(ids, ((DeleteJob) job).ids);
-
-                return inter.size() > 0;
-            }
-
-            return false;
-        }
-
-        @Override
-        public void prepare() {
-            ids = entityServiceCore.getChildBaseEntityIds(id);
-        }
-    }
-
 }

@@ -18,7 +18,7 @@ import java.util.Date;
  * Created by dtulendiyev on 3/28/16.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/applicationContextEAVPersistanse.xml")
+@ContextConfiguration("/applicationContextEAVPersistance.xml")
 public class BaseEntityDaoImplTest {
 
     @Autowired

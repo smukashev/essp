@@ -3,11 +3,16 @@ package kz.bsbnb.usci.receiver.reader.impl.beans;
 import java.util.Date;
 
 public class InfoData {
-
     private Date reportDate;
+
+    private Date accountDate;
+
     private Long actualCreditCount;
+
     private String code;
+
     private String docType;
+
     private String docValue;
 
     public Date getReportDate() {
@@ -50,4 +55,11 @@ public class InfoData {
         this.docValue = docValue;
     }
 
+    public Date getAccountDate() {
+        return accountDate;
+    }
+
+    public void setAccountDate(Date accountDate) {
+        this.accountDate = accountDate;
+    }
 }

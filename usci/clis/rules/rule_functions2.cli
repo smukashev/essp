@@ -1,0 +1,77 @@
+rule read $$$
+title: Общие функций(часть 2)
+
+function boolean hasBACT(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaClassRepository metaClassRepository, String baNo, String creditCode, BaseEntity entity){
+    try{
+        if(baNo == null || baNo.length() > 11 || baNo.length() <=11)
+            return true;
+
+        //получить отчетную дату
+        Date reportDate = entity.getReportDate();
+
+        //Инициализация сущности - для поиска
+        //  поиск соответсвия из справочника бал счетов и типа кредита
+        //  все классы с префиксом ref - справочники
+        BaseEntity be = new BaseEntity(metaClassRepository.getMetaClass("ref_ba_ct"), reportDate);
+
+        //Создание сущности балансовый счет (пустой)
+        IBaseEntity beAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"), reportDate);
+
+        //Создание сущности тип кредита (пустой)
+        IBaseEntity creditType = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_type"), reportDate);
+
+        //заполняем параметры поиска
+        beAccount.put("no_", new BaseValue(reportDate, baNo));
+        creditType.put("code", new BaseValue(reportDate, creditCode));
+
+        //заполняем параметры поиска для родительской сущности
+        be.put("balance_account",  new BaseValue(reportDate, beAccount));
+        be.put("credit_type",  new BaseValue(reportDate, creditType));
+
+        //Поиск сущности (entityService - это сервис ЕССП)
+        IBaseEntity res = baseEntityProcessorDao.prepare(be, be.getBaseEntityReportDate().getCreditorId());
+
+        //если идентификатор больше нуля - данное соответвие присутсвтует в базе
+        return res.getId() > 0;
+    } catch (Exception e) {
+        entity.addValidationError(e.getMessage());
+    }
+
+    return false;
+}
+
+function boolean isExclusiveIIN(String iin) {
+    try{
+        //  поиск ислючитльного иин
+        //  все классы с префиксом ref - справочники
+
+        IBaseEntityProcessorDao baseEntityProcessorDao = BRMSHelper.rulesLoadDao;
+        IMetaClassRepository metaClassRepository = BRMSHelper.rulesMetaDao;
+
+
+        //Инициализация сущности - для поиска
+        BaseEntity be = new BaseEntity(metaClassRepository.getMetaClass("ref_exclusive_doc"), new Date());
+
+        BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), new Date());
+
+        docType.put("code", new BaseValue("06"));
+
+        //заполняем параметры поиска
+        be.put("code",new BaseValue(iin));
+        be.put("doc_type", new BaseValue(docType));
+
+        //Поиск сущности
+        IBaseEntity res = baseEntityProcessorDao.prepare(be, 0L);
+
+        //если идентификатор больше нуля - данное соответвие присутсвтует в базе
+        return res.getId() > 0;
+    } catch (Exception e) {
+        return false;
+    }
+}
+
+$$$
+
+rule save
+
+quit

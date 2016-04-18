@@ -141,7 +141,7 @@ public class MetaClassGenerator extends AbstractDataGenerator
             {
                 IMetaAttribute type = generateMetaAttribute(recPrivate + 1, recGeneral + 1, classNames);
 
-                metaClass.setMetaAttribute("attribute_" + System.nanoTime(), type);
+                metaClass.setMetaAttribute("attribute_" + System.currentTimeMillis(), type);
             }
 
             complexTypeCount++;

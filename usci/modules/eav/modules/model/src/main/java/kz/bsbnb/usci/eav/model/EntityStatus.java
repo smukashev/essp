@@ -14,6 +14,7 @@ public class EntityStatus extends Persistable {
     private String devDescription;
     private Date receiptDate;
     private Long index;
+    private String contractNumber;
 
     private EntityStatuses status;
 
@@ -24,6 +25,14 @@ public class EntityStatus extends Persistable {
     public EntityStatus setBatchId(long batchId) {
         this.batchId = batchId;
         return this;
+    }
+
+    public String getContractNumber() {
+        return contractNumber;
+    }
+
+    public void setContractNumber(String contractNumber) {
+        this.contractNumber = contractNumber;
     }
 
     public long getEntityId() {
@@ -115,9 +124,9 @@ public class EntityStatus extends Persistable {
         } else if (status == EntityStatuses.PROCESSING) {
             return "В обработке";
         } else if (status == EntityStatuses.TOTAL_COUNT) {
-            return "Общее количество";
+            return "";
         } else if (status == EntityStatuses.ACTUAL_COUNT) {
-            return "Заявленоое количество";
+            return "";
         } else {
             return "Неизвестный тип";
         }

@@ -1084,6 +1084,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         validationErrors.clear();
     }
 
+    @Override
     public Set<String> getValidationErrors() {
         return validationErrors;
     }

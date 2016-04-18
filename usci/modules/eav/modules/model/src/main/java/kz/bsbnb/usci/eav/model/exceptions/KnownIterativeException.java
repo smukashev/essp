@@ -1,13 +1,12 @@
 package kz.bsbnb.usci.eav.model.exceptions;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
-/**
- * Created by bauka on 1/24/16.
- */
 public class KnownIterativeException extends KnownException {
 
-    private List<String> messages;
+    private Collection<String> messages;
 
     public KnownIterativeException(String message) {
         super(message);
@@ -18,7 +17,12 @@ public class KnownIterativeException extends KnownException {
         this.messages = messages;
     }
 
-    public List<String> getMessages(){
+    public KnownIterativeException(Set<String> messages) {
+        super("");
+        this.messages = messages;
+    }
+
+    public Collection<String> getMessages(){
         return messages;
     }
 

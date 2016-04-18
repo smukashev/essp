@@ -1,0 +1,590 @@
+#portion cr hard coded rules
+
+rule read $$$
+title: debt_pastdue_vs_report_date
+rule "DEBTREMAINS_DEBT_PASDUE_OPEN_DATE_MORE_THAN_OR_EQUAL_TO_REPORT_DATE"
+//MES825
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEl("change.remains.debt.pastdue.open_date") != null
+        && getEl("change.remains.debt.pastdue.open_date") >= reportDate)
+then
+  $entity.addValidationError("Дата вынесения на счет просроченной задолженности по основному долгу не должна быть равна или позднее отчетной даты");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: debt_pastdue_od_vs_cd
+rule "DEBT_REMAINS_DEBT_PASTDUE_CLOSE_DATE_LESS_THAN_OPEN_DATE"
+//MES827
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("change.remains.debt.pastdue.open_date")!=null
+    && getEl("change.remains.debt.pastdue.close_date")!=null
+    && getEl("change.remains.debt.pastdue.open_date") > getEl("change.remains.debt.pastdue.close_date") )
+then
+  $entity.addValidationError("Дата погашения просроченной задолженности по основному долгу не должна быть ранее даты вынесения на счет просроченной задолженности по основному долгу");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: debt_pastdue_cd_rd
+rule "DEBT_REMAINS_DEBT_PASTDUE_CLOSE_DATE_MORE_THAN_REPORT_DATE"
+//MES828
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.debt.pastdue.close_date") != null
+                && getEl("change.remains.debt.pastdue.close_date") > getReportDate())
+then
+   $entity.addValidationError("Дата погашения просроченной задолженности по основному долгу не должна быть позднее отчетной даты")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: debt_pastdue_val1
+rule "DEBT_REMAINS_DEBT_PASTDUE_VALUE_NULL_WHEN_CLOSE_DATE_IS_NOT_SET"
+//MES829
+when
+  $entity: BaseEntity( getMeta().getClassName() == "credit"
+                        && (getEl("change.remains.debt.pastdue.value") == null
+                            || getEl("change.remains.debt.pastdue.value") == 0.0 )
+                        &&    getEl("change.remains.debt.pastdue.close_date") == null
+                        &&    getEl("change.remains.debt.pastdue.open_date") != null)
+then
+   $entity.addValidationError("При наличии даты вынесения на счет просроченной задолженности по основному долгу и отсутствии даты погашения просроченной задолженности по основному долгу» значение остатка не может быть пустым или равным нулю.")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: debt_pastdue_val2
+rule "DEBT_REMAINS_DEBT_PASTDUE_OPEN_DATE_IS_NULL_WHEN_VALUE_IS_NON_ZERO"
+//MES833
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.debt.pastdue.open_date") == null
+                && getEl("change.remains.debt.pastdue.value")!=null
+                && getEl("change.remains.debt.pastdue.value")!= 0.0 )
+then
+   $entity.addValidationError("Отсутствует дата вынесения на счет просроченной задолженности по основному долгу")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: interest_pastdue_vs_rd
+rule "DEBTREMAINS_INTEREST_PASDUE_OPEN_DATE_MORE_THAN_OR_EQUAL_TO_REPORT_DATE"
+//MES826
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEl("change.remains.interest.pastdue.open_date") != null
+        && getEl("change.remains.interest.pastdue.open_date") >= reportDate)
+then
+  $entity.addValidationError("Дата вынесения на счет просроченной задолженности по вознаграждению не должна быть равна или позднее отчетной даты");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: interest_pastdue_od_vs_cd
+rule "DEBT_REMAINS_INTEREST_PASTDUE_CLOSE_DATE_LESS_THAN_OPEN_DATE"
+//MES830
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEl("change.remains.interest.pastdue.open_date")!=null
+    && getEl("change.remains.interest.pastdue.close_date")!=null
+    && getEl("change.remains.interest.pastdue.open_date") > getEl("change.remains.interest.pastdue.close_date") )
+then
+  $entity.addValidationError("Дата погашения просроченной задолженности по начисленному вознаграждению не может быть ранее даты вынесения на счет");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: interest_pastdue_cd_rd
+rule "DEBT_REMAINS_INTEREST_PASTDUE_CLOSE_DATE_MORE_THAN_REPORT_DATE"
+//MES831
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEl("change.remains.interest.pastdue.close_date") != null
+            && getEl("change.remains.interest.pastdue.close_date") >= getReportDate())
+then
+   $entity.addValidationError("Дата погашения просроченной задолженности по начисленному вознаграждению не может быть равна или позднее отчетной даты")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: interest_pastdue_val1
+rule "DEBT_REMAINS_INTEREST_PASTDUE_VALUE_NULL_WHEN_CLOSE_DATE_IS_NOT_SET"
+//MES832
+when
+  $entity: BaseEntity( getMeta().getClassName() == "credit"
+                        && (getEl("change.remains.interest.pastdue.value") == null
+                          || getEl("change.remains.interest.pastdue.value") == 0.0 )
+                        &&    getEl("change.remains.interest.pastdue.close_date") == null
+                        &&    getEl("change.remains.interest.pastdue.open_date") != null)
+then
+   $entity.addValidationError("При наличии даты вынесения на счет просроченной задолженности по начисленному вознаграждению и отсутствии даты погашения просроченной задолженности по начисленному вознаграждению значение остатка не может быть пустым или равным нулю.")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: interest_pastdue_val2
+rule "DEBT_REMAINS_INTEREST_PASTDUE_OPEN_DATE_IS_NULL_WHEN_VALUE_IS_NON_ZERO"
+//MES834
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.interest.pastdue.open_date") == null
+                && getEl("change.remains.interest.pastdue.value")!=null
+                && getEl("change.remains.interest.pastdue.value")!= 0.0 )
+then
+   $entity.addValidationError("Отсутствует дата вынесения на счет просроченной задолженности по вознаграждению")
+end
+$$$
+
+rule save
+
+rule read $$$
+title: ACTUAL_ISSUE_DATE_MISMATCH
+rule "ACTUAL_ISSUE_DATE_MISMATCH"
+//MES817
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEl("actual_issue_date")!=null && getEl("primary_contract.date")!=null
+        && getEl("actual_issue_date") < getEl("primary_contract.date"))
+then
+    $entity.addValidationError("Ошибка по фактической дате выдачи: фактическая дата выдачи должна быть позднее или равна дате договора");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: CONTRACT_MATURITY_DATE_MISMATCH
+rule "CONTRACT_MATURITY_DATE_MISMATCH"
+//MES818
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEl("contract_maturity_date") != null
+        && getEl("contract_maturity_date") < getEl("primary_contract.date"))
+then
+  $entity.addValidationError("Ошибка по дате погашения по условиям договора: дата погашения по договору должна быть позднее или равна дате договора")
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: CONTRACT_MATURITY_DATE_MISMATCH_ACTUAL_ID
+rule "CONTRACT_MATURITY_DATE_MISMATCH_ACTUAL_ID"
+//MES818
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEl("contract_maturity_date") != null
+        && getEl("actual_issue_date") != null
+        && getEl("contract_maturity_date") < getEl("actual_issue_date"))
+then
+  $entity.addValidationError("Ошибка по дате погашения по условиям договора: дата погашения по договору должна быть позднее или равна фактической дате выдачи")
+end
+
+$$$
+
+rule save
+
+
+rule read $$$
+title: MATURITY_DATE_MISMATCH
+rule "MATURITY_DATE_MISMATCH"
+//MES819
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && mDate : getEl("maturity_date")
+        && pDate : getEl("primary_contract.date")
+        && mDate!=null && pDate !=null
+        && mDate < pDate)
+then
+  $entity.addValidationError("Ошибка по дате фактического погашения: дата фактического погашения должна быть позднее или равна дате договора");
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: PROLONGATION_DATE_MISMATCH
+rule "PROLONGATION_DATE_MISMATCH_820"
+//MES820
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && pDate: getEl("prolongation_date") !=null
+            && mDate: getEl("contract_maturity_date")!=null
+        && pDate < mDate)
+then
+  $entity.addValidationError("Неверная дата окончания пролонгации");
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: PLEDGE_ABSENSE
+rule "PLEDGE_ABSENSE"
+//MES810
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEls("{count}pledges") == 0)
+then
+  $entity.addValidationError("Отсутствует блок обеспечения");
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: PLEDGE_NO_ABSENSE
+rule "PLEDGE_NO_ABSENSE"
+//MES814
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEls("{count}pledges[pledge_type.code!=47][contract=null]") > 0)
+then
+  $entity.addValidationError("Отсутствует номер договора залога");
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: PLEDGE_SUM_ABSENSE
+rule "PLEDGE_SUM_ABSENSE"
+//MES814
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEls("{count}pledges[pledge_type.code!=47][value=null]") > 0)
+then
+  $entity.addValidationError("Отсутствует залоговая сумма");
+end
+
+$$$
+
+rule save
+
+
+rule read $$$
+title: PLEDGE_BLANK_WITH_NON_BLANK
+rule "PLEDGE_BLANK_WITH_NON_BLANK"
+//MES837
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && getEls("{count}pledges") > 1
+    && getEls("{count}pledges[pledge_type.code=47]") > 0)
+then
+  $entity.addValidationError("Ошибка по обеспечению: Значение «Без залога» не может использоваться с иными значениями");
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: DEBTOR_DOC_ABSENSE
+rule "DEBTOR_DOC_ABSENSE"
+//MES903
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEls("{count}subject") > 0
+        && getEls("{count}subject.docs") == 0)
+then
+  $entity.addValidationError("Отсутствует документ субъекта кредитной истории");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: SUBJECT_DOC_NO_EMPTY
+rule "SUBJECT_DOC_NO_EMPTY"
+//MES914
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEls("{count}subject.docs[no=null]") > 0)
+then
+  $entity.addValidationError("Не указан номер документа субъекта");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: BANK_RELATION_BLOCK_INVALID
+rule "BANK_RELATION_BLOCK_INVALID"
+//MES921
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && (
+            (getEls("{count}subject[is_person=true]person_info.bank_relations.bank_relation") > 1
+            && getEls("{count}subject[is_person=true]person_info.bank_relations[bank_relation.code=50]") > 0)
+            ||
+            (getEls("{count}subject[is_organization=true]organization_info.bank_relations.bank_relation") > 1
+            && getEls("{count}subject[is_organization=true]organization_info.bank_relations[bank_relation.code=50]") > 0)
+            ||
+            (getEls("{count}subject[is_creditor=true]creditor_info.bank_relations.bank_relation") > 1
+            && getEls("{count}subject[is_creditor=true]creditor_info.bank_relations[bank_relation.code=50]") > 0)
+        ))
+then
+  $entity.addValidationError("Ошибка по признаку связанности: Значение \"Не связан\" не может использоваться с иными значениями");
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: BANK_RELATION_DUPLICATE
+rule "BANK_RELATION_DUPLICATE"
+//MES921
+//beef dobavit creditora
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+  && (
+        getEls("{hasDuplicates(subject[is_person=true]person_info.bank_relations)}bank_relation.code") == true ||
+        getEls("{hasDuplicates(subject[is_organization=true]organization_info.bank_relations)}bank_relation.code") == true ||
+        getEls("{hasDuplicates(subject[is_creditor=true]creditor_info.bank_relations)}bank_relation.code") == true
+     ))
+then
+  $entity.addValidationError("Ошибка по признаку связанности: Дублируется значение");
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: PLEDGE_DUPLICATE
+rule "PLEDGE_DUPLICATE"
+//MES836
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+  && getEls("{hasDuplicates(pledges)}pledge_type.code,contract") == true)
+then
+  $entity.addValidationError("Ошибка по обеспечению: Дублируются записи \"Номер договора залога\", \"Вид обеспечения\"");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: SUBJECT_DUPLICATE_DOCS
+rule "SUBJECT_DUPLICATE_DOCS"
+//MES922
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEls("{hasDuplicates(subject.docs)}doc_type.code,no") == true)
+then
+  $entity.addValidationError("Дублирующиеся документы");
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: SUBJECT_DUPLICATE_DOC_TYPES
+rule "SUBJECT_DUPLICATE_DOC_TYPES"
+//MES922
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && getEls("{hasDuplicates(subject.docs)}doc_type.code") == true)
+then
+  $entity.addValidationError("Дублирующиеся виды идентификационных документов");
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: INCORRECT_PROVISION_MSFO
+rule "INCORRECT_PROVISION_MSFO"
+//MES1600
+when
+  $entity: BaseEntity(getMeta().getClassName == "credit"
+      && getEl("portfolio.portfolio_msfo.code") != null
+      && getEl("change.credit_flow.provision.provision_msfo.value") != null
+      && getEl("change.credit_flow.provision.provision_msfo.value") > 0)
+then
+  $entity.addValidationError("Если сумма провизий по неоднородным кредитам по требованиям МСФО больше 0, то код однородного портфеля не заполняется");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: INCORRECT_PROVISION_KFN
+rule "INCORRECT_PROVISION_KFN"
+//MES1600
+when
+  $entity: BaseEntity(getMeta().getClassName == "credit"
+      && getEl("portfolio.portfolio.code") != null
+      && getEl("change.credit_flow.provision.provision_kfn.value") != null
+      && getEl("change.credit_flow.provision.provision_kfn.value") > 0)
+then
+  $entity.addValidationError("Если сумма провизий по неоднородным кредитам по требованиям УО больше 0, то код однородного портфеля не заполняется");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: credit_type
+rule "credit Type check"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit" && getEl("credit_type.code") == null )
+then
+ $entity.addValidationError("Не указан код вида займа (условного обязательства)");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: документ иной
+rule "документ иной"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                && getEls("{count}subject.docs[doc_type.code=16][name=null]") > 0 )
+then
+ $entity.addValidationError("При указании иного документа наименование документа не должен быть пустым");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: название документа
+rule "название документа"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                && getEls("{count}subject.docs[doc_type.code!=16][name!=null]") > 0 )
+then
+ $entity.addValidationError("Наименование документа указывается только для иного документа");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: признак ИП - тип юр лица
+rule "признак ИП - тип юр лица"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                && (getEls("{setString(01,04,07)}subject[is_organization=true]organization_info[is_se=true]enterprise_type.code") > 0
+                   ||
+                    getEls("{setString(02,03,05,06,08,09)}subject[is_organization=true]organization_info[is_se=false]enterprise_type.code") > 0))
+then
+ $entity.addValidationError("Код субъекта частного предпринимательства не соответствует типу субъекта кредитной истории");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: идентификацонный документ для КЗ
+rule "идентификацонный документ для КЗ"
+//17 и 99 убраны
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                 &&   getEls("{setString(06,07,11)}subject.docs.doc_type.code") == 0
+                 && ( getEls("{count}subject[is_person=true]person_info[country.code_numeric=398]") > 0
+                  || getEls("{count}subject[is_organization=true]organization_info[country.code_numeric=398]") > 0)
+                  )
+
+then
+ $entity.addValidationError("У резидента отсутствует обязательный идентификационный документ");
+end
+$$$
+
+rule save
+
+
+rule read $$$
+title: проверка документов по признаку IS_PERSON_DOC/IS_ORG_DOC
+rule "проверка документов по признаку IS_PERSON_DOC/IS_ORG_DOC"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                 && (getEls("{setString(07,10,14,15,16,18)}subject[is_person=true]docs.doc_type.code") > 0
+                  || getEls("{setString(01,02,03,04,05,06,08,12,13)}subject[is_organization=true][organization_info.is_se=false]docs.doc_type.code") > 0
+                  ))
+then
+ $entity.addValidationError("Вид документа не соответствует типу субъекта кредитной истории");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: функций проверки филиала
+
+function boolean creditorBranchIsGood(BaseEntity entity) {
+   try {
+
+      if(entity == null || entity.getId() < 0L || entity.getId() >= 0)
+         return true;
+
+      //Извлечь филиал
+      BaseEntity creditorBranch = (BaseEntity) entity.getEl("creditor_branch");
+
+      //Не обязательно для заполнения
+      if(creditorBranch == null)
+        return true;
+
+      //Извлечь кредитор
+      BaseEntity creditor = (BaseEntity) entity.getEl("creditor");
+
+      //Извлечь головной банк филиала
+      BaseEntity mainOffice = (BaseEntity) creditorBranch.getEl("main_office");
+
+      //Проверить на соответсвие
+      return creditor.getId() == mainOffice.getId();
+   } catch (Exception e){
+     //В случае ошибок
+     return false;
+   }
+}
+$$$
+
+rule save
+
+rule read $$$
+title: проверка филиала
+rule "проверка филиала"
+//Проверка принадлежности филиала кредитору
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit" &&  !creditorBranchIsGood($entity) )
+then
+ $entity.addValidationError("филиал заполнен не верно");
+end
+$$$
+
+rule save
+
+
+quit

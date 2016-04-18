@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
@@ -262,5 +263,13 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
         result = 31 * result + (int) (complexSetsCount ^ (complexSetsCount >>> 32));
 
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "BaseEntityReportDate{" +
+                "id=" + baseEntity.getId() +
+                ", reportDate=" + DataTypes.dateFormatDot.format(reportDate) +
+                '}';
     }
 }

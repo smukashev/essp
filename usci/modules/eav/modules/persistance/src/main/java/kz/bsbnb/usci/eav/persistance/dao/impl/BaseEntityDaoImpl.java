@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -167,69 +168,8 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     }
 
     @Override
-    public boolean isUsed(long baseEntityId, long exceptContainingId) {
-        String complexValuesTableAlias = "cv";
-        String complexSetValuesTableAlias = "csv";
-        String complexSetsTableAlias = "cs";
-
-        Select select = context
-                .selectOne()
-                .where(DSL.exists(context.select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
-                                .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                                .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))
-                                .and(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.notEqual(exceptContainingId))
-                        )
-                ).or(DSL.exists(context.select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
-                        .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias)
-                                .join(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias)).on(
-                                        EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).SET_ID
-                                                .equal(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).ID))
-                        ).where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.
-                                equal(baseEntityId))
-                        .and(EAV_BE_ENTITY_COMPLEX_SETS.as(complexSetsTableAlias).ENTITY_ID.
-                                notEqual(exceptContainingId))));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        return rows.size() > 0;
-    }
-
-    @Override
-    public boolean isUsed(long baseEntityId) {
-        String complexValuesTableAlias = "cv";
-        String complexSetValuesTableAlias = "csv";
-
-        Select select = context
-                .selectOne()
-                .where(DSL.exists(context
-                        .select(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ID)
-                        .from(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                        .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))))
-                .or(DSL.exists(context
-                        .select(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ID)
-                        .from(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias))
-                        .where(EAV_BE_COMPLEX_SET_VALUES.as(complexSetValuesTableAlias).ENTITY_VALUE_ID.equal(baseEntityId))));
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        return rows.size() > 0;
-    }
-
-    @Override
-    //@Transactional
+    @Transactional
     public boolean deleteRecursive(long baseEntityId) {
-        IMetaClass metaClass = getMetaClass(baseEntityId);
-        return deleteRecursive(baseEntityId, metaClass);
-    }
-
-    public boolean deleteRecursive(long baseEntityId, IMetaClass metaClass) {
-        boolean baseEntityUsed = isUsed(baseEntityId);
-        if (baseEntityUsed || metaClass.isReference()) {
-            return false;
-        }
-
         Set<Class<? extends IBaseValue>> baseValueClasses = new HashSet<>();
         baseValueClasses.add(BaseEntityBooleanValue.class);
         baseValueClasses.add(BaseEntityDateValue.class);
@@ -241,45 +181,16 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         baseValueClasses.add(BaseEntityComplexSet.class);
 
         for (Class<? extends IBaseValue> baseValueClass : baseValueClasses) {
-            IBaseValueDao baseValueDao = persistableDaoPool
-                    .getPersistableDao(baseValueClass, IBaseValueDao.class);
+            IBaseValueDao baseValueDao = persistableDaoPool.getPersistableDao(baseValueClass, IBaseValueDao.class);
             baseValueDao.deleteAll(baseEntityId);
         }
 
         IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool
                 .getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+
         baseEntityReportDateDao.deleteAll(baseEntityId);
         delete(baseEntityId);
 
         return true;
-    }
-
-    @Override
-    public Set<Long> getChildBaseEntityIds(long parentBaseEntityId) {
-        Set<Long> allChildBaseEntitiesIds = new HashSet<>();
-
-        // Complex values
-        IBaseEntityComplexValueDao baseEntityComplexValueDao = persistableDaoPool
-                .getPersistableDao(BaseEntityComplexValue.class, IBaseEntityComplexValueDao.class);
-        Set<Long> complexValuesBaseEntitiesIds = baseEntityComplexValueDao
-                .getChildBaseEntityIdsWithoutRefs(parentBaseEntityId);
-        for (Long complexValuesBaseEntitiesId : complexValuesBaseEntitiesIds) {
-            Set<Long> childBaseEntitiesIds = getChildBaseEntityIds(complexValuesBaseEntitiesId);
-            allChildBaseEntitiesIds.addAll(childBaseEntitiesIds);
-        }
-        allChildBaseEntitiesIds.addAll(complexValuesBaseEntitiesIds);
-
-        // Complex sets
-        IBaseEntityComplexSetDao baseEntityComplexSetDao = persistableDaoPool
-                .getPersistableDao(BaseEntityComplexSet.class, IBaseEntityComplexSetDao.class);
-        Set<Long> complexSetsBaseEntitiesIds = baseEntityComplexSetDao
-                .getChildBaseEntityIdsWithoutRefs(parentBaseEntityId);
-        for (Long complexSetsBaseEntitiesId : complexSetsBaseEntitiesIds) {
-            Set<Long> childBaseEntitiesIds = getChildBaseEntityIds(complexSetsBaseEntitiesId);
-            allChildBaseEntitiesIds.addAll(childBaseEntitiesIds);
-        }
-        allChildBaseEntitiesIds.addAll(complexSetsBaseEntitiesIds);
-
-        return allChildBaseEntitiesIds;
     }
 }

@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_M_COMPLEX_SET;
 
 @Component
 public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao {
@@ -163,9 +162,9 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
                 .and(EAV_M_SIMPLE_ATTRIBUTES.IS_KEY.eq(DataUtils.convert(true))).asField("KEY_ATTR");
 
         Field settingAttrField = context.select(EAV_M_SIMPLE_ATTRIBUTES.as("m3").ID)
-                .from(EAV_M_SIMPLE_ATTRIBUTES.as("m3"))
-                .join(EAV_M_CLASSES.as("m4")).on(EAV_M_SIMPLE_ATTRIBUTES.as("m3").CONTAINING_ID.eq(EAV_M_CLASSES.as("m4").ID))
-                .join(EAV_GLOBAL.as("m5")).on(EAV_M_CLASSES.as("m4").NAME.eq(EAV_GLOBAL.as("m5").CODE))
+                .from(EAV_GLOBAL.as("m5"))
+                .join(EAV_M_CLASSES.as("m4")).on(EAV_M_CLASSES.as("m4").NAME.eq(EAV_GLOBAL.as("m5").CODE))
+                .join(EAV_M_SIMPLE_ATTRIBUTES.as("m3")).on(EAV_M_SIMPLE_ATTRIBUTES.as("m3").CONTAINING_ID.eq(EAV_M_CLASSES.as("m4").ID))
                 .where(EAV_M_CLASSES.as("m4").ID.eq(EAV_M_COMPLEX_ATTRIBUTES.as("m1").CLASS_ID))
                 .and(EAV_GLOBAL.as("m5").TYPE.eq("REF_VIEW_SETTING"))
                 .and(EAV_GLOBAL.as("m5").VALUE.eq(EAV_M_SIMPLE_ATTRIBUTES.as("m3").NAME)).asField("SETTING_ATTR");
@@ -283,7 +282,7 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
         SelectLimitStep select = context.select(fields.toArray(new Field[]{})).from(
                 context.select(fieldsInner.toArray(new Field[]{}))
                         .from(context.select(EAV_BE_ENTITIES.ID, EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE)
-                                .from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES)
+                                .from(EAV_BE_ENTITY_REPORT_DATES).join(EAV_BE_ENTITIES)
                                 .on(EAV_BE_ENTITIES.ID.eq(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID))
                                 .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
                                 .and(entityId != null ? EAV_BE_ENTITIES.ID.eq(entityId) : DSL.trueCondition())
@@ -324,7 +323,7 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
                                 EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE,
                                 DSL.rowNumber().over().partitionBy(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID)
                                 .orderBy(EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.desc()).as("p"))
-                                .from(EAV_BE_ENTITIES).join(EAV_BE_ENTITY_REPORT_DATES)
+                                .from(EAV_BE_ENTITY_REPORT_DATES).join(EAV_BE_ENTITIES)
                                 .on(EAV_BE_ENTITY_REPORT_DATES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
                                 .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId))
                                 .and(dt != null ? EAV_BE_ENTITY_REPORT_DATES.REPORT_DATE.le(dt) : DSL.trueCondition())

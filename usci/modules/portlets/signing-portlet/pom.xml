@@ -8,7 +8,7 @@
     <version>0.1</version>
     <properties>
         <liferay.version>6.1.2</liferay.version>
-        <liferay.auto.deploy.dir>/home/maksat/soft/glassfish3/deploy</liferay.auto.deploy.dir>
+        <liferay.auto.deploy.dir>${env.DEPLOY}</liferay.auto.deploy.dir>
         <liferay.app.server.deploy.dir>/home/maksat/soft/glassfish3/deploy</liferay.app.server.deploy.dir>
         <liferay.app.server.portal.dir>/home/maksat/soft/glassfish3/deploy</liferay.app.server.portal.dir>
     </properties>
