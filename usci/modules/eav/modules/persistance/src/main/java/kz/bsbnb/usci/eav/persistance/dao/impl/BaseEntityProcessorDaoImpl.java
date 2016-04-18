@@ -29,6 +29,7 @@ import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
     private static final String LOGIC_RULE_META = "LOGIC_RULE_META";
 
+    @Qualifier("metaClassRepositoryImpl")
     @Autowired
     private IMetaClassRepository metaClassRepository;
 
@@ -204,8 +206,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             throw new IllegalStateException(Errors.compose(Errors.E197));
 
         /* Проверка сущности на бизнес правила */
-        if (!baseEntity.getMeta().isReference())
-            checkForRules((BaseEntity)baseEntity);
+        if (!baseEntity.getMeta().isReference()) {
+            long ruleTime = System.currentTimeMillis();
+            checkForRules((BaseEntity) baseEntity);
+            sqlStats.put("java:rule(" + baseEntity.getMeta().getClassName() + ")", (System.currentTimeMillis() - ruleTime));
+        }
 
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
