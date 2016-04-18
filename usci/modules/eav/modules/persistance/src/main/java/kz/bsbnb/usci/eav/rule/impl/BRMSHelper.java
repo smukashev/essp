@@ -74,16 +74,20 @@ public class BRMSHelper extends JDBCSupport implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        long t1 = System.currentTimeMillis();
+        try {
+            long t1 = System.currentTimeMillis();
 
-        MetaClass refBaDrtMetaClass = metaClassRepository.getMetaClass("ref_ba_drt");
+            MetaClass refBaDrtMetaClass = metaClassRepository.getMetaClass("ref_ba_drt");
 
-        List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaClass(refBaDrtMetaClass);
+            List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaClass(refBaDrtMetaClass);
 
-        for (BaseEntity entity : entities)
-            refsMap.put(new BalDebtRemains(entity.getEl("balance_account.no_").toString(), entity.getEl("debt_remains_type.code").toString()), entity);
+            for (BaseEntity entity : entities)
+                refsMap.put(new BalDebtRemains(entity.getEl("balance_account.no_").toString(), entity.getEl("debt_remains_type.code").toString()), entity);
 
-        System.out.println("Initialization time for ref_ba_dtr: " + (System.currentTimeMillis() - t1));
+            System.out.println("Время потраченное для кэширование: " + (System.currentTimeMillis() - t1));
+        } catch (Exception e) {
+            System.err.println("Необходимо после перезагрузить;");
+        }
     }
 
     public boolean hasBADRT(String balanceAccountNo, String debtRemainTypeCode) {

@@ -46,6 +46,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
     private static final String LOGIC_RULE_META = "LOGIC_RULE_META";
 
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @Autowired
+    private DSLContext context;
+
     @Qualifier("metaClassRepositoryImpl")
     @Autowired
     private IMetaClassRepository metaClassRepository;
@@ -71,19 +75,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     private RulesSingleton rulesSingleton;
 
-    private IDaoListener applyListener;
-
-    @SuppressWarnings("SpringJavaAutowiringInspection")
-    @Autowired
-    private DSLContext context;
-
-    private Set<String> metaRules;
-
-    @Autowired
-    public void setApplyListener(IDaoListener applyListener) {
-        this.applyListener = applyListener;
-    }
-
     @Value("${rules.enabled}")
     private boolean rulesEnabled;
 
@@ -92,6 +83,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Autowired
     private IRefRepository refRepository;
+
+    private IDaoListener applyListener;
+
+    private Set<String> metaRules;
+
+    @Autowired
+    public void setApplyListener(IDaoListener applyListener) {
+        this.applyListener = applyListener;
+    }
 
     @Override
     public long search(IBaseEntity baseEntity, long creditorId) {
