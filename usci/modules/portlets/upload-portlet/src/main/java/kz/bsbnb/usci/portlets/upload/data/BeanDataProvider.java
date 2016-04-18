@@ -10,7 +10,9 @@ import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Aidar.Myrzahanov
@@ -20,6 +22,10 @@ public class BeanDataProvider implements DataProvider {
     private static final String DEFAULT_UPLOADS_PATH = "D:\\portal_afn\\uploads\\";
     private static final String DIGITAL_SIGNING_SETTINGS = "DIGITAL_SIGNING_SETTINGS";
     private static final String DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE = "DIGITAL_SIGNING_ORGANIZATIONS_IDS";
+    private static final String ORG_FIRST_DATE_SETTING = "ORG_FIRST_DATE_SETTING";
+    private static final String DEFAULT_DATE_VALUE = "DEFAULT_DATE_VALUE";
+    private static final String CREDITOR_DATES = "CREDITOR_DATES";
+
     private final Logger logger = Logger.getLogger(BeanDataProvider.class);
 
     private PortalUserBeanRemoteBusiness portalUserBusiness;
@@ -108,5 +114,33 @@ public class BeanDataProvider implements DataProvider {
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
+    }
+
+    @Override
+    public Map<Long, String> getOrganizationFirstDates() {
+        Map<Long, String> firstDates = new HashMap<>();
+        String defaultDate = globalService.getValue(ORG_FIRST_DATE_SETTING, DEFAULT_DATE_VALUE);
+        List<Creditor> creditors = getOrganizations();
+
+        try {
+            String creditorDates = globalService.getValue(ORG_FIRST_DATE_SETTING, CREDITOR_DATES);
+            String[] pairs = creditorDates.split(",");
+            for(String pair: pairs) {
+                String[] record = pair.split("=");
+                Long creditorId = Long.parseLong(record[0]);
+                String date = record[1];
+                firstDates.put(creditorId, date);
+            }
+
+            for(Creditor creditor : creditors) {
+                if(!firstDates.containsKey(creditor.getId()))
+                    firstDates.put(creditor.getId(), defaultDate);
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        return firstDates;
     }
 }
