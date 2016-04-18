@@ -164,7 +164,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntity;
     }
 
-    public void checkForRules(BaseEntity baseEntity) {
+    private void checkForRules(BaseEntity baseEntity) {
         if (metaRules == null) {
             String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
             metaRules = new HashSet<>(Arrays.asList(metaArray));

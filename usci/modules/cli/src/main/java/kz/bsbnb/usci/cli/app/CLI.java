@@ -16,7 +16,6 @@ import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.core.service.IPackageService;
 import kz.bsbnb.usci.core.service.IRuleService;
 import kz.bsbnb.usci.eav.StaticRouter;
-import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.manager.IBaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityMergeManager;
 import kz.bsbnb.usci.eav.manager.impl.MergeManagerKey;
@@ -132,8 +131,6 @@ public class CLI {
 
     private ArrayList<String> args = new ArrayList<>();
 
-    private BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
-
     private InputStream inputStream = null;
 
     private JobDispatcher jobDispatcher = new JobDispatcher();
@@ -145,8 +142,6 @@ public class CLI {
     private IBatchService batchService;
 
     private IPackageService packageService;
-
-    //private IBatchVersionService batchVersionService;
 
     private ShowcaseService showcaseService;
 
@@ -988,35 +983,6 @@ public class CLI {
 
     }
 
-    public void testEntityFromXML(String fileName, String repDate) {
-        try {
-            Date reportDate = simpleDateFormat.parse(repDate);
-            // checkme!
-            long creditorId = 0;
-            CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService, reportDate, creditorId);
-            BaseEntity entity;
-            while ((entity = reader.read()) != null) {
-                BaseEntity clonedEntity = entity.clone();
-
-                List<String> intersectionList = comparator.intersect(entity, clonedEntity);
-
-                System.out.println("Intersection count: " + intersectionList.size() + ", actual count: " +
-                        entity.getSearchableChildrenCount());
-                if (intersectionList.size() != entity.getSearchableChildrenCount()) {
-                    System.out.println("Error");
-                    for (String path : intersectionList) {
-                        System.out.println(path);
-                    }
-                }
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println("File " + fileName + " not found, with error: " + e.getMessage());
-        } catch (ParseException e) {
-            System.out.println("Can't parse date " + repDate + " must be in format " + simpleDateFormat.toString());
-        }
-
-    }
-
     public void showEntityAttr(String path, long id) {
         IBaseEntity entity = baseEntityLoadDao.load(id);
 
@@ -1029,23 +995,6 @@ public class CLI {
                 System.out.println(value.toString());
             } else {
                 System.out.println("No such attribute with path: " + path);
-            }
-        }
-    }
-
-    public void showEntityInter(long id1, long id2) {
-        IBaseEntity entity1 = baseEntityLoadDao.load(id1);
-        IBaseEntity entity2 = baseEntityLoadDao.load(id2);
-
-        if (entity1 == null) {
-            System.out.println("No such entity with id: " + id1);
-        } else if (entity2 == null) {
-            System.out.println("No such entity with id: " + id2);
-        } else {
-            List<String> inter = comparator.intersect((BaseEntity) entity1, (BaseEntity) entity2);
-
-            for (String str : inter) {
-                System.out.println(str);
             }
         }
     }
@@ -1730,12 +1679,6 @@ public class CLI {
                     } else {
                         System.out.println("Argument needed: <show> <attr> <id> <attributePath>");
                     }
-                } else if (args.get(1).equals("inter")) {
-                    if (args.size() > 3) {
-                        showEntityInter(Long.parseLong(args.get(2)), Long.parseLong(args.get(3)));
-                    } else {
-                        System.out.println("Argument needed: <show> <inter> <id1> <id2>");
-                    }
                 } else if (args.get(1).equals("sq")) {
                     if (args.size() > 2) {
                         showEntitySQ(Long.parseLong(args.get(2)));
@@ -1788,12 +1731,6 @@ public class CLI {
                     findEntityFromXML(args.get(1), args.get(2));
                 } else {
                     System.out.println("Argument needed: <find> <fileName> <rep_date>");
-                }
-            } else if (args.get(0).equals("test")) {
-                if (args.size() > 2) {
-                    testEntityFromXML(args.get(1), args.get(2));
-                } else {
-                    System.out.println("Argument needed: <test> <fileName> <rep_date>");
                 }
             } else if (args.get(0).equals("sql")) {
                 if (args.size() == 2) {

@@ -1,12 +1,10 @@
 package kz.bsbnb.usci.eav.manager.impl;
 
 import kz.bsbnb.usci.eav.util.Errors;
-import kz.bsbnb.usci.eav.comparator.impl.BasicBaseEntityComparator;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
-import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
@@ -48,7 +46,7 @@ public class BaseEntityManager implements IBaseEntityManager {
 
     private Long creditorId;
 
-    private void registerEntity (Map<Class, List<IPersistable>> objects, IPersistable persistable) {
+    private void registerEntity(Map<Class, List<IPersistable>> objects, IPersistable persistable) {
         Class objectClass = persistable.getClass();
 
         if (objects.containsKey(objectClass)) {
@@ -129,10 +127,8 @@ public class BaseEntityManager implements IBaseEntityManager {
         if (entityList == null)
             return null;
 
-        BasicBaseEntityComparator comparator = new BasicBaseEntityComparator();
-
         for (IBaseEntity currentBaseEntity : entityList)
-            if (comparator.compare((BaseEntity) baseEntity, (BaseEntity) currentBaseEntity))
+            if (baseEntity.equalsByKey(currentBaseEntity))
                 return currentBaseEntity;
 
         return null;
