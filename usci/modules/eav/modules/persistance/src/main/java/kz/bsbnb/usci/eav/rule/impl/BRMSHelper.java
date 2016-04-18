@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -17,9 +18,11 @@ import java.util.*;
 
 @Component
 public class BRMSHelper extends JDBCSupport implements InitializingBean {
+    @Qualifier("metaClassRepositoryImpl")
     @Autowired
     private IMetaClassRepository metaClassRepository;
 
+    @Qualifier("baseEntityProcessorDaoImpl")
     @Autowired
     private IBaseEntityProcessorDao baseEntityProcessorDao;
 
