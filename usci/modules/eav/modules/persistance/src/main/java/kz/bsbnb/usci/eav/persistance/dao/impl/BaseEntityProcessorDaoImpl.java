@@ -369,7 +369,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    public List<Long> getEntityIDsByMetaclass(long metaClassId) {
+    public List<Long> getEntityIDsByMetaClass(long metaClassId) {
         ArrayList<Long> entityIds = new ArrayList<>();
 
         Select select = context
@@ -380,15 +380,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        for (Map<String, Object> row : rows) {
+        for (Map<String, Object> row : rows)
             entityIds.add(((BigDecimal) row.get(EAV_BE_ENTITIES.ID.getName())).longValue());
-        }
 
         return entityIds;
     }
 
     public List<BaseEntity> getEntityByMetaClass(MetaClass meta) {
-        List<Long> ids = getEntityIDsByMetaclass(meta.getId());
+        List<Long> ids = getEntityIDsByMetaClass(meta.getId());
 
         ArrayList<BaseEntity> entities = new ArrayList<>();
 
@@ -399,11 +398,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     @Override
-    public boolean isApproved(long id) {
+    public boolean isApproved(long creditorId) {
         Select select = context
                 .select(EAV_A_CREDITOR_STATE.ID)
                 .from(EAV_A_CREDITOR_STATE)
-                .where(EAV_A_CREDITOR_STATE.CREDITOR_ID.equal(id));
+                .where(EAV_A_CREDITOR_STATE.CREDITOR_ID.equal(creditorId));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -416,12 +415,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public boolean remove(long baseEntityId) {
         IBaseEntityDao baseEntityDao = persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
         return baseEntityDao.deleteRecursive(baseEntityId);
-    }
-
-    @Override
-    public Set<Long> getChildBaseEntityIds(long parentBaseEntityIds) {
-        IBaseEntityDao baseEntityDao = persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
-        return baseEntityDao.getChildBaseEntityIds(parentBaseEntityIds);
     }
 
     public IBaseEntityLoadDao getBaseEntityLoadDao() {

@@ -150,7 +150,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public BaseEntity getActualBaseEntity(BaseEntity baseEntity) {
-
         if (baseEntity.getId() < 1)
             throw new IllegalArgumentException(baseEntity.getMeta().getClassTitle() + " не найден");
 
@@ -168,8 +167,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
-    public List<Long> getEntityIDsByMetaclass(long id) {
-        return baseEntityProcessorDao.getEntityIDsByMetaclass(id);
+    public List<Long> getEntityIDsByMetaClass(long id) {
+        return baseEntityProcessorDao.getEntityIDsByMetaClass(id);
     }
 
     @Override
@@ -199,11 +198,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public void remove(long id) {
         baseEntityProcessorDao.remove(id);
-    }
-
-    @Override
-    public Set<Long> getChildBaseEntityIds(long parentBaseEntityIds) {
-        return baseEntityProcessorDao.getChildBaseEntityIds(parentBaseEntityIds);
     }
 
     @Override

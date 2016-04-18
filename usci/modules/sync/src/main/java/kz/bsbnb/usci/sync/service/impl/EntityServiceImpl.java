@@ -74,7 +74,7 @@ public class EntityServiceImpl implements IEntityService {
 
     @Override
     public List<Long> getEntityIDsByMetaclass(long id) {
-        return remoteEntityService.getEntityIDsByMetaclass(id);
+        return remoteEntityService.getEntityIDsByMetaClass(id);
     }
 
     public List<RefListItem> getRefsByMetaclass(long metaClassId) {

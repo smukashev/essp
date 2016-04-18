@@ -253,33 +253,4 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
         return true;
     }
-
-    @Override
-    public Set<Long> getChildBaseEntityIds(long parentBaseEntityId) {
-        Set<Long> allChildBaseEntitiesIds = new HashSet<>();
-
-        // Complex values
-        IBaseEntityComplexValueDao baseEntityComplexValueDao = persistableDaoPool
-                .getPersistableDao(BaseEntityComplexValue.class, IBaseEntityComplexValueDao.class);
-        Set<Long> complexValuesBaseEntitiesIds = baseEntityComplexValueDao
-                .getChildBaseEntityIdsWithoutRefs(parentBaseEntityId);
-        for (Long complexValuesBaseEntitiesId : complexValuesBaseEntitiesIds) {
-            Set<Long> childBaseEntitiesIds = getChildBaseEntityIds(complexValuesBaseEntitiesId);
-            allChildBaseEntitiesIds.addAll(childBaseEntitiesIds);
-        }
-        allChildBaseEntitiesIds.addAll(complexValuesBaseEntitiesIds);
-
-        // Complex sets
-        IBaseEntityComplexSetDao baseEntityComplexSetDao = persistableDaoPool
-                .getPersistableDao(BaseEntityComplexSet.class, IBaseEntityComplexSetDao.class);
-        Set<Long> complexSetsBaseEntitiesIds = baseEntityComplexSetDao
-                .getChildBaseEntityIdsWithoutRefs(parentBaseEntityId);
-        for (Long complexSetsBaseEntitiesId : complexSetsBaseEntitiesIds) {
-            Set<Long> childBaseEntitiesIds = getChildBaseEntityIds(complexSetsBaseEntitiesId);
-            allChildBaseEntitiesIds.addAll(childBaseEntitiesIds);
-        }
-        allChildBaseEntitiesIds.addAll(complexSetsBaseEntitiesIds);
-
-        return allChildBaseEntitiesIds;
-    }
 }

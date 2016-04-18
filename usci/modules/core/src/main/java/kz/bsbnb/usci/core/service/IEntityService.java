@@ -22,7 +22,7 @@ public interface IEntityService {
 
     BaseEntity getActualBaseEntity(BaseEntity baseEntity);
 
-    List<Long> getEntityIDsByMetaclass(long id);
+    List<Long> getEntityIDsByMetaClass(long id);
 
     List<RefListItem> getRefsByMetaclass(long metaClassId);
 
@@ -31,8 +31,6 @@ public interface IEntityService {
     Map<String, QueryEntry> getSQLStats();
 
     void remove(long id);
-
-    Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
 
     RefColumnsResponse getRefColumns(long metaClassId);
 }

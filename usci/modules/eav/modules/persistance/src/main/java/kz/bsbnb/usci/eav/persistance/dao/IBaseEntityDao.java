@@ -20,6 +20,4 @@ public interface IBaseEntityDao extends IPersistableDao {
     boolean deleteRecursive(long baseEntityId);
 
     boolean deleteRecursive(long baseEntityId, IMetaClass metaClass);
-
-    Set<Long> getChildBaseEntityIds(long parentBaseEntityId);
 }
