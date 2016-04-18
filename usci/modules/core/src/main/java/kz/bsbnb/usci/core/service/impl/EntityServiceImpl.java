@@ -40,22 +40,13 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     private IRefProcessorDao refProcessorDao;
 
     @Autowired
-    private IBaseEntitySearcherPool searcherPool;
-
-    @Autowired
     private SQLQueriesStats stats;
-
-    @Autowired
-    private IMailDao mailDao;
 
     @Autowired
     private IBaseEntityLoadDao baseEntityLoadDao;
 
     @Autowired
     private IBatchService batchService;
-
-    @Autowired
-    private IPersistableDaoPool persistableDaoPool;
 
     public EntityServiceImpl() throws RemoteException {
         super();
@@ -126,49 +117,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
-    public BaseEntity search(BaseEntity baseEntity) {
-        long creditorId = 0L;
-
-        if (baseEntity.getMeta().getClassName().equals("credit"))
-            creditorId = ((BaseEntity) baseEntity.getEl("creditor")).getId();
-
-        ArrayList<Long> result = searcherPool.getSearcher(baseEntity.getMeta().getClassName()).
-                findAll(baseEntity, creditorId);
-        if (result.size() > 0)
-            baseEntity.setId(result.get(0));
-        return baseEntity;
-    }
-
-    @Override
-    public BaseEntity prepare(BaseEntity baseEntity, long creditorId) {
-        baseEntityProcessorDao.prepare(baseEntity, creditorId);
-        return baseEntity;
-    }
-
-    @Override
-    public BaseEntity getActualBaseEntity(BaseEntity baseEntity) {
-        if (baseEntity.getId() < 1)
-            throw new IllegalArgumentException(baseEntity.getMeta().getClassTitle() + " не найден");
-
-        IBaseEntityReportDateDao baseEntityReportDateDao =
-                persistableDaoPool.getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
-
-        Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(baseEntity.getId(), baseEntity.getReportDate());
-
-        if (maxReportDate == null){
-            logger.error("Запись не была найдена в базе; \n" + baseEntity);
-            throw new UnsupportedOperationException(Errors.compose(Errors.E234));
-        }
-
-        return (BaseEntity) baseEntityLoadDao.load(baseEntity.getId(), maxReportDate);
-    }
-
-    @Override
-    public List<Long> getEntityIDsByMetaClass(long id) {
-        return baseEntityProcessorDao.getEntityIDsByMetaClass(id);
-    }
-
-    @Override
     public BaseEntity load(long id) {
         return (BaseEntity) baseEntityLoadDao.load(id);
     }
@@ -176,10 +124,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public BaseEntity load(long id, Date date) {
         return (BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, date);
-    }
-
-    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
-        return refProcessorDao.getRefsByMetaclass(metaClassId);
     }
 
     @Override
@@ -190,11 +134,6 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public Map<String, QueryEntry> getSQLStats() {
         return stats.getStats();
-    }
-
-    @Override
-    public void remove(long id) {
-        baseEntityProcessorDao.remove(id);
     }
 
     @Override

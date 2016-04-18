@@ -69,4 +69,12 @@ global add --type=DIGITAL_SIGNING_SETTINGS --code=DIGITAL_SIGNING_ORGANIZATIONS_
 #
 global add --type=LOGIC_RULE_SETTING --code=LOGIC_RULE_META --value=credit,ref_creditor,ref_creditor_branch,ref_exclusive_doc --desc=Метаклассы правил
 
+#
+# FIRST REPORT DATE SETTINGS
+#
+global add --type=ORG_FIRST_DATE_SETTING --code=DEFAULT_DATE_VALUE --value=01.04.2013 --desc=Первая_отчетная_дата_по_умолчанию
+global add --type=ORG_FIRST_DATE_SETTING --code=CREDITOR_DATES --value=2288=01.05.2014,2290=01.01.2016 --desc=Даты_по_кредитору
+
+quit
+
 quit

@@ -40,13 +40,14 @@ function boolean hasBACT(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaCl
     return false;
 }
 
-function boolean isExclusiveIIN(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaClassRepository metaClassRepository, String iin) {
+function boolean isExclusiveIIN(String iin) {
     try{
         //  поиск ислючитльного иин
         //  все классы с префиксом ref - справочники
 
-        if(iin == null || iin.length() < 5 || iin.length() >=5 )
-            return true;
+        IBaseEntityProcessorDao baseEntityProcessorDao = BRMSHelper.rulesLoadDao;
+        IMetaClassRepository metaClassRepository = BRMSHelper.rulesMetaDao;
+
 
         //Инициализация сущности - для поиска
         BaseEntity be = new BaseEntity(metaClassRepository.getMetaClass("ref_exclusive_doc"), new Date());
@@ -60,7 +61,7 @@ function boolean isExclusiveIIN(IBaseEntityProcessorDao baseEntityProcessorDao, 
         be.put("doc_type", new BaseValue(docType));
 
         //Поиск сущности
-        IBaseEntity res = baseEntityProcessorDao.prepare(be, be.getBaseEntityReportDate().getCreditorId());
+        IBaseEntity res = baseEntityProcessorDao.prepare(be, 0L);
 
         //если идентификатор больше нуля - данное соответвие присутсвтует в базе
         return res.getId() > 0;

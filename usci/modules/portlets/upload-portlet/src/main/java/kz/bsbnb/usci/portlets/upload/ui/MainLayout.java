@@ -32,6 +32,9 @@ public class MainLayout extends TabSheet{
         if (portletEnvironment.isNB()) {
             Tab configurationTab = addTab(new ConfigurationComponent(portletEnvironment, provider));
             configurationTab.setCaption(portletEnvironment.getResourceString(Localization.CONFIGURATION_TAB_CAPTION.getKey()));
+
+            Tab defaultDateConfigTab = addTab(new DefaultDateConfComponent(portletEnvironment, provider));
+            defaultDateConfigTab.setCaption("Настройка первой отчетной даты");
         }
     }
     

@@ -29,6 +29,7 @@ import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
     private static final String LOGIC_RULE_META = "LOGIC_RULE_META";
 
+    @Qualifier("metaClassRepositoryImpl")
     @Autowired
     private IMetaClassRepository metaClassRepository;
 
@@ -105,12 +107,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         final boolean isReference = metaClass.isReference();
         creditorId = isReference ? 0 : creditorId;
 
+        baseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
+
         if (isReference) {
-            long refRepositoryTime = System.currentTimeMillis();
             IBaseEntity referenceEntity = refRepository.findRef(baseEntity);
 
             if (referenceEntity != null) {
-                sqlStats.put("java::refRepositoryTime", (System.currentTimeMillis() - refRepositoryTime));
                 baseEntity.setId(referenceEntity.getId());
                 return baseEntity;
             }
@@ -124,8 +126,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 if (baseValue.getValue() != null) {
                     if (metaType.isSet()) {
                         IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
+                        childBaseSet.setCreditorId(creditorId);
                         for (IBaseValue childBaseValue : childBaseSet.get()) {
                             IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
+
+                            childBaseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
 
                             if (childBaseEntity.getValueCount() != 0)
                                 prepare((IBaseEntity) childBaseValue.getValue(), creditorId);
@@ -133,12 +138,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     } else {
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
+                        childBaseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
+
                         if (childBaseEntity.getValueCount() != 0) prepare(childBaseEntity, creditorId);
                     }
                 }
             }
 
-            if (isReference) baseValue.setCreditorId(creditorId);
+            baseValue.setCreditorId(creditorId);
         }
 
         if (metaClass.isSearchable()) {
@@ -153,9 +160,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             if (baseEntityId > 0)
                 baseEntity.setId(baseEntityId);
         }
-
-        if (isReference)
-            baseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
 
         return baseEntity;
     }
@@ -202,8 +206,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             throw new IllegalStateException(Errors.compose(Errors.E197));
 
         /* Проверка сущности на бизнес правила */
-        if (!baseEntity.getMeta().isReference())
-            checkForRules((BaseEntity)baseEntity);
+        if (!baseEntity.getMeta().isReference()) {
+            long ruleTime = System.currentTimeMillis();
+            checkForRules((BaseEntity) baseEntity);
+            sqlStats.put("java:rule(" + baseEntity.getMeta().getClassName() + ")", (System.currentTimeMillis() - ruleTime));
+        }
 
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
