@@ -159,9 +159,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 baseEntity.setId(baseEntityId);
         }
 
-        if (isReference)
-            baseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
-
         return baseEntity;
     }
 
