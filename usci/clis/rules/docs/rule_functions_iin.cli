@@ -1,7 +1,7 @@
 rule read $$$
 title: функций для проверки иин
 
-function List getInvalidIINs(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaClassRepository metaClassRepository, List iins){
+function List getInvalidIINs(List iins){
     List ret = new ArrayList();
     for(Object iin : iins) {
         if(!iinCorrect((String) iin ) && !isExclusiveIIN((String) iin))

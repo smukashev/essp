@@ -21,6 +21,24 @@
         </property>
     </bean>
 
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod" value="kz.bsbnb.usci.eav.rule.impl.BRMSHelper.setLoadDao"/>
+        <property name="arguments">
+            <list>
+                <bean class="kz.bsbnb.usci.eav.persistance.dao.impl.BaseEntityProcessorDaoImpl" />
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod" value="kz.bsbnb.usci.eav.rule.impl.BRMSHelper.setMetaDao"/>
+        <property name="arguments">
+            <list>
+                <bean class="kz.bsbnb.usci.eav.repository.impl.MetaClassRepositoryImpl" />
+            </list>
+        </property>
+    </bean>
+
     <!-- available services -->
     <bean id="entityRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
         <property name="serviceName" value="entityService"/>

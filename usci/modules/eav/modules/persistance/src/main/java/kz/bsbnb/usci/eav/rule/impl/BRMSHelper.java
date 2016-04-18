@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.rule.impl;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import org.jooq.DSLContext;
@@ -29,6 +30,18 @@ public class BRMSHelper extends JDBCSupport implements InitializingBean {
     private IMetaClassRepository metaClassRepository;
 
     private Map<BalDebtRemains, IBaseEntity> refsMap = new HashMap<>();
+
+    public static IBaseEntityProcessorDao rulesLoadDao;
+    public static IMetaClassRepository rulesMetaDao;
+
+    public static void setLoadDao(IBaseEntityProcessorDao loadDao){
+        rulesLoadDao = loadDao;
+    }
+
+    public static void setMetaDao(IMetaClassRepository metaDao){
+        rulesMetaDao = metaDao;
+    }
+
 
     @Autowired
     private IBaseEntityLoadDao baseEntityLoadDao;
