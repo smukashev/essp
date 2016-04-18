@@ -2,32 +2,21 @@ package kz.bsbnb.usci.eav.rule.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
-import org.jooq.DSLContext;
-import org.jooq.Select;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.*;
-
 @Component
 public class BRMSHelper extends JDBCSupport implements InitializingBean {
-
-    @SuppressWarnings("SpringJavaAutowiringInspection")
-    @Autowired
-    private DSLContext context;
-
     @Autowired
     private IMetaClassRepository metaClassRepository;
 
@@ -39,11 +28,11 @@ public class BRMSHelper extends JDBCSupport implements InitializingBean {
     public static IBaseEntityProcessorDao rulesLoadDao;
     public static IMetaClassRepository rulesMetaDao;
 
-    public static void setLoadDao(IBaseEntityProcessorDao loadDao){
+    public static void setLoadDao(IBaseEntityProcessorDao loadDao) {
         rulesLoadDao = loadDao;
     }
 
-    public static void setMetaDao(IMetaClassRepository metaDao){
+    public static void setMetaDao(IMetaClassRepository metaDao) {
         rulesMetaDao = metaDao;
     }
 
@@ -95,7 +84,7 @@ public class BRMSHelper extends JDBCSupport implements InitializingBean {
     }
 
     public boolean hasBADRT(String balanceAccountNo, String debtRemainTypeCode) {
-         return refsMap.get(new BalDebtRemains(balanceAccountNo, debtRemainTypeCode)) != null;
+        return refsMap.get(new BalDebtRemains(balanceAccountNo, debtRemainTypeCode)) != null;
     }
 
     public static boolean isValidRNN(String rnn) {
