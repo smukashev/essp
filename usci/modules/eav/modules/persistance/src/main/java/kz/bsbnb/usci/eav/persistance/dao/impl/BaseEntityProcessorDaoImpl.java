@@ -423,4 +423,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseEntityDao baseEntityDao = persistableDaoPool.getPersistableDao(BaseEntity.class, IBaseEntityDao.class);
         return baseEntityDao.getChildBaseEntityIds(parentBaseEntityIds);
     }
+
+    public IBaseEntityLoadDao getBaseEntityLoadDao() {
+        return baseEntityLoadDao;
+    }
 }

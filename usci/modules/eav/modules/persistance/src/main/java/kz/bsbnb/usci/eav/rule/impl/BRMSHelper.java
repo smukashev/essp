@@ -23,16 +23,6 @@ public class BRMSHelper {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-
-    public static IBaseEntityProcessorDao getEntityService(){
-        return new BaseEntityProcessorDaoImpl();
-    }
-
-    public static IMetaClassRepository getMetaService(){
-        return new MetaClassRepositoryImpl();
-    }
-
-
     public static boolean hasBADRT(String balanceAccountNo, String debtRemainTypeCode) {
 
         String select = "select count(1)\n" +
@@ -99,7 +89,7 @@ public class BRMSHelper {
         return (k == Integer.parseInt(rnn.substring(11, 12)));
     }
 
-    public static List getInvalidIINs(Object list) {
+    /*public static List getInvalidIINs(Object list) {
         List ret = new ArrayList();
         for (Object o : (LinkedList) list) {
             String s = (String) o;
@@ -107,7 +97,7 @@ public class BRMSHelper {
                 ret.add(s);
         }
         return ret;
-    }
+    }*/
 
     private static int[] weights = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2};
 

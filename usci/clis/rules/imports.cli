@@ -3,15 +3,16 @@ title: Нужные импорты для работы функций
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.*;
-#import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
-#import kz.bsbnb.usci.core.service.IMetaFactoryService;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 
-global kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao entityService;
-global kz.bsbnb.usci.eav.repository.IMetaClassRepository metaService;
+global kz.bsbnb.usci.eav.repository.IMetaClassRepository metaClassRepository;
+global kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao baseEntityProcessorDao;
+
 
 $$$
 rule save

@@ -23,4 +23,6 @@ public interface IBaseEntityProcessorDao {
     boolean remove(long baseEntityId);
 
     Set<Long> getChildBaseEntityIds(long parentBaseEntityIds);
+
+    IBaseEntityLoadDao getBaseEntityLoadDao();
 }

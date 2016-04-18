@@ -1,7 +1,7 @@
 rule read $$$
 title: Общие функций(часть 2)
 
-function boolean hasBACT(IBaseEntityProcessorDaoImpl baseEntityProcessorDao, IMetaClassRepository metaClassRepository, String baNo, String creditCode, BaseEntity entity){
+function boolean hasBACT(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaClassRepository metaClassRepository, String baNo, String creditCode, BaseEntity entity){
     try{
         if(baNo == null || baNo.length() > 11 || baNo.length() <=11)
             return true;
@@ -15,10 +15,10 @@ function boolean hasBACT(IBaseEntityProcessorDaoImpl baseEntityProcessorDao, IMe
         BaseEntity be = new BaseEntity(metaClassRepository.getMetaClass("ref_ba_ct"), reportDate);
 
         //Создание сущности балансовый счет (пустой)
-        BaseEntity beAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"), reportDate);
+        IBaseEntity beAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"), reportDate);
 
         //Создание сущности тип кредита (пустой)
-        BaseEntity creditType = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_type"), reportDate);
+        IBaseEntity creditType = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_type"), reportDate);
 
         //заполняем параметры поиска
         beAccount.put("no_", new BaseValue(reportDate, baNo));
@@ -29,7 +29,7 @@ function boolean hasBACT(IBaseEntityProcessorDaoImpl baseEntityProcessorDao, IMe
         be.put("credit_type",  new BaseValue(reportDate, creditType));
 
         //Поиск сущности (entityService - это сервис ЕССП)
-        BaseEntity res = baseEntityProcessorDao.prepare(be);
+        IBaseEntity res = baseEntityProcessorDao.prepare(be, be.getBaseEntityReportDate().getCreditorId());
 
         //если идентификатор больше нуля - данное соответвие присутсвтует в базе
         return res.getId() > 0;
@@ -40,7 +40,7 @@ function boolean hasBACT(IBaseEntityProcessorDaoImpl baseEntityProcessorDao, IMe
     return false;
 }
 
-function boolean isExclusiveIIN(String iin) {
+function boolean isExclusiveIIN(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaClassRepository metaClassRepository, String iin) {
     try{
         //  поиск ислючитльного иин
         //  все классы с префиксом ref - справочники
@@ -60,7 +60,7 @@ function boolean isExclusiveIIN(String iin) {
         be.put("doc_type", new BaseValue(docType));
 
         //Поиск сущности
-        BaseEntity res = baseEntityProcessorDao.prepare(be);
+        IBaseEntity res = baseEntityProcessorDao.prepare(be, be.getBaseEntityReportDate().getCreditorId());
 
         //если идентификатор больше нуля - данное соответвие присутсвтует в базе
         return res.getId() > 0;
