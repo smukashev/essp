@@ -105,12 +105,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         final boolean isReference = metaClass.isReference();
         creditorId = isReference ? 0 : creditorId;
 
+        baseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
+
         if (isReference) {
-            long refRepositoryTime = System.currentTimeMillis();
             IBaseEntity referenceEntity = refRepository.findRef(baseEntity);
 
             if (referenceEntity != null) {
-                sqlStats.put("java::refRepositoryTime", (System.currentTimeMillis() - refRepositoryTime));
                 baseEntity.setId(referenceEntity.getId());
                 return baseEntity;
             }
@@ -124,8 +124,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 if (baseValue.getValue() != null) {
                     if (metaType.isSet()) {
                         IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
+                        childBaseSet.setCreditorId(creditorId);
                         for (IBaseValue childBaseValue : childBaseSet.get()) {
                             IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
+
+                            childBaseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
 
                             if (childBaseEntity.getValueCount() != 0)
                                 prepare((IBaseEntity) childBaseValue.getValue(), creditorId);
@@ -133,12 +136,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     } else {
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
+                        childBaseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
+
                         if (childBaseEntity.getValueCount() != 0) prepare(childBaseEntity, creditorId);
                     }
                 }
             }
 
-            if (isReference) baseValue.setCreditorId(creditorId);
+            baseValue.setCreditorId(creditorId);
         }
 
         if (metaClass.isSearchable()) {

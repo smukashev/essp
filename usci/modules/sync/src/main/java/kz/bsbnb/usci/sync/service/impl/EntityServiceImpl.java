@@ -58,30 +58,6 @@ public class EntityServiceImpl implements IEntityService {
     }
 
     @Override
-    public BaseEntity prepare(BaseEntity baseEntity) {
-        return remoteEntityService.prepare(baseEntity, 0L);
-    }
-
-    @Override
-    public BaseEntity getActualBaseEntity(BaseEntity baseEntity) {
-        return remoteEntityService.getActualBaseEntity(baseEntity);
-    }
-
-    @Override
-    public BaseEntity search(BaseEntity baseEntity) {
-        return remoteEntityService.search(baseEntity);
-    }
-
-    @Override
-    public List<Long> getEntityIDsByMetaclass(long id) {
-        return remoteEntityService.getEntityIDsByMetaClass(id);
-    }
-
-    public List<RefListItem> getRefsByMetaclass(long metaClassId) {
-        return remoteEntityService.getRefsByMetaclass(metaClassId);
-    }
-
-    @Override
     public RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis) {
         return remoteEntityService.getRefListResponse(metaClassId, date, withHis);
     }
@@ -94,11 +70,6 @@ public class EntityServiceImpl implements IEntityService {
     @Override
     public SyncStatus getStatus() {
         return syncStatusSingleton.getStatus();
-    }
-
-    @Override
-    public void remove(long id) {
-        remoteEntityService.remove(id);
     }
 
     @Override
