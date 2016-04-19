@@ -1,33 +1,17 @@
 package kz.bsbnb.usci.eav.rule.impl;
 
-import kz.bsbnb.usci.eav.model.base.IBaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
 
 @Component
-public class BRMSHelper extends JDBCSupport implements InitializingBean {
-    @Qualifier("metaClassRepositoryImpl")
-    @Autowired
-    private IMetaClassRepository metaClassRepository;
-
-    @Qualifier("baseEntityProcessorDaoImpl")
-    @Autowired
-    private IBaseEntityProcessorDao baseEntityProcessorDao;
-
-    private Map<BalDebtRemains, IBaseEntity> refsMap = new HashMap<>();
-
+public class BRMSHelper extends JDBCSupport {
     public static IBaseEntityProcessorDao rulesLoadDao;
     public static IMetaClassRepository rulesMetaDao;
 
@@ -37,57 +21,6 @@ public class BRMSHelper extends JDBCSupport implements InitializingBean {
 
     public static void setMetaDao(IMetaClassRepository metaDao) {
         rulesMetaDao = metaDao;
-    }
-
-
-    @Autowired
-    private IBaseEntityLoadDao baseEntityLoadDao;
-
-    private class BalDebtRemains {
-        private final String no_;
-        private final String code;
-
-        public BalDebtRemains(String code, String no_) {
-            this.code = code;
-            this.no_ = no_;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            BalDebtRemains balDebtRemains = (BalDebtRemains) o;
-
-            if (!no_.equals(balDebtRemains.no_)) return false;
-            return code.equals(balDebtRemains.code);
-
-        }
-
-        @Override
-        public int hashCode() {
-            int result = no_.hashCode();
-            result = 31 * result + code.hashCode();
-            return result;
-        }
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        long t1 = System.currentTimeMillis();
-
-        MetaClass refBaDrtMetaClass = metaClassRepository.getMetaClass("ref_ba_drt");
-
-        List<BaseEntity> entities = baseEntityProcessorDao.getEntityByMetaClass(refBaDrtMetaClass);
-
-        for (BaseEntity entity : entities)
-            refsMap.put(new BalDebtRemains(entity.getEl("balance_account.no_").toString(), entity.getEl("debt_remains_type.code").toString()), entity);
-
-        System.out.println("Initialization time for ref_ba_dtr: " + (System.currentTimeMillis() - t1));
-    }
-
-    public boolean hasBADRT(String balanceAccountNo, String debtRemainTypeCode) {
-        return refsMap.get(new BalDebtRemains(balanceAccountNo, debtRemainTypeCode)) != null;
     }
 
     public static boolean isValidRNN(String rnn) {

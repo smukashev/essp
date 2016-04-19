@@ -15,6 +15,4 @@ public interface IRefProcessorDao {
     RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis);
 
     RefColumnsResponse getRefColumns(long metaClassId);
-
-    boolean historyExists(long metaId, long entityId);
 }

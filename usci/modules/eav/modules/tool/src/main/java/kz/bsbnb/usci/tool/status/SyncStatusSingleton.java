@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SyncStatusSingleton {
-    SyncStatus status = new SyncStatus();
+    private SyncStatus status = new SyncStatus();
 
     public void put(long queueSize, long threadsCount, double avgTime) {
         status.setQueueSize(queueSize);

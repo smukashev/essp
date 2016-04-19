@@ -1,10 +1,11 @@
 rule read $$$
-title: Общие функций(часть 2)
+title: функция сверки балансовый счет - тип кредита
 
-function boolean hasBACT(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaClassRepository metaClassRepository, String baNo, String creditCode, BaseEntity entity){
+function boolean hasBACT(String baNo, String creditCode, BaseEntity entity){
     try{
-        if(baNo == null || baNo.length() > 11 || baNo.length() <=11)
-            return true;
+        IBaseEntityProcessorDao baseEntityProcessorDao = BRMSHelper.rulesLoadDao;
+        IMetaClassRepository metaClassRepository = BRMSHelper.rulesMetaDao;
+
 
         //получить отчетную дату
         Date reportDate = entity.getReportDate();
@@ -29,7 +30,7 @@ function boolean hasBACT(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaCl
         be.put("credit_type",  new BaseValue(reportDate, creditType));
 
         //Поиск сущности (entityService - это сервис ЕССП)
-        IBaseEntity res = baseEntityProcessorDao.prepare(be, be.getBaseEntityReportDate().getCreditorId());
+        IBaseEntity res = baseEntityProcessorDao.prepare(be, 0L);
 
         //если идентификатор больше нуля - данное соответвие присутсвтует в базе
         return res.getId() > 0;
@@ -40,6 +41,59 @@ function boolean hasBACT(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaCl
     return false;
 }
 
+$$$
+rule save
+
+
+rule read $$$
+title: функция сверки балансовый счет - тип остатка
+function boolean hasBADRT(String baNo, String drtCode, BaseEntity entity){
+    try{
+        IBaseEntityProcessorDao baseEntityProcessorDao = BRMSHelper.rulesLoadDao;
+        IMetaClassRepository metaClassRepository = BRMSHelper.rulesMetaDao;
+
+
+        //получить отчетную дату
+        Date reportDate = entity.getReportDate();
+
+        //Инициализация сущности - для поиска
+        //  поиск соответсвия из справочника бал счетов и типа кредита
+        //  все классы с префиксом ref - справочники
+        BaseEntity be = new BaseEntity(metaClassRepository.getMetaClass("ref_ba_drt"), reportDate);
+
+        //Создание сущности балансовый счет (пустой)
+        IBaseEntity beAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"), reportDate);
+
+        //Создание сущности тип кредита (пустой)
+        IBaseEntity debtRemainsType = new BaseEntity(metaClassRepository.getMetaClass("ref_debt_remains_type"), reportDate);
+
+        //заполняем параметры поиска
+        beAccount.put("no_", new BaseValue(reportDate, baNo));
+        debtRemainsType.put("code", new BaseValue(reportDate, drtCode));
+
+        //заполняем параметры поиска для родительской сущности
+        be.put("balance_account",  new BaseValue(reportDate, beAccount));
+        be.put("debt_remains_type",  new BaseValue(reportDate, debtRemainsType));
+
+        //Поиск сущности (entityService - это сервис ЕССП)
+        IBaseEntity res = baseEntityProcessorDao.prepare(be, 0L);
+
+        //если идентификатор больше нуля - данное соответвие присутсвтует в базе
+        return res.getId() > 0;
+    } catch (Exception e) {
+        entity.addValidationError(e.getMessage());
+    }
+
+    return false;
+}
+
+
+$$$
+rule save
+
+
+rule read $$$
+title: функция исключительный документе
 function boolean isExclusiveIIN(String iin) {
     try{
         //  поиск ислючитльного иин

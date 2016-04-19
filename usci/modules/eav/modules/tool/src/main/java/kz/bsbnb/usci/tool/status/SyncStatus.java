@@ -11,7 +11,7 @@ public class SyncStatus implements Serializable {
         return queueSize;
     }
 
-    public void setQueueSize(long queueSize) {
+    void setQueueSize(long queueSize) {
         this.queueSize = queueSize;
     }
 
@@ -19,7 +19,7 @@ public class SyncStatus implements Serializable {
         return threadsCount;
     }
 
-    public void setThreadsCount(long threadsCount) {
+    void setThreadsCount(long threadsCount) {
         this.threadsCount = threadsCount;
     }
 
@@ -27,7 +27,7 @@ public class SyncStatus implements Serializable {
         return avgTime;
     }
 
-    public void setAvgTime(double avgTime) {
+    void setAvgTime(double avgTime) {
         this.avgTime = avgTime;
     }
 

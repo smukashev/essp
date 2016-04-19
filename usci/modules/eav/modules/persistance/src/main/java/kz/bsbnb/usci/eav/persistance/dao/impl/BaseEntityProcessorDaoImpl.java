@@ -46,6 +46,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
     private static final String LOGIC_RULE_META = "LOGIC_RULE_META";
 
+    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @Autowired
+    private DSLContext context;
+
     @Qualifier("metaClassRepositoryImpl")
     @Autowired
     private IMetaClassRepository metaClassRepository;
@@ -71,19 +75,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     private RulesSingleton rulesSingleton;
 
-    private IDaoListener applyListener;
-
-    @SuppressWarnings("SpringJavaAutowiringInspection")
-    @Autowired
-    private DSLContext context;
-
-    private Set<String> metaRules;
-
-    @Autowired
-    public void setApplyListener(IDaoListener applyListener) {
-        this.applyListener = applyListener;
-    }
-
     @Value("${rules.enabled}")
     private boolean rulesEnabled;
 
@@ -92,6 +83,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Autowired
     private IRefRepository refRepository;
+
+    private IDaoListener applyListener;
+
+    private Set<String> metaRules;
+
+    @Autowired
+    public void setApplyListener(IDaoListener applyListener) {
+        this.applyListener = applyListener;
+    }
 
     @Override
     public long search(IBaseEntity baseEntity, long creditorId) {
@@ -164,7 +164,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntity;
     }
 
-    public void checkForRules(BaseEntity baseEntity) {
+    private void checkForRules(BaseEntity baseEntity) {
         if (metaRules == null) {
             String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
             metaRules = new HashSet<>(Arrays.asList(metaArray));
@@ -178,8 +178,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 long t1 = System.currentTimeMillis();
                 rulesSingleton.runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
 
-                for(String s : baseEntity.getValidationErrors())
-                    errors.add(s);
+                for(String s : baseEntity.getValidationErrors()) errors.add(s);
 
                 sqlStats.put("java::rule(" + baseEntity.getMeta().getClassName()+")", System.currentTimeMillis() - t1);
             } catch (Exception e) {
@@ -206,11 +205,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             throw new IllegalStateException(Errors.compose(Errors.E197));
 
         /* Проверка сущности на бизнес правила */
-        if (!baseEntity.getMeta().isReference()) {
-            long ruleTime = System.currentTimeMillis();
+        if (!baseEntity.getMeta().isReference())
             checkForRules((BaseEntity) baseEntity);
-            sqlStats.put("java:rule(" + baseEntity.getMeta().getClassName() + ")", (System.currentTimeMillis() - ruleTime));
-        }
 
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
@@ -225,14 +221,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     if (baseEntityPostPrepared.getId() <= 0)
                         throw new KnownException(Errors.compose(Errors.E112));
 
-                    if (baseEntity.getMeta().isReference() &&
-                            refProcessorDao.historyExists(baseEntityPostPrepared.getMeta().getId(), baseEntityPostPrepared.getId())) {
-                        throw new KnownException(Errors.compose(Errors.E113));
-                    }
-
-                    if (baseEntity.getMeta().isReference())
-                        failIfHasUsages(baseEntityPostPrepared);
-
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
 
@@ -245,14 +233,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     IBaseEntityReportDateDao baseEntityReportDateDao = persistableDaoPool.getPersistableDao(
                             BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
-                    if (baseEntityReportDateDao.getMinReportDate(baseEntityPostPrepared.getId()).equals(
-                            baseEntityPostPrepared.getReportDate())) {
-                        logger.error("Дата закрытия не может быть одинаковой с датой открытия; \n" + baseEntityPostPrepared);
+                    Date minReportDate = baseEntityReportDateDao.getMinReportDate(baseEntityPostPrepared.getId());
+                    if (minReportDate.compareTo(baseEntityPostPrepared.getReportDate()) <= 0)
                         throw new IllegalStateException(Errors.compose(Errors.E115));
-                    }
 
-                    boolean reportDateExists = baseEntityReportDateDao.exists(baseEntityPostPrepared.getId(),
-                            baseEntityPostPrepared.getReportDate());
+                    boolean reportDateExists = baseEntityReportDateDao.exists(baseEntityPostPrepared.getId(), baseEntityPostPrepared.getReportDate());
 
                     IBaseEntityReportDate baseEntityReportDate;
 
@@ -326,53 +311,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
 
         if (metaRules.contains(baseEntityApplied.getMeta().getClassName())) {
-            rulesSingleton.runRules(baseEntityApplied, baseEntityApplied.getMeta().getClassName() + "_parser", baseEntityApplied.getReportDate());
+            rulesSingleton.runRules(baseEntityApplied, baseEntityApplied.getMeta().getClassName() + "_parser",
+                    baseEntityApplied.getReportDate());
 
-            if (baseEntityApplied.getValidationErrors().size() > 0) {
+            if (baseEntityApplied.getValidationErrors().size() > 0)
                 throw new KnownIterativeException(baseEntityApplied.getValidationErrors());
-            }
-        }
-    }
-
-    private void failIfHasUsages(IBaseEntity baseEntity) {
-        MetaClass metaClassOfDeleting = metaClassRepository.getMetaClass(baseEntity.getMeta().getId());
-
-        {
-            Select select = context
-                    .selectDistinct(EAV_BE_ENTITIES.CLASS_ID)
-                    .from(EAV_BE_COMPLEX_VALUES)
-                    .join(EAV_BE_ENTITIES).on(EAV_BE_COMPLEX_VALUES.ENTITY_ID.eq(EAV_BE_ENTITIES.ID))
-                    .where(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.eq(baseEntity.getId()));
-
-            List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-            StringBuilder sbUsages = new StringBuilder();
-
-            for (Map<String, Object> row : rows) {
-                Long metaId = ((BigDecimal) row.get(EAV_BE_ENTITIES.CLASS_ID.getName())).longValue();
-
-                MetaClass metaClass = metaClassRepository.getMetaClass(metaId);
-
-                sbUsages.append(metaClass.getClassName()).append(", ");
-            }
-
-            if (rows.size() > 0) {
-                throw new IllegalStateException(Errors.compose(Errors.E109, baseEntity.getId(), sbUsages.toString()));
-            }
-        }
-
-        {
-            if ("ref_creditor".equals(metaClassOfDeleting.getClassName())) {
-                Select select = context.select().from(EAV_A_CREDITOR_USER)
-                        .where(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(baseEntity.getId())).limit(1);
-
-                List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(),
-                        select.getBindValues().toArray());
-
-                if (rows.size() > 0) {
-                    throw new RuntimeException(Errors.compose(Errors.E110, baseEntity.getId()));
-                }
-            }
         }
     }
 

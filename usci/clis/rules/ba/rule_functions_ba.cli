@@ -3,9 +3,6 @@ title: функций проверки балансовых счетов
 
 function boolean isCurrencyConvertible(IBaseEntityProcessorDao baseEntityProcessorDao, IMetaClassRepository metaClassRepository, String currencyCode, Date reportDate){
     try{
-        if( currencyCode == null || currencyCode.length() > 5 || currencyCode.length() <=5)
-              return true;
-
         //Инициализавать сущность, тип <валюта> - для поиска
         BaseEntity be = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"), reportDate);
 
