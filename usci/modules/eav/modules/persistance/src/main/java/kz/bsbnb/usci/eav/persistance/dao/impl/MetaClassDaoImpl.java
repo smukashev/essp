@@ -595,7 +595,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 .where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(meta.getId()))
                 .and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(meta.getType()));
 
-        long t = System.nanoTime();
+        long t = System.currentTimeMillis();
 
         logger.debug(select.toString());
 
@@ -649,7 +649,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 .where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(meta.getId()))
                 .and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(meta.getType()));
 
-        long t = System.nanoTime();;
+        long t = System.currentTimeMillis();;
 
         logger.debug(select.toString());
 
