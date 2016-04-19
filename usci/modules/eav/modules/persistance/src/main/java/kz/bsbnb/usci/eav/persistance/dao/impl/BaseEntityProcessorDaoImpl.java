@@ -205,11 +205,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             throw new IllegalStateException(Errors.compose(Errors.E197));
 
         /* Проверка сущности на бизнес правила */
-        if (!baseEntity.getMeta().isReference()) {
-            long ruleTime = System.currentTimeMillis();
+        if (!baseEntity.getMeta().isReference())
             checkForRules((BaseEntity) baseEntity);
-            sqlStats.put("java:rule(" + baseEntity.getMeta().getClassName() + ")", (System.currentTimeMillis() - ruleTime));
-        }
 
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
