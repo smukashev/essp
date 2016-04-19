@@ -10,7 +10,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseSetDateValueDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -337,7 +335,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseSet baseSet, Date actualReportDate) {
+    public void loadBaseValues(IBaseSet baseSet, Date existingReportDate, Date savingReportDate) {
         Table tableOfValues = EAV_BE_DATE_SET_VALUES.as("ssv");
         Select select;
 
@@ -352,7 +350,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
                         tableOfValues.field(EAV_BE_DATE_SET_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_DATE_SET_VALUES.SET_ID).eq(baseSet.getId()))
-                .and(tableOfValues.field(EAV_BE_DATE_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(actualReportDate)))
+                .and(tableOfValues.field(EAV_BE_DATE_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(existingReportDate)))
                 .asTable("ssvn");
 
         select = context
@@ -374,8 +372,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
 
             Date value = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DATE_SET_VALUES.VALUE.getName()));
 
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
-                    row.get(EAV_BE_DATE_SET_VALUES.REPORT_DATE.getName()));
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DATE_SET_VALUES.REPORT_DATE.getName()));
 
             baseSet.put(BaseValueFactory.create(
                     MetaContainerTypes.META_SET,

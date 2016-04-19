@@ -28,7 +28,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
         if (maxReportDate == null)
             throw new RuntimeException(Errors.compose(Errors.E103, id, DataTypes.dateFormatDot.format(savingReportDate)));
 
-        return load(id, maxReportDate);
+        return load(id, maxReportDate, savingReportDate);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
         if (minReportDate == null)
             throw new RuntimeException(Errors.compose(Errors.E103, id, DataTypes.dateFormatDot.format(savingReportDate)));
 
-        return load(id, minReportDate);
+        return load(id, minReportDate, savingReportDate);
     }
 
     @Override
@@ -51,11 +51,11 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
         if (maxReportDate == null)
             throw new UnsupportedOperationException(Errors.compose(Errors.E101, id));
 
-        return load(id, maxReportDate);
+        return load(id, maxReportDate, maxReportDate);
     }
 
     @Override
-    public IBaseEntity load(long id, Date reportDate) {
-        return baseEntityDao.load(id, reportDate);
+    public IBaseEntity load(long id, Date existingReportDate, Date savingReportDate) {
+        return baseEntityDao.load(id, existingReportDate, savingReportDate);
     }
 }

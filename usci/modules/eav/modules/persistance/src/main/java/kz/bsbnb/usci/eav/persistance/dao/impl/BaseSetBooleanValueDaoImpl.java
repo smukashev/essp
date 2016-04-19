@@ -21,7 +21,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -336,7 +335,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseSet baseSet, Date actualReportDate) {
+    public void loadBaseValues(IBaseSet baseSet, Date existingReportDate, Date savingReportDate) {
         Table tableOfValues = EAV_BE_BOOLEAN_SET_VALUES.as("ssv");
         Select select;
 
@@ -353,7 +352,7 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.SET_ID).eq(baseSet.getId()))
                 .and(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.CREDITOR_ID).eq(baseSet.getCreditorId()))
-                .and(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(actualReportDate)))
+                .and(tableOfValues.field(EAV_BE_BOOLEAN_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(existingReportDate)))
                 .asTable("ssvn");
 
         select = context

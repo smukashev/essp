@@ -11,5 +11,5 @@ public interface IBaseEntityLoadDao {
 
     IBaseEntity load(long id);
 
-    IBaseEntity load(long id, Date reportDate);
+    IBaseEntity load(long id, Date existingReportDate, Date savingReportDate);
 }

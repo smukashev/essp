@@ -27,7 +27,7 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
 
     private boolean isNullable = true;
 
-    private boolean isDisabled = true;
+    private boolean isDisabled = false;
 
     public MetaAttribute(boolean isKey, boolean isNullable, IMetaType metaType) {
         this.isKey = isKey;

@@ -419,7 +419,8 @@ public class ZipFilesMonitor {
             String errMsg = null;
 
             if (existing != null) {
-                if (ReportStatus.COMPLETED.code().equals(existing.getStatus().getCode())) {
+                if (ReportStatus.COMPLETED.code().equals(existing.getStatus().getCode())
+                        || ReportStatus.ORGANIZATION_APPROVED.code().equals(existing.getStatus().getCode())) {
                     errMsg = "Данные на указанную отчетную дату утверждены организацией = "
                             + creditorId + ", отчетная дата = " + dateFormat.format(batchInfo.getRepDate());
                 }
@@ -431,7 +432,9 @@ public class ZipFilesMonitor {
 
                 Report prevMonthReport = reportBeanRemoteBusiness.getReport(creditorId, prevMonth);
 
-                if (prevMonthReport != null && !ReportStatus.COMPLETED.code().equals(prevMonthReport.getStatus().getCode())) {
+                if (prevMonthReport != null &&
+                        !ReportStatus.COMPLETED.code().equals(prevMonthReport.getStatus().getCode())
+                            && !ReportStatus.ORGANIZATION_APPROVED.code().equals(prevMonthReport.getStatus().getCode())) {
                     errMsg = "Необходимо утвердить данные за отчетный периюд : " + dateFormat.format(prevMonthReport.getReportDate());
                 }
             }

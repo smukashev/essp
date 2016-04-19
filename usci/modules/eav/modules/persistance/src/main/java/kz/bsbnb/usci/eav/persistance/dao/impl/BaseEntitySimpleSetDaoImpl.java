@@ -132,7 +132,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
         IBaseSet baseSet = new BaseSet(id, metaSet.getMemberType(), creditorId);
 
-        loadBaseValues(baseSet, reportDate);
+        loadBaseValues(baseSet, reportDate, reportDate);
 
         return BaseValueFactory.create(
                 MetaContainerTypes.META_CLASS,
@@ -350,7 +350,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate) {
+    public void loadBaseValues(IBaseEntity baseEntity, Date existingReportDate, Date savingReportDate) {
         Table tableOfSimpleSets = EAV_M_SIMPLE_SET.as("ss");
         Table tableOfEntitySimpleSets = EAV_BE_ENTITY_SIMPLE_SETS.as("ess");
         Select select;
@@ -367,7 +367,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                 .from(tableOfEntitySimpleSets)
                 .where(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID).eq(baseEntity.getId()))
                 .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.CREDITOR_ID).eq(baseEntity.getBaseEntityReportDate().getCreditorId()))
-                .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE).lessOrEqual(DataUtils.convert(actualReportDate)))
+                .and(tableOfEntitySimpleSets.field(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE).lessOrEqual(DataUtils.convert(existingReportDate)))
                 .asTable("essn");
 
         select = context
@@ -397,7 +397,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         }
     }
 
-    protected void loadBaseValues(IBaseSet baseSet, Date actualReportDate) {
+    protected void loadBaseValues(IBaseSet baseSet, Date existingReportDate, Date savingReportDate) {
         IMetaType metaType = baseSet.getMemberType();
 
         if (metaType.isSet())
@@ -407,26 +407,21 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         DataTypes dataType = metaValue.getTypeCode();
 
         switch (dataType) {
-            case INTEGER: {
-                baseSetIntegerValueDao.loadBaseValues(baseSet, actualReportDate);
+            case INTEGER:
+                baseSetIntegerValueDao.loadBaseValues(baseSet, existingReportDate, savingReportDate);
                 break;
-            }
-            case DATE: {
-                baseSetDateValueDao.loadBaseValues(baseSet, actualReportDate);
+            case DATE:
+                baseSetDateValueDao.loadBaseValues(baseSet, existingReportDate, savingReportDate);
                 break;
-            }
-            case STRING: {
-                baseSetStringValueDao.loadBaseValues(baseSet, actualReportDate);
+            case STRING:
+                baseSetStringValueDao.loadBaseValues(baseSet, existingReportDate, savingReportDate);
                 break;
-            }
-            case BOOLEAN: {
-                baseSetBooleanValueDao.loadBaseValues(baseSet, actualReportDate);
+            case BOOLEAN:
+                baseSetBooleanValueDao.loadBaseValues(baseSet, existingReportDate, savingReportDate);
                 break;
-            }
-            case DOUBLE: {
-                baseSetDoubleValueDao.loadBaseValues(baseSet, actualReportDate);
+            case DOUBLE:
+                baseSetDoubleValueDao.loadBaseValues(baseSet, existingReportDate, savingReportDate);
                 break;
-            }
             default:
                 throw new IllegalArgumentException(Errors.compose(Errors.E127));
         }

@@ -5,7 +5,6 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
-import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
@@ -15,13 +14,12 @@ import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
-import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +36,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Autowired
     private DSLContext context;
 
+    @Qualifier("metaClassRepositoryImpl")
     @Autowired
     private IMetaClassRepository metaClassRepository;
 
@@ -101,18 +100,18 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     }
 
     @Override
-    public IBaseEntity load(long id, Date reportDate) {
+    public IBaseEntity load(long id, Date existingReportDate, Date savingReportDate) {
         if (id < 1)
             throw new IllegalArgumentException(Errors.compose(Errors.E93));
 
-        if (reportDate == null)
+        if (existingReportDate == null)
             throw new IllegalArgumentException(Errors.compose(Errors.E94));
 
-        if (refRepository.getRef(id, reportDate) != null)
-            return refRepository.getRef(id, reportDate);
+        if (refRepository.getRef(id, existingReportDate) != null)
+            return refRepository.getRef(id, existingReportDate);
 
         IBaseEntity baseEntity = loadMock(id);
-        IBaseEntityReportDate baseEntityReportDate = baseEntityReportDateDao.load(id, reportDate);
+        IBaseEntityReportDate baseEntityReportDate = baseEntityReportDateDao.load(id, existingReportDate);
         baseEntity.setBaseEntityReportDate(baseEntityReportDate);
 
         baseEntityReportDate.setBaseEntity(baseEntity);
@@ -134,12 +133,12 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                 IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
                         .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
 
-                baseEntityValueDao.loadBaseValues(baseEntity, reportDate);
+                baseEntityValueDao.loadBaseValues(baseEntity, existingReportDate, savingReportDate);
             }
         }
 
         if (baseEntity.getMeta().isReference())
-            refRepository.setRef(id, reportDate, baseEntity);
+            refRepository.setRef(id, existingReportDate, baseEntity);
 
         return baseEntity;
     }

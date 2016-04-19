@@ -12,7 +12,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityIntegerValueDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -460,7 +458,7 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate) {
+    public void loadBaseValues(IBaseEntity baseEntity, Date existingReportDate, Date savingReportDate) {
         Table tableOfAttributes = EAV_M_SIMPLE_ATTRIBUTES.as("a");
         Table tableOfValues = EAV_BE_INTEGER_VALUES.as("v");
         Select select;
@@ -480,7 +478,7 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_INTEGER_VALUES.ENTITY_ID).eq(baseEntity.getId()))
                 .and(tableOfValues.field(EAV_BE_INTEGER_VALUES.REPORT_DATE)
-                        .lessOrEqual(DataUtils.convert(actualReportDate)))
+                        .lessOrEqual(DataUtils.convert(existingReportDate)))
                 .asTable("vn");
 
         select = context
@@ -498,7 +496,7 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
                 .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
                 .and((tableNumbering.field(EAV_BE_INTEGER_VALUES.IS_CLOSED).equal(false)
                         .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
-                        .or(tableNumbering.field(EAV_BE_INTEGER_VALUES.REPORT_DATE).equal(actualReportDate)
+                        .or(tableNumbering.field(EAV_BE_INTEGER_VALUES.REPORT_DATE).equal(savingReportDate)
                                 .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
 
         logger.debug(select.toString());
@@ -515,8 +513,7 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
 
             int value = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
 
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
-                    row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
 
             String attribute = (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
 

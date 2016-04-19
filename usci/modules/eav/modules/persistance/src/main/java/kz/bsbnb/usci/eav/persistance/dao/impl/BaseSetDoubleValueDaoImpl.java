@@ -10,7 +10,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseSetDoubleValueDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -343,7 +341,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseSet baseSet, Date actualReportDate) {
+    public void loadBaseValues(IBaseSet baseSet, Date existingReportDate, Date savingReportDate) {
         Table tableOfValues = EAV_BE_DOUBLE_SET_VALUES.as("ssv");
         Select select;
 
@@ -358,7 +356,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                         tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.SET_ID).eq(baseSet.getId()))
-                .and(tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(actualReportDate)))
+                .and(tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(existingReportDate)))
                 .asTable("ssvn");
 
         select = context
