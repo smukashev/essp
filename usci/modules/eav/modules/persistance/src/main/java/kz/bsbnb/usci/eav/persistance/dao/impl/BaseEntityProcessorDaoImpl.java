@@ -311,7 +311,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
 
         if (metaRules.contains(baseEntityApplied.getMeta().getClassName())) {
-            rulesSingleton.runRules(baseEntityApplied, baseEntityApplied.getMeta().getClassName() + "_parser",
+            rulesSingleton.runRules(baseEntityApplied, baseEntityApplied.getMeta().getClassName() + "_process",
                     baseEntityApplied.getReportDate());
 
             if (baseEntityApplied.getValidationErrors().size() > 0)

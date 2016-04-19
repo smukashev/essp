@@ -28,20 +28,22 @@ function boolean isBA5thSymbolCorrect(String ba, BaseEntity entity){
     if(ba.length() == 7 && ba.endsWith("000")) return true;
 
     List subjects = (List) entity.getEls("{get}subject.organization_info");
-    boolean isResident = false;
+    Boolean isResident = null;
 
     if(subjects.size() > 0) {
         BaseEntity subject = (BaseEntity) subjects.get(0);
-        isResident = isResident || (Integer)subject.getEls("{count}country[code_numeric=398]") > 0;
+        isResident = (Integer)subject.getEls("{count}country[code_numeric=398]") > 0;
     }
 
     subjects = (List) entity.getEls("{get}subject.person_info");
 
     if(subjects.size() > 0) {
         BaseEntity subject = (BaseEntity) subjects.get(0);
-        isResident = isResident || (Integer)subject.getEls("{count}country[code_numeric=398]") > 0;
+        isResident = (Integer)subject.getEls("{count}country[code_numeric=398]") > 0;
     }
 
+    if(isResident == null)
+       return true;
     if(isResident && ba.charAt(4) == '1')
         return true;
     if(!isResident && ba.charAt(4) == '2')
