@@ -20,6 +20,8 @@ public class BaseEntityOutput {
     }
 
     public static String toString(BaseEntity entity, String prefix) {
+        if (entity == null) return "null";
+
         String str = entity.getMeta().getClassName() + "(" + entity.getId() + ", ";
         str += entity.getReportDate() == null ? "-)" : dateFormat.format(entity.getReportDate()) + ");";
 

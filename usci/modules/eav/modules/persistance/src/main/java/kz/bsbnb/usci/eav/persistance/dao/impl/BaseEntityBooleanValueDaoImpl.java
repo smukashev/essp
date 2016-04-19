@@ -387,7 +387,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate) {
+    public void loadBaseValues(IBaseEntity baseEntity, Date existingReportDate, Date savingReportDate) {
         Table tableOfAttributes = EAV_M_SIMPLE_ATTRIBUTES.as("a");
         Table tableOfValues = EAV_BE_BOOLEAN_VALUES.as("v");
         Select select;
@@ -406,7 +406,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                         tableOfValues.field(EAV_BE_BOOLEAN_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.ENTITY_ID).eq(baseEntity.getId()))
-                .and(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(actualReportDate)))
+                .and(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(existingReportDate)))
                 .asTable("vn");
 
         select = context
@@ -424,7 +424,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
                 .and((tableNumbering.field(EAV_BE_BOOLEAN_VALUES.IS_CLOSED).equal(false)
                         .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
-                        .or(tableNumbering.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).equal(actualReportDate)
+                        .or(tableNumbering.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).equal(savingReportDate)
                                 .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
 
         logger.debug(select.toString());

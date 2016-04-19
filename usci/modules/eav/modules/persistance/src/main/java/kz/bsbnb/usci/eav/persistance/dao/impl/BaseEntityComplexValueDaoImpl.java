@@ -13,9 +13,7 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityComplexValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
-import kz.bsbnb.usci.eav.repository.IBatchRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -37,9 +35,6 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
-
-    @Autowired
-    private IBaseEntityDao baseEntityDao;
 
     @Autowired
     private IBaseEntityLoadDao baseEntityLoadDao;
@@ -445,7 +440,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseEntity baseEntity, Date actualReportDate) {
+    public void loadBaseValues(IBaseEntity baseEntity, Date existingReportDate, Date savingReportDate) {
         IMetaClass metaClass = baseEntity.getMeta();
 
         Table tableOfAttributes = EAV_M_COMPLEX_ATTRIBUTES.as("a");
@@ -468,7 +463,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_COMPLEX_VALUES.ENTITY_ID).eq(baseEntity.getId()))
                 .and(tableOfValues.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE)
-                        .lessOrEqual(DataUtils.convert(actualReportDate)))
+                        .lessOrEqual(DataUtils.convert(existingReportDate)))
                 .asTable("vn");
 
         select = context
@@ -486,7 +481,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                 .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
                 .and((tableNumbering.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED).equal(false)
                         .and(tableOfAttributes.field(EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL).equal(false)))
-                        .or(tableNumbering.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE).equal(actualReportDate)
+                        .or(tableNumbering.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE).equal(savingReportDate)
                                 .and(tableOfAttributes.field(EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL).equal(true))));
 
         logger.debug(select.toString());
@@ -511,7 +506,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
             IMetaType metaType = metaClass.getMemberType(attribute);
 
-            IBaseEntity childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, actualReportDate);
+            IBaseEntity childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, existingReportDate);
 
             baseEntity.put(attribute, BaseValueFactory.create(
                     MetaContainerTypes.META_CLASS,
@@ -527,8 +522,6 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Override
     public void deleteAll(long baseEntityId) {
-        Set<Long> childBaseEntityIds = getChildBaseEntityIds(baseEntityId);
-
         String tableAlias = "cv";
         Delete delete = context
                 .delete(EAV_BE_COMPLEX_VALUES.as(tableAlias))
@@ -536,64 +529,5 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-
-        for (long childBaseEntityId : childBaseEntityIds)
-            baseEntityDao.deleteRecursive(childBaseEntityId);
-    }
-
-    @Override
-    public Set<Long> getChildBaseEntityIds(long parentBaseEntityId) {
-        Set<Long> baseEntityIds = new HashSet<>();
-
-        String tableAlias = "bv";
-        Select select = context
-                .select(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID)
-                .from(EAV_BE_COMPLEX_VALUES.as(tableAlias))
-                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_ID.equal(parentBaseEntityId))
-                .groupBy(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID);
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        if (rows.size() > 0) {
-            for (Map<String, Object> row : rows) {
-                long childBaseEntityId = ((BigDecimal) row
-                        .get(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID.getName())).longValue();
-                baseEntityIds.add(childBaseEntityId);
-            }
-        }
-
-        return baseEntityIds;
-    }
-
-    @Override
-    public Set<Long> getChildBaseEntityIdsWithoutRefs(long parentBaseEntityId) {
-        Set<Long> baseEntityIds = new HashSet<>();
-
-        String entitiesTableAlias = "e";
-        String classesTableAlias = "c";
-        String complexValuesTableAlias = "cv";
-        Select select = context
-                .select(EAV_BE_ENTITIES.as(entitiesTableAlias).ID)
-                .from(EAV_BE_ENTITIES.as(entitiesTableAlias))
-                .join(EAV_M_CLASSES.as(classesTableAlias))
-                .on(EAV_BE_ENTITIES.as(entitiesTableAlias).CLASS_ID.equal(EAV_M_CLASSES.as(classesTableAlias).ID))
-                .join(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias))
-                .on(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_VALUE_ID.equal(EAV_BE_ENTITIES.as(entitiesTableAlias).ID))
-                .where(EAV_BE_COMPLEX_VALUES.as(complexValuesTableAlias).ENTITY_ID.equal(parentBaseEntityId))
-                .and(EAV_M_CLASSES.as(classesTableAlias).IS_REFERENCE.equal(DataUtils.convert(false)))
-                .groupBy(EAV_BE_ENTITIES.as(entitiesTableAlias).ID);
-
-        logger.debug(select.toString());
-        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
-
-        if (rows.size() > 0) {
-            for (Map<String, Object> row : rows) {
-                long childBaseEntityId = ((BigDecimal) row.get(EAV_BE_ENTITIES.ID.getName())).longValue();
-                baseEntityIds.add(childBaseEntityId);
-            }
-        }
-
-        return baseEntityIds;
     }
 }

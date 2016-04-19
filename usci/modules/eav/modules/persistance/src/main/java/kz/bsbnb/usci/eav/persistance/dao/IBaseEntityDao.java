@@ -9,7 +9,7 @@ import java.util.Set;
 public interface IBaseEntityDao extends IPersistableDao {
     IBaseEntity loadMock(long id);
 
-    IBaseEntity load(long id, Date reportDate);
+    IBaseEntity load(long id, Date reportDate, Date savingReportDate);
 
     IMetaClass getMetaClass(long baseEntityId);
 
