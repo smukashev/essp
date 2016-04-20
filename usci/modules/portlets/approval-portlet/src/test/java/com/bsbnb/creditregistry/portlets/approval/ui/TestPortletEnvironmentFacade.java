@@ -25,7 +25,7 @@ public class TestPortletEnvironmentFacade implements PortletEnvironmentFacade {
     }
 
     public TestPortletEnvironmentFacade(String language) {
-        locale = new Locale(language);
+        locale = new Locale("ru", "RU");
         bundle = ResourceBundle.getBundle("content.Language", locale);
     }
 

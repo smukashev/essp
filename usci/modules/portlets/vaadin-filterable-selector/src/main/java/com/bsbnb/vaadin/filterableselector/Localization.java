@@ -18,10 +18,10 @@ public enum Localization {
     SELECTION_EMPTY_PROMPT("SELECTION-EMPTY-PROMPT"),
     SELECTION_EMPTY_CAPTION("SELECTION-EMPTY-CAPTION");
     private static final String BUNDLE_NAME = "com.bsbnb.vaadin.filterableselector.content.Language";
-    private static ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru"));
+    private static ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
 
     public static void setLocale(Locale locale) {
-        bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+        bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
     }
     private String key;
 

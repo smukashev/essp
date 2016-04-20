@@ -1,6 +1,7 @@
 package com.bsbnb.usci.portlets.protocol.ui;
 
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -18,7 +19,7 @@ public class TestPortletEnvironmentFacade extends PortletEnvironmentFacade{
     }
     
     public TestPortletEnvironmentFacade(String language) {
-        locale = new Locale(language);
+        locale = new Locale("ru", "RU");
         bundle = ResourceBundle.getBundle("content.Language", locale);
     }
 

@@ -5,10 +5,12 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
+
+import javax.portlet.RenderRequest;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.portlet.RenderRequest;
 
 /**
  *
@@ -30,7 +32,7 @@ public class PortletEnvironmentImpl implements PortletEnvironment {
         for (Role role : user.getRoles()) {
             roles.add(role.getName());
         }
-        bundle = ResourceBundle.getBundle(BUNDLE_NAME, user.getLocale());
+        bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
     }
 
     @Override

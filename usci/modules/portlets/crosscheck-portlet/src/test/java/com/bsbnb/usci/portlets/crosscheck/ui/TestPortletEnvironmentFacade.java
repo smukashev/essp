@@ -20,7 +20,7 @@ public class TestPortletEnvironmentFacade extends PortletEnvironmentFacade {
     }
     
     public TestPortletEnvironmentFacade(String language) {
-        locale = new Locale(language);
+        locale = new Locale("ru", "RU");
         bundle = ResourceBundle.getBundle("content.Language", locale);
     }
 

@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 
 /**
  *
@@ -26,7 +25,7 @@ public class NotificationsPortalEnvironmentFacade implements PortalEnvironmentFa
     public NotificationsPortalEnvironmentFacade(User user) {
         this.user = user;
         if(user != null) {
-            this.locale = user.getLocale();
+            this.locale = new Locale("ru", "RU");
             this.bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
             try {
                 for (Role role : user.getRoles()) {
