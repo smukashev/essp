@@ -14,7 +14,7 @@ public class SigningPortletEnvironment {
     private final ResourceBundle bundle;
 
     public SigningPortletEnvironment(Locale locale) {
-        bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+        bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
     }
 
     public String getResourceString(Localization localization) {

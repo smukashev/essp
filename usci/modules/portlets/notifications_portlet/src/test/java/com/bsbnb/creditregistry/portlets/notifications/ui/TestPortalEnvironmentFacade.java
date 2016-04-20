@@ -1,6 +1,7 @@
 package com.bsbnb.creditregistry.portlets.notifications.ui;
 
 import com.bsbnb.creditregistry.portlets.notifications.PortalEnvironmentFacade;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -20,7 +21,7 @@ public class TestPortalEnvironmentFacade implements PortalEnvironmentFacade {
     public TestPortalEnvironmentFacade(long userId, Locale locale, boolean isAdmin) {
         this.userId = userId;
         this.locale = locale;
-        this.bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+        this.bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
         this.isAdmin = isAdmin;
     }
 

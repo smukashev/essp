@@ -5,13 +5,14 @@
 package com.bsbnb.usci.portlets.audit;
 
 
-import com.bsbnb.usci.portlets.audit.dm.AuditTableRecord;
 import com.bsbnb.usci.portlets.audit.dm.AuditController;
+import com.bsbnb.usci.portlets.audit.dm.AuditTableRecord;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -32,7 +33,7 @@ public class AuditLayout extends VerticalLayout {
     private Button deleteButton;  
     
     public AuditLayout(Locale locale) {
-        bundle = ResourceBundle.getBundle("content.Language", locale);
+        bundle = ResourceBundle.getBundle("content.Language", new Locale("ru", "RU"));
     }
     
     public String getString(String key) {

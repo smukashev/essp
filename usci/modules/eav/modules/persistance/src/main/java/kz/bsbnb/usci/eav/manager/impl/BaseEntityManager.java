@@ -122,6 +122,9 @@ public class BaseEntityManager implements IBaseEntityManager {
 
     @Override
     public IBaseEntity getProcessed(IBaseEntity baseEntity) {
+        if (!baseEntity.getMeta().isSearchable())
+            return null;
+
         List<IBaseEntity> entityList = processedEntities.get(baseEntity.getMeta().getClassName());
 
         if (entityList == null)
