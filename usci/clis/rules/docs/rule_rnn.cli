@@ -103,7 +103,7 @@ title: документ рук юр лица РНН
 rule "документ рук юр лица РНН"
 when
 	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& ($r : getInvalidRNNs((List)getEls("{get}subject.organization_info.head.docs[doc_type.code=11]no"), false) && $r.size() > 0))
+			&& ($r : getInvalidRNNs((List)getEls("{get}subject.organization_info.head.docs[doc_type.code=11]no"), true) && $r.size() > 0))
 then
 	$entity.addValidationError("" + $r);
 end
