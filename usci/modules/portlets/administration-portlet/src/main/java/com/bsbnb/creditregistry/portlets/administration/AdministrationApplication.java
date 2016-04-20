@@ -2,24 +2,20 @@ package com.bsbnb.creditregistry.portlets.administration;
 
 import com.bsbnb.creditregistry.portlets.administration.data.BeanDataProvider;
 import com.bsbnb.creditregistry.portlets.administration.ui.MainSplitPanel;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletRequestListener;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Window;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 
 import javax.portlet.*;
 import java.security.AccessControlException;
+import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 
 /**
  * @author Marat Madybayev
@@ -45,7 +41,7 @@ public class AdministrationApplication extends Application implements PortletReq
     }
 
     public void onRequestStart(PortletRequest request, PortletResponse response) {
-        bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
+        bundle = ResourceBundle.getBundle("content.Language", new Locale("ru", "RU"));
     }
 
     public void onRequestEnd(PortletRequest request, PortletResponse response) {

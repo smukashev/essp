@@ -1,8 +1,9 @@
 package com.bsbnb.usci.portlets.protocol;
 
-import java.util.ResourceBundle;
-
 import com.liferay.portal.model.User;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 
 /**
@@ -18,7 +19,7 @@ public class ProtocolPortletEnvironmentFacade extends PortletEnvironmentFacade{
 
     public ProtocolPortletEnvironmentFacade(User user, boolean isNB) {
         this.user = user;
-        bundle = ResourceBundle.getBundle(BUNDLE_NAME, user.getLocale());
+        bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
         isKazakh = "kz".equals(user.getLocale().getLanguage());
         this.isNB = isNB;
     }

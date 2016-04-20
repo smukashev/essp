@@ -6,6 +6,7 @@ package kz.bsbnb.usci.portlets.upload.ui;
 
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlets.upload.PortletEnvironmentFacade;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -18,7 +19,7 @@ public class TestPortletEnvironmentFacade implements PortletEnvironmentFacade {
     private ResourceBundle bundle;
 
     public TestPortletEnvironmentFacade(Locale userLocale) {
-        bundle = ResourceBundle.getBundle("content.Language", userLocale);
+        bundle = ResourceBundle.getBundle("content.Language", new Locale("ru", "RU"));
     }
 
     public String getResourceString(String key) {

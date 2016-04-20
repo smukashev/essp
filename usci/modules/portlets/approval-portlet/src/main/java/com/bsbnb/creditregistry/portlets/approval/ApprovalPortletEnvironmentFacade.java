@@ -12,8 +12,8 @@ import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
 import org.apache.log4j.Logger;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 
 /**
  *
@@ -34,7 +34,7 @@ public class ApprovalPortletEnvironmentFacade implements PortletEnvironmentFacad
     public ApprovalPortletEnvironmentFacade(User user) {
         this.user = user;
         readUserProperties(user);
-        bundle = ResourceBundle.getBundle(BUNDLE_NAME, user.getLocale());
+        bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
         isKazakh = "kz".equals(user.getLocale().getLanguage());
     }
 

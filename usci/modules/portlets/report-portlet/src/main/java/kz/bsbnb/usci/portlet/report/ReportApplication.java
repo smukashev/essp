@@ -1,12 +1,7 @@
 package kz.bsbnb.usci.portlet.report;
 
-import com.liferay.portal.model.Role;
-import kz.bsbnb.usci.eav.util.Errors;
-import kz.bsbnb.usci.portlet.report.dm.DatabaseConnect;
-import kz.bsbnb.usci.portlet.report.ui.MainLayout;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
@@ -14,24 +9,18 @@ import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
+import kz.bsbnb.usci.eav.util.Errors;
+import kz.bsbnb.usci.portlet.report.dm.DatabaseConnect;
+import kz.bsbnb.usci.portlet.report.ui.MainLayout;
 import org.apache.log4j.Logger;
 
+import javax.portlet.*;
 import java.security.AccessControlException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.EventRequest;
-import javax.portlet.EventResponse;
-import javax.portlet.PortletPreferences;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
 
 public class ReportApplication extends Application {
 
@@ -126,7 +115,7 @@ public class ReportApplication extends Application {
                 }
                 logger.info("Items view type: " + viewType);
 
-                bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
+                bundle = ResourceBundle.getBundle("content.Language", new Locale("ru", "RU"));
                 DatabaseConnect connect = new DatabaseConnect(user);
                 MainLayout layout = new MainLayout(connect);
                 layout.setWidth("100%");
