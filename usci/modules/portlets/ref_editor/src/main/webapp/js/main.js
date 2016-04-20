@@ -152,7 +152,8 @@ function loadEntity(entityId, date) {
             op : 'LIST_ENTITY',
             entityId: entityId,
             date: date,
-            asRoot: true
+            asRoot: true,
+            timeout:120000
         },
         callback: function(records, operation, success) {
             if (!success) {
@@ -195,7 +196,8 @@ function loadSubEntity(subNode, idSuffix) {
             op : 'LIST_ENTITY',
             entityId: subEntityId,
             date: Ext.getCmp('edDate').value,
-            asRoot: false
+            asRoot: false,
+            timeout: 120000
         },
         callback: function(records, operation, success) {
             if (!success) {
@@ -566,6 +568,8 @@ function hasEmptyKeySet(mainNode) {
 }
 
 Ext.onReady(function() {
+    Ext.override(Ext.data.proxy.Ajax, {timeout: 120000});
+
     grid = null;
 
     Ext.define('MyCheckboxField', {
@@ -666,7 +670,7 @@ Ext.onReady(function() {
         proxy: {
             type: 'ajax',
             url: dataUrl,
-            extraParams: {op : 'LIST_ENTITY'}
+            extraParams: {op : 'LIST_ENTITY', timeout: 120000}
         },
         folderSort: true
     });
@@ -677,7 +681,7 @@ Ext.onReady(function() {
         proxy: {
             type: 'ajax',
             url: dataUrl,
-            extraParams: {op : 'LIST_ENTITY'}
+            extraParams: {op : 'LIST_ENTITY', timeout: 120000}
         },
         folderSort: true
     });
