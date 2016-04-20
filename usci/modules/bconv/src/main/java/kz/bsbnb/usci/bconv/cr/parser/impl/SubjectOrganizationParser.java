@@ -215,7 +215,7 @@ public class SubjectOrganizationParser extends BatchParser {
 
                 organizationInfo.put("is_se",
                         new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(),
-                                Boolean.valueOf(event.asCharacters().getData()), false, true));
+                                (boolean)DataTypes.getCastObject(DataTypes.BOOLEAN, event.asCharacters().getData()), false, true));
                 break;
             case "docs":
                 BaseSet organizationDocs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);

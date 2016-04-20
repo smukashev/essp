@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -139,7 +140,7 @@ public class CreditParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("has_currency_earn",
                         new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(),
-                                Boolean.valueOf(event.asCharacters().getData()), false, true));
+                                (boolean)DataTypes.getCastObject(DataTypes.BOOLEAN, event.asCharacters().getData()), false, true));
                 break;
             case "creditor_branch":
                 creditorBranchParser.parse(xmlReader, batch, index, creditorId);
