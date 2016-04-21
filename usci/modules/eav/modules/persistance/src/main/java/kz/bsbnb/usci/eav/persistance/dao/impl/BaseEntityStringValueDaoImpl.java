@@ -78,7 +78,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         String tableAlias = "cv";
         Update update = context
                 .update(EAV_BE_STRING_VALUES.as(tableAlias))
-                .set(EAV_BE_STRING_VALUES.as(tableAlias).VALUE, DataUtils.convert((Date) baseValue.getValue()))
+                .set(EAV_BE_STRING_VALUES.as(tableAlias).VALUE, (String) baseValue.getValue())
                 .where(EAV_BE_STRING_VALUES.as(tableAlias).ENTITY_ID.equal(parentEntity.getId())
                         .and(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID.eq(baseValue.getMetaAttribute().getId()))
                         .and(EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID.eq(baseValue.getCreditorId()))
