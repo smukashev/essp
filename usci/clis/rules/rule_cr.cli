@@ -481,11 +481,12 @@ rule save
 rule read $$$
 title: название документа
 rule "название документа"
+//MES917
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
                 && getEls("{count}subject.docs[doc_type.code!=16][name!=null]") > 0 )
 then
- $entity.addValidationError("Наименование документа указывается только для иного документа");
+ $entity.addValidationError("Присутсвует излишнее наименование документа");
 end
 $$$
 
