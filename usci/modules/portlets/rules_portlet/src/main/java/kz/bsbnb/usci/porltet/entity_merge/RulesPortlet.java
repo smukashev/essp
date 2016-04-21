@@ -50,14 +50,14 @@ public class RulesPortlet extends MVCPortlet{
 
 
             RmiProxyFactoryBean ruleServiceFactoryBean = new RmiProxyFactoryBean();
-            ruleServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/ruleService");
+            ruleServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/ruleService");
             ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
 
             ruleServiceFactoryBean.afterPropertiesSet();
             ruleService = (IRuleService) ruleServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean batchServiceFactoryBean = new RmiProxyFactoryBean();
-            batchServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchService");
+            batchServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/packageService");
             batchServiceFactoryBean.setServiceInterface(IPackageService.class);
 
             batchServiceFactoryBean.afterPropertiesSet();
