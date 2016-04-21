@@ -66,6 +66,11 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     }
 
     @Override
+    public void complexUpdate(IPersistable persistable) {
+        throw new IllegalStateException(Errors.compose(Errors.E88, 0, persistable.getId()));
+    }
+
+    @Override
     public void update(IPersistable persistable) {
         throw new UnsupportedOperationException(Errors.compose(Errors.E2));
     }

@@ -64,6 +64,11 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
     }
 
     @Override
+    public void complexUpdate(IPersistable persistable) {
+        throw new IllegalStateException(Errors.compose(Errors.E88, 0, persistable.getId()));
+    }
+
+    @Override
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
 
