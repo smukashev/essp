@@ -71,6 +71,11 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
     }
 
     @Override
+    public void complexUpdate(IPersistable persistable) {
+        throw new IllegalStateException(Errors.compose(Errors.E88, 0, persistable.getId()));
+    }
+
+    @Override
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
 
