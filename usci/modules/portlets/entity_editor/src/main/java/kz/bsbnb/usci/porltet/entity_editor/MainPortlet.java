@@ -593,6 +593,10 @@ public class MainPortlet extends MVCPortlet {
                     } else {
                         searchClassName = resourceRequest.getParameter("searchName");
                         metaName = resourceRequest.getParameter("metaClass");
+
+                        if(searchClassName == null || metaName == null)
+                            return;
+
                         metaClass = metaFactoryService.getMetaClass(metaName);
                         try {
                             creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
