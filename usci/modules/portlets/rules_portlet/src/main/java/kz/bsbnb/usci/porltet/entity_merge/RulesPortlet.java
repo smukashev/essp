@@ -336,11 +336,33 @@ public class RulesPortlet extends MVCPortlet{
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             currentException = null;
-            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
+            String originalError = castJsonString(e);
+            if(originalError.contains("connect") || originalError.contains("rmi"))
+            if(!retry) {
+                retry = true;
+                logger.info("connect failed, reconnect triggered");
+                try {
+                    connectToServices();
+                    serveResource(resourceRequest, resourceResponse);
+                } catch (Exception e1) {
+                    logger.info("reconnect failed, seems services are down");
+                    originalError = castJsonString(e1);
+                    writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError + "\"}");
+                } finally {
+                    retry = false;
+                    return;
+                }
+            }
+
             originalError = Errors.decompose(originalError);
-            writer.write("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}");
+            writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError +"\"}");
         }
 
+    }
+
+    private String castJsonString(Exception e) {
+        return e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;")
+                        .replaceAll("\n","").replaceAll("\t"," ") : e.getClass().getName();
     }
 }
 

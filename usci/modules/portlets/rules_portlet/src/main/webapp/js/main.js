@@ -529,12 +529,18 @@ Ext.onReady(function(){
             extraParams: {
                 op: 'PACKAGE_ALL'
             },
+            listeners : {
+                exception: function(proxy, response, operation, eOpts) {
+                    var r = JSON.parse(response.responseText);
+                    if(r.errorMessage)
+                        Ext.Msg.alert("ошибка",r.errorMessage);
+                }
+            },
             reader: {
                 type: 'json',
                 root: 'data'
             }
-        },
-        autoLoad: true
+        }
     });
 
     packageVersionStore = Ext.create('Ext.data.Store',{
