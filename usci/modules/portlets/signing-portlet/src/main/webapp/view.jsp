@@ -236,7 +236,7 @@
                             </tr>
                             <c:forEach var="fileSignatureRecord" items="${inputFiles}">
                                 <tr>
-                                    <td align='center'><input id="check${fileSignatureRecord.id}" name="check${fileSignatureRecord.id}" type="checkbox" checked="true"/></td>
+                                    <td align='center'><input id="check${fileSignatureRecord.id}" name="check${fileSignatureRecord.id}" type="checkbox" checked="false"/></td>
                                     <td>${fileSignatureRecord.filename}</td>
                                     <td align='center'>
                                             ${fileSignatureRecord.sentDate}
