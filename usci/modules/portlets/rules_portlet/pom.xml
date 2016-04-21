@@ -11,7 +11,7 @@
 
     <properties>
         <liferay.version>6.1.1</liferay.version>
-        <liferay.auto.deploy.dir>C:\liferay-portal-6.1.2-ce-ga3\deploy</liferay.auto.deploy.dir>
+        <liferay.auto.deploy.dir>${env.deploy}</liferay.auto.deploy.dir>
         <liferay.app.server.deploy.dir>C:\liferay-portal-6.1.2-ce-ga3\deploy</liferay.app.server.deploy.dir>
         <liferay.app.server.portal.dir>C:\liferay-portal-6.1.2-ce-ga3\deploy</liferay.app.server.portal.dir>
     </properties>
@@ -127,6 +127,11 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
         </dependency>
     </dependencies>
 

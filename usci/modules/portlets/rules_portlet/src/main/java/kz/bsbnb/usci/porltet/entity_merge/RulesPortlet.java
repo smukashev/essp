@@ -34,7 +34,6 @@ public class RulesPortlet extends MVCPortlet{
     private IEntityService entityService;
     private boolean retry;
     private static final Logger logger = Logger.getLogger(RulesPortlet.class);
-    private Exception currentException;
 
     public void connectToServices() throws PortletException {
         try {
@@ -89,8 +88,8 @@ public class RulesPortlet extends MVCPortlet{
                 throw new AccessControlException(Errors.compose(Errors.E238));
 
         } catch (Exception e) {
-            currentException = e;
             logger.error(e.getMessage(),e);
+            renderRequest.setAttribute("error", "Нет прав для просмотра");
         }
 
         super.doView(renderRequest, renderResponse);
@@ -148,8 +147,6 @@ public class RulesPortlet extends MVCPortlet{
         PrintWriter writer = resourceResponse.getWriter();
 
         try {
-            if(currentException != null)
-                throw currentException;
 
             if(batchService == null ||ruleService ==null || entityService == null)
                 connectToServices();
@@ -335,7 +332,6 @@ public class RulesPortlet extends MVCPortlet{
 
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            currentException = null;
             String originalError = castJsonString(e);
             if(originalError.contains("connect") || originalError.contains("rmi"))
             if(!retry) {
