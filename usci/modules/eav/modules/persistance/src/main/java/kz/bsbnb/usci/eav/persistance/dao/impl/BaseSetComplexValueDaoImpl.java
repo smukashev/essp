@@ -36,9 +36,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
     private DSLContext context;
 
     @Autowired
-    private IBaseEntityDao baseEntityDao;
-
-    @Autowired
     private IBaseEntityLoadDao baseEntityLoadDao;
 
     @Override
@@ -61,6 +58,11 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         baseValue.setId(baseValueId);
 
         return baseValueId;
+    }
+
+    @Override
+    public void complexUpdate(IPersistable persistable) {
+        throw new IllegalStateException(Errors.compose(Errors.E88, 0, persistable.getId()));
     }
 
     @Override

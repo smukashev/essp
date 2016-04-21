@@ -71,6 +71,27 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
     }
 
     @Override
+    public void complexUpdate(IPersistable persistable) {
+        IBaseValue baseValue = (IBaseValue) persistable;
+        IBaseEntity parentEntity = (IBaseEntity) baseValue.getBaseContainer();
+
+        String tableAlias = "cv";
+        Update update = context
+                .update(EAV_BE_INTEGER_VALUES.as(tableAlias))
+                .set(EAV_BE_INTEGER_VALUES.as(tableAlias).VALUE, DataUtils.convert((Date) baseValue.getValue()))
+                .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ENTITY_ID.equal(parentEntity.getId())
+                        .and(EAV_BE_INTEGER_VALUES.as(tableAlias).ATTRIBUTE_ID.eq(baseValue.getMetaAttribute().getId()))
+                        .and(EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID.eq(baseValue.getCreditorId()))
+                        .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.eq(DataUtils.convert(baseValue.getRepDate()))));
+
+        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
+
+        if (count != 1)
+            throw new IllegalStateException(Errors.compose(Errors.E88, count, baseValue.getId()));
+    }
+
+
+    @Override
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
 

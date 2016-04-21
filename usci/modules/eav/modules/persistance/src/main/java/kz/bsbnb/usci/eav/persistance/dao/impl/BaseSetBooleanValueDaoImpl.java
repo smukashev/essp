@@ -67,6 +67,11 @@ public class BaseSetBooleanValueDaoImpl extends JDBCSupport implements IBaseSetB
     }
 
     @Override
+    public void complexUpdate(IPersistable persistable) {
+        throw new IllegalStateException(Errors.compose(Errors.E88, 0, persistable.getId()));
+    }
+
+    @Override
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
 
