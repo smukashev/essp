@@ -151,22 +151,21 @@ $$$
 
 rule save
 
-rule read $$$
-title: проверка 7 символа  бс дисконта
-rule "проверка 7 символа  бс дисконта"
-when
-	$entity: BaseEntity(getMeta().getClassName() == "credit"
-			&& $r : getEl("change.remains.discount.balance_account.no_")
-			&& $r != null
-			&& $c : getEl("currency.short_name")
-			&& $c != null
-			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
-then
-	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
-end
-$$$
-
-rule save
+#rule read $$$
+#title: проверка 7 символа  бс дисконта
+#rule "проверка 7 символа  бс дисконта"
+#when
+#	$entity: BaseEntity(getMeta().getClassName() == "credit"
+#			&& $r : getEl("change.remains.discount.balance_account.no_")
+#			&& $r != null
+#			&& $c : getEl("currency.short_name")
+#			&& $c != null
+#			&& !isBA7thSymbolCorrect(baseEntityProcessorDao, metaClassRepository, (String)$r, (String)$c, getReportDate()))
+#then
+#	$entity.addValidationError("7й символ балансового счета  неккоректный: " + $r);
+#end
+#$$$
+#rule save
 
 rule read $$$
 title: проверка 7 символа  бс лимита
