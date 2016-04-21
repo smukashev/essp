@@ -34,7 +34,6 @@ public class RulesPortlet extends MVCPortlet{
     private IEntityService entityService;
     private boolean retry;
     private static final Logger logger = Logger.getLogger(RulesPortlet.class);
-    private Exception currentException;
 
     public void connectToServices() throws PortletException {
         try {
@@ -50,14 +49,14 @@ public class RulesPortlet extends MVCPortlet{
 
 
             RmiProxyFactoryBean ruleServiceFactoryBean = new RmiProxyFactoryBean();
-            ruleServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/ruleService");
+            ruleServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/ruleService");
             ruleServiceFactoryBean.setServiceInterface(IRuleService.class);
 
             ruleServiceFactoryBean.afterPropertiesSet();
             ruleService = (IRuleService) ruleServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean batchServiceFactoryBean = new RmiProxyFactoryBean();
-            batchServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1097/batchService");
+            batchServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/packageService");
             batchServiceFactoryBean.setServiceInterface(IPackageService.class);
 
             batchServiceFactoryBean.afterPropertiesSet();
@@ -89,8 +88,8 @@ public class RulesPortlet extends MVCPortlet{
                 throw new AccessControlException(Errors.compose(Errors.E238));
 
         } catch (Exception e) {
-            currentException = e;
             logger.error(e.getMessage(),e);
+            renderRequest.setAttribute("error", "Нет прав для просмотра");
         }
 
         super.doView(renderRequest, renderResponse);
@@ -148,8 +147,6 @@ public class RulesPortlet extends MVCPortlet{
         PrintWriter writer = resourceResponse.getWriter();
 
         try {
-            if(currentException != null)
-                throw currentException;
 
             if(batchService == null ||ruleService ==null || entityService == null)
                 connectToServices();
@@ -335,12 +332,33 @@ public class RulesPortlet extends MVCPortlet{
 
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
-            currentException = null;
-            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
+            String originalError = castJsonString(e);
+            if(originalError.contains("connect") || originalError.contains("rmi"))
+            if(!retry) {
+                retry = true;
+                logger.info("connect failed, reconnect triggered");
+                try {
+                    connectToServices();
+                    serveResource(resourceRequest, resourceResponse);
+                } catch (Exception e1) {
+                    logger.info("reconnect failed, seems services are down");
+                    originalError = castJsonString(e1);
+                    writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError + "\"}");
+                } finally {
+                    retry = false;
+                    return;
+                }
+            }
+
             originalError = Errors.decompose(originalError);
-            writer.write("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}");
+            writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError +"\"}");
         }
 
+    }
+
+    private String castJsonString(Exception e) {
+        return e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;")
+                        .replaceAll("\n","").replaceAll("\t"," ") : e.getClass().getName();
     }
 }
 
