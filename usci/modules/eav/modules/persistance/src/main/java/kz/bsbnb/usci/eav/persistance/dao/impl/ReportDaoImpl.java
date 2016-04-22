@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.repository.IEavGlobalRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.ReportStatus;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -359,5 +360,20 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
             report.setStatus(shared);
         }
         return report;
+    }
+
+    @Override
+    public Report getFirstReport(long creditorId) {
+        Select select = context.select(DSL.min(EAV_REPORT.REPORT_DATE))
+                .from(EAV_REPORT)
+                .where(EAV_REPORT.CREDITOR_ID.eq(creditorId));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if(rows.size() < 1)
+            return null;
+
+        Date reportDate = (Timestamp)rows.iterator().next().get(EAV_REPORT.REPORT_DATE.getName());
+        return getReport(creditorId, reportDate);
     }
 }

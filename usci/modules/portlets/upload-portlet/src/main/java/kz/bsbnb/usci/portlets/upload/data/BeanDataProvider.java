@@ -9,10 +9,9 @@ import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author Aidar.Myrzahanov
@@ -142,5 +141,15 @@ public class BeanDataProvider implements DataProvider {
         }
 
         return firstDates;
+    }
+
+    @Override
+    public Date getDefaultDate() throws ParseException {
+        return new SimpleDateFormat("dd.MM.yyyy").parse(globalService.getValue(ORG_FIRST_DATE_SETTING, DEFAULT_DATE_VALUE));
+    }
+
+    @Override
+    public void saveOrganizationFirstDates(String firstDateString) {
+        globalService.update(ORG_FIRST_DATE_SETTING, CREDITOR_DATES, firstDateString);
     }
 }

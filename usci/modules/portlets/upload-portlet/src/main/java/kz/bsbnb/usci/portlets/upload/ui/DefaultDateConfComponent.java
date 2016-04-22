@@ -38,7 +38,7 @@ public class DefaultDateConfComponent extends VerticalLayout {
         calendar.set(Calendar.DAY_OF_MONTH, 1);
 
         List<Creditor> creditors = provider.getOrganizations();
-        Map<Long, String> firstDates = provider.getOrganizationFirstDates();
+        final Map<Long, String> firstDates = provider.getOrganizationFirstDates();
 
         //final List<DateField> dateFields = new LinkedList<>();
         final Map<Long, DateField> dateFields = new HashMap<>();
@@ -56,19 +56,40 @@ public class DefaultDateConfComponent extends VerticalLayout {
         }
 
         addComponent(new Button("Сохранить", new Button.ClickListener() {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+
 
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
 
-                for (DateField dateField : dateFields.values()) {
-                    if( !sdf.format(((Date) dateField.getValue())).startsWith("01")) {
-                        getWindow().showNotification("ERROR", dateField.getCaption() + " не является первой датой" );
-                        break;
-                    }
-                }
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+                    Date getDefaultDate = provider.getDefaultDate();
+                    StringBuffer firstDateString = new StringBuffer();
 
-                //getWindow().showNotification("WARN", sdf.format(dateFields.get(2288L).getValue()));
+                    for (DateField dateField : dateFields.values()) {
+                        if (!sdf.format(((Date) dateField.getValue())).startsWith("01")) {
+                            getWindow().showNotification("ERROR", dateField.getCaption() + "- " + sdf.format((Date) dateField.getValue()) + " не является первой датой");
+                            break;
+                        }
+                    }
+
+                    String separator = "";
+
+                    for (Long cid : dateFields.keySet()) {
+                        Date date = (Date) dateFields.get(cid).getValue();
+                        if (!date.equals(getDefaultDate)) {
+                            firstDateString.append(separator);
+                            separator = ",";
+                            firstDateString.append(cid + "=" + sdf.format(date));
+                        }
+                    }
+
+                    provider.saveOrganizationFirstDates(firstDateString.toString());
+
+                    getWindow().showNotification("WARN", "Сохранено успешно");
+                } catch (Exception e) {
+                    getWindow().showNotification("ERROR","Ошибка " + e.getMessage());
+                }
             }
         }));
 

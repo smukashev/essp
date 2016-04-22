@@ -34,4 +34,6 @@ public interface ReportBeanRemoteBusiness {
     void updateReport(Report report);
 
     void setTotalCount(long reportId, long totalCount);
+
+    Report getFirstReport(long creditorId);
 }
