@@ -2212,9 +2212,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         }
                     } catch (Exception insertException) {
                         try {
-                            persistableDao.update(insertedObject);
+                            persistableDao.complexUpdate(insertedObject);
                         } catch (Exception updateException) {
-                            throw new IllegalStateException(Errors.compose(Errors.E76, insertedObject));
+                            /*throw new IllegalStateException(Errors.compose(Errors.E76, insertedObject));*/
                         }
                     }
                 }
