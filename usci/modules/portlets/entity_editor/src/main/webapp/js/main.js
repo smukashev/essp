@@ -423,7 +423,6 @@ function addField(form, attr, idSuffix, node) {
                         totalProperty: 'total'
                     }
                 },
-                autoLoad: true,
                 remoteSort: true
             }),
             displayField: 'title',
@@ -1162,7 +1161,6 @@ Ext.onReady(function () {
                 totalProperty: 'total'
             }
         },
-        autoLoad: true,
         remoteSort: true
     });
 
@@ -1221,7 +1219,7 @@ Ext.onReady(function () {
                         }
                     },
                     format: 'd.m.Y',
-                    value: '01.11.2015'
+                    value: new Date()
                 }]
             }, {
                 region: 'center',

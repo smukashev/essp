@@ -2,6 +2,7 @@
 <%@ page import="com.liferay.portal.kernel.util.WebKeys" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 <%@ taglib prefix="aui" uri="http://alloy.liferay.com/tld/aui" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <portlet:defineObjects />
 
@@ -66,6 +67,13 @@
 <script src="<%=request.getContextPath()%>/js/lang/default.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/lang/<%= ((ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY)).getLocale() %>.js" type="text/javascript"></script>
 
-<div id="entity-editor-content">
+<c:choose>
+    <c:when test="${not empty error}">
+        ${error}
+    </c:when>
+    <c:when test="${empty error}">
+        <div id="entity-editor-content">
+    </c:when>
+</c:choose>
 
 </div>
