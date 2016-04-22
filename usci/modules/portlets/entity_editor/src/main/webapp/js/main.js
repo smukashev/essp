@@ -1219,7 +1219,7 @@ Ext.onReady(function () {
                         }
                     },
                     format: 'd.m.Y',
-                    value: '01.11.2015'
+                    value: new Date()
                 }]
             }, {
                 region: 'center',

@@ -596,7 +596,8 @@ public class MainPortlet extends MVCPortlet {
 
                         metaClass = metaFactoryService.getMetaClass(metaName);
                         try {
-                            creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
+                            if(creditorId == -1)
+                                creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
                         } catch (Exception e) {
                             creditorId = -1;
                         }
