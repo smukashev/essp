@@ -22,6 +22,7 @@ public class SubjectOptimizer {
         identificationCodes.add("06"); // ИНН
         identificationCodes.add("07"); // РНН
         identificationCodes.add("11"); // БИН
+        identificationCodes.add("17"); // АИН
     }
 
     public static String getKeyString(final IBaseEntity iBaseEntity) {
