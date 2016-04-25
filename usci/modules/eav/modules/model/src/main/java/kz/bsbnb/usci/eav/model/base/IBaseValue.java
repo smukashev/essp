@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.eav.model.base;
 
 
-import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;

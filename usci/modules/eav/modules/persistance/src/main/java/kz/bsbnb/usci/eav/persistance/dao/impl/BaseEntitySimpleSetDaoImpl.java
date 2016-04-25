@@ -78,10 +78,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         return baseValueId;
     }
 
-    @Override
-    public void complexUpdate(IPersistable persistable) {
-        throw new IllegalStateException(Errors.compose(Errors.E88, 0, persistable.getId()));
-    }
+
 
     @Override
     public void update(IPersistable persistable) {
@@ -148,6 +145,51 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                 baseSet,
                 closed,
                 last);
+    }
+
+    @Override
+    public IBaseValue getExistingBaseValue(IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
+
+        if (baseValue.getBaseContainer().getId() == 0)
+            return null;
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IBaseEntity baseEntity = (IBaseEntity) baseContainer;
+
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        IMetaType metaType = metaAttribute.getMetaType();
+        IMetaSet metaSet = (IMetaSet) metaType;
+
+        IBaseValue existingValue = null;
+
+        String tableAlias = "ess";
+
+        Select select = context
+                .select(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ID,
+                        EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE,
+                        EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_CLOSED,
+                        EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).IS_LAST)
+                .from(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias))
+                .where(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
+                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                .and(EAV_BE_ENTITY_SIMPLE_SETS.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new IllegalStateException(Errors.compose(Errors.E83, select.toString()));
+
+        if (rows.size() == 1) {
+            Map<String, Object> row = rows.iterator().next();
+
+            existingValue = constructValue(baseValue.getCreditorId(), row, metaType, metaSet);
+        }
+
+        return existingValue;
     }
 
     @Override

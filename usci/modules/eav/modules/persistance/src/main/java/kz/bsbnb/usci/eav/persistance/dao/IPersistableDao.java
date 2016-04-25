@@ -7,8 +7,5 @@ public interface IPersistableDao {
 
     void update(IPersistable persistable);
 
-    void complexUpdate(IPersistable persistable);
-
     void delete(IPersistable persistable);
-
 }
