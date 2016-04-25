@@ -71,6 +71,9 @@ public class ZipFilesMonitor {
 
     private static final String DIGITAL_SIGNING_SETTINGS = "DIGITAL_SIGNING_SETTINGS";
     private static final String DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE = "DIGITAL_SIGNING_ORGANIZATIONS_IDS";
+    private static final String ORG_FIRST_DATE_SETTING = "ORG_FIRST_DATE_SETTING";
+    private static final String CREDITOR_DATES = "CREDITOR_DATES";
+    private static final String DEFAULT_DATE_VALUE = "DEFAULT_DATE_VALUE";
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
@@ -432,10 +435,41 @@ public class ZipFilesMonitor {
 
                 Report prevMonthReport = reportBeanRemoteBusiness.getReport(creditorId, prevMonth);
 
-                if (prevMonthReport != null &&
-                        !ReportStatus.COMPLETED.code().equals(prevMonthReport.getStatus().getCode())
-                            && !ReportStatus.ORGANIZATION_APPROVED.code().equals(prevMonthReport.getStatus().getCode())) {
-                    errMsg = "Необходимо утвердить данные за отчетный периюд : " + dateFormat.format(prevMonthReport.getReportDate());
+
+                if(prevMonthReport != null) {
+                    if(!ReportStatus.COMPLETED.code().equals(prevMonthReport.getStatus().getCode())
+                            && !ReportStatus.ORGANIZATION_APPROVED.code().equals(prevMonthReport.getStatus().getCode()))
+                        errMsg = "Необходимо утвердить данные за отчетный периюд : " + dateFormat.format(prevMonthReport.getReportDate());
+                } else {
+                    Report firstReport = reportBeanRemoteBusiness.getFirstReport(creditorId);
+                    String creditorFirstDate = serviceFactory.getGlobalService().getValue(ORG_FIRST_DATE_SETTING, DEFAULT_DATE_VALUE);
+
+                    //Первый отчет для новой организации
+                    if(firstReport == null) {
+                        String creditorDates = serviceFactory.getGlobalService().getValue(ORG_FIRST_DATE_SETTING, CREDITOR_DATES);
+                        String[] pairs = creditorDates.split(",");
+                        for(String pair: pairs) {
+                            String[] record = pair.split("=");
+                            Long cId = Long.parseLong(record[0]);
+                            String date = record[1];
+                            if(creditorId == cId) {
+                                creditorFirstDate = date;
+                                break;
+                            }
+                        }
+
+                        try {
+                            if (!batchInfo.getRepDate().equals(dateFormat.parse(creditorFirstDate)))
+                                errMsg = "Настройками организации установлена первая отчетная дата: " + creditorFirstDate;
+                        } catch (Exception e) {
+                            logger.error(e.getMessage());
+                            errMsg = e.getMessage();
+                        }
+                    }
+                    //Утверждены не все отчетные даты
+                    else {
+                        errMsg = "История отчетности неккоректна";
+                    }
                 }
             }
 

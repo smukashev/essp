@@ -2,6 +2,8 @@ package kz.bsbnb.usci.portlets.upload.data;
 
 import kz.bsbnb.usci.cr.model.Creditor;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -24,4 +26,8 @@ public interface DataProvider {
     public void saveOrganizationsUsingDigitalSigning(List<Creditor> creditors);
 
     Map<Long,String> getOrganizationFirstDates();
+
+    Date getDefaultDate() throws ParseException;
+
+    void saveOrganizationFirstDates(String firstDateString);
 }

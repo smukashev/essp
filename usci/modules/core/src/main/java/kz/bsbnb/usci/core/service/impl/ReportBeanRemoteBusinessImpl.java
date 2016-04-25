@@ -102,4 +102,9 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness {
     public void setTotalCount(long reportId, long totalCount) {
         reportDao.setTotalCount(reportId, totalCount);
     }
+
+    @Override
+    public Report getFirstReport(long creditorId) {
+        return reportDao.getFirstReport(creditorId);
+    }
 }
