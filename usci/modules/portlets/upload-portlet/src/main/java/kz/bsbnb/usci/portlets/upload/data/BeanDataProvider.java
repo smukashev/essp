@@ -123,12 +123,15 @@ public class BeanDataProvider implements DataProvider {
 
         try {
             String creditorDates = globalService.getValue(ORG_FIRST_DATE_SETTING, CREDITOR_DATES);
-            String[] pairs = creditorDates.split(",");
-            for(String pair: pairs) {
-                String[] record = pair.split("=");
-                Long creditorId = Long.parseLong(record[0]);
-                String date = record[1];
-                firstDates.put(creditorId, date);
+
+            if(!creditorDates.trim().equals("-1")) {
+                String[] pairs = creditorDates.split(",");
+                for (String pair : pairs) {
+                    String[] record = pair.split("=");
+                    Long creditorId = Long.parseLong(record[0]);
+                    String date = record[1];
+                    firstDates.put(creditorId, date);
+                }
             }
 
             for(Creditor creditor : creditors) {
