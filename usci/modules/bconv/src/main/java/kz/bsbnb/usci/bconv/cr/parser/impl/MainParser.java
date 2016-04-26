@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -32,6 +33,13 @@ public class MainParser extends BatchParser {
 
     @Autowired
     private PortfolioDataParser portfolioDataParser;
+
+    private MetaClass creditMeta;
+
+    @Override
+    public void init() {
+        creditMeta = metaClassRepository.getMetaClass("credit");
+    }
 
     public void parse(InputStream in, Batch batch) throws SAXException, IOException, XMLStreamException {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -88,8 +96,7 @@ public class MainParser extends BatchParser {
             case "packages":
                 break;
             case "package":
-                BaseEntity pkg = new BaseEntity(metaClassRepository.getMetaClass("credit"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity pkg = new BaseEntity(creditMeta, batch.getRepDate(), creditorId);
 
                 String strOperationType = event.asStartElement().getAttributeByName(
                         new QName("operation_type")).getValue();

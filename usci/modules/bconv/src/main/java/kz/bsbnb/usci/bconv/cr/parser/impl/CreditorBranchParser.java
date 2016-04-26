@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseSetComplexValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -22,12 +23,16 @@ public class CreditorBranchParser extends BatchParser {
     private BaseEntity currentDoc = null;
     private BaseSet currentDocSet = null;
 
+    private MetaClass documentMeta, refDocTypeMeta;
+
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor_branch"),
-                batch.getRepDate(), creditorId);
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor_branch"), batch.getRepDate(), creditorId);
         currentDoc = null;
         currentDocSet = null;
+
+        documentMeta = metaClassRepository.getMetaClass("document");
+        refDocTypeMeta = metaClassRepository.getMetaClass("ref_doc_type");
     }
 
     @Override
@@ -41,14 +46,12 @@ public class CreditorBranchParser extends BatchParser {
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
                 break;
             case "docs":
-                currentDocSet = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
+                currentDocSet = new BaseSet(documentMeta, creditorId);
                 break;
             case "doc":
-                currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),
-                        batch.getRepDate(), creditorId);
+                currentDoc = new BaseEntity(documentMeta, batch.getRepDate(), creditorId);
 
-                BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity docType = new BaseEntity(refDocTypeMeta, batch.getRepDate(), creditorId);
 
                 docType.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(),

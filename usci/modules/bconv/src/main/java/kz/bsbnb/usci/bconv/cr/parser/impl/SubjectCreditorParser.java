@@ -5,6 +5,7 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -25,12 +26,17 @@ public class SubjectCreditorParser extends BatchParser {
 
     private BaseEntity creditorInfo;
 
+    private MetaClass documentMeta, refDocTypeMeta;
+
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("subject"), batch.getRepDate(), creditorId);
         creditorInfo = new BaseEntity(metaClassRepository.getMetaClass("creditor_info"), batch.getRepDate(), creditorId);
         docs = null;
         currentDoc = null;
+
+        documentMeta = metaClassRepository.getMetaClass("document");
+        refDocTypeMeta = metaClassRepository.getMetaClass("ref_doc_type");
     }
 
     @Override
@@ -44,14 +50,12 @@ public class SubjectCreditorParser extends BatchParser {
                         event.asCharacters().getData(), false, true));
                 break;
             case "docs":
-                docs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
+                docs = new BaseSet(documentMeta, creditorId);
                 break;
             case "doc":
-                currentDoc = new BaseEntity(metaClassRepository.getMetaClass("document"),
-                        batch.getRepDate(), creditorId);
+                currentDoc = new BaseEntity(documentMeta, batch.getRepDate(), creditorId);
 
-                BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity docType = new BaseEntity(refDocTypeMeta, batch.getRepDate(), creditorId);
 
                 docType.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(),

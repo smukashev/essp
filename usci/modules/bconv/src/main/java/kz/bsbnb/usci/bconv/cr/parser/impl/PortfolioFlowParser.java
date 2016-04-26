@@ -5,6 +5,7 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -22,13 +23,18 @@ public class PortfolioFlowParser extends BatchParser {
     private BaseSet currentDetails;
     private BaseEntity currentDetail;
 
+    private MetaClass refPortfolioMeta, portfolioFlowDetailMeta, refBalanceAccountMeta;
+
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_kfn"),
-                batch.getRepDate(), creditorId);
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_kfn"), batch.getRepDate(), creditorId);
 
         currentDetails = null;
         currentDetail = null;
+
+        refPortfolioMeta = metaClassRepository.getMetaClass("ref_portfolio");
+        portfolioFlowDetailMeta = metaClassRepository.getMetaClass("portfolio_flow_detail");
+        refBalanceAccountMeta = metaClassRepository.getMetaClass("ref_balance_account");
     }
 
     @Override
@@ -37,8 +43,7 @@ public class PortfolioFlowParser extends BatchParser {
             case "portfolio_flow":
                 break;
             case "portfolio":
-                BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity portfolio = new BaseEntity(refPortfolioMeta, batch.getRepDate(), creditorId);
 
                 event = (XMLEvent) xmlReader.next();
 
@@ -49,13 +54,13 @@ public class PortfolioFlowParser extends BatchParser {
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), portfolio, false, true));
                 break;
             case "details":
-                currentDetails = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_detail"), creditorId);
+                currentDetails = new BaseSet(portfolioFlowDetailMeta, creditorId);
                 break;
             case "detail":
-                currentDetail = new BaseEntity(metaClassRepository.getMetaClass("portfolio_flow_detail"), batch.getRepDate(), creditorId);
+                currentDetail = new BaseEntity(portfolioFlowDetailMeta, batch.getRepDate(), creditorId);
                 break;
             case "balance_account":
-                BaseEntity ba = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"), batch.getRepDate(), creditorId);
+                BaseEntity ba = new BaseEntity(refBalanceAccountMeta, batch.getRepDate(), creditorId);
 
                 event = (XMLEvent) xmlReader.next();
 

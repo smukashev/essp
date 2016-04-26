@@ -6,6 +6,8 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDoubleValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -26,15 +28,21 @@ public class ChangeCreditFlowParser extends BatchParser {
     private BaseEntity currentProvisionMsfo;
     private BaseEntity currentProvisionMsfoOverB;
 
+    private MetaClass refClassificationMeta, refBalanceAccountMeta, refProvisionGroupMeta, refProvisionMeta;
+
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit_flow"),
-                batch.getRepDate(), creditorId);
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit_flow"), batch.getRepDate(), creditorId);
 
         currentProvisionGroup = null;
         currentProvisionKfn = null;
         currentProvisionMsfo = null;
         currentProvisionMsfoOverB = null;
+
+        refClassificationMeta = metaClassRepository.getMetaClass("ref_classification");
+        refBalanceAccountMeta = metaClassRepository.getMetaClass("ref_balance_account");
+        refProvisionGroupMeta = metaClassRepository.getMetaClass("provision_group");
+        refProvisionMeta = metaClassRepository.getMetaClass("provision");
     }
 
     @Override
@@ -44,8 +52,7 @@ public class ChangeCreditFlowParser extends BatchParser {
             case "credit_flow":
                 break;
             case "classification":
-                BaseEntity classification = new BaseEntity(metaClassRepository.getMetaClass("ref_classification"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity classification = new BaseEntity(refClassificationMeta, batch.getRepDate(), creditorId);
 
                 event = (XMLEvent) xmlReader.next();
 
@@ -56,8 +63,7 @@ public class ChangeCreditFlowParser extends BatchParser {
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), classification, false, true));
                 break;
             case "provision":
-                currentProvisionGroup = new BaseEntity(metaClassRepository.getMetaClass("provision_group"),
-                        batch.getRepDate(), creditorId);
+                currentProvisionGroup = new BaseEntity(refProvisionGroupMeta, batch.getRepDate(), creditorId);
 
                 currentProvisionKfn = null;
                 currentProvisionMsfo = null;
@@ -70,8 +76,7 @@ public class ChangeCreditFlowParser extends BatchParser {
                 break;
             case "balance_account": {
                 event = (XMLEvent) xmlReader.next();
-                BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity balanceAccount = new BaseEntity(refBalanceAccountMeta, batch.getRepDate(), creditorId);
 
                 balanceAccount.put("no_",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -89,8 +94,7 @@ public class ChangeCreditFlowParser extends BatchParser {
             case "balance_account_msfo": {
                 event = (XMLEvent) xmlReader.next();
 
-                BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity balanceAccount = new BaseEntity(refBalanceAccountMeta, batch.getRepDate(), creditorId);
 
                 balanceAccount.put("no_",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -106,8 +110,7 @@ public class ChangeCreditFlowParser extends BatchParser {
                 break;
             case "balance_account_msfo_over_balance": {
                 event = (XMLEvent) xmlReader.next();
-                BaseEntity balanceAccount = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity balanceAccount = new BaseEntity(refBalanceAccountMeta, batch.getRepDate(), creditorId);
 
                 balanceAccount.put("no_",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -168,22 +171,19 @@ public class ChangeCreditFlowParser extends BatchParser {
 
     private BaseEntity getCurrentProvisionKfn() {
         if (currentProvisionKfn == null)
-            currentProvisionKfn = new BaseEntity(metaClassRepository.getMetaClass("provision"),
-                    batch.getRepDate(), creditorId);
+            currentProvisionKfn = new BaseEntity(refProvisionMeta, batch.getRepDate(), creditorId);
         return currentProvisionKfn;
     }
 
     private BaseEntity getCurrentProvisionMsfo() {
         if (currentProvisionMsfo == null)
-            currentProvisionMsfo = new BaseEntity(metaClassRepository.getMetaClass("provision"),
-                    batch.getRepDate(), creditorId);
+            currentProvisionMsfo = new BaseEntity(refProvisionMeta, batch.getRepDate(), creditorId);
         return currentProvisionMsfo;
     }
 
     private BaseEntity getCurrentProvisionMsfoOverB() {
         if (currentProvisionMsfoOverB == null)
-            currentProvisionMsfoOverB = new BaseEntity(metaClassRepository.getMetaClass("provision"),
-                    batch.getRepDate(), creditorId);
+            currentProvisionMsfoOverB = new BaseEntity(refProvisionMeta, batch.getRepDate(), creditorId);
         return currentProvisionMsfoOverB;
     }
 }
