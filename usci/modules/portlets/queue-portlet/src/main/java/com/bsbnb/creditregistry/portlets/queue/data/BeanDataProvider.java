@@ -159,7 +159,7 @@ public class BeanDataProvider implements DataProvider {
 
             file.setFilePath(ii.getFileName());
             file.setReceiverDate(ii.getReceiverDate());
-            file.setFilename(ii.getFileName());
+            file.setFilename(ii.getFileName() == null ? "" : new File(ii.getFileName()).getName());
             queue.add(file);
         }
 
