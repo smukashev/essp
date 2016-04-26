@@ -267,6 +267,24 @@ public class MainPortlet extends MVCPortlet {
                                             "\",\"cls\":\"folder\"}");
 
                                 }
+                                for (String innerClassesNames : metaClassFromSet.getSimpleSetAttributesNames()) {
+                                    if (!first) {
+                                        writer.write(",");
+                                    } else {
+                                        first = false;
+                                    }
+
+                                    String attrTitle = innerClassesNames;
+                                    if (metaClassFromSet.getMetaAttribute(innerClassesNames).getTitle() != null &&
+                                            metaClassFromSet.getMetaAttribute(innerClassesNames).getTitle().trim().length() > 0)
+                                        attrTitle = metaClassFromSet.getMetaAttribute(innerClassesNames).getTitle();
+
+
+                                    writer.write("{\"text\":\"" +
+                                            attrTitle +
+                                            "\",\"id\":\"" + node + "." + innerClassesNames +
+                                            "\",\"leaf\":true,\"cls\":\"file\"}");
+                                }
 
                                 for (String innerClassesNames : metaClassFromSet.getSimpleAttributesNames()) {
                                     if (!first) {
