@@ -32,4 +32,6 @@ public interface IReportDao {
     Report getReport(long creditorId, Date reportDate);
 
     void setTotalCount(long reportId, long totalCount);
+
+    Report getFirstReport(long creditorId);
 }

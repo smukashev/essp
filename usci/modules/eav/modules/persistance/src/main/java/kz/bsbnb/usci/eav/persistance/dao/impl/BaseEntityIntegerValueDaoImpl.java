@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -8,11 +7,11 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityIntegerValueDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -71,27 +70,6 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
     }
 
     @Override
-    public void complexUpdate(IPersistable persistable) {
-        IBaseValue baseValue = (IBaseValue) persistable;
-        IBaseEntity parentEntity = (IBaseEntity) baseValue.getBaseContainer();
-
-        String tableAlias = "cv";
-        Update update = context
-                .update(EAV_BE_INTEGER_VALUES.as(tableAlias))
-                .set(EAV_BE_INTEGER_VALUES.as(tableAlias).VALUE, (Integer) baseValue.getValue())
-                .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ENTITY_ID.equal(parentEntity.getId())
-                        .and(EAV_BE_INTEGER_VALUES.as(tableAlias).ATTRIBUTE_ID.eq(baseValue.getMetaAttribute().getId()))
-                        .and(EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID.eq(baseValue.getCreditorId()))
-                        .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.eq(DataUtils.convert(baseValue.getRepDate()))));
-
-        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-
-        if (count != 1)
-            throw new IllegalStateException(Errors.compose(Errors.E88, count, baseValue.getId()));
-    }
-
-
-    @Override
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
 
@@ -144,10 +122,35 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
             throw new IllegalStateException(Errors.compose(Errors.E99, count, id));
     }
 
+    private IBaseValue constructValue(Map<String, Object> row, IMetaClass metaClass, IMetaType metaType) {
+        long id = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.ID.getName())).longValue();
+
+        long creditorId = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.CREDITOR_ID.getName())).longValue();
+
+        int value = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
+
+        Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
+
+        boolean closed = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.IS_CLOSED.getName())).longValue() == 1;
+
+        boolean last = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1;
+
+        return BaseValueFactory.create(
+                metaClass.getType(),
+                metaType,
+                id,
+                creditorId,
+                reportDate,
+                value,
+                closed,
+                last);
+    }
+
     @Override
     @SuppressWarnings("unchecked")
-    public IBaseValue getNextBaseValue(IBaseValue baseValue) {
+    public IBaseValue getExistingBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
 
         if (metaAttribute == null)
             throw new IllegalStateException(Errors.compose(Errors.E80));
@@ -155,7 +158,58 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
         if (metaAttribute.getId() < 1)
             throw new IllegalStateException(Errors.compose(Errors.E81));
 
+        if (baseContainer == null)
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
+
+        if (baseContainer.getId() < 1)
+            return null;
+
+        IBaseEntity parentEntity = (IBaseEntity) baseContainer;
+        IMetaClass parentEntityMeta = parentEntity.getMeta();
+
+        IMetaType metaType = metaAttribute.getMetaType();
+        IBaseValue nextBaseValue = null;
+
+        String tableAlias = "bv";
+
+        Select select = context
+                .select(EAV_BE_INTEGER_VALUES.as(tableAlias).ID,
+                        EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_INTEGER_VALUES.as(tableAlias).VALUE,
+                        EAV_BE_INTEGER_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_INTEGER_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_INTEGER_VALUES.as(tableAlias))
+                .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ENTITY_ID.equal(parentEntity.getId()))
+                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())));
+
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
+
+        if (rows.size() == 1)
+            nextBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
+
+        return nextBaseValue;
+    }
+
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public IBaseValue getNextBaseValue(IBaseValue baseValue) {
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
         IBaseContainer baseContainer = baseValue.getBaseContainer();
+
+        if (metaAttribute == null)
+            throw new IllegalStateException(Errors.compose(Errors.E80));
+
+        if (metaAttribute.getId() < 1)
+            throw new IllegalStateException(Errors.compose(Errors.E81));
 
         if (baseContainer == null)
             throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
@@ -163,8 +217,8 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
         if (baseContainer.getId() < 1)
             return null;
 
-        IBaseEntity baseEntity = (IBaseEntity) baseContainer;
-        IMetaClass metaClass = baseEntity.getMeta();
+        IBaseEntity parentEntity = (IBaseEntity) baseContainer;
+        IMetaClass parentEntityMeta = parentEntity.getMeta();
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue nextBaseValue = null;
@@ -182,11 +236,10 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
                         EAV_BE_INTEGER_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_INTEGER_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_INTEGER_VALUES.as(tableAlias))
-                .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
+                .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ENTITY_ID.equal(parentEntity.getId()))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
-                        DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subQueryAlias);
 
         Select select = context
@@ -206,33 +259,8 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
         if (rows.size() > 1)
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            long id = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            boolean last = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            int value = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
-                    row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
-
-            nextBaseValue = BaseValueFactory.create(
-                    metaClass.getType(),
-                    metaType,
-                    id,
-                    creditorId,
-                    reportDate,
-                    value,
-                    closed,
-                    last);
-        }
+        if (rows.size() == 1)
+            nextBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
 
         return nextBaseValue;
     }
@@ -241,6 +269,7 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
     @SuppressWarnings("unchecked")
     public IBaseValue getPreviousBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
 
         if (metaAttribute == null)
             throw new IllegalStateException(Errors.compose(Errors.E80));
@@ -248,16 +277,14 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
         if (metaAttribute.getId() < 1)
             throw new IllegalStateException(Errors.compose(Errors.E81));
 
-        IBaseContainer baseContainer = baseValue.getBaseContainer();
-
         if (baseContainer == null)
             throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseContainer.getId() < 1)
             return null;
 
-        IBaseEntity baseEntity = (IBaseEntity) baseContainer;
-        IMetaClass metaClass = baseEntity.getMeta();
+        IBaseEntity parentEntity = (IBaseEntity) baseContainer;
+        IMetaClass parentEntityMeta = parentEntity.getMeta();
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue previousBaseValue = null;
@@ -275,11 +302,10 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
                         EAV_BE_INTEGER_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_INTEGER_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_INTEGER_VALUES.as(tableAlias))
-                .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
+                .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ENTITY_ID.equal(parentEntity.getId()))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.lessThan(
-                        DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.lessThan(DataUtils.convert(baseValue.getRepDate())))
                 .asTable(subQueryAlias);
 
         Select select = context
@@ -299,37 +325,8 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
         if (rows.size() > 1)
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            int value = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
-
-            previousBaseValue = BaseValueFactory.create(
-                    metaClass.getType(),
-                    metaType,
-                    id,
-                    creditorId,
-                    reportDate,
-                    value,
-                    closed,
-                    last);
-        }
+        if (rows.size() == 1)
+            previousBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
 
         return previousBaseValue;
     }
@@ -337,6 +334,7 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
     @Override
     public IBaseValue getClosedBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
 
         if (metaAttribute == null)
             throw new IllegalStateException(Errors.compose(Errors.E80));
@@ -344,13 +342,14 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
         if (metaAttribute.getId() < 1)
             throw new IllegalStateException(Errors.compose(Errors.E81));
 
-        IBaseContainer baseContainer = baseValue.getBaseContainer();
-
         if (baseContainer == null)
             throw new IllegalStateException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
         if (baseContainer.getId() < 1)
             return null;
+
+        IBaseEntity parentEntity = (IBaseEntity) baseContainer;
+        IMetaClass parentEntityMeta = parentEntity.getMeta();
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue closedBaseValue = null;
@@ -359,14 +358,15 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
         Select select = context
                 .select(EAV_BE_INTEGER_VALUES.as(tableAlias).ID,
                         EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_INTEGER_VALUES.as(tableAlias).VALUE,
+                        EAV_BE_INTEGER_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_INTEGER_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_INTEGER_VALUES.as(tableAlias))
                 .where(EAV_BE_INTEGER_VALUES.as(tableAlias).ENTITY_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
-                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.lessOrEqual(
-                        DataUtils.convert(baseValue.getRepDate())))
+                .and(EAV_BE_INTEGER_VALUES.as(tableAlias).REPORT_DATE.lessOrEqual(DataUtils.convert(baseValue.getRepDate())))
                 .and(EAV_BE_INTEGER_VALUES.as(tableAlias).IS_CLOSED.equal(DataUtils.convert(true)));
 
         logger.debug(select.toString());
@@ -375,31 +375,8 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
         if (rows.size() > 1)
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean last = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            int value = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
-
-            closedBaseValue = BaseValueFactory.create(
-                    MetaContainerTypes.META_CLASS,
-                    metaType,
-                    id,
-                    creditorId,
-                    baseValue.getRepDate(),
-                    value,
-                    true,
-                    last);
-        }
+        if (rows.size() == 1)
+            closedBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
 
         return closedBaseValue;
     }
@@ -407,6 +384,7 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
     @Override
     public IBaseValue getLastBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
 
         if (metaAttribute == null)
             throw new IllegalStateException(Errors.compose(Errors.E80));
@@ -414,13 +392,14 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
         if (metaAttribute.getId() < 1)
             throw new IllegalStateException(Errors.compose(Errors.E81));
 
-        IBaseContainer baseContainer = baseValue.getBaseContainer();
-
         if (baseContainer == null)
             throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
 
         if (baseContainer.getId() < 1)
             return null;
+
+        IBaseEntity parentEntity = (IBaseEntity) baseContainer;
+        IMetaClass parentEntityMeta = parentEntity.getMeta();
 
         IMetaType metaType = metaAttribute.getMetaType();
         IBaseValue lastBaseValue = null;
@@ -445,34 +424,8 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
         if (rows.size() > 1)
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            long id = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            int value = ((BigDecimal) row
-                    .get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row
-                    .get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
-
-            lastBaseValue = BaseValueFactory.create(
-                    MetaContainerTypes.META_CLASS,
-                    metaType,
-                    id,
-                    creditorId,
-                    reportDate,
-                    value,
-                    closed,
-                    true);
-        }
+        if (rows.size() == 1)
+            lastBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
 
         return lastBaseValue;
     }
@@ -524,31 +477,11 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         for (Map<String, Object> row : rows) {
-            long id = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            boolean last = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            int value = ((BigDecimal) row.get(EAV_BE_INTEGER_VALUES.VALUE.getName())).intValue();
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_INTEGER_VALUES.REPORT_DATE.getName()));
-
             String attribute = (String) row.get(EAV_M_SIMPLE_ATTRIBUTES.NAME.getName());
 
             IMetaType metaType = baseEntity.getMemberType(attribute);
 
-            baseEntity.put(attribute, BaseValueFactory.create(
-                    MetaContainerTypes.META_CLASS,
-                    metaType,
-                    id,
-                    creditorId,
-                    reportDate,
-                    value,
-                    closed,
-                    last));
+            baseEntity.put(attribute, constructValue(row, baseEntity.getMeta(), metaType));
         }
     }
 

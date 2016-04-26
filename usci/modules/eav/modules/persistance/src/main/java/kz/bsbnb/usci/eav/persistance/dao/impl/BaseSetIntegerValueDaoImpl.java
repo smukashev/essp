@@ -67,11 +67,6 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
     }
 
     @Override
-    public void complexUpdate(IPersistable persistable) {
-        throw new IllegalStateException(Errors.compose(Errors.E88, 0, persistable.getId()));
-    }
-
-    @Override
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
 
@@ -141,6 +136,50 @@ public class BaseSetIntegerValueDaoImpl extends JDBCSupport implements IBaseSetI
                 closed,
                 last);
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public IBaseValue getExistingBaseValue (IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IBaseSet baseSet = (IBaseSet) baseContainer;
+        IMetaType metaType = baseSet.getMemberType();
+
+        IBaseValue previousBaseValue = null;
+
+        String tableAlias = "bsv";
+
+        Select select = context
+                .select(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_INTEGER_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_INTEGER_SET_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_INTEGER_SET_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_INTEGER_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).VALUE.equal((Integer) baseValue.getValue()))
+                .and(EAV_BE_INTEGER_SET_VALUES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
+
+        if (rows.size() == 1) {
+            Map<String, Object> row = rows.iterator().next();
+
+            previousBaseValue = constructValue(baseValue, metaType, row);
+        }
+
+        return previousBaseValue;
+    }
+
 
     @Override
     @SuppressWarnings("unchecked")

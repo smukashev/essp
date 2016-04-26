@@ -9,10 +9,9 @@ import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author Aidar.Myrzahanov
@@ -124,12 +123,15 @@ public class BeanDataProvider implements DataProvider {
 
         try {
             String creditorDates = globalService.getValue(ORG_FIRST_DATE_SETTING, CREDITOR_DATES);
-            String[] pairs = creditorDates.split(",");
-            for(String pair: pairs) {
-                String[] record = pair.split("=");
-                Long creditorId = Long.parseLong(record[0]);
-                String date = record[1];
-                firstDates.put(creditorId, date);
+
+            if(!creditorDates.trim().equals("-1")) {
+                String[] pairs = creditorDates.split(",");
+                for (String pair : pairs) {
+                    String[] record = pair.split("=");
+                    Long creditorId = Long.parseLong(record[0]);
+                    String date = record[1];
+                    firstDates.put(creditorId, date);
+                }
             }
 
             for(Creditor creditor : creditors) {
@@ -142,5 +144,15 @@ public class BeanDataProvider implements DataProvider {
         }
 
         return firstDates;
+    }
+
+    @Override
+    public Date getDefaultDate() throws ParseException {
+        return new SimpleDateFormat("dd.MM.yyyy").parse(globalService.getValue(ORG_FIRST_DATE_SETTING, DEFAULT_DATE_VALUE));
+    }
+
+    @Override
+    public void saveOrganizationFirstDates(String firstDateString) {
+        globalService.update(ORG_FIRST_DATE_SETTING, CREDITOR_DATES, firstDateString);
     }
 }
