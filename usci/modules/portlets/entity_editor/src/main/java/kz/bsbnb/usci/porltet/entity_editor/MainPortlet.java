@@ -686,7 +686,7 @@ public class MainPortlet extends MVCPortlet {
                         serveResource(resourceRequest, resourceResponse);
                     } catch (Exception e1) {
                         logger.info("reconnect failed, seems services are down");
-                        originalError = castJsonString(e1);
+                        originalError = Errors.decompose(castJsonString(e1));
                         out.write(("{ \"success\": false, \"errorMessage\": \""+ originalError + "\"}").getBytes());
                     } finally {
                         retry = false;

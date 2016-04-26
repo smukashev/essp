@@ -540,7 +540,8 @@ Ext.onReady(function(){
                 type: 'json',
                 root: 'data'
             }
-        }
+        },
+        autoLoad: true
     });
 
     packageVersionStore = Ext.create('Ext.data.Store',{

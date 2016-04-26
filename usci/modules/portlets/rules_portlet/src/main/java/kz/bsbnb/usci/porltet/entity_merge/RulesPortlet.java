@@ -342,7 +342,7 @@ public class RulesPortlet extends MVCPortlet{
                     serveResource(resourceRequest, resourceResponse);
                 } catch (Exception e1) {
                     logger.info("reconnect failed, seems services are down");
-                    originalError = castJsonString(e1);
+                    originalError = Errors.decompose(castJsonString(e1));
                     writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError + "\"}");
                 } finally {
                     retry = false;
