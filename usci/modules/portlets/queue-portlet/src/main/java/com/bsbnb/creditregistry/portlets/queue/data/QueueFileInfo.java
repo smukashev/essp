@@ -172,7 +172,7 @@ public class QueueFileInfo implements Property.ValueChangeListener {
      */
     public void setFilename(String filename) {
         this.filename = filename;
-        if(filename!=null&&filename.length()>20) {
+        if(filename!=null&&filename.length()>30) {
             this.shortFilename = filename.substring(0, 9)+"..."+filename.substring(filename.length()-8);
         } else {
             this.shortFilename = filename;
