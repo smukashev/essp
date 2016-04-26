@@ -117,7 +117,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
             throw new IllegalStateException(Errors.compose(Errors.E147, count, id));
     }
 
-    private IBaseValue constructValue (Map<String, Object> row, IMetaClass metaClass, IMetaType metaType) {
+    private IBaseValue constructValue (Map<String, Object> row, IMetaType metaType) {
         long id = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.ID.getName())).longValue();
 
         long creditorId = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.ID.getName())).longValue();
@@ -131,7 +131,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         boolean closed = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
         return BaseValueFactory.create(
-                metaClass.getType(),
+                MetaContainerTypes.META_SET,
                 metaType,
                 id,
                 creditorId,
@@ -177,7 +177,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
             throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
         if (rows.size() == 1)
-            previousBaseValue = constructValue(rows.get(0), baseSet, metaType);
+            previousBaseValue = constructValue(rows.get(0), metaType);
 
         return previousBaseValue;
     }
@@ -231,7 +231,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            previousBaseValue = constructValue(baseValue, metaType, row);
+            previousBaseValue = constructValue(row, metaType);
         }
 
         return previousBaseValue;
@@ -286,7 +286,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            nextBaseValue = constructValue(baseValue, metaType, row);
+            nextBaseValue = constructValue(row, metaType);
         }
 
         return nextBaseValue;
@@ -329,7 +329,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            closedBaseValue = constructValue(baseValue, metaType, row);
+            closedBaseValue = constructValue(row, metaType);
         }
 
         return closedBaseValue;
@@ -370,7 +370,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         if (rows.size() == 1) {
             Map<String, Object> row = rows.iterator().next();
 
-            lastBaseValue = constructValue(baseValue, metaType, row);
+            lastBaseValue = constructValue(row, metaType);
         }
 
         return lastBaseValue;

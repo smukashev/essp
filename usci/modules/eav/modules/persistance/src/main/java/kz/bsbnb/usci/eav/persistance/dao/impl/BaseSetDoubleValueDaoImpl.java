@@ -122,8 +122,12 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
             throw new IllegalStateException(Errors.compose(Errors.E143, count, id));
     }
 
-    private IBaseValue constructValue (IBaseValue baseValue, IMetaType metaType, Map<String, Object> row) {
+    private IBaseValue constructValue (Map<String, Object> row, IMetaType metaType) {
         long id = ((BigDecimal) row.get(EAV_BE_DOUBLE_SET_VALUES.ID.getName())).longValue();
+
+        long creditorId = ((BigDecimal) row.get(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID.getName())).longValue();
+
+        double value = ((BigDecimal) row.get(EAV_BE_DOUBLE_SET_VALUES.VALUE.getName())).doubleValue();
 
         Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE.getName()));
 
@@ -135,9 +139,9 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                 MetaContainerTypes.META_SET,
                 metaType,
                 id,
-                baseValue.getCreditorId(),
+                creditorId,
                 reportDate,
-                baseValue.getValue(),
+                value,
                 closed,
                 last);
     }
@@ -161,7 +165,9 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
 
         Select select = context
                 .select(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).VALUE,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
@@ -177,11 +183,8 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
         if (rows.size() > 1)
             throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            previousBaseValue = constructValue(baseValue, metaType, row);
-        }
+        if (rows.size() == 1)
+            previousBaseValue = constructValue(rows.get(0), metaType);
 
         return previousBaseValue;
     }
@@ -207,7 +210,9 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).VALUE,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
@@ -219,7 +224,9 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
 
         Select select = context
                 .select(subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.ID),
+                        subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID),
                         subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.VALUE),
                         subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED),
                         subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.IS_LAST))
                 .from(subQueryTable)
@@ -232,11 +239,8 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
         if (rows.size() > 1)
             throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            previousBaseValue = constructValue(baseValue, metaType, row);
-        }
+        if (rows.size() == 1)
+            previousBaseValue = constructValue(rows.get(0), metaType);
 
         return previousBaseValue;
     }
@@ -257,13 +261,14 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
         IBaseValue nextBaseValue = null;
 
         String tableAlias = "bsv";
-        String subqueryAlias = "bsvn";
-        Table subqueryTable = context
+        String subQueryAlias = "bsvn";
+        Table subQueryTable = context
                 .select(DSL.rank()
                                 .over().orderBy(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).ID,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).VALUE,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
@@ -271,16 +276,17 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                 .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).VALUE.equal((Double) baseValue.getValue()))
                 .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
                 .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE.greaterThan(DataUtils.convert(baseValue.getRepDate())))
-                .asTable(subqueryAlias);
+                .asTable(subQueryAlias);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.ID),
-                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID),
-                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_DOUBLE_SET_VALUES.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.ID),
+                        subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID),
+                        subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.VALUE),
+                        subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_DOUBLE_SET_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());
@@ -289,11 +295,8 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
         if (rows.size() > 1)
             throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            nextBaseValue = constructValue(baseValue, metaType, row);
-        }
+        if (rows.size() == 1)
+            nextBaseValue = constructValue(rows.get(0), metaType);
 
         return nextBaseValue;
     }
@@ -318,6 +321,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                 .select(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).ID,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).VALUE,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
@@ -333,11 +337,8 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
         if (rows.size() > 1)
             throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            closedBaseValue = constructValue(baseValue, metaType, row);
-        }
+        if (rows.size() == 1)
+            closedBaseValue = constructValue(rows.get(0), metaType);
 
         return closedBaseValue;
     }
@@ -361,7 +362,9 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                 .select(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).ID,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).REPORT_DATE,
-                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_CLOSED)
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).VALUE,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_DOUBLE_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
@@ -374,11 +377,8 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
         if (rows.size() > 1)
             throw new RuntimeException(Errors.compose(Errors.E83,baseValue.getMetaAttribute().getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            lastBaseValue = constructValue(baseValue, metaType, row);
-        }
+        if (rows.size() == 1)
+            lastBaseValue = constructValue(rows.get(0), metaType);
 
         return lastBaseValue;
     }
@@ -394,8 +394,9 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
                                 .partitionBy(tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.VALUE))
                                 .orderBy(tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
                         tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.ID),
-                        tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.VALUE),
+                        tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID),
                         tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE),
+                        tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.VALUE),
                         tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED),
                         tableOfValues.field(EAV_BE_DOUBLE_SET_VALUES.IS_LAST))
                 .from(tableOfValues)
@@ -405,6 +406,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
 
         select = context
                 .select(tableNumbering.field(EAV_BE_DOUBLE_SET_VALUES.ID),
+                        tableNumbering.field(EAV_BE_DOUBLE_SET_VALUES.CREDITOR_ID),
                         tableNumbering.field(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE),
                         tableNumbering.field(EAV_BE_DOUBLE_SET_VALUES.VALUE),
                         tableNumbering.field(EAV_BE_DOUBLE_SET_VALUES.IS_CLOSED),
@@ -416,25 +418,8 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        for (Map<String, Object> row : rows) {
-            long id = ((BigDecimal) row.get(EAV_BE_DOUBLE_SET_VALUES.ID.getName())).longValue();
-
-            boolean last = ((BigDecimal) row.get(EAV_BE_DOUBLE_SET_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            double value = ((BigDecimal) row.get(EAV_BE_DOUBLE_SET_VALUES.VALUE.getName())).doubleValue();
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DOUBLE_SET_VALUES.REPORT_DATE.getName()));
-
-            baseSet.put(BaseValueFactory.create(
-                    MetaContainerTypes.META_SET,
-                    baseSet.getMemberType(),
-                    id,
-                    baseSet.getCreditorId(),
-                    reportDate,
-                    value,
-                    false,
-                    last));
-        }
+        for (Map<String, Object> row : rows)
+            baseSet.put(constructValue(row, baseSet.getMemberType()));
     }
 
     @Override

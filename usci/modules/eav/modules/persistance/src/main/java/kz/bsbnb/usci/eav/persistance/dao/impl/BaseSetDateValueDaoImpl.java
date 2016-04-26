@@ -51,8 +51,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         return baseValueId;
     }
 
-    protected long insert(long baseSetId, long creditorId, Date reportDate, Object value, boolean closed,
-                          boolean last) {
+    protected long insert(long baseSetId, long creditorId, Date reportDate, Object value, boolean closed, boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_DATE_SET_VALUES)
                 .set(EAV_BE_DATE_SET_VALUES.SET_ID, baseSetId)
@@ -80,8 +79,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
                 baseValue.isLast());
     }
 
-    protected void update(long id, long baseSetId, long creditorId, Date reportDate, Object value, boolean closed,
-                          boolean last) {
+    protected void update(long id, long baseSetId, long creditorId, Date reportDate, Object value, boolean closed, boolean last) {
         String tableAlias = "sv";
         Update update = context
                 .update(EAV_BE_DATE_SET_VALUES.as(tableAlias))
@@ -119,10 +117,14 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
             throw new IllegalStateException(Errors.compose(Errors.E141, count, id));
     }
 
-    private IBaseValue constructValue (IBaseValue baseValue, IMetaType metaType, Map<String, Object> row) {
+    private IBaseValue constructValue (Map<String, Object> row, IMetaType metaType) {
         long id = ((BigDecimal) row.get(EAV_BE_DATE_SET_VALUES.ID.getName())).longValue();
 
+        long creditorId = ((BigDecimal) row.get(EAV_BE_DATE_SET_VALUES.CREDITOR_ID.getName())).longValue();
+
         Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DATE_SET_VALUES.REPORT_DATE.getName()));
+
+        Date value = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DATE_SET_VALUES.VALUE.getName()));
 
         boolean last = ((BigDecimal) row.get(EAV_BE_DATE_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
@@ -132,9 +134,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
                 MetaContainerTypes.META_SET,
                 metaType,
                 id,
-                baseValue.getCreditorId(),
+                creditorId,
                 reportDate,
-                baseValue.getValue(),
+                value,
                 closed,
                 last);
     }
@@ -158,7 +160,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
 
         Select select = context
                 .select(EAV_BE_DATE_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_DATE_SET_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DATE_SET_VALUES.as(tableAlias).VALUE,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DATE_SET_VALUES.as(tableAlias))
@@ -173,11 +177,8 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         if (rows.size() > 1)
             throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            previousBaseValue = constructValue(baseValue, metaType, row);
-        }
+        if (rows.size() == 1)
+            previousBaseValue = constructValue(rows.get(0), metaType);
 
         return previousBaseValue;
     }
@@ -203,7 +204,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_DATE_SET_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DATE_SET_VALUES.as(tableAlias).VALUE,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DATE_SET_VALUES.as(tableAlias))
@@ -215,7 +218,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
 
         Select select = context
                 .select(subQueryTable.field(EAV_BE_DATE_SET_VALUES.ID),
+                        subQueryTable.field(EAV_BE_DATE_SET_VALUES.CREDITOR_ID),
                         subQueryTable.field(EAV_BE_DATE_SET_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_DATE_SET_VALUES.VALUE),
                         subQueryTable.field(EAV_BE_DATE_SET_VALUES.IS_CLOSED),
                         subQueryTable.field(EAV_BE_DATE_SET_VALUES.IS_LAST))
                 .from(subQueryTable)
@@ -228,11 +233,8 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         if (rows.size() > 1)
             throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            previousBaseValue = constructValue(baseValue, metaType, row);
-        }
+        if (rows.size() == 1)
+            previousBaseValue = constructValue(rows.get(0), metaType);
 
         return previousBaseValue;
     }
@@ -258,7 +260,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
                 .select(DSL.rank()
                                 .over().orderBy(EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_DATE_SET_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DATE_SET_VALUES.as(tableAlias).VALUE,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DATE_SET_VALUES.as(tableAlias))
@@ -270,7 +274,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
 
         Select select = context
                 .select(subQueryTable.field(EAV_BE_DATE_SET_VALUES.ID),
+                        subQueryTable.field(EAV_BE_DATE_SET_VALUES.CREDITOR_ID),
                         subQueryTable.field(EAV_BE_DATE_SET_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_DATE_SET_VALUES.VALUE),
                         subQueryTable.field(EAV_BE_DATE_SET_VALUES.IS_CLOSED),
                         subQueryTable.field(EAV_BE_DATE_SET_VALUES.IS_LAST))
                 .from(subQueryTable)
@@ -283,11 +289,8 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         if (rows.size() > 1)
             throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            nextBaseValue = constructValue(baseValue, metaType, row);
-        }
+        if (rows.size() == 1)
+            nextBaseValue = constructValue(rows.get(0), metaType);
 
         return nextBaseValue;
     }
@@ -310,7 +313,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         String tableAlias = "bsv";
         Select select = context
                 .select(EAV_BE_DATE_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_DATE_SET_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DATE_SET_VALUES.as(tableAlias).VALUE,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DATE_SET_VALUES.as(tableAlias))
@@ -326,11 +331,8 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         if (rows.size() > 1)
             throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            closedBaseValue = constructValue(baseValue, metaType, row);
-        }
+        if (rows.size() == 1)
+            closedBaseValue = constructValue(rows.get(0), metaType);
 
         return closedBaseValue;
     }
@@ -352,7 +354,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         String tableAlias = "bsv";
         Select select = context
                 .select(EAV_BE_DATE_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_DATE_SET_VALUES.as(tableAlias).CREDITOR_ID,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_DATE_SET_VALUES.as(tableAlias).VALUE,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_DATE_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_DATE_SET_VALUES.as(tableAlias))
@@ -367,11 +371,8 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         if (rows.size() > 1)
             throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            lastBaseValue = constructValue(baseValue, metaType, row);
-        }
+        if (rows.size() == 1)
+            lastBaseValue = constructValue(rows.get(0), metaType);
 
         return lastBaseValue;
     }
@@ -398,8 +399,10 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
 
         select = context
                 .select(tableNumbering.field(EAV_BE_DATE_SET_VALUES.ID),
+                        tableNumbering.field(EAV_BE_DATE_SET_VALUES.CREDITOR_ID),
                         tableNumbering.field(EAV_BE_DATE_SET_VALUES.REPORT_DATE),
                         tableNumbering.field(EAV_BE_DATE_SET_VALUES.VALUE),
+                        tableNumbering.field(EAV_BE_DATE_SET_VALUES.IS_CLOSED),
                         tableNumbering.field(EAV_BE_DATE_SET_VALUES.IS_LAST))
                 .from(tableNumbering)
                 .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
@@ -408,25 +411,8 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        for (Map<String, Object> row : rows) {
-            long id = ((BigDecimal) row.get(EAV_BE_DATE_SET_VALUES.ID.getName())).longValue();
-
-            boolean last = ((BigDecimal) row.get(EAV_BE_DATE_SET_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            Date value = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DATE_SET_VALUES.VALUE.getName()));
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_DATE_SET_VALUES.REPORT_DATE.getName()));
-
-            baseSet.put(BaseValueFactory.create(
-                    MetaContainerTypes.META_SET,
-                    baseSet.getMemberType(),
-                    id,
-                    baseSet.getCreditorId(),
-                    reportDate,
-                    value,
-                    false,
-                    last));
-        }
+        for (Map<String, Object> row : rows)
+           baseSet.put(constructValue(row, baseSet.getMemberType()));
     }
 
     @Override
