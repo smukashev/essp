@@ -71,26 +71,6 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
     }
 
     @Override
-    public void complexUpdate(IPersistable persistable) {
-        IBaseValue baseValue = (IBaseValue) persistable;
-        IBaseEntity parentEntity = (IBaseEntity) baseValue.getBaseContainer();
-
-        String tableAlias = "cv";
-        Update update = context
-                .update(EAV_BE_STRING_VALUES.as(tableAlias))
-                .set(EAV_BE_STRING_VALUES.as(tableAlias).VALUE, (String) baseValue.getValue())
-                .where(EAV_BE_STRING_VALUES.as(tableAlias).ENTITY_ID.equal(parentEntity.getId())
-                        .and(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID.eq(baseValue.getMetaAttribute().getId()))
-                        .and(EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID.eq(baseValue.getCreditorId()))
-                        .and(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.eq(DataUtils.convert(baseValue.getRepDate()))));
-
-        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-
-        if (count != 1)
-            throw new IllegalStateException(Errors.compose(Errors.E88, count, baseValue.getId()));
-    }
-
-    @Override
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
 
@@ -145,6 +125,81 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
 
     @Override
     @SuppressWarnings("unchecked")
+    public IBaseValue getExistingBaseValue(IBaseValue baseValue) {
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+
+        if (metaAttribute == null)
+            throw new IllegalStateException(Errors.compose(Errors.E80));
+
+        if (metaAttribute.getId() < 1)
+            throw new IllegalStateException(Errors.compose(Errors.E81));
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+
+        if (baseContainer == null)
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
+
+        if (baseContainer.getId() < 1)
+            return null;
+
+        IBaseEntity baseEntity = (IBaseEntity) baseContainer;
+        IMetaClass metaClass = baseEntity.getMeta();
+
+        IMetaType metaType = metaAttribute.getMetaType();
+        IBaseValue existingBaseValue = null;
+
+        String tableAlias = "bv";
+
+        Select select = context
+                .select(DSL.rank().over()
+                                .orderBy(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                        EAV_BE_STRING_VALUES.as(tableAlias).ID,
+                        EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_STRING_VALUES.as(tableAlias).VALUE,
+                        EAV_BE_STRING_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_STRING_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_STRING_VALUES.as(tableAlias))
+                .where(EAV_BE_STRING_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
+                .and(EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                .and(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())));
+
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
+
+        if (rows.size() == 1) {
+            Map<String, Object> row = rows.iterator().next();
+
+            long id = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.ID.getName())).longValue();
+            long creditorId = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.CREDITOR_ID.getName())).longValue();
+            boolean closed = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.IS_CLOSED.getName())).longValue() == 1;
+            boolean last = ((BigDecimal) row.get(EAV_BE_STRING_VALUES.IS_LAST.getName())).longValue() == 1;
+            String value = (String) row.get(EAV_BE_STRING_VALUES.VALUE.getName());
+
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp)
+                    row.get(EAV_BE_STRING_VALUES.REPORT_DATE.getName()));
+
+            existingBaseValue = BaseValueFactory.create(
+                    metaClass.getType(),
+                    metaType,
+                    id,
+                    creditorId,
+                    reportDate,
+                    value,
+                    closed,
+                    last);
+        }
+
+        return existingBaseValue;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public IBaseValue getNextBaseValue(IBaseValue baseValue) {
         IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
 
@@ -169,9 +224,9 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         IBaseValue nextBaseValue = null;
 
         String tableAlias = "bv";
-        String subqueryAlias = "bvn";
+        String subQuery = "bvn";
 
-        Table subqueryTable = context
+        Table subQueryTable = context
                 .select(DSL.rank().over()
                                 .orderBy(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_STRING_VALUES.as(tableAlias).ID,
@@ -186,17 +241,17 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
                 .and(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE.greaterThan(
                         DataUtils.convert(baseValue.getRepDate())))
-                .asTable(subqueryAlias);
+                .asTable(subQuery);
 
         Select select = context
-                .select(subqueryTable.field(EAV_BE_STRING_VALUES.ID),
-                        subqueryTable.field(EAV_BE_STRING_VALUES.CREDITOR_ID),
-                        subqueryTable.field(EAV_BE_STRING_VALUES.REPORT_DATE),
-                        subqueryTable.field(EAV_BE_STRING_VALUES.VALUE),
-                        subqueryTable.field(EAV_BE_STRING_VALUES.IS_CLOSED),
-                        subqueryTable.field(EAV_BE_STRING_VALUES.IS_LAST))
-                .from(subqueryTable)
-                .where(subqueryTable.field("num_pp").cast(Integer.class).equal(1));
+                .select(subQueryTable.field(EAV_BE_STRING_VALUES.ID),
+                        subQueryTable.field(EAV_BE_STRING_VALUES.CREDITOR_ID),
+                        subQueryTable.field(EAV_BE_STRING_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_STRING_VALUES.VALUE),
+                        subQueryTable.field(EAV_BE_STRING_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_STRING_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
 
 
         logger.debug(select.toString());

@@ -9,13 +9,19 @@ import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
-import kz.bsbnb.usci.eav.persistance.dao.*;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityReportDateDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityValueDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.util.Errors;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Delete;
+import org.jooq.Insert;
+import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.*;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
 
 @Repository
 public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
@@ -65,10 +71,6 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         return baseEntityId;
     }
 
-    @Override
-    public void complexUpdate(IPersistable persistable) {
-        throw new IllegalStateException(Errors.compose(Errors.E88, 0, persistable.getId()));
-    }
 
     @Override
     public void update(IPersistable persistable) {
@@ -91,10 +93,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
 
         if (count > 1)
-            throw new IllegalStateException(Errors.compose(Errors.E89,id));
+            throw new IllegalStateException(Errors.compose(Errors.E89, id));
 
         if (count < 1)
-            throw new IllegalStateException(Errors.compose(Errors.E90,id));
+            throw new IllegalStateException(Errors.compose(Errors.E90, id));
 
         refRepository.delRef(id);
     }

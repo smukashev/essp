@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
@@ -67,11 +68,6 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
     }
 
     @Override
-    public void complexUpdate(IPersistable persistable) {
-        throw new IllegalStateException(Errors.compose(Errors.E88, 0, persistable.getId()));
-    }
-
-    @Override
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
 
@@ -84,8 +80,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
                 baseValue.isLast());
     }
 
-    protected void update(long id, long baseSetId, long creditorId, Date reportDate, Object value, boolean closed,
-                          boolean last) {
+    protected void update(long id, long baseSetId, long creditorId, Date reportDate, Object value, boolean closed, boolean last) {
         String tableAlias = "sv";
         Update update = context
                 .update(EAV_BE_STRING_SET_VALUES.as(tableAlias))
@@ -101,7 +96,6 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
 
         if (count != 1)
             throw new IllegalStateException(Errors.compose(Errors.E148, count, id));
-
     }
 
     @Override
@@ -123,24 +117,69 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
             throw new IllegalStateException(Errors.compose(Errors.E147, count, id));
     }
 
-    private IBaseValue constructValue (IBaseValue baseValue, IMetaType metaType, Map<String, Object> row) {
+    private IBaseValue constructValue (Map<String, Object> row, IMetaClass metaClass, IMetaType metaType) {
         long id = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.ID.getName())).longValue();
 
+        long creditorId = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.ID.getName())).longValue();
+
         Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_STRING_SET_VALUES.REPORT_DATE.getName()));
+
+        String value = (String) row.get(EAV_BE_STRING_SET_VALUES.VALUE.getName());
 
         boolean last = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.IS_LAST.getName())).longValue() == 1;
 
         boolean closed = ((BigDecimal) row.get(EAV_BE_STRING_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
         return BaseValueFactory.create(
-                MetaContainerTypes.META_SET,
+                metaClass.getType(),
                 metaType,
                 id,
-                baseValue.getCreditorId(),
+                creditorId,
                 reportDate,
-                baseValue.getValue(),
+                value,
                 closed,
                 last);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public IBaseValue getExistingBaseValue (IBaseValue baseValue) {
+        if (baseValue.getBaseContainer() == null)
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
+
+        if(baseValue.getBaseContainer().getId() == 0)
+            return null;
+
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+        IBaseSet baseSet = (IBaseSet) baseContainer;
+        IMetaType metaType = baseSet.getMemberType();
+
+        IBaseValue previousBaseValue = null;
+
+        String tableAlias = "bsv";
+
+        Select select = context
+                .select(EAV_BE_STRING_SET_VALUES.as(tableAlias).ID,
+                        EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_STRING_SET_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_STRING_SET_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_STRING_SET_VALUES.as(tableAlias))
+                .where(EAV_BE_STRING_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
+                .and(EAV_BE_STRING_SET_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_STRING_SET_VALUES.as(tableAlias).VALUE.equal((String) baseValue.getValue()))
+                .and(EAV_BE_STRING_SET_VALUES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())));
+
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new RuntimeException(Errors.compose(Errors.E83, baseValue.getMetaAttribute().getName()));
+
+        if (rows.size() == 1)
+            previousBaseValue = constructValue(rows.get(0), baseSet, metaType);
+
+        return previousBaseValue;
     }
 
     @Override
