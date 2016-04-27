@@ -236,23 +236,13 @@ public class CortegeDaoImpl extends CommonDao {
                     }
                 }
             } else {
-                Date maxOpenDate;
-                try {
-                    sql = "SELECT MAX(rep_date) AS REP_DATE FROM %s WHERE " + historyKeyElement.queryKeys;
-                    sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+                sql = "DELETE FROM %s WHERE " + historyKeyElement.queryKeys + " and rep_date = ?";
 
-                    maxOpenDate = (Date) jdbcTemplateSC.queryForMap("SELECT MAX(rep_date) AS REP_DATE FROM %s WHERE + historyKeyElement.queryKeys", sql, historyKeyElement.values).get("REP_DATE");
-                } catch (EmptyResultDataAccessException e) {
-                    maxOpenDate = null;
-                }
+                jdbcTemplateSC.update("DELETE FROM %s WHERE + historyKeyElement.queryKeys + and rep_date = ?", String.format(sql, getActualTableName(showCase), COLUMN_PREFIX,
+                        showCase.getRootClassName()), getObjectArray(false, historyKeyElement.values, entity.getReportDate()));
 
                 entryMap.put(new ValueElement("REP_DATE", 0L, 0), entity.getReportDate());
-
-                if (maxOpenDate == null || entity.getReportDate().compareTo(maxOpenDate) >= 0) {
-                    simpleInsertValueElement(entryMap, getActualTableName(showCase));
-                } else {
-                    simpleInsertValueElement(entryMap, getHistoryTableName(showCase));
-                }
+                simpleInsertValueElement(entryMap, getActualTableName(showCase));
             }
         }
     }
