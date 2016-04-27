@@ -45,6 +45,9 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
     public IBaseEntity getRef(long id, Date reportDate) {
         IBaseEntity entity = cache.get(new BaseEntityKey(id, reportDate));
 
+        if (entity == null)
+            return null;
+
         if (entity.getId() < 1)
             throw new IllegalStateException(Errors.compose(Errors.E291));
 
