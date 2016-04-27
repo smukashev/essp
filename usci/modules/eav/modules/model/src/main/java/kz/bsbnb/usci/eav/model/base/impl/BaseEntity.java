@@ -538,7 +538,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         if (!(getClass() == obj.getClass()))
             return false;
 
+        if (!(getClass().equals(obj.getClass())))
+            return false;
+
         BaseEntity that = (BaseEntity) obj;
+
+        if (this.getMeta().getId() != that.getMeta().getId())
+            return false;
 
         int thisValueCount = this.getValueCount();
         int thatValueCount = that.getValueCount();
