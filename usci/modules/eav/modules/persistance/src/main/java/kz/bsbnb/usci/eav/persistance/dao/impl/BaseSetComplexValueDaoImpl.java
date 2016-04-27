@@ -156,11 +156,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         if (rows.size() > 1)
             throw new IllegalStateException(Errors.compose(Errors.E137, childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            previousBaseValue = constructValue(row, metaType, childBaseEntity);
-        }
+        if (rows.size() == 1)
+            previousBaseValue = constructValue(rows.get(0), metaType, childBaseEntity);
 
         return previousBaseValue;
     }
@@ -214,11 +211,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         if (rows.size() > 1)
             throw new IllegalStateException(Errors.compose(Errors.E137, childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-           previousBaseValue = constructValue(row, metaType, childBaseEntity);
-        }
+        if (rows.size() == 1)
+           previousBaseValue = constructValue(rows.get(0), metaType, childBaseEntity);
 
         return previousBaseValue;
     }
@@ -246,8 +240,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                                 .over().orderBy(EAV_BE_COMPLEX_SET_VALUES.
                                         as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ID,
-                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
@@ -259,8 +253,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         Select select = context
                 .select(subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.ID),
-                        subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
                         subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID),
+                        subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
                         subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
                         subqueryTable.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
                 .from(subqueryTable)
@@ -273,11 +267,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         if (rows.size() > 1)
             throw new IllegalStateException(Errors.compose(Errors.E136, childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
 
-        if (rows.size() >= 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            nextBaseValue = constructValue(row, metaType, childBaseEntity);
-        }
+        if (rows.size() >= 1)
+            nextBaseValue = constructValue(rows.get(0), metaType, childBaseEntity);
 
         return nextBaseValue;
     }
@@ -306,6 +297,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                 .select(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ID,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_CLOSED,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
@@ -321,27 +313,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
             throw new IllegalStateException(Errors.compose(Errors.E135,
                     childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean last = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.IS_LAST.getName())).longValue() == 1;
-
-            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(), baseValue.getRepDate());
-
-            closedBaseValue = BaseValueFactory.create(
-                    MetaContainerTypes.META_SET,
-                    metaType,
-                    id,
-                    creditorId,
-                    baseValue.getRepDate(),
-                    childBaseEntityLoaded,
-                    true,
-                    last);
-        }
+        if (rows.size() == 1)
+            closedBaseValue = constructValue(rows.get(0), metaType, childBaseEntity);
 
         return closedBaseValue;
     }
@@ -366,7 +339,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                 .select(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ID,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).REPORT_DATE,
                         EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).CREDITOR_ID,
-                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_CLOSED)
+                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).IS_LAST)
                 .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias))
                 .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).SET_ID.equal(baseContainer.getId()))
                 .and(EAV_BE_COMPLEX_SET_VALUES.as(tableAlias).ENTITY_VALUE_ID.equal(childBaseEntity.getId()))
@@ -379,29 +353,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         if (rows.size() > 1)
             throw new IllegalStateException(Errors.compose(Errors.E83, select.toString()));
 
-        if (rows.size() == 1) {
-            Map<String, Object> row = rows.iterator().next();
-
-            long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
-
-            long creditorId = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID.getName())).longValue();
-
-            boolean closed = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
-
-            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
-
-            IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(), reportDate);
-
-            lastBaseValue = BaseValueFactory.create(
-                    MetaContainerTypes.META_SET,
-                    metaType,
-                    id,
-                    creditorId,
-                    reportDate,
-                    childBaseEntityLoaded,
-                    closed,
-                    true);
-        }
+        if (rows.size() == 1)
+            lastBaseValue = constructValue(rows.get(0), metaType, childBaseEntity);
 
         return lastBaseValue;
     }
@@ -429,9 +382,10 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         select = context
                 .select(tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.ID),
-                        tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
                         tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID),
+                        tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
                         tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
+                        tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
                         tableNumbering.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
                 .from(tableNumbering)
                 .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))

@@ -388,8 +388,9 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
                                 .partitionBy(tableOfValues.field(EAV_BE_DATE_SET_VALUES.VALUE))
                                 .orderBy(tableOfValues.field(EAV_BE_DATE_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
                         tableOfValues.field(EAV_BE_DATE_SET_VALUES.ID),
-                        tableOfValues.field(EAV_BE_DATE_SET_VALUES.VALUE),
+                        tableOfValues.field(EAV_BE_DATE_SET_VALUES.CREDITOR_ID),
                         tableOfValues.field(EAV_BE_DATE_SET_VALUES.REPORT_DATE),
+                        tableOfValues.field(EAV_BE_DATE_SET_VALUES.VALUE),
                         tableOfValues.field(EAV_BE_DATE_SET_VALUES.IS_CLOSED),
                         tableOfValues.field(EAV_BE_DATE_SET_VALUES.IS_LAST))
                 .from(tableOfValues)
