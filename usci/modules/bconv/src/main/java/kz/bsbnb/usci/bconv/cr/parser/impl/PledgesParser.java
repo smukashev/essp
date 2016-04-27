@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDoubleValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -20,20 +21,26 @@ public class PledgesParser extends BatchParser {
         super();
     }
 
+    private MetaClass pledgeMeta, refPledgeTypeMeta;
+
+    @Override
+    public void init() {
+        pledgeMeta = metaClassRepository.getMetaClass("pledge");
+        refPledgeTypeMeta = metaClassRepository.getMetaClass("ref_pledge_type");
+    }
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName) throws SAXException {
         switch (localName) {
             case "pledges":
                 break;
             case "pledge":
-                currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("pledge"),
-                        batch.getRepDate(), creditorId);
+                currentBaseEntity = new BaseEntity(pledgeMeta, batch.getRepDate(), creditorId);
                 break;
             case "pledge_type":
                 event = (XMLEvent) xmlReader.next();
 
-                BaseEntity pledgeType = new BaseEntity(metaClassRepository.getMetaClass("ref_pledge_type"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity pledgeType = new BaseEntity(refPledgeTypeMeta, batch.getRepDate(), creditorId);
 
                 pledgeType.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));

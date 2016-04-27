@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseSetComplexValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -30,10 +31,15 @@ public class PortfolioDataParser extends BatchParser {
     private BaseSet portfolioFlow;
     private BaseSet portfolioFlowMsfo;
 
+    private MetaClass portfolioFlowKfnMeta, portfolioFlowMsfoMeta;
+
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("portfolio_data"),
                 batch.getRepDate(), creditorId);
+
+        portfolioFlowKfnMeta = metaClassRepository.getMetaClass("portfolio_flow_kfn");
+        portfolioFlowMsfoMeta = metaClassRepository.getMetaClass("portfolio_flow_msfo");
     }
 
     @Override
@@ -80,13 +86,13 @@ public class PortfolioDataParser extends BatchParser {
 
     private BaseSet getPortfolioFlow() {
         if (portfolioFlow == null)
-            portfolioFlow = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_kfn"), creditorId);
+            portfolioFlow = new BaseSet(portfolioFlowKfnMeta, creditorId);
         return portfolioFlow;
     }
 
     private BaseSet getPortfolioFlowMsfo() {
         if (portfolioFlowMsfo == null)
-            portfolioFlowMsfo = new BaseSet(metaClassRepository.getMetaClass("portfolio_flow_msfo"), creditorId);
+            portfolioFlowMsfo = new BaseSet(portfolioFlowMsfoMeta, creditorId);
         return portfolioFlowMsfo;
     }
 }

@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseSetComplexValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -37,6 +38,15 @@ public class PackageParser extends BatchParser {
 
     private int totalCount = 0;
 
+    private MetaClass creditMeta, refCreditTypeMeta, pledgeMeta;
+
+    @Override
+    public void init() {
+        creditMeta = metaClassRepository.getMetaClass("credit");
+        refCreditTypeMeta = metaClassRepository.getMetaClass("ref_credit_type");
+        pledgeMeta = metaClassRepository.getMetaClass("pledge");
+    }
+
     public int getTotalCount() {
         return totalCount;
     }
@@ -54,7 +64,7 @@ public class PackageParser extends BatchParser {
             case "packages":
                 break;
             case "package":
-                currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("credit"), batch.getRepDate(), creditorId);
+                currentBaseEntity = new BaseEntity(creditMeta, batch.getRepDate(), creditorId);
                 // TODO: set index
                 /*currentBaseEntity.setIndex(Long.parseLong(
                     event.asStartElement().getAttributeByName(new QName("no")).getValue()));*/
@@ -78,8 +88,7 @@ public class PackageParser extends BatchParser {
                 creditParser.parse(xmlReader, batch, index, creditorId);
                 BaseEntity credit = creditParser.getCurrentBaseEntity();
 
-                BaseEntity creditType = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_type"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity creditType = new BaseEntity(refCreditTypeMeta, batch.getRepDate(), creditorId);
                 // fixme!
                 try {
                     creditType.put("code",
@@ -105,7 +114,7 @@ public class PackageParser extends BatchParser {
                 }
                 break;
             case "pledges":
-                BaseSet pledges = new BaseSet(metaClassRepository.getMetaClass("pledge"), creditorId);
+                BaseSet pledges = new BaseSet(pledgeMeta, creditorId);
 
                 while (true) {
                     pledgesParser.parse(xmlReader, batch, index, creditorId);

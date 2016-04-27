@@ -5,6 +5,7 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,19 +42,35 @@ public class SubjectOrganizationParser extends BatchParser {
     private BaseEntity currentAddress;
     private BaseEntity organizationInfo;
 
+    private MetaClass refCountryMeta, refOffshoreMeta, bankRelationMeta, refBankRelationMeta, addressMeta, refRegionMeta,
+                    contactMeta, refContactType, organizationNameMeta, refLegalFormMeta, refEnterpriseTypeMeta, refEconTradeMeta,
+                    documentMeta;
+
     @Override
     public void init() {
-        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("subject"),
-                batch.getRepDate(), creditorId);
+        currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("subject"), batch.getRepDate(), creditorId);
 
-        organizationInfo = new BaseEntity(metaClassRepository.getMetaClass("organization_info"),
-                batch.getRepDate(), creditorId);
+        organizationInfo = new BaseEntity(metaClassRepository.getMetaClass("organization_info"), batch.getRepDate(), creditorId);
 
         bankRelations = null;
         addresses = null;
         contacts = null;
         currentContact = null;
         currentAddress = null;
+
+        refCountryMeta = metaClassRepository.getMetaClass("ref_country");
+        refOffshoreMeta = metaClassRepository.getMetaClass("ref_offshore");
+        bankRelationMeta = metaClassRepository.getMetaClass("bank_relation");
+        refBankRelationMeta = metaClassRepository.getMetaClass("ref_bank_relation");
+        addressMeta = metaClassRepository.getMetaClass("address");
+        refRegionMeta = metaClassRepository.getMetaClass("ref_region");
+        contactMeta = metaClassRepository.getMetaClass("contact");
+        refContactType = metaClassRepository.getMetaClass("ref_contact_type");
+        organizationNameMeta = metaClassRepository.getMetaClass("organization_name");
+        refLegalFormMeta = metaClassRepository.getMetaClass("ref_legal_form");
+        refEnterpriseTypeMeta = metaClassRepository.getMetaClass("ref_enterprise_type");
+        refEconTradeMeta = metaClassRepository.getMetaClass("ref_econ_trade");
+        documentMeta = metaClassRepository.getMetaClass("document");
     }
 
     @Override
@@ -64,7 +81,7 @@ public class SubjectOrganizationParser extends BatchParser {
             case "country":
                 event = (XMLEvent) xmlReader.next();
 
-                BaseEntity country = new BaseEntity(metaClassRepository.getMetaClass("ref_country"),
+                BaseEntity country = new BaseEntity(refCountryMeta,
                         batch.getRepDate(), creditorId);
 
                 country.put("code_numeric",
@@ -76,8 +93,7 @@ public class SubjectOrganizationParser extends BatchParser {
                 break;
             case "offshore":
                 event = (XMLEvent) xmlReader.next();
-                BaseEntity offshore = new BaseEntity(metaClassRepository.getMetaClass("ref_offshore"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity offshore = new BaseEntity(refOffshoreMeta, batch.getRepDate(), creditorId);
 
                 offshore.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -86,16 +102,15 @@ public class SubjectOrganizationParser extends BatchParser {
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), offshore, false, true));
                 break;
             case "bank_relations":
-                bankRelations = new BaseSet(metaClassRepository.getMetaClass("bank_relation"), creditorId);
+                bankRelations = new BaseSet(bankRelationMeta, creditorId);
                 break;
             case "bank_relation":
                 event = (XMLEvent) xmlReader.next();
 
-                BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("bank_relation"),
+                BaseEntity bankRelation = new BaseEntity(bankRelationMeta,
                         batch.getRepDate(), creditorId);
 
-                BaseEntity refBankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity refBankRelation = new BaseEntity(refBankRelationMeta, batch.getRepDate(), creditorId);
 
                 refBankRelation.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -106,18 +121,18 @@ public class SubjectOrganizationParser extends BatchParser {
                 bankRelations.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), bankRelation, false, true));
                 break;
             case "addresses":
-                addresses = new BaseSet(metaClassRepository.getMetaClass("address"), creditorId);
+                addresses = new BaseSet(addressMeta, creditorId);
 
                 break;
             case "address":
-                currentAddress = new BaseEntity(metaClassRepository.getMetaClass("address"), batch.getRepDate(), creditorId);
+                currentAddress = new BaseEntity(addressMeta, batch.getRepDate(), creditorId);
 
                 currentAddress.put("type",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                                 event.asStartElement().getAttributeByName(new QName("type")).getValue(), false, true));
                 break;
             case "region":
-                BaseEntity region = new BaseEntity(metaClassRepository.getMetaClass("ref_region"), batch.getRepDate(), creditorId);
+                BaseEntity region = new BaseEntity(refRegionMeta, batch.getRepDate(), creditorId);
 
                 event = (XMLEvent) xmlReader.next();
 
@@ -132,12 +147,12 @@ public class SubjectOrganizationParser extends BatchParser {
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
                 break;
             case "contacts":
-                contacts = new BaseSet(metaClassRepository.getMetaClass("contact"), creditorId);
+                contacts = new BaseSet(contactMeta, creditorId);
                 break;
             case "contact":
-                currentContact = new BaseEntity(metaClassRepository.getMetaClass("contact"), batch.getRepDate(), creditorId);
+                currentContact = new BaseEntity(contactMeta, batch.getRepDate(), creditorId);
 
-                BaseEntity contactType = new BaseEntity(metaClassRepository.getMetaClass("ref_contact_type"), new Date(), creditorId);
+                BaseEntity contactType = new BaseEntity(refContactType, new Date(), creditorId);
 
                 contactType.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
                         event.asStartElement().getAttributeByName(new QName("contact_type")).getValue(), false, true));
@@ -157,7 +172,7 @@ public class SubjectOrganizationParser extends BatchParser {
                 contacts.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentContact, false, true));
                 break;
             case "names":
-                BaseSet organizationNames = new BaseSet(metaClassRepository.getMetaClass("organization_name"), creditorId);
+                BaseSet organizationNames = new BaseSet(organizationNameMeta, creditorId);
 
                 while (true) {
                     subjectOrganizationNamesParser.parse(xmlReader, batch, index, creditorId);
@@ -176,8 +191,7 @@ public class SubjectOrganizationParser extends BatchParser {
                         subjectOrganizationHeadParser.getCurrentBaseEntity(), false, true));
                 break;
             case "legal_form":
-                BaseEntity legalForm = new BaseEntity(metaClassRepository.getMetaClass("ref_legal_form"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity legalForm = new BaseEntity(refLegalFormMeta, batch.getRepDate(), creditorId);
 
                 event = (XMLEvent) xmlReader.next();
 
@@ -190,8 +204,7 @@ public class SubjectOrganizationParser extends BatchParser {
             case "enterprise_type":
                 event = (XMLEvent) xmlReader.next();
 
-                BaseEntity enterpriseType = new BaseEntity(metaClassRepository.getMetaClass("ref_enterprise_type"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity enterpriseType = new BaseEntity(refEnterpriseTypeMeta, batch.getRepDate(), creditorId);
 
                 enterpriseType.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -202,8 +215,7 @@ public class SubjectOrganizationParser extends BatchParser {
             case "econ_trade":
                 event = (XMLEvent) xmlReader.next();
 
-                BaseEntity econTrade = new BaseEntity(metaClassRepository.getMetaClass("ref_econ_trade"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity econTrade = new BaseEntity(refEconTradeMeta, batch.getRepDate(), creditorId);
 
                 econTrade.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -218,7 +230,7 @@ public class SubjectOrganizationParser extends BatchParser {
                                 (Boolean)DataTypes.getCastObject(DataTypes.BOOLEAN, event.asCharacters().getData()), false, true));
                 break;
             case "docs":
-                BaseSet organizationDocs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
+                BaseSet organizationDocs = new BaseSet(documentMeta, creditorId);
 
                 while (true) {
                     subjectOrganizationDocsParser.parse(xmlReader, batch, index, creditorId);

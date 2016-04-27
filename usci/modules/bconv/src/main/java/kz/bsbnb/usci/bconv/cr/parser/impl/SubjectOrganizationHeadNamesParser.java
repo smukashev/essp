@@ -4,6 +4,7 @@ import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -18,6 +19,13 @@ public class SubjectOrganizationHeadNamesParser extends BatchParser {
         super();
     }
 
+    private MetaClass personNameMeta;
+
+    @Override
+    public void init() {
+        personNameMeta = metaClassRepository.getMetaClass("person_name");
+    }
+
     @Override
     public boolean startElement(XMLEvent event, StartElement startElement, String localName)
             throws SAXException {
@@ -25,8 +33,7 @@ public class SubjectOrganizationHeadNamesParser extends BatchParser {
             case "names":
                 break;
             case "name":
-                currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("person_name"),
-                        batch.getRepDate(), creditorId);
+                currentBaseEntity = new BaseEntity(personNameMeta, batch.getRepDate(), creditorId);
                 break;
             case "firstname":
                 event = (XMLEvent) xmlReader.next();

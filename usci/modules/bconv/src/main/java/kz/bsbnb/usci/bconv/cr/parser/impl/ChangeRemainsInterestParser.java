@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDateValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDoubleValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -29,6 +30,9 @@ public class ChangeRemainsInterestParser extends BatchParser {
     private BaseEntity fieldPastDue;
     private BaseEntity fieldWriteOf;
 
+    private MetaClass refRemainsInterestCurrectMeta, refRemainsInterestPastdueMeta, refRemainsInterestWriteOffMeta,
+                        refBalanceAccountMeta;
+
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_interest"),
@@ -37,6 +41,11 @@ public class ChangeRemainsInterestParser extends BatchParser {
         fieldCurrent = null;
         fieldPastDue = null;
         fieldWriteOf = null;
+
+        refRemainsInterestCurrectMeta = metaClassRepository.getMetaClass("remains_interest_current");
+        refRemainsInterestPastdueMeta = metaClassRepository.getMetaClass("remains_interest_pastdue");
+        refRemainsInterestWriteOffMeta = metaClassRepository.getMetaClass("remains_interest_write_off");
+        refBalanceAccountMeta = metaClassRepository.getMetaClass("ref_balance_account");
     }
 
     @Override
@@ -45,18 +54,15 @@ public class ChangeRemainsInterestParser extends BatchParser {
             case "interest":
                 break;
             case "current":
-                fieldCurrent = new BaseEntity(metaClassRepository.getMetaClass("remains_interest_current"),
-                        batch.getRepDate(), creditorId);
+                fieldCurrent = new BaseEntity(refRemainsInterestCurrectMeta, batch.getRepDate(), creditorId);
                 interestWay = localName;
                 break;
             case "pastdue":
-                fieldPastDue = new BaseEntity(metaClassRepository.getMetaClass("remains_interest_pastdue"),
-                        batch.getRepDate(), creditorId);
+                fieldPastDue = new BaseEntity(refRemainsInterestPastdueMeta,batch.getRepDate(), creditorId);
                 interestWay = localName;
                 break;
             case "write_off":
-                fieldWriteOf = new BaseEntity(metaClassRepository.getMetaClass("remains_interest_write_off"),
-                        batch.getRepDate(), creditorId);
+                fieldWriteOf = new BaseEntity(refRemainsInterestWriteOffMeta, batch.getRepDate(), creditorId);
                 interestWay = localName;
                 break;
             case "value": {
@@ -99,8 +105,7 @@ public class ChangeRemainsInterestParser extends BatchParser {
             }
             case "balance_account": {
                 event = (XMLEvent) xmlReader.next();
-                BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity baseEntity = new BaseEntity(refBalanceAccountMeta, batch.getRepDate(), creditorId);
 
                 baseEntity.put("no_",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
