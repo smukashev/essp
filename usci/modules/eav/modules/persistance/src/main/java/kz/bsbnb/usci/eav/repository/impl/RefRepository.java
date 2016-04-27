@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -16,22 +17,20 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
     private final HashMap<BaseEntityKey, IBaseEntity> cache = new HashMap<>();
 
     @Override
-    public IBaseEntity findRef(IBaseEntity baseEntity) {
+    public long findRef(IBaseEntity baseEntity) {
         boolean synced;
         int syncCounter = 0;
         do {
             try {
                 for (Map.Entry<BaseEntityKey, IBaseEntity> entry : cache.entrySet()) {
-                    if (baseEntity.getReportDate().compareTo(entry.getValue().getReportDate()) == 0
-                            && baseEntity.equalsByReference(entry.getValue())) {
-                        return entry.getValue();
-                    }
+                    if (baseEntity.equalsByReference(entry.getValue()))
+                        return entry.getValue().getId();
                 }
                 synced = false;
             } catch (Exception e) {
                 synced = true;
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(1);
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
@@ -39,12 +38,17 @@ public class RefRepository extends JDBCSupport implements IRefRepository {
         } while (synced && syncCounter++ < 1000);
 
 
-        return null;
+        return 0;
     }
 
     @Override
     public IBaseEntity getRef(long id, Date reportDate) {
-        return cache.get(new BaseEntityKey(id, reportDate));
+        IBaseEntity entity = cache.get(new BaseEntityKey(id, reportDate));
+
+        if (entity.getId() < 1)
+            throw new IllegalStateException(Errors.compose(Errors.E291));
+
+        return entity;
     }
 
     public void setRef(long id, Date reportDate, IBaseEntity baseEntity) {

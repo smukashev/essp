@@ -5,7 +5,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import java.util.Date;
 
 public interface IRefRepository {
-    IBaseEntity findRef(IBaseEntity baseEntity);
+    long findRef(IBaseEntity baseEntity);
 
     IBaseEntity getRef(long Id, Date reportDate);
 
