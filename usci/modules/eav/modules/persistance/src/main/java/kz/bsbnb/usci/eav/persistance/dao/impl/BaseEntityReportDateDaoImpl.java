@@ -136,35 +136,6 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
     }
 
     @Override
-    public void complexUpdate(IPersistable persistable) {
-        if (persistable.getId() < 1)
-            throw new RuntimeException(Errors.compose(Errors.E124));
-
-        IBaseEntityReportDate baseEntityReportDate = (IBaseEntityReportDate) persistable;
-
-        String tableAlias = "rd";
-        Update update = context
-                .update(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias))
-                .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).INTEGER_VALUES_COUNT, baseEntityReportDate.getIntegerValuesCount())
-                .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).DATE_VALUES_COUNT, baseEntityReportDate.getDateValuesCount())
-                .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).STRING_VALUES_COUNT, baseEntityReportDate.getStringValuesCount())
-                .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).BOOLEAN_VALUES_COUNT, baseEntityReportDate.getBooleanValuesCount())
-                .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).DOUBLE_VALUES_COUNT, baseEntityReportDate.getDoubleValuesCount())
-                .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_VALUES_COUNT, baseEntityReportDate.getComplexValuesCount())
-                .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).SIMPLE_SETS_COUNT, baseEntityReportDate.getSimpleSetsCount())
-                .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).COMPLEX_SETS_COUNT, baseEntityReportDate.getComplexSetsCount())
-                .set(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).IS_CLOSED, DataUtils.convert(baseEntityReportDate.isClosed()))
-                .where(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).ENTITY_ID.equal(baseEntityReportDate.getBaseEntity().getId())
-                .and(EAV_BE_ENTITY_REPORT_DATES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseEntityReportDate.getReportDate()))));
-
-        logger.debug(update.toString());
-        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-
-        if (count != 1)
-            throw new RuntimeException(Errors.compose(Errors.E125));
-    }
-
-    @Override
     public void update(IPersistable persistable) {
         if (persistable.getId() < 1)
             throw new RuntimeException(Errors.compose(Errors.E124));
