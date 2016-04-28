@@ -424,6 +424,7 @@ function addField(form, attr, idSuffix, node) {
                     }
                 },
                 autoLoad: true,
+                timeout: 120000,
                 remoteSort: true
             }),
             displayField: 'title',
