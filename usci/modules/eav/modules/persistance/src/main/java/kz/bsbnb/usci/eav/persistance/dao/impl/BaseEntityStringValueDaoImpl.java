@@ -55,8 +55,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
         return baseValueId;
     }
 
-    protected long insert(long baseEntityId, long creditorId, long metaAttributeId, Date reportDate, Object value,
-                          boolean closed, boolean last) {
+    protected long insert(long baseEntityId, long creditorId, long metaAttributeId, Date reportDate, Object value, boolean closed, boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_STRING_VALUES)
                 .set(EAV_BE_STRING_VALUES.ENTITY_ID, baseEntityId)

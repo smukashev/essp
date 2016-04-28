@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
@@ -8,6 +7,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IEavGlobalDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.*;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BATCHES;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BATCH_STATUSES;
 
 @Repository
 public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
@@ -234,8 +235,9 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         batch.setRepDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.REP_DATE.getName())));
         batch.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.RECEIPT_DATE.getName())));
         batch.setBatchType((String) row.get(EAV_BATCHES.BATCH_TYPE.getName()));
-        batch.setTotalCount(getNullSafeLong(row, EAV_BATCHES.TOTAL_COUNT));
-        batch.setActualCount(getNullSafeLong(row, EAV_BATCHES.ACTUAL_COUNT));
+        //        TODO:     TOTAL_COUNT <-> ACTUAL_COUNT are misplaced in DB. So we misplace its second time here....
+        batch.setTotalCount(getNullSafeLong(row, EAV_BATCHES.ACTUAL_COUNT));
+        batch.setActualCount(getNullSafeLong(row, EAV_BATCHES.TOTAL_COUNT));
         batch.setReportId(getNullSafeLong(row, EAV_BATCHES.REPORT_ID));
         return batch;
     }

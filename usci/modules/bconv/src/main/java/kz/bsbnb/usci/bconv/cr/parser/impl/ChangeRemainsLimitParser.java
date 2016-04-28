@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDoubleValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -16,6 +17,8 @@ import javax.xml.stream.events.XMLEvent;
 @Component
 @Scope("prototype")
 public class ChangeRemainsLimitParser extends BatchParser {
+    private MetaClass refBalanceAccountMeta;
+
     public ChangeRemainsLimitParser() {
         super();
     }
@@ -23,6 +26,7 @@ public class ChangeRemainsLimitParser extends BatchParser {
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("remains_limit"), batch.getRepDate(), creditorId);
+        refBalanceAccountMeta = metaClassRepository.getMetaClass("ref_balance_account");
     }
 
     @Override
@@ -45,8 +49,7 @@ public class ChangeRemainsLimitParser extends BatchParser {
             case "balance_account":
                 event = (XMLEvent) xmlReader.next();
 
-                BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity baseEntity = new BaseEntity(refBalanceAccountMeta, batch.getRepDate(), creditorId);
 
                 baseEntity.put("no_",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));

@@ -345,7 +345,7 @@ public enum Errors {
         errors.put("E288", "Загрузка на витрину не доступна");
         errors.put("E289", "Запись не удалена из очереди");
         errors.put("E290", "Не могу применить бизнес правила: #e_message");
-        errors.put("E291", "");
+        errors.put("E291", "Справочник не имеет ID;");
         errors.put("E292", "");
         errors.put("E293", "");
         errors.put("E294", "");

@@ -430,7 +430,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
         for (Map<String, Object> row : rows) {
             String attribute = (String) row.get(EAV_M_COMPLEX_SET.NAME.getName());
-            baseEntity.put(attribute, constructValue(rows.get(0), baseEntity.getMeta(), baseEntity.getMemberType(attribute)));
+            baseEntity.put(attribute, constructValue(row, baseEntity.getMeta(), baseEntity.getMemberType(attribute)));
         }
     }
 

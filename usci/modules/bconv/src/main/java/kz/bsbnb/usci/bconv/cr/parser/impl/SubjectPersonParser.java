@@ -5,6 +5,7 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class SubjectPersonParser extends BatchParser {
 
     private BaseEntity personInfo;
 
+    private MetaClass refCountryMeta, refOffshoreMeta, bankRelationMeta, refBankRelationMeta, addressMeta,
+                        refRegionMeta, contactMeta, refContactTypeMeta, personNameMeta, documentMeta;
+
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("subject"), batch.getRepDate(), creditorId);
@@ -48,6 +52,17 @@ public class SubjectPersonParser extends BatchParser {
         addresses = null;
         currentAddress = null;
         bankRelations = null;
+
+        refCountryMeta = metaClassRepository.getMetaClass("ref_country");
+        refOffshoreMeta = metaClassRepository.getMetaClass("ref_offshore");
+        bankRelationMeta = metaClassRepository.getMetaClass("bank_relation");
+        refBankRelationMeta = metaClassRepository.getMetaClass("ref_bank_relation");
+        addressMeta = metaClassRepository.getMetaClass("address");
+        refRegionMeta = metaClassRepository.getMetaClass("ref_region");
+        contactMeta = metaClassRepository.getMetaClass("contact");
+        refContactTypeMeta = metaClassRepository.getMetaClass("ref_contact_type");
+        personNameMeta = metaClassRepository.getMetaClass("person_name");
+        documentMeta = metaClassRepository.getMetaClass("document");
     }
 
     @Override
@@ -58,7 +73,7 @@ public class SubjectPersonParser extends BatchParser {
                 break;
             case "country":
                 event = (XMLEvent) xmlReader.next();
-                BaseEntity country = new BaseEntity(metaClassRepository.getMetaClass("ref_country"),
+                BaseEntity country = new BaseEntity(refCountryMeta,
                         batch.getRepDate(), creditorId);
 
                 country.put("code_numeric",
@@ -71,8 +86,7 @@ public class SubjectPersonParser extends BatchParser {
             case "offshore":
                 event = (XMLEvent) xmlReader.next();
 
-                BaseEntity ref_offshore = new BaseEntity(metaClassRepository.getMetaClass("ref_offshore"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity ref_offshore = new BaseEntity(refOffshoreMeta, batch.getRepDate(), creditorId);
 
                 ref_offshore.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -81,16 +95,15 @@ public class SubjectPersonParser extends BatchParser {
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), ref_offshore, false, true));
                 break;
             case "bank_relations":
-                bankRelations = new BaseSet(metaClassRepository.getMetaClass("bank_relation"), creditorId);
+                bankRelations = new BaseSet(bankRelationMeta, creditorId);
                 break;
             case "bank_relation":
                 event = (XMLEvent) xmlReader.next();
 
-                BaseEntity bankRelation = new BaseEntity(metaClassRepository.getMetaClass("bank_relation"),
+                BaseEntity bankRelation = new BaseEntity(bankRelationMeta,
                         batch.getRepDate(), creditorId);
 
-                BaseEntity refBankRelation = new BaseEntity(metaClassRepository.getMetaClass("ref_bank_relation"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity refBankRelation = new BaseEntity(refBankRelationMeta, batch.getRepDate(), creditorId);
 
                 refBankRelation.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -101,11 +114,10 @@ public class SubjectPersonParser extends BatchParser {
                 bankRelations.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), bankRelation, false, true));
                 break;
             case "addresses":
-                addresses = new BaseSet(metaClassRepository.getMetaClass("address"), creditorId);
+                addresses = new BaseSet(addressMeta, creditorId);
                 break;
             case "address":
-                currentAddress = new BaseEntity(metaClassRepository.getMetaClass("address"),
-                        batch.getRepDate(), creditorId);
+                currentAddress = new BaseEntity(addressMeta, batch.getRepDate(), creditorId);
 
                 currentAddress.put("type",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
@@ -113,8 +125,7 @@ public class SubjectPersonParser extends BatchParser {
                 break;
             case "region":
                 event = (XMLEvent) xmlReader.next();
-                BaseEntity region = new BaseEntity(metaClassRepository.getMetaClass("ref_region"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity region = new BaseEntity(refRegionMeta, batch.getRepDate(), creditorId);
 
                 region.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -128,14 +139,13 @@ public class SubjectPersonParser extends BatchParser {
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
                 break;
             case "contacts":
-                contacts = new BaseSet(metaClassRepository.getMetaClass("contact"), creditorId);
+                contacts = new BaseSet(contactMeta, creditorId);
                 break;
             case "contact":
-                BaseEntity currentContact = new BaseEntity(metaClassRepository.getMetaClass("contact"),
+                BaseEntity currentContact = new BaseEntity(contactMeta,
                         batch.getRepDate(), creditorId);
 
-                BaseEntity contactType = new BaseEntity(metaClassRepository.getMetaClass("ref_contact_type"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity contactType = new BaseEntity(refContactTypeMeta, batch.getRepDate(), creditorId);
 
                 contactType.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
@@ -155,10 +165,10 @@ public class SubjectPersonParser extends BatchParser {
                 contacts.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentContact, false, true));
                 break;
             case "names":
-                names = new BaseSet(metaClassRepository.getMetaClass("person_name"), creditorId);
+                names = new BaseSet(personNameMeta, creditorId);
                 break;
             case "name":
-                currentName = new BaseEntity(metaClassRepository.getMetaClass("person_name"), batch.getRepDate(), creditorId);
+                currentName = new BaseEntity(personNameMeta, batch.getRepDate(), creditorId);
 
                 currentName.put("lang",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
@@ -180,7 +190,7 @@ public class SubjectPersonParser extends BatchParser {
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
                 break;
             case "docs":
-                BaseSet personDocs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
+                BaseSet personDocs = new BaseSet(documentMeta, creditorId);
 
                 while (true) {
                     subjectPersonDocsParser.parse(xmlReader, batch, index, creditorId);

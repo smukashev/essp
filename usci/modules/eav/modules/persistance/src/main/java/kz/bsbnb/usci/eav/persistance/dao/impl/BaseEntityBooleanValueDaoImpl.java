@@ -70,26 +70,6 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
     }
 
     @Override
-    public void complexUpdate(IPersistable persistable) {
-        IBaseValue baseValue = (IBaseValue) persistable;
-        IBaseEntity parentEntity = (IBaseEntity) baseValue.getBaseContainer();
-
-        String tableAlias = "cv";
-        Update update = context
-                .update(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
-                .set(EAV_BE_BOOLEAN_VALUES.as(tableAlias).VALUE, DataUtils.convert((Boolean) baseValue.getValue()))
-                .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(parentEntity.getId())
-                        .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.eq(baseValue.getMetaAttribute().getId()))
-                        .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID.eq(baseValue.getCreditorId()))
-                        .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.eq(DataUtils.convert(baseValue.getRepDate()))));
-
-        int count = updateWithStats(update.getSQL(), update.getBindValues().toArray());
-
-        if (count != 1)
-            throw new IllegalStateException(Errors.compose(Errors.E88, count, baseValue.getId()));
-    }
-
-    @Override
     public void update(IPersistable persistable) {
         IBaseValue baseValue = (IBaseValue) persistable;
 
@@ -164,6 +144,71 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 value,
                 closed,
                 last);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public IBaseValue getExistingBaseValue(IBaseValue baseValue) {
+        IMetaAttribute metaAttribute = baseValue.getMetaAttribute();
+        IBaseContainer baseContainer = baseValue.getBaseContainer();
+
+        if (metaAttribute == null)
+            throw new IllegalStateException(Errors.compose(Errors.E80));
+
+        if (metaAttribute.getId() < 1)
+            throw new IllegalStateException(Errors.compose(Errors.E81));
+
+        if (baseContainer == null)
+            throw new IllegalStateException(Errors.compose(Errors.E82, baseValue.getMetaAttribute().getName()));
+
+        if (baseContainer.getId() < 1)
+            return null;
+
+        IBaseEntity baseEntity = (IBaseEntity) baseContainer;
+
+        IMetaType metaType = metaAttribute.getMetaType();
+        IBaseValue existingBaseValue = null;
+
+        String tableAlias = "bv";
+        String subQueryAlias = "bvn";
+
+        Table subQueryTable = context
+                .select(DSL.rank().over()
+                                .orderBy(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.asc()).as("num_pp"),
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).ID,
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID,
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE,
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).VALUE,
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_CLOSED,
+                        EAV_BE_BOOLEAN_VALUES.as(tableAlias).IS_LAST)
+                .from(EAV_BE_BOOLEAN_VALUES.as(tableAlias))
+                .where(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ENTITY_ID.equal(baseEntity.getId()))
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).CREDITOR_ID.equal(baseValue.getCreditorId()))
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).ATTRIBUTE_ID.equal(metaAttribute.getId()))
+                .and(EAV_BE_BOOLEAN_VALUES.as(tableAlias).REPORT_DATE.equal(DataUtils.convert(baseValue.getRepDate())))
+                .asTable(subQueryAlias);
+
+        Select select = context
+                .select(subQueryTable.field(EAV_BE_BOOLEAN_VALUES.ID),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.CREDITOR_ID),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.VALUE),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.IS_CLOSED),
+                        subQueryTable.field(EAV_BE_BOOLEAN_VALUES.IS_LAST))
+                .from(subQueryTable)
+                .where(subQueryTable.field("num_pp").cast(Integer.class).equal(1));
+
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
+
+        if (rows.size() == 1)
+            existingBaseValue = constructValue(rows.get(0), metaType);
+
+        return existingBaseValue;
     }
 
     @Override

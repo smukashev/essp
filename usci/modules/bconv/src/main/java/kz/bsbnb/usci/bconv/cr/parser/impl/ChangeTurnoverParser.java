@@ -5,6 +5,7 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDoubleValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -27,6 +28,8 @@ public class ChangeTurnoverParser extends BatchParser {
     private BaseEntity currentDebt;
     boolean debtFlag = false;
 
+    private MetaClass refTurnOverIssueMeta, refTurnOverIssueDebtMeta, refTurnOverissueInterestMeta;
+
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("turnover"), batch.getRepDate(), creditorId);
@@ -36,6 +39,10 @@ public class ChangeTurnoverParser extends BatchParser {
         interestFlag = false;
         currentDebt = null;
         debtFlag = false;
+
+        refTurnOverIssueMeta = metaClassRepository.getMetaClass("turnover_issue");
+        refTurnOverIssueDebtMeta = metaClassRepository.getMetaClass("turnover_issue_debt");
+        refTurnOverissueInterestMeta = metaClassRepository.getMetaClass("turnover_issue_interest");
     }
 
     @Override
@@ -44,17 +51,14 @@ public class ChangeTurnoverParser extends BatchParser {
             case "turnover":
                 break;
             case "issue":
-                currentIssue = new BaseEntity(metaClassRepository.getMetaClass("turnover_issue"),
-                        batch.getRepDate(), creditorId);
+                currentIssue = new BaseEntity(refTurnOverIssueMeta, batch.getRepDate(), creditorId);
                 break;
             case "debt":
-                currentDebt = new BaseEntity(metaClassRepository.getMetaClass("turnover_issue_debt"),
-                        batch.getRepDate(), creditorId);
+                currentDebt = new BaseEntity(refTurnOverIssueDebtMeta, batch.getRepDate(), creditorId);
                 debtFlag = true;
                 break;
             case "interest":
-                currentInterest = new BaseEntity(metaClassRepository.getMetaClass("turnover_issue_interest"),
-                        batch.getRepDate(), creditorId);
+                currentInterest = new BaseEntity(refTurnOverissueInterestMeta, batch.getRepDate(), creditorId);
                 interestFlag = true;
                 break;
             case "amount":

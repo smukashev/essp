@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -33,8 +34,21 @@ public class CreditParser extends BatchParser {
     @Autowired
     private CreditorBranchParser creditorBranchParser;
 
+    private MetaClass refCurrencyMeta, refCreditPurposeMeta, refCreditObjectMeta, refFinanceSourceMeta, refPortfolioMeta,
+                    portfolioMeta;
+
     public CreditParser() {
         super();
+    }
+
+    @Override
+    public void init() {
+        refCurrencyMeta = metaClassRepository.getMetaClass("ref_currency");
+        refCreditPurposeMeta = metaClassRepository.getMetaClass("ref_credit_purpose");
+        refCreditObjectMeta = metaClassRepository.getMetaClass("ref_credit_object");
+        refFinanceSourceMeta = metaClassRepository.getMetaClass("ref_finance_source");
+        refPortfolioMeta = metaClassRepository.getMetaClass("ref_portfolio");
+        portfolioMeta = metaClassRepository.getMetaClass("portfolio");
     }
 
     public void setCurrentBaseEntity(BaseEntity baseEntity) {
@@ -57,8 +71,7 @@ public class CreditParser extends BatchParser {
             case "currency":
                 event = (XMLEvent) xmlReader.next();
 
-                BaseEntity currency = new BaseEntity(metaClassRepository.getMetaClass("ref_currency"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity currency = new BaseEntity(refCurrencyMeta, batch.getRepDate(), creditorId);
 
                 currency.put("short_name",
                         new BaseValue<>(0, creditorId, batch.getRepDate(), event.asCharacters().getData()));
@@ -100,8 +113,7 @@ public class CreditParser extends BatchParser {
             }
             case "credit_purpose":
                 event = (XMLEvent) xmlReader.next();
-                BaseEntity creditPurpose = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_purpose"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity creditPurpose = new BaseEntity(refCreditPurposeMeta, batch.getRepDate(), creditorId);
 
                 creditPurpose.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -111,8 +123,7 @@ public class CreditParser extends BatchParser {
                 break;
             case "credit_object":
                 event = (XMLEvent) xmlReader.next();
-                BaseEntity creditObject = new BaseEntity(metaClassRepository.getMetaClass("ref_credit_object"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity creditObject = new BaseEntity(refCreditObjectMeta, batch.getRepDate(), creditorId);
 
                 creditObject.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -127,8 +138,7 @@ public class CreditParser extends BatchParser {
                 break;
             case "finance_source":
                 event = (XMLEvent) xmlReader.next();
-                BaseEntity financeSource = new BaseEntity(metaClassRepository.getMetaClass("ref_finance_source"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity financeSource = new BaseEntity(refFinanceSourceMeta, batch.getRepDate(), creditorId);
 
                 financeSource.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
@@ -156,8 +166,7 @@ public class CreditParser extends BatchParser {
                     String value = getNullableTagValue(localName, event, xmlReader);
 
                     if (value != null) {
-                        BaseEntity portfolio = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),
-                                batch.getRepDate(), creditorId);
+                        BaseEntity portfolio = new BaseEntity(refPortfolioMeta, batch.getRepDate(), creditorId);
 
                         portfolio.put("code",
                                 new BaseEntityStringValue(0, creditorId, batch.getRepDate(), value, false, true));
@@ -169,15 +178,14 @@ public class CreditParser extends BatchParser {
                                 new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), null, false, true));
                     }
                 } else {
-                    currentPortfolio = new BaseEntity(metaClassRepository.getMetaClass("portfolio"), batch.getRepDate(), creditorId);
+                    currentPortfolio = new BaseEntity(portfolioMeta, batch.getRepDate(), creditorId);
                 }
                 break;
             case "portfolio_msfo":
                 String value = getNullableTagValue(localName, event, xmlReader);
 
                 if (value != null) {
-                    BaseEntity portfolioMSFO = new BaseEntity(metaClassRepository.getMetaClass("ref_portfolio"),
-                            batch.getRepDate(), creditorId);
+                    BaseEntity portfolioMSFO = new BaseEntity(refPortfolioMeta, batch.getRepDate(), creditorId);
 
                     portfolioMSFO.put("code",
                             new BaseEntityStringValue(0, creditorId, batch.getRepDate(), value, false, true));

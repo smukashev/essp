@@ -5,6 +5,7 @@ import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexValue;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityStringValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -20,9 +21,12 @@ public class SubjectOrganizationHeadDocsParser extends BatchParser {
         super();
     }
 
+    private MetaClass refDocTypeMeta;
+
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("document"), batch.getRepDate(), creditorId);
+        refDocTypeMeta = metaClassRepository.getMetaClass("ref_doc_type");
     }
 
     @Override
@@ -31,8 +35,7 @@ public class SubjectOrganizationHeadDocsParser extends BatchParser {
             case "docs":
                 break;
             case "doc":
-                BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"),
-                        batch.getRepDate(), creditorId);
+                BaseEntity docType = new BaseEntity(refDocTypeMeta, batch.getRepDate(), creditorId);
 
                 docType.put("code",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(),

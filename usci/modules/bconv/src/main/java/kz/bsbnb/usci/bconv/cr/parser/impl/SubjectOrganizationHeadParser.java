@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityComplexSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.BaseSetComplexValue;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -27,9 +28,14 @@ public class SubjectOrganizationHeadParser extends BatchParser {
         super();
     }
 
+    private MetaClass personNameMeta, documentMeta;
+
     @Override
     public void init() {
         currentBaseEntity = new BaseEntity(metaClassRepository.getMetaClass("head"), batch.getRepDate(), creditorId);
+
+        personNameMeta = metaClassRepository.getMetaClass("person_name");
+        documentMeta = metaClassRepository.getMetaClass("document");
     }
 
     @Override
@@ -39,7 +45,7 @@ public class SubjectOrganizationHeadParser extends BatchParser {
             case "head":
                 break;
             case "names":
-                BaseSet headNames = new BaseSet(metaClassRepository.getMetaClass("person_name"), creditorId);
+                BaseSet headNames = new BaseSet(personNameMeta, creditorId);
                 while (true) {
                     subjectOrganizationHeadNamesParser.parse(xmlReader, batch, index, creditorId);
                     if (subjectOrganizationHeadNamesParser.hasMore()) {
@@ -52,7 +58,7 @@ public class SubjectOrganizationHeadParser extends BatchParser {
                         new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), headNames, false, true));
                 break;
             case "docs":
-                BaseSet docs = new BaseSet(metaClassRepository.getMetaClass("document"), creditorId);
+                BaseSet docs = new BaseSet(documentMeta, creditorId);
 
                 while (true) {
                     subjectOrganizationHeadDocsParser.parse(xmlReader, batch, index, creditorId);

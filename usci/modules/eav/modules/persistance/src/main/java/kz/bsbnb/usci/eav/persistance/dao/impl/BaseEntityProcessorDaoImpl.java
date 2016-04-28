@@ -50,10 +50,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     private DSLContext context;
 
-    @Qualifier("metaClassRepositoryImpl")
-    @Autowired
-    private IMetaClassRepository metaClassRepository;
-
     @Autowired
     private IPersistableDaoPool persistableDaoPool;
 
@@ -62,9 +58,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Autowired
     private IBaseEntityApplyDao baseEntityApplyDao;
-
-    @Autowired
-    private IRefProcessorDao refProcessorDao;
 
     @Autowired
     private IEavOptimizerDao eavOptimizerDao;
@@ -110,12 +103,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         baseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
 
         if (isReference) {
-            IBaseEntity referenceEntity = refRepository.findRef(baseEntity);
+            long id = refRepository.findRef(baseEntity);
 
-            if (referenceEntity != null) {
-                baseEntity.setId(referenceEntity.getId());
-                return baseEntity;
-            }
+            if (id > 0)
+                baseEntity.setId(id);
         }
 
         for (String attribute : baseEntity.getAttributes()) {
@@ -127,10 +118,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     if (metaType.isSet()) {
                         IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
                         childBaseSet.setCreditorId(creditorId);
+
                         for (IBaseValue childBaseValue : childBaseSet.get()) {
                             IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
-
-                            childBaseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
 
                             if (childBaseEntity.getValueCount() != 0)
                                 prepare((IBaseEntity) childBaseValue.getValue(), creditorId);
@@ -138,9 +128,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     } else {
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
-                        childBaseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
-
-                        if (childBaseEntity.getValueCount() != 0) prepare(childBaseEntity, creditorId);
+                        if (childBaseEntity.getValueCount() != 0)
+                            prepare(childBaseEntity, creditorId);
                     }
                 }
             }
@@ -148,7 +137,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             baseValue.setCreditorId(creditorId);
         }
 
-        if (metaClass.isSearchable()) {
+        if (metaClass.isSearchable() && baseEntity.getId() == 0) {
             long baseEntityId;
 
             if (BasicOptimizer.metaList.contains(metaClass.getClassName())) {
@@ -170,9 +159,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             metaRules = new HashSet<>(Arrays.asList(metaArray));
         }
 
-        if(rulesEnabled && baseEntity.getMeta() != null &&
-                metaRules.contains(baseEntity.getMeta().getClassName()) && (baseEntity.getOperation() != null
-                && (baseEntity.getOperation().equals(OperationType.INSERT) || baseEntity.getOperation().equals(OperationType.UPDATE)))) {
+        if (!rulesEnabled || baseEntity.getOperation() == null)
+            return;
+
+        if((baseEntity.getOperation().equals(OperationType.INSERT) || baseEntity.getOperation().equals(OperationType.UPDATE))
+                && metaRules.contains(baseEntity.getMeta().getClassName())) {
             List<String> errors = new ArrayList<>();
             try {
                 long t1 = System.currentTimeMillis();
