@@ -25,6 +25,7 @@ import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.jooq.tools.Convert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -74,6 +75,7 @@ public class ZipFilesMonitor {
     private static final String ORG_FIRST_DATE_SETTING = "ORG_FIRST_DATE_SETTING";
     private static final String CREDITOR_DATES = "CREDITOR_DATES";
     private static final String DEFAULT_DATE_VALUE = "DEFAULT_DATE_VALUE";
+    private static final String WAITING_FOR_SIGNATURE = "WAITING_FOR_SIGNATURE";
 
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
 
@@ -338,7 +340,8 @@ public class ZipFilesMonitor {
         Iterator<Batch> it = pendingBatchList.iterator();
         while (it.hasNext()) {
             Batch batch = it.next();
-            if (batch.getStatusId()==22 && batch.getSign() == null && batch.getCreditorId() > 0
+            EavGlobal signGlobal = serviceFactory.getGlobalService().getGlobal(batch.getStatusId());
+            if (signGlobal.getValue().equals(WAITING_FOR_SIGNATURE) && batch.getSign() == null && batch.getCreditorId() > 0
                     && Arrays.asList(orgIds).contains(batch.getCreditorId() + ""))
                 it.remove();
         }
