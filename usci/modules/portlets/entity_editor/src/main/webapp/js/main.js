@@ -423,6 +423,7 @@ function addField(form, attr, idSuffix, node) {
                         totalProperty: 'total'
                     }
                 },
+                autoLoad: true,
                 remoteSort: true
             }),
             displayField: 'title',
