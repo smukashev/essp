@@ -76,4 +76,9 @@ public class EntityServiceImpl implements IEntityService {
     public RefColumnsResponse getRefColumns(long metaClassId) {
         return remoteEntityService.getRefColumns(metaClassId);
     }
+
+    @Override
+    public RefListResponse getRefListApprox(long metaClassId) {
+        return remoteEntityService.getRefListApprox(metaClassId);
+    }
 }

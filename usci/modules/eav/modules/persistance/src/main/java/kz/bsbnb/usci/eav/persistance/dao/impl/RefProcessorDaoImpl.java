@@ -5,6 +5,10 @@ import kz.bsbnb.eav.persistance.generated.tables.EavBeStringValues;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.persistance.dao.IMetaClassDao;
 import kz.bsbnb.usci.eav.persistance.dao.IRefProcessorDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -26,6 +30,9 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
+
+    @Autowired
+    private IMetaClassDao metaClassDao;
 
     @Override
     public RefColumnsResponse getRefColumns(long metaClassId) {
@@ -424,5 +431,46 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
         }
 
         return filtered;
+    }
+
+    @Override
+    public RefListResponse getRefListApprox(long metaClassId) {
+        Table entityTable = context.select(EAV_BE_ENTITIES.ID)
+                .from(EAV_BE_ENTITIES)
+                .where(EAV_BE_ENTITIES.CLASS_ID.eq(metaClassId)).asTable("ent");
+
+        Select select = context.select(entityTable.field(EAV_BE_ENTITIES.ID),
+                context.select(EAV_BE_STRING_VALUES.VALUE)
+                        .from(EAV_BE_STRING_VALUES)
+                        .where(EAV_BE_STRING_VALUES.ENTITY_ID.eq(entityTable.field(EAV_BE_ENTITIES.ID)))
+                        .and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(getBestNameAttribute(metaClassId).getId()))
+                        .and(EAV_BE_STRING_VALUES.CREDITOR_ID.eq(0L))
+                        .and(EAV_BE_STRING_VALUES.IS_LAST.eq(DataUtils.convert(true)))
+                        .asField("name_ru"))
+                .from(entityTable);
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        return new RefListResponse(rows);
+    }
+
+    public IMetaAttribute getBestNameAttribute(long metaClassId) {
+        MetaClass meta = metaClassDao.load(metaClassId);
+
+        IMetaAttribute metaAttribute;
+
+        metaAttribute = meta.getMetaAttribute("name_ru");
+
+        if(metaAttribute == null)
+            metaAttribute = meta.getMetaAttribute("name");
+
+        if(metaAttribute == null)
+            metaAttribute = meta.getMetaAttribute("code");
+
+
+        if(metaAttribute == null)
+            metaAttribute = new MetaAttribute(0L, false, false);
+
+        return metaAttribute;
     }
 }

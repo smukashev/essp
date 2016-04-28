@@ -423,6 +423,8 @@ function addField(form, attr, idSuffix, node) {
                         totalProperty: 'total'
                     }
                 },
+                autoLoad: true,
+                timeout: 120000,
                 remoteSort: true
             }),
             displayField: 'title',
@@ -713,6 +715,13 @@ Ext.onReady(function () {
                 totalProperty: 'total'
             }
         },
+        autoLoad: true,
+        listeners: {
+            load: function(me,records,options) {
+                if(records.length == 1)
+                    Ext.getCmp('edCreditor').setValue(records[0].get('id'));
+            }
+        }
     });
 
 

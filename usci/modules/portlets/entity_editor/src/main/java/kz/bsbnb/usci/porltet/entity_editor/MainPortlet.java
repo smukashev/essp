@@ -508,7 +508,22 @@ public class MainPortlet extends MVCPortlet {
                     break;
                 case LIST_BY_CLASS_SHORT:
                     String metaId = resourceRequest.getParameter("metaId");
-                    RefListResponse refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), null, false);
+
+                    if(metaId == null || metaId.trim().length() < 1)
+                        return;
+
+                    RefListResponse refListResponse;
+                    MetaClass mc = metaFactoryService.getMetaClass(Long.parseLong(metaId));
+                    boolean useFast = false;
+
+                    if(mc.getClassName().equals("ref_balance_account"))
+                        useFast = true;
+
+                    if(useFast) {
+                        refListResponse = entityService.getRefListApprox(Long.parseLong(metaId));
+                    } else {
+                        refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), null, false);
+                    }
                     refListResponse = refListToShort(refListResponse);
                     String sJson = gson.toJson(refListResponse);
                     out.write(sJson.getBytes());

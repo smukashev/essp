@@ -540,6 +540,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
         BaseEntity that = (BaseEntity) obj;
 
+        if (this.getMeta().getId() != that.getMeta().getId())
+            return false;
+
         int thisValueCount = this.getValueCount();
         int thatValueCount = that.getValueCount();
 

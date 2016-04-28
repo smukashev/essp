@@ -54,8 +54,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
         return baseValueId;
     }
 
-    protected long insert(long baseSetId, long creditorId, Date reportDate, Object value, boolean closed,
-                          boolean last) {
+    protected long insert(long baseSetId, long creditorId, Date reportDate, Object value, boolean closed, boolean last) {
         Insert insert = context
                 .insertInto(EAV_BE_DOUBLE_SET_VALUES)
                 .set(EAV_BE_DOUBLE_SET_VALUES.SET_ID, baseSetId)

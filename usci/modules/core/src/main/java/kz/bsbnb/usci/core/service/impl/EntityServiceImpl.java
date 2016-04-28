@@ -137,6 +137,11 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
+    public RefListResponse getRefListApprox(long metaClassId) {
+        return refProcessorDao.getRefListApprox(metaClassId);
+    }
+
+    @Override
     public RefColumnsResponse getRefColumns(long metaClassId) {
         return refProcessorDao.getRefColumns(metaClassId);
     }
