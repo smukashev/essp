@@ -516,7 +516,7 @@ public class MainPortlet extends MVCPortlet {
                     MetaClass mc = metaFactoryService.getMetaClass(Long.parseLong(metaId));
                     boolean useFast = false;
 
-                    if(mc.getClassTitle().equals("ref_balance_account"))
+                    if(mc.getClassName().equals("ref_balance_account"))
                         useFast = true;
 
                     if(useFast) {

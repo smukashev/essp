@@ -27,4 +27,6 @@ public interface IEntityService {
     SyncStatus getStatus();
 
     RefColumnsResponse getRefColumns(long metaClassId);
+
+    RefListResponse getRefListApprox(long metaClassId);
 }

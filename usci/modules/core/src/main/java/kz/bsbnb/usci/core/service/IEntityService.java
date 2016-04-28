@@ -21,4 +21,6 @@ public interface IEntityService {
     RefListResponse getRefListResponse(long metaClassId, Date date, boolean withHis);
 
     Map<String, QueryEntry> getSQLStats();
+
+    RefListResponse getRefListApprox(long metaClassId);
 }
