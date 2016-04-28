@@ -338,7 +338,7 @@ public class ZipFilesMonitor {
         Iterator<Batch> it = pendingBatchList.iterator();
         while (it.hasNext()) {
             Batch batch = it.next();
-            if (batch.getSign() == null && batch.getCreditorId() > 0
+            if (batch.getStatusId()==22 && batch.getSign() == null && batch.getCreditorId() > 0
                     && Arrays.asList(orgIds).contains(batch.getCreditorId() + ""))
                 it.remove();
         }
