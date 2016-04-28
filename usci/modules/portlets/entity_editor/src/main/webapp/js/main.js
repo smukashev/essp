@@ -714,6 +714,13 @@ Ext.onReady(function () {
                 totalProperty: 'total'
             }
         },
+        autoLoad: true,
+        listeners: {
+            load: function(me,records,options) {
+                if(records.length == 1)
+                    Ext.getCmp('edCreditor').setValue(records[0].get('id'));
+            }
+        }
     });
 
 
