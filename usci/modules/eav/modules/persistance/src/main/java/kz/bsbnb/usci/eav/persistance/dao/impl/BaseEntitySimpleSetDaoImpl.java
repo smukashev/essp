@@ -425,10 +425,9 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                         tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
                 .from(tableNumbering)
                 .join(tableOfSimpleSets)
-                .on(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID)
-                        .eq(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.ID)))
-                .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                .and(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED).equal(false));
+                .on(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID).eq(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.ID)))
+                .where(tableNumbering.field("num_pp").cast(Integer.class).eq(1))
+                .and(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED).eq(false));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

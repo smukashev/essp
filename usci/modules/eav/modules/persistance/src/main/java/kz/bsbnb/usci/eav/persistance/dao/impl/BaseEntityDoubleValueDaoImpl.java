@@ -467,11 +467,11 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                 .join(tableOfAttributes)
                 .on(tableNumbering.field(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID)
                         .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
-                .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                .and((tableNumbering.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED).equal(false)
-                        .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
-                        .or(tableNumbering.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE).equal(savingReportDate)
-                                .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
+                .where((tableNumbering.field("num_pp").cast(Integer.class).equal(1)
+                .and(tableNumbering.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED).equal(false))
+                .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
+                .or(tableNumbering.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE).equal(savingReportDate)
+                .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

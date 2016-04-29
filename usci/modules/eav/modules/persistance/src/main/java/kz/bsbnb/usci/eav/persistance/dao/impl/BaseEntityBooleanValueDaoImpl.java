@@ -486,9 +486,9 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                 .join(tableOfAttributes)
                 .on(tableNumbering.field(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID)
                         .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
-                .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
+                .where((tableNumbering.field("num_pp").cast(Integer.class).equal(1)
                 .and((tableNumbering.field(EAV_BE_BOOLEAN_VALUES.IS_CLOSED).equal(false)
-                        .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
+                        .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))))
                         .or(tableNumbering.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).equal(savingReportDate)
                                 .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
 

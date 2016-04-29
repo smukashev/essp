@@ -417,13 +417,12 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                         tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_LAST))
                 .from(tableNumbering)
                 .join(tableOfComplexSets)
-                .on(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID)
-                        .eq(tableOfComplexSets.field(EAV_M_COMPLEX_SET.ID)))
-                .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                .and((tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED).equal(false)
-                        .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).equal(false)))
-                        .or(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE).equal(savingReportDate)
-                                .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).equal(true))));
+                .on(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.ATTRIBUTE_ID).eq(tableOfComplexSets.field(EAV_M_COMPLEX_SET.ID)))
+                .where((tableNumbering.field("num_pp").cast(Integer.class).equal(1)
+                        .and(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED).eq(false))
+                        .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).eq(false)))
+                        .or(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE).eq(savingReportDate)
+                        .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).eq(true))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
