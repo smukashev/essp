@@ -26,7 +26,7 @@ public interface IBaseEntity extends IBaseContainer {
 
     Object getEl(String path);
 
-    Object getEls(String path, boolean skipCloseDelete);
+    Object getEls(String path);
 
     List<Object> getElWithArrays(String path);
 
