@@ -377,49 +377,49 @@ $$$
 
 rule save
 
-rule read $$$
-title: PLEDGE_DUPLICATE
-rule "PLEDGE_DUPLICATE"
-//MES836
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-  && getEls("{hasDuplicates(pledges)}pledge_type.code,contract") == true)
-then
-  $entity.addValidationError("Ошибка по обеспечению: Дублируются записи \"Номер договора залога\", \"Вид обеспечения\"");
-end
-$$$
+#rule read $$$
+#title: PLEDGE_DUPLICATE
+#rule "PLEDGE_DUPLICATE"
+#//MES836
+#when
+#  $entity: BaseEntity(getMeta().getClassName() == "credit"
+#  && getEls("{hasDuplicates(pledges)}pledge_type.code,contract") == true)
+#then
+#  $entity.addValidationError("Ошибка по обеспечению: Дублируются записи \"Номер договора залога\", \"Вид обеспечения\"");
+#end
+#$$$
+#
+#rule save
 
-rule save
+#rule read $$$
+#title: SUBJECT_DUPLICATE_DOCS
+#rule "SUBJECT_DUPLICATE_DOCS"
+#//MES922
+#when
+#  $entity: BaseEntity(getMeta().getClassName() == "credit"
+#        && getEls("{hasDuplicates(subject.docs)}doc_type.code,no") == true)
+#then
+#  $entity.addValidationError("Дублирующиеся документы");
+#end
+#
+#$$$
+#
+#rule save
 
-rule read $$$
-title: SUBJECT_DUPLICATE_DOCS
-rule "SUBJECT_DUPLICATE_DOCS"
-//MES922
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-        && getEls("{hasDuplicates(subject.docs)}doc_type.code,no") == true)
-then
-  $entity.addValidationError("Дублирующиеся документы");
-end
-
-$$$
-
-rule save
-
-rule read $$$
-title: SUBJECT_DUPLICATE_DOC_TYPES
-rule "SUBJECT_DUPLICATE_DOC_TYPES"
-//MES922
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-        && getEls("{hasDuplicates(subject.docs)}doc_type.code") == true)
-then
-  $entity.addValidationError("Дублирующиеся виды идентификационных документов");
-end
-
-$$$
-
-rule save
+#rule read $$$
+#title: SUBJECT_DUPLICATE_DOC_TYPES
+#rule "SUBJECT_DUPLICATE_DOC_TYPES"
+#//MES922
+#when
+#  $entity: BaseEntity(getMeta().getClassName() == "credit"
+#        && getEls("{hasDuplicates(subject.docs)}doc_type.code") == true)
+#then
+#  $entity.addValidationError("Дублирующиеся виды идентификационных документов");
+#end
+#
+#$$$
+#
+#rule save
 
 rule read $$$
 title: INCORRECT_PROVISION_MSFO
