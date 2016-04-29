@@ -60,7 +60,8 @@ public class QueueApplication extends Application {
                 User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
                 if (user != null) {
                     for (Role role : user.getRoles()) {
-                        if (role.getName().equals("Administrator") || role.getName().equals("NationalBankEmployee"))
+                        if (role.getName().equals("Administrator") || role.getName().equals("NationalBankEmployee")
+                                || role.getName().equals("BankUser"))
                             hasRights = true;
                     }
                 }

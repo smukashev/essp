@@ -146,10 +146,11 @@ public class QueueComponent extends VerticalLayout {
         buttonsLayout.setComponentAlignment(enableQueueAutoUpdateCheckBox, Alignment.MIDDLE_LEFT);
         buttonsLayout.addComponent(autoUpdateLayout);
         buttonsLayout.setComponentAlignment(autoUpdateLayout, Alignment.MIDDLE_LEFT);
+        /*todo: add support to delete files from the queue
         if (env.isBankUser()) {
             buttonsLayout.addComponent(removeFilesFromQueueButton);
             buttonsLayout.setComponentAlignment(removeFilesFromQueueButton, Alignment.MIDDLE_LEFT);
-        }
+        }*/
         buttonsLayout.addComponent(toXLSButton);
         buttonsLayout.setComponentAlignment(toXLSButton, Alignment.MIDDLE_RIGHT);
         buttonsLayout.setWidth("100%");
