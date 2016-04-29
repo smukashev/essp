@@ -444,7 +444,6 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.ID),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.CREDITOR_ID),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
-
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.IS_LAST))

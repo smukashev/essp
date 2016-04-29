@@ -65,7 +65,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         Insert insert = context
                 .insertInto(EAV_BE_ENTITY_SIMPLE_SETS)
                 .set(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID, baseValue.getBaseContainer().getId())
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.CREDITOR_ID, baseValue.getBaseContainer().getId())
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.CREDITOR_ID, baseValue.getCreditorId())
                 .set(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID, baseValue.getMetaAttribute().getId())
                 .set(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE, DataUtils.convert(baseValue.getRepDate()))
                 .set(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED, DataUtils.convert(baseValue.isClosed()))
