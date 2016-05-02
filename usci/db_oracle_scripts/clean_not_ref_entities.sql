@@ -13,13 +13,13 @@ begin
   delete from eav_be_boolean_values where entity_id >= maxId;
   delete from eav_be_complex_values where entity_id >= maxId;
 
-  delete from eav_be_complex_set_values where set_id in (select id from eav_be_entity_complex_sets where entity_id >=maxId);
-  delete from eav_be_integer_set_values where set_id in (select id from eav_be_entity_simple_sets where entity_id >=maxId);
-  delete from eav_be_string_set_values where set_id in (select id from eav_be_entity_simple_sets where entity_id >=maxId);
-  delete from eav_be_double_set_values where set_id in (select id from eav_be_entity_simple_sets where entity_id >=maxId);
-  delete from eav_be_boolean_set_values where set_id in (select id from eav_be_entity_simple_sets where entity_id >=maxId);
+  delete from eav_be_complex_set_values where set_id in (select id from eav_be_entity_complex_sets where entity_id >= maxId);
+  delete from eav_be_integer_set_values where set_id in (select id from eav_be_entity_simple_sets where entity_id >= maxId);
+  delete from eav_be_string_set_values where set_id in (select id from eav_be_entity_simple_sets where entity_id >= maxId);
+  delete from eav_be_double_set_values where set_id in (select id from eav_be_entity_simple_sets where entity_id >= maxId);
+  delete from eav_be_boolean_set_values where set_id in (select id from eav_be_entity_simple_sets where entity_id >= maxId);
 
-  delete from eav_be_entity_complex_sets where entity_id >=maxId;
+  delete from eav_be_entity_complex_sets where entity_id >= maxId;
   delete from eav_be_entity_simple_sets where entity_id >= maxId;
 
   delete from eav_optimizer where entity_id >= maxId;

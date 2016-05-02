@@ -65,7 +65,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
                         throw new UnsupportedOperationException(Errors.compose(Errors.E57,
                                 baseEntityLoaded.getId(), baseEntityLoaded.getBaseEntityReportDate().getReportDate()));
-
                 } else {
                     baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), maxReportDate, reportDateSaving);
 
