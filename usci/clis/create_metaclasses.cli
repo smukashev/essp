@@ -512,6 +512,7 @@ meta add --name=ref_creditor_branch --attribute=main_office --type=meta_class --
 meta add --name=ref_creditor_branch --attribute=region --type=meta_class --childname=ref_region --keytype=any --immutable
 meta add --name=ref_creditor_branch --attribute=docs --type=meta_class --childname=document --array --keytype=any --cumulative
 meta key --name=ref_creditor_branch --attribute=docs
+meta key --name=ref_creditor_branch --attribute=code --optional
 
 #====================================
 #= REF_CREDIT_OBJECT
