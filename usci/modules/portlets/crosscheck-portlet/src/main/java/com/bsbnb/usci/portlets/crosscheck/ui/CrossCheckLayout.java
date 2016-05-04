@@ -16,10 +16,7 @@ import com.bsbnb.vaadin.messagebox.MessageBox;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.terminal.DownloadStream;
-import com.vaadin.terminal.ExternalResource;
-import com.vaadin.terminal.Resource;
-import com.vaadin.terminal.StreamResource;
+import com.vaadin.terminal.*;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
@@ -621,7 +618,7 @@ public class CrossCheckLayout extends VerticalLayout {
             groupedCellFormatRed.setBackground(Colour.RED);
             groupedCellFormatRed.setBorder(Border.ALL, BorderLineStyle.THIN);
             autoSizeCellView = new jxl.CellView();
-            //autoSizeCellView.set
+            autoSizeCellView.setAutosize(true);
 
             WritableWorkbook workbook = jxl.Workbook.createWorkbook(baos, settings);
             for (CrossCheck crossCheck : uniqueCreditorsCrossChecks)

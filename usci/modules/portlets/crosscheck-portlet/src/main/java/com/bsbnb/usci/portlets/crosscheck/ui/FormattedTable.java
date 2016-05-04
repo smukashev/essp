@@ -121,7 +121,7 @@ public class FormattedTable extends Table {
         NumberFormat groupedNumberFormat = new NumberFormat("### ### ### ##0");
         jxl.write.WritableCellFormat groupedCellFormat = new WritableCellFormat(times12Font, groupedNumberFormat);
         jxl.CellView cellView = new jxl.CellView();
-       // cellView.setAutosize(true);// NEW
+        cellView.setAutosize(true);// NEW
         WritableCellFormat[] dateFormats = new WritableCellFormat[columnIDs.length];
         for (int columnIndex = 0; columnIndex < columnIDs.length; columnIndex++) {
             String formatString = formatData.get(columnIDs[columnIndex]);
