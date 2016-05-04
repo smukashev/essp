@@ -112,9 +112,9 @@ public enum Errors {
         errors.put("E73", "Запись открытия не была найдена #metaAttribute");
         errors.put("E74", "Last значение выгружено неправильно");
         errors.put("E75", "Закрытие атрибута за прошлый период не является возможным");
-        errors.put("E76", "Ошибка при вставке #e_message");
-        errors.put("E77", "Ошибка при обновлений #e_message");
-        errors.put("E78", "Ошибка при удалений #e_message");
+        errors.put("E76", "Ошибка при вставке #insertedObject, #e_message");
+        errors.put("E77", "Ошибка при обновлений #updatedObject, #e_message");
+        errors.put("E78", "Ошибка при удалений #deletedObject, #e_message");
         errors.put("E79", "Удаление затронуло #count записей #id , EAV_BE_BOOLEAN_VALUES");
 
         errors.put("E80", "Мета данные атрибута не могут быть NULL");
