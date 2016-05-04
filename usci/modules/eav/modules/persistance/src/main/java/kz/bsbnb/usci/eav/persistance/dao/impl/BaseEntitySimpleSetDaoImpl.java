@@ -65,7 +65,7 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
         Insert insert = context
                 .insertInto(EAV_BE_ENTITY_SIMPLE_SETS)
                 .set(EAV_BE_ENTITY_SIMPLE_SETS.ENTITY_ID, baseValue.getBaseContainer().getId())
-                .set(EAV_BE_ENTITY_SIMPLE_SETS.CREDITOR_ID, baseValue.getBaseContainer().getId())
+                .set(EAV_BE_ENTITY_SIMPLE_SETS.CREDITOR_ID, baseValue.getCreditorId())
                 .set(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID, baseValue.getMetaAttribute().getId())
                 .set(EAV_BE_ENTITY_SIMPLE_SETS.REPORT_DATE, DataUtils.convert(baseValue.getRepDate()))
                 .set(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED, DataUtils.convert(baseValue.isClosed()))
@@ -425,10 +425,9 @@ public class BaseEntitySimpleSetDaoImpl extends JDBCSupport implements IBaseEnti
                         tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_LAST))
                 .from(tableNumbering)
                 .join(tableOfSimpleSets)
-                .on(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID)
-                        .eq(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.ID)))
-                .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                .and(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED).equal(false));
+                .on(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.ATTRIBUTE_ID).eq(tableOfSimpleSets.field(EAV_M_SIMPLE_SET.ID)))
+                .where(tableNumbering.field("num_pp").cast(Integer.class).eq(1))
+                .and(tableNumbering.field(EAV_BE_ENTITY_SIMPLE_SETS.IS_CLOSED).eq(false));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

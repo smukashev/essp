@@ -19,8 +19,6 @@ import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
-import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
-import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.rule.impl.RulesSingleton;
 import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import kz.bsbnb.usci.eav.util.Errors;
@@ -29,7 +27,6 @@ import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,9 +71,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     private IEavGlobalDao globalDao;
 
-    @Autowired
-    private IRefRepository refRepository;
-
     private IDaoListener applyListener;
 
     private Set<String> metaRules;
@@ -101,13 +95,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         creditorId = isReference ? 0 : creditorId;
 
         baseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
-
-        if (isReference) {
-            long id = refRepository.findRef(baseEntity);
-
-            if (id > 0)
-                baseEntity.setId(id);
-        }
 
         for (String attribute : baseEntity.getAttributes()) {
             IMetaType metaType = baseEntity.getMemberType(attribute);
@@ -288,9 +275,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         if (applyListener != null)
             applyListener.applyToDBEnded(baseEntityApplied);
-
-        if (baseEntityApplied.getMeta().isReference() && baseEntityApplied.getId() > 0)
-            refRepository.setRef(baseEntityApplied.getId(), baseEntityApplied.getReportDate(), baseEntityApplied);
 
         return baseEntityApplied;
     }

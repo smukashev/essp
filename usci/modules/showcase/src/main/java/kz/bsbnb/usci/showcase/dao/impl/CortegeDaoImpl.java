@@ -36,7 +36,7 @@ public class CortegeDaoImpl extends CommonDao {
     @Transactional
     public void generate(IBaseEntity globalEntityApplied, ShowCase showCase) {
         if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0) {
-            List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath(), true);
+            List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath());
 
             for (BaseEntity baseEntityApplied : allApplied)
                 rootCortegeGenerate(globalEntityApplied, baseEntityApplied, showCase);

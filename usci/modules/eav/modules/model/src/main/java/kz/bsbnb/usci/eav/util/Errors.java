@@ -1,9 +1,6 @@
 package kz.bsbnb.usci.eav.util;
 
-import org.apache.commons.lang.enums.EnumUtils;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -28,8 +25,7 @@ public enum Errors {
     E280, E281, E282, E283, E284, E285, E286, E287, E288, E289, E290, E291, E292, E293, E294, E295, E296, E297, E298, E299,
     E300, E301, E302, E303, E304, E305, E306, E307, E308, E309, E310, E311, E312, E313, E314, E315, E316, E317, E318, E319,
     E320, E321, E322, E323, E324, E325, E326, E327, E328, E329, E330, E331, E332, E333, E334, E335, E336, E337, E338, E339,
-    E340, E341, E342, E343, E344, E345, E346, E347, E348, E349, E350, E351, E352, E353, E354, E355, E356, E357, E358, E359,
-    ;
+    E340, E341, E342, E343, E344, E345, E346, E347, E348, E349, E350, E351, E352, E353, E354, E355, E356, E357, E358, E359,;
 
     public static final String SEPARATOR = "\\|~~~\\|";
     private static final String LOCALE = "RU";
@@ -116,9 +112,9 @@ public enum Errors {
         errors.put("E73", "Запись открытия не была найдена #metaAttribute");
         errors.put("E74", "Last значение выгружено неправильно");
         errors.put("E75", "Закрытие атрибута за прошлый период не является возможным");
-        errors.put("E76", "Ошибка при вставке #e_message");
-        errors.put("E77", "Ошибка при обновлений #e_message");
-        errors.put("E78", "Ошибка при удалений #e_message");
+        errors.put("E76", "Ошибка при вставке #insertedObject, #e_message");
+        errors.put("E77", "Ошибка при обновлений #updatedObject, #e_message");
+        errors.put("E78", "Ошибка при удалений #deletedObject, #e_message");
         errors.put("E79", "Удаление затронуло #count записей #id , EAV_BE_BOOLEAN_VALUES");
 
         errors.put("E80", "Мета данные атрибута не могут быть NULL");
@@ -238,7 +234,7 @@ public enum Errors {
         errors.put("E183", "Мета класс для оптимизаций не найден;");
         errors.put("E184", "Документ не содержит обязательные поля; ");
         errors.put("E185", "Кредитор не найден в справочнике;");
-        errors.put("E186", "Тип документа не найден;");
+        errors.put("E186", "Тип документа(#type) не найден;");
         errors.put("E187", "Договор не содержит обязательные поля;");
         errors.put("E188", "Ключевое поле docs пустое;");
         errors.put("E189", "Субъект должен иметь идентификационные документы;");
@@ -408,7 +404,6 @@ public enum Errors {
         errors.put("E350", "");
 
 
-
     }
 
     public static String getError(Errors code) {
@@ -428,7 +423,7 @@ public enum Errors {
         return message;
     }
 
-    public static String replaceTags(Errors code, Object... params){
+    public static String replaceTags(Errors code, Object... params) {
         String error = getError(code);
 
         Matcher matcher = Pattern.compile("#\\s*(\\w+)")
@@ -447,26 +442,27 @@ public enum Errors {
         }
         return error;
     }
+
     public static String decompose(String message) {
         if (message == null) return null;
 
         String[] paramArr = message.split(Errors.SEPARATOR);
 
-        try{// DT:checkme!
+        try {// DT:checkme!
             Errors.valueOf(paramArr[0]);
-        }catch(Exception e){
+        } catch (Exception e) {
             return checkLength(message);
         }
 
-        String[] params = new String[paramArr.length-1];
-        System.arraycopy(paramArr,1,params,0,params.length);
+        String[] params = new String[paramArr.length - 1];
+        System.arraycopy(paramArr, 1, params, 0, params.length);
 
         return replaceTags(Errors.valueOf(paramArr[0]), params);
     }
 
-    public static String checkLength(String message){
-        if(message != null && message.length()> 255){
-            message = message.substring(0,255);
+    public static String checkLength(String message) {
+        if (message != null && message.length() > 255) {
+            message = message.substring(0, 255);
         }
         return message;
     }

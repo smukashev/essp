@@ -16,7 +16,6 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
-import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.DSLContext;
 import org.jooq.Delete;
@@ -52,9 +51,6 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Autowired
     private IBaseEntityReportDateDao baseEntityReportDateDao;
 
-    @Autowired
-    private IRefRepository refRepository;
-
     @Override
     public long insert(IPersistable persistable) {
         IBaseEntity baseEntity = (IBaseEntity) persistable;
@@ -80,7 +76,6 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Override
     public void delete(IPersistable persistable) {
         delete(persistable.getId());
-        refRepository.delRef(persistable.getId());
     }
 
     protected void delete(long id) {
@@ -97,8 +92,6 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
         if (count < 1)
             throw new IllegalStateException(Errors.compose(Errors.E90, id));
-
-        refRepository.delRef(id);
     }
 
     public IBaseEntity loadMock(long id) {
@@ -113,9 +106,6 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
         if (existingReportDate == null)
             throw new IllegalArgumentException(Errors.compose(Errors.E94));
-
-        if (refRepository.getRef(id, existingReportDate) != null)
-            return refRepository.getRef(id, existingReportDate);
 
         IBaseEntity baseEntity = loadMock(id);
         IBaseEntityReportDate baseEntityReportDate = baseEntityReportDateDao.load(id, existingReportDate);
@@ -143,9 +133,6 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                 baseEntityValueDao.loadBaseValues(baseEntity, existingReportDate, savingReportDate);
             }
         }
-
-        if (baseEntity.getMeta().isReference())
-            refRepository.setRef(id, existingReportDate, baseEntity);
 
         return baseEntity;
     }

@@ -121,8 +121,11 @@ public class MetaKeyCommand extends AbstractCommand implements IMetaCommand {
             if (attr != null) {
                 if (isOptional) {
                     attr.setOptionalKey(true);
+                    attr.setKey(false);
+                } else {
+                    attr.setKey(true);
                 }
-                attr.setKey(!attr.isKey());
+
                 metaClassRepository.saveMetaClass(meta);
             } else {
                 System.out.println("No such instance of MetaAttribute with name: " + attribute);

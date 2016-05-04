@@ -444,19 +444,17 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.ID),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.CREDITOR_ID),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE),
-
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.ENTITY_VALUE_ID),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED),
                         tableNumbering.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
                 .from(tableNumbering)
                 .join(tableOfAttributes)
-                .on(tableNumbering.field(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID)
-                        .eq(tableOfAttributes.field(EAV_M_COMPLEX_ATTRIBUTES.ID)))
-                .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                .and((tableNumbering.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED).equal(false)
-                        .and(tableOfAttributes.field(EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL).equal(false)))
-                        .or(tableNumbering.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE).equal(savingReportDate)
-                                .and(tableOfAttributes.field(EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL).equal(true))));
+                .on(tableNumbering.field(EAV_BE_COMPLEX_VALUES.ATTRIBUTE_ID).eq(tableOfAttributes.field(EAV_M_COMPLEX_ATTRIBUTES.ID)))
+                .where((tableNumbering.field("num_pp").cast(Integer.class).eq(1)
+                    .and(tableNumbering.field(EAV_BE_COMPLEX_VALUES.IS_CLOSED).eq(false))
+                    .and(tableOfAttributes.field(EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL).eq(false)))
+                    .or(tableNumbering.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE).eq(savingReportDate)
+                    .and(tableOfAttributes.field(EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL).eq(true))));
 
         logger.debug(select.toString());
 

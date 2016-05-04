@@ -465,13 +465,12 @@ public class BaseEntityIntegerValueDaoImpl extends JDBCSupport implements IBaseE
                         tableNumbering.field(EAV_BE_INTEGER_VALUES.IS_LAST))
                 .from(tableNumbering)
                 .join(tableOfAttributes)
-                .on(tableNumbering.field(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID)
-                        .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
-                .where(tableNumbering.field("num_pp").cast(Integer.class).equal(1))
-                .and((tableNumbering.field(EAV_BE_INTEGER_VALUES.IS_CLOSED).equal(false)
-                        .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
-                        .or(tableNumbering.field(EAV_BE_INTEGER_VALUES.REPORT_DATE).equal(savingReportDate)
-                                .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
+                .on(tableNumbering.field(EAV_BE_INTEGER_VALUES.ATTRIBUTE_ID).eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
+                .where((tableNumbering.field("num_pp").cast(Integer.class).equal(1)
+                .and(tableNumbering.field(EAV_BE_INTEGER_VALUES.IS_CLOSED).equal(false))
+                .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))
+                .or(tableNumbering.field(EAV_BE_INTEGER_VALUES.REPORT_DATE).equal(savingReportDate)
+                .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(true))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

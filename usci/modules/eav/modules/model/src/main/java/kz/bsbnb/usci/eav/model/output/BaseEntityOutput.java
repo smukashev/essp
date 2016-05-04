@@ -61,7 +61,7 @@ public class BaseEntityOutput {
             }
 
             if (!valueIsNull)
-                str += "\n" + prefix + memberName + " : " + value.getCreditorId() + " : " + valueToString;
+                str += "\n" + prefix + memberName + " : " + value.getId() + " : "  + DataTypes.dateFormatDot.format(value.getRepDate()) + " : " + valueToString;
         }
 
         return str;

@@ -141,6 +141,11 @@ entity read  usci/refs/18.09.2015/ref_portfolio_18_09_2015.xml 18.09.2015
 entity read  usci/refs/30.09.2015/ref_portfolio_30_09_2015.xml 30.09.2015
 entity read  usci/refs/01.12.2015/ref_portfolio_01_12_2015.xml 01.12.2015
 entity read  usci/refs/29.01.2016/ref_portfolio_29_01_2016.xml 29.01.2016
+
+entity read  usci/refs/01.01.1990/ref_debt_remains_type_01_01_1990.xml 01.01.1990
+
+entity read  usci/refs/usci_ref_doc_type.xml 01.04.2013
+
 entity read  usci/refs/01.01.2012/ref_ba_ct_01_01_2012.xml 01.01.2012
 entity read  usci/refs/01.01.2013/ref_ba_ct_01_01_2013.xml 01.01.2013
 entity read  usci/refs/30.04.2013/ref_ba_ct_30_04_2013.xml 30.04.2013
@@ -149,7 +154,7 @@ entity read  usci/refs/02.12.2013/ref_ba_ct_02_12_2013.xml 02.12.2013
 entity read  usci/refs/31.12.2013/ref_ba_ct_31_12_2013.xml 31.12.2013
 entity read  usci/refs/12.06.2015/ref_ba_ct_12_06_2015.xml 12.06.2015
 #entity read  usci/refs/02.12.2013/ref_ba_ct_c_02_12_2013.xml 02.12.2013
-entity read  usci/refs/01.01.1990/ref_debt_remains_type_01_01_1990.xml 01.01.1990
+
 entity read  usci/refs/01.01.2012/ref_ba_drt_01_01_2012.xml 01.01.2012
 entity read  usci/refs/01.01.2013/ref_ba_drt_01_01_2013.xml 01.01.2013
 entity read  usci/refs/30.04.2013/ref_ba_drt_30_04_2013.xml 30.04.2013
@@ -158,10 +163,6 @@ entity read  usci/refs/29.07.2013/ref_ba_drt_29_07_2013.xml 29.07.2013
 entity read  usci/refs/02.12.2013/ref_ba_drt_02_12_2013.xml 02.12.2013
 entity read  usci/refs/31.12.2013/ref_ba_drt_31_12_2013.xml 31.12.2013
 entity read  usci/refs/12.06.2015/ref_ba_drt_12_06_2015.xml 12.06.2015
-
-
-#custom doc_type
-entity read  usci/refs/usci_ref_doc_type.xml 01.04.2013
 
 entity read  usci/refs/01.01.1990/ref_exclusive_doc_01_01_1990.xml 01.01.1990
 quit

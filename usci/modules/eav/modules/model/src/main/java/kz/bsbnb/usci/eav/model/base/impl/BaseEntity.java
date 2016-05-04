@@ -657,11 +657,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return result;
     }
 
-    public Object getEls(String path){
-        return getEls(path, false);
-    }
-
-    public Object getEls(String path, boolean skipCloseDelete) {
+    public Object getEls(String path) {
         Queue<Object> queue = new LinkedList<>();
 
         StringBuilder str = new StringBuilder();
@@ -711,7 +707,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 throw new RuntimeException(Errors.compose(Errors.E16));
             }
 
-            LinkedList list = (LinkedList) getEls("{get}" + downPath, false);
+            LinkedList list = (LinkedList) getEls("{get}" + downPath);
 
             String[] fields = path.split(",");
 
@@ -814,16 +810,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             if (curO == null)
                 continue;
 
-            //showcase info
-            if(!skipCloseDelete && (curO instanceof BaseEntity)) {
-                if(((BaseEntity) curO).operationType != null)
-                    switch (((BaseEntity) curO).operationType) {
-                        case DELETE:
-                        case CLOSE:
-                            continue;
-                    }
-            }
-
             if (step == yk) {
                 if (function.startsWith("count")) {
                     retCount++;
@@ -833,7 +819,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 ret.add(curO);
                 continue;
             }
-
 
             //noinspection ConstantConditions
             BaseEntity curBE = (BaseEntity) curO;
