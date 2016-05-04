@@ -195,8 +195,6 @@
       <index-column name="attribute_id"/>
       <index-column name="creditor_id"/>
 			<index-column name="value"/>
-      <index-column name="is_closed"/>
-      <index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_complex_set_values">
@@ -241,8 +239,6 @@
 			<index-column name="set_id"/>
 			<index-column name="creditor_id"/>
 			<index-column name="entity_value_id"/>
-			<index-column name="is_last"/>
-			<index-column name="is_closed"/>
 		</index>
 		<!-- load values -->
 		<index name="ebcsv_IN_si_rd_ic">
@@ -300,8 +296,6 @@
 		  <index-column name="entity_id"/>
       <index-column name="attribute_id"/>
       <index-column name="creditor_id"/>
-      <index-column name="is_closed"/>
-      <index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_date_set_values">
@@ -394,8 +388,6 @@
       <index-column name="attribute_id"/>
       <index-column name="creditor_id"/>
 			<index-column name="value"/>
-      <index-column name="is_closed"/>
-      <index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_double_set_values">
@@ -488,8 +480,6 @@
       <index-column name="attribute_id"/>
       <index-column name="creditor_id"/>
 			<index-column name="value"/>
-      <index-column name="is_closed"/>
-      <index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_entities">
@@ -542,11 +532,12 @@
 			<index-column name="creditor_id"/>
 			<index-column name="is_last"/>
 		</index>
-		<!-- load values -->
+		<!-- improved searcher -->
     <index name="ebecs_IN_id_ai_ci">
 			<index-column name="id"/>
 			<index-column name="attribute_id"/>
 		</index>
+		<!-- load values -->
 		<index name="ebecs_IN_ei_il">
 			<index-column name="entity_id"/>
 			<index-column name="creditor_id"/>
@@ -712,8 +703,6 @@
       <index-column name="attribute_id"/>
       <index-column name="creditor_id"/>
 			<index-column name="value"/>
-      <index-column name="is_closed"/>
-      <index-column name="is_last"/>
 		</index>
 	</table>
 	<table name="eav_be_string_set_values">
@@ -801,12 +790,11 @@
 			<index-column name="entity_id"/>
 			<index-column name="report_date"/>
     </index>
+    <!-- improved searcher -->
     <index name="ebsv_IN_ai_ci_v_ic_il">
 			<index-column name="attribute_id"/>
 			<index-column name="creditor_id"/>
 			<index-column name="value"/>
-			<index-column name="is_closed"/>
-			<index-column name="is_last"/>
     </index>
 	</table>
 	<table name="eav_a_user">

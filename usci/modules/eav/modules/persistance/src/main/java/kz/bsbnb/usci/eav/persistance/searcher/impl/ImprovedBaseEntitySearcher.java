@@ -123,9 +123,9 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 String valueAlias = "v_" + name;
 
-                condition = simpleTable.as(valueAlias).field("VALUE").equal(simpleValue)
-                        .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
-                        .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true)));
+                condition = simpleTable.as(valueAlias).field("VALUE").eq(simpleValue)
+                        .and(simpleTable.as(valueAlias).field("IS_CLOSED").eq(DataUtils.convert(false)))
+                        .and(simpleTable.as(valueAlias).field("IS_LAST").eq(DataUtils.convert(true)));
 
                 hasOptionalKey = true;
 
@@ -159,22 +159,15 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                             if (metaClass.getComplexKeyType() == ComplexKeyTypes.ALL) {
                                 String valueAlias = "v_" + name;
                                 condition = condition == null ?
-                                        simpleTable.as(valueAlias).field("VALUE").equal(simpleValue)
-                                                .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
-                                                .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true)))
-                                        :
-                                        condition.and(simpleTable.as(valueAlias).field("VALUE").equal(simpleValue))
-                                                .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
-                                                .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true)));
+                                        simpleTable.as(valueAlias).field("VALUE").eq(simpleValue) :
+                                        condition.and(simpleTable.as(valueAlias).field("VALUE").eq(simpleValue));
                             } else {
                                 String valueAlias = "v";
                                 Select select = context
                                         .select(simpleTable.as(valueAlias).field("ID"))
                                         .from(simpleTable.as(valueAlias))
-                                        .where(simpleTable.as(valueAlias).field("ENTITY_ID").equal(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                                .and(simpleTable.as(valueAlias).field("VALUE").equal(simpleValue))
-                                                .and(simpleTable.as(valueAlias).field("IS_CLOSED").equal(DataUtils.convert(false)))
-                                                .and(simpleTable.as(valueAlias).field("IS_LAST").equal(DataUtils.convert(true))));
+                                        .where(simpleTable.as(valueAlias).field("ENTITY_ID").eq(EAV_BE_ENTITIES.as(entityAlias).ID)
+                                                .and(simpleTable.as(valueAlias).field("VALUE").eq(simpleValue)));
 
                                 condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
                             }
@@ -192,17 +185,13 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                     String valueAlias = "v_" + name;
                                     condition = condition == null ?
                                             EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId) :
-                                            condition.and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId))
-                                                    .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
-                                                    .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).IS_LAST.equal(DataUtils.convert(true)));
+                                            condition.and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId));
                                 } else {
                                     String valueAlias = "v";
                                     Select select = context
                                             .select(EAV_BE_COMPLEX_VALUES.as(valueAlias).ID).from(EAV_BE_COMPLEX_VALUES.as(valueAlias))
                                             .where(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID.equal(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                                    .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId))
-                                                    .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
-                                                    .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).IS_LAST.equal(DataUtils.convert(true))));
+                                                    .and(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_VALUE_ID.equal(childBaseEntityId)));
 
                                     condition = condition == null ? DSL.exists(select) : condition.or(DSL.exists(select));
                                 }
@@ -249,9 +238,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                     .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).CREDITOR_ID.eq(creditorId))
                                     .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ID))
                                     .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds))
-                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.eq(DataUtils.convert(false)))
-                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.eq(DataUtils.convert(true))));
+                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).ENTITY_VALUE_ID.in(childBaseEntityIds)));
 
                             condition = condition == null ? DSL.exists(select) :
                                     metaClass.getComplexKeyType() == ComplexKeyTypes.ALL ?
@@ -267,9 +254,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                                     .on(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ATTRIBUTE_ID.eq(metaAttribute.getId()))
                                     .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).CREDITOR_ID.eq(creditorId))
                                     .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).SET_ID.eq(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ID))
-                                    .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID)
-                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_CLOSED.equal(DataUtils.convert(false)))
-                                            .and(EAV_BE_COMPLEX_SET_VALUES.as(setValueAlias).IS_LAST.equal(DataUtils.convert(true))));
+                                    .where(EAV_BE_ENTITY_COMPLEX_SETS.as(entitySetAlias).ENTITY_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID));
 
                             Condition setCondition = select.asField().eq(sChildBaseEntityIds);
 
@@ -304,8 +289,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 joins = joins.join(simpleTable.as(valueAlias))
                         .on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(simpleTable.as(valueAlias).field("ENTITY_ID"))
-                                .and(simpleTable.as(valueAlias).field("CREDITOR_ID").equal(creditorId)
-                                        .and(simpleTable.as(valueAlias).field("ATTRIBUTE_ID").equal(attribute.getId()))));
+                                .and(simpleTable.as(valueAlias).field("CREDITOR_ID").eq(creditorId)
+                                        .and(simpleTable.as(valueAlias).field("ATTRIBUTE_ID").eq(attribute.getId()))));
             } else {
                 joins = joins.join(EAV_BE_COMPLEX_VALUES.as(valueAlias))
                         .on(EAV_BE_ENTITIES.as(entityAlias).ID.equal(EAV_BE_COMPLEX_VALUES.as(valueAlias).ENTITY_ID)
