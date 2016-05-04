@@ -145,9 +145,6 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                     if (baseValue == null || baseValue.getValue() == null)
                         throw new KnownException(Errors.compose(Errors.E177, name, entity.getMeta().getClassName()));
 
-                    if (baseValue.getValue() == null && (metaClass.getComplexKeyType() == ComplexKeyTypes.ANY))
-                        continue;
-
                     if (!memberType.isSet()) {
                         if (!memberType.isComplex()) {
                             generateJoins(joins, entityAlias, name, memberType, creditorId, metaAttribute);
