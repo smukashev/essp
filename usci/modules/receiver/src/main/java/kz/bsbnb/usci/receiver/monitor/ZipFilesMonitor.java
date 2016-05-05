@@ -89,8 +89,16 @@ public class ZipFilesMonitor {
         try {
             Batch batch = batchService.getBatch(batchId);
             BatchInfo batchInfo = new BatchInfo(batch);
+           // EavGlobal signGlobal = serviceFactory.getGlobalService().getGlobal(batch.getStatusId());
 
-            System.out.println(batchId + " - restarted");
+            //if(signGlobal.getValue().equals(WAITING_FOR_SIGNATURE)) {
+
+                batchService.addBatchStatus(new BatchStatus()
+                        .setBatchId(batchId)
+                        .setStatus(BatchStatuses.WAITING)
+                        .setReceiptDate(new Date()));
+            //}
+            System.out.println("Перезагрузка батча : " + batch.getId() + " - " + batch.getFileName());
 
             jobLauncherQueue.addJob(batchId, batchInfo);
             receiverStatusSingleton.batchReceived();
