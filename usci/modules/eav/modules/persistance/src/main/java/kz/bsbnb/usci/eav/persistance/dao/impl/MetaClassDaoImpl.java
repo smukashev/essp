@@ -131,9 +131,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_CLASSES.PARENT_IS_KEY,
                     EAV_M_CLASSES.IS_REFERENCE)
                     .from(EAV_M_CLASSES)
-                    .where(EAV_M_CLASSES.ID.equal(metaClass.getId()))
-                    .limit(1)
-                    .offset(0);
+                    .where(EAV_M_CLASSES.ID.equal(metaClass.getId()));
         }
 
         logger.debug(select.toString());

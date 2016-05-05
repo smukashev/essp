@@ -2,10 +2,14 @@ rule read $$$
 title: функция сверки балансовый счет - тип кредита
 
 function boolean hasBACT(String baNo, String creditCode, BaseEntity entity){
-    try{
+    try {
+        // fixme!
+        if (baNo == null || creditCode == null) {
+            return true;
+        }
+
         IBaseEntityProcessorDao baseEntityProcessorDao = BRMSHelper.rulesLoadDao;
         IMetaClassRepository metaClassRepository = BRMSHelper.rulesMetaDao;
-
 
         //получить отчетную дату
         Date reportDate = entity.getReportDate();
@@ -49,6 +53,11 @@ rule read $$$
 title: функция сверки балансовый счет - тип остатка
 function boolean hasBADRT(String baNo, String drtCode, BaseEntity entity){
     try{
+        // fixme!
+        if (baNo == null || drtCode == null) {
+            return true;
+        }
+
         IBaseEntityProcessorDao baseEntityProcessorDao = BRMSHelper.rulesLoadDao;
         IMetaClassRepository metaClassRepository = BRMSHelper.rulesMetaDao;
 
