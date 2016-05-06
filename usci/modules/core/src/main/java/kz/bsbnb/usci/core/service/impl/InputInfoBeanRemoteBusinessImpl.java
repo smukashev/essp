@@ -7,11 +7,9 @@ import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EavGlobal;
-import kz.bsbnb.usci.eav.model.json.*;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.DataUtils;
-import kz.bsbnb.usci.eav.util.QueueOrderType;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +27,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     @Autowired
     private IGlobalService globalService;
 
-    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE);
+    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING);
 
     private Map<Long, EavGlobal> globalMap = new HashMap<>();
 
@@ -57,12 +55,14 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             InputInfo ii = new InputInfo();
 
             String lastStatus = "";
+            Date lastReceiptDate = null;
 
             ii.setBatchStatuses(new ArrayList<Protocol>());
 
             for (BatchStatus batchStatus : batchStatusList) {
                 if (protocolsToDisplay.contains(batchStatus.getStatus())) {
-                    if (StringUtils.isEmpty(lastStatus)) {
+                    if (lastReceiptDate == null || lastReceiptDate.compareTo(batchStatus.getReceiptDate()) < 0) {
+                        lastReceiptDate = batchStatus.getReceiptDate();
                         lastStatus = batchStatus.getStatus().code();
                     }
                     fillProtocol(batchStatus, ii);
@@ -89,6 +89,12 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                     break;
                 case "WAITING_FOR_SIGNATURE":
                     lastStatus = "Ожидает подписи";
+                    break;
+                case "WAITING":
+                    lastStatus = "В очереди";
+                    break;
+                case "PROCESSING":
+                    lastStatus = "В обработке";
                     break;
             }
 
