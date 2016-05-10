@@ -32,10 +32,7 @@ public enum Errors {
     private static HashMap<String, String> errors = new HashMap<>();
 
     static {
-        errors.put("E1_RU", "Ключевой атрибут ( #attr ) не может быть пустым");
-        errors.put("E1_KZ", "Ключевой атрибут ( #attr ) не может быть пустым");
-        errors.put("E1_EN", "Ключевой атрибут ( #attr ) не может быть пустым");
-
+        errors.put("E1", "Ключевой атрибут (#attr) не может быть пустым");
         errors.put("E2", "Не реализован");
         errors.put("E3", "Документ является NULL");
         errors.put("E4", "Тип документка является NULL");
@@ -68,8 +65,6 @@ public enum Errors {
         errors.put("E32", "Элемент множества не может быть равен null");//Element of the set can not be equal to null
         errors.put("E33", "Комплексный метод был вызван для простого атрибута или массива"); //Get complex attribute method called for simple attribute or array
         errors.put("E34", "Ожидалось значение поля"); //Field value expected
-
-
         errors.put("E35", "Простой метод был вызван для комплексного атрибута или массива"); //Get simple attribute method called for complex attribute or array
         errors.put("E36", "reportDate является null. Инициализация BaseValue невозможна.");//reportDate is null. Initialization of the BaseValue is not possible
         errors.put("E37", "BaseValue класс не реализует интерфейс Cloneable");
@@ -79,8 +74,6 @@ public enum Errors {
         errors.put("E43", "Невозможно создать объект BaseValue");//Can not create instance of BaseValue
         errors.put("E44", "Путь не может иметь простые элементы");
         errors.put("E45", "Атрибут: #attribute не найден в мета классе: #metaclass");
-
-
         errors.put("E46", "MetaType не может быть null");//MetaType can not be null
         errors.put("E47", "Нет пагинации");//no pagination
         errors.put("E48", "Не поддерживается");//not supported
@@ -105,7 +98,6 @@ public enum Errors {
         errors.put("E67", "Оперативные данные выгружены неправильно #metaAttribute");
         errors.put("E68", "Предыдущая запись не была найдена #metaAttribute");
         errors.put("E69", "Оперативные данные #metaAttribute могут изменятся только за существующие периоды");
-
         errors.put("E70", "Предыдущая запись не найдена #metaAttribute");
         errors.put("E71", "Запись класса #metaAttribute не найдена");
         errors.put("E72", "Дата закрытия атрибута #metaAttribute должна быть больше или равна дате открытия атрибута");
@@ -116,19 +108,16 @@ public enum Errors {
         errors.put("E77", "Ошибка при обновлений #updatedObject, #e_message");
         errors.put("E78", "Ошибка при удалений #deletedObject, #e_message");
         errors.put("E79", "Удаление затронуло #count записей #id , EAV_BE_BOOLEAN_VALUES");
-
         errors.put("E80", "Мета данные атрибута не могут быть NULL");
         errors.put("E81", "Мета данные атрибута должны иметь ID больше 0");
         errors.put("E82", "Родитель записи #metaAttribute является NULL");
         errors.put("E83", "Найдено больше одной записи #metaAttribute");
-
         errors.put("E84", "Обновление затронуло #count записей #id , EAV_BE_BOOLEAN_VALUES");
         errors.put("E85", "Удаление затронуло #count записей #id , EAV_BE_ENTITY_COMPLEX_SETS");
         errors.put("E86", "Обновление затронуло #count записей #id , EAV_BE_ENTITY_COMPLEX_SETS");
         errors.put("E87", "Удаление затронуло #count записей #id , EAV_BE_COMPLEX_VALUES");
         errors.put("E88", "Обновление затронуло #count записей #id , EAV_BE_COMPLEX_VALUES");
         errors.put("E89", "Попытка удалений более 1 записи #id");
-
         errors.put("E90", "Удаление не произошло #id");
         errors.put("E91", "Найдено более одной записи #id");
         errors.put("E92", "Запись не была найдена #id");
@@ -139,7 +128,6 @@ public enum Errors {
         errors.put("E97", "Удаление затронуло #count записей #id , EAV_BE_DOUBLE_VALUES");
         errors.put("E98", "Обновление затронуло #count записей #id , EAV_BE_DOUBLE_VALUES");
         errors.put("E99", "Удаление затронуло #count записей #id , EAV_BE_INTEGER_VALUES");
-
         errors.put("E100", "Обновление затронуло #count записей #id , EAV_BE_INTEGER_VALUES");
         errors.put("E101", "В базе отсутсвует отчетная дата на #id");
         errors.put("E102", "Необходимо предоставить ID записи и отчётную дату");
@@ -150,7 +138,6 @@ public enum Errors {
         errors.put("E107", "Два объекта BaseValue может быть в паре только один раз");//Two BaseValue objects can be paired only once
         errors.put("E108", "Неверная структура MergeManager-а");//Invalid structure of MergeManager
         errors.put("E109", "Невозможно удалить сущность #metaclass (id: #id ) используется в классах: #sbUsages");
-
         errors.put("E110", "Невозмозжно удалить кредитор у которго есть связки с пользователями (id: #id )");
         errors.put("E111", "Кредитор не найден #creditor");
         errors.put("E112", "Сущность для удаления не найдена");
@@ -161,7 +148,6 @@ public enum Errors {
         errors.put("E117", "Запись не была найдена в базе. Обновление не выполнено; ");
         errors.put("E118", "Операция не поддерживается #operation");
         errors.put("E119", "Удаление должно было затронуть одну запись");
-
         errors.put("E120", "Отсутствует ID. Необходимо указать ID сущности;");
         errors.put("E121", "Отсутствует отчетная дата. Необходимо указать отчетную дату");
         errors.put("E122", "Найдено больше одной записи на одну отчетную дату");
@@ -172,7 +158,6 @@ public enum Errors {
         errors.put("E127", "Неизвестный тип");//Unknown type
         errors.put("E128", "Обновление затронуло #count записей #id , EAV_BE_ENTITY_SIMPLE_SETS");
         errors.put("E129", "Удаление затронуло #count записей #id , EAV_BE_STRING_VALUES");
-
         errors.put("E130", "Обновление затронуло #count записей #id , EAV_BE_STRING_VALUES");
         errors.put("E131", "Удаление затронуло #count записей #id , EAV_BE_BOOLEAN_SET_VALUES");
         errors.put("E132", "Обновление затронуло #count записей #id , EAV_BE_BOOLEAN_SET_VALUES");
@@ -183,7 +168,6 @@ public enum Errors {
         errors.put("E137", "Найдено более одной предыдущей записи массива #id , #metaclass");
         errors.put("E138", "Обновление затронуло #count записей #id , EAV_BE_COMPLEX_SET_VALUES");
         errors.put("E139", "Операция Удаление должна удалять только один запись");//DELETE operation should be delete only one record
-
         errors.put("E140", "Операция Обновление должна обновлять только один запись");//UPDATE operation should be update only one record
         errors.put("E141", "Удаление затронуло #count записей #id , EAV_BE_DATE_SET_VALUES");
         errors.put("E142", "Обновление затронуло #count записей #id , EAV_BE_DATE_SET_VALUES");
@@ -194,7 +178,6 @@ public enum Errors {
         errors.put("E147", "Удаление затронуло #count записей #id , EAV_BE_STRING_SET_VALUES");
         errors.put("E148", "Обновление затронуло #count записей #id , EAV_BE_STRING_SET_VALUES");
         errors.put("E149", "Найдено более одного пакета. Не удается загрузить.");//More than one batch found. Can't load.
-
         errors.put("E150", "Пакет не найден. Не удается загрузить.");//Batch not found. Can't load.
         errors.put("E151", "Более одного BatchEntry найдены");//More then one BatchEntry found
         errors.put("E152", "BatchEntry с идентификатором #id не найден");//BatchEntry with identifier #id was not found
@@ -205,7 +188,6 @@ public enum Errors {
         errors.put("E157", "Обновление затронуло #count записей #id , EAV_OPTIMIZER");
         errors.put("E158", "Мета класс не был создан");
         errors.put("E159", "MetaClass должен иметь идентификатор до удаление обекъекта с БД");//MetaClass must have an id filled before attributes deletion to DB
-
         errors.put("E160", "Классы не найдены");//Classes not found
         errors.put("E161", "MetaClass должен иметь идентификатор до вставки в БД");//MetaClass must have an id filled before attributes insertion to DB
         errors.put("E162", "Мета класс не имеет имя или идентификатор.Не удается загрузить.");//Meta class does not have name or id. Can't load
@@ -216,7 +198,6 @@ public enum Errors {
         errors.put("E167", "#attributeName является массивом,ожидалось одно значение.");//#attributeName is an array, single value expected.
         errors.put("E168", "#attributeName не является массивом");//#attributeName is not an array
         errors.put("E169", "MetaClass должен иметь идентификатор до обновление объекта в БД");//MetaClass must have an id filled before attributes update in DB
-
         errors.put("E170", "MetaClass должен иметь ID до обновление");//MetaClass must have id to be updated
         errors.put("E171", "Повторяющиеся идентификаторы в report_message или в report_message_attachment");//Duplicate ids in report_message or report_message_attachment
         errors.put("E172", "Persistable класс не может быть null");//Persistable class can not be null
@@ -227,7 +208,6 @@ public enum Errors {
         errors.put("E177", "Ключевой атрибут( #name ) не может быть пустым. Родитель: #metaclass ;");
         errors.put("E178", "Массив должен содержать элементы( #metaclass );");
         errors.put("E179", "Простой массив не может быть ключевым( #metaclass );");
-
         errors.put("E180", "Неудается найти конфигурационный файл БД #schema");
         errors.put("E181", "Проблемы с очередью: #e_message");
         errors.put("E182", "ОС не поддерживается");//OS is not support
@@ -238,13 +218,11 @@ public enum Errors {
         errors.put("E187", "Договор не содержит обязательные поля;");
         errors.put("E188", "Ключевое поле docs пустое;");
         errors.put("E189", "Субъект должен иметь идентификационные документы;");
-
         errors.put("E190", "Тип данных не определён #dataTypes");
         errors.put("E191", "ZIP-файл не содержит каких-либо файлов");//ZIP file does not contain any files
         errors.put("E192", "Sync тайм-аут в reader-е");//Sync timeout in reader
         errors.put("E193", "Ошибка при проверки XML");//XML validation error
         errors.put("E194", "Ошибка преобразования класса: #localName , текст исключении :  #e_message");//Cast error: #localName , exception text:  #e_message
-
         errors.put("E195", "Ошибка бизнес правил #e_message");
         errors.put("E196", "Запись найдена в базе( #id ). Вставка не произведена;");
         errors.put("E197", "Кредитор установлен не правильно;");
