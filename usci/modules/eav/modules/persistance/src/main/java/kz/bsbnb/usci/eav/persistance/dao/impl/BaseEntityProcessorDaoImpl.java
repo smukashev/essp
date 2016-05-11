@@ -161,7 +161,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         rulesSingleton.runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
                         break;
                     } catch (Exception ex) {
-                        if (++retryCount == 10) throw ex;
+                        if (++retryCount == 10)
+                            throw ex;
+
+                        Thread.sleep(100);
                     }
                 } while (true);
 
