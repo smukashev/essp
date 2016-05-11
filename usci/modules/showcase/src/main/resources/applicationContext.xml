@@ -86,7 +86,7 @@
     <bean id="jmsConsumerConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory" p:targetConnectionFactory-ref="jmsFactory" />
 
     <jms:listener-container container-type="default" connection-factory="jmsConsumerConnectionFactory"
-                            acknowledge="client" concurrency="${jms.consumerCount}" prefetch="1000">
+                            acknowledge="client" concurrency="${jms.consumerCount}" prefetch="10000">
         <jms:listener destination="showcaseQueue" ref="showcaseMessageConsumer" />
     </jms:listener-container>
 </beans>

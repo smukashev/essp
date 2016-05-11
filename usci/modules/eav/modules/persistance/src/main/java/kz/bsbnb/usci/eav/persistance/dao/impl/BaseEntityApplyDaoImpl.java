@@ -541,21 +541,41 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     if (metaAttribute.isFinal())
                         throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
 
-                    IBaseValue baseValueApplied = BaseValueFactory.create(
-                            MetaContainerTypes.META_CLASS,
-                            metaType,
-                            0,
-                            creditorId,
-                            new Date(baseValueSaving.getRepDate().getTime()),
-                            returnCastedValue(metaValue, baseValueSaving),
-                            false,
-                            baseValueLoaded.isLast());
+                    IBaseValueDao valueDao = persistableDaoPool
+                            .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
+
+                    IBaseValue baseValueExisting = valueDao.getExistingBaseValue(baseValueSaving);
+
+                    IBaseValue baseValueApplied;
+                    if (baseValueExisting != null) {
+                        baseValueApplied = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                baseValueExisting.getId(),
+                                baseValueExisting.getCreditorId(),
+                                baseValueExisting.getRepDate(),
+                                returnCastedValue(metaValue, baseValueExisting),
+                                baseValueExisting.isClosed(),
+                                baseValueExisting.isLast());
+                    } else {
+                        baseValueApplied = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                0,
+                                creditorId,
+                                new Date(baseValueSaving.getRepDate().getTime()),
+                                returnCastedValue(metaValue, baseValueSaving),
+                                baseValueLoaded.isClosed(),
+                                baseValueLoaded.isLast());
+                    }
 
                     baseValueApplied.setBaseContainer(baseEntityApplied);
                     baseValueApplied.setMetaAttribute(metaAttribute);
 
                     baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
-                    baseEntityManager.registerAsInserted(baseValueApplied);
+
+                    if (baseValueExisting == null)
+                        baseEntityManager.registerAsInserted(baseValueApplied);
 
                     if (baseValueLoaded.isLast()) {
                         IBaseValue baseValuePrevious = BaseValueFactory.create(
@@ -573,6 +593,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         baseEntityManager.registerAsUpdated(baseValuePrevious);
                     }
+
                     // case#9
                 } else if (compare == -1) {
                     IBaseValue baseValueApplied = BaseValueFactory.create(
@@ -989,21 +1010,41 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     if (metaAttribute.isFinal())
                         throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
 
-                    IBaseValue baseValueApplied = BaseValueFactory.create(
-                            MetaContainerTypes.META_CLASS,
-                            metaType,
-                            0,
-                            creditorId,
-                            new Date(baseValueSaving.getRepDate().getTime()),
-                            baseEntityApplied,
-                            false,
-                            true);
+                    IBaseValueDao valueDao = persistableDaoPool.getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
+
+                    IBaseValue baseValueExisting = valueDao.getExistingBaseValue(baseValueSaving);
+
+                    IBaseValue baseValueApplied;
+
+                    if (baseValueExisting != null) {
+                        baseValueApplied = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                baseValueExisting.getId(),
+                                baseValueExisting.getCreditorId(),
+                                baseValueExisting.getRepDate(),
+                                baseValueExisting.getValue(),
+                                baseValueExisting.isClosed(),
+                                baseValueExisting.isLast());
+                    } else {
+                        baseValueApplied = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                0,
+                                creditorId,
+                                new Date(baseValueSaving.getRepDate().getTime()),
+                                baseEntityApplied,
+                                false,
+                                true);
+                    }
 
                     baseValueApplied.setBaseContainer(baseEntity);
                     baseValueApplied.setMetaAttribute(metaAttribute);
 
+                    if (baseValueExisting == null)
+                        baseEntityManager.registerAsInserted(baseValueApplied);
+
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                    baseEntityManager.registerAsInserted(baseValueApplied);
 
                     if (baseValueLoaded.isLast()) {
                         IBaseValue baseValuePrevious = BaseValueFactory.create(
