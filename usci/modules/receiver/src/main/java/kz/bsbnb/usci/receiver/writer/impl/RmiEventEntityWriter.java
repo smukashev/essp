@@ -1,10 +1,7 @@
 package kz.bsbnb.usci.receiver.writer.impl;
 
-import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
-import kz.bsbnb.usci.receiver.common.Global;
 import kz.bsbnb.usci.receiver.writer.IWriter;
 import kz.bsbnb.usci.sync.service.IEntityService;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
