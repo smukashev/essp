@@ -123,9 +123,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 String valueAlias = "v_" + name;
 
-                condition = simpleTable.as(valueAlias).field("VALUE").eq(simpleValue)
-                        .and(simpleTable.as(valueAlias).field("IS_CLOSED").eq(DataUtils.convert(false)))
-                        .and(simpleTable.as(valueAlias).field("IS_LAST").eq(DataUtils.convert(true)));
+                condition = simpleTable.as(valueAlias).field("VALUE").eq(simpleValue);
 
                 hasOptionalKey = true;
 

@@ -70,4 +70,3 @@ values (3005, 3002, 'DETAILS', 1);
 sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enabled) (select user_id as portal_user_id, 1001 as mail_template_id, 1 as enabled   from eav_a_user)
 sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enabled) (select user_id as portal_user_id, 3001 as mail_template_id, 1 as enabled   from eav_a_user)
 sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enabled) (select user_id as portal_user_id, 4002 as mail_template_id, 1 as enabled   from eav_a_user)
-

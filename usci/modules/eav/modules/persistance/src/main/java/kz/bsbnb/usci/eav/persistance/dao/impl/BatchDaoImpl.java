@@ -71,6 +71,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
     public List<Batch> getPendingBatchList() {
         EavGlobal statusCompleted = eavGlobalDao.get(BatchStatuses.COMPLETED.type(), BatchStatuses.COMPLETED.code());
         EavGlobal statusError = eavGlobalDao.get(BatchStatuses.ERROR.type(), BatchStatuses.ERROR.code());
+        EavGlobal statusCancelled = eavGlobalDao.get(BatchStatuses.CANCELLED.type(), BatchStatuses.CANCELLED.code());
 
         Select select = context.select(
                 EAV_BATCHES.ID,
@@ -97,9 +98,9 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 on(EAV_BATCHES.ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class)))
                 .where(DSL.field("\"bs\".\"num\"").eq(1))
                 .and(DSL.field("\"bs\".STATUS_ID").ne(statusCompleted.getId())
+                        .and(DSL.field("\"bs\".STATUS_ID").ne(statusCancelled.getId()))
                         .and(DSL.field("\"bs\".STATUS_ID").ne(statusError.getId())))
-                .and(EAV_BATCHES.IS_DISABLED.eq(DataUtils.convert(false))).orderBy(EAV_BATCHES.ID);
-
+                        .and(EAV_BATCHES.IS_DISABLED.eq(DataUtils.convert(false))).orderBy(EAV_BATCHES.ID);
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         List<Batch> pendingBatchList = new ArrayList<>();

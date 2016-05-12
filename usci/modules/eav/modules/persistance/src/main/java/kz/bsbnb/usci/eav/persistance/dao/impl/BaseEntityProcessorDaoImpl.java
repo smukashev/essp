@@ -154,7 +154,19 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             List<String> errors = new ArrayList<>();
             try {
                 long t1 = System.currentTimeMillis();
-                rulesSingleton.runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
+
+                long retryCount = 0;
+                do {
+                    try {
+                        rulesSingleton.runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
+                        break;
+                    } catch (Exception ex) {
+                        if (++retryCount == 10)
+                            throw ex;
+
+                        Thread.sleep(100);
+                    }
+                } while (true);
 
                 for(String s : baseEntity.getValidationErrors()) errors.add(s);
 
