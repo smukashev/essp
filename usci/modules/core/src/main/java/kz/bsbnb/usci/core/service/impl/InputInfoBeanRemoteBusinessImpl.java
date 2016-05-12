@@ -27,7 +27,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     @Autowired
     private IGlobalService globalService;
 
-    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING);
+    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING, CANCELLED);
 
     private Map<Long, EavGlobal> globalMap = new HashMap<>();
 
@@ -59,16 +59,25 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
             ii.setBatchStatuses(new ArrayList<Protocol>());
 
+            Boolean isCompleted = false;
+
             for (BatchStatus batchStatus : batchStatusList) {
                 if (protocolsToDisplay.contains(batchStatus.getStatus())) {
                     if (lastReceiptDate == null || lastReceiptDate.compareTo(batchStatus.getReceiptDate()) < 0) {
                         lastReceiptDate = batchStatus.getReceiptDate();
                         lastStatus = batchStatus.getStatus().code();
+
+                        if (batchStatus.getStatus().equals(COMPLETED))
+                            isCompleted = true;
+
                     }
                     fillProtocol(batchStatus, ii);
                 }
                 fillDates(batchStatus, ii);
             }
+
+            if (isCompleted)
+                lastStatus = "COMPLETED";
 
             ii.setUserId(batch.getUserId());
             ii.setReportDate(batch.getRepDate());
@@ -157,6 +166,10 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 case "WAITING_FOR_SIGNATURE":
                     s.setNameRu("Ожидает подписи");
                     s.setNameKz("Ожидает подписи");
+                    break;
+                case "CANCELLED":
+                    s.setNameRu("Отмена загрузки");
+                    s.setNameKz("Отмена загрузки");
                     break;
                 default:
                     s.setNameRu(batchStatus.getStatus().code());

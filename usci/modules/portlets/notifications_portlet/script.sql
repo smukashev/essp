@@ -70,31 +70,3 @@ values (3005, 3002, 'DETAILS', 1);
 sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enabled) (select user_id as portal_user_id, 1001 as mail_template_id, 1 as enabled   from eav_a_user)
 sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enabled) (select user_id as portal_user_id, 3001 as mail_template_id, 1 as enabled   from eav_a_user)
 sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enabled) (select user_id as portal_user_id, 4002 as mail_template_id, 1 as enabled   from eav_a_user)
-
-
--- set status ORGANIZATION_APPROVED for january and february reports
-update eav_report set status_id=7 where report_date = to_date('01.01.2016','dd.mm.yyyy');
-update eav_report set status_id=7 where report_date = to_date('01.02.2016','dd.mm.yyyy');
-
--- find reports for january
-select * from eav_report where report_date = to_date('01.01.2016','dd.mm.yyyy');
-
---insert february reports for januries
-insert into eav_report(creditor_id,total_count, actual_count, beg_date,end_date,report_date,status_id,username)
-values(2426,777,777, to_date('01.02.2016','dd.mm.yyyy'),to_date('01.02.2016','dd.mm.yyyy'), to_date('01.02.2016','dd.mm.yyyy'),7,'Неивестный');
-insert into eav_report(creditor_id,total_count, actual_count, beg_date,end_date,report_date,status_id,username)
-values(2423,1,1, to_date('01.02.2016','dd.mm.yyyy'),to_date('01.02.2016','dd.mm.yyyy'), to_date('01.02.2016','dd.mm.yyyy'),7,'Неивестный');
-insert into eav_report(creditor_id,total_count, actual_count, beg_date,end_date,report_date,status_id,username)
-values(2429,1,1, to_date('01.02.2016','dd.mm.yyyy'),to_date('01.02.2016','dd.mm.yyyy'), to_date('01.02.2016','dd.mm.yyyy'),7,'Неивестный');
-insert into eav_report(creditor_id,total_count, actual_count, beg_date,end_date,report_date,status_id,username)
-values(2432,16,16, to_date('01.02.2016','dd.mm.yyyy'),to_date('01.02.2016','dd.mm.yyyy'), to_date('01.02.2016','dd.mm.yyyy'),7,'Неивестный');
-
---insert match reports for januries
-insert into eav_report(creditor_id,total_count, actual_count, beg_date,end_date,report_date,status_id,username)
-values(2426,777,777, to_date('01.03.2016','dd.mm.yyyy'),to_date('01.03.2016','dd.mm.yyyy'), to_date('01.03.2016','dd.mm.yyyy'),7,'Неивестный');
-insert into eav_report(creditor_id,total_count, actual_count, beg_date,end_date,report_date,status_id,username)
-values(2423,1,1, to_date('01.03.2016','dd.mm.yyyy'),to_date('01.03.2016','dd.mm.yyyy'), to_date('01.03.2016','dd.mm.yyyy'),7,'Неивестный');
-insert into eav_report(creditor_id,total_count, actual_count, beg_date,end_date,report_date,status_id,username)
-values(2429,1,1, to_date('01.03.2016','dd.mm.yyyy'),to_date('01.03.2016','dd.mm.yyyy'), to_date('01.03.2016','dd.mm.yyyy'),7,'Неивестный');
-insert into eav_report(creditor_id,total_count, actual_count, beg_date,end_date,report_date,status_id,username)
-values(2432,16,16, to_date('01.03.2016','dd.mm.yyyy'),to_date('01.03.2016','dd.mm.yyyy'), to_date('01.03.2016','dd.mm.yyyy'),7,'Неивестный');
