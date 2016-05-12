@@ -65,6 +65,7 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -1187,6 +1188,70 @@ public class CLI {
         return DriverManager.getConnection(url, name, password);
     }
 
+    public void processUploadsCommand() {
+        String pathToTmp = "E:/tmp/";
+        File tmpFolder = new File(pathToTmp);
+        File destination = new File("E:/Zips/");
+
+        if (!tmpFolder.isDirectory())
+            throw new IllegalArgumentException(pathToTmp + " is not a directory!");
+
+        int counter = 1;
+
+        Map<File, File> map = new HashMap<>();
+
+        for (File creditorFolder : tmpFolder.listFiles()) {
+            Long creditorId;
+
+            try {
+                creditorId = Long.parseLong(creditorFolder.getName());
+            } catch (Exception e) {
+                continue;
+            }
+
+            File timeFolders[] = creditorFolder.listFiles();
+            File sortedTimeFolders[] = new File[timeFolders.length];
+
+            for (int i = 0; i < timeFolders.length; i++) {
+                sortedTimeFolders[timeFolders.length - i - 1] = timeFolders[i];
+            }
+
+            List<String> names = new LinkedList<>();
+
+            for (File timeFolder : sortedTimeFolders) {
+                for (File zipFile : timeFolder.listFiles()) {
+                    if (!names.contains(zipFile.getName()) && !zipFile.getName().contains("XML_DATA_BY_CID")) {
+                        map.put(timeFolder, zipFile);
+                        names.add(zipFile.getName());
+                    }
+                }
+            }
+        }
+
+        List<String> existingFiles = new LinkedList<>();
+        for (Map.Entry<File, File> entry : map.entrySet()) {
+            if (existingFiles.contains(entry.getValue().getName()))
+                throw new IllegalStateException(entry.getValue().getName());
+
+            existingFiles.add(entry.getValue().getName());
+            System.out.println("update eav_batches set receipt_date = to_date('" + entry.getKey().getName() + "', 'YYYY.MM.DD-HH24:MI:SS') where file_name like '%" + entry.getValue().getName() + "';");
+        }
+
+        System.out.println("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+        for (Map.Entry<File, File> entry : map.entrySet()) {
+            File newFile = new File(destination.getAbsolutePath() + "/" + entry.getValue().getName());
+            try {
+                FileCopyUtils.copy(entry.getValue(), newFile);
+                Thread.sleep(60000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            System.out.println(newFile.getAbsolutePath() + " copied;");
+        }
+    }
+
     public void commandImport() {
         if (args.size() > 4) {
             Connection conn;
@@ -1300,7 +1365,7 @@ public class CLI {
                             System.out.println("Error can't mark sent file: " + id);
                         }
 
-                        Thread.sleep(10000);
+                        Thread.sleep(30000);
                     } else {
                         System.out.println("Nothing to do.");
                         Thread.sleep(10000);
@@ -2461,6 +2526,8 @@ public class CLI {
                 commandMaintenance(line);
             } else if (command.equals("cp")) {
                 commandCp();
+            } else if (command.equals("processUploads")) {
+                processUploadsCommand();
             } else {
                 System.out.println("No such command: " + command);
             }

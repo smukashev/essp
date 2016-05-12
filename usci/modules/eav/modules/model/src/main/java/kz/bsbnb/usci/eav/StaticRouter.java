@@ -83,7 +83,7 @@ public final class StaticRouter {
 
     private final static int stendThreadLimit = 10;
     private final static int devThreadLimit = 10;
-    private final static int prodThreadLimit = 20;
+    private final static int prodThreadLimit = 100;
 
     public static String getAsIP() {
         switch(mode) {
