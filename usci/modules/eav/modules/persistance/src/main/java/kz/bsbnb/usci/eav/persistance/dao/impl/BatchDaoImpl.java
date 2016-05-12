@@ -94,7 +94,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                         DSL.rowNumber().over()
                                 .partitionBy(EAV_BATCH_STATUSES.BATCH_ID)
                                 .orderBy(EAV_BATCH_STATUSES.STATUS_ID.desc()).as("num"))
-                        .from(EAV_BATCH_STATUSES).asTable("bs")).
+                        .from(EAV_BATCH_STATUSES).where(EAV_BATCH_STATUSES.BATCH_ID.notIn(context.selectDistinct(EAV_BATCH_STATUSES.BATCH_ID).from(EAV_BATCH_STATUSES).where(EAV_BATCH_STATUSES.STATUS_ID.eq(statusCompleted.getId())))).asTable("bs")).
                 on(EAV_BATCHES.ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class)))
                 .where(DSL.field("\"bs\".\"num\"").eq(1))
                 .and(DSL.field("\"bs\".STATUS_ID").ne(statusCompleted.getId())
