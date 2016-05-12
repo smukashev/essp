@@ -59,16 +59,25 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
             ii.setBatchStatuses(new ArrayList<Protocol>());
 
+            Boolean isCompleted = false;
+
             for (BatchStatus batchStatus : batchStatusList) {
                 if (protocolsToDisplay.contains(batchStatus.getStatus())) {
                     if (lastReceiptDate == null || lastReceiptDate.compareTo(batchStatus.getReceiptDate()) < 0) {
                         lastReceiptDate = batchStatus.getReceiptDate();
                         lastStatus = batchStatus.getStatus().code();
+
+                        if (batchStatus.getStatus().equals(COMPLETED))
+                            isCompleted = true;
+
                     }
                     fillProtocol(batchStatus, ii);
                 }
                 fillDates(batchStatus, ii);
             }
+
+            if (isCompleted)
+                lastStatus = "COMPLETED";
 
             ii.setUserId(batch.getUserId());
             ii.setReportDate(batch.getRepDate());
