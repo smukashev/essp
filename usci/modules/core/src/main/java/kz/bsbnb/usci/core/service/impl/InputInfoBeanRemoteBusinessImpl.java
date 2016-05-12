@@ -158,6 +158,10 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                     s.setNameRu("Ожидает подписи");
                     s.setNameKz("Ожидает подписи");
                     break;
+                case "CANCELLED":
+                    s.setNameRu("Отмена загрузки");
+                    s.setNameKz("Отмена загрузки");
+                    break;
                 default:
                     s.setNameRu(batchStatus.getStatus().code());
                     s.setNameKz(batchStatus.getStatus().code());
