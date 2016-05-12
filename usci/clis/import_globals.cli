@@ -31,6 +31,7 @@ global add --type=BATCH_STATUS --code=PROCESSING --value=PROCESSING --desc=В_о
 global add --type=BATCH_STATUS --code=ERROR --value=ERROR --desc=Ошибка
 global add --type=BATCH_STATUS --code=COMPLETED --value=COMPLETED --desc=Завершён
 global add --type=BATCH_STATUS --code=WAITING_FOR_SIGNATURE --value=WAITING_FOR_SIGNATURE --desc=Ожидает_подписи
+global add --type=BATCH_STATUS --code=CANCELLED --value=CANCELLED --desc=Отмена_загрузки
 
 #
 # NOTIFICATION

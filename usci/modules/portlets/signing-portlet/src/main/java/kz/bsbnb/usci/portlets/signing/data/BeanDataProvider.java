@@ -4,12 +4,18 @@ import kz.bsbnb.usci.core.service.InputFileBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.*;
 import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.model.BatchStatus;
+import kz.bsbnb.usci.eav.util.BatchStatuses;
 import kz.bsbnb.usci.eav.util.Errors;
+import kz.bsbnb.usci.receiver.repository.IServiceRepository;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
+import kz.bsbnb.usci.sync.service.IBatchService;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -88,8 +94,9 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public void cancelFile(FileSignatureRecord file) {
-        InputInfo inputInfo = file.getInputFile().getInputInfo();
-        inputInfo.setStatus(getFileStatus(InputInfoStatus.REJECTED));
+        //InputInfo inputInfo = file.getInputFile().getInputInfo();
+        //inputInfo.setStatus(getFileStatus(InputInfoStatus.REJECTED));
+        batchProcessService.CancelBatch(file.getInputFile().getId());
         //inputInfoBusiness.update(inputInfo);
     }
 
