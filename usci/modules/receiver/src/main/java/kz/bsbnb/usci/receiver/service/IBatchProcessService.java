@@ -19,6 +19,7 @@ public interface IBatchProcessService {
     ReceiverStatus getStatus();
 
     boolean restartBatch(long id);
+    void CancelBatch(long id);
 
     void reloadJobLauncherConfig();
 

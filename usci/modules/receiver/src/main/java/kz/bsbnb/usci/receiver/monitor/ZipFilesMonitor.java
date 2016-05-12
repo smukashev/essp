@@ -85,6 +85,14 @@ public class ZipFilesMonitor {
         this.jobs = jobs;
     }
 
+
+    public void CancelBatch(long batchId) {
+        batchService.addBatchStatus(new BatchStatus()
+                .setBatchId(batchId)
+                .setStatus(BatchStatuses.CANCELLED)
+                .setReceiptDate(new Date()));
+    }
+
     public boolean restartBatch(long batchId) {
         try {
             Batch batch = batchService.getBatch(batchId);
