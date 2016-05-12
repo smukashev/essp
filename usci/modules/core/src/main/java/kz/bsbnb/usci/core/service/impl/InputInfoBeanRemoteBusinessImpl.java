@@ -27,7 +27,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     @Autowired
     private IGlobalService globalService;
 
-    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING);
+    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING, CANCELLED);
 
     private Map<Long, EavGlobal> globalMap = new HashMap<>();
 
