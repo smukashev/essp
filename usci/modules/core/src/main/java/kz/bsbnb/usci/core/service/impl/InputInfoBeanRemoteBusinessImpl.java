@@ -66,12 +66,12 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                     if (lastReceiptDate == null || lastReceiptDate.compareTo(batchStatus.getReceiptDate()) < 0) {
                         lastReceiptDate = batchStatus.getReceiptDate();
                         lastStatus = batchStatus.getStatus().code();
-
-                        if (batchStatus.getStatus().equals(COMPLETED))
-                            isCompleted = true;
-
                     }
+
                     fillProtocol(batchStatus, ii);
+
+                    if (batchStatus.getStatus().equals(COMPLETED))
+                        isCompleted = true;
                 }
                 fillDates(batchStatus, ii);
             }
