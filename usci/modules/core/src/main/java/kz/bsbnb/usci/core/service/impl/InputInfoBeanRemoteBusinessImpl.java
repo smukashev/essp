@@ -105,6 +105,9 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 case "PROCESSING":
                     lastStatus = "В обработке";
                     break;
+                case "CANCELLED":
+                    lastStatus = "Отмена загрузки";
+                    break;
             }
 
             Shared s = new Shared();
@@ -166,10 +169,6 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 case "WAITING_FOR_SIGNATURE":
                     s.setNameRu("Ожидает подписи");
                     s.setNameKz("Ожидает подписи");
-                    break;
-                case "CANCELLED":
-                    s.setNameRu("Отмена загрузки");
-                    s.setNameKz("Отмена загрузки");
                     break;
                 default:
                     s.setNameRu(batchStatus.getStatus().code());
