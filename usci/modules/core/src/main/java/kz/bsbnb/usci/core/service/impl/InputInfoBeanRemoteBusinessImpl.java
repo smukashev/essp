@@ -27,7 +27,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     @Autowired
     private IGlobalService globalService;
 
-    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING);
+    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING, CANCELLED);
 
     private Map<Long, EavGlobal> globalMap = new HashMap<>();
 
@@ -59,16 +59,25 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
             ii.setBatchStatuses(new ArrayList<Protocol>());
 
+            Boolean isCompleted = false;
+
             for (BatchStatus batchStatus : batchStatusList) {
                 if (protocolsToDisplay.contains(batchStatus.getStatus())) {
                     if (lastReceiptDate == null || lastReceiptDate.compareTo(batchStatus.getReceiptDate()) < 0) {
                         lastReceiptDate = batchStatus.getReceiptDate();
                         lastStatus = batchStatus.getStatus().code();
                     }
+
                     fillProtocol(batchStatus, ii);
+
+                    if (batchStatus.getStatus().equals(COMPLETED))
+                        isCompleted = true;
                 }
                 fillDates(batchStatus, ii);
             }
+
+            if (isCompleted)
+                lastStatus = "COMPLETED";
 
             ii.setUserId(batch.getUserId());
             ii.setReportDate(batch.getRepDate());
@@ -95,6 +104,9 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                     break;
                 case "PROCESSING":
                     lastStatus = "В обработке";
+                    break;
+                case "CANCELLED":
+                    lastStatus = "Отмена загрузки";
                     break;
             }
 

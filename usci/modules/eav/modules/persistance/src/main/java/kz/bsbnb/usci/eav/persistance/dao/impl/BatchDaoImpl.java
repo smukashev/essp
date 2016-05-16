@@ -71,6 +71,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
     public List<Batch> getPendingBatchList() {
         EavGlobal statusCompleted = eavGlobalDao.get(BatchStatuses.COMPLETED.type(), BatchStatuses.COMPLETED.code());
         EavGlobal statusError = eavGlobalDao.get(BatchStatuses.ERROR.type(), BatchStatuses.ERROR.code());
+        EavGlobal statusCancelled = eavGlobalDao.get(BatchStatuses.CANCELLED.type(), BatchStatuses.CANCELLED.code());
 
         Select select = context.select(
                 EAV_BATCHES.ID,
@@ -92,14 +93,14 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                         EAV_BATCH_STATUSES.STATUS_ID,
                         DSL.rowNumber().over()
                                 .partitionBy(EAV_BATCH_STATUSES.BATCH_ID)
-                                .orderBy(EAV_BATCH_STATUSES.STATUS_ID.desc()).as("num"))
-                        .from(EAV_BATCH_STATUSES).asTable("bs")).
+                                .orderBy(EAV_BATCH_STATUSES.RECEIPT_DATE.desc()).as("num"))
+                        .from(EAV_BATCH_STATUSES).where(EAV_BATCH_STATUSES.BATCH_ID.notIn(context.selectDistinct(EAV_BATCH_STATUSES.BATCH_ID).from(EAV_BATCH_STATUSES).where(EAV_BATCH_STATUSES.STATUS_ID.eq(statusCompleted.getId())))).asTable("bs")).
                 on(EAV_BATCHES.ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class)))
                 .where(DSL.field("\"bs\".\"num\"").eq(1))
                 .and(DSL.field("\"bs\".STATUS_ID").ne(statusCompleted.getId())
+                        .and(DSL.field("\"bs\".STATUS_ID").ne(statusCancelled.getId()))
                         .and(DSL.field("\"bs\".STATUS_ID").ne(statusError.getId())))
-                .and(EAV_BATCHES.IS_DISABLED.eq(DataUtils.convert(false))).orderBy(EAV_BATCHES.ID);
-
+                        .and(EAV_BATCHES.IS_DISABLED.eq(DataUtils.convert(false))).orderBy(EAV_BATCHES.ID);
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         List<Batch> pendingBatchList = new ArrayList<>();

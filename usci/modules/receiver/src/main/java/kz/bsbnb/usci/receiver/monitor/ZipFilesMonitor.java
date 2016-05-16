@@ -68,7 +68,7 @@ public class ZipFilesMonitor {
     SenderThread sender;
 
     public static final int ZIP_BUFFER_SIZE = 1024;
-    public static final int MAX_SYNC_QUEUE_SIZE = 256;
+    public static final int MAX_SYNC_QUEUE_SIZE = 2048;
 
     private static final String DIGITAL_SIGNING_SETTINGS = "DIGITAL_SIGNING_SETTINGS";
     private static final String DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE = "DIGITAL_SIGNING_ORGANIZATIONS_IDS";
@@ -83,6 +83,14 @@ public class ZipFilesMonitor {
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
+    }
+
+
+    public void CancelBatch(long batchId) {
+        batchService.addBatchStatus(new BatchStatus()
+                .setBatchId(batchId)
+                .setStatus(BatchStatuses.CANCELLED)
+                .setReceiptDate(new Date()));
     }
 
     public boolean restartBatch(long batchId) {
@@ -429,7 +437,7 @@ public class ZipFilesMonitor {
 
         Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
 
-        if (!StaticRouter.isDevMode()) {
+        if (!StaticRouter.isDevMode() && false) {
             String errMsg = null;
 
             if (existing != null) {
