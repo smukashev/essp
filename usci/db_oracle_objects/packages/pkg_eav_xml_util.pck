@@ -316,31 +316,11 @@
     p_report_date IN DATE
   ) RETURN XMLTYPE;
 
-  FUNCTION get_persons_xml
-  (
-    p_credit_id IN NUMBER,
-    p_report_date IN DATE,
-    p_tag_name IN VARCHAR2 DEFAULT 'person'
-  ) RETURN XMLTYPE;
-
-  FUNCTION get_organizations_xml
-  (
-    p_credit_id IN NUMBER,
-    p_report_date IN DATE,
-    p_tag_name IN VARCHAR2 DEFAULT 'organization'
-  ) RETURN XMLTYPE;
-
-  FUNCTION get_creditors_xml
-  (
-    p_credit_id IN NUMBER,
-    p_report_date IN DATE,
-    p_tag_name IN VARCHAR2 DEFAULT 'creditors'
-  ) RETURN XMLTYPE;
-
   FUNCTION get_organization_xml
   (
     p_organization_id IN NUMBER,
     p_report_date IN DATE,
+    p_creditor_id IN NUMBER,
     p_tag_name IN VARCHAR2 DEFAULT 'organization'
   ) RETURN XMLTYPE;
 
@@ -348,6 +328,7 @@
   (
     p_person_id IN NUMBER,
     p_report_date IN DATE,
+    p_creditor_id IN NUMBER,
     p_tag_name IN VARCHAR2 DEFAULT 'person',
     p_type IN NUMBER DEFAULT 0 -- 0 - PERSON, 1 - HEAD
   ) RETURN XMLTYPE;
@@ -396,6 +377,7 @@
     p_person_id IN NUMBER,
     p_organization_id IN NUMBER,
     p_report_date IN DATE,
+    p_creditor_id IN NUMBER DEFAULT -1,
     p_tag_name IN VARCHAR2 DEFAULT 'bank_relations'
   ) RETURN XMLTYPE;
 
@@ -410,26 +392,8 @@
   FUNCTION get_subject
   (
     p_credit_id NUMBER,
-    p_report_date DATE
-  ) RETURN XMLType;
-
-
-  FUNCTION get_persons
-  (
-    p_credit_id NUMBER,
-    p_report_date DATE
-  ) RETURN XMLType;
-
-  FUNCTION get_organizations
-  (
-    p_credit_id NUMBER,
-    p_report_date DATE
-  ) RETURN XMLType;
-
-  FUNCTION get_creditors
-  (
-    p_credit_id NUMBER,
-    p_report_date DATE
+    p_report_date DATE,
+    p_creditor_id NUMBER
   ) RETURN XMLType;
 
   FUNCTION get_portfolio_flows_kfn
@@ -1490,13 +1454,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                        WHERE EXISTS (SELECT t.* FROM core.debt_remains t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.value IS NOT NULL AND t.value <> 0)
                           OR EXISTS (SELECT t.* FROM core.credit_flow t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date)
                           OR EXISTS (SELECT t.* FROM core.turnover t WHERE t.credit_id = vch.id AND t.rep_date = v_report_date AND t.amount IS NOT NULL AND t.amount <> 0)),
-                     -- PERSONS
-                     get_persons_xml(vch.id, v_report_date, 'persons'),
-                     -- ORGANIZATIONS
-                     get_organizations_xml(vch.id, v_report_date, 'organizations'),
-                     -- CREDITORS
-                     get_creditors_xml(vch.id, v_report_date, 'creditors'),
-
                      -- SUBJECTS_OLD
                      (SELECT xmlelement("subjects",
                                xmlagg(
@@ -2431,12 +2388,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                      )
                    )
                  ),
-                 get_subject(vch.id, v_report_date),
-                 /*
-                 get_persons(vch.id, v_report_date),
-                 get_organizations(vch.id, v_report_date),
-                 get_creditors(vch.id, v_report_date),
-                 */
+                 get_subject(vch.id, v_report_date, vch.creditor_id),
                  --PLEDGES
                  get_pledges_xml(vch.id, v_report_date),
                  -- CREDITOR
@@ -4084,6 +4036,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
   (
     p_organization_id IN NUMBER,
     p_report_date IN DATE,
+    p_creditor_id IN NUMBER,
     p_tag_name IN VARCHAR2 DEFAULT 'organization'
   ) RETURN XMLTYPE
   IS
@@ -4095,7 +4048,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- ADDRESSES
                  get_addresses_xml(null, voh.id, p_report_date),
                  -- BANK_RELATIONS
-                 get_bank_relations_xml(null, voh.id, p_report_date),
+                 get_bank_relations_xml(null, voh.id, p_report_date, p_creditor_id),
                  -- CONTACTS
                  get_contacts_xml(null, voh.id, p_report_date),
                  -- COUNTRY
@@ -4107,7 +4060,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- ENTERPRISE_TYPE
                  get_ref_enterprise_type_xml(voh.enterprise_type_id, p_report_date),
                  -- HEAD
-                 get_person_xml(voh.head_id, p_report_date, 'head', 1),
+                 get_person_xml(voh.head_id, p_report_date, -1, 'head', 1),
                  -- IS_SE
                  nillable_xml('is_se', decode(voh.is_se, 1, 'true', 'false')),
                  -- LEGAL_FORM
@@ -4141,6 +4094,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
   (
     p_person_id IN NUMBER,
     p_report_date IN DATE,
+    p_creditor_id IN NUMBER,
     p_tag_name IN VARCHAR2 DEFAULT 'person',
     p_type IN NUMBER DEFAULT 0 -- 0 - PERSON, 1 - HEAD
   ) RETURN XMLTYPE
@@ -4154,7 +4108,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    -- ADDRESSES
                    get_addresses_xml(vph.id, null, p_report_date),
                    -- BANK_RELATIONS
-                   get_bank_relations_xml(vph.id, null, p_report_date),
+                   get_bank_relations_xml(vph.id, null, p_report_date, p_creditor_id),
                    -- CONTACTS
                    get_contacts_xml(vph.id, null, p_report_date),
                    -- COUNTRY
@@ -4437,6 +4391,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     p_person_id IN NUMBER,
     p_organization_id IN NUMBER,
     p_report_date IN DATE,
+    p_creditor_id IN NUMBER,
     p_tag_name IN VARCHAR2 DEFAULT 'bank_relations'
   ) RETURN XMLTYPE
   IS
@@ -4459,7 +4414,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        WHERE ((di.person_id = p_person_id AND di.org_id IS NULL)
           OR (di.org_id = p_organization_id AND di.person_id IS NULL))
          AND di.open_date <= p_report_date
-         AND (di.close_date > p_report_date OR di.close_date is null);
+         AND (di.close_date > p_report_date OR di.close_date is null)
+         AND di.creditor_id = p_creditor_id;
     EXCEPTION
       WHEN no_data_found THEN
         v_xml := null;
@@ -4520,7 +4476,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
   FUNCTION get_subject
   (
     p_credit_id NUMBER,
-    p_report_date DATE
+    p_report_date DATE,
+	p_creditor_id NUMBER
   ) RETURN XMLType
   IS
     v_xml XMLTYPE;
@@ -4529,6 +4486,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_creditor_id NUMBER;
     v_subject_cnt NUMBER;
     v_doc_xml XMLTYPE;
+    v_credit_type_id NUMBER;
   BEGIN
      BEGIN
       SELECT vdh.person_id
@@ -4591,6 +4549,17 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END IF;
 
     IF(v_subject_cnt = 0) THEN
+      --успешно в случае репо
+      SELECT type_id INTO v_credit_type_id
+       FROM v_credit_his vhs
+       WHERE vhs.open_date <= p_report_date
+         AND (vhs.close_date > p_report_date or vhs.close_date is null)
+         AND vhs.id = p_credit_id;
+
+      IF(v_credit_type_id in (17,1080)) THEN
+        RETURN NULL;
+      END IF;
+
       write_log(SYSDATE, 'Subject not found in credit: ' || p_credit_id, 'ERROR', '');
     END IF;
 
@@ -4611,8 +4580,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
     SELECT xmlelement("subject",
                   v_doc_xml,
-                  get_person_xml(v_person_id, p_report_date, 'person_info' ),
-                  get_organization_xml(v_org_id, p_report_date, 'organization_info'),
+                  get_person_xml(v_person_id, p_report_date, p_creditor_id, 'person_info' ),
+                  get_organization_xml(v_org_id, p_report_date, p_creditor_id, 'organization_info'),
                   get_ref_creditor_info(v_creditor_id, p_report_date),
                   nillable_xml('is_creditor', decode(v_creditor_id, NULL, 0, 1)),
                   nillable_xml('is_person', decode(v_person_id, NULL, 0, 1)),
@@ -4626,103 +4595,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
    EXCEPTION
      WHEN OTHERS THEN
         write_log(p_log_date => SYSDATE,p_log_text => SQLERRM,p_log_level => c_log_level_error,p_procedure_call => '');
-  END;
-
-  FUNCTION get_persons
-  (
-    p_credit_id NUMBER,
-    p_report_date DATE
-  ) RETURN XMLType
-  IS
-    v_xml XMLTYPE;
-    v_elem_cnt XMLTYPE;
-  BEGIN
-    SELECT xmlagg(get_person_xml(vdh.person_id, p_report_date, 'item'))
-      INTO v_elem_cnt
-      FROM v_debtor_his vdh
-     WHERE vdh.credit_id = p_credit_id
-       AND vdh.type_id in (1, 7)
-       AND vdh.person_id IS NOT NULL
-       AND vdh.open_date <= p_report_date
-       AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
-
-    if(v_elem_cnt is null) then
-      select xmlelement("persons", xmlattributes('true' as "xsi:nil"), NULL)
-        into v_xml
-        from dual;
-    else
-      select xmlelement("persons", v_elem_cnt)
-        into v_xml
-        from dual;
-    end if;
-
-    return v_xml;
-  END;
-
-  FUNCTION get_organizations
-  (
-    p_credit_id NUMBER,
-    p_report_date DATE
-  ) RETURN XMLType
-  IS
-    v_xml XMLTYPE;
-    v_elem_cnt XMLTYPE;
-    v_cnt number;
-  BEGIN
-
-    SELECT xmlagg(get_organization_xml(vdh.org_id, p_report_date, 'item'))
-      INTO v_elem_cnt
-      FROM v_debtor_his vdh
-     WHERE vdh.credit_id = p_credit_id
-       AND vdh.type_id in (1, 7)
-       AND vdh.org_id IS NOT NULL
-       AND vdh.open_date <= p_report_date
-       AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
-
-    if(v_elem_cnt is null) then
-      select xmlelement("organizations", xmlattributes('true' as "xsi:nil"), NULL)
-        into v_xml
-        from dual;
-    else
-      select xmlelement("organizations", v_elem_cnt)
-        into v_xml
-        from dual;
-    end if;
-
-    return v_xml;
-  END;
-
-  FUNCTION get_creditors
-  (
-    p_credit_id NUMBER,
-    p_report_date DATE
-  ) RETURN XMLType
-  IS
-    v_xml XMLTYPE;
-    v_elem_cnt XMLTYPE;
-    v_cnt number;
-  BEGIN
-
-    SELECT xmlagg(get_ref_creditor_xml(vdh.creditor_id, p_report_date, 'item'))
-      INTO v_elem_cnt
-      FROM v_debtor_his vdh
-     WHERE vdh.credit_id = p_credit_id
-       AND vdh.type_id in (1, 7)
-       AND vdh.creditor_id IS NOT NULL
-       AND vdh.open_date <= p_report_date
-       AND (vdh.close_date > p_report_date OR vdh.close_date IS NULL);
-
-    if(v_elem_cnt is null) then
-      select xmlelement("creditors", xmlattributes('true' as "xsi:nil"), NULL)
-        into v_xml
-        from dual;
-    else
-      select xmlelement("creditors", v_elem_cnt)
-        into v_xml
-        from dual;
-    end if;
-
-    return v_xml;
   END;
 
   FUNCTION get_portfolio_flows_kfn
