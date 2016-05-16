@@ -23,5 +23,7 @@ begin
   delete from eav_be_entity_simple_sets where entity_id >= maxId;
 
   delete from eav_optimizer where entity_id >= maxId;
+
+  delete from eav_entity_statuses where entity_id >= maxId or entity_id <= 0;
   commit;
 end;
