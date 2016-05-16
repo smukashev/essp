@@ -4486,6 +4486,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_creditor_id NUMBER;
     v_subject_cnt NUMBER;
     v_doc_xml XMLTYPE;
+    v_credit_type_id NUMBER;
   BEGIN
      BEGIN
       SELECT vdh.person_id
@@ -4548,6 +4549,17 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END IF;
 
     IF(v_subject_cnt = 0) THEN
+      --успешно в случае репо
+      SELECT type_id INTO v_credit_type_id
+       FROM v_credit_his vhs
+       WHERE vhs.open_date <= p_report_date
+         AND (vhs.close_date > p_report_date or vhs.close_date is null)
+         AND vhs.id = p_credit_id;
+
+      IF(v_credit_type_id in (17,1080)) THEN
+        RETURN NULL;
+      END IF;
+
       write_log(SYSDATE, 'Subject not found in credit: ' || p_credit_id, 'ERROR', '');
     END IF;
 
