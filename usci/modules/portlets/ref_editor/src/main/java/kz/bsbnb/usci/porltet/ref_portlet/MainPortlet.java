@@ -587,7 +587,7 @@ public class MainPortlet extends MVCPortlet {
         headers.add("Дата начала");
         headers.add("Дата окончания");
 
-        int initialColIndex = 1;
+        int initialColIndex = 0;
 
         int rowCounter = 1;
 
