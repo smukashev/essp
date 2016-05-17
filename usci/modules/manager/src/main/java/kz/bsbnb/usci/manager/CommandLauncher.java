@@ -28,11 +28,6 @@ public class CommandLauncher {
 		// TODO: If core, sync, receiver to run then launch in this order...
 		// TODO: glassfish Task
 		mainProperties = Utils.readProperties("main.properties");
-/*
-		taskMap = new HashMap<String, TaskEntity>();
-		taskMap.put("RUN_CORE", new TaskEntity("run", "core.classpath", "core.main", "RUN_CORE", coreProcess));
-		taskMap.put("STOP_CORE", new TaskEntity("stop", "core.classpath", "core.main", "STOP_CORE", coreProcess));
-*/
 		taskMap = new HashMap<String, Task>();
 
 		WrapProcess coreWrapProcess = new WrapProcess();
@@ -114,12 +109,12 @@ public class CommandLauncher {
 
 		try {
 			Process process = Runtime.getRuntime().exec(task.getCommand(), null, new File(task.getDirectory()));
-			WrapProcess wrapWrapProcess = new WrapProcess();
-			wrapWrapProcess.setProcess(process);
+			WrapProcess wrapProcess = new WrapProcess();
+			wrapProcess.setProcess(process);
 
 //			printStdoutStderr(process);
 
-			task.setWrapProcess(wrapWrapProcess);
+			task.setWrapProcess(wrapProcess);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
