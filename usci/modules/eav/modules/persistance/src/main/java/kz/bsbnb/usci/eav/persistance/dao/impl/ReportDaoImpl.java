@@ -364,7 +364,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
 
     @Override
     public Report getFirstReport(long creditorId) {
-        Select select = context.select(DSL.min(EAV_REPORT.REPORT_DATE))
+        Select select = context.select(DSL.min(EAV_REPORT.REPORT_DATE).as(EAV_REPORT.REPORT_DATE.getName()))
                 .from(EAV_REPORT)
                 .where(EAV_REPORT.CREDITOR_ID.eq(creditorId));
 
