@@ -105,7 +105,7 @@ public class CommandLauncher {
 	}
 
 	private static void runCommand(Task task) {
-		logger.info("runCommand: " + task.getCommand());
+		logger.info("run command: " + task.getCommand());
 
 		try {
 			Process process = Runtime.getRuntime().exec(task.getCommand(), null, new File(task.getDirectory()));
@@ -118,6 +118,8 @@ public class CommandLauncher {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		logger.info("end command: " + task.getCommand());
 	}
 
 	private static void printStdoutStderr(Process process) throws IOException {
