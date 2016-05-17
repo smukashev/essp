@@ -112,7 +112,7 @@ public class CommandLauncher {
 			WrapProcess wrapProcess = new WrapProcess();
 			wrapProcess.setProcess(process);
 
-//			printStdoutStderr(process);
+			printStdoutStderr(process);
 
 			task.setWrapProcess(wrapProcess);
 		} catch (IOException e) {
