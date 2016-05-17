@@ -28,6 +28,7 @@
         <module>modules/cr</module>
         <module>modules/parent</module>
         <module>modules/showcase</module>
+        <module>modules/manager</module>
     </modules>
 
     <build>

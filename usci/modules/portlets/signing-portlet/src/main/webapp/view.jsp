@@ -158,7 +158,7 @@
     <c:choose>
         <c:when test="${noCertificate}">
             <div class="portlet-msg-error">
-                Отсутвтует сертификат
+                Отсутствует сертификат
                 <%--<liferay-ui:message key="message-files-no-certificate"/>--%>
             </div>
         </c:when>
@@ -168,7 +168,7 @@
                     <c:choose>
                         <c:when test="${hasSuccessfullySignedFiles}">
                             <div class="portlet-msg-info">
-                                Подписано добавелно в очередь: ${signedFilenames}
+                                Подписано добавлено в очередь: ${signedFilenames}
                                 <%-- <liferay-ui:message key="message-files-signed-and-queued" arguments="${signedFilenames}"/> --%>
                             </div>
                         </c:when>
@@ -236,7 +236,7 @@
                             </tr>
                             <c:forEach var="fileSignatureRecord" items="${inputFiles}">
                                 <tr>
-                                    <td align='center'><input id="check${fileSignatureRecord.id}" name="check${fileSignatureRecord.id}" type="checkbox"/></td>
+                                    <td align='center'><input id="check${fileSignatureRecord.id}" name="check${fileSignatureRecord.id}" type="checkbox" checked/></td>
                                     <td>${fileSignatureRecord.filename}</td>
                                     <td align='center'>
                                             ${fileSignatureRecord.sentDate}
