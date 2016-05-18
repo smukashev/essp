@@ -34,11 +34,11 @@ public class PrimaryContractParser extends BatchParser {
             case "no":
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("no", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                        event.asCharacters().getData(), false, true));
+                        trim(event.asCharacters().getData()), false, true));
                 break;
             case "date":
                 event = (XMLEvent) xmlReader.next();
-                String dateRaw = event.asCharacters().getData();
+                String dateRaw = trim(event.asCharacters().getData());
                 try {
                     currentBaseEntity.put("date", new BaseEntityDateValue(0, creditorId, batch.getRepDate(),
                             dateFormat.parse(dateRaw), false, true));

@@ -60,7 +60,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
             case "value": {
                 event = (XMLEvent) xmlReader.next();
                 BaseValue baseValue = new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                        new Double(event.asCharacters().getData()), false, true);
+                        new Double(trim(event.asCharacters().getData())), false, true);
                 switch (debtWay) {
                     case "current":
                         fieldCurrent.put("value", baseValue);
@@ -77,7 +77,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
             case "value_currency": {
                 event = (XMLEvent) xmlReader.next();
                 BaseValue baseValue = new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                        new Double(event.asCharacters().getData()), false, true);
+                        new Double(trim(event.asCharacters().getData())), false, true);
                 switch (debtWay) {
                     case "current":
                         fieldCurrent.put("value_currency", baseValue);
@@ -96,7 +96,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
                 BaseEntity baseEntity = new BaseEntity(metaClassRepository.getMetaClass("ref_balance_account"),
                         batch.getRepDate(), creditorId);
                 baseEntity.put("no_",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 BaseValue baseValue = new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), baseEntity, false, true);
                 switch (debtWay) {
                     case "current":
@@ -114,7 +114,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
             }
             case "open_date": {
                 event = (XMLEvent) xmlReader.next();
-                String dateRaw = event.asCharacters().getData();
+                String dateRaw = trim(event.asCharacters().getData());
                 try {
                     fieldPastDue.put("open_date",
                             new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw), false, true));
@@ -125,7 +125,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
             }
             case "close_date": {
                 event = (XMLEvent) xmlReader.next();
-                String dateRaw = event.asCharacters().getData();
+                String dateRaw = trim(event.asCharacters().getData());
                 try {
                     fieldPastDue.put("close_date",
                             new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw), false, true));
@@ -136,7 +136,7 @@ public class ChangeRemainsDebtParser extends BatchParser {
             }
             case "date": {
                 event = (XMLEvent) xmlReader.next();
-                String dateRaw = event.asCharacters().getData();
+                String dateRaw = trim(event.asCharacters().getData());
                 try {
                     fieldWriteOf.put("date",
                             new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw), false, true));

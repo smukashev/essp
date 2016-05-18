@@ -48,7 +48,7 @@ public class PortfolioFlowParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
 
                 portfolio.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentBaseEntity.put("portfolio",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), portfolio, false, true));
@@ -65,7 +65,7 @@ public class PortfolioFlowParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
 
                 ba.put("no_",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentDetail.put(localName, new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), ba, false, true));
                 break;
@@ -73,7 +73,7 @@ public class PortfolioFlowParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
 
                 currentDetail.put(localName,
-                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(trim(event.asCharacters().getData())), false, true));
                 break;
             default:
                 throw new UnknownTagException(localName);

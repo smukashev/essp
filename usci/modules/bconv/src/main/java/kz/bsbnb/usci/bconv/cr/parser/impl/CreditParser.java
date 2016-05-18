@@ -74,7 +74,7 @@ public class CreditParser extends BatchParser {
                 BaseEntity currency = new BaseEntity(refCurrencyMeta, batch.getRepDate(), creditorId);
 
                 currency.put("short_name",
-                        new BaseValue<>(0, creditorId, batch.getRepDate(), event.asCharacters().getData()));
+                        new BaseValue<>(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData())));
 
                 currentBaseEntity.put("currency",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), currency, false, true));
@@ -84,12 +84,12 @@ public class CreditParser extends BatchParser {
 
                 currentBaseEntity.put("interest_rate_yearly",
                         new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                                new Double(event.asCharacters().getData()), false, true));
+                                new Double(trim(event.asCharacters().getData())), false, true));
                 break;
             case "contract_maturity_date": {
                 event = (XMLEvent) xmlReader.next();
 
-                String dateRaw = event.asCharacters().getData();
+                String dateRaw = trim(event.asCharacters().getData());
 
                 try {
                     currentBaseEntity.put("contract_maturity_date",
@@ -101,11 +101,11 @@ public class CreditParser extends BatchParser {
             }
             case "actual_issue_date": {
                 event = (XMLEvent) xmlReader.next();
-                String dateRaw = event.asCharacters().getData();
+                String dateRaw = trim(event.asCharacters().getData());
                 try {
                     currentBaseEntity.put("actual_issue_date",
                             new BaseEntityDateValue(0, creditorId, batch.getRepDate(),
-                                    dateFormat.parse(event.asCharacters().getData()), false, true));
+                                    dateFormat.parse(trim(event.asCharacters().getData())), false, true));
                 } catch (ParseException e) {
                     getCurrentBaseEntity().addValidationError("Неправильная дата: " + dateRaw);
                 }
@@ -116,7 +116,7 @@ public class CreditParser extends BatchParser {
                 BaseEntity creditPurpose = new BaseEntity(refCreditPurposeMeta, batch.getRepDate(), creditorId);
 
                 creditPurpose.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentBaseEntity.put("credit_purpose",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditPurpose, false, true));
@@ -126,7 +126,7 @@ public class CreditParser extends BatchParser {
                 BaseEntity creditObject = new BaseEntity(refCreditObjectMeta, batch.getRepDate(), creditorId);
 
                 creditObject.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentBaseEntity.put("credit_object",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditObject, false, true));
@@ -134,14 +134,14 @@ public class CreditParser extends BatchParser {
             case "amount":
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("amount",
-                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(trim(event.asCharacters().getData())), false, true));
                 break;
             case "finance_source":
                 event = (XMLEvent) xmlReader.next();
                 BaseEntity financeSource = new BaseEntity(refFinanceSourceMeta, batch.getRepDate(), creditorId);
 
                 financeSource.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentBaseEntity.put("finance_source",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), financeSource, false, true));
@@ -150,7 +150,7 @@ public class CreditParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("has_currency_earn",
                         new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(),
-                                (boolean)DataTypes.getCastObject(DataTypes.BOOLEAN, event.asCharacters().getData()), false, true));
+                                (boolean)DataTypes.getCastObject(DataTypes.BOOLEAN, trim(event.asCharacters().getData())), false, true));
                 break;
             case "creditor_branch":
                 creditorBranchParser.parse(xmlReader, batch, index, creditorId);
@@ -209,7 +209,7 @@ public class CreditParser extends BatchParser {
 
         if (attrNullify == null || !"true".equals(attrNullify.getValue())) {
             event = (XMLEvent) xmlReader.next();
-            return event.asCharacters().getData();
+            return trim(event.asCharacters().getData());
         }
 
         return null;

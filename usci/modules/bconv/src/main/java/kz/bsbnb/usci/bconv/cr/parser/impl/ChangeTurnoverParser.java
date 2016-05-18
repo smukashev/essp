@@ -65,11 +65,11 @@ public class ChangeTurnoverParser extends BatchParser {
                 if (interestFlag) {
                     event = (XMLEvent) xmlReader.next();
                     currentInterest.put("amount",
-                            new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                            new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(trim(event.asCharacters().getData())), false, true));
                 } else if (debtFlag) {
                     event = (XMLEvent) xmlReader.next();
                     currentDebt.put("amount",
-                            new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                            new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(trim(event.asCharacters().getData())), false, true));
                 }
 
                 break;
@@ -78,12 +78,12 @@ public class ChangeTurnoverParser extends BatchParser {
                     event = (XMLEvent) xmlReader.next();
 
                     currentInterest.put("amount_currency",
-                            new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                            new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(trim(event.asCharacters().getData())), false, true));
                 } else if (debtFlag) {
                     event = (XMLEvent) xmlReader.next();
 
                     currentDebt.put("amount_currency",
-                            new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                            new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(trim(event.asCharacters().getData())), false, true));
                 }
                 break;
             default:

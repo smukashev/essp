@@ -62,7 +62,7 @@ public class ChangeParser extends BatchParser {
                 break;
             case "maturity_date": {
                 event = (XMLEvent) xmlReader.next();
-                String dateRaw = event.asCharacters().getData();
+                String dateRaw = trim(event.asCharacters().getData());
                 try {
                     maturityDate = new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw),
                             false, true);
@@ -73,7 +73,7 @@ public class ChangeParser extends BatchParser {
             }
             case "prolongation_date": {
                 event = (XMLEvent) xmlReader.next();
-                String dateRaw = event.asCharacters().getData();
+                String dateRaw = trim(event.asCharacters().getData());
                 try {
                     prolongationDate = new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw), false, true);
                 } catch (ParseException e) {

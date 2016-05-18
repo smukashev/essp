@@ -47,7 +47,7 @@ public class SubjectCreditorParser extends BatchParser {
             case "code":
                 event = (XMLEvent) xmlReader.next();
                 creditorInfo.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                        event.asCharacters().getData(), false, true));
+                        trim(event.asCharacters().getData()), false, true));
                 break;
             case "docs":
                 docs = new BaseSet(documentMeta, creditorId);
@@ -68,13 +68,13 @@ public class SubjectCreditorParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
 
                 currentDoc.put("name",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "no":
                 event = (XMLEvent) xmlReader.next();
 
                 currentDoc.put("no",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             default:
                 throw new UnknownTagException(localName);
