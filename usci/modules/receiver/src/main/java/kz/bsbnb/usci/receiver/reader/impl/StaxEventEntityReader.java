@@ -179,7 +179,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 try {
                     XMLEvent event = (XMLEvent) xmlEventReader.next();
-                    obj = DataTypes.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData().replaceAll("\\s+", ""));
+                    obj = DataTypes.getCastObject(metaValue.getTypeCode(), event.asCharacters().getData().trim());
                 } catch (NumberFormatException n) {
                     n.printStackTrace();
                     throw new RuntimeException(Errors.compose(Errors.E194, localName, n));

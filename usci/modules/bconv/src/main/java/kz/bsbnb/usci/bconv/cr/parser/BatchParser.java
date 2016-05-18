@@ -97,7 +97,7 @@ public abstract class BatchParser {
     }
 
     public String trim(String data) {
-        return data.replaceAll("\\s+", "");
+        return data.trim();
     }
 
 }
