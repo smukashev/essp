@@ -207,6 +207,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 .set(EAV_BATCHES.TOTAL_COUNT, batch.getTotalCount())
                 .set(EAV_BATCHES.ACTUAL_COUNT, batch.getActualCount())
                 .set(EAV_BATCHES.REPORT_ID, batch.getReportId())
+                .set(EAV_BATCHES.IS_MAINTENANCE, DataUtils.convert(batch.isMaintenance()))
                 .where(EAV_BATCHES.ID.eq(batch.getId()));
 
         int updatedCount = updateWithStats(update.getSQL(), update.getBindValues().toArray());
@@ -253,6 +254,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         batch.setTotalCount(getNullSafeLong(row, EAV_BATCHES.ACTUAL_COUNT));
         batch.setActualCount(getNullSafeLong(row, EAV_BATCHES.TOTAL_COUNT));
         batch.setReportId(getNullSafeLong(row, EAV_BATCHES.REPORT_ID));
+        batch.setMaintenance(getNullSafeLong(row, EAV_BATCHES.IS_MAINTENANCE) == 1);
+        batch.setMaintenanceApproved(getNullSafeLong(row, EAV_BATCHES.IS_MAINTENANCE_APPROVED) == 1);
         return batch;
     }
 

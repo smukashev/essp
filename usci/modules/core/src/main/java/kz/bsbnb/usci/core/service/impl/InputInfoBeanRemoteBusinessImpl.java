@@ -27,7 +27,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     @Autowired
     private IGlobalService globalService;
 
-    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING, CANCELLED);
+    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING, CANCELLED, MAINTENANCE_REQUEST);
 
     private Map<Long, EavGlobal> globalMap = new HashMap<>();
 
@@ -108,6 +108,9 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 case "CANCELLED":
                     lastStatus = "Отмена загрузки";
                     break;
+                case "MAINTENANCE_REQUEST":
+                    lastStatus = "Запрос на изменение за утрвежденный период";
+                    break;
             }
 
             Shared s = new Shared();
@@ -133,7 +136,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             inputInfo.setStartedDate(batchStatus.getReceiptDate());
         } else if (lastStatus == COMPLETED) {
             inputInfo.setCompletionDate(batchStatus.getReceiptDate());
-        } else if (lastStatus == WAITING || lastStatus == WAITING_FOR_SIGNATURE) {
+        } else if (lastStatus == WAITING || lastStatus == WAITING_FOR_SIGNATURE || lastStatus == MAINTENANCE_REQUEST) {
             inputInfo.setReceiverDate(batchStatus.getReceiptDate());
         } else if (lastStatus == ERROR) {
             inputInfo.setReceiverDate(batchStatus.getReceiptDate());
@@ -169,6 +172,10 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 case "WAITING_FOR_SIGNATURE":
                     s.setNameRu("Ожидает подписи");
                     s.setNameKz("Ожидает подписи");
+                    break;
+                case  "MAINTENANCE_REQUEST":
+                    s.setNameRu("Запрос на изменение за утвержденный период");
+                    s.setNameKz("Запрос на изменение за утвержденный период");
                     break;
                 default:
                     s.setNameRu(batchStatus.getStatus().code());

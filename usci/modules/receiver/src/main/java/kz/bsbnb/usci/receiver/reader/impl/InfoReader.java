@@ -28,6 +28,10 @@ public class InfoReader extends MainReader {
                 break;
             case "actual_credit_count":
                 break;
+            case "maintenance":
+                String val = ((XMLEvent) this.xmlReader.next()).asCharacters().getData();
+                infoData.setMaintenance("1".equals(val) || "true".equals(val));
+                break;
         }
 
         return false;

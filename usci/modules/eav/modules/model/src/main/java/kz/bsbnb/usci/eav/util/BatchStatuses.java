@@ -6,7 +6,8 @@ public enum BatchStatuses implements IGlobal {
     ERROR,
     WAITING_FOR_SIGNATURE,
     COMPLETED,
-    CANCELLED;
+    CANCELLED,
+    MAINTENANCE_REQUEST;
 
     @Override
     public String type() {

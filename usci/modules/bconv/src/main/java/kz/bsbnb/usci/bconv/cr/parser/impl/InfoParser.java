@@ -100,6 +100,8 @@ public class InfoParser extends BatchParser {
                 break;
             case "actual_credit_count":
                 break;
+            case  "maintenance":
+                break;
             default:
                 throw new UnknownTagException(localName);
         }
@@ -131,6 +133,8 @@ public class InfoParser extends BatchParser {
             case "report_date":
                 break;
             case "actual_credit_count":
+                break;
+            case "maintenance":
                 break;
             default:
                 throw new UnknownTagException(localName);
