@@ -762,6 +762,7 @@ showcase set meta credit
 showcase set name CORE_PLEDGE
 showcase set tableName CORE_PLEDGE
 showcase set downPath pledges
+showcase set final true
 
 showcase list add pledge_type pledge_type
 showcase list add contract contract
