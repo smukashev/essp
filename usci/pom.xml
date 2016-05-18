@@ -19,15 +19,15 @@
 
     <modules>
         <module>modules/eav</module>
-        <module>modules/core</module>
-        <module>modules/receiver</module>
-        <module>modules/sync</module>
-        <module>modules/portlets</module>
-        <module>modules/bconv</module>
-        <module>modules/cli</module>
-        <module>modules/cr</module>
         <module>modules/parent</module>
+        <module>modules/core</module>
+        <module>modules/sync</module>
+        <module>modules/bconv</module>
+        <module>modules/cr</module>
+        <module>modules/receiver</module>
         <module>modules/showcase</module>
+        <module>modules/cli</module>
+        <module>modules/portlets</module>
         <module>modules/manager</module>
     </modules>
 
