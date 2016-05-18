@@ -43,7 +43,7 @@ public class PledgesParser extends BatchParser {
                 BaseEntity pledgeType = new BaseEntity(refPledgeTypeMeta, batch.getRepDate(), creditorId);
 
                 pledgeType.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentBaseEntity.put("pledge_type",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), pledgeType, false, true));
@@ -53,13 +53,13 @@ public class PledgesParser extends BatchParser {
             case "no":
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("contract",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "value":
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("value",
                         new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                                new Double(event.asCharacters().getData()), false, true));
+                                new Double(trim(event.asCharacters().getData())), false, true));
                 break;
             default:
                 throw new UnknownTagException(localName);

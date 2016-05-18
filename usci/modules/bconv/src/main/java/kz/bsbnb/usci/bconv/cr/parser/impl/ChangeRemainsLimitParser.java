@@ -38,13 +38,13 @@ public class ChangeRemainsLimitParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("value",
                         new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                                new Double(event.asCharacters().getData()), false, true));
+                                new Double(trim(event.asCharacters().getData())), false, true));
                 break;
             case "value_currency":
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("value_currency",
                         new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(),
-                                new Double(event.asCharacters().getData()), false, true));
+                                new Double(trim(event.asCharacters().getData())), false, true));
                 break;
             case "balance_account":
                 event = (XMLEvent) xmlReader.next();
@@ -52,7 +52,7 @@ public class ChangeRemainsLimitParser extends BatchParser {
                 BaseEntity baseEntity = new BaseEntity(refBalanceAccountMeta, batch.getRepDate(), creditorId);
 
                 baseEntity.put("no_",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentBaseEntity.put("balance_account",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), baseEntity, false, true));

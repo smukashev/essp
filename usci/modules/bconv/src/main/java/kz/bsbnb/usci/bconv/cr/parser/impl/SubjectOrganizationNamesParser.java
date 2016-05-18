@@ -43,7 +43,7 @@ public class SubjectOrganizationNamesParser extends BatchParser {
 
                 currentBaseEntity.put("name",
                         new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                                event.asCharacters().getData(), false, true));
+                                trim(event.asCharacters().getData()), false, true));
                 break;
             default:
                 throw new UnknownTagException(localName);
