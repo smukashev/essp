@@ -50,6 +50,8 @@ public class CommandLauncher {
 		taskMap.put("STOP_SHOWCASE", new StopTask("STOP_SHOWCASE", showcaseTask.getWrapProcess()));
 		taskMap.put("RUN_MAVEN", new MavenTask(mainProperties));
 		taskMap.put("RUN_GIT", new GitTask(mainProperties));
+		taskMap.put("RUN_ACTIVEMQ", new ActiveMQStartTask(mainProperties));
+		taskMap.put("STOP_ACTIVEMQ", new ActiveMQStopTask(mainProperties));
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -83,7 +85,7 @@ public class CommandLauncher {
 		final String classPath = mainProperties.getProperty(runTask.getClasspath());
 		final String securityPolicy = mainProperties.getProperty("java.security.policy");
 		final String fileEncoding = mainProperties.getProperty("file.encoding");
-		final String coreMain = mainProperties.getProperty(runTask.getMain());
+		final String taskMain = mainProperties.getProperty(runTask.getMain());
 		final ArrayList<String> argumentList = new ArrayList<String>() {
 			{
 				add(javaLauncher);
@@ -91,13 +93,26 @@ public class CommandLauncher {
 				add(classPath);
 				add(securityPolicy);
 				add(fileEncoding);
-				add(coreMain);
+				add(taskMain);
 			}
 		};
 
 		try {
-			Process process = new ProcessBuilder(argumentList).start();
-//			printStdoutStderr(process);
+			final Process process = new ProcessBuilder(argumentList).start();
+
+			// TODO: Memory leaks?
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						printStdoutStderr(process);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
+			logger.info("process launched: " + process);
+
 			runTask.getWrapProcess().setProcess(process);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -151,7 +166,7 @@ public class CommandLauncher {
 			runService((RunTask) task);
 		if (task instanceof StopTask)
 			stopService((StopTask) task);
-		if (task instanceof MavenTask || task instanceof GitTask)
+		if (task instanceof CommandTask)
 			runCommand(task);
 	}
 }

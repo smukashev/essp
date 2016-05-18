@@ -89,6 +89,8 @@ global add --type=MANAGER_TASKS --code=RUN_SHOWCASE --value=0 --desc=Запус�
 global add --type=MANAGER_TASKS --code=STOP_SHOWCASE --value=0 --desc=Остановка_сервиса_SHOWCASE
 global add --type=MANAGER_TASKS --code=RUN_MAVEN --value=0 --desc=Запуск_компиляции_mvn_clean_install
 global add --type=MANAGER_TASKS --code=RUN_GIT --value=0 --desc=Получение_исхдников_из_репозитория_git_pull
+global add --type=MANAGER_TASKS --code=RUN_ACTIVEMQ --value=0 --desc=Запуск ActiveMQ
+global add --type=MANAGER_TASKS --code=STOP_ACTIVEMQ --value=0 --desc=Остановка ActiveMQ
 
 quit
 
