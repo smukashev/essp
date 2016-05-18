@@ -20,15 +20,15 @@ public class TaskDAO extends TimerTask {
 	PreparedStatement selectStatement = null;
 	PreparedStatement updateStatement = null;
 	ResultSet rs = null;
-	String selectSQL = "SELECT ID, NAME, STATUS FROM CORE.MANAGER_TASKS WHERE STATUS > ?";
-	String updateSQL = "UPDATE CORE.MANAGER_TASKS SET STATUS=0, MODIFY_DATE=SYSDATE WHERE ID = ?";
+	String selectSQL = "SELECT ID, CODE, VALUE FROM EAV_GLOBAL WHERE TYPE = 'MANAGER_TASKS' AND VALUE != ?";
+	String updateSQL = "UPDATE EAV_GLOBAL SET VALUE='0' WHERE ID = ?";
 
 	@Override
 	public void run() {
 		try {
 			dbConnection = DBConnectionClass.getCurrentConnection();
 			selectStatement = dbConnection.prepareStatement(selectSQL);
-			selectStatement.setInt(1, 0);
+			selectStatement.setString(1, "0");
 
 			// execute select SQL stetement
 			rs = selectStatement.executeQuery();
@@ -36,11 +36,11 @@ public class TaskDAO extends TimerTask {
 			while (rs.next()) {
 
 				Integer id = rs.getInt("ID");
-				String taskName = rs.getString("NAME");
-				Integer taskStatus = rs.getInt("STATUS");
+				String taskName = rs.getString("CODE");
+				String taskStatus = rs.getString("VALUE");
 				logger.info("Reading " + taskName + " status: " + taskStatus + "...");
 
-				if (taskStatus > 0) {
+				if (!"0".equals(taskStatus)) {
 					updateTask(dbConnection, id);
 					CommandLauncher.run(taskName);
 				}

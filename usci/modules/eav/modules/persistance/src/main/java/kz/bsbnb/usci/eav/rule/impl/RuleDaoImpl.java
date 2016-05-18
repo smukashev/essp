@@ -282,7 +282,7 @@ public class RuleDaoImpl extends JDBCSupport implements IRuleDao {
         Update update = context.update(table).
                 set(DSL.field("RULE"), rule.getRule())
                 .where(field.eq(rule.getId()))
-                .and(DSL.field("OPEN_DATE").eq(rule.getOpenDate()));
+                .and(DSL.field("OPEN_DATE").eq(DataUtils.convert(rule.getOpenDate())));
 
         updateWithStats(update.getSQL(), update.getBindValues().toArray());
 
