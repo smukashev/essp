@@ -83,7 +83,7 @@ public class CommandLauncher {
 		final String classPath = mainProperties.getProperty(runTask.getClasspath());
 		final String securityPolicy = mainProperties.getProperty("java.security.policy");
 		final String fileEncoding = mainProperties.getProperty("file.encoding");
-		final String coreMain = mainProperties.getProperty(runTask.getMain());
+		final String taskMain = mainProperties.getProperty(runTask.getMain());
 		final ArrayList<String> argumentList = new ArrayList<String>() {
 			{
 				add(javaLauncher);
@@ -91,13 +91,24 @@ public class CommandLauncher {
 				add(classPath);
 				add(securityPolicy);
 				add(fileEncoding);
-				add(coreMain);
+				add(taskMain);
 			}
 		};
 
 		try {
-			Process process = new ProcessBuilder(argumentList).start();
-//			printStdoutStderr(process);
+			final Process process = new ProcessBuilder(argumentList).start();
+			// TODO: Memory leaks?
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						printStdoutStderr(process);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
+			logger.info("process launched: " + process);
 			runTask.getWrapProcess().setProcess(process);
 		} catch (IOException e) {
 			e.printStackTrace();
