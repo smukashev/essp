@@ -42,7 +42,7 @@ public class ModelHelper {
         cm.setDiff(rs.getString("DIFF"));
         cm.setId(rs.getBigDecimal("ID").toBigInteger());
         cm.setInnerValue(rs.getString("INNER_VALUE"));
-        cm.setIsError(rs.getBoolean("IS_ERROR"));
+        cm.setIsError(rs.getBigDecimal("IS_ERROR").toBigInteger());
         cm.setMessage(m);
         cm.setOuterValue(rs.getString("OUTER_VALUE"));
 

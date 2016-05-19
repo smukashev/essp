@@ -56,4 +56,7 @@ public class CrossCheckMessageDisplayWrapper {
     public int getIsError() {
         return crossCheckMessage.getIsError() ? 1 : 0;
     }
+    public int getNonCritical() {
+        return crossCheckMessage.getIsNonCriticalError()?1:0;
+    }
 }

@@ -21,6 +21,11 @@
     color:      black;
     border-bottom: 1px solid #AAAAAA;
 }
+.colored-table .v-table-cell-content-yellow{
+    background: #FFDEAD;
+    color:      black;
+    border-bottom: 1px solid #AAAAAA;
+}
 
 /* Basic style for all selected cells . */
 .colored-table .v-selected .v-table-cell-content {
