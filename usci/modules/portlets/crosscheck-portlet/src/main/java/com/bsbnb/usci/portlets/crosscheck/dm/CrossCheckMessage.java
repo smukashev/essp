@@ -93,9 +93,12 @@ public class CrossCheckMessage implements Serializable {
     public boolean getIsError() {
         return BigInteger.ONE.equals(isError);
     }
+    public boolean getIsNonCriticalError() {
+        return isError.equals(new BigInteger("2"));
+    }
 
-    public void setIsError(boolean isError) {
-        this.isError = isError ? BigInteger.ONE : BigInteger.ZERO;
+    public void setIsError(BigInteger isError) {
+        this.isError = isError;
     }
 
     public Message getMessage() {

@@ -274,7 +274,10 @@ public class CrossCheckLayout extends VerticalLayout {
                     CrossCheckMessageDisplayWrapper ccm = (CrossCheckMessageDisplayWrapper) itemId;
                     if (ccm.getIsError() != 0) {
                         return "red";
-                    } else {
+                    } else if (ccm.getNonCritical()==1) {
+                        return "yellow";
+                    }
+                    else {
                         return "lightgreen";
                     }
                 } else {

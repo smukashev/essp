@@ -1,30 +1,26 @@
 package com.bsbnb.usci.portlets.protocol.ui;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.Number;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-
 import com.bsbnb.usci.portlets.protocol.ProtocolApplication;
-import jxl.CellView;
-import jxl.Workbook;
-import jxl.format.Border;
-import jxl.format.BorderLineStyle;
-import jxl.write.*;
-
 import com.vaadin.data.Property;
 import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Table;
+import jxl.CellView;
+import jxl.Workbook;
+import jxl.format.Border;
+import jxl.format.BorderLineStyle;
+import jxl.write.*;
 import org.apache.log4j.Logger;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-
-import java.util.logging.Level;
+import java.lang.Number;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  *
@@ -110,7 +106,8 @@ public class FormattedTable extends Table {
                         sheet.addCell(new jxl.write.Label(columnIndex, rowCounter, value.toString(), times12format));
 
                     } else if (value instanceof Number) {
-                        jxl.write.Number number = new jxl.write.Number(columnIndex, rowCounter, Integer.parseInt(value.toString()), times12format);
+                        String stringValue = value.toString();
+                        jxl.write.Number number = new jxl.write.Number(columnIndex, rowCounter, Integer.parseInt(stringValue.substring(0, stringValue.indexOf("."))), times12format);
                         sheet.addCell(number);
                     } else if (value instanceof Date) {
                         sheet.addCell(new jxl.write.DateTime(columnIndex, rowCounter, (Date) value, dateFormats[columnIndex]));
