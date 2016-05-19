@@ -871,8 +871,11 @@ showcase list addRootKey portfolio_flow_kfn_id portfolio_flow_kfn_id
 
 showcase list addHistoryKey portfolio_data_id portfolio_data_id
 showcase list addHistoryKey portfolio_flow_kfn_id portfolio_flow_kfn_id
+showcase list addHistoryKey details_id details_id
 
 showcase addIndex nonunique portfolio_data_id
+showcase addIndex nonunique portfolio_data_id portfolio_flow_kfn_id
+showcase addIndex nonunique portfolio_data_id portfolio_flow_kfn_id details_id
 
 showcase save
 
@@ -901,8 +904,11 @@ showcase list addRootKey portfolio_flow_msfo_id portfolio_flow_msfo_id
 
 showcase list addHistoryKey portfolio_data_id portfolio_data_id
 showcase list addHistoryKey portfolio_flow_msfo_id portfolio_flow_msfo_id
+showcase list addHistoryKey details_id details_id
 
 showcase addIndex nonunique portfolio_data_id
+showcase addIndex nonunique portfolio_data_id portfolio_flow_msfo_id
+showcase addIndex nonunique portfolio_data_id portfolio_flow_msfo_id details_id
 
 showcase save
 
