@@ -437,7 +437,7 @@ public class ZipFilesMonitor {
 
         Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
 
-        if (!StaticRouter.isDevMode() && false) {
+        if (!StaticRouter.isDevMode()) {
             String errMsg = null;
 
             if (existing != null) {
