@@ -108,6 +108,11 @@ function createItemsGrid(itemId) {
                         type: 'json',
                         root: 'data',
                         totalProperty: 'total'
+                    },
+                    listeners: {
+                        exception : function(proxy, response, operation) {
+                            handleError(operation);
+                        }
                     }
                 },
                 autoLoad: true
@@ -157,7 +162,7 @@ function loadEntity(entityId, date) {
         },
         callback: function(records, operation, success) {
             if (!success) {
-                Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
+                handleError(operation);
             }
         }
     });
@@ -201,7 +206,7 @@ function loadSubEntity(subNode, idSuffix) {
         },
         callback: function(records, operation, success) {
             if (!success) {
-                Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.error));
+                handleError(operation);
             } else {
                 subNode.data.value = records[0].data.value;
 
@@ -433,6 +438,12 @@ function loadAttributes(form, selectedNode, arrayElAddition) {
         },
         success: function (result) {
             var json = JSON.parse(result.responseText);
+
+            if(!json.success) {
+                handleErrorByMessage(json.errorMessage);
+                return;
+            }
+
             attrStore.removeAll();
             attrStore.add(json.data);
             var attributes = attrStore.getRange();
@@ -567,6 +578,39 @@ function hasEmptyKeySet(mainNode) {
     return false;
 }
 
+
+function handleError(operation) {
+    var error = '';
+    if(operation.error != undefined) {
+        error = operation.error.statusText;
+    } else {
+        error = operation.request.proxy.reader.rawData.errorMessage;
+    }
+
+    if(error) {
+        if(error.toLowerCase().indexOf('connect') > -1) {
+            error = 'Сбой при подключении к сервисам, возможно идут технические работы';
+        }
+    } else {
+        error = 'Неизвестная ошибка';
+    }
+
+    Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(error));
+}
+
+function handleErrorByMessage(errorMessage){
+    if(!errorMessage) {
+        errorMessage = 'Неизвестная ошибка';
+    } else {
+        if(errorMessage.toLowerCase().indexOf('connect') > -1) {
+            errorMessage = 'Сбой при подключении к сервисам, возможно идут технические работы';
+        }
+    }
+
+    Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(errorMessage));
+}
+
+
 Ext.onReady(function() {
     Ext.override(Ext.data.proxy.Ajax, {timeout: 120000});
 
@@ -607,6 +651,11 @@ Ext.onReady(function() {
                 type: 'json',
                 root: 'data',
                 totalProperty: 'total'
+            },
+            listeners: {
+                exception : function(proxy, response, operation) {
+                    handleError(operation);
+                }
             }
         },
         autoLoad: true,
@@ -670,9 +719,17 @@ Ext.onReady(function() {
         proxy: {
             type: 'ajax',
             url: dataUrl,
-            extraParams: {op : 'LIST_ENTITY', timeout: 120000}
+            extraParams: {op : 'LIST_ENTITY', timeout: 120000},
+            listeners: {
+                exception : function(proxy, response, operation) {
+                    handleError(operation);
+                }
+            }
         },
-        folderSort: true
+        folderSort: true,
+        root : {
+            loaded: true
+        }
     });
 
     subEntityStore = Ext.create('Ext.data.TreeStore', {
@@ -681,7 +738,12 @@ Ext.onReady(function() {
         proxy: {
             type: 'ajax',
             url: dataUrl,
-            extraParams: {op : 'LIST_ENTITY', timeout: 120000}
+            extraParams: {op : 'LIST_ENTITY', timeout: 120000},
+            listeners: {
+                exception : function(proxy, response, operation) {
+                    handleError(operation);
+                }
+            }
         },
         folderSort: true
     });
@@ -708,7 +770,13 @@ Ext.onReady(function() {
                     op: 'SAVE_XML'
                 },
                 success: function(response) {
-                    Ext.MessageBox.alert("", "Сохранено успешно");
+                    var json = JSON.parse(response.responseText);
+
+                    if(!json.success) {
+                        handleErrorByMessage(json.errorMessage);
+                    } else {
+                        Ext.MessageBox.alert("", "Сохранено успешно");
+                    }
                 }
             });
         },
@@ -790,7 +858,13 @@ Ext.onReady(function() {
                     op: 'SAVE_XML'
                 },
                 success: function(response) {
-                    Ext.MessageBox.alert("", "Операция выполнена успешно");
+                    var json = JSON.parse(response.responseText);
+
+                    if(!json.success) {
+                        handleErrorByMessage(json.errorMessage);
+                    } else {
+                        Ext.MessageBox.alert("", "Операция выполнена успешно");
+                    }
                 }
             });
         }
@@ -1000,13 +1074,14 @@ Ext.onReady(function() {
         }
     });
 
+    /*why extra query ???
     entityGrid.getStore().load({
         callback: function (records, operation, success) {
             if (!success) {
-                Ext.MessageBox.alert(label_ERROR, operation.request.proxy.reader.rawData.errorMessage);
+                handleError(operation);
             }
         }
-    });
+    });*/
 
     // --------------------------------------------
     var today = new Date();

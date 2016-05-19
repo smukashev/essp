@@ -541,7 +541,8 @@ public class MainPortlet extends MVCPortlet {
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             currentException = null;
-            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").replace("\n","") : e.getClass().getName();
+            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").
+                    replace("\n","").replaceAll("\t"," ") : e.getClass().getName();
             originalError = Errors.decompose(originalError);
             out.write(("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}").getBytes());
         }
@@ -697,7 +698,7 @@ public class MainPortlet extends MVCPortlet {
     private String getAttributesJson(IMetaClass meta, User currentUser) {
         StringBuilder result = new StringBuilder();
 
-        result.append("{\"total\":");
+        result.append("{\"success\" : true, \"total\":");
         result.append(meta.getAttributeNames().size());
         result.append(",\"data\":[");
 

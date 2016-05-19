@@ -86,7 +86,7 @@ public class SubjectOrganizationParser extends BatchParser {
 
                 country.put("code_numeric",
                         new BaseEntityIntegerValue(0, creditorId, batch.getRepDate(),
-                                new Integer(event.asCharacters().getData()), false, true));
+                                new Integer(trim(event.asCharacters().getData())), false, true));
 
                 organizationInfo.put("country",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), country, false, true));
@@ -96,7 +96,7 @@ public class SubjectOrganizationParser extends BatchParser {
                 BaseEntity offshore = new BaseEntity(refOffshoreMeta, batch.getRepDate(), creditorId);
 
                 offshore.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 organizationInfo.put("offshore",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), offshore, false, true));
@@ -113,7 +113,7 @@ public class SubjectOrganizationParser extends BatchParser {
                 BaseEntity refBankRelation = new BaseEntity(refBankRelationMeta, batch.getRepDate(), creditorId);
 
                 refBankRelation.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 bankRelation.put("bank_relation",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), refBankRelation, false, true));
@@ -137,14 +137,14 @@ public class SubjectOrganizationParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
 
                 region.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentAddress.put("region", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), region, false, true));
                 break;
             case "details":
                 event = (XMLEvent) xmlReader.next();
                 currentAddress.put("details",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "contacts":
                 contacts = new BaseSet(contactMeta, creditorId);
@@ -164,7 +164,7 @@ public class SubjectOrganizationParser extends BatchParser {
 
                 event = (XMLEvent) xmlReader.next();
 
-                contactDetails.put(new BaseSetStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                contactDetails.put(new BaseSetStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentContact.put("details",
                         new BaseEntitySimpleSet(0, creditorId, batch.getRepDate(), contactDetails, false, true));
@@ -196,7 +196,7 @@ public class SubjectOrganizationParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
 
                 legalForm.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 organizationInfo.put("legal_form",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), legalForm, false, true));
@@ -207,7 +207,7 @@ public class SubjectOrganizationParser extends BatchParser {
                 BaseEntity enterpriseType = new BaseEntity(refEnterpriseTypeMeta, batch.getRepDate(), creditorId);
 
                 enterpriseType.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 organizationInfo.put("enterprise_type",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), enterpriseType, false, true));
@@ -218,7 +218,7 @@ public class SubjectOrganizationParser extends BatchParser {
                 BaseEntity econTrade = new BaseEntity(refEconTradeMeta, batch.getRepDate(), creditorId);
 
                 econTrade.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 organizationInfo.put("econ_trade", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), econTrade, false, true));
                 break;
@@ -227,7 +227,7 @@ public class SubjectOrganizationParser extends BatchParser {
 
                 organizationInfo.put("is_se",
                         new BaseEntityBooleanValue(0, creditorId, batch.getRepDate(),
-                                (Boolean)DataTypes.getCastObject(DataTypes.BOOLEAN, event.asCharacters().getData()), false, true));
+                                (Boolean)DataTypes.getCastObject(DataTypes.BOOLEAN, trim(event.asCharacters().getData())), false, true));
                 break;
             case "docs":
                 BaseSet organizationDocs = new BaseSet(documentMeta, creditorId);

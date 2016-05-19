@@ -34,10 +34,10 @@ public abstract class MainReader {
 
                 if (endElement(localName)) break;
             } else if (event.isCharacters()) {
-                data.append(event.asCharacters().getData().replaceAll("\\s+", ""));
+                data.append(event.asCharacters().getData().trim());
             } else if (event.isEndDocument()) {
                 logger.debug("end document");
-                data.append(event.asCharacters().getData().replaceAll("\\s+", ""));
+                data.append(event.asCharacters().getData().trim());
             } else {
                 logger.debug(event.toString());
             }

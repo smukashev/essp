@@ -76,6 +76,22 @@ global add --type=LOGIC_RULE_SETTING --code=LOGIC_RULE_META --value=credit,ref_c
 global add --type=ORG_FIRST_DATE_SETTING --code=DEFAULT_DATE_VALUE --value=01.04.2013 --desc=Первая_отчетная_дата_по_умолчанию
 global add --type=ORG_FIRST_DATE_SETTING --code=CREDITOR_DATES --value=2288=01.05.2014,2290=01.01.2016 --desc=Даты_по_кредитору
 
+#
+# MANAGER_TASKS
+#
+global add --type=MANAGER_TASKS --code=RUN_CORE --value=0 --desc=Запуск_сервиса_CORE
+global add --type=MANAGER_TASKS --code=STOP_CORE --value=0 --desc=Остановка_сервиса_CORE
+global add --type=MANAGER_TASKS --code=RUN_SYNC --value=0 --desc=Запуск_сервиса_SYNC
+global add --type=MANAGER_TASKS --code=STOP_SYNC --value=0 --desc=Остановка_сервиса_SYNC
+global add --type=MANAGER_TASKS --code=RUN_RECEIVER --value=0 --desc=Запуск_сервиса_RECEIVER
+global add --type=MANAGER_TASKS --code=STOP_RECEIVER --value=0 --desc=Остановка_сервиса_RECEIVER
+global add --type=MANAGER_TASKS --code=RUN_SHOWCASE --value=0 --desc=Запуск_сервиса_SHOWCASE
+global add --type=MANAGER_TASKS --code=STOP_SHOWCASE --value=0 --desc=Остановка_сервиса_SHOWCASE
+global add --type=MANAGER_TASKS --code=RUN_MAVEN --value=0 --desc=Запуск_компиляции_mvn_clean_install
+global add --type=MANAGER_TASKS --code=RUN_GIT --value=0 --desc=Получение_исхдников_из_репозитория_git_pull
+global add --type=MANAGER_TASKS --code=RUN_ACTIVEMQ --value=0 --desc=Запуск ActiveMQ
+global add --type=MANAGER_TASKS --code=STOP_ACTIVEMQ --value=0 --desc=Остановка ActiveMQ
+
 quit
 
 quit

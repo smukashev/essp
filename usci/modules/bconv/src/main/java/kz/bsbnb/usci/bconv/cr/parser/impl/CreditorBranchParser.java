@@ -43,7 +43,7 @@ public class CreditorBranchParser extends BatchParser {
             case "code":
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "docs":
                 currentDocSet = new BaseSet(documentMeta, creditorId);
@@ -63,12 +63,12 @@ public class CreditorBranchParser extends BatchParser {
             case "name":
                 event = (XMLEvent) xmlReader.next();
                 currentDoc.put("name",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "no":
                 event = (XMLEvent) xmlReader.next();
                 currentDoc.put("no",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             default:
                 throw new UnknownTagException(localName);

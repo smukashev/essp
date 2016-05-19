@@ -215,7 +215,6 @@ begin
   execute immediate 'alter table R_CORE_PERSON_NAME enable row movement';
   execute immediate 'alter table R_CORE_PERSON_NAME_HIS enable row movement';
   execute immediate 'alter table R_CORE_PLEDGE enable row movement';
-  execute immediate 'alter table R_CORE_PLEDGE_HIS enable row movement';
   execute immediate 'alter table R_CORE_PORTFOLIO_FLOW_KFN enable row movement';
   execute immediate 'alter table R_CORE_PORTFOLIO_FLOW_MSFO enable row movement';
   execute immediate 'alter table R_CORE_REMAINS enable row movement';

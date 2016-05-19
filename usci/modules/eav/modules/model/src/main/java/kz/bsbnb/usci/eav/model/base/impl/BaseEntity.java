@@ -377,7 +377,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 IMetaAttribute metaAttribute = this.meta.getMetaAttribute(name);
                 IMetaType metaType = metaAttribute.getMetaType();
 
-                if (metaAttribute.isImmutable()) continue;
+                if (metaAttribute.isImmutable())
+                    continue;
 
                 if (metaType.isComplex()) {
                     IBaseValue baseValue = getBaseValue(name);
@@ -508,6 +509,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         for (String name : this.meta.getAttributeNames()) {
             IMetaAttribute metaAttribute = this.meta.getMetaAttribute(name);
             IMetaType metaType = metaAttribute.getMetaType();
+
+            if (metaAttribute.isKey() && metaType.isSet())
+                continue;
 
             if (metaAttribute.isKey()) {
                 IBaseValue thisBaseValue = this.getBaseValue(name);
