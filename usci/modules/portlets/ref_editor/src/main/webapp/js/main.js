@@ -726,7 +726,10 @@ Ext.onReady(function() {
                 }
             }
         },
-        folderSort: true
+        folderSort: true,
+        root : {
+            loaded: true
+        }
     });
 
     subEntityStore = Ext.create('Ext.data.TreeStore', {
@@ -1071,13 +1074,14 @@ Ext.onReady(function() {
         }
     });
 
+    /*why extra query ???
     entityGrid.getStore().load({
         callback: function (records, operation, success) {
             if (!success) {
                 handleError(operation);
             }
         }
-    });
+    });*/
 
     // --------------------------------------------
     var today = new Date();
