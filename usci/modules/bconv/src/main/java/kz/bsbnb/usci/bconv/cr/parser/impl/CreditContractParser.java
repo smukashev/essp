@@ -35,19 +35,19 @@ public class CreditContractParser extends BatchParser {
                 case "no":
                     event = (XMLEvent) xmlReader.next();
                     currentBaseEntity.put("no",
-                            new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                            new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                     break;
                 case "date":
                     event = (XMLEvent) xmlReader.next();
                     currentBaseEntity.put("date",
                             new BaseEntityDateValue(0, creditorId, batch.getRepDate(),
-                                    dateFormat.parse(event.asCharacters().getData()), false, true));
+                                    dateFormat.parse(trim(event.asCharacters().getData())), false, true));
                     break;
                 default:
                     throw new UnknownTagException(localName);
             }
         } catch (ParseException parseException) {
-            throw new UnknownValException(localName, event.asCharacters().getData());
+            throw new UnknownValException(localName, trim(event.asCharacters().getData()));
         }
 
         return false;

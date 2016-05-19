@@ -57,7 +57,7 @@ public class ChangeCreditFlowParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
 
                 classification.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentBaseEntity.put("classification",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), classification, false, true));
@@ -72,14 +72,14 @@ public class ChangeCreditFlowParser extends BatchParser {
             case "value":
                 event = (XMLEvent) xmlReader.next();
                 getCurrentProvisionKfn().put("value",
-                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(trim(event.asCharacters().getData())), false, true));
                 break;
             case "balance_account": {
                 event = (XMLEvent) xmlReader.next();
                 BaseEntity balanceAccount = new BaseEntity(refBalanceAccountMeta, batch.getRepDate(), creditorId);
 
                 balanceAccount.put("no_",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 getCurrentProvisionKfn().put("balance_account",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), balanceAccount, false, true));
@@ -88,7 +88,7 @@ public class ChangeCreditFlowParser extends BatchParser {
             case "value_msfo":
                 event = (XMLEvent) xmlReader.next();
                 getCurrentProvisionMsfo().put("value",
-                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()),
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(trim(event.asCharacters().getData())),
                                 false, true));
                 break;
             case "balance_account_msfo": {
@@ -97,7 +97,7 @@ public class ChangeCreditFlowParser extends BatchParser {
                 BaseEntity balanceAccount = new BaseEntity(refBalanceAccountMeta, batch.getRepDate(), creditorId);
 
                 balanceAccount.put("no_",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 getCurrentProvisionMsfo().put("balance_account",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), balanceAccount, false, true));
@@ -106,14 +106,14 @@ public class ChangeCreditFlowParser extends BatchParser {
             case "value_msfo_over_balance":
                 event = (XMLEvent) xmlReader.next();
                 getCurrentProvisionMsfoOverB().put("value",
-                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(event.asCharacters().getData()), false, true));
+                        new BaseEntityDoubleValue(0, creditorId, batch.getRepDate(), new Double(trim(event.asCharacters().getData())), false, true));
                 break;
             case "balance_account_msfo_over_balance": {
                 event = (XMLEvent) xmlReader.next();
                 BaseEntity balanceAccount = new BaseEntity(refBalanceAccountMeta, batch.getRepDate(), creditorId);
 
                 balanceAccount.put("no_",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 getCurrentProvisionMsfoOverB().put("balance_account",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), balanceAccount, false, true));

@@ -55,7 +55,7 @@ public class InfoParser extends BatchParser {
                 break;
             case "code":
                 event = (XMLEvent) xmlReader.next();
-                String crCode = event.asCharacters().getData();
+                String crCode = trim(event.asCharacters().getData());
 
                 currentBaseEntity.put("code", new BaseEntityStringValue(0, creditorId, batch.getRepDate(), crCode, false, true));
                 break;
@@ -78,19 +78,19 @@ public class InfoParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
 
                 currentDoc.put("name",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "no":
                 event = (XMLEvent) xmlReader.next();
 
                 currentDoc.put("no",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "account_date":
                 break;
             case "report_date":
                 event = (XMLEvent) xmlReader.next();
-                String dateRaw = event.asCharacters().getData();
+                String dateRaw = trim(event.asCharacters().getData());
 
                 try {
                     reportDate = new BaseEntityDateValue(0, creditorId, batch.getRepDate(), dateFormat.parse(dateRaw), false, true);

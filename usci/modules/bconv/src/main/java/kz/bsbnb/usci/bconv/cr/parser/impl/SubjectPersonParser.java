@@ -78,7 +78,7 @@ public class SubjectPersonParser extends BatchParser {
 
                 country.put("code_numeric",
                         new BaseEntityIntegerValue(0, creditorId, batch.getRepDate(),
-                                new Integer(event.asCharacters().getData()), false, true));
+                                new Integer(trim(event.asCharacters().getData())), false, true));
 
                 personInfo.put("country",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), country, false, true));
@@ -89,7 +89,7 @@ public class SubjectPersonParser extends BatchParser {
                 BaseEntity ref_offshore = new BaseEntity(refOffshoreMeta, batch.getRepDate(), creditorId);
 
                 ref_offshore.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 personInfo.put("offshore",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), ref_offshore, false, true));
@@ -106,7 +106,7 @@ public class SubjectPersonParser extends BatchParser {
                 BaseEntity refBankRelation = new BaseEntity(refBankRelationMeta, batch.getRepDate(), creditorId);
 
                 refBankRelation.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 bankRelation.put("bank_relation",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), refBankRelation, false, true));
@@ -128,7 +128,7 @@ public class SubjectPersonParser extends BatchParser {
                 BaseEntity region = new BaseEntity(refRegionMeta, batch.getRepDate(), creditorId);
 
                 region.put("code",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentAddress.put("region", new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), region, false, true));
                 break;
@@ -136,7 +136,7 @@ public class SubjectPersonParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
 
                 currentAddress.put("details",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "contacts":
                 contacts = new BaseSet(contactMeta, creditorId);
@@ -157,7 +157,7 @@ public class SubjectPersonParser extends BatchParser {
                 BaseSet contactDetails = new BaseSet(new MetaValue(DataTypes.STRING), creditorId);
 
                 event = (XMLEvent) xmlReader.next();
-                contactDetails.put(new BaseSetStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                contactDetails.put(new BaseSetStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
 
                 currentContact.put("details",
                         new BaseEntitySimpleSet(0, creditorId, batch.getRepDate(), contactDetails, false, true));
@@ -177,17 +177,17 @@ public class SubjectPersonParser extends BatchParser {
             case "firstname":
                 event = (XMLEvent) xmlReader.next();
                 currentName.put("firstname",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "lastname":
                 event = (XMLEvent) xmlReader.next();
                 currentName.put("lastname",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "middlename":
                 event = (XMLEvent) xmlReader.next();
                 currentName.put("middlename",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "docs":
                 BaseSet personDocs = new BaseSet(documentMeta, creditorId);

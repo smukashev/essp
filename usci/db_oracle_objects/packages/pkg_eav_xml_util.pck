@@ -4183,19 +4183,20 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    -- DOC_TYPE
                    decode(t.type_id, 99, xmlelement("doc_type", xmlelement("code",99)), get_ref_doc_type_xml(t.type_id, p_report_date)),
                    -- NO
-                   nillable_xml('no', t.no_)
+                   nillable_xml('no', t.no_),
+                   decode(t.name, null, null , xmlelement("name", t.name))
                  )
                )
              )
         INTO v_xml
-        FROM (SELECT vddh.type_id, vddh.no_
+        FROM (SELECT vddh.type_id, vddh.no_, vddh.name
                 FROM core.v_debtor_doc_his vddh
                WHERE ((vddh.person_id = p_person_id AND vddh.org_id IS NULL)
                   OR (vddh.org_id = p_organization_id AND vddh.person_id IS NULL))
                  AND vddh.open_date <= p_report_date
                  AND (vddh.close_date > p_report_date OR vddh.close_date is null)
            UNION ALL
-              SELECT 99 as type_id, to_char(decode(p_person_id, null, p_organization_id, p_person_id)) as no_
+              SELECT 99 as type_id, to_char(decode(p_person_id, null, p_organization_id, p_person_id)) as no_, null as name
                  FROM DUAL
                 WHERE v_iden_cnt = 0 AND p_person_type = 0
           ) t;

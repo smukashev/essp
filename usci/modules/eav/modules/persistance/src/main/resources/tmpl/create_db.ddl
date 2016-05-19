@@ -534,8 +534,8 @@
 		</index>
 		<!-- improved searcher -->
     <index name="ebecs_IN_id_ai_ci">
-			<index-column name="id"/>
 			<index-column name="attribute_id"/>
+			<index-column name="id"/>
 		</index>
 		<!-- load values -->
 		<index name="ebecs_IN_ei_il">

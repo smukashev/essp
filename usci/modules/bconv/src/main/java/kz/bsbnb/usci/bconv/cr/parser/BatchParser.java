@@ -96,4 +96,8 @@ public abstract class BatchParser {
         return index;
     }
 
+    public String trim(String data) {
+        return data.trim();
+    }
+
 }

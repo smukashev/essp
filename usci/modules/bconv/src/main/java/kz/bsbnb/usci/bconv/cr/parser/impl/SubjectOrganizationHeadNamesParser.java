@@ -39,19 +39,19 @@ public class SubjectOrganizationHeadNamesParser extends BatchParser {
                 event = (XMLEvent) xmlReader.next();
 
                 currentBaseEntity.put("firstname",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "lastname":
                 event = (XMLEvent) xmlReader.next();
 
                 currentBaseEntity.put("lastname",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "middlename":
                 event = (XMLEvent) xmlReader.next();
 
                 currentBaseEntity.put("middlename",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             default:
                 throw new UnknownTagException(localName);

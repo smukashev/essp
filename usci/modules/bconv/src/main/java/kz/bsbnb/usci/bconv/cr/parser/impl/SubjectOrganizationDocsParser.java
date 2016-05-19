@@ -48,12 +48,12 @@ public class SubjectOrganizationDocsParser extends BatchParser {
             case "name":
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("name",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             case "no":
                 event = (XMLEvent) xmlReader.next();
                 currentBaseEntity.put("no",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), event.asCharacters().getData(), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
                 break;
             default:
                 throw new UnknownTagException(localName);
