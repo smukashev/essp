@@ -3,21 +3,20 @@ package com.bsbnb.usci.portlets.protocol.export;
 import com.bsbnb.usci.portlets.protocol.data.ProtocolDisplayBean;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Component;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.Number;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Date;
 import jxl.CellView;
 import jxl.Workbook;
-import jxl.WorkbookSettings;
 import jxl.format.Border;
 import jxl.format.BorderLineStyle;
 import jxl.write.*;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.Number;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Date;
 
 /**
  *
@@ -93,7 +92,8 @@ public class XlsProtocolExporter extends ProtocolExporter {
                         if (value instanceof String) {
                             sheet.addCell(new jxl.write.Label(accessorIndex, rowCounter, value.toString(), times12format));
                         } else if (value instanceof Number) {
-                            jxl.write.Number number = new jxl.write.Number(accessorIndex, rowCounter, Integer.parseInt(value.toString()), times12format);
+                            String stringValue = value.toString();
+                            jxl.write.Number number = new jxl.write.Number(accessorIndex, rowCounter, Integer.parseInt(stringValue.substring(0, stringValue.indexOf("."))), times12format);
                             sheet.addCell(number);
                         } else if (value instanceof Date) {
                             sheet.addCell(new jxl.write.DateTime(accessorIndex, rowCounter, (Date) value, dateCellFormat));
