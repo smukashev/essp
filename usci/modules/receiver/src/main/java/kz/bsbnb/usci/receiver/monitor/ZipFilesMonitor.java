@@ -308,7 +308,7 @@ public class ZipFilesMonitor {
         if (!haveError && !checkAndFillEavReport(cId, batchInfo, batchId))
             haveError = true;
 
-        batch.setCreditorId(cId);
+        batch.setCreditorId(isNB ? 0 : cId);
         batch.setReportId(batchInfo.getReportId());
         batchService.uploadBatch(batch);
 
