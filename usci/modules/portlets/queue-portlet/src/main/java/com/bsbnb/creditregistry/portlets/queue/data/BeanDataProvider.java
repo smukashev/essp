@@ -6,6 +6,7 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.EavGlobal;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
@@ -164,5 +165,22 @@ public class BeanDataProvider implements DataProvider {
         }
 
         return queue;
+    }
+
+    @Override
+    public BatchFullJModel getBatchFullModel(BigInteger batchId) {
+        return inputInfoBusiness.getBatchFullModel(batchId);
+    }
+
+    @Override
+    public List<InputInfoDisplayBean> getMaintenanceInfo(List<Creditor> creditors, Date reportDate) {
+        List<InputInfo> inputInfoList = inputInfoBusiness.getMaintenanceInfo(creditors,reportDate);
+
+        List<InputInfoDisplayBean> result = new ArrayList<>(inputInfoList.size());
+        for (InputInfo inputInfo : inputInfoList) {
+            if(inputInfo != null && inputInfo.getCreditor() != null)
+                result.add(new InputInfoDisplayBean(inputInfo,this));
+        }
+        return result;
     }
 }

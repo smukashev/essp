@@ -7,19 +7,31 @@ import java.util.Locale;
  *
  * @author Aidar.Myrzahanov
  */
-public interface PortalEnvironmentFacade {
+public abstract class PortalEnvironmentFacade {
 
-    long getUserId();
+    private static PortalEnvironmentFacade instance;
 
-    String getString(String key);
+    public static void set(PortalEnvironmentFacade provider) {
+        instance = provider;
+    }
 
-    String getString(Localization key);
+    public static PortalEnvironmentFacade get() {
+        return instance;
+    }
 
-    Locale getLocale();
+    public abstract String getResourceString(String key);
 
-    String getLocaleLanguage();
+    public abstract long getUserId();
 
-    boolean isUserAdmin();
+    public abstract String getString(String key);
 
-    boolean isBankUser();
+    public abstract String getString(Localization key);
+
+    public abstract  Locale getLocale();
+
+    public abstract String getLocaleLanguage();
+
+    public abstract boolean isUserAdmin();
+
+    public abstract boolean isBankUser();
 }

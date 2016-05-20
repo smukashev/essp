@@ -21,4 +21,6 @@ public interface IBatchDao {
     void incrementActualCount(long batchId, long count);
 
     void clearActualCount(long batchId);
+
+    List<Batch> getMaintenanceBatches(Date reportDate);
 }

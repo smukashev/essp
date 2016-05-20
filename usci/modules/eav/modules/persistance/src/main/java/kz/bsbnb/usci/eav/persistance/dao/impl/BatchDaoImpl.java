@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -280,5 +281,26 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 .where(EAV_BATCHES.ID.eq(batchId));
 
         updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
+
+
+    @Override
+    public List<Batch> getMaintenanceBatches(Date reportDate) {
+        SelectConditionStep select = context.selectFrom(EAV_BATCHES)
+                .where(EAV_BATCHES.IS_MAINTENANCE.eq(DataUtils.convert(true)))
+                .and(EAV_BATCHES.IS_MAINTENANCE_APPROVED.eq(DataUtils.convert(false)));
+
+        if(reportDate != null)
+            select = select.and(EAV_BATCHES.REP_DATE.eq(DataUtils.convert(reportDate)));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        List<Batch> maintenanceBatches = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            maintenanceBatches.add(fillBatch(new Batch() , row));
+        }
+
+        return maintenanceBatches;
     }
 }

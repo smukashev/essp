@@ -37,4 +37,6 @@ public interface IBatchService {
     boolean incrementActualCounts(Map<Long, Long> batchesToUpdate);
 
     boolean clearActualCount(long batchId);
+
+    List<Batch> getMaintenanceBatches(Date reportDate);
 }
