@@ -286,4 +286,9 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         return list;
     }
+
+    @Override
+    public void approveMaintenance(List<Long> approvedBatchIds) {
+        batchService.approveMaintenance(approvedBatchIds);
+    }
 }

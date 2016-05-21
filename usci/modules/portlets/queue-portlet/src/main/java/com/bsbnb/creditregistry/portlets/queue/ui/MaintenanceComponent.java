@@ -16,11 +16,13 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.eav.model.Batch;
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Check;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -56,11 +58,6 @@ public class MaintenanceComponent  extends VerticalLayout {
         logger.info("Loading maintenance interface");
 
         List<Creditor> userCreditors = dataProvider.getCreditors(environment.getUserId(), environment.isUserAdmin());
-        Iterator<Creditor> iterator = userCreditors.iterator();
-        while(iterator.hasNext()) {
-            if(iterator.next().getId() != 2371L)
-                iterator.remove();
-        }
         creditorsSelect = new FilterableSelect<>(userCreditors, new Selector<Creditor>() {
             public String getCaption(Creditor item) {
                 return item.getName();
@@ -86,18 +83,6 @@ public class MaintenanceComponent  extends VerticalLayout {
         filesTable = new FormattedTable();
         inputInfoContainer = new BeanItemContainer<>(InputInfoDisplayBean.class);
         filesTable.setContainerDataSource(inputInfoContainer);
-
-        Button sendFilesButton = new Button("send them", new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                for (InputInfoDisplayBean inputInfoDisplayBean : inputInfoList) {
-                    System.out.println(inputInfoDisplayBean.isSelected());
-                }
-
-            }
-        });
-
-        addComponent(sendFilesButton);
 
         filesTable.addGeneratedColumn("select", new Table.ColumnGenerator() {
             @Override
@@ -127,10 +112,16 @@ public class MaintenanceComponent  extends VerticalLayout {
         filesTable.addFormat("completionDate", "dd/MM/yyyy HH:mm:ss");
         filesTable.addFormat("startDate", "dd/MM/yyyy HH:mm:ss");
 
-
-        Button loadButton = new Button(environment.getString(Localization.LOAD), new Button.ClickListener() {
+        final Button sendFilesButton = new Button("Отправить", new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                List<Long> batchIds = new LinkedList<>();
+                for (InputInfoDisplayBean inputInfoDisplayBean : inputInfoList) {
+                    if(inputInfoDisplayBean.isSelected())
+                        batchIds.add(inputInfoDisplayBean.getInputInfo().getId().longValue());
+                }
+
+                dataProvider.approveAndSend(batchIds);
                 creditorsSelect.getSelectedElements(new SelectionCallback<Creditor>() {
                     @Override
                     public void selected(List<Creditor> creditors) {
@@ -139,7 +130,33 @@ public class MaintenanceComponent  extends VerticalLayout {
                         inputInfoContainer.removeAllItems();
                         inputInfoContainer.addAll(inputInfoList);
                         filesTable.setVisible(true);
+                    }
+                });
 
+                MessageBox.Show("Успешно отправлено", getWindow());
+
+            }
+        });
+
+        sendFilesButton.setVisible(false);
+
+
+        final Button loadButton = new Button(environment.getString(Localization.LOAD), new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                creditorsSelect.getSelectedElements(new SelectionCallback<Creditor>() {
+                    @Override
+                    public void selected(List<Creditor> creditors) {
+                        Date reportDate = (Date) reportDateField.getValue();
+                        inputInfoList = dataProvider.getMaintenanceInfo(creditors, reportDate);
+                        if(inputInfoList.size() < 1) {
+                            MessageBox.Show("Нет данных", getWindow());
+                            return;
+                        }
+                        inputInfoContainer.removeAllItems();
+                        inputInfoContainer.addAll(inputInfoList);
+                        filesTable.setVisible(true);
+                        sendFilesButton.setVisible(true);
                     }
                 });
                 //loadTable();
@@ -151,7 +168,7 @@ public class MaintenanceComponent  extends VerticalLayout {
 
         addComponent(loadButton);
         addComponent(filesTable);
-
+        addComponent(sendFilesButton);
     }
 
     private String[] getResourceStrings(String[] keys) {

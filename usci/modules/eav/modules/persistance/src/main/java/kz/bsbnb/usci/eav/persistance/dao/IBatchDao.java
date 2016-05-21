@@ -23,4 +23,6 @@ public interface IBatchDao {
     void clearActualCount(long batchId);
 
     List<Batch> getMaintenanceBatches(Date reportDate);
+
+    void approveMaintenance(List<Long> approvedBatchIds);
 }

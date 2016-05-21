@@ -30,4 +30,6 @@ public interface DataProvider {
     BatchFullJModel getBatchFullModel(BigInteger batchId);
 
     List<InputInfoDisplayBean> getMaintenanceInfo(List<Creditor> creditors, Date reportDate);
+
+    void approveAndSend(List<Long> approvedInputInfos);
 }

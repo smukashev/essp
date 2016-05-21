@@ -20,10 +20,8 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.logging.Level;
 
 /**
  *
@@ -182,5 +180,13 @@ public class BeanDataProvider implements DataProvider {
                 result.add(new InputInfoDisplayBean(inputInfo,this));
         }
         return result;
+    }
+
+    @Override
+    public void approveAndSend(List<Long> approvedInputInfos) {
+        inputInfoBusiness.approveMaintenance(approvedInputInfos);
+        for (Long approvedInputInfoId : approvedInputInfos) {
+            batchProcessService.restartBatch(approvedInputInfoId);
+        }
     }
 }

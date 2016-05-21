@@ -303,4 +303,13 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
 
         return maintenanceBatches;
     }
+
+    @Override
+    public void approveMaintenance(List<Long> approvedBatchIds) {
+        Update update = context.update(EAV_BATCHES)
+                .set(EAV_BATCHES.IS_MAINTENANCE_APPROVED, DataUtils.convert(true))
+                .where(EAV_BATCHES.ID.in(approvedBatchIds));
+
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
 }
