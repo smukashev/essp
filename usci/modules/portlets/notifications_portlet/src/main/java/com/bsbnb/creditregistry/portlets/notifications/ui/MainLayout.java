@@ -49,7 +49,7 @@ public class MainLayout extends VerticalLayout {
             });
         }
 
-        mainTabSheet.setSelectedTab(settingsTab);
+        //mainTabSheet.setSelectedTab(settingsTab);
         addComponent(mainTabSheet);
     }
 }
