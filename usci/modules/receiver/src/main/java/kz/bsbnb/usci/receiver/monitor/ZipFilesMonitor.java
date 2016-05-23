@@ -477,8 +477,8 @@ public class ZipFilesMonitor {
 
 
                 if(prevMonthReport != null) {
-                    if(!ReportStatus.COMPLETED.code().equals(prevMonthReport.getStatus().getCode())
-                            && !ReportStatus.ORGANIZATION_APPROVED.code().equals(prevMonthReport.getStatus().getCode()))
+                    if(!(ReportStatus.COMPLETED.code().equals(prevMonthReport.getStatus().getCode())
+                            || ReportStatus.ORGANIZATION_APPROVED.code().equals(prevMonthReport.getStatus().getCode())))
                         errMsg = "Необходимо утвердить данные за отчетный периюд : " + dateFormat.format(prevMonthReport.getReportDate());
                 } else {
                     Report firstReport = reportBeanRemoteBusiness.getFirstReport(creditorId);
