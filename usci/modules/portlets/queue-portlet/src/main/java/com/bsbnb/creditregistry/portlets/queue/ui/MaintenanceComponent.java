@@ -116,12 +116,21 @@ public class MaintenanceComponent  extends VerticalLayout {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 List<Long> batchIds = new LinkedList<>();
+
+                Iterator<InputInfoDisplayBean> iterator = inputInfoList.iterator();
+
+                while(iterator.hasNext()) {
+                    if(!iterator.next().isSelected())
+                        iterator.remove();
+                }
+
                 for (InputInfoDisplayBean inputInfoDisplayBean : inputInfoList) {
-                    if(inputInfoDisplayBean.isSelected())
                         batchIds.add(inputInfoDisplayBean.getInputInfo().getId().longValue());
                 }
 
                 dataProvider.approveAndSend(batchIds);
+                dataProvider.sendNotification(inputInfoList);
+
                 creditorsSelect.getSelectedElements(new SelectionCallback<Creditor>() {
                     @Override
                     public void selected(List<Creditor> creditors) {

@@ -4,6 +4,7 @@ import com.bsbnb.creditregistry.portlets.queue.thread.ConfigurationException;
 import kz.bsbnb.usci.core.service.*;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputInfo;
+import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
@@ -21,6 +22,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -28,11 +30,14 @@ import java.util.*;
  * @author Aidar.Myrzahanov
  */
 public class BeanDataProvider implements DataProvider {
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private RemoteCreditorBusiness creditorBusiness;
     private InputInfoBeanRemoteBusiness inputInfoBusiness;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private IGlobalService globalService;
     private IBatchProcessService batchProcessService;
+    private MailMessageBeanCommonBusiness mailMessageBusiness;
+
     public final Logger logger = Logger.getLogger(BeanDataProvider.class);
 
     public BeanDataProvider() {
@@ -96,6 +101,13 @@ public class BeanDataProvider implements DataProvider {
 
             batchProcessServiceFactoryBean.afterPropertiesSet();
             batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+
+            RmiProxyFactoryBean mailBusinessFactoryBean = new RmiProxyFactoryBean();
+            mailBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/mailRemoteBusiness");
+            mailBusinessFactoryBean.setServiceInterface(MailMessageBeanCommonBusiness.class);
+            mailBusinessFactoryBean.afterPropertiesSet();
+            mailMessageBusiness = (MailMessageBeanCommonBusiness) mailBusinessFactoryBean.getObject();
+
         } catch (Exception e) {
             throw new RuntimeException(Errors.getError(Errors.E286));
         }
@@ -188,5 +200,44 @@ public class BeanDataProvider implements DataProvider {
         for (Long approvedInputInfoId : approvedInputInfos) {
             batchProcessService.restartBatch(approvedInputInfoId);
         }
+    }
+
+    @Override
+    public void sendNotification(List<InputInfoDisplayBean> inputInfoList) {
+
+        Map<Long, Creditor> creditorsMap = new HashMap<>();
+        String fileNames = "";
+        int fileNameCount = 0;
+
+        for (InputInfoDisplayBean inputInfoDisplayBean : inputInfoList) {
+            creditorsMap.put(inputInfoDisplayBean.getInputInfo().getCreditor().getId()
+                    , inputInfoDisplayBean.getInputInfo().getCreditor());
+        }
+
+        for (Long creditorId : creditorsMap.keySet()) {
+            Creditor creditor = creditorsMap.get(creditorId);
+
+            fileNames = "";
+            fileNameCount = 0;
+
+            for (InputInfoDisplayBean inputInfoDisplayBean : inputInfoList) {
+                if(inputInfoDisplayBean.getInputInfo().getCreditor().getId() == creditorId) {
+                    fileNames += inputInfoDisplayBean.getFileName() + ", Отчетная дата: " + DATE_FORMAT.format(inputInfoDisplayBean.getReportDate()) + "<br/>";
+                    fileNameCount ++;
+                }
+
+                if(fileNameCount > 30)
+                    break;
+            }
+
+            List<PortalUser> notificationRecipients = portalUserBusiness.getPortalUsersHavingAccessToCreditor(creditor);
+            Properties mailMessageParameters = new Properties();
+            mailMessageParameters.setProperty("ORG", creditor.getName());
+            mailMessageParameters.setProperty("FILE_NAMES", fileNames);
+            for (PortalUser portalUser : notificationRecipients) {
+                mailMessageBusiness.sendMailMessage("MAINTENANCE_APPROVED", portalUser.getUserId(), mailMessageParameters);
+            }
+        }
+
     }
 }

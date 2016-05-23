@@ -32,4 +32,6 @@ public interface DataProvider {
     List<InputInfoDisplayBean> getMaintenanceInfo(List<Creditor> creditors, Date reportDate);
 
     void approveAndSend(List<Long> approvedInputInfos);
+
+    void sendNotification(List<InputInfoDisplayBean> inputInfoList);
 }
