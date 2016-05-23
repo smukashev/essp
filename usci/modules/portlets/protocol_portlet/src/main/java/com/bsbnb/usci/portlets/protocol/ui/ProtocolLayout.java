@@ -424,7 +424,8 @@ public class ProtocolLayout extends VerticalLayout {
             Map<String, Long> weightsByErrorCode = new HashMap<>();
             weightsByErrorCode.put(BatchStatuses.ERROR.code(), 1000L);
             weightsByErrorCode.put(BatchStatuses.COMPLETED.code(), 999L);
-            weightsByErrorCode.put(BatchStatuses.MAINTENANCE_REQUEST.code(), 2L);
+            weightsByErrorCode.put(BatchStatuses.MAINTENANCE_REQUEST.code(), 20L);
+            weightsByErrorCode.put(BatchStatuses.WAITING.code(), 10L);
             weightsByErrorCode.put(BatchStatuses.WAITING_FOR_SIGNATURE.code(), 1L);
 
             long maxWeight = 0;
