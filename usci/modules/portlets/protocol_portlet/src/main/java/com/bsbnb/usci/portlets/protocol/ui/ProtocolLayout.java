@@ -51,6 +51,7 @@ import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.SubjectType;
+import kz.bsbnb.usci.eav.util.BatchStatuses;
 import org.apache.log4j.Logger;
 
 /**
@@ -419,7 +420,31 @@ public class ProtocolLayout extends VerticalLayout {
         Set<String> messageTypeCodes = new HashSet<>();
 
         if (listOfProtocols.isEmpty()) {
-            boolean errorStatus = false;
+
+            Map<String, Long> weightsByErrorCode = new HashMap<>();
+            weightsByErrorCode.put(BatchStatuses.ERROR.code(), 1000L);
+            weightsByErrorCode.put(BatchStatuses.COMPLETED.code(), 999L);
+            weightsByErrorCode.put(BatchStatuses.MAINTENANCE_REQUEST.code(), 2L);
+            weightsByErrorCode.put(BatchStatuses.WAITING_FOR_SIGNATURE.code(), 1L);
+
+            long maxWeight = 0;
+            Protocol p = null;
+
+            for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
+                Long weight = weightsByErrorCode.get(batchStatus.getMessageType().getCode());
+                if (weight == null)
+                    weight = 0L;
+
+                if (maxWeight < weight) {
+                    maxWeight = weight;
+                    p = batchStatus;
+                }
+            }
+
+            if (p != null)
+                listOfProtocols.add(new ProtocolDisplayBean(p));
+
+            /*boolean errorStatus = false;
             for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
                 if("ERROR".equals(batchStatus.getMessageType().getCode())){
                     errorStatus = true;
@@ -431,7 +456,7 @@ public class ProtocolLayout extends VerticalLayout {
                 if(!errorStatus || "ERROR".equals(batchStatus.getMessageType().getCode())){
                     listOfProtocols.add(new ProtocolDisplayBean(batchStatus));
                 }
-            }
+            }*/
         }
 
         if (listOfProtocols.isEmpty()) {

@@ -120,7 +120,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 lastStatus = "Отмена загрузки";
                 break;
             case "MAINTENANCE_REQUEST":
-                lastStatus = "Запрос на изменение за утрвежденный период";
+                lastStatus = "Запрос на изменение за утвержденный период";
                 break;
         }
 
