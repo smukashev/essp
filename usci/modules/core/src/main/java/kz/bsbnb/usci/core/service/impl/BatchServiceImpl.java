@@ -235,4 +235,14 @@ public class BatchServiceImpl implements IBatchService {
             return false;
         }
     }
+
+    @Override
+    public List<Batch> getMaintenanceBatches(Date reportDate) {
+        return batchDao.getMaintenanceBatches(reportDate);
+    }
+
+    @Override
+    public void approveMaintenance(List<Long> approvedBatchIds) {
+        batchDao.approveMaintenance(approvedBatchIds);
+    }
 }

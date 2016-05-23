@@ -17,6 +17,8 @@ public class MainLayout extends VerticalLayout {
     private final DataProvider dataProvider;
     private Tab adminTab;
     private AdministratorComponent administratorComponent;
+    private MaintenanceComponent maintenanceComponent;
+    private Tab maintenanceTab;
 
     public MainLayout(PortalEnvironmentFacade environment, DataProvider dataProvider) {
         this.environment = environment;
@@ -35,6 +37,11 @@ public class MainLayout extends VerticalLayout {
             administratorComponent = new AdministratorComponent(environment, dataProvider);
             adminTab = mainTabSheet.addTab(administratorComponent);
             adminTab.setCaption(environment.getString(Localization.ADMIN_TAB_NAME));
+
+            maintenanceComponent = new MaintenanceComponent(environment, dataProvider);
+            maintenanceTab = mainTabSheet.addTab(maintenanceComponent);
+            maintenanceTab.setCaption(environment.getString(Localization.ADMIN_TAB_NAME));
+
             mainTabSheet.setSizeFull();
             mainTabSheet.addListener(new TabSheet.SelectedTabChangeListener() {
 
@@ -43,6 +50,8 @@ public class MainLayout extends VerticalLayout {
                     Tab selectedTab = tabSheet.getTab(tabSheet.getSelectedTab());
                     if (selectedTab == adminTab) {
                         administratorComponent.initializeUI();
+                    } else if(selectedTab == maintenanceTab) {
+                        maintenanceComponent.initializeUI();
                     }
                 }
             });

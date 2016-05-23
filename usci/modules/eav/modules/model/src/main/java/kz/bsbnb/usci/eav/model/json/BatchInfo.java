@@ -19,6 +19,7 @@ public class BatchInfo {
     private long reportId;
     private long totalCount;
     private long actualCount;
+    private boolean maintenance;
 
     public BatchInfo() {
         super();
@@ -136,5 +137,13 @@ public class BatchInfo {
 
     public void setCreditorId(Long creditorId) {
         this.creditorId = creditorId;
+    }
+
+    public boolean isMaintenance() {
+        return maintenance;
+    }
+
+    public void setMaintenance(boolean maintenance) {
+        this.maintenance = maintenance;
     }
 }

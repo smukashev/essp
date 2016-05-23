@@ -3,8 +3,11 @@ package com.bsbnb.creditregistry.portlets.queue.data;
 import com.bsbnb.creditregistry.portlets.queue.thread.ConfigurationException;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.EavGlobal;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
 
+import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 public interface DataProvider {
@@ -23,4 +26,12 @@ public interface DataProvider {
     //public void rejectInputInfo(int inputInfoId) throws InputInfoNotInQueueException;
 
     List<QueueFileInfo> getPreviewQueue(List<Creditor> creditors, List<Integer> selectedCreditorIds, QueueOrderType selectedOrder);
+
+    BatchFullJModel getBatchFullModel(BigInteger batchId);
+
+    List<InputInfoDisplayBean> getMaintenanceInfo(List<Creditor> creditors, Date reportDate);
+
+    void approveAndSend(List<Long> approvedInputInfos);
+
+    void sendNotification(List<InputInfoDisplayBean> inputInfoList);
 }

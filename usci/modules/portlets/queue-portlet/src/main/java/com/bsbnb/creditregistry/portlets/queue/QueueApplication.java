@@ -70,6 +70,7 @@ public class QueueApplication extends Application {
                     throw new AccessControlException(Errors.compose(Errors.E238));
 
                 QueuePortalEnvironmentFacade queuePortalEnvironmentFacade = new QueuePortalEnvironmentFacade(user);
+                PortalEnvironmentFacade.set(queuePortalEnvironmentFacade);
                 BeanDataProvider dataProvider = new BeanDataProvider();
                 mainWindow.addComponent(new MainLayout(queuePortalEnvironmentFacade, dataProvider));
                 setMainWindow(mainWindow);

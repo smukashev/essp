@@ -86,7 +86,16 @@ public class MailHandler implements Runnable {
         long recipientUserId = mailMessage.getRecipientUserId().longValue();
         boolean isSending = provider.isTemplateSendingEnabled(mailMessage.getMailTemplate(), recipientUserId);
         PortalUser recipient = provider.getPortalUserByUserId(recipientUserId);
-        if (!recipient.isActive()) {
+
+        if(recipient == null) {
+            logger.info("Uesr with id " + recipientUserId  +" returned as null, sending not possible");
+            mailMessage.setStatusId(MailMessageStatuses.USER_NOT_FOUND);
+            mailMessage.setSendingDate(new Date());
+            provider.updateMailMessage(mailMessage);
+            return;
+        }
+
+        if (!recipient.isActive() ) {
             isSending = false;
         }
 

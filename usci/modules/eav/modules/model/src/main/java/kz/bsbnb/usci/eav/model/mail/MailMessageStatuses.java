@@ -8,4 +8,5 @@ public class MailMessageStatuses {
     public static final int PROCESSING = 132;
     public static final int SENT = 133;
     public static final int REJECTED_BY_USER_SETTINGS = 134;
+    public static final int USER_NOT_FOUND = 135;
 }
