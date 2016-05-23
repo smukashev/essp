@@ -19,6 +19,8 @@ public class Batch extends Persistable {
     private Long reportId;
     private Long creditorId;
     private Long statusId;
+    private boolean maintenance;
+    private Boolean maintenanceApproved;
 
     public Batch() {
         super();
@@ -207,5 +209,21 @@ public class Batch extends Persistable {
                 ", fileName='" + fileName + '\'' +
                 ", repDate=" + repDate +
                 ", creditorId=" + creditorId + '}';
+    }
+
+    public void setMaintenance(boolean maintenance) {
+        this.maintenance = maintenance;
+    }
+
+    public boolean isMaintenance() {
+        return maintenance;
+    }
+
+    public void setMaintenanceApproved(Boolean maintenanceApproved) {
+        this.maintenanceApproved = maintenanceApproved;
+    }
+
+    public Boolean isMaintenanceApproved() {
+        return maintenanceApproved;
     }
 }

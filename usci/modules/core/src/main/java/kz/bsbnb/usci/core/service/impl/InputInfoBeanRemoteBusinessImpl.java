@@ -27,7 +27,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     @Autowired
     private IGlobalService globalService;
 
-    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING, CANCELLED);
+    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING, CANCELLED, MAINTENANCE_REQUEST);
 
     private Map<Long, EavGlobal> globalMap = new HashMap<>();
 
@@ -52,74 +52,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
             List<BatchStatus> batchStatusList = batchService.getBatchStatusList(batch.getId());
 
-            InputInfo ii = new InputInfo();
-
-            String lastStatus = "";
-            Date lastReceiptDate = null;
-
-            ii.setBatchStatuses(new ArrayList<Protocol>());
-
-            Boolean isCompleted = false;
-            String completedStatus = null;
-
-            for (BatchStatus batchStatus : batchStatusList) {
-                if (protocolsToDisplay.contains(batchStatus.getStatus())) {
-                    if (lastReceiptDate == null || lastReceiptDate.compareTo(batchStatus.getReceiptDate()) < 0) {
-                        lastReceiptDate = batchStatus.getReceiptDate();
-                        lastStatus = batchStatus.getStatus().code();
-                    }
-
-                    fillProtocol(batchStatus, ii);
-
-                    if (batchStatus.getStatus().equals(COMPLETED) || batchStatus.getStatus().equals(ERROR)) {
-                        isCompleted = true;
-                        completedStatus = batchStatus.getStatus().code();
-                    }
-                }
-                fillDates(batchStatus, ii);
-            }
-
-            if (isCompleted)
-                lastStatus = completedStatus;
-
-            ii.setUserId(batch.getUserId());
-            ii.setReportDate(batch.getRepDate());
-
-            ii.setTotal(10L);
-
-            ii.setId(BigInteger.valueOf(batch.getId()));
-
-            ii.setCreditor(currentCreditor);
-            ii.setFileName(batch.getFileName());
-
-            switch (lastStatus) {
-                case "COMPLETED":
-                    lastStatus = "Завершён";
-                    break;
-                case "ERROR":
-                    lastStatus = "Ошибка";
-                    break;
-                case "WAITING_FOR_SIGNATURE":
-                    lastStatus = "Ожидает подписи";
-                    break;
-                case "WAITING":
-                    lastStatus = "В очереди";
-                    break;
-                case "PROCESSING":
-                    lastStatus = "В обработке";
-                    break;
-                case "CANCELLED":
-                    lastStatus = "Отмена загрузки";
-                    break;
-            }
-
-            Shared s = new Shared();
-            s.setCode("S");
-            s.setNameRu(lastStatus);
-            s.setNameKz(lastStatus);
-
-            ii.setReceiverType(s);
-            ii.setStatus(s);
+            InputInfo ii = getInputInfo(batch, currentCreditor, batchStatusList);
 
             if (reportDate == null || DataUtils.compareBeginningOfTheDay(ii.getReportDate(), reportDate) == 0) {
                 list.add(ii);
@@ -129,6 +62,78 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
         return list;
     }
 
+    private InputInfo getInputInfo(Batch batch, Creditor currentCreditor, List<BatchStatus> batchStatusList) {
+        InputInfo ii = new InputInfo();
+
+        String lastStatus = "";
+        Date lastReceiptDate = null;
+
+        ii.setBatchStatuses(new ArrayList<Protocol>());
+
+        Boolean isCompleted = false;
+
+        for (BatchStatus batchStatus : batchStatusList) {
+            if (protocolsToDisplay.contains(batchStatus.getStatus())) {
+                if (lastReceiptDate == null || lastReceiptDate.compareTo(batchStatus.getReceiptDate()) < 0) {
+                    lastReceiptDate = batchStatus.getReceiptDate();
+                    lastStatus = batchStatus.getStatus().code();
+                }
+
+                fillProtocol(batchStatus, ii);
+
+                if (batchStatus.getStatus().equals(COMPLETED))
+                    isCompleted = true;
+            }
+            fillDates(batchStatus, ii);
+        }
+
+        if (isCompleted)
+            lastStatus = "COMPLETED";
+
+        ii.setUserId(batch.getUserId());
+        ii.setReportDate(batch.getRepDate());
+
+        ii.setTotal(10L);
+
+        ii.setId(BigInteger.valueOf(batch.getId()));
+
+        ii.setCreditor(currentCreditor);
+        ii.setFileName(batch.getFileName());
+
+        switch (lastStatus) {
+            case "COMPLETED":
+                lastStatus = "Завершён";
+                break;
+            case "ERROR":
+                lastStatus = "Ошибка";
+                break;
+            case "WAITING_FOR_SIGNATURE":
+                lastStatus = "Ожидает подписи";
+                break;
+            case "WAITING":
+                lastStatus = "В очереди";
+                break;
+            case "PROCESSING":
+                lastStatus = "В обработке";
+                break;
+            case "CANCELLED":
+                lastStatus = "Отмена загрузки";
+                break;
+            case "MAINTENANCE_REQUEST":
+                lastStatus = "Запрос на изменение за утвержденный период";
+                break;
+        }
+
+        Shared s = new Shared();
+        s.setCode("S");
+        s.setNameRu(lastStatus);
+        s.setNameKz(lastStatus);
+
+        ii.setReceiverType(s);
+        ii.setStatus(s);
+        return ii;
+    }
+
     private String fillDates(BatchStatus batchStatus, InputInfo inputInfo) {
         BatchStatuses lastStatus = batchStatus.getStatus();
 
@@ -136,7 +141,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             inputInfo.setStartedDate(batchStatus.getReceiptDate());
         } else if (lastStatus == COMPLETED) {
             inputInfo.setCompletionDate(batchStatus.getReceiptDate());
-        } else if (lastStatus == WAITING || lastStatus == WAITING_FOR_SIGNATURE) {
+        } else if (lastStatus == WAITING || lastStatus == WAITING_FOR_SIGNATURE || lastStatus == MAINTENANCE_REQUEST) {
             inputInfo.setReceiverDate(batchStatus.getReceiptDate());
         } else if (lastStatus == ERROR) {
             inputInfo.setReceiverDate(batchStatus.getReceiptDate());
@@ -172,6 +177,10 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 case "WAITING_FOR_SIGNATURE":
                     s.setNameRu("Ожидает подписи");
                     s.setNameKz("Ожидает подписи");
+                    break;
+                case  "MAINTENANCE_REQUEST":
+                    s.setNameRu("Запрос на изменение за утвержденный период");
+                    s.setNameKz("Запрос на изменение за утвержденный период");
                     break;
                 default:
                     s.setNameRu(batchStatus.getStatus().code());
@@ -248,5 +257,38 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 batch.getUserId(),
                 batch.getCreditorId()
         );
+    }
+
+    @Override
+    public List<InputInfo> getMaintenanceInfo(List<Creditor> creditors, Date reportDate) {
+        List<Batch> maintenanceBatches = batchService.getMaintenanceBatches(reportDate);
+        ArrayList<InputInfo> list = new ArrayList<>();
+
+        HashMap<Long, Creditor> inputCreditors = new HashMap<>();
+
+        for (Creditor cred : creditors) {
+            inputCreditors.put(cred.getId(), cred);
+        }
+
+        Iterator<Batch> mIterator = maintenanceBatches.iterator();
+        while(mIterator.hasNext()) {
+            Batch batch = mIterator.next();
+            if(!inputCreditors.containsKey(batch.getCreditorId()))
+                mIterator.remove();
+
+
+
+            InputInfo ii = getInputInfo(batch, inputCreditors.get(batch.getCreditorId())
+                    , batchService.getBatchStatusList(batch.getId()));
+
+            list.add(ii);
+        }
+
+        return list;
+    }
+
+    @Override
+    public void approveMaintenance(List<Long> approvedBatchIds) {
+        batchService.approveMaintenance(approvedBatchIds);
     }
 }

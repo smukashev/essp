@@ -14,4 +14,8 @@ public interface InputInfoBeanRemoteBusiness {
     List<InputInfo> getPendingBatches(List<Creditor> creditorsList);
 
     BatchFullJModel getBatchFullModel(BigInteger batchId);
+
+    List<InputInfo> getMaintenanceInfo(List<Creditor> creditors, Date reportDate);
+
+    void approveMaintenance(List<Long> approvedInputInfos);
 }

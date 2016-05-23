@@ -13,7 +13,7 @@ import java.util.ResourceBundle;
  *
  * @author Aidar.Myrzahanov
  */
-public class QueuePortalEnvironmentFacade implements PortalEnvironmentFacade {
+public class QueuePortalEnvironmentFacade extends PortalEnvironmentFacade {
     private static final String BUNDLE_NAME = "content.Language";
 
     private User user;
@@ -67,6 +67,10 @@ public class QueuePortalEnvironmentFacade implements PortalEnvironmentFacade {
         return locale.getLanguage();
     }
 
+    public String getResourceString(String key) {
+        return bundle.getString(key);
+    }
+
     @Override
     public boolean isUserAdmin() {
         return isAdmin;
@@ -76,4 +80,5 @@ public class QueuePortalEnvironmentFacade implements PortalEnvironmentFacade {
     public boolean isBankUser() {
         return isBankUser;
     }
+
 }

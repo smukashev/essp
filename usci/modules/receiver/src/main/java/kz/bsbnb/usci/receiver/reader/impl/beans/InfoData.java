@@ -14,6 +14,7 @@ public class InfoData {
     private String docType;
 
     private String docValue;
+    private boolean maintenance;
 
     public Date getReportDate() {
         return reportDate;
@@ -61,5 +62,13 @@ public class InfoData {
 
     public void setAccountDate(Date accountDate) {
         this.accountDate = accountDate;
+    }
+
+    public void setMaintenance(boolean maintenance) {
+        this.maintenance = maintenance;
+    }
+
+    public boolean isMaintenance() {
+        return maintenance;
     }
 }

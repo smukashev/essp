@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -207,6 +208,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 .set(EAV_BATCHES.TOTAL_COUNT, batch.getTotalCount())
                 .set(EAV_BATCHES.ACTUAL_COUNT, batch.getActualCount())
                 .set(EAV_BATCHES.REPORT_ID, batch.getReportId())
+                .set(EAV_BATCHES.IS_MAINTENANCE, DataUtils.convert(batch.isMaintenance()))
                 .where(EAV_BATCHES.ID.eq(batch.getId()));
 
         int updatedCount = updateWithStats(update.getSQL(), update.getBindValues().toArray());
@@ -253,6 +255,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         batch.setTotalCount(getNullSafeLong(row, EAV_BATCHES.ACTUAL_COUNT));
         batch.setActualCount(getNullSafeLong(row, EAV_BATCHES.TOTAL_COUNT));
         batch.setReportId(getNullSafeLong(row, EAV_BATCHES.REPORT_ID));
+        batch.setMaintenance(getNullSafeLong(row, EAV_BATCHES.IS_MAINTENANCE) == 1);
+        batch.setMaintenanceApproved(getNullSafeLong(row, EAV_BATCHES.IS_MAINTENANCE_APPROVED) == 1);
         return batch;
     }
 
@@ -275,6 +279,36 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         Update update = context.update(EAV_BATCHES)
                 .set(EAV_BATCHES.ACTUAL_COUNT, 0L)
                 .where(EAV_BATCHES.ID.eq(batchId));
+
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
+
+
+    @Override
+    public List<Batch> getMaintenanceBatches(Date reportDate) {
+        SelectConditionStep select = context.selectFrom(EAV_BATCHES)
+                .where(EAV_BATCHES.IS_MAINTENANCE.eq(DataUtils.convert(true)))
+                .and(EAV_BATCHES.IS_MAINTENANCE_APPROVED.eq(DataUtils.convert(false)));
+
+        if(reportDate != null)
+            select = select.and(EAV_BATCHES.REP_DATE.eq(DataUtils.convert(reportDate)));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        List<Batch> maintenanceBatches = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            maintenanceBatches.add(fillBatch(new Batch() , row));
+        }
+
+        return maintenanceBatches;
+    }
+
+    @Override
+    public void approveMaintenance(List<Long> approvedBatchIds) {
+        Update update = context.update(EAV_BATCHES)
+                .set(EAV_BATCHES.IS_MAINTENANCE_APPROVED, DataUtils.convert(true))
+                .where(EAV_BATCHES.ID.in(approvedBatchIds));
 
         updateWithStats(update.getSQL(), update.getBindValues().toArray());
     }

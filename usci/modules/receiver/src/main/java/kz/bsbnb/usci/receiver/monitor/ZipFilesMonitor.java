@@ -97,6 +97,16 @@ public class ZipFilesMonitor {
         try {
             Batch batch = batchService.getBatch(batchId);
             BatchInfo batchInfo = new BatchInfo(batch);
+
+            if(batch.isMaintenance() && !batch.isMaintenanceApproved()) {
+                batchService.addBatchStatus(new BatchStatus()
+                        .setBatchId(batchId)
+                        .setStatus(BatchStatuses.MAINTENANCE_REQUEST)
+                        .setReceiptDate(new Date())
+                );
+
+                return false;
+            }
            // EavGlobal signGlobal = serviceFactory.getGlobalService().getGlobal(batch.getStatusId());
 
             //if(signGlobal.getValue().equals(WAITING_FOR_SIGNATURE)) {
@@ -310,10 +320,21 @@ public class ZipFilesMonitor {
 
         batch.setCreditorId(isNB ? 0 : cId);
         batch.setReportId(batchInfo.getReportId());
+        batch.setMaintenance(batchInfo.isMaintenance());
         batchService.uploadBatch(batch);
 
         if (!haveError) {
             if (!waitForSignature(batch, batchInfo)) {
+                if(batchInfo.isMaintenance()) {
+                    batchService.addBatchStatus(new BatchStatus()
+                            .setBatchId(batchId)
+                            .setStatus(BatchStatuses.MAINTENANCE_REQUEST)
+                            .setReceiptDate(new Date())
+                    );
+
+                    return;
+                }
+
                 batchService.addBatchStatus(new BatchStatus()
                         .setBatchId(batchId)
                         .setStatus(BatchStatuses.WAITING)
@@ -640,6 +661,7 @@ public class ZipFilesMonitor {
                 batchInfo.setSize(infoData.getActualCreditCount());
                 batchInfo.setActualCount(infoData.getActualCreditCount());
                 batchInfo.setTotalCount(0);
+                batchInfo.setMaintenance(infoData.isMaintenance());
 
                 String code = infoData.getCode();
                 if (code != null && code.length() > 0) {

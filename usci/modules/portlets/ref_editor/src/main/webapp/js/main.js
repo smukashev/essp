@@ -335,6 +335,11 @@ function addField(form, attr, idSuffix, node) {
                         type: 'json',
                         root: 'data',
                         totalProperty: 'total'
+                    },
+                    listeners: {
+                        exception : function(proxy, response, operation) {
+                            handleError(operation);
+                        }
                     }
                 },
                 autoLoad: true,
