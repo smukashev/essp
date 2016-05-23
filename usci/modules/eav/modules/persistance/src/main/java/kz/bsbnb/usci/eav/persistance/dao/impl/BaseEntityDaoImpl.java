@@ -9,10 +9,7 @@ import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityReportDateDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityValueDao;
-import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
+import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
@@ -51,6 +48,9 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Autowired
     private IBaseEntityReportDateDao baseEntityReportDateDao;
 
+    @Autowired
+    private IEavOptimizerDao eavOptimizerDao;
+
     @Override
     public long insert(IPersistable persistable) {
         IBaseEntity baseEntity = (IBaseEntity) persistable;
@@ -75,23 +75,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Override
     public void delete(IPersistable persistable) {
-        delete(persistable.getId());
-    }
-
-    protected void delete(long id) {
-        String tableAlias = "e";
-        Delete delete = context
-                .delete(EAV_BE_ENTITIES.as(tableAlias))
-                .where(EAV_BE_ENTITIES.as(tableAlias).ID.equal(id));
-
-        logger.debug(delete.toString());
-        int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
-
-        if (count > 1)
-            throw new IllegalStateException(Errors.compose(Errors.E89, id));
-
-        if (count < 1)
-            throw new IllegalStateException(Errors.compose(Errors.E90, id));
+        deleteRecursive(persistable.getId());
     }
 
     public IBaseEntity loadMock(long id) {
@@ -182,7 +166,22 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                 .getPersistableDao(BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
         baseEntityReportDateDao.deleteAll(baseEntityId);
-        delete(baseEntityId);
+
+        eavOptimizerDao.delete(baseEntityId);
+
+        String tableAlias = "e";
+        Delete delete = context
+                .delete(EAV_BE_ENTITIES.as(tableAlias))
+                .where(EAV_BE_ENTITIES.as(tableAlias).ID.equal(baseEntityId));
+
+        logger.debug(delete.toString());
+        int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+
+        if (count > 1)
+            throw new IllegalStateException(Errors.compose(Errors.E89, baseEntityId));
+
+        if (count < 1)
+            throw new IllegalStateException(Errors.compose(Errors.E90, baseEntityId));
 
         return true;
     }
