@@ -80,6 +80,9 @@ public class CortegeDaoImpl extends CommonDao {
                 rootExecutionFlag = true;
             }
 
+            if (globalEntity.getOperation() != null)
+                continue;
+
             if (!showCase.isFinal()) {
                 Date maxOpenDate;
                 try {

@@ -531,7 +531,7 @@ title: проверка документов по признаку IS_PERSON_DOC
 rule "проверка документов по признаку IS_PERSON_DOC/IS_ORG_DOC"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                 && (getEls("{setString(07,10,14,15,16,18)}subject[is_person=true]docs.doc_type.code") > 0
+                 && (getEls("{setString(07,10,15,16,18)}subject[is_person=true]docs.doc_type.code") > 0
                   || getEls("{setString(01,02,03,04,05,06,08,12,13)}subject[is_organization=true][organization_info.is_se=false]docs.doc_type.code") > 0
                   ))
 then

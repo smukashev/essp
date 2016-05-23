@@ -114,6 +114,8 @@ public class CLI {
 
     @Autowired EntityExporter entityExporter;
 
+    @Autowired IBaseEntityDao baseEntityDao;
+
     @Autowired
     EntityProcessorListenerImpl entityProcessorListener;
 
@@ -849,8 +851,8 @@ public class CLI {
         } */
     }
 
-    public void removeEntityById(long id, String url) {
-        // todo: remove
+    public void removeEntityById(long id) {
+        baseEntityDao.deleteRecursive(id);
     }
 
     public void dumpEntityToXML(String ids, String fileName) {
@@ -1776,8 +1778,8 @@ public class CLI {
                     System.out.println("Argument needed: <xml> delete <id> <fileName>");
                 }
             } else if (args.get(0).equals("rm")) {
-                if (args.size() > 2) {
-                    removeEntityById(Long.parseLong(args.get(1)), args.get(2));
+                if (args.size() > 1) {
+                    removeEntityById(Long.parseLong(args.get(1)));
                 } else {
                     System.out.println("Argument needed: <rm> <id> <service_url>");
                     System.out.println("Example: rm 100 rmi://127.0.0.1:1099/batchEntryService");

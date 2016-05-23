@@ -889,7 +889,7 @@ sql update eav_m_simple_attributes set title='Пятое значение НПС
 sql update eav_m_simple_attributes set title='Седьмое значение НПС' where name='seventh_sign'
 sql update eav_m_simple_attributes set title='Фамилия' where name='lastname'
 sql update eav_m_simple_attributes set title='Валюта' where name='amount_currency'
-sql update eav_m_simple_attributes set title='Значение' where name='weight'
+sql update eav_m_simple_attributes set title='Вес' where name='weight'
 sql update eav_m_simple_attributes set title='Номер' where name='no'
 sql update eav_m_simple_attributes set title='Наименование' where name='name'
 sql update eav_m_simple_attributes set title='Код' where name='nokbdb_code'
