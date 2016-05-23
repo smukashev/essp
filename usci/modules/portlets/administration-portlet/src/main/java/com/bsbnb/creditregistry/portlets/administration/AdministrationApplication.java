@@ -60,7 +60,7 @@ public class AdministrationApplication extends Application implements PortletReq
                 User user = PortalUtil.getUser(PortalUtil.getHttpServletRequest(request));
                 if (user != null) {
                     for (Role role : user.getRoles()) {
-                        if (role.getName().equals("Administrator") || role.getName().equals("NationalBankEmployee"))
+                        if (role.getName().equals("Administrator"))
                             hasRights = true;
                     }
                 }

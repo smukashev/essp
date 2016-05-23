@@ -55,6 +55,7 @@ public class MainPortlet extends MVCPortlet {
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     public final Logger logger = Logger.getLogger(MainPortlet.class);
     private Exception currentException;
+    private boolean retry;
 
     public void connectToServices() {
         try {
@@ -540,12 +541,33 @@ public class MainPortlet extends MVCPortlet {
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
+            String originalError = castJsonString(e);
+            if(originalError.contains("connect") || originalError.contains("rmi"))
+                if(!retry) {
+                    retry = true;
+                    logger.info("connect failed, reconnect triggered");
+                    try {
+                        connectToServices();
+                        serveResource(resourceRequest, resourceResponse);
+                    } catch (Exception e1) {
+                        logger.info("reconnect failed, seems services are down");
+                        originalError = Errors.decompose(castJsonString(e1));
+                        out.write(("{ \"success\": false, \"errorMessage\": \""+ originalError + "\"}").getBytes());
+                    } finally {
+                        retry = false;
+                        return;
+                    }
+                }
+
             currentException = null;
-            String originalError = e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;").
-                    replace("\n","").replaceAll("\t"," ") : e.getClass().getName();
             originalError = Errors.decompose(originalError);
             out.write(("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}").getBytes());
         }
+    }
+
+    private String castJsonString(Exception e) {
+        return e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;")
+                .replaceAll("\n","").replaceAll("\t"," ") : e.getClass().getName();
     }
 
     private byte[] constructExcel(RefListResponse refListResponse, RefColumnsResponse refColumnsResponse, String refTitle, String userName, String sRepDate, boolean withHis) throws WriteException, IOException, ParseException {
