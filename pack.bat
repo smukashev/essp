@@ -16,6 +16,7 @@ copy .\usci\modules\portlets\report-portlet\target\credit-registry-report-portle
 copy .\usci\modules\portlets\rules_portlet\target\rules_portlet-0.0.1-SNAPSHOT.war .\portlet_wars
 copy .\usci\modules\portlets\signing-portlet\target\signing-portlet.war .\portlet_wars
 copy .\usci\modules\portlets\upload-portlet\target\upload-portlet.war .\portlet_wars
+copy .\usci\modules\portlets\queue-portlet\target\queue-portlet.war .\portlet_wars
 
 
 

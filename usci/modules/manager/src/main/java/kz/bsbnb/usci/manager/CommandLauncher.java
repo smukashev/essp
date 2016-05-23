@@ -89,7 +89,6 @@ public class CommandLauncher {
 		final ArrayList<String> argumentList = new ArrayList<String>() {
 			{
 				add(javaLauncher);
-				add("-cp");
 				add(classPath);
 				add(securityPolicy);
 				add(fileEncoding);
