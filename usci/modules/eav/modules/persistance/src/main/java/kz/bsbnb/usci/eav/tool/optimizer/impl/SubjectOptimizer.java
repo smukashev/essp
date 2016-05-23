@@ -20,8 +20,8 @@ public class SubjectOptimizer {
 
     static {
         identificationCodes.add("06"); // ИНН
-        identificationCodes.add("07"); // РНН
-        identificationCodes.add("11"); // БИН
+        identificationCodes.add("07"); // БИН
+        identificationCodes.add("11"); // РНН
         identificationCodes.add("17"); // АИН
         identificationCodes.add("99"); // Присвоенный документ
     }
