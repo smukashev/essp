@@ -14,7 +14,7 @@ function boolean isAinCorrect(String ain, boolean isPerson){
         if(!ain.substring(10,12).matches("\\d{2}"))
             return false;
     } else {
-        if(!isDigit(ain.charAt(4)))
+        if(ain.charAt(4) != '0')
             return false;
         if(!isDateValid(ain.substring(5,11), "yyMMdd"))
             return false;
