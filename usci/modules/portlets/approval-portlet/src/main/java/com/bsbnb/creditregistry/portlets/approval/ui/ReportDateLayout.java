@@ -74,10 +74,11 @@ public class ReportDateLayout extends VerticalLayout {
 
         HorizontalLayout crossCheckStatusLayout = new HorizontalLayout();
         Label crossCheckStatusLabel = new Label("<b>" + environment.getResourceString(Localization.CROSS_CHECK_RESULT_LABEL_CAPTION) + ": </b>", Label.CONTENT_XHTML);
-        CrossCheck lastCrossCheck = provider.getLastCrossCheck(creditor, reportDate);
-        String crossCheckLinkCaption = lastCrossCheck == null
+        Report rep = provider.getReport(creditor,reportDate);
+        String crossCheckLinkCaption = (rep == null)
                 ? environment.getResourceString(Localization.CROSS_CHECK_DID_NOT_RUN)
-                : lastCrossCheck.getStatus().getNameRu();
+                : rep.getStatus().getNameRu();
+
         CrossCheckLink crossCheckLink = new CrossCheckLink(crossCheckLinkCaption, creditor.getId(), reportDate);
         crossCheckStatusLayout.addComponent(crossCheckStatusLabel);
         crossCheckStatusLayout.addComponent(crossCheckLink);
