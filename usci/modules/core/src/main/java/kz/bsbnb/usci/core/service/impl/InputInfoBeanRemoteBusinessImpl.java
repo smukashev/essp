@@ -71,6 +71,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
         ii.setBatchStatuses(new ArrayList<Protocol>());
 
         Boolean isCompleted = false;
+        String completedStatus = null;
 
         for (BatchStatus batchStatus : batchStatusList) {
             if (protocolsToDisplay.contains(batchStatus.getStatus())) {
@@ -81,14 +82,16 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
                 fillProtocol(batchStatus, ii);
 
-                if (batchStatus.getStatus().equals(COMPLETED))
+                if (batchStatus.getStatus().equals(COMPLETED) || batchStatus.getStatus().equals(ERROR)) {
                     isCompleted = true;
+                    completedStatus = batchStatus.getStatus().code();
+                }
             }
             fillDates(batchStatus, ii);
         }
 
         if (isCompleted)
-            lastStatus = "COMPLETED";
+            lastStatus = completedStatus;
 
         ii.setUserId(batch.getUserId());
         ii.setReportDate(batch.getRepDate());
