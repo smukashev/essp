@@ -201,7 +201,7 @@ class CLIXMLReader {
 
                 try {
                     event = (XMLEvent) xmlEventReader.next();
-                    obj = getCastObject(metaValue.getTypeCode(), event.asCharacters().getData().replaceAll("\\s+", ""));
+                    obj = getCastObject(metaValue.getTypeCode(), event.asCharacters().getData().trim());
                     //xmlEventReader.next();
                 } catch (NumberFormatException n) {
                     n.printStackTrace();

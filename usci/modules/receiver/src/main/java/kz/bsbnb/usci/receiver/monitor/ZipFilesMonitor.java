@@ -665,15 +665,15 @@ public class ZipFilesMonitor {
 
                 String code = infoData.getCode();
                 if (code != null && code.length() > 0) {
-                    batchInfo.addParam("CODE", code.replaceAll("\\s+", ""));
+                    batchInfo.addParam("CODE", code.trim());
                 } else {
                     String docType = infoData.getDocType();
                     String docValue = infoData.getDocValue();
 
                     if (docType != null && docValue != null &&
                             docType.length() > 0 && docValue.length() > 0) {
-                        batchInfo.addParam("DOC_TYPE", docType.replaceAll("\\s+", ""));
-                        batchInfo.addParam("DOC_VALUE", docValue.replaceAll("\\s+", ""));
+                        batchInfo.addParam("DOC_TYPE", docType.trim());
+                        batchInfo.addParam("DOC_VALUE", docValue.trim());
                     }
                 }
 
@@ -690,7 +690,7 @@ public class ZipFilesMonitor {
                 manifestReader.parse(eventReader);
                 ManifestData manifestData = manifestReader.getManifestData();
 
-                batchInfo.setBatchType(manifestData.getType().replaceAll("\\s+", ""));
+                batchInfo.setBatchType(manifestData.getType().trim());
 
                 batchInfo.setBatchName(parseFileNameFromPath(filename));
 
