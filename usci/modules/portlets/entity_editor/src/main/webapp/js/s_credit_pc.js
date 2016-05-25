@@ -26,8 +26,9 @@ Ext.onReady(function() {
                 searchName: serviceCode,
                 timeout: 120000,
                 no: Ext.getCmp('edPrimaryContractNO').value,
-                date: Ext.getCmp('edPrimaryContractDate').value,
-                creditorId: Ext.getCmp('edCreditor').value
+                pDate: Ext.getCmp('edPrimaryContractDate').value,
+                creditorId: Ext.getCmp('edCreditor').value,
+                date: Ext.getCmp('edDate').value
 
             };
             //loader
