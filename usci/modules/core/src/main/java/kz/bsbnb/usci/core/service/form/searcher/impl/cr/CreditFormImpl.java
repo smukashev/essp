@@ -55,6 +55,8 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
         if(!metaClass.getClassName().equals("credit"))
             throw new RuntimeException(Errors.compose(Errors.E231));
         Date reportDate = new Date();
+        if(parameters.get("date") != null)
+            reportDate = (Date) DataTypes.getCastObject(DataTypes.DATE, parameters.get("date"));
         IBaseEntitySearcher searcher = searcherPool.getSearcher("credit");
         ISearchResult result = new PaginableSearchResult();
         BaseEntity credit = new BaseEntity(metaClass, reportDate, creditorId);
@@ -63,7 +65,7 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
                 reportDate, creditorId);
         primaryContract.put("no", new BaseValue(creditorId, reportDate, parameters.get("no")));
         primaryContract.put("date", new BaseValue(creditorId, reportDate,
-                DataTypes.getCastObject(DataTypes.DATE, parameters.get("date"))));
+                DataTypes.getCastObject(DataTypes.DATE, parameters.get("pDate"))));
         credit.put("primary_contract", new BaseValue(creditorId, reportDate, primaryContract));
         Long id = searcher.findSingle(credit, creditorId);
 
@@ -72,7 +74,7 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
         SearchPagination pagination = new SearchPagination(0);
         result.setPagination(pagination);
         if(id != null) {
-            entityList.add((BaseEntity) baseEntityLoadDao.load(id));
+            entityList.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
             pagination.setTotalCount(1);
         }
         return result;

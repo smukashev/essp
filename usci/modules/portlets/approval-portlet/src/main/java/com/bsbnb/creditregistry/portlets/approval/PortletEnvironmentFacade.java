@@ -14,6 +14,8 @@ public interface PortletEnvironmentFacade {
 
     public long getUserID();
 
+    public User getUser();
+
     public boolean isLanguageKazakh();
 
     public boolean isNbUser();
