@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
 import kz.bsbnb.usci.eav.showcase.ShowCaseField;
@@ -80,7 +81,7 @@ public class CortegeDaoImpl extends CommonDao {
                 rootExecutionFlag = true;
             }
 
-            if (globalEntity.getOperation() != null)
+            if (globalEntity.getOperation() != null && globalEntity.getOperation().equals(OperationType.DELETE))
                 continue;
 
             if (!showCase.isFinal()) {
