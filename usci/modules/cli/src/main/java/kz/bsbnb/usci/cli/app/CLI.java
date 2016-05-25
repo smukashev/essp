@@ -57,6 +57,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -1175,6 +1176,10 @@ public class CLI {
             } else if (args.get(0).equals("tojava")) {
                 MetaClass metaClass = metaClassRepository.getMetaClass(args.get(1));
                 System.out.println(metaClass.toJava(""));
+            } else if (args.get(0).equals("select")) {
+                MetaClass metaClass = metaClassRepository.getMetaClass(args.get(1));
+                Select select = metaClassDao.getSimpleSelect(metaClass.getId());
+                System.out.println(select);
             } else {
                 System.out.println("No such operation: " + args.get(0));
             }
