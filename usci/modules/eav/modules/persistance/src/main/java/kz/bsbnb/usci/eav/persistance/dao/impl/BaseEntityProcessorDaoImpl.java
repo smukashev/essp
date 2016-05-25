@@ -264,8 +264,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
                 case UPDATE:
-                    /*if (baseEntityPostPrepared.getId() <= 0)
-                        throw new KnownException(Errors.compose(Errors.E198));*/
+                    if (baseEntityPostPrepared.getId() <= 0)
+                        throw new KnownException(Errors.compose(Errors.E198));
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
 
