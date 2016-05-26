@@ -3,6 +3,7 @@ package com.bsbnb.creditregistry.portlets.approval.ui;
 import com.bsbnb.creditregistry.portlets.approval.ApprovalPortletResource;
 import com.bsbnb.creditregistry.portlets.approval.PortletEnvironmentFacade;
 import com.bsbnb.creditregistry.portlets.approval.data.DataProvider;
+import com.bsbnb.creditregistry.portlets.approval.data.DatabaseConnect;
 import com.bsbnb.creditregistry.portlets.approval.data.ReportDisplayBean;
 import com.bsbnb.creditregistry.portlets.approval.data.ReportDisplayBean.ReportDisplayListener;
 import com.bsbnb.vaadin.filterableselector.FilterableSelect;
@@ -21,6 +22,7 @@ import jxl.format.Border;
 import jxl.format.BorderLineStyle;
 import jxl.write.*;
 import jxl.write.Label;
+import kz.bsbnb.ddlutils.model.Database;
 import kz.bsbnb.usci.cr.model.Creditor;
 import org.apache.log4j.Logger;
 
@@ -29,10 +31,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.Number;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -181,10 +184,36 @@ public class CreditorsListLayout extends VerticalLayout implements ReportDisplay
             }
         });
         exportToXlsButton.setIcon(ApprovalPortletResource.EXCEL_ICON);
+
+        DatabaseConnect procedur = new DatabaseConnect(environment.getUser());
+        List<Object> params = new ArrayList<>();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(reportDate);
+        cal.add(Calendar.MONTH, -1);
+        Date maturityDate = cal.getTime();
+        params.add(maturityDate);
+        params.add(reportDate);
+
+        Map<Long, Long> actualCounts = new HashMap<>();
+        try {
+            ResultSet result = procedur.getResultSetFromStoredProcedure("CREDITOR_ACTUAL_COUNT", params);
+            while(result.next()) {
+                Long creditor_id =  result.getLong("ref_creditor_id");
+                Long actual_count =  result.getLong("actual_count");
+                actualCounts.put(creditor_id,actual_count);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         List<ReportDisplayBean> reports = provider.getReportsForDate(selectedCreditors, reportDate);
         for (ReportDisplayBean report : reports) {
+            Long code = report.getReport().getCreditor().getId();
+            report.getReport().setActualCount(actualCounts.get(code));
             report.addReportDisplayListener(this);
         }
+
         reportsContainer = new BeanItemContainer<ReportDisplayBean>(ReportDisplayBean.class, reports);
         FormattedTable reportsTable = new FormattedTable();
         reportsTable.setContainerDataSource(reportsContainer);

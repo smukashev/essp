@@ -40,6 +40,11 @@ public class TestPortletEnvironmentFacade implements PortletEnvironmentFacade {
     }
 
     @Override
+    public User getUser() {
+        return null;
+    }
+
+    @Override
     public boolean isLanguageKazakh() {
         return false;
     }

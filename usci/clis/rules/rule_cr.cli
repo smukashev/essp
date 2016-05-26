@@ -559,6 +559,10 @@ function boolean creditorBranchIsGood(BaseEntity entity) {
       //Извлечь головной банк филиала
       BaseEntity mainOffice = (BaseEntity) creditorBranch.getEl("main_office");
 
+      //Не обязательно для заполнения
+      if(mainOffice == null)
+         return true;
+
       //Проверить на соответсвие
       return creditor.getId() == mainOffice.getId();
    } catch (Exception e){
