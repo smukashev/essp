@@ -170,7 +170,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                 for(String s : baseEntity.getValidationErrors()) errors.add(s);
 
-                sqlStats.put("java::rule(" + baseEntity.getMeta().getClassName()+")", System.currentTimeMillis() - t1);
+                sqlStats.put("java::rule", System.currentTimeMillis() - t1);
             } catch (Exception e) {
                 logger.error(Errors.compose(Errors.E290,e));
                 throw new RuntimeException(Errors.compose(Errors.E290,e));
@@ -203,7 +203,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         long prepareTime = System.currentTimeMillis();
         baseEntityPostPrepared = prepare(((BaseEntity) baseEntity).clone(), creditorId);
-        sqlStats.put("java::prepare(" + baseEntity.getMeta().getClassName() + ")", (System.currentTimeMillis() - prepareTime));
+        sqlStats.put("java::prepare", (System.currentTimeMillis() - prepareTime));
 
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
@@ -280,7 +280,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         } else {
             long applyTime = System.currentTimeMillis();
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
-            sqlStats.put("java::apply(" + baseEntity.getMeta().getClassName() + ")", (System.currentTimeMillis() - applyTime));
+            sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
             baseEntityApplyDao.applyToDb(baseEntityManager);
         }
