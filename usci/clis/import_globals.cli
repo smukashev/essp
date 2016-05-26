@@ -6,7 +6,7 @@ global add --type=REPORT_STATUS --code=WOE --value=77 --desc=Отконтрол�
 global add --type=REPORT_STATUS --code=IN_PROGRESS --value=90 --desc=В_процессе
 global add --type=REPORT_STATUS --code=CROSS_CHECK_ERROR --value=91 --desc=Ошибка_межформенного_контроля
 global add --type=REPORT_STATUS --code=COMPLETED --value=92 --desc=Завершен/Утвержден
-global add --type=REPORT_STATUS --code=ORGANIZATION_APPROVING --value=127 --desc=Идет_подтверждение
+global add --type=REPORT_STATUS --code=ORGANIZATION_APPROVING --value=127 --desc=Утвержден_организацией
 global add --type=REPORT_STATUS --code=ORGANIZATION_APPROVED --value=128 --desc=Утвержден_организацией
 
 #
