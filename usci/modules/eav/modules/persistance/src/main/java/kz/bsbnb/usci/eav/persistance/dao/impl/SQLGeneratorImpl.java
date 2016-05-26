@@ -38,7 +38,7 @@ public class SQLGeneratorImpl extends JDBCSupport implements ISQLGenerator {
 
     @SuppressWarnings("all")
     @Override
-    public Select getSimpleSelect(long metaId) {
+    public Select getSimpleSelect(long metaId, boolean onlyKey) {
         final String ebe = "ebe";
         int counter = 1;
 
@@ -59,7 +59,7 @@ public class SQLGeneratorImpl extends JDBCSupport implements ISQLGenerator {
             IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
             IMetaType metaType = metaAttribute.getMetaType();
 
-            if (!metaAttribute.isKey() && !metaAttribute.isOptionalKey())
+            if (onlyKey && !metaAttribute.isKey() && !metaAttribute.isOptionalKey())
                 continue;
 
             String attrName = metaAttribute.getName().toUpperCase();
@@ -110,7 +110,7 @@ public class SQLGeneratorImpl extends JDBCSupport implements ISQLGenerator {
             IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
             IMetaType metaType = metaAttribute.getMetaType();
 
-            if (!metaAttribute.isKey() && !metaAttribute.isOptionalKey())
+            if (onlyKey && !metaAttribute.isKey() && !metaAttribute.isOptionalKey())
                 continue;
 
             if (metaType.isSet()) {
@@ -171,8 +171,8 @@ public class SQLGeneratorImpl extends JDBCSupport implements ISQLGenerator {
     }
 
     @Override
-    public List<Map<String, Object>> getSimpleResult(long metaId) {
-        Select select = getSimpleSelect(metaId);
+    public List<Map<String, Object>> getSimpleResult(long metaId, boolean onlyKey) {
+        Select select = getSimpleSelect(metaId, onlyKey);
         return queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
     }
 
