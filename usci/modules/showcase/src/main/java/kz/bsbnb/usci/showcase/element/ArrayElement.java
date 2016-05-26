@@ -3,7 +3,7 @@ package kz.bsbnb.usci.showcase.element;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 
 public class ArrayElement {
-    public final int index;
+    public int index;
     public final ValueElement valueElement;
     public BaseEntity entity;
 

@@ -937,7 +937,7 @@ public class CLI {
                 totalCount++;
                 try {
                     long id = baseEntityProcessorDao.process(entity).getId();
-                    System.out.println("Запись сохранилась с ИД: " + id);
+                    System.out.println(entity.getMeta().getClassName() + " сохранился с ИД: " + id);
                     actualCount++;
                 } catch (Exception ex) {
                     lastException = ex;

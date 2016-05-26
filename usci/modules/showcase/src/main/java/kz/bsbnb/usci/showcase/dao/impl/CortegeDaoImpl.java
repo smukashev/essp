@@ -52,6 +52,7 @@ public class CortegeDaoImpl extends CommonDao {
 
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = new HashMap<>();
 
+        int indexCounter = 1;
         for (BaseEntity entity : entities) {
             HashMap<ArrayElement, HashMap<ValueElement, Object>> tmpMap = generateMap(entity, showCase);
 
@@ -60,6 +61,7 @@ public class CortegeDaoImpl extends CommonDao {
 
             for (ArrayElement arrayElement : tmpMap.keySet()) {
                 arrayElement.setEntity(entity);
+                arrayElement.index = indexCounter++;
             }
 
             savingMap.putAll(tmpMap);
@@ -104,7 +106,8 @@ public class CortegeDaoImpl extends CommonDao {
                     sql = "SELECT MAX(open_date) AS open_date FROM %s WHERE " + historyKeyElement.queryKeys;
                     sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                    maxOpenDate = (Date) jdbcTemplateSC.queryForMap("SELECT MAX(open_date) AS open_date FROM %s WHERE  + historyKeyElement.queryKeys", sql, historyKeyElement.values).get("OPEN_DATE");
+                    maxOpenDate = (Date) jdbcTemplateSC.queryForMap(
+                            "SELECT MAX(open_date) AS open_date FROM %s WHERE  + historyKeyElement.queryKeys", sql, historyKeyElement.values).get("OPEN_DATE");
                 } catch (EmptyResultDataAccessException e) {
                     maxOpenDate = null;
                 }
