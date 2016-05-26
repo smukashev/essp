@@ -756,6 +756,7 @@ Ext.onReady(function() {
     var buttonXML = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
+        hidden:!isNb,
         handler : function (){
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
@@ -846,6 +847,7 @@ Ext.onReady(function() {
         id: "buttonDelete",
         text: label_DEL,
         maxWidth: 200,
+        hidden:!isNb,
         handler : function (){
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
@@ -879,6 +881,7 @@ Ext.onReady(function() {
         id: "buttonClose",
         text: label_CLOSE,
         maxWidth: 200,
+        hidden:!isNb,
         handler : function (){
             var tree = Ext.getCmp('entityTreeView');
             rootNode = tree.getRootNode();
@@ -988,6 +991,7 @@ Ext.onReady(function() {
     var buttonAdd = Ext.create('Ext.button.Button', {
         id: "entityEditorAddBtn",
         text: 'Добавить',
+        hidden:!isNb,
         handler : function (){
             nextArrayIndex = 0;
             var form = Ext.getCmp('ModalFormPannel');
