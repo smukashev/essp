@@ -1173,8 +1173,22 @@ Ext.onReady(function() {
                 displayField:'classTitle',
                 listeners: {
                     change: function (field, newValue, oldValue) {
+                        var selectedRef = field.findRecordByValue(newValue);
+                        if(selectedRef.data['className']  == 'ref_portfolio'){
+                            buttonAdd.show();
+                            buttonXML.show();
+                            buttonDelete.show();
+                            buttonClose.show();
+                        }else{
+                            buttonAdd.hide();
+                            buttonXML.hide();
+                            buttonDelete.hide();
+                            buttonClose.hide();
+                        }
+
                         currentClassId = newValue;
                         createItemsGrid(currentClassId);
+
                     }
                 },
                 editable : false
