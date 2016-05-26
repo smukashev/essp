@@ -117,6 +117,8 @@ public class CLI {
 
     @Autowired IBaseEntityDao baseEntityDao;
 
+    @Autowired ISQLGenerator sqlGenerator;
+
     @Autowired
     EntityProcessorListenerImpl entityProcessorListener;
 
@@ -1178,7 +1180,7 @@ public class CLI {
                 System.out.println(metaClass.toJava(""));
             } else if (args.get(0).equals("select")) {
                 MetaClass metaClass = metaClassRepository.getMetaClass(args.get(1));
-                Select select = metaClassDao.getSimpleSelect(metaClass.getId());
+                Select select = sqlGenerator.getSimpleSelect(metaClass.getId());
                 System.out.println(select);
             } else {
                 System.out.println("No such operation: " + args.get(0));
