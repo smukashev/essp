@@ -31,11 +31,14 @@ public class MainPortlet extends MVCPortlet {
     private PortalUserBeanRemoteBusiness portalUserBusiness;
 
     //должен быть отличен от C:/zips (т.е папки receiver-а)
-    private final static String TMP_FILE_DIR = "\\\\" + StaticRouter.getAsIP() + "\\batch_entry_list_temp_folder";
+    //private final static String TMP_FILE_DIR = "\\\\" + StaticRouter.getAsIP() + "\\batch_entry_list_temp_folder";
+    private final static String TMP_FILE_DIR = StaticRouter.isDevMode() ? "/home/usci_data/batch_entry_list_temp_folder" :
+            "\\\\" + StaticRouter.getAsIP() + "\\batch_entry_list_temp_folder";
 
     private IBatchEntryService batchEntryService;
     private Logger logger = Logger.getLogger(MainPortlet.class);
     private Exception currentException;
+    private boolean retry;
 
     public void connectToServices() {
         try {
@@ -262,11 +265,34 @@ public class MainPortlet extends MVCPortlet {
                     break;
             }
         } catch (Exception e) {
-            currentException = null;
             logger.error(e.getMessage(),e);
-            String originalError = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
+            String originalError = castJsonString(e);
+            if(originalError.contains("connect") || originalError.contains("rmi"))
+                if(!retry) {
+                    retry = true;
+                    logger.info("connect failed, reconnect triggered");
+                    try {
+                        connectToServices();
+                        serveResource(resourceRequest, resourceResponse);
+                    } catch (Exception e1) {
+                        logger.info("reconnect failed, seems services are down");
+                        originalError = Errors.decompose(castJsonString(e1));
+                        writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError + "\"}");
+                    } finally {
+                        retry = false;
+                        return;
+                    }
+                }
+
             originalError = Errors.decompose(originalError);
-            writer.write("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}");
+            writer.write("{ \"success\": false, \"errorMessage\": \""+ originalError +"\"}");
         }
+
+
+    }
+
+    private String castJsonString(Exception e) {
+        return e.getMessage() != null ? e.getMessage().replaceAll("\"","&quot;")
+                .replaceAll("\n","").replaceAll("\t"," ") : e.getClass().getName();
     }
 }
