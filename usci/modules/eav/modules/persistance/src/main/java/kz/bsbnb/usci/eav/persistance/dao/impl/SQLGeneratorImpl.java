@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_DATE_VALUES;
-import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
 
 @Repository
 public class SQLGeneratorImpl extends JDBCSupport implements ISQLGenerator {
