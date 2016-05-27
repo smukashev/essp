@@ -171,13 +171,20 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         if (childBaseEntity.getId() < 1)
                             throw new KnownException(Errors.compose(Errors.E62, childBaseEntity.getMeta().getClassName()));
 
+                        IBaseEntity childBaseEntityImmutable = baseEntityLoadDao.loadByMaxReportDate(
+                                childBaseEntity.getId(), childBaseEntity.getReportDate());
+
+                        if (childBaseEntityImmutable == null)
+                            throw new RuntimeException(Errors.compose(Errors.E63, childBaseEntity.getId(),
+                                    childBaseEntity.getReportDate()));
+
                         IBaseValue baseValueApplied = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
                                 0,
                                 creditorId,
                                 new Date(baseValueSaving.getRepDate().getTime()),
-                                childBaseEntity,
+                                childBaseEntityImmutable,
                                 false,
                                 true);
 
@@ -758,10 +765,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 if (compare == 0) {
                     // case#1
                     if (metaAttribute.isFinal()) {
-                        if (metaClass.hasNotFinalAttributes() && !metaClass.isSearchable())
-                            throw new IllegalStateException(Errors.compose(Errors.E65, baseEntity.getMeta().getClassName(),
-                                    metaAttribute.getName()));
-
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
@@ -932,8 +935,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     if (baseEntitySaving.getId() < 1)
                         throw new KnownException(Errors.compose(Errors.E62, baseEntitySaving.getMeta().getClassName()));
 
-                    baseEntityApplied = baseEntityLoaded;
-                    /*baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());*/
+                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
                 } else {
                     baseEntityApplied = metaClass.isSearchable() ?
                             apply(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager) :
@@ -969,8 +971,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     if (baseEntitySaving.getId() < 1)
                         throw new KnownException(Errors.compose(Errors.E62, baseEntitySaving.getMeta().getClassName()));
 
-                    /*baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());*/
-                    baseEntityApplied = baseEntityLoaded;
+                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
                 } else {
                     baseEntityApplied = apply(creditorId, baseEntitySaving, null, baseEntityManager);
                 }
@@ -1108,8 +1109,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             if (baseEntitySaving.getId() < 1)
                                 throw new KnownException(Errors.compose(Errors.E62, baseEntitySaving.getMeta().getClassName()));
 
-                            /*baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());*/
-                            baseEntityApplied = (BaseEntity) baseValueLoaded.getValue();
+                            baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
                                     apply(creditorId, baseEntitySaving, null, baseEntityManager) :
@@ -1132,8 +1132,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             if (baseEntitySaving.getId() < 1)
                                 throw new KnownException(Errors.compose(Errors.E62, baseEntitySaving.getMeta().getClassName()));
 
-                            /*baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());*/
-                            baseEntityApplied = (BaseEntity) baseValueLoaded.getValue();
+                            baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
                                     apply(creditorId, baseEntitySaving, baseEntityClosed, baseEntityManager) :
@@ -1212,8 +1211,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     if (baseEntitySaving.getId() < 1)
                         throw new KnownException(Errors.compose(Errors.E62, baseEntitySaving.getMeta().getClassName()));
 
-                    /*baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());*/
-                    baseEntityApplied = (BaseEntity) baseValueLoaded.getValue();
+                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
                 } else {
                     IBaseValue previousBaseValue = valueDao.getPreviousBaseValue(baseValueSaving);
 
@@ -1767,10 +1765,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 if (compare == 0) {
                     // case#1
                     if (metaAttribute.isFinal()) {
-                        if (!childMetaClass.isSearchable() && childMetaClass.hasNotFinalAttributes())
-                            throw new IllegalStateException(Errors.compose(Errors.E65, baseEntity.getMeta().getClassName(),
-                                    metaAttribute.getName()));
-
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
@@ -2319,7 +2313,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         }
                     } catch (Exception insertException) {
                         /*throw new IllegalStateException(Errors.compose(Errors.E76, insertedObject, insertException.getMessage()));*/
-                        System.err.println(insertException.getMessage());
+                        System.err.println(insertedObject + " : " + insertException.getMessage());
                     }
                 }
             }
@@ -2336,7 +2330,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         persistableDao.update(updatedObject);
                     } catch (Exception updateException) {
                         /*throw new IllegalStateException(Errors.compose(Errors.E77, updatedObject, updateException.getMessage()));*/
-                        System.err.println(updateException.getMessage());
+                        System.err.println(updatedObject + " : " + updateException.getMessage());
                     }
                 }
             }
@@ -2353,7 +2347,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         persistableDao.delete(deletedObject);
                     } catch (Exception deleteException) {
                         /*throw new IllegalStateException(Errors.compose(Errors.E78, deletedObject, deleteException.getMessage()));*/
-                        System.err.println(deleteException.getMessage());
+                        System.err.println(deletedObject + " : " + deleteException.getMessage());
                     }
                 }
             }
