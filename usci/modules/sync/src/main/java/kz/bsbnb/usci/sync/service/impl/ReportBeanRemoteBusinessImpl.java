@@ -88,4 +88,9 @@ public class ReportBeanRemoteBusinessImpl implements ReportBeanRemoteBusiness {
     public Report getFirstReport(long creditorId) {
         return remoteReportBusiness.getFirstReport(creditorId);
     }
+
+    @Override
+    public Report getMaxApprovedReport(long creditorId) {
+        return remoteReportBusiness.getMaxApprovedReport(creditorId);
+    }
 }

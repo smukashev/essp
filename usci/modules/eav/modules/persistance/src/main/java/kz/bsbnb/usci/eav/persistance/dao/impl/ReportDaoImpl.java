@@ -376,4 +376,63 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
         Date reportDate = (Timestamp)rows.iterator().next().get(EAV_REPORT.REPORT_DATE.getName());
         return getReport(creditorId, reportDate);
     }
+
+    @Override
+    public Report getMaxApprovedReport(long creditorId) {
+
+        Condition approvedCondition = EAV_GLOBAL.TYPE.eq(ReportStatus.COMPLETED.type())
+                .and(
+                        EAV_GLOBAL.CODE.eq(ReportStatus.COMPLETED.code())
+                                .or(EAV_GLOBAL.CODE.eq(ReportStatus.ORGANIZATION_APPROVED.code()))
+                                .or(EAV_GLOBAL.CODE.eq(ReportStatus.ORGANIZATION_APPROVING.code()))
+                );
+
+        Select approvedIds = context.select(EAV_GLOBAL.ID).from(EAV_GLOBAL)
+                .where(approvedCondition);
+
+        Select select = context.selectFrom(EAV_REPORT)
+                .where(EAV_REPORT.CREDITOR_ID.eq(creditorId))
+                .and(EAV_REPORT.REPORT_DATE.eq(
+                        context.select(DSL.max(EAV_REPORT.REPORT_DATE)).from(EAV_REPORT)
+                        .where(EAV_REPORT.CREDITOR_ID.eq(creditorId)
+                        .and(EAV_REPORT.STATUS_ID.in(approvedIds))
+                )).and(EAV_REPORT.STATUS_ID.in(approvedIds)));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.isEmpty()) return null;
+
+        Map<String, Object> row = rows.get(0);
+
+        Report report = new Report();
+        report.setId(((BigDecimal) row.get(EAV_REPORT.ID.getName())).longValue());
+
+        Creditor creditor = new Creditor();
+        creditor.setId(((BigDecimal) row.get(EAV_REPORT.CREDITOR_ID.getName())).longValue());
+
+        report.setCreditor(creditor);
+
+        report.setTotalCount(((BigDecimal) row.get(EAV_REPORT.TOTAL_COUNT.getName())).longValue());
+        report.setActualCount(((BigDecimal) row.get(EAV_REPORT.ACTUAL_COUNT.getName())).longValue());
+        report.setBeginningDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.BEG_DATE.getName())));
+        report.setEndDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.END_DATE.getName())));
+        report.setLastManualEditDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.LAST_MANUAL_EDIT_DATE.getName())));
+
+        report.setStatusId(((BigDecimal) row.get(EAV_REPORT.STATUS_ID.getName())).longValue());
+        report.setReportDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.REPORT_DATE.getName())));
+
+        EavGlobal global = eavGlobalRepository.getGlobal(report.getStatusId());
+        {
+            Shared shared = new Shared();
+            shared.setId(global.getId());
+            shared.setType(global.getType());
+            shared.setCode(global.getCode());
+            shared.setNameRu(global.getDescription());
+            shared.setNameKz(global.getDescription());
+            report.setStatus(shared);
+        }
+
+
+        return report;
+    }
 }

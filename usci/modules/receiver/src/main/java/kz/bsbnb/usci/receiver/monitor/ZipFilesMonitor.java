@@ -39,6 +39,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import java.io.*;
 import java.nio.file.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -315,7 +316,7 @@ public class ZipFilesMonitor {
         }
 
 
-        if (!haveError && !checkAndFillEavReport(cId, batchInfo, batchId))
+        if (!haveError && !isNB && !checkAndFillEavReport(cId, batchInfo, batchId))
             haveError = true;
 
         batch.setCreditorId(isNB ? 0 : cId);
@@ -456,10 +457,66 @@ public class ZipFilesMonitor {
     private boolean checkAndFillEavReport(long creditorId, BatchInfo batchInfo, long batchId) {
         ReportBeanRemoteBusiness reportBeanRemoteBusiness = serviceFactory.getReportBeanRemoteBusinessService();
 
-        Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
-
         if (!StaticRouter.isDevMode()) {
             String errMsg = null;
+            Report maxApprovedReport = reportBeanRemoteBusiness.getMaxApprovedReport(creditorId);
+
+            Date mustDate = null;
+
+            //never approved
+            if(maxApprovedReport == null) {
+                String creditorDates = serviceFactory.getGlobalService().getValue(ORG_FIRST_DATE_SETTING, CREDITOR_DATES);
+                String creditorFirstDate = serviceFactory.getGlobalService().getValue(ORG_FIRST_DATE_SETTING, DEFAULT_DATE_VALUE);
+
+                String[] pairs = creditorDates.split(",");
+                for(String pair: pairs) {
+                    String[] record = pair.split("=");
+                    Long cId = Long.parseLong(record[0]);
+                    String date = record[1];
+                    if(creditorId == cId) {
+                        creditorFirstDate = date;
+                        break;
+                    }
+                }
+
+                try {
+                    mustDate = dateFormat.parse(creditorFirstDate);
+                } catch (ParseException e) {
+                    logger.error("Ошибка при парсинге певой даты для организаций creditorId = "
+                            + creditorId + ", batchId = " + batchId + ", creditorFirstDate = " + creditorFirstDate);
+                    errMsg = "Неправильная настройка первой отчетной даты для организации";
+                }
+
+                if(mustDate != null && !mustDate.equals(batchInfo.getRepDate())) {
+                    errMsg = "Ошибка отчетной даты. Первая отчетная дата для организации = "
+                            + dateFormat.format(mustDate) + ", заявлено = " + dateFormat.format(batchInfo.getRepDate());
+                }
+
+            } else {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(maxApprovedReport.getReportDate());
+                Integer reportPeriodDurationMonths = null;
+
+                for (Creditor creditor : creditors) {
+                    if(creditor.getId() == creditorId) {
+                        reportPeriodDurationMonths = creditor.getSubjectType().getReportPeriodDurationMonths();
+                        break;
+                    }
+                }
+                cal.add(Calendar.MONTH, reportPeriodDurationMonths == null ? 1 : reportPeriodDurationMonths);
+                mustDate = cal.getTime();
+
+                if(!mustDate.equals(batchInfo.getRepDate())) {
+                    errMsg = "Ошибка отчетной даты. Последняя утвержденная дата = " + dateFormat.format(maxApprovedReport.getReportDate()) + ", " +
+                            " заявлено = " + dateFormat.format(batchInfo.getRepDate()) + ", шаг отчетности = " + reportPeriodDurationMonths;
+                    logger.error(errMsg);
+                }
+            }
+
+
+
+            /*
+            creditors.get(0).getSubjectType().getReportPeriodDurationMonths()
 
             if (existing != null) {
                 if (ReportStatus.COMPLETED.code().equals(existing.getStatus().getCode())
@@ -513,7 +570,7 @@ public class ZipFilesMonitor {
                         errMsg = "История отчетности неккоректна";
                     }
                 }
-            }
+            }*/
 
             if (errMsg != null) {
                 batchService.addBatchStatus(new BatchStatus()
@@ -533,6 +590,7 @@ public class ZipFilesMonitor {
         }
 
         EavGlobal inProgress = serviceFactory.getGlobalService().getGlobal(ReportStatus.IN_PROGRESS);
+        Report existing = reportBeanRemoteBusiness.getReport(creditorId, batchInfo.getRepDate());
 
         if (existing != null) {
             existing.setStatusId(inProgress.getId());
