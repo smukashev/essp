@@ -345,9 +345,6 @@ when
             ||
             (getEls("{count}subject[is_organization=true]organization_info.bank_relations.bank_relation") > 1
             && getEls("{count}subject[is_organization=true]organization_info.bank_relations[bank_relation.code=50]") > 0)
-            ||
-            (getEls("{count}subject[is_creditor=true]creditor_info.bank_relations.bank_relation") > 1
-            && getEls("{count}subject[is_creditor=true]creditor_info.bank_relations[bank_relation.code=50]") > 0)
         ))
 then
   $entity.addValidationError("Ошибка по признаку связанности: Значение \"Не связан\" не может использоваться с иными значениями");
@@ -366,8 +363,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
   && (
         getEls("{hasDuplicates(subject[is_person=true]person_info.bank_relations)}bank_relation.code") == true ||
-        getEls("{hasDuplicates(subject[is_organization=true]organization_info.bank_relations)}bank_relation.code") == true ||
-        getEls("{hasDuplicates(subject[is_creditor=true]creditor_info.bank_relations)}bank_relation.code") == true
+        getEls("{hasDuplicates(subject[is_organization=true]organization_info.bank_relations)}bank_relation.code") == true
      ))
 then
   $entity.addValidationError("Ошибка по признаку связанности: Дублируется значение");
