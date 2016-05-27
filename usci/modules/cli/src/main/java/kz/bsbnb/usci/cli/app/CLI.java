@@ -117,6 +117,8 @@ public class CLI {
 
     @Autowired IBaseEntityDao baseEntityDao;
 
+    @Autowired ISQLGenerator sqlGenerator;
+
     @Autowired
     EntityProcessorListenerImpl entityProcessorListener;
 
@@ -937,7 +939,7 @@ public class CLI {
                 totalCount++;
                 try {
                     long id = baseEntityProcessorDao.process(entity).getId();
-                    System.out.println("Запись сохранилась с ИД: " + id);
+                    System.out.println(entity.getMeta().getClassName() + " сохранился с ИД: " + id);
                     actualCount++;
                 } catch (Exception ex) {
                     lastException = ex;
@@ -1178,7 +1180,13 @@ public class CLI {
                 System.out.println(metaClass.toJava(""));
             } else if (args.get(0).equals("select")) {
                 MetaClass metaClass = metaClassRepository.getMetaClass(args.get(1));
-                Select select = metaClassDao.getSimpleSelect(metaClass.getId());
+                Select select;
+                if (args.size() > 2) {
+                    select = sqlGenerator.getSimpleSelect(metaClass.getId(), true);
+                } else {
+                    select = sqlGenerator.getSimpleSelect(metaClass.getId(), false);
+                }
+
                 System.out.println(select);
             } else {
                 System.out.println("No such operation: " + args.get(0));

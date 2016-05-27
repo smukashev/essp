@@ -39,25 +39,41 @@ public class CortegeDaoImpl extends CommonDao {
         if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0) {
             List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath());
 
-            for (BaseEntity baseEntityApplied : allApplied)
-                rootCortegeGenerate(globalEntityApplied, baseEntityApplied, showCase);
+            rootCortegeGenerate(globalEntityApplied, allApplied, showCase);
         } else {
-            rootCortegeGenerate(globalEntityApplied, globalEntityApplied, showCase);
+            rootCortegeGenerate(globalEntityApplied, Collections.singletonList((BaseEntity) globalEntityApplied), showCase);
         }
     }
 
     /* Performs main operations on showcase  */
     @Transactional
-    private void rootCortegeGenerate(IBaseEntity globalEntity, IBaseEntity entity, ShowCase showCase) {
+    private void rootCortegeGenerate(IBaseEntity globalEntity, List<BaseEntity> entities, ShowCase showCase) {
         String sql;
 
-        HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = generateMap(entity, showCase);
+        HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = new HashMap<>();
 
-        if (savingMap == null || savingMap.size() == 0) return;
+        int indexCounter = 1;
+        for (BaseEntity entity : entities) {
+            HashMap<ArrayElement, HashMap<ValueElement, Object>> tmpMap = generateMap(entity, showCase);
+
+            if (tmpMap == null)
+                continue;
+
+            for (ArrayElement arrayElement : tmpMap.keySet()) {
+                arrayElement.setEntity(entity);
+                arrayElement.index = indexCounter++;
+            }
+
+            savingMap.putAll(tmpMap);
+        }
+
+        if (savingMap.size() == 0)
+            return;
 
         boolean rootExecutionFlag = false;
 
         for (Map.Entry<ArrayElement, HashMap<ValueElement, Object>> entry : savingMap.entrySet()) {
+            BaseEntity entity  = entry.getKey().entity;
             HashMap<ValueElement, Object> entryMap = entry.getValue();
 
             if (showCase.isChild()) {
@@ -90,7 +106,8 @@ public class CortegeDaoImpl extends CommonDao {
                     sql = "SELECT MAX(open_date) AS open_date FROM %s WHERE " + historyKeyElement.queryKeys;
                     sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-                    maxOpenDate = (Date) jdbcTemplateSC.queryForMap("SELECT MAX(open_date) AS open_date FROM %s WHERE  + historyKeyElement.queryKeys", sql, historyKeyElement.values).get("OPEN_DATE");
+                    maxOpenDate = (Date) jdbcTemplateSC.queryForMap(
+                            "SELECT MAX(open_date) AS open_date FROM %s WHERE  + historyKeyElement.queryKeys", sql, historyKeyElement.values).get("OPEN_DATE");
                 } catch (EmptyResultDataAccessException e) {
                     maxOpenDate = null;
                 }

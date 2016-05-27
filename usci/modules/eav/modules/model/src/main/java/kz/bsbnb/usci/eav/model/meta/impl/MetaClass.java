@@ -434,46 +434,6 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         this.parentIsKey = parentIsKey;
     }
 
-    @Override
-    public boolean hasNotFinalAttributes() {
-        for (String attribute : getAttributeNames()) {
-            IMetaAttribute metaAttribute = getMetaAttribute(attribute);
-            IMetaType metaType = metaAttribute.getMetaType();
-
-            if (metaAttribute.isImmutable())
-                continue;
-
-            if (!metaAttribute.isFinal())
-                return true;
-
-            boolean hasNotFinalAttributes = false;
-
-            if (metaType.isComplex()) {
-                if (metaType.isSet()) {
-                    IMetaSet childMetaSet = (IMetaSet) metaType;
-                    IMetaClass childMetaClass = (IMetaClass) childMetaSet.getMemberType();
-
-                    if (childMetaClass.isSearchable())
-                        continue;
-
-                    hasNotFinalAttributes = childMetaClass.hasNotFinalAttributes();
-                } else {
-                    IMetaClass childMetaClass = (IMetaClass) metaType;
-
-                    if (childMetaClass.isSearchable())
-                        continue;
-
-                    hasNotFinalAttributes = childMetaClass.hasNotFinalAttributes();
-                }
-            }
-
-            if (hasNotFinalAttributes)
-                return true;
-        }
-
-        return false;
-    }
-
     public Set<String> getSimpleAttributesNames(DataTypes dataType) {
         Set<String> allAttributeNames = this.members.keySet();
         Set<String> filteredAttributeNames = new HashSet<>();
