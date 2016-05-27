@@ -1,5 +1,8 @@
 <%@ page import="com.liferay.portal.theme.ThemeDisplay" %>
 <%@ page import="com.liferay.portal.kernel.util.WebKeys" %>
+<%@ page import="com.liferay.portal.util.PortalUtil" %>
+<%@ page import="com.liferay.portal.service.UserLocalServiceUtil" %>
+<%@ page import="com.liferay.portal.model.Role" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 <%@ taglib prefix="aui" uri="http://alloy.liferay.com/tld/aui" %>
 
@@ -8,7 +11,14 @@
 <%
 //    List<BaseEntity> baseEntityList = (List<BaseEntity>)renderRequest.getAttribute("entityList");
 %>
+<%
+    boolean isNb = false;
 
+    for(Role r : UserLocalServiceUtil.getUser(PortalUtil.getUserId(request)).getRoles()) {
+        if(r.getName().equals("NationalBankEmployee") || r.getName().equals("Administrator"))
+            isNb = true;
+    }
+%>
 <portlet:resourceURL var="getDataURL">
 
     <%--<portlet:param name="metaId" value="testClass" />--%>
@@ -22,6 +32,7 @@
     var dataUrl = '<%=getDataURL%>';
     var givenEntityId = '<%=renderRequest.getAttribute("entityId")%>';
     var contextPathUrl = '<%=request.getContextPath()%>';
+    var isNb = '<%=isNb%>' == 'true';
 </script>
 
 <script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>

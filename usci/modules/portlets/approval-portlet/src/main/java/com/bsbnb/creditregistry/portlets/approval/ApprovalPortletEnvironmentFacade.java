@@ -74,6 +74,9 @@ public class ApprovalPortletEnvironmentFacade implements PortletEnvironmentFacad
         return user.getUserId();
     }
 
+    public User getUser(){
+        return user;
+    }
     @Override
     public boolean isLanguageKazakh() {
         return isKazakh;
