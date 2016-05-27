@@ -765,10 +765,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 if (compare == 0) {
                     // case#1
                     if (metaAttribute.isFinal()) {
-                        if (metaClass.hasNotFinalAttributes() && !metaClass.isSearchable())
-                            throw new IllegalStateException(Errors.compose(Errors.E65, baseEntity.getMeta().getClassName(),
-                                    metaAttribute.getName()));
-
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
@@ -1769,10 +1765,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 if (compare == 0) {
                     // case#1
                     if (metaAttribute.isFinal()) {
-                        if (!childMetaClass.isSearchable() && childMetaClass.hasNotFinalAttributes())
-                            throw new IllegalStateException(Errors.compose(Errors.E65, baseEntity.getMeta().getClassName(),
-                                    metaAttribute.getName()));
-
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
