@@ -459,12 +459,12 @@ public class ZipFilesMonitor {
 
         if (!StaticRouter.isDevMode()) {
             String errMsg = null;
-            Report maxApprovedReport = reportBeanRemoteBusiness.getMaxApprovedReport(creditorId);
+            Date lastApprovedDate = reportBeanRemoteBusiness.getLastApprovedDate(creditorId);
 
             Date mustDate = null;
 
             //never approved
-            if(maxApprovedReport == null) {
+            if(lastApprovedDate == null) {
                 String creditorDates = serviceFactory.getGlobalService().getValue(ORG_FIRST_DATE_SETTING, CREDITOR_DATES);
                 String creditorFirstDate = serviceFactory.getGlobalService().getValue(ORG_FIRST_DATE_SETTING, DEFAULT_DATE_VALUE);
 
@@ -494,7 +494,7 @@ public class ZipFilesMonitor {
 
             } else {
                 Calendar cal = Calendar.getInstance();
-                cal.setTime(maxApprovedReport.getReportDate());
+                cal.setTime(lastApprovedDate);
                 Integer reportPeriodDurationMonths = null;
 
                 for (Creditor creditor : creditors) {
@@ -507,7 +507,7 @@ public class ZipFilesMonitor {
                 mustDate = cal.getTime();
 
                 if(!mustDate.equals(batchInfo.getRepDate())) {
-                    errMsg = "Ошибка отчетной даты. Последняя утвержденная дата = " + dateFormat.format(maxApprovedReport.getReportDate()) + ", " +
+                    errMsg = "Ошибка отчетной даты. Последняя утвержденная дата = " + dateFormat.format(lastApprovedDate) + ", " +
                             " заявлено = " + dateFormat.format(batchInfo.getRepDate()) + ", шаг отчетности = " + reportPeriodDurationMonths;
                     logger.error(errMsg);
                 }

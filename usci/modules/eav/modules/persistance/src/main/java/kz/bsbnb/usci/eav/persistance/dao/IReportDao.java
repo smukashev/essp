@@ -34,6 +34,4 @@ public interface IReportDao {
     void setTotalCount(long reportId, long totalCount);
 
     Report getFirstReport(long creditorId);
-
-    Report getMaxApprovedReport(long creditorId);
 }
