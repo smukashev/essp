@@ -22,7 +22,7 @@ public class Report implements Serializable {
         STATUS_NAME_MAP.put(76l, "Отконтроллирован с ошибками");
         STATUS_NAME_MAP.put(77l, "Отконтроллирован без ошибок");
         STATUS_NAME_MAP.put(128l, "Утвержден организацией");
-        STATUS_NAME_MAP.put(127l, "Идет подтверждение");
+        STATUS_NAME_MAP.put(127l, "Утвержден организацией");
 
 
         STATUS_CODE_MAP.put(90l, "RECIPIENCY_IN_PROGRESS");
