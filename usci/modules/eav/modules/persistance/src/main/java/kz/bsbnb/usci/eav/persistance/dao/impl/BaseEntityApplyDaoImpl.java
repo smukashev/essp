@@ -597,7 +597,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         } else {
             if (baseValueSaving.getValue() == null) {
                 return;
-                // TODO: uncomment
                 /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
                         baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
             }
@@ -1039,7 +1038,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseEntity baseEntitySaving = (IBaseEntity) baseValueSaving.getValue();
             if (baseEntitySaving == null) {
                 return;
-                // TODO: uncomment
                 /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
                         baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
             }
@@ -1129,7 +1127,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         if (baseValueExisting != null) {
                             IBaseEntity baseEntityExisting = (IBaseEntity) baseValueExisting.getValue();
-                            IBaseEntity baseEntityApplied = applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityExisting, baseEntityManager);
+                            IBaseEntity baseEntityApplied = applyBaseEntityAdvanced(creditorId, baseEntitySaving,
+                                    baseEntityExisting, baseEntityManager);
 
                             IBaseValue baseValueApplied = BaseValueFactory.create(
                                     MetaContainerTypes.META_CLASS,
@@ -1146,9 +1145,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         } else {
                             IBaseEntity baseEntityApplied;
                             if (metaAttribute.isImmutable()) {
-                                baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                                baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
+                                        baseEntitySaving.getReportDate());
                             } else {
-                                baseEntityApplied = apply(creditorId, baseEntitySaving, baseValueNext.getValue(), baseEntityManager);
+                                baseEntityApplied = apply(creditorId, baseEntitySaving, null, baseEntityManager);
                             }
 
                             IBaseValue baseValueApplied = BaseValueFactory.create(
@@ -1375,7 +1375,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         } else {
             if (childBaseSetSaving == null) {
                 return;
-                // TODO: uncomment
                 /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
                         baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
             }
@@ -1878,7 +1877,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         } else {
             if (childBaseSetSaving == null) {
                 return;
-                // TODO: uncomment
                 /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
                         baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
             }
@@ -2170,7 +2168,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     IBaseEntity childBaseEntityLoaded = (IBaseEntity) childBaseValueLoaded.getValue();
 
-                    //fixme!
                     if (childBaseEntityLoaded != null && !childMetaClass.isSearchable())
                         baseEntityManager.registerAsDeleted(childBaseEntityLoaded);
 
@@ -2254,7 +2251,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public void applyToDb(IBaseEntityManager baseEntityManager) {
         long applyToDbTime = System.currentTimeMillis();
         for (int i = 0; i < BaseEntityManager.CLASS_PRIORITY.size(); i++) {
-            Class objectClass = BaseEntityManager.CLASS_PRIORITY.get(i);
+            Class<? extends IPersistable> objectClass = BaseEntityManager.CLASS_PRIORITY.get(i);
             List<IPersistable> insertedObjects = baseEntityManager.getInsertedObjects(objectClass);
             if (insertedObjects != null && insertedObjects.size() != 0) {
                 IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
@@ -2279,7 +2276,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
 
         for (int i = 0; i < BaseEntityManager.CLASS_PRIORITY.size(); i++) {
-            Class objectClass = BaseEntityManager.CLASS_PRIORITY.get(i);
+            Class<? extends IPersistable> objectClass = BaseEntityManager.CLASS_PRIORITY.get(i);
             List<IPersistable> updatedObjects = baseEntityManager.getUpdatedObjects(objectClass);
             if (updatedObjects != null && updatedObjects.size() != 0) {
                 IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
@@ -2295,7 +2292,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
 
         for (int i = BaseEntityManager.CLASS_PRIORITY.size() - 1; i >= 0; i--) {
-            Class objectClass = BaseEntityManager.CLASS_PRIORITY.get(i);
+            Class<? extends IPersistable> objectClass = BaseEntityManager.CLASS_PRIORITY.get(i);
             List<IPersistable> deletedObjects = baseEntityManager.getDeletedObjects(objectClass);
             if (deletedObjects != null && deletedObjects.size() != 0) {
                 IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
