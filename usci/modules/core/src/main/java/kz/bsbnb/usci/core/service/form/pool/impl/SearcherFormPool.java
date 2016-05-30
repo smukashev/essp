@@ -6,6 +6,7 @@ import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -19,7 +20,15 @@ public class SearcherFormPool implements ISearcherFormPool {
 
     @Override
     public List<ISearcherForm> getSearcherForms() {
-        return this.searcherForms;
+        Iterator<ISearcherForm> iterator = searcherForms.listIterator();
+
+        while(iterator.hasNext()) {
+            ISearcherForm sf = iterator.next();
+            if(sf.getClass().getSimpleName().startsWith("Dev"))
+                iterator.remove();
+        }
+
+        return searcherForms;
     }
 
     @Override
