@@ -153,32 +153,15 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 && metaRules.contains(baseEntity.getMeta().getClassName())) {
             List<String> errors = new ArrayList<>();
             try {
-                long t1 = System.currentTimeMillis();
-
-                long retryCount = 0;
-                do {
-                    try {
-                        rulesSingleton.runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
-                        break;
-                    } catch (Exception ex) {
-                        if (++retryCount == 10)
-                            throw ex;
-
-                        Thread.sleep(100);
-                    }
-                } while (true);
-
+                rulesSingleton.runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
                 for(String s : baseEntity.getValidationErrors()) errors.add(s);
-
-                sqlStats.put("java::rule", System.currentTimeMillis() - t1);
             } catch (Exception e) {
                 logger.error(Errors.compose(Errors.E290,e));
                 throw new RuntimeException(Errors.compose(Errors.E290,e));
             }
 
-            if (errors.size() > 0) {
+            if (errors.size() > 0)
                 throw new KnownIterativeException(errors);
-            }
         }
     }
 
