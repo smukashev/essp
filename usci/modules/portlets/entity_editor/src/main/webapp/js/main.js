@@ -5,6 +5,8 @@ Ext.require([
     'Ext.tip.*'
 ]);
 
+var devModule = {};
+
 var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
 var currentSearch;
 var currentMeta;
@@ -1292,7 +1294,7 @@ Ext.onReady(function () {
                     }
                 })
             ]
-        }]
+        }, devModule]
 
     });
 
