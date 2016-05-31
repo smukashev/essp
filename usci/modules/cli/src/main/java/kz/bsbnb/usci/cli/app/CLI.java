@@ -2352,7 +2352,8 @@ public class CLI {
             try {
                 while (true) {
                     try {
-                        conn = connectToDB("jdbc:oracle:thin:@10.8.1.200:1521:ESSP", "CORE", "core");
+                        if (conn == null)
+                            conn = connectToDB("jdbc:oracle:thin:@10.8.1.200:1521:ESSP", "CORE", "core");
                     } catch (Exception e) {
                         System.out.println("Can't connect to DB: " + e.getMessage());
                         return;
