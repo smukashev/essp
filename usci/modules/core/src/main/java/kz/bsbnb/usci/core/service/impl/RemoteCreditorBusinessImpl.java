@@ -2,6 +2,7 @@ package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.RemoteCreditorBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.cr.model.SubjectType;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
@@ -75,6 +76,10 @@ public class RemoteCreditorBusinessImpl implements RemoteCreditorBusiness {
                     }
                 }
             }
+
+            SubjectType st = new SubjectType();
+            st.setReportPeriodDurationMonths(((Integer) entity.getEl("subject_type.report_period_duration_months")));
+            creditor.setSubjectType(st);
 
             creditors.add(creditor);
         }

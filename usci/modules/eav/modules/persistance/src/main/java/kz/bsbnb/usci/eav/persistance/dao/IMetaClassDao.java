@@ -27,7 +27,5 @@ public interface IMetaClassDao extends IDao<MetaClass> {
 
     void remove(MetaClass metaClass);
 
-    List<Map<String, Object>> getSimpleResult(long metaId);
 
-    Select getSimpleSelect(long metaId);
 }

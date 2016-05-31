@@ -20,6 +20,7 @@ import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -36,6 +37,10 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
 
     @Autowired
     IBaseEntityLoadDao baseEntityLoadDao;
+
+    @Autowired
+    @Qualifier("devSearcherForm")
+    ISearcherForm devForm;
 
     @Override
     public List<Pair> getMetaClasses(long userId) {
@@ -54,6 +59,11 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
     public ISearchResult search(HashMap<String, String> parameters, MetaClass metaClass, String prefix, long creditorId) {
         if(!metaClass.getClassName().equals("credit"))
             throw new RuntimeException(Errors.compose(Errors.E231));
+
+        if(parameters.get("dev") != null) {
+            return devForm.search(parameters, metaClass, prefix, creditorId);
+        }
+
         Date reportDate = new Date();
         if(parameters.get("date") != null)
             reportDate = (Date) DataTypes.getCastObject(DataTypes.DATE, parameters.get("date"));

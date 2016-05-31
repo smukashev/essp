@@ -772,7 +772,6 @@ showcase list addCustom credit creditor creditor_id
 showcase list addCustom credit root credit_id
 
 showcase list addRootKey credit_id credit_id
-showcase list addRootKey pledge_id pledge_id
 
 showcase list addHistoryKey credit_id credit_id
 showcase list addHistoryKey pledge_id pledge_id
@@ -867,7 +866,6 @@ showcase list addCustom portfolio_data root portfolio_data_id
 showcase list addCustom portfolio_data creditor portfolio_data_creditor_id
 
 showcase list addRootKey portfolio_data_id portfolio_data_id
-showcase list addRootKey portfolio_flow_kfn_id portfolio_flow_kfn_id
 
 showcase list addHistoryKey portfolio_data_id portfolio_data_id
 showcase list addHistoryKey portfolio_flow_kfn_id portfolio_flow_kfn_id
@@ -900,7 +898,6 @@ showcase list addCustom portfolio_data root portfolio_data_id
 showcase list addCustom portfolio_data creditor portfolio_data_creditor_id
 
 showcase list addRootKey portfolio_data_id portfolio_data_id
-showcase list addRootKey portfolio_flow_msfo_id portfolio_flow_msfo_id
 
 showcase list addHistoryKey portfolio_data_id portfolio_data_id
 showcase list addHistoryKey portfolio_flow_msfo_id portfolio_flow_msfo_id
@@ -912,6 +909,6 @@ showcase addIndex nonunique portfolio_data_id portfolio_flow_msfo_id details_id
 
 showcase save
 
-showcase sql run usci/db_oracle_scripts/showcase/showcase_table_range_partitioning.sql
+showcase sql run usci/db_oracle_scripts/showcase_table_range_partitioning.sql
 
 quit

@@ -23,6 +23,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.rmi.RemoteException;
@@ -33,6 +34,7 @@ import java.util.*;
 public class EntityServiceImpl extends UnicastRemoteObject implements IEntityService {
     private final Logger logger = LoggerFactory.getLogger(EntityServiceImpl.class);
 
+    @Qualifier("baseEntityProcessorDaoImpl")
     @Autowired
     private IBaseEntityProcessorDao baseEntityProcessorDao;
 
@@ -54,15 +56,13 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
     @Override
     public void process(BaseEntity mockEntity) {
+        long t1 = System.currentTimeMillis();
         try {
-            long t1 = System.currentTimeMillis();
             BaseEntity baseEntity = (BaseEntity) baseEntityProcessorDao.process(mockEntity);
-            long t2 = System.currentTimeMillis() - t1;
-
             baseEntity.setBatchId(mockEntity.getBatchId());
             baseEntity.setIndex(mockEntity.getBatchIndex());
 
-            stats.put("process(" + mockEntity.getMeta().getClassName() + ")", t2);
+            stats.put("java::process", (System.currentTimeMillis() - t1));
 
             EntityStatus entityStatus = new EntityStatus();
             entityStatus.setBatchId(baseEntity.getBatchId());
@@ -74,6 +74,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             batchService.addEntityStatus(entityStatus);
         } catch (Exception e) {
+            stats.put("process_error", (System.currentTimeMillis() - t1));
+
             if (!(e instanceof KnownException))
                 logger.error("Батч: " + mockEntity.getBatchId() + ", Индекс: " + (mockEntity.getBatchIndex() - 1)
                         + "\n" + e.getMessage() + "\n" + ExceptionUtils.getStackTrace(e));

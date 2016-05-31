@@ -5,6 +5,10 @@ Ext.require([
     'Ext.tip.*'
 ]);
 
+var devModule = {
+    region: 'south'
+};
+
 var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
 var currentSearch;
 var currentMeta;
@@ -1292,7 +1296,7 @@ Ext.onReady(function () {
                     }
                 })
             ]
-        }]
+        }, devModule]
 
     });
 

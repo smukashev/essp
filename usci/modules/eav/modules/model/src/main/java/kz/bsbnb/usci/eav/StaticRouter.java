@@ -13,27 +13,27 @@ public final class StaticRouter {
     private static final MODE mode = MODE.PROD;
 
     /* Application Server IP */
-    private final static String stendAsIP = "10.10.20.28";
+    private final static String stendAsIP = "10.10.32.28";
     private final static String devAsIP = "localhost";
     private final static String prodAsIP = "10.8.1.116";
 
     /* Core Schema IP */
-    private final static String stendDBCoreIP = "10.10.20.27";
+    private final static String stendDBCoreIP = "10.10.32.27";
     private final static String devDBCoreIP = "localhost";
     private final static String prodDBCoreIp = "10.8.1.200";
 
     /* Showcase Schema IP */
-    private final static String stendDBShowcaseIP = "10.10.20.27";
+    private final static String stendDBShowcaseIP = "10.10.32.27";
     private final static String devDBShowcaseIP = "localhost";
     private final static String prodDBShowcaseIP = "10.8.1.85";
 
     /* Reporter Schema IP */
-    private final static String stendDBReporterIP = "10.10.20.27";
+    private final static String stendDBReporterIP = "10.10.32.27";
     private final static String devDBReporterIP = "localhost";
     private final static String prodDBReporterIP = "10.8.1.85";
 
     /* Portal URL */
-    private final static String stendPortalUrl = "10.10.20.28";
+    private final static String stendPortalUrl = "10.10.32.28";
     private final static String devPortalUrl = "localhost";
     private final static String prodPortalUrl = "essp.nationalbank.kz";
 
@@ -53,8 +53,8 @@ public final class StaticRouter {
     private final static String prodShowcaseSchemaName = "SHOWCASE";
 
     /* Credit Registry DB IP */
-    private final static String stendCRDBIP = "10.10.20.44";
-    private final static String devCRDBIP = "10.10.20.44";
+    private final static String stendCRDBIP = "10.10.32.44";
+    private final static String devCRDBIP = "10.10.32.44";
     private final static String prodCRDBIP  = "10.8.1.250";
 
     /* Credit Registry DB Username */

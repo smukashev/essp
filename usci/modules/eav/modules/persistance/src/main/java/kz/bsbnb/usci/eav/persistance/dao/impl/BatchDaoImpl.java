@@ -95,12 +95,9 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                         DSL.rowNumber().over()
                                 .partitionBy(EAV_BATCH_STATUSES.BATCH_ID)
                                 .orderBy(EAV_BATCH_STATUSES.RECEIPT_DATE.desc(), EAV_BATCH_STATUSES.STATUS_ID.desc()).as("num"))
-                        .from(EAV_BATCH_STATUSES).where(EAV_BATCH_STATUSES.BATCH_ID.notIn(context.selectDistinct(EAV_BATCH_STATUSES.BATCH_ID).from(EAV_BATCH_STATUSES).where(EAV_BATCH_STATUSES.STATUS_ID.eq(statusCompleted.getId())))).asTable("bs")).
+                        .from(EAV_BATCH_STATUSES).where(EAV_BATCH_STATUSES.BATCH_ID.notIn(context.selectDistinct(EAV_BATCH_STATUSES.BATCH_ID).from(EAV_BATCH_STATUSES).where(EAV_BATCH_STATUSES.STATUS_ID.eq(statusCompleted.getId()).or(EAV_BATCH_STATUSES.STATUS_ID.eq(statusError.getId())).or(EAV_BATCH_STATUSES.STATUS_ID.eq(statusCancelled.getId()))))).asTable("bs")).
                 on(EAV_BATCHES.ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class)))
                 .where(DSL.field("\"bs\".\"num\"").eq(1))
-                .and(DSL.field("\"bs\".STATUS_ID").ne(statusCompleted.getId())
-                        .and(DSL.field("\"bs\".STATUS_ID").ne(statusCancelled.getId()))
-                        .and(DSL.field("\"bs\".STATUS_ID").ne(statusError.getId())))
                         .and(EAV_BATCHES.IS_DISABLED.eq(DataUtils.convert(false))).orderBy(EAV_BATCHES.ID);
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 

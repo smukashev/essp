@@ -1656,6 +1656,8 @@ person-> names -> name-> firstname, person-> names -> name-> lastname, person-> 
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="insert"/>
 			<xsd:enumeration value="update"/>
+			<xsd:enumeration value="delete"/>
+			<xsd:enumeration value="close"/>
 			<!-- Добавление информации -->
 			<!-- Изменение информации -->
 		</xsd:restriction>

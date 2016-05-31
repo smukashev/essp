@@ -5,6 +5,7 @@ import com.bsbnb.creditregistry.portlets.approval.PortletEnvironmentFacade;
 import com.bsbnb.creditregistry.portlets.approval.bpm.ApprovalBusiness;
 import com.bsbnb.creditregistry.portlets.approval.data.CrossCheckLink;
 import com.bsbnb.creditregistry.portlets.approval.data.DataProvider;
+import com.bsbnb.creditregistry.portlets.approval.data.DatabaseConnect;
 import com.bsbnb.util.translit.Transliterator;
 import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.StreamResource;
@@ -20,12 +21,10 @@ import kz.bsbnb.usci.eav.util.ReportStatus;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -155,10 +154,34 @@ public class ReportDateLayout extends VerticalLayout {
 
         Label horizontalLine = new Label("<hr/>", Label.CONTENT_XHTML);
 
+
+        //get actual count from procudure
+        DatabaseConnect procedur = new DatabaseConnect(environment.getUser());
+        List<Object> params = new ArrayList<>();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(reportDate);
+        cal.add(Calendar.MONTH, -1);
+        Date maturityDate = cal.getTime();
+        params.add(maturityDate);
+        params.add(reportDate);
+
+        Map<Long, Long> actualCounts = new HashMap<>();
+        try {
+            ResultSet result = procedur.getResultSetFromStoredProcedure("CREDITOR_ACTUAL_COUNT", params);
+            while(result.next()) {
+                Long creditor_id =  result.getLong("ref_creditor_id");
+                Long actual_count =  result.getLong("actual_count");
+                actualCounts.put(creditor_id,actual_count);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         Label contractsCountLabel = new Label("<b>"
                 + environment.getResourceString(Localization.CONTRACTS_COUNT_LABEL_CAPTION)
                 + ": </b>"
-                + report.getActualCount(), Label.CONTENT_XHTML);
+                + actualCounts.get(report.getCreditor().getId()), Label.CONTENT_XHTML);
         contractsCountLabel.setSizeUndefined();
 
         final String reportStatusCaption = String.format(environment.getResourceString(Localization.REPORT_STATUS_LABEL_CAPTION), report.getStatus().getNameRu());

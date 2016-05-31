@@ -159,13 +159,15 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
 
         EavGlobal completed = eavGlobalRepository.getGlobal(ReportStatus.COMPLETED);
         EavGlobal organizationApproved = eavGlobalRepository.getGlobal(ReportStatus.ORGANIZATION_APPROVED);
+        EavGlobal organizationApproving = eavGlobalRepository.getGlobal(ReportStatus.ORGANIZATION_APPROVING);
 
         SelectForUpdateStep select = context
                 .select(field)
                 .from(EAV_REPORT)
                 .where(EAV_REPORT.CREDITOR_ID.eq(creditorId))
                 .and(EAV_REPORT.STATUS_ID.eq(completed.getId())
-                .or(EAV_REPORT.STATUS_ID.eq(organizationApproved.getId())));
+                .or(EAV_REPORT.STATUS_ID.eq(organizationApproved.getId()))
+                .or(EAV_REPORT.STATUS_ID.eq(organizationApproving.getId())));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
@@ -211,7 +213,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
             ReportMessage reportMessage = new ReportMessage();
             reportMessage.setId(((BigDecimal) row.get(EAV_REPORT_MESSAGE.ID.getName())).longValue());
             reportMessage.setReport(report);
-            reportMessage.setSendDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT_MESSAGE.SEND_DATE.getName())));
+            reportMessage.setSendDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT_MESSAGE.SEND_DATE.getName())));
             reportMessage.setText((String) row.get(EAV_REPORT_MESSAGE.TEXT.getName()));
             reportMessage.setUsername((String) row.get(EAV_REPORT_MESSAGE.USERNAME.getName()));
 
@@ -243,7 +245,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
             ReportMessage reportMessage = new ReportMessage();
             reportMessage.setId(((BigDecimal) row.get(EAV_REPORT_MESSAGE.ID.getName())).longValue());
             reportMessage.setReport(report);
-            reportMessage.setSendDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT_MESSAGE.SEND_DATE.getName())));
+            reportMessage.setSendDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT_MESSAGE.SEND_DATE.getName())));
             reportMessage.setText((String) row.get(EAV_REPORT_MESSAGE.TEXT.getName()));
             reportMessage.setUsername((String) row.get(EAV_REPORT_MESSAGE.USERNAME.getName()));
             attachment.setReportMessage(reportMessage);
@@ -265,7 +267,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
                         EAV_REPORT_MESSAGE.TEXT,
                         EAV_REPORT_MESSAGE.USERNAME)
                     .values(report.getId(),
-                        DataUtils.convert(message.getSendDate()),
+                        DataUtils.convertToTimestamp(message.getSendDate()),
                         message.getText(),
                         message.getUsername());
 
