@@ -19,6 +19,7 @@ import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.impl.BasicBaseEntitySearcherPool;
+import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.rule.impl.RulesSingleton;
 import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import kz.bsbnb.usci.eav.util.Errors;
@@ -76,6 +77,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private Set<String> metaRules;
 
     @Autowired
+    private IRefRepository refRepository;
+
+    @Autowired
     public void setApplyListener(IDaoListener applyListener) {
         this.applyListener = applyListener;
     }
@@ -124,18 +128,28 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             baseValue.setCreditorId(creditorId);
         }
 
-        if (metaClass.isSearchable() && baseEntity.getId() == 0) {
-            long baseEntityId;
+        /*if (metaClass.isReference()) {
+            long refId = refRepository.prepareRef(baseEntity);
 
-            if (BasicOptimizer.metaList.contains(metaClass.getClassName())) {
-                baseEntityId = eavOptimizerDao.find(creditorId, baseEntity.getMeta().getId(), BasicOptimizer.getKeyString(baseEntity));
+            if (refId > 0) {
+                baseEntity.setId(refId);
             } else {
-                baseEntityId = search(baseEntity, creditorId);
+                throw new RuntimeException("ref not found : " + baseEntity);
             }
+        } else {*/
+            if (metaClass.isSearchable() && baseEntity.getId() == 0) {
+                long baseEntityId;
 
-            if (baseEntityId > 0)
-                baseEntity.setId(baseEntityId);
-        }
+                if (BasicOptimizer.metaList.contains(metaClass.getClassName())) {
+                    baseEntityId = eavOptimizerDao.find(creditorId, baseEntity.getMeta().getId(), BasicOptimizer.getKeyString(baseEntity));
+                } else {
+                    baseEntityId = search(baseEntity, creditorId);
+                }
+
+                if (baseEntityId > 0)
+                    baseEntity.setId(baseEntityId);
+            }
+        //}
 
         return baseEntity;
     }
