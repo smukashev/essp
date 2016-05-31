@@ -909,6 +909,6 @@ showcase addIndex nonunique portfolio_data_id portfolio_flow_msfo_id details_id
 
 showcase save
 
-showcase sql run usci/db_oracle_scripts/showcase/showcase_table_range_partitioning.sql
+showcase sql run usci/db_oracle_scripts/showcase_table_range_partitioning.sql
 
 quit
