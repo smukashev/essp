@@ -11,6 +11,7 @@ import kz.bsbnb.usci.cli.app.exporter.EntityExporter;
 import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
+import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.rule.impl.RulesSingleton;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.core.service.IPackageService;
@@ -111,13 +112,15 @@ public class CLI {
 
     @Autowired private ImprovedBaseEntitySearcher searcher;
 
-    @Autowired ApplicationContext context;
+    @Autowired private ApplicationContext context;
 
-    @Autowired EntityExporter entityExporter;
+    @Autowired private EntityExporter entityExporter;
 
-    @Autowired IBaseEntityDao baseEntityDao;
+    @Autowired private IBaseEntityDao baseEntityDao;
 
-    @Autowired ISQLGenerator sqlGenerator;
+    @Autowired private IDaoListener applyListener;
+
+    @Autowired private ISQLGenerator sqlGenerator;
 
     @Autowired
     EntityProcessorListenerImpl entityProcessorListener;
@@ -2344,107 +2347,51 @@ public class CLI {
                 runner.runScript(args.get(2), StaticRouter.getShowcaseSchemaName());
                 System.out.println("Скрипт отработан за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
             }
-        } else if (args.get(0).equals("generate")) {
-            System.out.println("Запускаю генерацию в showcase...");
-            long t1 = System.currentTimeMillis();
-            String token = args.get(1);
+        } else if (args.get(0).equals("oper_sc")) {
+            Connection conn;
 
-            Map<String, Object> options = parse(args.subList(1, args.size()));
-            if (options == null || !options.containsKey("creditor_id")) {
-                printUsageShowcaseGenerate();
+            try {
+                conn = connectToDB("jdbc:oracle:thin:@172.17.110.197:1521:ORCL", "C##CORE", "core");
+            } catch (Exception e) {
+                System.out.println("Can't connect to DB: " + e.getMessage());
                 return;
             }
 
-            Long creditorId = (Long) options.get("creditor_id");
-
-            if (options.containsKey("entity_id")) {
-                sendToShowcaseEntity(creditorId, (Long) options.get("entity_id"), null);
-            } else if (options.containsKey("metaclass") && !options.containsKey("report_date")) {
-                sendToShowcase(creditorId, (String) options.get("metaclass"), null);
-            } else if (options.containsKey("metaclass") && options.containsKey("report_date")) {
-                sendToShowcase(creditorId, (String) options.get("metaclass"), (Date) options.get("report_date"));
-            } else if (!options.containsKey("metaclass") && !options.containsKey("report_date")) {
-                printUsageShowcaseGenerate();
+            PreparedStatement preparedStatement;
+            try {
+                preparedStatement = conn.prepareStatement("SELECT entity_id, report_date FROM oper_sc");
+            } catch (SQLException e) {
+                System.out.println("Can't create prepared statement: " + e.getMessage());
+                try {
+                    conn.close();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
                 return;
             }
 
-            System.out.println("Генерация отработана за " + ((System.currentTimeMillis() - t1) / 1000) + " сек.");
+            ResultSet result = preparedStatement.executeQuery();
+
+            while(result.next()) {
+                Long entityId = result.getLong("entity_id");
+                Date reportDate = result.getDate("report_date");
+
+                IBaseEntity loadedEntity = baseEntityLoadDao.loadByMaxReportDate(entityId, reportDate);
+
+                applyListener.applyToDBEnded(loadedEntity);
+
+                preparedStatement = conn.prepareStatement("DELETE FROM oper_sc where entity_id = ? and report_date = ?");
+                preparedStatement.setLong(1, entityId);
+                preparedStatement.setDate(2, DataUtils.convertToSQLDate(DataUtils.convertToTimestamp(reportDate)));
+
+                preparedStatement.executeUpdate();
+
+                System.out.println(entityId + " : " + reportDate);
+            }
+
         } else {
             throw new IllegalArgumentException(Errors.compose(Errors.E219));
         }
-    }
-
-    private void printUsageShowcaseGenerate() {
-        System.out.println("Usage: showcase generate  creditor_id <NNN> [entity_id <NNN>] [metaclass <AAA>] [report_date <dd.mm.yyyy>]");
-    }
-
-    private Map<String, Object> parse(List<String> args) {
-        if (args.size() % 2 != 0) {
-            return null;
-        }
-
-        Map<String, Object> opt = new HashMap<String, Object>();
-        for (int i = 0; i < args.size() - 1; i += 2) {
-            if ("creditor_id".equals(args.get(i))) {
-                if (!("" + args.get(i + 1)).matches("\\d+"))
-                    return null;
-                opt.put("" + args.get(i), Long.parseLong(args.get(i + 1)));
-            }
-            if ("entity_id".equals(args.get(i))) {
-                if (!("" + args.get(i + 1)).matches("\\d+"))
-                    return null;
-                opt.put("" + args.get(i), Long.parseLong(args.get(i + 1)));
-            }
-            if ("report_date".equals(args.get(i))) {
-                if (!("" + args.get(i + 1)).matches("\\d{2}\\.\\d{2}\\.\\d{4}"))
-                    return null;
-                try {
-                    opt.put("" + args.get(i), simpleDateFormat.parse("" + args.get(i + 1)));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-            if ("metaclass".equals(args.get(i))) {
-                if (!("" + args.get(i + 1)).matches("\\w+"))
-                    return null;
-                opt.put("" + args.get(i), "" + args.get(i + 1));
-            }
-        }
-
-        return opt;
-    }
-
-    private void sendToShowcase(Long creditorId, String metaClassName, Date reportDate) {
-        MetaClass metaClass = metaClassRepository.getMetaClass(metaClassName);
-        List<Long> entityIdList = baseEntityProcessorDao.getEntityIDsByMetaClass(metaClass.getId());
-        for (Long entityId : entityIdList) {
-            sendToShowcaseEntity(creditorId, entityId, reportDate);
-        }
-    }
-
-    private void sendToShowcaseEntity(Long creditorId, Long enityId, Date reportDate) {
-        //System.out.print("Sending entity_id=" + enityId + "? ");
-        long entityCreditorId = 0;
-        IBaseEntity entity = null;
-        try {
-            entity = (reportDate == null) ? baseEntityLoadDao.load(enityId) : baseEntityLoadDao.loadByMaxReportDate(enityId, reportDate);
-            entityCreditorId = getCreditorId(entity);
-        } catch (Exception e) { //  TODO: Then cancel creditor checking...? "Справочник ... не доступен на отчётный период dd.mm.yyyy", "Атрибут: creditor не найден в мета классе: ..."
-            System.out.println(e.getMessage());
-            entityCreditorId = -1;
-        }
-
-        // filter by creditorId
-        if (entityCreditorId > 0 && entityCreditorId == creditorId.longValue()) {
-            entityProcessorListener.applyToDBEnded(entity);
-            //System.out.println("OK");
-        } else {
-            //System.out.println("NO");
-        }
-    }
-
-    private long getCreditorId(IBaseEntity entity) {
-        return ((BaseEntityComplexValue) (entity.getBaseValue("creditor"))).getValue().getId();
     }
 
     public Exception getLastException() {
@@ -2457,20 +2404,16 @@ public class CLI {
             command = st.nextToken().trim();
 
             args.clear();
-            while (st.hasMoreTokens()) {
+            while (st.hasMoreTokens())
                 args.add(st.nextToken().trim());
-            }
         } else {
             return;
         }
 
-
-        if (command.startsWith("#")) {
+        if (command.startsWith("#"))
             return;
-        }
 
         try {
-
             if (command.equals("test")) {
                 commandTest();
             } else if (command.equals("clear")) {
@@ -2857,13 +2800,13 @@ public class CLI {
     }
 
     interface DispatcherJob {
-        public boolean intersects(DispatcherJob job);
+        boolean intersects(DispatcherJob job);
 
-        public boolean isAlive();
+        boolean isAlive();
 
-        public void start();
+        void start();
 
-        public void prepare();
+        void prepare();
     }
 
     class JobDispatcher extends Thread {
