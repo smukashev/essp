@@ -220,6 +220,7 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
         WritableFont times12Font = new WritableFont(WritableFont.TIMES, 12);
         WritableCellFormat times12Format = new WritableCellFormat(times12Font);
         WritableCellFormat numberFormat = new WritableCellFormat(new NumberFormat("# ### ##0"));
+        ResultSet dataSource = null;
 
         numberFormat.setFont(times12Font);
         WritableCellFormat dateFormat = new WritableCellFormat(jxl.write.DateFormats.DEFAULT);
@@ -255,15 +256,18 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
             int lastRecordNumber = sheetNumber * recordsBySheet;
             int recordCounter = firstRecordNumber;
             logTime("Before query");
-            ResultSet dataSource = getTargetReportComponent().getResultSet(firstRecordNumber, lastRecordNumber);
+            dataSource = getTargetReportComponent().getResultSet(firstRecordNumber, lastRecordNumber);
             logTime("After query");
             ResultSetMetaData rsmd = dataSource.getMetaData();
-            for(int columnIndex=1; columnIndex<=dataSource.getMetaData().getColumnCount(); columnIndex++) {
-                currentSheet.addCell(new Label(columnIndex, rowIndex, dataSource.getMetaData().getColumnName(columnIndex), times12Format));
+            if(rowIndex==1) {
 
-                recordCounter++;
+                for (int columnIndex = 1; columnIndex <= dataSource.getMetaData().getColumnCount(); columnIndex++) {
+                    currentSheet.addCell(new Label(columnIndex, rowIndex, dataSource.getMetaData().getColumnName(columnIndex), times12Format));
+
+                    recordCounter++;
+                }
+                rowIndex++;
             }
-            rowIndex++;
             while (dataSource.next()) {
                 for (int columnIndex = 1; columnIndex <= rsmd.getColumnCount(); columnIndex++) {
                     int columnNumber = columnIndex;
@@ -302,6 +306,21 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
             }
             return recordCounter >= lastRecordNumber;
         } finally {
+
+            if (dataSource.getStatement() != null) {
+                try {
+                    dataSource.getStatement().close();
+                } catch (SQLException sqle) {
+                    logger.info(null, sqle);
+                }
+            }
+            if (dataSource!= null) {
+                try {
+                    dataSource.close();
+                } catch (SQLException sqle) {
+                    logger.info(null, sqle);
+                }
+            }
             if (workbook != null) {
                 try {
                     workbook.close();
