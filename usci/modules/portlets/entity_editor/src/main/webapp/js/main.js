@@ -5,7 +5,9 @@ Ext.require([
     'Ext.tip.*'
 ]);
 
-var devModule = {};
+var devModule = {
+    region: 'south'
+};
 
 var regex = /^\S+-(\d+)-(\S+)-(\S+)$/;
 var currentSearch;
