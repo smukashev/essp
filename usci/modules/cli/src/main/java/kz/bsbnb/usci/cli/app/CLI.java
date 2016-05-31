@@ -2352,49 +2352,59 @@ public class CLI {
             try {
                 while (true) {
                     try {
-                        if (conn == null)
-                            conn = connectToDB("jdbc:oracle:thin:@10.8.1.200:1521:ESSP", "CORE", "core");
-                    } catch (Exception e) {
-                        System.out.println("Can't connect to DB: " + e.getMessage());
-                        return;
-                    }
-
-                    PreparedStatement preparedStatement;
-                    try {
-                        preparedStatement = conn.prepareStatement("SELECT entity_id, report_date from (SELECT entity_id, report_date FROM oper_sc order by report_date, entity_id) where rownum < 10000");
-                    } catch (SQLException e) {
-                        System.out.println("Can't create prepared statement: " + e.getMessage());
                         try {
-                            conn.close();
-                        } catch (SQLException e1) {
-                            e1.printStackTrace();
+                            if (conn == null || conn.isClosed())
+                                conn = connectToDB("jdbc:oracle:thin:@10.8.1.200:1521:ESSP", "CORE", "core");
+                        } catch (Exception e) {
+                            System.out.println("Can't connect to DB: " + e.getMessage());
+                            return;
                         }
-                        return;
+
+                        PreparedStatement preparedStatement;
+                        try {
+                            preparedStatement = conn.prepareStatement("SELECT entity_id, report_date from (SELECT entity_id, report_date FROM oper_sc order by report_date, entity_id) where rownum < 256");
+                        } catch (SQLException e) {
+                            System.out.println("Can't create prepared statement: " + e.getMessage());
+                            try {
+                                conn.close();
+                            } catch (SQLException e1) {
+                                e1.printStackTrace();
+                            }
+                            return;
+                        }
+
+                        ResultSet result = preparedStatement.executeQuery();
+
+                        while (result.next()) {
+                            Long entityId = result.getLong("entity_id");
+                            Date reportDate = result.getDate("report_date");
+
+                            IBaseEntity loadedEntity = baseEntityLoadDao.loadByMaxReportDate(entityId, reportDate);
+
+                            applyListener.applyToDBEnded(loadedEntity);
+
+                            preparedStatement = conn.prepareStatement("DELETE FROM oper_sc where entity_id = ? and report_date = ?");
+                            preparedStatement.setLong(1, entityId);
+                            preparedStatement.setDate(2, DataUtils.convertToSQLDate(DataUtils.convertToTimestamp(reportDate)));
+
+                            preparedStatement.executeUpdate();
+
+                            System.out.println(entityId + " : " + reportDate);
+                        }
+
+                        result.close();
+
+                        Thread.sleep(5000);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                        try {
+                            if (conn != null)
+                                conn.close();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                     }
-
-                    ResultSet result = preparedStatement.executeQuery();
-
-                    while (result.next()) {
-                        Long entityId = result.getLong("entity_id");
-                        Date reportDate = result.getDate("report_date");
-
-                        IBaseEntity loadedEntity = baseEntityLoadDao.loadByMaxReportDate(entityId, reportDate);
-
-                        applyListener.applyToDBEnded(loadedEntity);
-
-                        preparedStatement = conn.prepareStatement("DELETE FROM oper_sc where entity_id = ? and report_date = ?");
-                        preparedStatement.setLong(1, entityId);
-                        preparedStatement.setDate(2, DataUtils.convertToSQLDate(DataUtils.convertToTimestamp(reportDate)));
-
-                        preparedStatement.executeUpdate();
-
-                        System.out.println(entityId + " : " + reportDate);
-                    }
-
-                    Thread.sleep(10000);
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             } finally {
                 if (conn != null)
                     conn.close();
