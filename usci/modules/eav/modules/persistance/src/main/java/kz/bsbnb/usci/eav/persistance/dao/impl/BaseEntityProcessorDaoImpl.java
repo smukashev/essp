@@ -195,7 +195,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         throw new KnownException(Errors.compose(Errors.E112));
 
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
-                    baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
+                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntityPostPrepared.getId(), baseEntityPostPrepared.getReportDate());
+                    baseEntityApplied.setOperation(OperationType.DELETE);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
