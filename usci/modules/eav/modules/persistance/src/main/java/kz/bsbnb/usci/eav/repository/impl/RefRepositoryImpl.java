@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Repository
 public class RefRepositoryImpl implements IRefRepository, InitializingBean {
@@ -32,38 +33,65 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
     @Autowired
     private IMetaClassRepository metaClassRepository;
 
+    ReentrantReadWriteLock semaphore = new ReentrantReadWriteLock();
+
     @Override
     public void afterPropertiesSet() throws Exception {
-       /* long t1 = System.currentTimeMillis();
-        for (MetaClass meta : metaClassRepository.getMetaClasses()) {
-            if (meta.isReference())
-                prepareMap.put(meta.getId(), sqlGenerator.getSimpleResult(meta.getId(), true));
+        semaphore.writeLock().lock();
+        try {
+            long t1 = System.currentTimeMillis();
+            for (MetaClass meta : metaClassRepository.getMetaClasses()) {
+                if (meta.isReference())
+                    prepareMap.put(meta.getId(), sqlGenerator.getSimpleResult(meta.getId(), true));
+            }
+            System.out.println((System.currentTimeMillis() - t1));
+        } finally {
+            semaphore.writeLock().unlock();
         }
-        System.out.println((System.currentTimeMillis() - t1));*/
     }
 
     @Override
-    public long prepareRef(IBaseEntity baseEntity) {
-        List<Map<String, Object>> mapList = prepareMap.get(baseEntity.getMeta().getId());
-        List<Map<String, Object>> currentEntityMapList = convert(baseEntity);
+    public long prepareRef(final IBaseEntity baseEntity) {
+        semaphore.readLock().lock();
+        try {
+            List<Map<String, Object>> mapList = prepareMap.get(baseEntity.getMeta().getId());
+            List<Map<String, Object>> currentEntityMapList = convert(baseEntity);
 
-        for (Map<String, Object> map : mapList) {
-            for (Map<String, Object> current : currentEntityMapList) {
-                boolean found = true;
+            for (Map<String, Object> map : mapList) {
+                for (Map<String, Object> current : currentEntityMapList) {
+                    boolean found = true;
 
-                for (Map.Entry<String, Object> currentEntry : current.entrySet()) {
-                    if (!currentEntry.getValue().equals(map.get(currentEntry.getKey()))) {
-                        found = false;
-                        break;
+                    for (Map.Entry<String, Object> currentEntry : current.entrySet()) {
+                        if (!currentEntry.getValue().equals(map.get(currentEntry.getKey()))) {
+                            found = false;
+                            break;
+                        }
                     }
+
+                    if (found)
+                        return ((BigDecimal) map.get(baseEntity.getMeta().getClassName().toUpperCase() + "_ID")).longValue();
                 }
-
-                if (found)
-                    return ((BigDecimal) map.get(baseEntity.getMeta().getClassName().toUpperCase() + "_ID")).longValue();
             }
-        }
 
-        return 0;
+            return 0;
+        } finally {
+            semaphore.readLock().unlock();
+        }
+    }
+
+    public void installRef(final IBaseEntity entity) {
+        semaphore.writeLock().lock();
+        try {
+            List<Map<String, Object>> mapList = convert(entity);
+
+            List<Map<String, Object>> preparedRef = prepareMap.get(entity.getMeta().getId());
+
+            for (Map<String, Object> m : mapList) {
+                preparedRef.add(m);
+            }
+        } finally {
+            semaphore.writeLock().unlock();
+        }
     }
 
     private List<Map<String, Object>> convert (IBaseEntity baseEntity) {

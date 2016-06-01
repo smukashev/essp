@@ -148,7 +148,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            existingValue = constructValue(rows.get(0), parentEntityMeta, metaType);
+            existingValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
 
         return existingValue;
     }
@@ -213,7 +213,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            nextBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
+            nextBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
 
         return nextBaseValue;
     }
@@ -278,7 +278,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            previousBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
+            previousBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
 
         return previousBaseValue;
     }
@@ -328,7 +328,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            closedBaseValue = constructValue(rows.get(0), metaClass, metaType);
+            closedBaseValue = constructValue(rows.get(0), metaClass, metaType, null);
 
         return closedBaseValue;
     }
@@ -377,7 +377,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            lastBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
+            lastBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
 
         return lastBaseValue;
     }
@@ -429,7 +429,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
         for (Map<String, Object> row : rows) {
             String attribute = (String) row.get(EAV_M_COMPLEX_SET.NAME.getName());
-            baseEntity.put(attribute, constructValue(row, baseEntity.getMeta(), baseEntity.getMemberType(attribute)));
+            baseEntity.put(attribute, constructValue(row, baseEntity.getMeta(), baseEntity.getMemberType(attribute), savingReportDate));
         }
     }
 
@@ -444,7 +444,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
     }
 
-    private IBaseValue constructValue(Map<String, Object> row, IMetaClass metaClass, IMetaType metaType) {
+    private IBaseValue constructValue(final Map<String, Object> row, final IMetaClass metaClass, final IMetaType metaType, final Date savingReportDate) {
         IMetaSet metaSet = (IMetaSet) metaType;
 
         long id = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
@@ -459,7 +459,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
         IBaseSet baseSet = new BaseSet(id, metaSet.getMemberType(), creditorId);
 
-        baseSetComplexValueDao.loadBaseValues(baseSet, reportDate, reportDate);
+        baseSetComplexValueDao.loadBaseValues(baseSet, reportDate, savingReportDate);
 
         return BaseValueFactory.create(
                 metaClass.getType(),

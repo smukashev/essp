@@ -101,7 +101,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             throw new IllegalStateException(Errors.compose(Errors.E87, count, persistable.getId()));
     }
 
-    private IBaseValue constructValue(Map<String, Object> row, IMetaClass metaClass, IMetaType metaType) {
+    private IBaseValue constructValue(Map<String, Object> row, IMetaClass metaClass, IMetaType metaType, Date savingReportDate) {
         long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
 
         long creditorId = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.CREDITOR_ID.getName())).longValue();
@@ -110,7 +110,13 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
         Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_COMPLEX_VALUES.REPORT_DATE.getName()));
 
-        IBaseEntity childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, reportDate);
+        IBaseEntity childBaseEntity;
+
+        if (savingReportDate == null) {
+            childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, reportDate);
+        } else {
+            childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, savingReportDate);
+        }
 
         boolean closed = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
@@ -175,7 +181,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            existingValue = constructValue(rows.get(0), parentEntityMeta, metaType);
+            existingValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
 
         return existingValue;
     }
@@ -242,7 +248,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            nextBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
+            nextBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
 
         return nextBaseValue;
     }
@@ -308,7 +314,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-           previousBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
+           previousBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
 
         return previousBaseValue;
     }
@@ -358,7 +364,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            closedBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
+            closedBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
 
         return closedBaseValue;
     }
@@ -407,14 +413,14 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            lastBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType);
+            lastBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
 
         return lastBaseValue;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public void loadBaseValues(IBaseEntity baseEntity, Date existingReportDate, Date savingReportDate) {
+    public void loadBaseValues(final IBaseEntity baseEntity, final Date existingReportDate, final Date savingReportDate) {
         IMetaClass metaClass = baseEntity.getMeta();
 
         Table tableOfAttributes = EAV_M_COMPLEX_ATTRIBUTES.as("a");
@@ -465,7 +471,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
             IMetaType metaType = metaClass.getMemberType(attribute);
 
-            baseEntity.put(attribute, constructValue(row, metaClass, metaType));
+            baseEntity.put(attribute, constructValue(row, metaClass, metaType, savingReportDate));
         }
     }
 

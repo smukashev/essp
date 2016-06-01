@@ -377,7 +377,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.SET_ID).eq(baseSet.getId()))
-                .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(existingReportDate)))
+                .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(savingReportDate)))
                 .asTable("csvn");
 
         select = context
@@ -406,7 +406,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
-            IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, existingReportDate);
+            IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, savingReportDate);
 
             baseSet.put(BaseValueFactory.create(
                     MetaContainerTypes.META_SET,

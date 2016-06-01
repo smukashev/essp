@@ -128,7 +128,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             baseValue.setCreditorId(creditorId);
         }
 
-        /*if (metaClass.isReference()) {
+        if (metaClass.isReference()) {
             long refId = refRepository.prepareRef(baseEntity);
 
             if (refId > 0) {
@@ -136,7 +136,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             } else {
                 throw new RuntimeException("ref not found : " + baseEntity);
             }
-        } else {*/
+        } else {
             if (metaClass.isSearchable() && baseEntity.getId() == 0) {
                 long baseEntityId;
 
@@ -149,7 +149,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 if (baseEntityId > 0)
                     baseEntity.setId(baseEntityId);
             }
-        //}
+        }
 
         return baseEntity;
     }
