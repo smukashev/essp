@@ -60,8 +60,12 @@ public class BaseEntityOutput {
                 }
             }
 
-            if (!valueIsNull)
-                str += "\n" + prefix + memberName + " : " + value.getId() + " : "  + DataTypes.dateFormatDot.format(value.getRepDate()) + " : " + valueToString;
+            if (!valueIsNull) {
+                str += "\n" + prefix + memberName + " : ";
+                if (type.isSet())
+                    str += value.getId() + " : ";
+                str += DataTypes.dateFormatDot.format(value.getRepDate()) + " : " + valueToString;
+            }
         }
 
         return str;
