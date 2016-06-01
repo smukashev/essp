@@ -131,11 +131,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if (metaClass.isReference()) {
             long refId = refRepository.prepareRef(baseEntity);
 
-            if (refId > 0) {
+            if (refId > 0)
                 baseEntity.setId(refId);
-            } else {
-                throw new RuntimeException("ref not found : " + baseEntity);
-            }
         } else {
             if (metaClass.isSearchable() && baseEntity.getId() == 0) {
                 long baseEntityId;
@@ -285,6 +282,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         if (applyListener != null)
             applyListener.applyToDBEnded(baseEntityApplied);
+
+        if (baseEntityApplied.getMeta().isReference())
+            refRepository.installRef(baseEntityApplied);
 
         return baseEntityApplied;
     }

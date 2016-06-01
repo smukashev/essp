@@ -87,6 +87,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
             List<Map<String, Object>> preparedRef = prepareMap.get(entity.getMeta().getId());
 
             for (Map<String, Object> m : mapList) {
+                m.put(entity.getMeta().getClassName().toUpperCase() + "_ID", new BigDecimal(entity.getId()));
                 preparedRef.add(m);
             }
         } finally {
