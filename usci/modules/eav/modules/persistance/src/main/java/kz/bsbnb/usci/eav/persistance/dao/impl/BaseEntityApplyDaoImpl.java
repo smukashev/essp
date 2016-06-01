@@ -1127,8 +1127,15 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         if (baseValueExisting != null) {
                             IBaseEntity baseEntityExisting = (IBaseEntity) baseValueExisting.getValue();
-                            IBaseEntity baseEntityApplied = applyBaseEntityAdvanced(creditorId, baseEntitySaving,
-                                    baseEntityExisting, baseEntityManager);
+
+                            IBaseEntity baseEntityApplied;
+                            if (metaAttribute.isImmutable()) {
+                                baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                            } else {
+                                baseEntityApplied = metaClass.isSearchable() ?
+                                        apply(creditorId, baseEntitySaving, baseEntityExisting, baseEntityManager) :
+                                        applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityExisting, baseEntityManager);
+                            }
 
                             IBaseValue baseValueApplied = BaseValueFactory.create(
                                     MetaContainerTypes.META_CLASS,
