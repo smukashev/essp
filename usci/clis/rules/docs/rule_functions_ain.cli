@@ -25,15 +25,6 @@ function boolean isAinCorrect(String ain, boolean isPerson){
     return true;
 }
 
-function List getInvalidAINs(List ains, boolean isPerson) {
-    List ret = new ArrayList();
-        for(Object ain: ains) {
-            if(!isAinCorrect((String) ain , isPerson))
-                ret.add(ain);
-        }
-    return ret;
-}
-
 $$$
 
 rule save
