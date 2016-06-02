@@ -108,10 +108,8 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
             if (metaType.isSet() && metaType.isComplex()) {
                 final IBaseValue baseValue = baseEntity.getBaseValue(attributeName);
 
-                if (baseValue == null) {
-                    System.err.println(baseEntity.getMeta().getClassName() + " : " + metaAttribute + " is null");
+                if (baseValue == null)
                     continue;
-                }
 
                 final BaseSet baseSet = (BaseSet) baseValue.getValue();
 
