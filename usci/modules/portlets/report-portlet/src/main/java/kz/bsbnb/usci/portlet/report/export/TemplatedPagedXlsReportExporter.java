@@ -343,29 +343,10 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
      * Текущие настройки:
      * Координаты заголовка отчета в файле шаблона xls: header-top, header-bottom, header-left, header-right
      */
-
-    private void loadConfig(String configFilePath) {
-        logger.info("Config file path: "+ configFilePath);
-        File configFile = new File(configFilePath);
-        if (!configFile.exists()) {
-            return;
-        }
-        logger.info("Config file exists");
-        FileInputStream configFileStream = null;
-        try {
-            configFileStream = new FileInputStream(configFile);
-            PropertyResourceBundle configuration = new PropertyResourceBundle(configFileStream);
-            headerBottom = getIntegerFromConfiguration(configuration, "header-bottom");
-        } catch (IOException ioe) {
-            logger.warn("Error reading configuration file", ioe);
-        } finally {
-            if (configFileStream != null) {
-                try {
-                    configFileStream.close();
-                } catch (Exception e) {
-                }
-            }
-        }
+    @Override
+    protected void loadConfig(String configFilePath) {
+        super.loadConfig(configFilePath);
+        headerBottom = getIntegerProperty("header-bottom", 0);
     }
 
     private boolean isConfigurationValid() {
@@ -376,7 +357,7 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
         return 50000;
     }
 
-    private Integer getIntegerFromConfiguration(PropertyResourceBundle configuration, String key) {
+    protected Integer getIntegerFromConfiguration(PropertyResourceBundle configuration, String key) {
         String value = configuration.getString(key);
         try {
             return Integer.parseInt(value);
