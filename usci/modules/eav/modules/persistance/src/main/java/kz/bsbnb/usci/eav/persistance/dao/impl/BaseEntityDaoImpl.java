@@ -28,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
 
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_SET_VALUES;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_VALUES;
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
 
 @Repository
@@ -184,5 +186,30 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
             throw new IllegalStateException(Errors.compose(Errors.E90, baseEntityId));
 
         return true;
+    }
+
+    @Override
+    public boolean isUsed(long baseEntityId) {
+        final String tableAliasCV = "cv";
+        final String tableAliasCSV = "csv";
+
+        Select selectCV = context
+                .select(EAV_BE_COMPLEX_VALUES.as(tableAliasCV).ENTITY_VALUE_ID)
+                .from(EAV_BE_COMPLEX_VALUES.as(tableAliasCV))
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAliasCV).ENTITY_VALUE_ID.eq(baseEntityId));
+
+        List listCV = queryForListWithStats(selectCV.getSQL(), selectCV.getBindValues().toArray());
+
+        if (listCV.size() > 0)
+            return true;
+
+        Select selectCSV = context
+                .select(EAV_BE_COMPLEX_SET_VALUES.as(tableAliasCSV).ENTITY_VALUE_ID)
+                .from(EAV_BE_COMPLEX_SET_VALUES.as(tableAliasCSV))
+                .where(EAV_BE_COMPLEX_SET_VALUES.as(tableAliasCSV).ENTITY_VALUE_ID.eq(baseEntityId));
+
+        List listCSV = queryForListWithStats(selectCSV.getSQL(), selectCSV.getBindValues().toArray());
+
+        return listCSV.size() > 0;
     }
 }

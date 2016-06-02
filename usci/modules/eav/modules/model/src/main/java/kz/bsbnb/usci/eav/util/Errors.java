@@ -320,7 +320,7 @@ public enum Errors {
         errors.put("E289", "Запись не удалена из очереди");
         errors.put("E290", "Не могу применить бизнес правила: #e_message");
         errors.put("E291", "Справочник не имеет ID;");
-        errors.put("E292", "");
+        errors.put("E292", "Запись не может быть удалена. На запись ссылаются другие объекты");
         errors.put("E293", "");
         errors.put("E294", "");
         errors.put("E295", "");

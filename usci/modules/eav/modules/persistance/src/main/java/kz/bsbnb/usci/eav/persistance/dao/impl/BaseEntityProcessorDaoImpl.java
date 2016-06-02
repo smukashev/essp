@@ -55,6 +55,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private IBaseEntityLoadDao baseEntityLoadDao;
 
     @Autowired
+    private IBaseEntityDao baseEntityDao;
+
+    @Autowired
     private IBaseEntityApplyDao baseEntityApplyDao;
 
     @Autowired
@@ -204,6 +207,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 case DELETE:
                     if (baseEntityPostPrepared.getId() <= 0)
                         throw new KnownException(Errors.compose(Errors.E112));
+
+                    if (baseEntityDao.isUsed(baseEntityPostPrepared.getId()))
+                        throw new KnownException(Errors.compose(Errors.E292));
 
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntityPostPrepared.getId(), baseEntityPostPrepared.getReportDate());
