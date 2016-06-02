@@ -442,7 +442,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                         tableOfValues.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_COMPLEX_VALUES.ENTITY_ID).eq(baseEntity.getId()))
-                .and(tableOfValues.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(existingReportDate)))
+                .and(tableOfValues.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(savingReportDate)))
                 .asTable("vn");
 
         select = context

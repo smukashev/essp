@@ -44,7 +44,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
                 if (meta.isReference())
                     prepareMap.put(meta.getId(), sqlGenerator.getSimpleResult(meta.getId(), true));
             }
-            System.out.println((System.currentTimeMillis() - t1));
+            System.out.println("Caching time: " + (System.currentTimeMillis() - t1));
         } finally {
             semaphore.writeLock().unlock();
         }
@@ -107,11 +107,15 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
 
             if (metaType.isSet() && metaType.isComplex()) {
                 final IBaseValue baseValue = baseEntity.getBaseValue(attributeName);
+
+                if (baseValue == null)
+                    continue;
+
                 final BaseSet baseSet = (BaseSet) baseValue.getValue();
 
-                for (IBaseValue<IBaseEntity> childBaseValue : baseSet.get()) {
+                for (IBaseValue childBaseValue : baseSet.get()) {
                     Map<String, Object> map = new HashMap<>();
-                    IBaseEntity childBaseEntity = childBaseValue.getValue();
+                    IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
                     map.put(childBaseEntity.getMeta().getClassName().toUpperCase() + "_ID", new BigDecimal(childBaseEntity.getId()));
                     mapList.add(map);
                 }

@@ -8,8 +8,12 @@ import kz.bsbnb.usci.portlet.report.ui.ReportComponent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
+import java.util.logging.Level;
 
 /**
  *
@@ -21,6 +25,43 @@ public abstract class AbstractReportExporter extends VerticalLayout {
     protected ReportComponent targetReportComponent;
     private ReportLoad load;
     private ReportController controller = new ReportController();
+    private Properties reportProperties;
+
+    protected void loadConfig(String configFilePath) {
+        File configFile = new File(configFilePath);
+        if (!configFile.exists()) {
+            return;
+        }
+        FileInputStream configFileStream = null;
+        try {
+            configFileStream = new FileInputStream(configFile);
+            reportProperties = new Properties();
+            reportProperties.load(configFileStream);
+        } catch (IOException ioe) {
+
+        } finally {
+            if (configFileStream != null) {
+                try {
+                    configFileStream.close();
+                } catch (Exception e) {
+                }
+            }
+        }
+    }
+    protected int getIntegerProperty(String key, int defaultValue) {
+        try {
+            return Integer.valueOf(getReportProperty(key));
+        } catch (NumberFormatException nfe) {
+            return defaultValue;
+        }
+    }
+
+    private String getReportProperty(String key) {
+        if (reportProperties == null) {
+            return "";
+        }
+        return reportProperties.getProperty(key, "");
+    }
 
     public void setTargetReportComponent(ReportComponent target) {
         this.targetReportComponent = target;
