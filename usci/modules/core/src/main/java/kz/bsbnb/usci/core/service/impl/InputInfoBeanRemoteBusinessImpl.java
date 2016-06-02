@@ -96,7 +96,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
         ii.setUserId(batch.getUserId());
         ii.setReportDate(batch.getRepDate());
 
-        ii.setTotal(10L);
+        ii.setTotal(batch.getTotalCount());
 
         ii.setId(BigInteger.valueOf(batch.getId()));
 

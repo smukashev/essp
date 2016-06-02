@@ -101,12 +101,12 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         protocol.setMessageType(type);
 
         if (TOTAL_COUNT == entityStatus.getStatus()) {
-            message.setNameRu("Общее количество:");
-            message.setNameKz("Общее количество:");
-            protocol.setNote("" + batch.getTotalCount());
-        } else if (ACTUAL_COUNT == entityStatus.getStatus()) {
             message.setNameRu("Заявленное количество:");
             message.setNameKz("Заявленное количество:");
+            protocol.setNote("" + batch.getTotalCount());
+        } else if (ACTUAL_COUNT == entityStatus.getStatus()) {
+            message.setNameRu("Общее количество:");
+            message.setNameKz("Общее количество:");
             protocol.setNote("" + batch.getActualCount());
         } else {
             if (COMPLETED == entityStatus.getStatus()) {
