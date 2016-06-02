@@ -1,12 +1,14 @@
 package kz.bsbnb.usci.portlet.report.export;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.PropertyResourceBundle;
 import java.util.logging.Level;
 import jxl.CellView;
 import jxl.Workbook;
@@ -34,8 +36,38 @@ import static kz.bsbnb.usci.portlet.report.ReportApplication.logTime;
  */
 public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
 
+    WritableFont times12Font = new WritableFont(WritableFont.TIMES, 12);
+    WritableCellFormat times12Format = new WritableCellFormat(times12Font);
+    WritableCellFormat numberFormat = new WritableCellFormat(new NumberFormat("# ### ##0"));
+    WritableCellFormat dateFormat = new WritableCellFormat(jxl.write.DateFormats.DEFAULT);
+
     private int idIndex = 1;
     private final Logger logger = Logger.getLogger(OutputFormExporter.class);
+    private int firstOutputColumnIndex = 1;
+    protected int rowIndex;
+    protected int recordCounter;
+    protected ResultSetMetaData rsmd;
+    private boolean isIdTheSame;
+    private int firstRecordNumber;
+    private int previousId;
+    private int previousIdRowIndex;
+    private int idCounter = 0;
+
+
+    private boolean shouldMergeColumn(int columnIndex) throws SQLException {
+        return !isPledgeColumn(columnIndex) && columnIndex != 2;
+    }
+
+    private boolean isPledgeColumn(int columnIndex) throws SQLException {
+        return rsmd.getColumnName(columnIndex).toUpperCase().startsWith("PLEDGE");
+    }
+
+    @Override
+    protected void loadConfig(String configFilePath) {
+        super.loadConfig(configFilePath);
+        firstOutputColumnIndex = getIntegerProperty("first-output-column-index", 1);
+    }
+
 
     @Override
     protected boolean generatePage(String exportFilePrefix, int sheetNumber) throws WriteException, IOException, SQLException {
@@ -44,12 +76,9 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
         settings.setUseTemporaryFileDuringWrite(true);
         settings.setRationalization(false);
         settings.setMergedCellChecking(false);
-        WritableFont times12Font = new WritableFont(WritableFont.TIMES, 12);
-        WritableCellFormat times12Format = new WritableCellFormat(times12Font);
-        WritableCellFormat numberFormat = new WritableCellFormat(new NumberFormat("# ### ##0"));
+
 
         numberFormat.setFont(times12Font);
-        WritableCellFormat dateFormat = new WritableCellFormat(jxl.write.DateFormats.DEFAULT);
         dateFormat.setFont(times12Font);
         try {
             times12Format.setBorder(Border.ALL, BorderLineStyle.THIN);
@@ -73,75 +102,27 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             File xlsFile = File.createTempFile("Records", ".xls", AbstractReportExporter.REPORT_FILES_FOLDER);
             workbook = Workbook.createWorkbook(new FileOutputStream(xlsFile), settings);
             WritableSheet currentSheet = workbook.createSheet("Report", sheetNumber);
-            int rowIndex = writeHeaderToSheet(currentSheet) + 1;
+            previousId = -1;
+            previousIdRowIndex = writeHeaderToSheet(currentSheet) + 1;
+            rowIndex = previousIdRowIndex;
             int recordsBySheet = getRecordsBySheet();
-            int firstRecordNumber = (sheetNumber - 1) * recordsBySheet + 1;
+            firstRecordNumber = (sheetNumber - 1) * recordsBySheet + 1;
             int lastRecordNumber = sheetNumber * recordsBySheet;
-            int recordCounter = firstRecordNumber;
+            recordCounter = firstRecordNumber;
             ReportApplication.setStartTime();
             dataSource = getTargetReportComponent().getResultSet(firstRecordNumber, lastRecordNumber);
             ReportApplication.logTime("After query");
-            ResultSetMetaData rsmd = dataSource.getMetaData();
-            int previousId = -1;
-            int previousRowIndex = rowIndex;
+            rsmd = dataSource.getMetaData();
             int startIdIndex = idIndex;
             while (dataSource.next()) {
-                int id = dataSource.getInt(2);
-                int startColumnIndex = 1;
-                int finishColumnIndex = rsmd.getColumnCount();
-                if (previousId == -1) {
-                    previousId = id;
-                } else if (previousId != id) {
-                    idIndex++;
-                    previousId = id;
-                    if (rowIndex - 1 > previousRowIndex) {
-                        for (int columnIndex = 1; columnIndex <= rsmd.getColumnCount(); columnIndex++) {
-                            if (columnIndex != 23 && columnIndex != 24 && columnIndex != 2) {
-                                int columnNumber = columnIndex == 1 ? 1 : columnIndex - 1;
-                                currentSheet.mergeCells(columnNumber, previousRowIndex, columnNumber, rowIndex - 1);
-                            }
-                        }
-                    }
-                    previousRowIndex = rowIndex;
-                } else {
-                    startColumnIndex = 23;
-                    finishColumnIndex = 24;
-                }
-
-                for (int columnIndex = startColumnIndex; columnIndex <= finishColumnIndex; columnIndex++) {
-                    if (columnIndex != 2) {
-                        int columnNumber = columnIndex == 1 ? 1 : columnIndex - 1;
-                        if (rsmd.getColumnType(columnIndex) == Types.NUMERIC) {
-                            double value = dataSource.getDouble(columnIndex);
-                            if (columnNumber == 1) {
-                                value = idIndex;
-                            }
-                            currentSheet.addCell(new jxl.write.Number(columnNumber, rowIndex, value, numberFormat));
-                        } else if (rsmd.getColumnType(columnIndex) == Types.TIMESTAMP && dataSource.getDate(columnIndex) != null) {
-                            currentSheet.addCell(new jxl.write.DateTime(columnNumber, rowIndex, dataSource.getDate(columnIndex), dateFormat));
-                        } else {
-                            Object value = dataSource.getObject(columnIndex);
-                            if (value == null) {
-                                value = "";
-                            }
-                            currentSheet.addCell(new Label(columnNumber, rowIndex, value.toString(), times12Format));
-                        }
-                    }
-                }
+                writeRow(dataSource, currentSheet);
                 rowIndex++;
                 if (rowIndex % 1000 == 0) {
                     ReportApplication.logTime(String.format("Row #%d", rowIndex));
                 }
                 recordCounter++;
             }
-            if (rowIndex - 1 > previousRowIndex) {
-                for (int columnIndex = 1; columnIndex <= rsmd.getColumnCount(); columnIndex++) {
-                    if (columnIndex != 23 && columnIndex != 24 && columnIndex != 2) {
-                        int columnNumber = columnIndex == 1 ? 1 : columnIndex - 1;
-                        currentSheet.mergeCells(columnNumber, previousRowIndex, columnNumber, rowIndex - 1);
-                    }
-                }
-            }
+            mergeRowIfNecessary(currentSheet);
             ReportApplication.logTime("After reading data source");
             workbook.write();
             workbook.close();
@@ -178,6 +159,66 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
                     dataSource.close();
                 } catch (Exception e) {
                 }
+            }
+        }
+    }
+
+    protected void writeRow(ResultSet dataSource, WritableSheet currentSheet) throws SQLException, WriteException {
+        handleNewId(dataSource.getInt(2), currentSheet, dataSource);
+        for (int columnIndex = 1; columnIndex <= rsmd.getColumnCount(); columnIndex++) {
+            if (columnIndex == 2) {
+                //Пропускаем id
+                continue;
+            }
+            if (isIdTheSame) {
+                if (!isPledgeColumn(columnIndex)) {
+                    continue;
+                }
+            }
+            int columnNumber = columnIndex == 1 ? 1 : columnIndex - 1;
+            if (rsmd.getColumnType(columnIndex) == Types.NUMERIC) {
+                double value = dataSource.getDouble(columnIndex);
+                if (columnNumber == 1) {
+                    value = idCounter;
+                }
+                currentSheet.addCell(new jxl.write.Number(columnNumber, rowIndex, value, numberFormat));
+            } else if (rsmd.getColumnType(columnIndex) == Types.TIMESTAMP && dataSource.getDate(columnIndex) != null) {
+                currentSheet.addCell(new jxl.write.DateTime(columnNumber, rowIndex, dataSource.getDate(columnIndex), dateFormat));
+            } else {
+                Object value = dataSource.getObject(columnIndex);
+                if (value == null) {
+                    value = "";
+                }
+                currentSheet.addCell(new Label(columnNumber, rowIndex, value.toString(), times12Format));
+            }
+
+        }
+    }
+    private void handleNewId(int id, WritableSheet currentSheet, ResultSet dataSource) throws WriteException, SQLException {
+        if (previousId == id) {
+            isIdTheSame = true;
+            return;
+        }
+        isIdTheSame = false;
+        idCounter++;
+        idIndex++;
+        mergeRowIfNecessary(currentSheet);
+        if (previousId == -1) {
+            firstRecordNumber = idCounter;
+        }
+        previousId = id;
+        previousIdRowIndex = rowIndex;
+        //storeDuplicatesInfo(dataSource);
+    }
+    private void mergeRowIfNecessary(WritableSheet currentSheet) throws WriteException, SQLException {
+        if (rowIndex - 1 <= previousIdRowIndex) {
+            return;
+        }
+        for (int columnIndex = 1; columnIndex <= rsmd.getColumnCount(); columnIndex++) {
+            if (shouldMergeColumn(columnIndex)) {
+                int columnNumber = columnIndex == 1 ? 1 : columnIndex - 1;
+                columnNumber -= (1 - firstOutputColumnIndex);
+                currentSheet.mergeCells(columnNumber, previousIdRowIndex, columnNumber, rowIndex - 1);
             }
         }
     }
