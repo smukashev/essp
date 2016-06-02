@@ -248,7 +248,6 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         batch.setRepDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.REP_DATE.getName())));
         batch.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.RECEIPT_DATE.getName())));
         batch.setBatchType((String) row.get(EAV_BATCHES.BATCH_TYPE.getName()));
-        //        TODO:     TOTAL_COUNT <-> ACTUAL_COUNT are misplaced in DB. So we misplace its second time here....
         batch.setTotalCount(getNullSafeLong(row, EAV_BATCHES.ACTUAL_COUNT));
         batch.setActualCount(getNullSafeLong(row, EAV_BATCHES.TOTAL_COUNT));
         batch.setReportId(getNullSafeLong(row, EAV_BATCHES.REPORT_ID));
