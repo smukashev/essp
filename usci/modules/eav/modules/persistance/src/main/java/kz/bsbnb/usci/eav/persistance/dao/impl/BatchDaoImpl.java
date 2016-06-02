@@ -248,8 +248,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         batch.setRepDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.REP_DATE.getName())));
         batch.setReceiptDate(DataUtils.convert((Timestamp) row.get(EAV_BATCHES.RECEIPT_DATE.getName())));
         batch.setBatchType((String) row.get(EAV_BATCHES.BATCH_TYPE.getName()));
-        batch.setTotalCount(getNullSafeLong(row, EAV_BATCHES.TOTAL_COUNT));
-        batch.setActualCount(getNullSafeLong(row, EAV_BATCHES.ACTUAL_COUNT));
+        batch.setTotalCount(getNullSafeLong(row, EAV_BATCHES.ACTUAL_COUNT));
+        batch.setActualCount(getNullSafeLong(row, EAV_BATCHES.TOTAL_COUNT));
         batch.setReportId(getNullSafeLong(row, EAV_BATCHES.REPORT_ID));
         batch.setMaintenance(getNullSafeLong(row, EAV_BATCHES.IS_MAINTENANCE) == 1);
         batch.setMaintenanceApproved(getNullSafeLong(row, EAV_BATCHES.IS_MAINTENANCE_APPROVED) == 1);
