@@ -74,7 +74,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
             batchService.addEntityStatus(entityStatus);
         } catch (Exception e) {
-            stats.put("process_error", (System.currentTimeMillis() - t1));
+            stats.put("java::process_error", (System.currentTimeMillis() - t1));
 
             if (!(e instanceof KnownException))
                 logger.error("Батч: " + mockEntity.getBatchId() + ", Индекс: " + (mockEntity.getBatchIndex() - 1)
