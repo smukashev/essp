@@ -263,13 +263,18 @@ function loadAttributes(form, selectedNode, arrayElAddition) {
         idSuffix = '_add';
     }
 
+    var myMask = new Ext.LoadMask(Ext.getCmp("EntityEditorFormPanel"), {msg: "Идет загрузка..."});
+    myMask.show();
+
     Ext.Ajax.request({
         url: dataUrl,
         params: {
             op: 'LIST_ATTRIBUTES',
             metaId: metaId
         },
+        timeout: 120000,
         success: function (result) {
+            myMask.hide();
             var json = JSON.parse(result.responseText);
             attrStore.removeAll();
             attrStore.add(json.data);
@@ -280,6 +285,10 @@ function loadAttributes(form, selectedNode, arrayElAddition) {
             for (var i = 0; i < attributes.length; i++) {
                 addField(form, attributes[i].data, idSuffix, selectedNodeData);
             }
+        },
+        failure: function(){
+            Ext.MessageBox.alert("Ошибка", "Ведутся профилактические работы, попробуйте выполнить запрос позже");
+            myMask.hide();
         }
     });
 }
