@@ -88,18 +88,18 @@ public class PackageParser extends BatchParser {
                 creditParser.parse(xmlReader, batch, index, creditorId);
                 BaseEntity credit = creditParser.getCurrentBaseEntity();
 
-                BaseEntity creditType = new BaseEntity(refCreditTypeMeta, batch.getRepDate(), creditorId);
-                // fixme!
-                try {
+                if(event.asStartElement().getAttributeByName(new QName("credit_type")) != null) {
+                    String creditTypeCode = event.asStartElement().getAttributeByName(new QName("credit_type")).getValue();
+                    BaseEntity creditType = new BaseEntity(refCreditTypeMeta, batch.getRepDate(), creditorId);
+
                     creditType.put("code",
                             new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
-                                    event.asStartElement().getAttributeByName(new QName("credit_type")).getValue(), false, true));
-                } catch (Exception e) {
-                    currentBaseEntity.addValidationError("Тип кредита заполнен не верно;");
+                                    creditTypeCode, false, true));
+
+                    credit.put("credit_type",
+                            new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditType, false, true));
                 }
 
-                credit.put("credit_type",
-                        new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), creditType, false, true));
                 break;
             case "subjects":
                 while (true) {

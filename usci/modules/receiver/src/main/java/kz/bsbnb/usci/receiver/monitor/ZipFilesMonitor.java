@@ -506,10 +506,18 @@ public class ZipFilesMonitor {
                 cal.add(Calendar.MONTH, reportPeriodDurationMonths == null ? 1 : reportPeriodDurationMonths);
                 mustDate = cal.getTime();
 
-                if(!mustDate.equals(batchInfo.getRepDate())) {
-                    errMsg = "Ошибка отчетной даты. Последняя утвержденная дата = " + dateFormat.format(lastApprovedDate) + ", " +
-                            " заявлено = " + dateFormat.format(batchInfo.getRepDate()) + ", шаг отчетности = " + reportPeriodDurationMonths;
-                    logger.error(errMsg);
+                if(batchInfo.isMaintenance()) {
+                    if(mustDate.compareTo(batchInfo.getRepDate()) <= 0) {
+                        errMsg = "Ошибка запроса на изменение за утвержденный период. Последняя утвержденная дата = " +
+                                dateFormat.format(lastApprovedDate) + ", " + " заявлено = " + dateFormat.format(batchInfo.getRepDate())
+                                + ", шаг отчетности = " + reportPeriodDurationMonths;
+                    }
+                } else {
+                    if(!mustDate.equals(batchInfo.getRepDate())) {
+                        errMsg = "Ошибка отчетной даты. Последняя утвержденная дата = " + dateFormat.format(lastApprovedDate) + ", " +
+                                " заявлено = " + dateFormat.format(batchInfo.getRepDate()) + ", шаг отчетности = " + reportPeriodDurationMonths;
+                        logger.error(errMsg);
+                    }
                 }
             }
 
