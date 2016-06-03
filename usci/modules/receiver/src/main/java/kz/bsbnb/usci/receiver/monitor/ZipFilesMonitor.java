@@ -512,6 +512,9 @@ public class ZipFilesMonitor {
                                 dateFormat.format(lastApprovedDate) + ", " + " заявлено = " + dateFormat.format(batchInfo.getRepDate())
                                 + ", шаг отчетности = " + reportPeriodDurationMonths;
                     }
+
+                    //otherwise breaks status_id in eav_report
+                    return true;
                 } else {
                     if(!mustDate.equals(batchInfo.getRepDate())) {
                         errMsg = "Ошибка отчетной даты. Последняя утвержденная дата = " + dateFormat.format(lastApprovedDate) + ", " +
