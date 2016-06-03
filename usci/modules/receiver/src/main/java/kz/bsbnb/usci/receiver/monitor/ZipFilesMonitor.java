@@ -508,7 +508,7 @@ public class ZipFilesMonitor {
 
                 if(batchInfo.isMaintenance()) {
                     if(mustDate.compareTo(batchInfo.getRepDate()) <= 0) {
-                        errMsg = "Ошибка запроса на изменение за утвержденный период. Последння утвержденная дата = " +
+                        errMsg = "Ошибка запроса на изменение за утвержденный период. Последняя утвержденная дата = " +
                                 dateFormat.format(lastApprovedDate) + ", " + " заявлено = " + dateFormat.format(batchInfo.getRepDate())
                                 + ", шаг отчетности = " + reportPeriodDurationMonths;
                     }
