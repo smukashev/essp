@@ -479,7 +479,7 @@ public class CLI {
 
                             fout.write((batchId + "," +
                                     batch.getFileName() + "," +
-                                    batch.getTotalCount() + "," +
+                                    batch.getActualCount() + "," +
                                     row_count + "," + error_count + "\n").getBytes());
                         }
                         break;
@@ -755,7 +755,7 @@ public class CLI {
 
                             fout.write((batchId + "," +
                                     batch.getFileName() + "," +
-                                    batch.getTotalCount() + ",restarted\n").getBytes());
+                                    batch.getActualCount() + ",restarted\n").getBytes());
 
                             batchProcessService.restartBatch(batchId);
                         }
@@ -844,7 +844,7 @@ public class CLI {
         //if (error_count > 0 || row_count != batchInfo.getSize()) {
         System.out.println(batchId + "," +
                 batch.getFileName() + "," +
-                batch.getTotalCount() + "," + row_count + "," + error_count + ",restarted");
+                batch.getActualCount() + "," + row_count + "," + error_count + ",restarted");
 
         //sender.addJob(batchId, batchInfo);
         //receiverStatusSingleton.batchReceived();
