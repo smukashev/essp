@@ -511,10 +511,10 @@ public class ZipFilesMonitor {
                         errMsg = "Ошибка запроса на изменение за утвержденный период. Последняя утвержденная дата = " +
                                 dateFormat.format(lastApprovedDate) + ", " + " заявлено = " + dateFormat.format(batchInfo.getRepDate())
                                 + ", шаг отчетности = " + reportPeriodDurationMonths;
+                    } else {
+                        //otherwise breaks status_id in eav_report
+                        return true;
                     }
-
-                    //otherwise breaks status_id in eav_report
-                    return true;
                 } else {
                     if(!mustDate.equals(batchInfo.getRepDate())) {
                         errMsg = "Ошибка отчетной даты. Последняя утвержденная дата = " + dateFormat.format(lastApprovedDate) + ", " +
