@@ -33,7 +33,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
     @Autowired
     private IMetaClassRepository metaClassRepository;
 
-    ReentrantReadWriteLock semaphore = new ReentrantReadWriteLock();
+    private ReentrantReadWriteLock semaphore = new ReentrantReadWriteLock();
 
     @Override
     public void afterPropertiesSet() throws Exception {
