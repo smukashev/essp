@@ -232,6 +232,7 @@ public class ZipFilesMonitor {
 
                         sleep(1000);
                     } catch (Exception e) {
+                        jobLauncherQueue.jobFinished();
                         e.printStackTrace();
                     }
                 } else {
