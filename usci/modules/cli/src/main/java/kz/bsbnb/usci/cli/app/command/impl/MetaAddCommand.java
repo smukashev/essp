@@ -84,6 +84,9 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
     public static final String OPTION_REQUIRED = "r";
     public static final String LONG_OPTION_REQUIRED = "required";
 
+    public static final String OPTION_NULLABLE = "n";
+    public static final String LONG_OPTION_NULLABLE = "nullable";
+
     public static final String DEFAULT_NAME = null;
     public static final String DEFAULT_ATTRIBUTE = null;
     public static final AttributeType DEFAULT_TYPE = null;
@@ -94,6 +97,7 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
     public static final boolean DEFAULT_CUMULATIVE = false;
     public static final boolean DEFAULT_FINAL = false;
     public static final boolean DEFAULT_REQUIRED = false;
+    public static final boolean DEFAULT_NULLABLE = false;
 
     private IMetaClassRepository metaClassRepository;
     private Options options = new Options();
@@ -173,6 +177,12 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
         requiredOption.setArgs(0);
         requiredOption.setRequired(false);
         options.addOption(requiredOption);
+
+        Option nullableOption = new Option(OPTION_NULLABLE, LONG_OPTION_NULLABLE, false,
+                "Nullable flag for new instance of MetaAttribute.");
+        nullableOption.setArgs(0);
+        nullableOption.setRequired(false);
+        options.addOption(nullableOption);
     }
 
     @Override
@@ -189,6 +199,7 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
         boolean isFinal = DEFAULT_FINAL;
         boolean isRequired = DEFAULT_REQUIRED;
         boolean isCumulative = DEFAULT_CUMULATIVE;
+        boolean isNullable = DEFAULT_NULLABLE;
 
         try {
             CommandLine commandLine = commandLineParser.parse(options, args);
@@ -247,6 +258,10 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
             if (commandLine.hasOption(OPTION_REQUIRED)) {
                 isRequired = true;
             }
+
+            if (commandLine.hasOption(OPTION_NULLABLE)) {
+                isNullable = true;
+            }
         } catch (ParseException e) {
             System.err.println(e.getMessage());
             helpFormatter.printHelp(getCustomUsageString("meta add", options), options);
@@ -279,6 +294,7 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
                 metaAttribute.setFinal(isFinal);
                 metaAttribute.setRequired(isRequired);
                 metaAttribute.setCumulative(isCumulative);
+                metaAttribute.setNullable(isNullable);
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             } else {
                 MetaAttribute metaAttribute = new MetaAttribute(false, false, childMetaClass);
@@ -286,6 +302,7 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
                 metaAttribute.setFinal(isFinal);
                 metaAttribute.setRequired(isRequired);
                 metaAttribute.setCumulative(isCumulative);
+                metaAttribute.setNullable(isNullable);
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             }
         } else {
@@ -301,6 +318,7 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
                 metaAttribute.setFinal(isFinal);
                 metaAttribute.setRequired(isRequired);
                 metaAttribute.setCumulative(isCumulative);
+                metaAttribute.setNullable(isNullable);
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             } else {
                 MetaAttribute metaAttribute = new MetaAttribute(false, false, metaValue);
@@ -308,7 +326,7 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
                 metaAttribute.setFinal(isFinal);
                 metaAttribute.setRequired(isRequired);
                 metaAttribute.setCumulative(isCumulative);
-
+                metaAttribute.setNullable(isNullable);
                 metaClass.setMetaAttribute(attribute, metaAttribute);
             }
         }
