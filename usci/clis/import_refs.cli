@@ -27,6 +27,7 @@ entity read  usci/refs/01.02.2012/ref_region_01_02_2012.xml 01.01.2012
 #entity read  usci/refs/01.09.2009/ref_creditor_01_09_2009.xml 01.09.2009
 entity read  usci/refs/01.01.2012/ref_creditor_01_01_2012.xml 01.01.2012
 entity read  usci/refs/16.01.2013/ref_creditor_16_01_2013.xml 16.01.2013
+entity read  usci/refs/27.08.2013/ref_creditor_c_27_08_2013.xml 27.08.2013
 entity read  usci/refs/19.05.2014/ref_creditor_19_05_2014.xml 19.05.2014
 #entity read  usci/refs/01.09.2010/ref_creditor_c_01_09_2010.xml 01.09.2010
 #entity read  usci/refs/01.09.2009/ref_creditor_branch_01_09_2009.xml 01.09.2009
