@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.portlet.report.ui;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -48,7 +49,7 @@ public class CustomDataSource extends IndexedContainer implements JRDataSource {
                 if(rsmd.getColumnType(columnIndex+1)==Types.TIMESTAMP) {
                     columnClass = Date.class;
                 } else if(rsmd.getColumnType(columnIndex+1)==Types.NUMERIC) {
-                    columnClass = Double.class;
+                    columnClass = BigDecimal.class;
                 }
                 addContainerProperty(columnNames[columnIndex], columnClass, null);
             }
@@ -58,9 +59,9 @@ public class CustomDataSource extends IndexedContainer implements JRDataSource {
                 for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
                     Object obj = rs.getObject(columnIndex);
                     if(rsmd.getColumnType(columnIndex)==Types.TIMESTAMP&&obj!=null) {
-                        record[columnIndex-1] = rs.getDate(columnIndex);
+                        record[columnIndex-1] = rs.getTimestamp(columnIndex);
                     } else if(rsmd.getColumnType(columnIndex)==Types.NUMERIC&&obj!=null) {
-                        record[columnIndex-1] = rs.getDouble(columnIndex);
+                        record[columnIndex-1] = rs.getBigDecimal(columnIndex);
                     } else {
                         record[columnIndex - 1] = rs.getString(columnIndex);
                     }
@@ -101,10 +102,10 @@ public class CustomDataSource extends IndexedContainer implements JRDataSource {
 
     public Object getFieldValue(String fieldName) throws NoSuchFieldException {
         Integer index = columnIndicesMap.get(fieldName);
+        if ("ROWNUM".equalsIgnoreCase(fieldName)) {
+            return (currentRecordIndex + 1);
+        }
         if (index == null) {
-            if ("ROWNUM".equalsIgnoreCase(fieldName)) {
-                return (currentRecordIndex + 1);
-            }
             throw new NoSuchFieldException(fieldName);
         }
         return dataSet.get(currentRecordIndex)[index];
