@@ -31,7 +31,7 @@ public class ReportController {
     public List<Report> loadReports(DatabaseConnect connect) {
             List<Report> reports =  new ArrayList<Report>();
         List<ReportInputParameter> inputParameters = new ArrayList<ReportInputParameter>();
-        List<ExportType> exportTypes = new ArrayList<ExportType>();
+
         Connection conn  = connect.getConnection();
         Statement stmt = null;
         Statement stmt2 = null;
@@ -47,6 +47,7 @@ public class ReportController {
             ResultSet rs = stmt.executeQuery(query);
             while(rs.next())
             {
+                List<ExportType> exportTypes = new ArrayList<ExportType>();
                 Report rep = new Report();
                 rep.setId(rs.getLong("ID"));
                 rep.setNameRu(rs.getString("NAME_RU"));
