@@ -25,7 +25,6 @@ import kz.bsbnb.usci.sync.service.IEntityService;
 import kz.bsbnb.usci.sync.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.jooq.tools.Convert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -284,6 +283,8 @@ public class ZipFilesMonitor {
 
                     failFast(batchId, "Несоответствие кредитора пользователю портала");
                     haveError = true;
+
+                    cId = cList.get(0).getId();
                 }
             } else {
                 cId = -1L;
@@ -765,6 +766,7 @@ public class ZipFilesMonitor {
                 batchInfo.setBatchType(manifestData.getType().trim());
 
                 batchInfo.setBatchName(parseFileNameFromPath(filename));
+                batchInfo.setMaintenance(manifestData.isMaintenance());
 
                 batchInfo.setUserId(userId == null ? manifestData.getUserId() : userId);
 

@@ -295,9 +295,9 @@ meta add --name=turnover_issue_interest --attribute=amount_currency --type=doubl
 #====================================
 
 meta create --name=provision_group
-meta add --name=provision_group --attribute=provision_kfn --type=meta_class --childname=provision --final
-meta add --name=provision_group --attribute=provision_msfo --type=meta_class --childname=provision --final
-meta add --name=provision_group --attribute=provision_msfo_over_balance --type=meta_class --childname=provision --final
+meta add --name=provision_group --attribute=provision_kfn --type=meta_class --childname=provision --final --nullable
+meta add --name=provision_group --attribute=provision_msfo --type=meta_class --childname=provision --final --nullable
+meta add --name=provision_group --attribute=provision_msfo_over_balance --type=meta_class --childname=provision --final --nullable
 
 #====================================
 #= REF_BANK_RELATION
