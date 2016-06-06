@@ -27,7 +27,7 @@ public class CreditorRepository extends BaseRepository {
         QUERY_ALL = "SELECT * FROM ref.v_creditor_his";
         QUERY_OPEN = "SELECT * FROM ref.v_creditor_his where open_date = to_date('repDate', 'dd.MM.yyyy') " +
                 " and (close_date > to_date('repDate','dd.MM.yyyy') or close_date is null) and main_office_id is null";
-        QUERY_CLOSE = "SELECT * FROM ref.v_creditor_his where close_date = to_date('repDate', 'dd.MM.yyyy') " +
+        QUERY_CLOSE = "SELECT * FROM ref.v_creditor_his where shutdown_date = to_date('repDate', 'dd.MM.yyyy') " +
                 " and main_office_id is null";
         COLUMNS_QUERY = "SELECT * from (" +
                 " select 'ID' as column_name from dual union all" +
