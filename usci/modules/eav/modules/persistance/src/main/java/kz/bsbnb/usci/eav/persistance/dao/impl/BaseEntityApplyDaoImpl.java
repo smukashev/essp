@@ -281,25 +281,25 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         if (baseEntitySaving.getId() < 1 && baseEntityLoaded.getId() > 0)
             baseEntitySaving.setId(baseEntityLoaded.getId());
 
-        for (String attribute : metaClass.getAttributeNames()) {
-            IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attribute);
-            IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attribute);
+        for (String attrName : metaClass.getAttributeNames()) {
+            IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attrName);
+            IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attrName);
 
-            if (baseValueSaving == null && baseValueLoaded != null)
-                baseEntityApplied.put(attribute, baseValueLoaded);
+            final IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attrName);
+            final IMetaType metaType = metaAttribute.getMetaType();
+
+            if (baseValueSaving == null && baseValueLoaded != null && !metaAttribute.isNullable())
+                baseEntityApplied.put(attrName, baseValueLoaded);
+
+            if (baseValueSaving == null && metaAttribute.isNullable()) {
+                baseValueSaving = BaseValueFactory.create(baseEntitySaving.getBaseContainerType(), metaType,
+                        0, creditorId, baseEntitySaving.getReportDate(), null, false, true);
+                baseValueSaving.setBaseContainer(baseEntitySaving);
+                baseValueSaving.setMetaAttribute(metaAttribute);
+            }
 
             if (baseValueSaving == null)
                 continue;
-
-            IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
-            if (metaAttribute == null)
-                throw new RuntimeException(Errors.compose(Errors.E58));
-
-            IBaseContainer baseContainerSaving = baseValueSaving.getBaseContainer();
-            if (baseContainerSaving != null && baseContainerSaving.getBaseContainerType() != BaseContainerType.BASE_ENTITY)
-                throw new RuntimeException(Errors.compose(Errors.E59, baseValueSaving.getMetaAttribute().getName()));
-
-            IMetaType metaType = metaAttribute.getMetaType();
 
             if (metaType.isComplex()) {
                 if (metaType.isSet())

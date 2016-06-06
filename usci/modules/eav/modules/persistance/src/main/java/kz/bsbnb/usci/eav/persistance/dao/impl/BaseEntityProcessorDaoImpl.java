@@ -225,7 +225,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
 
                     Date minReportDate = baseEntityReportDateDao.getMinReportDate(baseEntityPostPrepared.getId());
-                    if (minReportDate.compareTo(baseEntityPostPrepared.getReportDate()) <= 0)
+                    if (minReportDate.compareTo(baseEntityPostPrepared.getReportDate()) >= 0)
                         throw new IllegalStateException(Errors.compose(Errors.E115));
 
                     boolean reportDateExists = baseEntityReportDateDao.exists(baseEntityPostPrepared.getId(), baseEntityPostPrepared.getReportDate());

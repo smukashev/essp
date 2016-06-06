@@ -13,8 +13,7 @@ import java.util.Date;
 
 public class BaseValueFactory {
     public static IBaseValue create(BaseContainerType baseContainerType, IMetaType metaType, long id, long creditorId,
-                                    Date reportDate, Object value, boolean closed,
-                                    boolean last) {
+                                    Date reportDate, Object value, boolean closed, boolean last) {
         int metaContainerType = 0;
         switch (baseContainerType) {
             case BASE_ENTITY:
@@ -36,8 +35,7 @@ public class BaseValueFactory {
                 if (metaType.isSet()) {
                     IBaseSet baseSet = (IBaseSet) value;
                     if (metaType.isComplex())
-                        baseValue = new BaseEntityComplexSet(id, creditorId, reportDate, baseSet,
-                                closed, last);
+                        baseValue = new BaseEntityComplexSet(id, creditorId, reportDate, baseSet, closed, last);
                     else
                         baseValue = new BaseEntitySimpleSet(id, creditorId, reportDate, baseSet, closed, last);
                 } else {

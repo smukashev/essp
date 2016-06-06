@@ -295,9 +295,9 @@ meta add --name=turnover_issue_interest --attribute=amount_currency --type=doubl
 #====================================
 
 meta create --name=provision_group
-meta add --name=provision_group --attribute=provision_kfn --type=meta_class --childname=provision --final
-meta add --name=provision_group --attribute=provision_msfo --type=meta_class --childname=provision --final
-meta add --name=provision_group --attribute=provision_msfo_over_balance --type=meta_class --childname=provision --final
+meta add --name=provision_group --attribute=provision_kfn --type=meta_class --childname=provision --final --nullable
+meta add --name=provision_group --attribute=provision_msfo --type=meta_class --childname=provision --final --nullable
+meta add --name=provision_group --attribute=provision_msfo_over_balance --type=meta_class --childname=provision --final --nullable
 
 #====================================
 #= REF_BANK_RELATION
@@ -454,20 +454,20 @@ meta add --name=subject --attribute=is_creditor --type=boolean
 #====================================
 
 meta create --name=remains
-meta add --name=remains --attribute=discounted_value --type=meta_class --childname=remains_discounted_value --final
-meta add --name=remains --attribute=correction --type=meta_class --childname=remains_correction --final
-meta add --name=remains --attribute=debt --type=meta_class --childname=remains_debt --final
-meta add --name=remains --attribute=discount --type=meta_class --childname=remains_discount --final
-meta add --name=remains --attribute=interest --type=meta_class --childname=remains_interest --final
-meta add --name=remains --attribute=limit --type=meta_class --childname=remains_limit --final
+meta add --name=remains --attribute=discounted_value --type=meta_class --childname=remains_discounted_value --final --nullable
+meta add --name=remains --attribute=correction --type=meta_class --childname=remains_correction --final --nullable
+meta add --name=remains --attribute=debt --type=meta_class --childname=remains_debt --final --nullable
+meta add --name=remains --attribute=discount --type=meta_class --childname=remains_discount --final --nullable
+meta add --name=remains --attribute=interest --type=meta_class --childname=remains_interest --final --nullable
+meta add --name=remains --attribute=limit --type=meta_class --childname=remains_limit --final --nullable
 
 #====================================
 #= TURNOVER_ISSUE
 #====================================
 
 meta create --name=turnover_issue
-meta add --name=turnover_issue --attribute=debt --type=meta_class --childname=turnover_issue_debt --final
-meta add --name=turnover_issue --attribute=interest --type=meta_class --childname=turnover_issue_interest --final
+meta add --name=turnover_issue --attribute=debt --type=meta_class --childname=turnover_issue_debt --final --nullable
+meta add --name=turnover_issue --attribute=interest --type=meta_class --childname=turnover_issue_interest --final --nullable
 
 #====================================
 #= TURNOVER
