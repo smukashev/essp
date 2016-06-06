@@ -466,8 +466,8 @@ meta add --name=remains --attribute=limit --type=meta_class --childname=remains_
 #====================================
 
 meta create --name=turnover_issue
-meta add --name=turnover_issue --attribute=debt --type=meta_class --childname=turnover_issue_debt --final
-meta add --name=turnover_issue --attribute=interest --type=meta_class --childname=turnover_issue_interest --final
+meta add --name=turnover_issue --attribute=debt --type=meta_class --childname=turnover_issue_debt --final --nullable
+meta add --name=turnover_issue --attribute=interest --type=meta_class --childname=turnover_issue_interest --final --nullable
 
 #====================================
 #= TURNOVER
