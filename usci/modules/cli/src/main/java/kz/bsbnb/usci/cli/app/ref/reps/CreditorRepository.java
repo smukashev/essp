@@ -3,6 +3,7 @@ package kz.bsbnb.usci.cli.app.ref.reps;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
 import kz.bsbnb.usci.cli.app.ref.craw.CreditorDocCrawler;
 import kz.bsbnb.usci.cli.app.ref.craw.NokbdbCrawler;
+import kz.bsbnb.usci.cli.app.ref.craw.RegionCrawler;
 import kz.bsbnb.usci.cli.app.ref.craw.SubjectTypeCrawler;
 import kz.bsbnb.usci.cli.app.ref.refs.Creditor;
 
@@ -25,16 +26,19 @@ public class CreditorRepository extends BaseRepository {
 
     public CreditorRepository() {
         QUERY_ALL = "SELECT * FROM ref.v_creditor_his";
-        QUERY_OPEN = "SELECT * FROM ref.v_creditor_his where open_date = to_date('repDate', 'dd.MM.yyyy') " +
-                " and (close_date > to_date('repDate','dd.MM.yyyy') or close_date is null) and main_office_id is null";
-        QUERY_CLOSE = "SELECT * FROM ref.v_creditor_his where shutdown_date = to_date('repDate', 'dd.MM.yyyy') " +
-                " and main_office_id is null";
+        QUERY_OPEN = "SELECT t1.*, t2.region_id FROM ref.v_creditor_his t1, ref.creditor t2\n" +
+                "WHERE t1.id = t2.id  AND t1.open_date = to_date('repDate', 'dd.MM.yyyy')\n" +
+                "AND (t1.close_date     > to_date('repDate','dd.MM.yyyy') OR t1.close_date IS NULL)\n" +
+                "AND t1.main_office_id IS NULL";
+        QUERY_CLOSE = "SELECT t1.*, t2.region_id FROM ref.v_creditor_his t1, ref.creditor t2 \n" +
+                "where t1.id = t2.id  AND  t1.shutdown_date = to_date('repDate', 'dd.MM.yyyy') and t1.main_office_id is null";
         COLUMNS_QUERY = "SELECT * from (" +
                 " select 'ID' as column_name from dual union all" +
                 " select 'MAIN_OFFICE_ID' as column_name from dual union all" +
                 " select 'SUBJECT_TYPE_ID' as column_name from dual union all" +
                 " select 'SHORT_NAME' as column_name from dual union all" +
                 " select 'CODE' as column_name from dual union all" +
+                " select 'REGION_ID' as column_name from dual union all" +
                 " select 'NAME' as column_name from dual)";
 
         creditorDocCrawler = new CreditorDocCrawler();
@@ -43,12 +47,14 @@ public class CreditorRepository extends BaseRepository {
         subjectTypeCrawler.constructAll();
         nokbdbCrawler = new NokbdbCrawler();
         nokbdbCrawler.constructAll();
+        regionCrawler = new RegionCrawler();
+        regionCrawler.constructAll();
     }
 
     CreditorDocCrawler creditorDocCrawler;
     SubjectTypeCrawler subjectTypeCrawler;
     NokbdbCrawler nokbdbCrawler;
-
+    RegionCrawler regionCrawler;
 
     @Override
     public HashMap construct(String query){
@@ -57,6 +63,7 @@ public class CreditorRepository extends BaseRepository {
             CreditorDocRepository creditorDocRepository = (CreditorDocRepository) creditorDocCrawler.getRepositoryInstance();
             SubjectTypeRepository subjectTypeRepository = (SubjectTypeRepository) subjectTypeCrawler.getRepositoryInstance();
             NokbdbRepository nokbdbRepository = (NokbdbRepository) nokbdbCrawler.getRepositoryInstance();
+            RegionRepository regionRepository = (RegionRepository) regionCrawler.getRepositoryInstance();
 
             ResultSet rows = getStatement().executeQuery(query.replaceAll("repDate",repDate));
             HashMap hm = new HashMap();
@@ -68,12 +75,12 @@ public class CreditorRepository extends BaseRepository {
                     try {
                         tmp.put(s, rows.getString((String) s));
                     } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 }
                 tmp.put("docs",creditorDocRepository.getByProperty("CREDITOR_ID",(String)tmp.get("ID")));
                 tmp.put("subject_type",subjectTypeRepository.getById((String)tmp.get("SUBJECT_TYPE_ID")));
                 tmp.put("nokbdb",nokbdbRepository.getById((String)tmp.get("ID")));
+                tmp.put("region",regionRepository.getById((String)tmp.get("REGION_ID")));
                 Creditor dt = new Creditor(tmp);
                 hm.put(dt.get(dt.getKeyName()),dt);
             }

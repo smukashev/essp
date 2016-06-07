@@ -53,6 +53,14 @@ public class Creditor extends BaseRef {
         SubjectType st = (SubjectType) hm.get("subject_type");
         st.buildElement(subjectType);
 
+        if(hm.get("region") != null){
+            Element regionType = getDocument().createElement("region");
+            root.appendChild(regionType);
+
+            Region region = (Region) hm.get("region");
+            region.buildElement(regionType);
+        }
+
         if(hm.get("nokbdb") !=null ){
             appendToElement(root, "nokbdb_code" , hm.get("nokbdb").toString() );
             /*Element nokbdb = getDocument().createElement("nokbdb");
