@@ -30,4 +30,6 @@ public interface IMailDao {
     boolean isMailHandlingOn();
     List<MailTemplate> getUserConfiguredTemplates();
     public void insertUserMailTemplate(UserMailTemplate userMailTemplate);
+    Long getLastLaunchTime();
+    void setLastLaunchMillis(long millis);
 }

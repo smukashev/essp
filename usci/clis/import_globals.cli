@@ -38,6 +38,7 @@ global add --type=BATCH_STATUS --code=MAINTENANCE_REQUEST --value=MAINTENANCE_RE
 # NOTIFICATION
 #
 global add --type=NOTIFICATION --code=IS_MAIL_HANDLING_ON --value=1 --desc=признак_отправки_уведомлений
+global add --type=NOTIFICATION --code=LAST_MAIL_HANDLER_LAUNCH_TIME --value=-1 --desc=последняя_работа_обработчика
 
 #
 # QUEUE

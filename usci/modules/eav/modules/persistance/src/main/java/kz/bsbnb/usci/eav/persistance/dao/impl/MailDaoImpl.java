@@ -24,6 +24,7 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
 
     private static final String NOTIFICATION = "NOTIFICATION";
     private static final String IS_MAIL_HANDLING_ON = "IS_MAIL_HANDLING_ON";
+    private static final String LAST_MAIL_HANDLER_LAUNCH_TIME = "LAST_MAIL_HANDLER_LAUNCH_TIME";
 
     @Override
     public List<UserMailTemplate> getUserMailTemplates(long userId) {
@@ -322,5 +323,24 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
                 .set(MAIL_USER_MAIL_TEMPLATE.ENABLED, DataUtils.convert(true));
 
         jdbcTemplate.update(insert.getSQL(), insert.getBindValues().toArray());
+    }
+
+    @Override
+    public Long getLastLaunchTime() {
+        Select select = context.select(EAV_GLOBAL.VALUE)
+                .from(EAV_GLOBAL).where(EAV_GLOBAL.TYPE.eq(NOTIFICATION))
+                .and(EAV_GLOBAL.CODE.eq(LAST_MAIL_HANDLER_LAUNCH_TIME));
+
+        return jdbcTemplate.queryForLong(select.getSQL(), select.getBindValues().toArray());
+    }
+
+    @Override
+    public void setLastLaunchMillis(long millis) {
+        Update update = context.update(EAV_GLOBAL)
+                .set(EAV_GLOBAL.VALUE, millis + "")
+                .where(EAV_GLOBAL.TYPE.eq(NOTIFICATION))
+                .and(EAV_GLOBAL.CODE.eq(LAST_MAIL_HANDLER_LAUNCH_TIME));
+
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
     }
 }

@@ -85,4 +85,14 @@ public class MailMessageBeanCommonBusinessImpl implements MailMessageBeanCommonB
     public boolean isMailHandlingOn() {
         return mailDao.isMailHandlingOn();
     }
+
+    @Override
+    public Long getLastLaunchTime() {
+        return mailDao.getLastLaunchTime();
+    }
+
+    @Override
+    public void setLastLaunchMillis(long millis) {
+        mailDao.setLastLaunchMillis(millis);
+    }
 }
