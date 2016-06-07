@@ -49,6 +49,11 @@
         <code>0002</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
       <nokbdb_code>J:КИК:</nokbdb_code>
     </ref_creditor>
     <ref_creditor>
@@ -75,6 +80,11 @@
         <code>0002</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
       <nokbdb_code>J:Элитстрой Финанс:</nokbdb_code>
     </ref_creditor>
     <ref_creditor>
@@ -113,6 +123,11 @@
         <code>0002</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>19</code>
+        <name_kz>Алматы облысы</name_kz>
+        <name_ru>Алматинская область</name_ru>
+      </region>
       <nokbdb_code>J:АлмРегИпотечОрг:</nokbdb_code>
     </ref_creditor>
     <ref_creditor>
@@ -164,6 +179,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Банк Kassa Nova"</name>
@@ -202,6 +222,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>71</code>
+        <name_kz>Астана қ.</name_kz>
+        <name_ru>г.Астана</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Эксимбанк Казахстан"</name>
@@ -240,6 +265,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "ДБ "КЗИ Банк"</name>
@@ -278,6 +308,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Евразийский банк"</name>
@@ -328,6 +363,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "ABC Bank"</name>
@@ -366,6 +406,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>71</code>
+        <name_kz>Астана қ.</name_kz>
+        <name_ru>г.Астана</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "EU Bank (ДБ АО "Евразийский Банк")"</name>
@@ -404,6 +449,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Банк Развития Казахстана"</name>
@@ -454,6 +504,11 @@
         <code>0008</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>71</code>
+        <name_kz>Астана қ.</name_kz>
+        <name_ru>г.Астана</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Казкоммерцбанк"</name>
@@ -492,6 +547,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "AsiaCredit Bank (АзияКредит Банк)"</name>
@@ -530,10 +590,15 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
-      <name>АО "ДБ "Punjab National Bank"-Казахстан"</name>
-      <short_name>АО "ДБ "PNB"</short_name>
+      <name>АО "Tengri Bank"</name>
+      <short_name>АО "Tengri Bank"</short_name>
       <code>620</code>
       <docs>
         <item>
@@ -560,6 +625,18 @@
             <code>15</code>
           </doc_type>
         </item>
+        <item>
+          <no>451700027971</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика </name_ru>
+            <name_kz>Регистрационный номер налогоплательщика </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
       </docs>
       <subject_type>
         <kind_id>31</kind_id>
@@ -568,6 +645,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Altyn Bank" (ДБ АО "Народный Банк Казахстана")</name>
@@ -598,6 +680,18 @@
             <code>15</code>
           </doc_type>
         </item>
+        <item>
+          <no>600900133859</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика </name_ru>
+            <name_kz>Регистрационный номер налогоплательщика </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
       </docs>
       <subject_type>
         <kind_id>31</kind_id>
@@ -606,6 +700,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Исламский Банк "Al Hilal"</name>
@@ -644,6 +743,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Нурбанк"</name>
@@ -694,6 +798,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Delta Bank"</name>
@@ -744,6 +853,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО ДБ "Национальный Банк Пакистана" в Казахстане</name>
@@ -782,6 +896,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>19</code>
+        <name_kz>Алматы облысы</name_kz>
+        <name_ru>Алматинская область</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>ДО АО Банк ВТБ (Казахстан)</name>
@@ -832,6 +951,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Цеснабанк"</name>
@@ -882,6 +1006,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>71</code>
+        <name_kz>Астана қ.</name_kz>
+        <name_ru>г.Астана</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Qazaq Banki" (прежнее наименование АО "СЕНИМ-БАНК")</name>
@@ -898,6 +1027,18 @@
             <is_person_doc>0</is_person_doc>
             <weight>10</weight>
             <code>07</code>
+          </doc_type>
+        </item>
+        <item>
+          <no>600700017765</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика </name_ru>
+            <name_kz>Регистрационный номер налогоплательщика </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
           </doc_type>
         </item>
         <item>
@@ -920,6 +1061,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>ДБ АО "Сбербанк"</name>
@@ -970,6 +1116,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Capital Bank Kazakhstan"</name>
@@ -1008,6 +1159,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Шинхан Банк Казахстан"</name>
@@ -1046,6 +1202,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Народный сберегательный банк Казахстана"</name>
@@ -1096,6 +1257,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Торгово-промышленный Банк Китая в Алматы"</name>
@@ -1134,6 +1300,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>ДБ АО "Хоум Кредит энд Финанс Банк"</name>
@@ -1172,6 +1343,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "ForteBank"</name>
@@ -1222,6 +1398,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Темiрбанк"</name>
@@ -1272,6 +1453,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Казинвестбанк"</name>
@@ -1310,6 +1496,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Банк ЦентрКредит"</name>
@@ -1360,6 +1551,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО ДБ "Альфа-Банк"</name>
@@ -1398,6 +1594,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "ДБ "RBS (Kazakhstan)"</name>
@@ -1436,6 +1637,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "БТА Банк"</name>
@@ -1474,6 +1680,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Ситибанк Казахстан"</name>
@@ -1512,6 +1723,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>Тестовая организация</name>
@@ -1575,6 +1791,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Банк Астаны"</name>
@@ -1625,6 +1846,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Bank RBK"</name>
@@ -1675,6 +1901,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "АТФБанк"</name>
@@ -1713,6 +1944,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Аграрная Кредитная корпорация"</name>
@@ -1751,6 +1987,11 @@
         <code>0003</code>
         <report_period_duration_months>3</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>71</code>
+        <name_kz>Астана қ.</name_kz>
+        <name_ru>г.Астана</name_ru>
+      </region>
       <nokbdb_code>J:Агр КредКорп:</nokbdb_code>
     </ref_creditor>
     <ref_creditor>
@@ -1789,6 +2030,11 @@
         <code>0003</code>
         <report_period_duration_months>3</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>71</code>
+        <name_kz>Астана қ.</name_kz>
+        <name_ru>г.Астана</name_ru>
+      </region>
       <nokbdb_code>J:КазАгроФин:</nokbdb_code>
     </ref_creditor>
     <ref_creditor>
@@ -1827,6 +2073,11 @@
         <code>0003</code>
         <report_period_duration_months>3</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
       <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
     </ref_creditor>
     <ref_creditor>
@@ -1865,6 +2116,11 @@
         <code>0003</code>
         <report_period_duration_months>3</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>71</code>
+        <name_kz>Астана қ.</name_kz>
+        <name_ru>г.Астана</name_ru>
+      </region>
       <nokbdb_code>J:ПродКонтрактКорп:</nokbdb_code>
     </ref_creditor>
     <ref_creditor>
@@ -1916,6 +2172,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
     <ref_creditor>
       <name>АО "Заман-Банк"</name>
@@ -1954,6 +2215,11 @@
         <code>0001</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>55</code>
+        <name_kz>Павлодар облысы</name_kz>
+        <name_ru>Павлодарская область</name_ru>
+      </region>
     </ref_creditor>
   </entities>
 </batch>

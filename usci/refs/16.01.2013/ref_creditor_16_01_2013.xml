@@ -24,6 +24,11 @@
         <name_ru>Банк первого уровня</name_ru>
         <code>0009</code>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
     </ref_creditor>
   </entities>
 </batch>
