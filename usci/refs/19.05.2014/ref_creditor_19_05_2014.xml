@@ -37,6 +37,11 @@
         <code>0002</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
       <nokbdb_code>J600900577988Ипотечная :</nokbdb_code>
     </ref_creditor>
   </entities>

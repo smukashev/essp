@@ -3,6 +3,7 @@
   <entities>
     <ref_creditor operation="CLOSE">
       <name>АО "Ипотечная Организация "Элитстрой Финанс"</name>
+      <short_name>АО "ИО "Элитстрой Финанс"</short_name>
       <docs>
         <item>
           <no>190501794</no>
@@ -24,6 +25,11 @@
         <code>0002</code>
         <report_period_duration_months>1</report_period_duration_months>
       </subject_type>
+      <region>
+        <code>75</code>
+        <name_kz>Алматы қ.</name_kz>
+        <name_ru>г.Алматы</name_ru>
+      </region>
       <nokbdb_code>J:Элитстрой Финанс:</nokbdb_code>
     </ref_creditor>
   </entities>

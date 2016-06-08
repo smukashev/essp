@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
@@ -124,7 +125,7 @@ public class MailHandler implements Runnable {
         message.setText(provider.getMessageText(mailMessage), "utf-8", "html");
 
         logger.info("sent to: " + host + ", sender: " + sender);
-        //Transport.send(message);
+        Transport.send(message);
     }
 
     @Override
