@@ -1,9 +1,11 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.model.mail.*;
 import kz.bsbnb.usci.eav.persistance.dao.IMailDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.SetUtils;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -342,5 +344,52 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
                 .and(EAV_GLOBAL.CODE.eq(LAST_MAIL_HANDLER_LAUNCH_TIME));
 
         updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
+
+    @Override
+    public void insertNewUsers(List<PortalUser> users) {
+        SelectForUpdateStep select;
+        select = context.select(EAV_A_USER.USER_ID).from(EAV_A_USER);
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        Set<Long> dbUsers = new HashSet<>();
+        Set<Long> portalUsers = new HashSet<>();
+
+        for (Map<String, Object> row : rows) {
+            dbUsers.add(((BigDecimal) row.get(EAV_A_USER.USER_ID.getName())).longValue());
+        }
+
+        for (PortalUser user : users) {
+            portalUsers.add(user.getUserId());
+        }
+
+        Set<Long> toAdd = SetUtils.difference(portalUsers, dbUsers);
+
+        if(toAdd.size() < 1)
+            return;
+
+        Set<Long> userConfigurableTemplates = new HashSet<>();
+
+        Select templateSelect = context.select(MAIL_TEMPLATE.ID)
+                .from(MAIL_TEMPLATE)
+                .where(MAIL_TEMPLATE.CONFIGURATION_TYPE_ID.eq(138L));
+
+        List<Map<String, Object>> tRows = queryForListWithStats(templateSelect.getSQL(), templateSelect.getBindValues().toArray());
+
+        for (Map<String, Object> tRow : tRows) {
+            userConfigurableTemplates.add(((BigDecimal) tRow.get(MAIL_TEMPLATE.ID.getName())).longValue());
+        }
+
+
+        for (Long userId : toAdd) {
+            for (Long templateId : userConfigurableTemplates) {
+                Insert insert = context.insertInto(MAIL_USER_MAIL_TEMPLATE)
+                        .set(MAIL_USER_MAIL_TEMPLATE.PORTAL_USER_ID, userId)
+                        .set(MAIL_USER_MAIL_TEMPLATE.MAIL_TEMPLATE_ID, templateId);
+
+                updateWithStats(insert.getSQL(), insert.getBindValues().toArray());
+            }
+        }
+
     }
 }

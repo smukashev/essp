@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
+import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.model.mail.MailMessage;
 import kz.bsbnb.usci.eav.model.mail.MailMessageParameter;
 import kz.bsbnb.usci.eav.model.mail.MailTemplate;
@@ -32,4 +33,5 @@ public interface IMailDao {
     public void insertUserMailTemplate(UserMailTemplate userMailTemplate);
     Long getLastLaunchTime();
     void setLastLaunchMillis(long millis);
+    void insertNewUsers(List<PortalUser> users);
 }
