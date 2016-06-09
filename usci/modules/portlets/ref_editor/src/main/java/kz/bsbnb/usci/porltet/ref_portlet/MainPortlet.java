@@ -385,12 +385,7 @@ public class MainPortlet extends MVCPortlet {
         OutputStream out = resourceResponse.getPortletOutputStream();
 
         try {
-
-            if(currentException !=null)
-                throw currentException;
-
-            if (metaFactoryService == null)
-                connectToServices();
+            connectToServices();
 
             OperationTypes operationType = OperationTypes.valueOf(getParam("op", resourceRequest));
 
@@ -542,24 +537,6 @@ public class MainPortlet extends MVCPortlet {
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             String originalError = castJsonString(e);
-            if(originalError.contains("connect") || originalError.contains("rmi"))
-                if(!retry) {
-                    retry = true;
-                    logger.info("connect failed, reconnect triggered");
-                    try {
-                        connectToServices();
-                        serveResource(resourceRequest, resourceResponse);
-                    } catch (Exception e1) {
-                        logger.info("reconnect failed, seems services are down");
-                        originalError = Errors.decompose(castJsonString(e1));
-                        out.write(("{ \"success\": false, \"errorMessage\": \""+ originalError + "\"}").getBytes());
-                    } finally {
-                        retry = false;
-                        return;
-                    }
-                }
-
-            currentException = null;
             originalError = Errors.decompose(originalError);
             out.write(("{\"success\": false, \"errorMessage\": \"" + originalError + "\"}").getBytes());
         }
