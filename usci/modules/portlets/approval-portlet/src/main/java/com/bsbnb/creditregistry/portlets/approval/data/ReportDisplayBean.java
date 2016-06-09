@@ -82,7 +82,8 @@ public class ReportDisplayBean {
         if(ReportStatus.COMPLETED.code().equals(status.getCode())) {
             return "lightblue";
         }
-        if(ReportStatus.ORGANIZATION_APPROVED.code().equals(status.getCode())) {
+        if(ReportStatus.ORGANIZATION_APPROVED.code().equals(status.getCode())
+                || ReportStatus.ORGANIZATION_APPROVING.code().equals(status.getCode())) {
             return "orange";
         }
         if(ReportStatus.WOE.code().equals(status.getCode())) {
