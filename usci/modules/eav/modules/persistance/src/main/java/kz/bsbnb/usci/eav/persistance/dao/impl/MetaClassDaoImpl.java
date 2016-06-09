@@ -240,7 +240,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 metaClass.getComplexKeyType().toString(),
                 DataUtils.convert(metaClass.getBeginDate()),
                 DataUtils.convert(metaClass.isDisabled()),
-                DataUtils.convert(metaClass.isParentIsKey()),
+                DataUtils.convert(metaClass.parentIsKey()),
                 DataUtils.convert(metaClass.isReference()));
 
         logger.debug(insert.toString());
@@ -265,7 +265,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 set(EAV_M_CLASSES.BEGIN_DATE, DataUtils.convert(metaClass.getBeginDate())).
                 set(EAV_M_CLASSES.IS_DISABLED, DataUtils.convert(metaClass.isDisabled())).
                 set(EAV_M_CLASSES.IS_REFERENCE, DataUtils.convert(metaClass.isReference())).
-                set(EAV_M_CLASSES.PARENT_IS_KEY, DataUtils.convert(metaClass.isParentIsKey())).
+                set(EAV_M_CLASSES.PARENT_IS_KEY, DataUtils.convert(metaClass.parentIsKey())).
                 where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
 
         jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
@@ -312,7 +312,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     .set(EAV_M_SIMPLE_SET.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
                     .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
                     .set(EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
-                    .set(EAV_M_COMPLEX_SET.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
+                    .set(EAV_M_SIMPLE_SET.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
                     .set(EAV_M_SIMPLE_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
         }
 
