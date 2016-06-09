@@ -108,6 +108,9 @@ public class MainParser extends BatchParser {
                     case "update":
                         pkg.setOperation(OperationType.UPDATE);
                         break;
+                    case "delete":
+                        pkg.setOperation(OperationType.DELETE);
+                        break;
                     default:
                         throw new IllegalStateException(Errors.compose(Errors.E118, strOperationType));
                 }
