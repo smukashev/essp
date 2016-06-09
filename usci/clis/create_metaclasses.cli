@@ -585,7 +585,7 @@ meta add --name=ref_credit_type --attribute=name_ru --type=string --required
 #= PLEDGE
 #====================================
 
-meta create --name=pledge --parent_is_key
+meta create --name=pledge
 meta add --name=pledge --attribute=contract --type=string
 meta add --name=pledge --attribute=value --type=double
 meta add --name=pledge --attribute=pledge_type --type=meta_class --childname=ref_pledge_type --keytype=any --immutable
@@ -594,7 +594,7 @@ meta add --name=pledge --attribute=pledge_type --type=meta_class --childname=ref
 #= CHANGE
 #====================================
 
-meta create --name=change --parent_is_key
+meta create --name=change
 meta add --name=change --attribute=credit_flow --type=meta_class --childname=credit_flow --final
 meta add --name=change --attribute=remains --type=meta_class --childname=remains --final
 meta add --name=change --attribute=turnover --type=meta_class --childname=turnover --final
