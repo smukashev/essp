@@ -557,11 +557,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return BaseEntityOutput.toString(this);
     }
 
-    @SuppressWarnings("unused")
-    public String toJava(String fName) {
-        return BaseEntityOutput.getJavaFunction(fName, this);
-    }
-
 
     @Override
     public int hashCode() {
