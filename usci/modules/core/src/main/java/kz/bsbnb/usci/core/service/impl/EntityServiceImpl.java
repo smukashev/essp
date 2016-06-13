@@ -108,8 +108,9 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
                     } else {
                         entityStatus.setErrorCode(params[0]);
                         if (params.length > 1)
-                            entityStatus.setDevDescription(StringUtils.join(Arrays.copyOfRange(params, 1, params.length),
-                                    Errors.SEPARATOR.replaceAll("\\\\", "")));
+                            entityStatus.setDevDescription(Errors.checkLength(
+                                    StringUtils.join(Arrays.copyOfRange(params, 1, params.length),
+                                    Errors.SEPARATOR.replaceAll("\\\\", ""))));
                     }
                 }
 
