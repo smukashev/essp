@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.model.base.impl;
 
-import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
@@ -44,6 +43,12 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     private final List<IBaseEntity> keyElements = new ArrayList<>();
 
     private boolean keyElementsInstalled = false;
+
+    private transient AdditionalInfo additionalInfo = new AdditionalInfo();
+
+    public AdditionalInfo getAdditionalInfo() {
+        return additionalInfo;
+    }
 
     @Override
     public OperationType getOperation() {
@@ -437,6 +442,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                 }
             }
         }
+
+        if (this.meta.parentIsKey() && !this.additionalInfo.equals(that.getAdditionalInfo()))
+            return false;
 
         return true;
     }

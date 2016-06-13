@@ -261,6 +261,26 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             }
         }
 
+        if (entity.getMeta().parentIsKey()) {
+            if (entity.getAdditionalInfo().parentId == 0)
+                return null;
+
+            if (entity.getAdditionalInfo().isSet) {
+                final String ecs ="ebecs";
+                final String cv = "ebcsv";
+
+                joins.join(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs)).on(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs).ENTITY_ID.eq(entity.getAdditionalInfo().parentId))
+                        .and(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs).ATTRIBUTE_ID.eq(entity.getAdditionalInfo().attributeId))
+                        .join(EAV_BE_COMPLEX_SET_VALUES.as(cv)).on(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs).ID.eq(EAV_BE_COMPLEX_SET_VALUES.as(cv).SET_ID))
+                            .and(EAV_BE_COMPLEX_SET_VALUES.as(cv).ENTITY_VALUE_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID));
+            } else {
+                final String cv = "ebcv";
+                joins.join(EAV_BE_COMPLEX_VALUES.as(cv)).on(EAV_BE_COMPLEX_VALUES.as(cv).ENTITY_ID.eq(entity.getAdditionalInfo().parentId))
+                        .and(EAV_BE_COMPLEX_VALUES.as(cv).ATTRIBUTE_ID.eq(entity.getAdditionalInfo().attributeId))
+                        .and(EAV_BE_COMPLEX_VALUES.as(cv).ENTITY_VALUE_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID));
+            }
+        }
+
         SelectConditionStep where = joins.where(EAV_BE_ENTITIES.as(entityAlias).CLASS_ID.equal(metaClass.getId()));
 
         if (condition != null) {
