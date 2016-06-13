@@ -39,6 +39,9 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
     IBaseEntityLoadDao baseEntityLoadDao;
 
     @Autowired
+    IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Autowired
     @Qualifier("devSearcherForm")
     ISearcherForm devForm;
 
@@ -77,7 +80,13 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
         primaryContract.put("date", new BaseValue(creditorId, reportDate,
                 DataTypes.getCastObject(DataTypes.DATE, parameters.get("pDate"))));
         credit.put("primary_contract", new BaseValue(creditorId, reportDate, primaryContract));
-        Long id = searcher.findSingle(credit, creditorId);
+
+        BaseEntity creditor = new BaseEntity(metaClassRepository.getMetaClass("ref_creditor"), reportDate, creditorId);
+        creditor.setId(creditorId);
+        credit.put("creditor",new BaseValue(creditorId, reportDate, creditor));
+
+        baseEntityProcessorDao.prepare(credit, creditorId);
+        Long id = credit.getId();
 
         List<BaseEntity> entityList = new ArrayList<>();
         result.setData(entityList);
