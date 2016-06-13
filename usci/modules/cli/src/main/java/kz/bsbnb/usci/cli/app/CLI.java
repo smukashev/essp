@@ -2507,7 +2507,7 @@ public class CLI {
         }
 
         String sourceFolder = args.get(0);
-        String targetFolder = "C:\\zips";
+        String targetFolder = "E:\\Zips";
 
         if (args.size() > 1)
             targetFolder = args.get(1);
@@ -2531,7 +2531,7 @@ public class CLI {
                 Process p = Runtime.getRuntime().exec("cmd /c " + copy + " " + file.getAbsolutePath() + " " + targetFolder);
                 p.waitFor();
                 cnt++;
-                Thread.sleep(1000);
+                Thread.sleep(3000);
                 System.out.println(file.getName() + " copied");
             } catch (Exception e) {
                 e.printStackTrace();
