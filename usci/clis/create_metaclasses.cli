@@ -97,16 +97,6 @@ meta add --name=ref_country --attribute=short_name_kz --type=string
 meta add --name=ref_country --attribute=short_name_ru --type=string
 
 #====================================
-#= REF_REGION
-#====================================
-
-meta create --name=ref_region --reference
-meta add --name=ref_region --attribute=code --type=string --required
-meta key --name=ref_region --attribute=code
-meta add --name=ref_region --attribute=name_kz --type=string --required
-meta add --name=ref_region --attribute=name_ru --type=string --required
-
-#====================================
 #= REF_CREDITOR
 #====================================
 
@@ -119,7 +109,16 @@ meta add --name=ref_creditor --attribute=subject_type --type=meta_class --childn
 meta add --name=ref_creditor --attribute=docs --type=meta_class --childname=document --array --keytype=any --cumulative
 meta key --name=ref_creditor --attribute=docs
 meta key --name=ref_creditor --attribute=code --optional
-meta add --name=ref_creditor --attribute=region --type=meta_class --childname=ref_region --keytype=any --immutable
+
+#====================================
+#= REF_REGION
+#====================================
+
+meta create --name=ref_region --reference
+meta add --name=ref_region --attribute=code --type=string --required
+meta key --name=ref_region --attribute=code
+meta add --name=ref_region --attribute=name_kz --type=string --required
+meta add --name=ref_region --attribute=name_ru --type=string --required
 
 #====================================
 #= REF_CONTACT_TYPE
@@ -585,7 +584,7 @@ meta add --name=ref_credit_type --attribute=name_ru --type=string --required
 #= PLEDGE
 #====================================
 
-meta create --name=pledge
+meta create --name=pledge --parent_is_key
 meta add --name=pledge --attribute=contract --type=string
 meta add --name=pledge --attribute=value --type=double
 meta add --name=pledge --attribute=pledge_type --type=meta_class --childname=ref_pledge_type --keytype=any --immutable
@@ -594,7 +593,7 @@ meta add --name=pledge --attribute=pledge_type --type=meta_class --childname=ref
 #= CHANGE
 #====================================
 
-meta create --name=change
+meta create --name=change --parent_is_key
 meta add --name=change --attribute=credit_flow --type=meta_class --childname=credit_flow --final
 meta add --name=change --attribute=remains --type=meta_class --childname=remains --final
 meta add --name=change --attribute=turnover --type=meta_class --childname=turnover --final
@@ -742,7 +741,7 @@ sql insert into MAIL_TEMPLATE (id, subject, text, code, name_ru, name_kz, config
 sql insert into MAIL_TEMPLATE (id, subject, text, code, name_ru, name_kz, configuration_type_id) values (3001, 'Кредитный регистр. Утверждение данных. %CREDITOR% - %REPORT_DATE%', 'Организация: <b>%CREDITOR%.</b><br/> ' || chr(10) || 'Отчетная дата: <b>%REPORT_DATE%.</b><br/>' || chr(10) || 'Статус: <b>%STATUS%.</b><br/>' || chr(10) || 'Пользователь <b>%USERNAME%</b> внес изменения.<br/>' || chr(10) || 'Время: <b>%UPDATE_TIME%.</b><br/>' || chr(10) || 'Текст сообщения: %TEXT%.<br/>' || chr(10) || '<hr/>' || chr(10) || 'Сообщения об утверждении/разутверждении данных отправляются автоматически.<br/>' || chr(10) || 'Вы можете отказаться от получения уведомлений об утверждении/разутверждении данных на странице "Почтовые уведомления" портала (во вкладке "Настройка почтовых уведомлений") ', 'APPROVAL_UPDATE', 'Утверждение данных', 'Утверждение данных', 138)
 sql insert into MAIL_TEMPLATE (id, subject, text, code, name_ru, name_kz, configuration_type_id) values (4001, 'Кредитный регистр. Не идет обработка файлов', 'Состояние очереди не изменялось в течении %TIMEOUT% секунд. ' || chr(10) || 'Количество файлов в очереди: %FILES_IN_QUEUE%. ' || chr(10) || 'Время последней отправки файла в обработку: %LAST_SEND_TIME%. ' || chr(10) || 'Количество записей протокола по обрабатываемым файлам: %PROTOCOLS_COUNT%', 'QUEUE_MONITOR', 'Очередь', 'Очередь', 137)
 sql insert into MAIL_TEMPLATE (id, subject, text, code, name_ru, name_kz, configuration_type_id) values (2001, 'Кредитный регистр. Данные утверждены', 'Организация: <b> %ORG%.</b><br/>' || chr(10) || 'Отчетная дата: <b>%REPORT_DATE%.</b><br/>' || chr(10) || 'Статус: <b>%STATUS%</b><br/>' || chr(10) || '<hr/>' || chr(10) || 'Сообщения об утверждении/разутверждении данных отправляются автоматически.<br/>' || chr(10) || 'Вы можете отказаться от получения уведомлений об утверждении/разутверждении данных на странице "Почтовые уведомления" портала (во вкладке "Настройка почтовых уведомлений") ', 'REPORT_APPROVED', 'Данные утверждены', 'Данные утверждены', 137)
-sql insert into MAIL_TEMPLATE (id, subject, text, code, name_ru, name_kz, configuration_type_id) values (2002, 'Кредитный регистр. Данные на изменение за утвержденый период', 'Организация: <b> %ORG%.</b><br/>' || chr(10)  || 'Файлы: <b>%FILE_NAMES%</b><br/>' || chr(10) || '<hr/>' || chr(10) || ' Подробнее смотрите в протоколе', 'MAINTENANCE_APPROVED', 'Данные за утвержденный период', 'Данные за утвержденный период', 138)
+sql insert into MAIL_TEMPLATE (id, subject, text, code, name_ru, name_kz, configuration_type_id) values (2002, 'Кредитный регистр. Данные на изменение за утвержденый период', 'Организация: <b> %ORG%.</b><br/>' || chr(10)  || 'Файлы: <b>%FILE_NAMES%</b><br/>' || chr(10) || '<hr/>' || chr(10) || ' Подробнее смотрите в протоколе', 'MAINTENANCE_APPROVED', 'Данные за утвержденный период', 'Данные за утвержденный период', 137)
 sql insert into MAIL_TEMPLATE (id, subject, text, code, name_ru, name_kz, configuration_type_id) values (1001, 'Кредитный регистр. Обработка файла завершена', 'Обработка файла <b>%FILENAME%</b> завершена' || chr(10) || '<hr/>' || chr(10) || 'Сообщения о завершении обработки файлов отправляются автоматически.<br/>' || chr(10) || 'Вы можете отказаться от получения уведомлений о завершении обработки файлов на странице "Почтовые уведомления" портала (во вкладке "Настройка почтовых уведомлений") ', 'FILE_PROCESSING_COMPLETED', 'Обработка завершена', 'Обработка завершена', 138)
 sql insert into MAIL_TEMPLATE (id, subject, text, code, name_ru, name_kz, configuration_type_id) values (5002, '%SUBJECT%', '%TEXT%', 'GENERIC_TEMPLATE', 'Уведомление', 'Уведомление', 137)
 sql insert into MAIL_TEMPLATE (id, subject, text, code, name_ru, name_kz, configuration_type_id) values (3002, 'Дублирующиеся записи в выходной форме', '%DETAILS%', 'DUPLICATE_IN_OUTPUT_FORM', 'Дублирующиеся записи в выходной форме', 'Дублирующиеся записи в выходной форме', 137)
@@ -952,7 +951,7 @@ sql update eav_m_complex_attributes set title='Валюта' where name='currenc
 sql update eav_m_complex_attributes set title='Изменение' where name='change'
 
 sql update eav_m_complex_set  set title='Наименование' where name='names'
-sql update eav_m_complex_set  set title='Займы' where name='pledges'
+sql update eav_m_complex_set  set title='Обеспечение' where name='pledges'
 sql update eav_m_complex_set  set title='Детали' where name='details'
 sql update eav_m_complex_set  set title='Документы' where name='docs'
 sql update eav_m_complex_set  set title='Портфолио' where name='portfolio_flows_kfn'
