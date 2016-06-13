@@ -33,7 +33,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
 
     private VerticalLayout statusPanel;
 
-    private static final String UPLOADS_PATH = "\\\\" + StaticRouter.getAsIP() + "\\tmp\\";
+    private static final String UPLOADS_PATH = "\\\\" + StaticRouter.getAsIP() + "\\tmp$\\";
 
     public static final long MAX_FILE_LENGTH = 5 * (1L << 20);
 

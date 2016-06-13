@@ -182,7 +182,7 @@ public class BaseRepository implements  Runnable
     public static String resolveWhereForClosedDate(BaseCrawler crawler){
         switch (crawler.getClassName()) {
             case "ref_creditor":
-                return " where close_date is not null and main_office_id is null";
+                return " where shutdown_date is not null and main_office_id is null";
             case "ref_creditor_branch":
                 return " where close_date is not null and main_office_id is not null";
             case "ref_ba_ct":
@@ -226,10 +226,18 @@ public class BaseRepository implements  Runnable
         if(crawler instanceof ExclDocCrawler)
             return  new String[] {};
 
-        ResultSet rows = getStatement()
-                .executeQuery("select distinct(to_char(close_date,'dd.MM.yyyy')) as close_date from "
-                        + resolveTable(crawler) + resolveWhereForClosedDate(crawler));
-        List<String> ret = new LinkedList<String>();
+        ResultSet rows;
+
+        if(crawler instanceof CreditorCrawler) {
+            rows = getStatement()
+                    .executeQuery("select distinct(to_char(shutdown_date,'dd.MM.yyyy')) as close_date from "
+                            + resolveTable(crawler) + resolveWhereForClosedDate(crawler));
+        } else {
+            rows = getStatement()
+                    .executeQuery("select distinct(to_char(close_date,'dd.MM.yyyy')) as close_date from "
+                            + resolveTable(crawler) + resolveWhereForClosedDate(crawler));
+        }
+        List<String> ret = new LinkedList<>();
 
         while(rows.next()){
             if(rows.getString("close_date") != null)

@@ -14,7 +14,7 @@ public class DatabaseMailHandlerConfiguration implements MailHandlerConfiguratio
     private static final String IS_MAIL_HANDLING_ON_CODE = "IS_MAIL_HANDLING_ON";
     private static final String MAIL_HOST_CODE = "MAIL_HOST";
     private static final String MAIL_SENDER_CODE = "MAIL_SENDER";
-    private static long lastLaunchMillis;
+
 
     private final DataProvider dataProvider;
 
@@ -25,8 +25,7 @@ public class DatabaseMailHandlerConfiguration implements MailHandlerConfiguratio
     @Override
     public long getLastLaunchMillis() throws ConfigurationException {
         try {
-            //return Long.parseLong(dataProvider.getConfig(LAST_MAIL_HANDLER_LAUNCH_TIME_CODE).getValue());
-            return lastLaunchMillis;
+            return dataProvider.getLastLaunchTime();
         } catch (NumberFormatException nfe) {
             throw new ConfigurationException(Errors.compose(Errors.E246, LAST_MAIL_HANDLER_LAUNCH_TIME_CODE , nfe));
         }
@@ -37,9 +36,10 @@ public class DatabaseMailHandlerConfiguration implements MailHandlerConfiguratio
         //Sysconfig config = dataProvider.getConfig(LAST_MAIL_HANDLER_LAUNCH_TIME_CODE);
         //config.setValue(millis + "");
         //dataProvider.saveConfig(config);
-        synchronized (this) {
+        dataProvider.setLastLaunchMillis(millis);
+        /*synchronized (this) {
             lastLaunchMillis = millis;
-        }
+        }*/
     }
 
     public boolean isMailHandlingOn() throws ConfigurationException {

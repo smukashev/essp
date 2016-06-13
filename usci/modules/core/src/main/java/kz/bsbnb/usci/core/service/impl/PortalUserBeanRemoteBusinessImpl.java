@@ -3,6 +3,7 @@ package kz.bsbnb.usci.core.service.impl;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
+import kz.bsbnb.usci.eav.persistance.dao.IMailDao;
 import kz.bsbnb.usci.eav.persistance.dao.IUserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,9 @@ import java.util.List;
 public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBusiness {
     @Autowired
     IUserDao userDao;
+
+    @Autowired
+    IMailDao mailDao;
 
     /**
      * Проверяет наличие связи между пользователем портала и БВУ/НО.
@@ -72,6 +76,7 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
      */
     @Override
     public void synchronize(List<PortalUser> users) {
+        mailDao.insertNewUsers(users);
         userDao.synchronize(users);
     }
 

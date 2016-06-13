@@ -49,4 +49,8 @@ public interface DataProvider {
     public boolean isTemplateSendingEnabled(MailTemplate mailTemplate, long recipientUserId);
 
     boolean isMailHandlingOn();
+
+    Long getLastLaunchTime();
+
+    void setLastLaunchMillis(long millis);
 }

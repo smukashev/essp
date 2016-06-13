@@ -766,6 +766,7 @@ public class ZipFilesMonitor {
                 batchInfo.setBatchType(manifestData.getType().trim());
 
                 batchInfo.setBatchName(parseFileNameFromPath(filename));
+                batchInfo.setMaintenance(manifestData.isMaintenance());
 
                 batchInfo.setUserId(userId == null ? manifestData.getUserId() : userId);
 

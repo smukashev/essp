@@ -68,6 +68,13 @@ public class ManifestReader extends MainReader {
                 manifestData.getAdditionalParams().put(currentName, data.toString());
                 data.setLength(0);
                 break;
+            case "maintenance":
+                boolean isMaintenance = false;
+                if(data != null) {
+                    isMaintenance = "1".equals(data.toString()) || "true".equals(data.toString().toLowerCase());
+                }
+                manifestData.setMaintenance(isMaintenance);
+                break;
         }
 
         return false;

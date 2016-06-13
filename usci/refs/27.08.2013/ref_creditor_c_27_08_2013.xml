@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <batch>
   <entities>
-    <ref_creditor>
-      <name>АО "ИПОТЕЧНАЯ ОРГАНИЗАЦИЯ "ЭКСПРЕСС ФИНАНС"</name>
-      <short_name>АО "ИО "ЭКСПРЕСС ФИНАНС"</short_name>
+    <ref_creditor operation="CLOSE">
+      <name>АО "Ипотечная Организация "Элитстрой Финанс"</name>
+      <short_name>АО "ИО "Элитстрой Финанс"</short_name>
       <docs>
         <item>
-          <no>600900577988</no>
-          <doc_type>
-            <name_ru>Регистрационный номер налогоплательщика </name_ru>
-            <name_kz>Регистрационный номер налогоплательщика </name_kz>
-            <is_identification>1</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>1</is_person_doc>
-            <weight>25</weight>
-            <code>11</code>
-          </doc_type>
-        </item>
-        <item>
-          <no>060940001883</no>
+          <no>190501794</no>
           <doc_type>
             <name_ru>Бизнес - идентификационный номер </name_ru>
             <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -42,7 +30,7 @@
         <name_kz>Алматы қ.</name_kz>
         <name_ru>г.Алматы</name_ru>
       </region>
-      <nokbdb_code>J600900577988Ипотечная :</nokbdb_code>
+      <nokbdb_code>J:Элитстрой Финанс:</nokbdb_code>
     </ref_creditor>
   </entities>
 </batch>

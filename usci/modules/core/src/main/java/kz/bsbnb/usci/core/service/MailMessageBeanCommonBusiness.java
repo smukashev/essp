@@ -25,4 +25,8 @@ public interface MailMessageBeanCommonBusiness {
     boolean isTemplateEnabledForUser(Long templateId, long userId);
 
     boolean isMailHandlingOn();
+
+    Long getLastLaunchTime();
+
+    void setLastLaunchMillis(long millis);
 }

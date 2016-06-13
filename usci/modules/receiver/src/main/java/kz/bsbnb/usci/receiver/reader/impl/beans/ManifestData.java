@@ -10,6 +10,7 @@ public class ManifestData {
     private Integer size;
     private Date reportDate;
     private HashMap<String, String> additionalParams = new HashMap<>();
+    private boolean maintenance;
 
     public String getType() {
         return type;
@@ -49,5 +50,13 @@ public class ManifestData {
 
     public void setAdditionalParams(HashMap<String, String> additionalParams) {
         this.additionalParams = additionalParams;
+    }
+
+    public void setMaintenance(boolean maintenance) {
+        this.maintenance = maintenance;
+    }
+
+    public boolean isMaintenance() {
+        return maintenance;
     }
 }

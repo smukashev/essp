@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
@@ -120,11 +121,16 @@ public class MailHandler implements Runnable {
         MimeMessage message = new MimeMessage(session);
         message.setFrom(new InternetAddress(sender));
         message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
+
+        if(email != null && email.toLowerCase().endsWith("liferay.com")) {
+            logger.info("emails @liferay.com are skipped");
+            return;
+        }
         message.setSubject(provider.getMessageSubject(mailMessage));
         message.setText(provider.getMessageText(mailMessage), "utf-8", "html");
 
         logger.info("sent to: " + host + ", sender: " + sender);
-        //Transport.send(message);
+        Transport.send(message);
     }
 
     @Override

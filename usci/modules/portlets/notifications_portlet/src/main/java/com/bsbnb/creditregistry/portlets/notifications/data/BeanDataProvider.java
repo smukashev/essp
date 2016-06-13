@@ -17,7 +17,6 @@ import com.bsbnb.creditregistry.ejb.ref.business.remote.IRemoteSharedBusiness;
 import com.bsbnb.creditregistry.ejb.ref.exception.ResultInconsistentException;
 import com.bsbnb.creditregistry.ejb.ref.exception.ResultNotFoundException;
 */
-import com.bsbnb.creditregistry.portlets.notifications.thread.ConfigurationException;
 import kz.bsbnb.usci.core.service.*;
 import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.StaticRouter;
@@ -27,8 +26,6 @@ import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.*;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 /**
  *
@@ -62,6 +59,24 @@ public class BeanDataProvider implements DataProvider {
     private IRemoteSharedBusiness sharedBusiness;
     */
 
+    public void connectToServices() {
+        try {
+            portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
+            portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/portalUserBeanRemoteBusiness");
+            portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
+            portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
+            portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+
+            mailBusinessFactoryBean = new RmiProxyFactoryBean();
+            mailBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/mailRemoteBusiness");
+            mailBusinessFactoryBean.setServiceInterface(MailMessageBeanCommonBusiness.class);
+            mailBusinessFactoryBean.afterPropertiesSet();
+            mailMessageBusiness = (MailMessageBeanCommonBusiness) mailBusinessFactoryBean.getObject();
+        } catch (Exception e) {
+            throw new RuntimeException(Errors.getError(Errors.E286));
+        }
+    }
+
     public BeanDataProvider() {
         /*
         Properties props = new Properties();
@@ -79,21 +94,8 @@ public class BeanDataProvider implements DataProvider {
         } catch (NamingException ne) {
             log.log(Level.SEVERE, "Exception occured while initializing beans", ne);
         }*/
-        try {
-            portalUserBeanRemoteBusinessFactoryBean = new RmiProxyFactoryBean();
-            portalUserBeanRemoteBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/portalUserBeanRemoteBusiness");
-            portalUserBeanRemoteBusinessFactoryBean.setServiceInterface(PortalUserBeanRemoteBusiness.class);
-            portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
-            portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
 
-            mailBusinessFactoryBean = new RmiProxyFactoryBean();
-            mailBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/mailRemoteBusiness");
-            mailBusinessFactoryBean.setServiceInterface(MailMessageBeanCommonBusiness.class);
-            mailBusinessFactoryBean.afterPropertiesSet();
-            mailMessageBusiness = (MailMessageBeanCommonBusiness) mailBusinessFactoryBean.getObject();
-        } catch (Exception e) {
-            throw new RuntimeException(Errors.getError(Errors.E286));
-        }
+        connectToServices();
 
         /*
         remoteCreditorBusinessFactoryBean = new RmiProxyFactoryBean();
@@ -218,6 +220,19 @@ public class BeanDataProvider implements DataProvider {
 
     @Override
     public boolean isMailHandlingOn() {
+        connectToServices();
         return mailMessageBusiness.isMailHandlingOn();
+    }
+
+    @Override
+    public Long getLastLaunchTime() {
+        connectToServices();
+        return mailMessageBusiness.getLastLaunchTime();
+    }
+
+    @Override
+    public void setLastLaunchMillis(long millis) {
+        connectToServices();
+        mailMessageBusiness.setLastLaunchMillis(millis);
     }
 }
