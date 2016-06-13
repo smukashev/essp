@@ -84,7 +84,7 @@ public class MetaAddCommand extends AbstractCommand implements IMetaCommand {
     public static final String OPTION_REQUIRED = "r";
     public static final String LONG_OPTION_REQUIRED = "required";
 
-    public static final String OPTION_NULLABLE = "n";
+    public static final String OPTION_NULLABLE = "null";
     public static final String LONG_OPTION_NULLABLE = "nullable";
 
     public static final String DEFAULT_NAME = null;

@@ -53,4 +53,33 @@ public interface IBaseEntity extends IBaseContainer {
     Set<String> getValidationErrors();
 
     void setOperation(OperationType type);
+
+    AdditionalInfo getAdditionalInfo();
+
+    class AdditionalInfo {
+        public boolean isSet;
+        public Long parentId;
+        public Long attributeId;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            AdditionalInfo that = (AdditionalInfo) o;
+
+            if (isSet != that.isSet) return false;
+            if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) return false;
+            return attributeId != null ? attributeId.equals(that.attributeId) : that.attributeId == null;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = (isSet ? 1 : 0);
+            result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
+            result = 31 * result + (attributeId != null ? attributeId.hashCode() : 0);
+            return result;
+        }
+    }
 }

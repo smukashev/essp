@@ -116,9 +116,9 @@ public class MetaClass extends MetaContainer implements IMetaClass {
     }
 
     public void setMetaAttribute(String name, IMetaAttribute metaAttribute) {
-        if (!searchable && metaAttribute.isKey()) {
+        if (!searchable && (metaAttribute.isKey() || metaAttribute.isOptionalKey()))
             searchable = true;
-        }
+
         members.put(name, metaAttribute);
         metaAttribute.setName(name);
     }

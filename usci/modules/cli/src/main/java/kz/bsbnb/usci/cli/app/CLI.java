@@ -336,25 +336,6 @@ public class CLI {
         }
     }
 
-    public void entityToJava(long id, String reportDateStr) {
-        IBaseEntity entity;
-
-        if (reportDateStr != null) {
-            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-
-            try {
-                entity = baseEntityLoadDao.loadByMaxReportDate(id, dateFormat.parse(reportDateStr));
-            } catch (ParseException e) {
-                e.printStackTrace();
-                return;
-            }
-        } else {
-            entity = baseEntityLoadDao.load(id);
-        }
-
-        System.out.println(BaseEntityOutput.toJava((BaseEntity) entity, "", 0));
-    }
-
     public void showEntity(long id, String reportDateStr) {
         IBaseEntity entity;
 
@@ -374,7 +355,12 @@ public class CLI {
         if (entity == null) {
             System.out.println("No such entity with id: " + id);
         } else {
-            System.out.println(entity.toString());
+            String output = entity.toString();
+            String[] lines = output.split(System.getProperty("line.separator"));
+
+            for (String str : lines) {
+                System.out.println(str);
+            }
         }
     }
 
@@ -1751,11 +1737,7 @@ public class CLI {
         if (args.size() > 1) {
             if (args.get(0).equals("show")) {
                 if (args.get(1).equals("id")) {
-                    if (args.get(2) != null && args.get(2).equals("tojava")) {
-                        entityToJava(Long.parseLong(args.get(3)), args.size() > 4 ? args.get(4) : null);
-                    } else {
                         showEntity(Long.parseLong(args.get(2)), args.size() > 3 ? args.get(3) : null);
-                    }
                 } else if (args.get(1).equals("attr")) {
                     if (args.size() > 3) {
                         showEntityAttr(args.get(3), Long.parseLong(args.get(2)));
