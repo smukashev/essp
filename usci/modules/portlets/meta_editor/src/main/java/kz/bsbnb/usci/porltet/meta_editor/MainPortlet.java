@@ -2,7 +2,6 @@ package kz.bsbnb.usci.porltet.meta_editor;
 
 
 import com.google.gson.Gson;
-import com.liferay.portal.kernel.io.WriterOutputStream;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
@@ -514,7 +513,9 @@ public class MainPortlet extends MVCPortlet {
                                         ((MetaClass)attrMetaSet.getMemberType()).getClassName() + "\", ");
                                 writer.write("\"is_key\": \"" + meta.getElAttribute(attrName).isKey() + "\", ");
                                 writer.write("\"is_required\": \"" + meta.getElAttribute(attrName).isRequired() + "\", ");
-                                writer.write("\"is_nullable\": \"" + meta.getElAttribute(attrName).isNullable() + "\"");
+                                writer.write("\"is_nullable\": \"" + meta.getElAttribute(attrName).isNullable() + "\",");
+                                writer.write("\"is_final\": \"" + meta.getElAttribute(attrName).isFinal() + "\", ");
+                                writer.write("\"is_disabled\": \"" + meta.getElAttribute(attrName).isDisabled() + "\"");
                                 writer.write("}}");
                             } else {
                                 writer.write("{\"success\": true, \"data\": {");
@@ -525,7 +526,9 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"simpleType\": \"" + attrMetaSet.getTypeCode() + "\", ");
                                 writer.write("\"is_key\": \"" + meta.getElAttribute(attrName).isKey() + "\", ");
                                 writer.write("\"is_required\": \"" + meta.getElAttribute(attrName).isRequired() + "\", ");
-                                writer.write("\"is_nullable\": \"" + meta.getElAttribute(attrName).isNullable() + "\"");
+                                writer.write("\"is_nullable\": \"" + meta.getElAttribute(attrName).isNullable() + "\",");
+                                writer.write("\"is_final\": \"" + meta.getElAttribute(attrName).isFinal() + "\", ");
+                                writer.write("\"is_disabled\": \"" + meta.getElAttribute(attrName).isDisabled() + "\"");
                                 writer.write("}}");
                             }
                         }

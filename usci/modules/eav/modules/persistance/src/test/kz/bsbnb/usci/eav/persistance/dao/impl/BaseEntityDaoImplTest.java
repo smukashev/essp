@@ -35,10 +35,5 @@ public class BaseEntityDaoImplTest {
             e.printStackTrace();
         }
 
-        IBaseEntity baseEntity = baseEntityDao.load((long)13583, reportDate);
-
-
-        baseEntityDao.delete(baseEntity);
-
     }
 }

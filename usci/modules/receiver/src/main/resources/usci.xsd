@@ -92,19 +92,19 @@
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="bank_relation">
+            <xsd:element name="ref_bank_relation">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="bank_relation">
+                        <xsd:extension base="ref_bank_relation">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="ref_bank_relation">
+            <xsd:element name="bank_relation">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="ref_bank_relation">
+                        <xsd:extension base="bank_relation">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
@@ -146,15 +146,6 @@
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="contract">
-                <xsd:complexType>
-                    <xsd:complexContent>
-                        <xsd:extension base="contract">
-                            <xsd:attribute name="operation" type="operation" use="optional"/>
-                        </xsd:extension>
-                    </xsd:complexContent>
-                </xsd:complexType>
-            </xsd:element>
             <xsd:element name="ref_ba_drt">
                 <xsd:complexType>
                     <xsd:complexContent>
@@ -164,10 +155,10 @@
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="portfolio">
+            <xsd:element name="contract">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="portfolio">
+                        <xsd:extension base="contract">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
@@ -186,6 +177,15 @@
                 <xsd:complexType>
                     <xsd:complexContent>
                         <xsd:extension base="ref_enterprise_type">
+                            <xsd:attribute name="operation" type="operation" use="optional"/>
+                        </xsd:extension>
+                    </xsd:complexContent>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="portfolio">
+                <xsd:complexType>
+                    <xsd:complexContent>
+                        <xsd:extension base="portfolio">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
@@ -299,19 +299,19 @@
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="organization_name">
+            <xsd:element name="ref_finance_source">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="organization_name">
+                        <xsd:extension base="ref_finance_source">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="ref_finance_source">
+            <xsd:element name="organization_name">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="ref_finance_source">
+                        <xsd:extension base="organization_name">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
@@ -362,19 +362,19 @@
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="subject">
+            <xsd:element name="remains_discount">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="subject">
+                        <xsd:extension base="remains_discount">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="remains_discount">
+            <xsd:element name="subject">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="remains_discount">
+                        <xsd:extension base="subject">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
@@ -398,19 +398,19 @@
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="turnover_issue">
+            <xsd:element name="ref_country">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="turnover_issue">
+                        <xsd:extension base="ref_country">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="ref_country">
+            <xsd:element name="turnover_issue">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="ref_country">
+                        <xsd:extension base="turnover_issue">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
@@ -479,19 +479,19 @@
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="turnover_issue_debt">
+            <xsd:element name="remains_discounted_value">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="turnover_issue_debt">
+                        <xsd:extension base="remains_discounted_value">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="remains_discounted_value">
+            <xsd:element name="turnover_issue_debt">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="remains_discounted_value">
+                        <xsd:extension base="turnover_issue_debt">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
@@ -569,19 +569,19 @@
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="address">
+            <xsd:element name="remains_debt">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="address">
+                        <xsd:extension base="remains_debt">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="remains_debt">
+            <xsd:element name="address">
                 <xsd:complexType>
                     <xsd:complexContent>
-                        <xsd:extension base="remains_debt">
+                        <xsd:extension base="address">
                             <xsd:attribute name="operation" type="operation" use="optional"/>
                         </xsd:extension>
                     </xsd:complexContent>
@@ -707,18 +707,18 @@
         </xsd:all>
     </xsd:complexType>
 
-    <xsd:complexType name="bank_relation">
-        <xsd:all>
-            <xsd:element name="bank_relation" type="ref_bank_relation" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="creditor" type="ref_creditor" minOccurs="0" maxOccurs="1" nillable="true"/>
-        </xsd:all>
-    </xsd:complexType>
-
     <xsd:complexType name="ref_bank_relation">
         <xsd:all>
             <xsd:element name="name_ru" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="code" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="false"/>
             <xsd:element name="name_kz" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="bank_relation">
+        <xsd:all>
+            <xsd:element name="bank_relation" type="ref_bank_relation" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="creditor" type="ref_creditor" minOccurs="0" maxOccurs="1" nillable="true"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -769,13 +769,6 @@
         </xsd:all>
     </xsd:complexType>
 
-    <xsd:complexType name="contract">
-        <xsd:all>
-            <xsd:element name="no" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="date" type="date" minOccurs="0" maxOccurs="1" nillable="true"/>
-        </xsd:all>
-    </xsd:complexType>
-
     <xsd:complexType name="ref_ba_drt">
         <xsd:all>
             <xsd:element name="balance_account" type="ref_balance_account" minOccurs="1" maxOccurs="1" nillable="false"/>
@@ -783,10 +776,10 @@
         </xsd:all>
     </xsd:complexType>
 
-    <xsd:complexType name="portfolio">
+    <xsd:complexType name="contract">
         <xsd:all>
-            <xsd:element name="portfolio_msfo" type="ref_portfolio" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="portfolio" type="ref_portfolio" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="no" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="date" type="date" minOccurs="0" maxOccurs="1" nillable="true"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -805,6 +798,13 @@
             <xsd:element name="is_se" type="xsd:boolean" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="code" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="false"/>
             <xsd:element name="name_kz" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="portfolio">
+        <xsd:all>
+            <xsd:element name="portfolio_msfo" type="ref_portfolio" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="portfolio" type="ref_portfolio" minOccurs="0" maxOccurs="1" nillable="true"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -926,18 +926,18 @@
         </xsd:all>
     </xsd:complexType>
 
-    <xsd:complexType name="organization_name">
-        <xsd:all>
-            <xsd:element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="lang" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
-        </xsd:all>
-    </xsd:complexType>
-
     <xsd:complexType name="ref_finance_source">
         <xsd:all>
             <xsd:element name="name_ru" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="code" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="false"/>
             <xsd:element name="name_kz" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="organization_name">
+        <xsd:all>
+            <xsd:element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="lang" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -981,6 +981,14 @@
         </xsd:all>
     </xsd:complexType>
 
+    <xsd:complexType name="remains_discount">
+        <xsd:all>
+            <xsd:element name="value_currency" type="xsd:double" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="balance_account" type="ref_balance_account" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="value" type="xsd:double" minOccurs="0" maxOccurs="1" nillable="true"/>
+        </xsd:all>
+    </xsd:complexType>
+
     <xsd:complexType name="subject">
         <xsd:all>
             <xsd:element name="organization_info" type="organization_info" minOccurs="0" maxOccurs="1" nillable="true"/>
@@ -990,14 +998,6 @@
             <xsd:element name="creditor_info" type="creditor_info" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="person_info" type="person_info" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="is_creditor" type="xsd:boolean" minOccurs="0" maxOccurs="1" nillable="true"/>
-        </xsd:all>
-    </xsd:complexType>
-
-    <xsd:complexType name="remains_discount">
-        <xsd:all>
-            <xsd:element name="value_currency" type="xsd:double" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="balance_account" type="ref_balance_account" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="value" type="xsd:double" minOccurs="0" maxOccurs="1" nillable="true"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -1016,13 +1016,6 @@
         </xsd:all>
     </xsd:complexType>
 
-    <xsd:complexType name="turnover_issue">
-        <xsd:all>
-            <xsd:element name="debt" type="turnover_issue_debt" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="interest" type="turnover_issue_interest" minOccurs="0" maxOccurs="1" nillable="true"/>
-        </xsd:all>
-    </xsd:complexType>
-
     <xsd:complexType name="ref_country">
         <xsd:all>
             <xsd:element name="name_ru" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
@@ -1031,6 +1024,13 @@
             <xsd:element name="short_name_kz" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="short_name_ru" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="name_kz" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="turnover_issue">
+        <xsd:all>
+            <xsd:element name="debt" type="turnover_issue_debt" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="interest" type="turnover_issue_interest" minOccurs="0" maxOccurs="1" nillable="true"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -1091,16 +1091,16 @@
         </xsd:all>
     </xsd:complexType>
 
+    <xsd:complexType name="remains_discounted_value">
+        <xsd:all>
+            <xsd:element name="value" type="xsd:double" minOccurs="0" maxOccurs="1" nillable="true"/>
+        </xsd:all>
+    </xsd:complexType>
+
     <xsd:complexType name="turnover_issue_debt">
         <xsd:all>
             <xsd:element name="amount" type="xsd:double" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="amount_currency" type="xsd:double" minOccurs="0" maxOccurs="1" nillable="true"/>
-        </xsd:all>
-    </xsd:complexType>
-
-    <xsd:complexType name="remains_discounted_value">
-        <xsd:all>
-            <xsd:element name="value" type="xsd:double" minOccurs="0" maxOccurs="1" nillable="true"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -1178,19 +1178,19 @@
         </xsd:all>
     </xsd:complexType>
 
-    <xsd:complexType name="address">
-        <xsd:all>
-            <xsd:element name="region" type="ref_region" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="details" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="type" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
-        </xsd:all>
-    </xsd:complexType>
-
     <xsd:complexType name="remains_debt">
         <xsd:all>
             <xsd:element name="pastdue" type="remains_debt_pastdue" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="current" type="remains_debt_current" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="write_off" type="remains_debt_write_off" minOccurs="0" maxOccurs="1" nillable="true"/>
+        </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="address">
+        <xsd:all>
+            <xsd:element name="region" type="ref_region" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="details" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="type" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -1223,6 +1223,7 @@
 
     <xsd:complexType name="ref_creditor">
         <xsd:all>
+            <xsd:element name="region" type="ref_region" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="docs" type="document_set" minOccurs="1" maxOccurs="1" nillable="false"/>
             <xsd:element name="nokbdb_code" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>

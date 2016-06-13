@@ -116,9 +116,9 @@ public class MetaClass extends MetaContainer implements IMetaClass {
     }
 
     public void setMetaAttribute(String name, IMetaAttribute metaAttribute) {
-        if (!searchable && metaAttribute.isKey()) {
+        if (!searchable && (metaAttribute.isKey() || metaAttribute.isOptionalKey()))
             searchable = true;
-        }
+
         members.put(name, metaAttribute);
         metaAttribute.setName(name);
     }
@@ -426,7 +426,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         this.classTitle = classTitle;
     }
 
-    public boolean isParentIsKey() {
+    public boolean parentIsKey() {
         return parentIsKey;
     }
 
