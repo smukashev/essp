@@ -49,7 +49,7 @@ public final class StaticRouter {
 
     /* Showcase Schema name */
     private final static String stendShowcaseSchemaName = "C##SHOWCASE";
-    private final static String devShowcaseSchemaName = "C##CORE";
+    private final static String devShowcaseSchemaName = "C##SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHOWCASE";
 
     /* Credit Registry DB IP */
@@ -81,9 +81,12 @@ public final class StaticRouter {
     private final static boolean devStatsEnabled = true;
     private final static boolean prodStatsEnabled = true;
 
-    private final static int stendThreadLimit = 10;
-    private final static int devThreadLimit = 10;
+    private final static int stendThreadLimit = 20;
+    private final static int devThreadLimit = 20;
     private final static int prodThreadLimit = 100;
+
+    private final static String[] GODModes = new String[] {"XML_DATA_BY_CID", "~~GOD~~"};
+    private final static String[] DEVILModes = new String[] {"~~DEVIL~~"};
 
     public static String getAsIP() {
         switch(mode) {
@@ -278,6 +281,14 @@ public final class StaticRouter {
             default:
                 throw new IllegalStateException(Errors.compose(Errors.E284));
         }
+    }
+
+    public static String[] getGODModes() {
+        return GODModes;
+    }
+
+    public static String[] getDEVILModes() {
+        return DEVILModes;
     }
 
     public static boolean isDevMode(){
