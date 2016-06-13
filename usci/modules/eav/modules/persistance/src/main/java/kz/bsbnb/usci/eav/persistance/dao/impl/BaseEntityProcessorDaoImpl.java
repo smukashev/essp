@@ -173,22 +173,24 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         for (IBaseValue childBaseValue : childBaseSet.get()) {
                             IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
 
-                            childBaseEntity.getAdditionalInfo().isSet = true;
-                            childBaseEntity.getAdditionalInfo().attributeId = metaAttribute.getId();
-                            childBaseEntity.getAdditionalInfo().parentId = baseEntity.getId();
+                            if (childBaseEntity.getValueCount() != 0) {
+                                childBaseEntity.getAdditionalInfo().isSet = true;
+                                childBaseEntity.getAdditionalInfo().attributeId = metaAttribute.getId();
+                                childBaseEntity.getAdditionalInfo().parentId = baseEntity.getId();
 
-                            if (childBaseEntity.getValueCount() != 0)
                                 prepare((IBaseEntity) childBaseValue.getValue(), creditorId);
+                            }
                         }
                     } else {
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
-                        childBaseEntity.getAdditionalInfo().isSet = false;
-                        childBaseEntity.getAdditionalInfo().attributeId = metaAttribute.getId();
-                        childBaseEntity.getAdditionalInfo().parentId = baseEntity.getId();
+                        if (childBaseEntity.getValueCount() != 0) {
+                            childBaseEntity.getAdditionalInfo().isSet = false;
+                            childBaseEntity.getAdditionalInfo().attributeId = metaAttribute.getId();
+                            childBaseEntity.getAdditionalInfo().parentId = baseEntity.getId();
 
-                        if (childBaseEntity.getValueCount() != 0)
                             prepare(childBaseEntity, creditorId);
+                        }
                     }
                 }
             }
