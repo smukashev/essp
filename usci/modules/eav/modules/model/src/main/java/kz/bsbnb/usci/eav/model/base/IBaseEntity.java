@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -56,7 +57,7 @@ public interface IBaseEntity extends IBaseContainer {
 
     AdditionalInfo getAdditionalInfo();
 
-    class AdditionalInfo {
+    class AdditionalInfo implements Serializable {
         public boolean isSet;
         public Long parentId;
         public Long attributeId;

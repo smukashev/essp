@@ -44,7 +44,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     private boolean keyElementsInstalled = false;
 
-    private transient AdditionalInfo additionalInfo = new AdditionalInfo();
+    private AdditionalInfo additionalInfo = new AdditionalInfo();
 
     public AdditionalInfo getAdditionalInfo() {
         return additionalInfo;
