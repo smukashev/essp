@@ -50,8 +50,6 @@ public interface IBaseEntity extends IBaseContainer {
 
     List<IBaseEntity> getKeyElements();
 
-    boolean equalsByReference(IBaseEntity baseEntity);
-
     Set<String> getValidationErrors();
 
     void setOperation(OperationType type);

@@ -426,7 +426,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         this.classTitle = classTitle;
     }
 
-    public boolean isParentIsKey() {
+    public boolean parentIsKey() {
         return parentIsKey;
     }
 
