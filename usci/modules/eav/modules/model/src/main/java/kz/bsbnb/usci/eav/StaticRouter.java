@@ -283,12 +283,22 @@ public final class StaticRouter {
         }
     }
 
-    public static String[] getGODModes() {
-        return GODModes;
+    public static boolean isGODMode(String filename) {
+        for (String tmpStr : GODModes) {
+            if (filename.contains(tmpStr))
+                return true;
+        }
+
+        return false;
     }
 
-    public static String[] getDEVILModes() {
-        return DEVILModes;
+    public static boolean isDEVILMode(String filename) {
+        for (String tmpStr : DEVILModes) {
+            if (filename.contains(tmpStr))
+                return true;
+        }
+
+        return false;
     }
 
     public static boolean isDevMode(){
