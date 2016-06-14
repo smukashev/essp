@@ -187,6 +187,10 @@ public class MainPortlet extends MVCPortlet {
                         xml += "\n</entities>\n" +
                                 "</batch>";
                         List<Creditor> creditors = portalUserBusiness.getMainCreditorsInAlphabeticalOrder(currentUser.getUserId());
+
+                        if(creditors.size() < 1)
+                            throw new RuntimeException("Нет доступных кредиторов");
+
                         Creditor creditor = creditors.get(0);
                         String creditorName = creditor.getName();
                         String creditorCode = creditor.getCode();
