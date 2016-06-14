@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav;
 
 import kz.bsbnb.usci.eav.util.Errors;
 
+@SuppressWarnings("all")
 public final class StaticRouter {
     private enum MODE {
         STEND,
@@ -49,7 +50,7 @@ public final class StaticRouter {
 
     /* Showcase Schema name */
     private final static String stendShowcaseSchemaName = "C##SHOWCASE";
-    private final static String devShowcaseSchemaName = "C##CORE";
+    private final static String devShowcaseSchemaName = "C##SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHOWCASE";
 
     /* Credit Registry DB IP */
@@ -81,9 +82,12 @@ public final class StaticRouter {
     private final static boolean devStatsEnabled = true;
     private final static boolean prodStatsEnabled = true;
 
-    private final static int stendThreadLimit = 10;
-    private final static int devThreadLimit = 10;
+    private final static int stendThreadLimit = 20;
+    private final static int devThreadLimit = 20;
     private final static int prodThreadLimit = 100;
+
+    private final static String[] GODModes = new String[]{"XML_DATA_BY_CID", "GGGGODGGG"};
+    private final static String[] DEVILModes = new String[]{"GGGDEVILGGG"};
 
     public static String getAsIP() {
         switch(mode) {
@@ -278,6 +282,39 @@ public final class StaticRouter {
             default:
                 throw new IllegalStateException(Errors.compose(Errors.E284));
         }
+    }
+
+    public static boolean isGODMode(String filename) {
+        for (String tmpStr : GODModes) {
+            if (filename.contains(tmpStr))
+                return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isDEVILMode(String filename) {
+        for (String tmpStr : DEVILModes) {
+            if (filename.contains(tmpStr))
+                return true;
+        }
+
+        return false;
+    }
+
+    public static String cutGodMode(String filename) {
+        for (String tmpStr : GODModes) {
+            if (filename.indexOf(tmpStr) >= 0) {
+                filename = filename.substring(0, filename.indexOf(tmpStr)) + filename.substring(filename.indexOf(tmpStr) + tmpStr.length());
+            }
+        }
+
+        return filename;
+    }
+
+    public static boolean isInMode(String filename) {
+        return isGODMode(filename) || isDEVILMode(filename);
+
     }
 
     public static boolean isDevMode(){

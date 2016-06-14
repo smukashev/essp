@@ -757,7 +757,7 @@
     <xsd:complexType name="portfolio_flow_kfn">
         <xsd:all>
             <xsd:element name="details" type="portfolio_flow_detail_set" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="portfolio" type="ref_portfolio" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="portfolio" type="ref_portfolio" minOccurs="1" maxOccurs="1" nillable="false"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -1077,7 +1077,7 @@
         <xsd:all>
             <xsd:element name="discounted_value" type="xsd:double" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="details" type="portfolio_flow_detail_set" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="portfolio" type="ref_portfolio" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="portfolio" type="ref_portfolio" minOccurs="1" maxOccurs="1" nillable="false"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -1147,7 +1147,7 @@
 
     <xsd:complexType name="portfolio_flow_detail">
         <xsd:all>
-            <xsd:element name="balance_account" type="ref_balance_account" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="balance_account" type="ref_balance_account" minOccurs="1" maxOccurs="1" nillable="false"/>
             <xsd:element name="value" type="xsd:double" minOccurs="0" maxOccurs="1" nillable="true"/>
         </xsd:all>
     </xsd:complexType>
