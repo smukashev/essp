@@ -86,8 +86,8 @@ public final class StaticRouter {
     private final static int devThreadLimit = 20;
     private final static int prodThreadLimit = 100;
 
-    private final static String[] GODModes = new String[]{"XML_DATA_BY_CID", "gggGODggg"};
-    private final static String[] DEVILModes = new String[]{"gggDEVILggg"};
+    private final static String[] GODModes = new String[]{"XML_DATA_BY_CID", "GGGGODGGG"};
+    private final static String[] DEVILModes = new String[]{"GGGDEVILGGG"};
 
     public static String getAsIP() {
         switch(mode) {
