@@ -318,7 +318,7 @@ public class ZipFilesMonitor {
         }
 
 
-        if (!haveError && !isNB && !checkAndFillEavReport(cId, batchInfo, batchId))
+        if (!haveError && !isNB && !StaticRouter.isInMode(filename) && !checkAndFillEavReport(cId, batchInfo, batchId))
             haveError = true;
 
         batch.setCreditorId(isNB ? 0 : cId);
@@ -327,7 +327,7 @@ public class ZipFilesMonitor {
         batchService.uploadBatch(batch);
 
         if (!haveError) {
-            if (!waitForSignature(batch, batchInfo)) {
+            if (!StaticRouter.isInMode(filename) && !waitForSignature(batch, batchInfo)) {
                 if(batchInfo.isMaintenance()) {
                     batchService.addBatchStatus(new BatchStatus()
                             .setBatchId(batchId)

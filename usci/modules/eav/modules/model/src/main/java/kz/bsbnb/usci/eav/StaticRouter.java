@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav;
 
 import kz.bsbnb.usci.eav.util.Errors;
 
+@SuppressWarnings("all")
 public final class StaticRouter {
     private enum MODE {
         STEND,
@@ -299,6 +300,11 @@ public final class StaticRouter {
         }
 
         return false;
+    }
+
+    public static boolean isInMode(String filename) {
+        return isGODMode(filename) || isDEVILMode(filename);
+
     }
 
     public static boolean isDevMode(){
