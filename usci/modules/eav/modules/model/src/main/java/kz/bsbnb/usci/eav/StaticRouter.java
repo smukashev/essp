@@ -86,8 +86,8 @@ public final class StaticRouter {
     private final static int devThreadLimit = 20;
     private final static int prodThreadLimit = 100;
 
-    private final static String[] GODModes = new String[] {"XML_DATA_BY_CID", "~~GOD~~"};
-    private final static String[] DEVILModes = new String[] {"~~DEVIL~~"};
+    private final static String[] GODModes = new String[]{"XML_DATA_BY_CID", "gggGODggg"};
+    private final static String[] DEVILModes = new String[]{"gggDEVILggg"};
 
     public static String getAsIP() {
         switch(mode) {
@@ -300,6 +300,16 @@ public final class StaticRouter {
         }
 
         return false;
+    }
+
+    public static String cutGodMode(String filename) {
+        for (String tmpStr : GODModes) {
+            if (filename.indexOf(tmpStr) >= 0) {
+                filename = filename.substring(0, filename.indexOf(tmpStr)) + filename.substring(filename.indexOf(tmpStr) + tmpStr.length());
+            }
+        }
+
+        return filename;
     }
 
     public static boolean isInMode(String filename) {
