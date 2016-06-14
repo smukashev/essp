@@ -913,21 +913,35 @@ Ext.onReady(function () {
             rootNode = tree.getRootNode();
 
             var xmlStr = "";
+            var selectedNode = tree.getSelectionModel().getLastSelected();
 
-            for (var i = 0; i < rootNode.childNodes.length; i++) {
-                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, "DELETE");
-            }
-
-            Ext.Ajax.request({
-                url: dataUrl,
-                method: 'POST',
-                params: {
-                    xml_data: xmlStr,
-                    date: Ext.getCmp('edDate').value,
-                    op: 'SAVE_XML'
+            Ext.MessageBox.alert({
+                title: 'Потверждение на удаление?',
+                msg: 'Вы точно хотите отметить на удаление? ' + selectedNode.data.title + ' значение: ' + selectedNode.data.value,
+                buttons: Ext.MessageBox.YESNO,
+                buttonText:{
+                    yes: "Да",
+                    no: "Нет"
                 },
-                success: function (response) {
-                    Ext.MessageBox.alert("", "Операция выполнена успешно");
+                fn: function(val){
+                    if(val == 'yes') {
+                        for (var i = 0; i < rootNode.childNodes.length; i++) {
+                            xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, "DELETE");
+                        }
+
+                        Ext.Ajax.request({
+                            url: dataUrl,
+                            method: 'POST',
+                            params: {
+                                xml_data: xmlStr,
+                                date: Ext.getCmp('edDate').value,
+                                op: 'SAVE_XML'
+                            },
+                            success: function (response) {
+                                Ext.MessageBox.alert("", "Операция выполнена успешно");
+                            }
+                        });
+                    }
                 }
             });
         }
