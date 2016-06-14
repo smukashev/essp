@@ -178,6 +178,10 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
         xmlStr += offset + "<item>\n";
     } else {
         if (first) {
+
+            if(currentNode.data.markedAsDeleted)
+                operation = 'DELETE';
+
             xmlStr += offset + "<" + currentNode.data.code +
                 (operation ? " operation=\"" + operation + "\"" : "") + ">\n";
         } else {
@@ -186,6 +190,12 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
     }
 
     for (var i = 0; i < children.length; i++) {
+
+        if(children[i].data.markedAsDeleted) {
+            xmlStr += offset + "  " + "<" + children[i].data.code + " xsi:nil=\"true\" />\n";
+            continue;
+        }
+
         if (children[i].data.simple) {
             if (currentNode.data.array) {
                 xmlStr += offset + "  " + "<item>";
@@ -925,7 +935,10 @@ Ext.onReady(function () {
                 },
                 fn: function(val){
                     if(val == 'yes') {
-                        for (var i = 0; i < rootNode.childNodes.length; i++) {
+                        selectedNode.data.markedAsDeleted = true;
+                        Ext.MessageBox.alert("", "Операция выполнена успешно. Необходимо " +
+                            "сохранить данные и отправить на обработку");
+                        /*for (var i = 0; i < rootNode.childNodes.length; i++) {
                             xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, "DELETE");
                         }
 
@@ -940,7 +953,7 @@ Ext.onReady(function () {
                             success: function (response) {
                                 Ext.MessageBox.alert("", "Операция выполнена успешно");
                             }
-                        });
+                        });*/
                     }
                 }
             });
