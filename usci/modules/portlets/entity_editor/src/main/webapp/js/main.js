@@ -704,6 +704,7 @@ Ext.onReady(function () {
             {name: 'metaId', type: 'string'},
             {name: 'childMetaId', type: 'string'},
             {name: 'childType', type: 'string'},
+            {name: 'date', type: 'string'}
         ]
     });
 
@@ -1112,6 +1113,11 @@ Ext.onReady(function () {
                 }
                 return subjectName;
             }
+        },{
+            text: 'Дата',
+            flex: 1,
+            dataIndex: 'date',
+            sortable: true
         }/*,{
          text: label_CODE,
          flex: 1,
