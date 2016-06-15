@@ -42,8 +42,6 @@ public class Report implements Serializable {
 
     private Long statusId;
 
-    private Long crossCheckStatusId;
-
     private Long totalCount;
 
     private Long actualCount;
@@ -57,8 +55,6 @@ public class Report implements Serializable {
     private Date lastManualEditDate;
 
     private Shared status;
-
-    private Shared crossCheckStatus;
 
     public Long getId() {
         return id;
@@ -82,14 +78,6 @@ public class Report implements Serializable {
 
     public void setStatusId(Long statusId) {
         this.statusId = statusId;
-    }
-
-    public Long getCrossCheckStatusId() {
-        return crossCheckStatusId;
-    }
-
-    public void setCrossCheckStatusId(Long crossCheckStatusId) {
-        this.crossCheckStatusId = crossCheckStatusId;
     }
 
     public Long getTotalCount() {
@@ -153,21 +141,6 @@ public class Report implements Serializable {
 
     public void setStatus(Shared status) {
         this.status = status;
-    }
-
-    public Shared getCrossCheckStatus() {
-        if (crossCheckStatusId != null && (crossCheckStatus == null || crossCheckStatus.getId() != crossCheckStatusId)) {
-            crossCheckStatus = new Shared();
-            crossCheckStatus.setId(crossCheckStatusId);
-            crossCheckStatus.setCode(STATUS_CODE_MAP.get(crossCheckStatusId));
-            crossCheckStatus.setNameRu(STATUS_NAME_MAP.get(crossCheckStatusId));
-            crossCheckStatus.setNameKz(STATUS_NAME_MAP.get(crossCheckStatusId));
-        }
-        return crossCheckStatus;
-    }
-
-    public void setCrossCheckStatus(Shared crossCheckStatus) {
-        this.crossCheckStatus = crossCheckStatus;
     }
 
     @Override
