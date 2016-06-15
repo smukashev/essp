@@ -55,12 +55,20 @@ public interface IBaseEntity extends IBaseContainer {
 
     void setOperation(OperationType type);
 
-    AdditionalInfo getAdditionalInfo();
+    AdditionalInfo getAddInfo();
+
+    void setAddInfo(IBaseEntity parentEntity, boolean isSet, long attributeId);
 
     class AdditionalInfo implements Serializable {
+        public IBaseEntity parentEntity;
         public boolean isSet;
-        public Long parentId;
         public Long attributeId;
+
+        public AdditionalInfo(IBaseEntity parentEntity, boolean isSet, Long attributeId) {
+            this.parentEntity = parentEntity;
+            this.isSet = isSet;
+            this.attributeId = attributeId;
+        }
 
         @Override
         public boolean equals(Object o) {
@@ -69,18 +77,22 @@ public interface IBaseEntity extends IBaseContainer {
 
             AdditionalInfo that = (AdditionalInfo) o;
 
-            if (isSet != that.isSet) return false;
-            if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) return false;
-            return attributeId != null ? attributeId.equals(that.attributeId) : that.attributeId == null;
+            if (parentEntity == null || attributeId == null || that.parentEntity == null || that.attributeId == null)
+                throw new IllegalStateException(o.toString());
 
-        }
+            if (!attributeId.equals(that.attributeId))
+                return false;
 
-        @Override
-        public int hashCode() {
-            int result = (isSet ? 1 : 0);
-            result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
-            result = 31 * result + (attributeId != null ? attributeId.hashCode() : 0);
-            return result;
+            if (parentEntity.getId() > 0 && that.parentEntity.getId() > 0 && parentEntity.getId() == that.parentEntity.getId())
+                return true;
+
+            if (parentEntity.getId() > 0 || that.parentEntity.getId() > 0)
+                return false;
+
+            if (parentEntity.getId() == 0 && that.parentEntity.getId() == 0 && parentEntity.equalsByKey(that.parentEntity))
+                return true;
+
+            return false;
         }
     }
 }
