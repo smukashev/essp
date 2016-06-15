@@ -112,6 +112,7 @@ public class ReportDaoImpl extends JDBCSupport implements IReportDao {
             report.setEndDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.END_DATE.getName())));
             report.setLastManualEditDate(DataUtils.convertToTimestamp((Timestamp) row.get(EAV_REPORT.LAST_MANUAL_EDIT_DATE.getName())));
             report.setStatusId(((BigDecimal) row.get(EAV_REPORT.STATUS_ID.getName())).longValue());
+            report.setCrossCheckStatusId(((BigDecimal) row.get(EAV_REPORT.CROSS_CHECK_STATUS_ID.getName())).longValue());
             report.setReportDate(DataUtils.convert((Timestamp) row.get(EAV_REPORT.REPORT_DATE.getName())));
             reports.add(report);
 
