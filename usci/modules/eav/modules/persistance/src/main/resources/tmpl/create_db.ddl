@@ -1018,6 +1018,7 @@
     <column name="end_date" required="false" type="DATE"/>
     <column name="report_date" required="true" type="DATE"/>
     <column name="status_id" required="true" type="NUMERIC" size="14,0"/>
+    <column name="cross_check_status_id" required="false" type="NUMERIC" size="14,0"/>
     <column name="username" required="false" type="VARCHAR" size="80"/>
     <column name="last_manual_edit_date" required="false" type="DATE"/>
     <unique name="er_UN_ci_rd">

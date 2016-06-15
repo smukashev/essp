@@ -1,8 +1,6 @@
 package kz.bsbnb.usci.porltet.entity_editor;
 
 import com.google.gson.Gson;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
@@ -38,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MainPortlet extends MVCPortlet {
+    public static final SimpleDateFormat dFormat = new SimpleDateFormat("dd.MM.yyyy");
     private IMetaFactoryService metaFactoryService;
     private IEntityService entityService;
     private IBatchEntryService batchEntryService;
@@ -163,7 +162,7 @@ public class MainPortlet extends MVCPortlet {
     private String entityToJson(BaseEntity entity, String title, String code, IMetaAttribute attr,
                                 boolean asRoot,
                                 boolean isNb,
-                                long creditorId) {
+                                long creditorId, Date repDate) {
 
         MetaClass meta = entity.getMeta();
 
@@ -186,6 +185,7 @@ public class MainPortlet extends MVCPortlet {
         str += "\"value\": \"" + entity.getId() + "\",";
         str += "\"simple\": false,";
         str += "\"array\": false,";
+        str += "\"date\": \"" + (repDate == null ? "" : dFormat.format(repDate)) +"\",";
         str += "\"ref\": " + entity.getMeta().isReference() + ",";
         str += "\"isKey\": " + (attr != null ? attr.isKey() : false) + ",";
         str += "\"isRequired\": " + (attr != null ? attr.isRequired() : false) + ",";
@@ -213,7 +213,7 @@ public class MainPortlet extends MVCPortlet {
                 }
 
                 str +=  entityToJson((BaseEntity)(value.getValue()), attrTitle, innerClassesNames,
-                        meta.getMetaAttribute(innerClassesNames), false, isNb, creditorId);
+                        meta.getMetaAttribute(innerClassesNames), false, isNb, creditorId, value.getRepDate());
             }
 
         }
@@ -258,6 +258,7 @@ public class MainPortlet extends MVCPortlet {
                     "\"title\":\"" + attrTitle + "\",\n" +
                     "\"code\":\"" + innerClassesNames + "\",\n" +
                     "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+                    "\"date\": \"" + dFormat.format(value.getRepDate()) +"\"," +
                     "\"simple\": true,\n" +
                     "\"array\": false,\n" +
                     "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
@@ -270,13 +271,14 @@ public class MainPortlet extends MVCPortlet {
                     Object dtVal = value.getValue();
                     String dtStr = "";
                     if (dtVal != null) {
-                        dtStr = new SimpleDateFormat("dd.MM.yyyy").format(dtVal);
+                        dtStr = dFormat.format(dtVal);
                     }
 
                     str +=  "{" +
                             "\"title\":\"" + attrTitle + "\",\n" +
                             "\"code\":\"" + innerClassesNames + "\",\n" +
                             "\"value\":\"" + dtStr + "\",\n" +
+                            "\"date\": \""+dFormat.format(value.getRepDate())+"\",\n" +
                             "\"simple\": true,\n" +
                             "\"array\": false,\n" +
                             "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
@@ -365,7 +367,7 @@ public class MainPortlet extends MVCPortlet {
                     }
 
                     str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]", "[" + i + "]",
-                            null, false, isNb, creditorId);
+                            null, false, isNb, creditorId, value.getRepDate());
                     i++;
                 }
 
@@ -395,7 +397,7 @@ public class MainPortlet extends MVCPortlet {
                         Object dtVal = value.getValue();
                         String dtStr = "";
                         if (dtVal != null) {
-                            dtStr = new SimpleDateFormat("dd.MM.yyyy").format(dtVal);
+                            dtStr = dFormat.format(dtVal);
                         }
 
                         str +=  "{" +
@@ -598,7 +600,7 @@ public class MainPortlet extends MVCPortlet {
 
                         sJson = "{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entity, entity.getMeta().getClassTitle(),
-                                        entity.getMeta().getClassName(), null, asRoot, isNb, creditorId) +
+                                        entity.getMeta().getClassName(), null, asRoot, isNb, creditorId, null) +
                                 "]}";
 
                         out.write(sJson.getBytes());
@@ -639,7 +641,7 @@ public class MainPortlet extends MVCPortlet {
                                 break;
                             BaseEntity currentEntity = it.next();
                             sb.append(entityToJson(currentEntity, currentEntity.getMeta().getClassTitle(),
-                                    currentEntity.getMeta().getClassName(), null, true, isNb, creditorId));
+                                    currentEntity.getMeta().getClassName(), null, true, isNb, creditorId, null));
 
                             if(it.hasNext()) sb.append(",");
                         } while(true);

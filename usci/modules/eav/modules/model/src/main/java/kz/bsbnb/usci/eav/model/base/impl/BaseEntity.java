@@ -44,10 +44,16 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     private boolean keyElementsInstalled = false;
 
-    private AdditionalInfo additionalInfo = new AdditionalInfo();
+    private AdditionalInfo additionalInfo;
 
-    public AdditionalInfo getAdditionalInfo() {
+    @Override
+    public AdditionalInfo getAddInfo() {
         return additionalInfo;
+    }
+
+    @Override
+    public void setAddInfo (IBaseEntity parentEntity, boolean isSet, long attributeId) {
+        additionalInfo = new AdditionalInfo(parentEntity, isSet, attributeId);
     }
 
     @Override
@@ -443,7 +449,7 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             }
         }
 
-        if (this.meta.parentIsKey() && !this.additionalInfo.equals(that.getAdditionalInfo()))
+        if (this.meta.parentIsKey() && !this.getAddInfo().equals(that.getAddInfo()))
             return false;
 
         return true;

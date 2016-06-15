@@ -180,13 +180,17 @@ public class MainPortlet extends MVCPortlet {
                         String xml =
                                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
                                         "<batch>\n" +
-                                        "<entities>\n";
+                                        "<entities xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n";
 
                         xml += batchEntry.getValue() + "\n";
 
                         xml += "\n</entities>\n" +
                                 "</batch>";
                         List<Creditor> creditors = portalUserBusiness.getMainCreditorsInAlphabeticalOrder(currentUser.getUserId());
+
+                        if(creditors.size() < 1)
+                            throw new RuntimeException("Нет доступных кредиторов");
+
                         Creditor creditor = creditors.get(0);
                         String creditorName = creditor.getName();
                         String creditorCode = creditor.getCode();
@@ -245,6 +249,7 @@ public class MainPortlet extends MVCPortlet {
                         batchProcessService.processBatch(f.getPath(), currentUser.getUserId(), isNB);
 
                         batchEntryIds.add(batchEntry.getId());
+                        writer.write("{ \"success\": true}");
                     }
 
                     batchEntryService.delete(batchEntryIds);

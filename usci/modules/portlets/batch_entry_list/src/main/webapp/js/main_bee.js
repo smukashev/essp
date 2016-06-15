@@ -18,9 +18,15 @@ Ext.onReady(function() {
                 params: {
                     op: 'SEND_XML'
                 },
-                success: function() {
-                    Ext.MessageBox.alert(LABEL_SUCCESS, LABEL_SEND_APPROVAL);
-                    store.load();
+                success: function(info) {
+                    var response = JSON.parse(info.responseText);
+                    if(response.success) {
+                        Ext.MessageBox.alert(LABEL_SUCCESS, LABEL_SEND_APPROVAL);
+                        store.load();
+                    } else {
+                        Ext.MessageBox.alert("Ошибка",response.errorMessage);
+                    }
+
                 },
                 failure: function() {
                     console.log('woops');

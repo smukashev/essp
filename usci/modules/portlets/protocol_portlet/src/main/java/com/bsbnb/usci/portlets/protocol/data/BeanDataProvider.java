@@ -3,7 +3,6 @@ package com.bsbnb.usci.portlets.protocol.data;
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Link;
-import kz.bsbnb.usci.core.service.InputFileBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.InputInfoBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.ProtocolBeanRemoteBusiness;
@@ -92,13 +91,27 @@ public class BeanDataProvider implements DataProvider {
     }
 
     public List<InputInfoDisplayBean> getInputInfosByCreditors(List<Creditor> creditors, Date reportDate) {
-        List<InputInfo> inputInfoList = inputInfoBusiness.getAllInputInfos(creditors,reportDate);
+        List<InputInfo> inputInfoList = inputInfoBusiness.getAllInputInfos(creditors, reportDate);
         List<InputInfoDisplayBean> result = new ArrayList<>(inputInfoList.size());
         for (InputInfo inputInfo : inputInfoList) {
-            if(inputInfo != null && inputInfo.getCreditor() != null)
-                result.add(new InputInfoDisplayBean(inputInfo,this));
+            if (inputInfo != null && inputInfo.getCreditor() != null && !StaticRouter.isDEVILMode(inputInfo.getFileName())) {
+                if (StaticRouter.isGODMode(inputInfo.getFileName())) {
+                    inputInfo.setFileName(cutGodMode(inputInfo.getFileName()));
+                }
+                result.add(new InputInfoDisplayBean(inputInfo, this));
+            }
         }
         return result;
+    }
+
+    public String cutGodMode(String filename) {
+        for (String tmpStr : StaticRouter.getGODModes()) {
+            if (filename.indexOf(tmpStr) >= 0) {
+                filename = filename.substring(0, filename.indexOf(tmpStr)) + filename.substring(filename.indexOf(tmpStr) + tmpStr.length());
+            }
+        }
+
+        return filename;
     }
 
     public Map<SharedDisplayBean, Map<String, List<ProtocolDisplayBean>>> getProtocolsByInputInfoGrouped(
