@@ -93,8 +93,13 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         MetaClass metaClass = entity.getMeta();
         String entityAlias = (entityName == null ? "root" : "e_" + entityName);
 
-        SelectJoinStep joins = context.select(EAV_BE_ENTITIES.as(entityAlias).ID.as("inner_id"))
-                .from(EAV_BE_ENTITIES.as(entityAlias));
+        SelectJoinStep joins;
+
+        if (entity.getMeta().parentIsKey()) {
+            joins = context.selectDistinct(EAV_BE_ENTITIES.as(entityAlias).ID.as("inner_id")).from(EAV_BE_ENTITIES.as(entityAlias));
+        } else {
+            joins = context.select(EAV_BE_ENTITIES.as(entityAlias).ID.as("inner_id")).from(EAV_BE_ENTITIES.as(entityAlias));
+        }
 
         if (metaClass == null)
             throw new IllegalArgumentException(Errors.compose(Errors.E176));
