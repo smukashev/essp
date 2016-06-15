@@ -318,7 +318,7 @@ public class ZipFilesMonitor {
         }
 
 
-        if (!haveError && !isNB && !checkAndFillEavReport(cId, batchInfo, batchId))
+        if (!haveError && !isNB && !StaticRouter.isInMode(filename) && !checkAndFillEavReport(cId, batchInfo, batchId))
             haveError = true;
 
         batch.setCreditorId(isNB ? 0 : cId);
@@ -327,7 +327,7 @@ public class ZipFilesMonitor {
         batchService.uploadBatch(batch);
 
         if (!haveError) {
-            if (!waitForSignature(batch, batchInfo)) {
+            if (!waitForSignature(filename, batch, batchInfo)) {
                 if(batchInfo.isMaintenance()) {
                     batchService.addBatchStatus(new BatchStatus()
                             .setBatchId(batchId)
@@ -352,9 +352,12 @@ public class ZipFilesMonitor {
         }
     }
 
-    boolean waitForSignature(Batch batch, BatchInfo batchInfo) {
+    boolean waitForSignature(String filename, Batch batch, BatchInfo batchInfo) {
+        if (!StaticRouter.isInMode(filename))
+            return false;
+
         String digitalSignArguments = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,
-                DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
+        DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
 
         String[] orgIds = digitalSignArguments.split(",");
         if (batch.getCreditorId() > 0 && Arrays.asList(orgIds).contains(String.valueOf(batch.getCreditorId()))) {

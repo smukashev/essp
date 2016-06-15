@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.model.exceptions.KnownIterativeException;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.*;
@@ -103,9 +104,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         baseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
 
-        for (String attribute : baseEntity.getAttributes()) {
-            IMetaType metaType = baseEntity.getMemberType(attribute);
-            IBaseValue baseValue = baseEntity.getBaseValue(attribute);
+        for (String attrName : baseEntity.getAttributes()) {
+            IMetaAttribute metaAttribute = baseEntity.getMeta().getMetaAttribute(attrName);
+            IMetaType metaType = baseEntity.getMemberType(attrName);
+            IBaseValue baseValue = baseEntity.getBaseValue(attrName);
+
+            if (!metaAttribute.isKey())
+                continue;
 
             if (metaType.isComplex()) {
                 if (baseValue.getValue() != null) {
@@ -149,6 +154,44 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 if (baseEntityId > 0)
                     baseEntity.setId(baseEntityId);
             }
+        }
+
+        for (String attrName : baseEntity.getAttributes()) {
+            IMetaAttribute metaAttribute = baseEntity.getMeta().getMetaAttribute(attrName);
+            IMetaType metaType = baseEntity.getMemberType(attrName);
+            IBaseValue baseValue = baseEntity.getBaseValue(attrName);
+
+            if (metaAttribute.isKey())
+                continue;
+
+            if (metaType.isComplex()) {
+                if (baseValue.getValue() != null) {
+                    if (metaType.isSet()) {
+                        IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
+                        childBaseSet.setCreditorId(creditorId);
+
+                        for (IBaseValue childBaseValue : childBaseSet.get()) {
+                            IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
+
+                            if (childBaseEntity.getValueCount() != 0) {
+                                childBaseEntity.setAddInfo(baseEntity, true, metaAttribute.getId());
+
+                                prepare((IBaseEntity) childBaseValue.getValue(), creditorId);
+                            }
+                        }
+                    } else {
+                        IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
+
+                        if (childBaseEntity.getValueCount() != 0) {
+                            childBaseEntity.setAddInfo(baseEntity, false, metaAttribute.getId());
+
+                            prepare(childBaseEntity, creditorId);
+                        }
+                    }
+                }
+            }
+
+            baseValue.setCreditorId(creditorId);
         }
 
         return baseEntity;
