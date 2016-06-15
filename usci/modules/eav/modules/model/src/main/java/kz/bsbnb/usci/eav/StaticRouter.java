@@ -302,14 +302,8 @@ public final class StaticRouter {
         return false;
     }
 
-    public static String cutGodMode(String filename) {
-        for (String tmpStr : GODModes) {
-            if (filename.indexOf(tmpStr) >= 0) {
-                filename = filename.substring(0, filename.indexOf(tmpStr)) + filename.substring(filename.indexOf(tmpStr) + tmpStr.length());
-            }
-        }
-
-        return filename;
+    public static String[] getGODModes() {
+        return GODModes;
     }
 
     public static boolean isInMode(String filename) {
