@@ -744,6 +744,23 @@ Ext.onReady(function () {
             load: function(me,records,options) {
                 if(records.length == 1)
                     Ext.getCmp('edCreditor').setValue(records[0].get('id'));
+
+                    Ext.Ajax.request({
+                        url: dataUrl,
+                        method: 'POST',
+                        params: {
+                            creditorId: Ext.getCmp('edCreditor').value,
+                            op: 'GET_REPORT_DATE'
+                        },
+                        success: function (response) {
+                            var data = JSON.parse(response.responseText);
+                            if(data.success) {
+                                Ext.getCmp('edDate').setValue(data.data);
+                            } else {
+                                Ext.MessageBox.alert("", data.errorMessage);
+                            }
+                        }
+                    });
             }
         }
     });
@@ -756,6 +773,13 @@ Ext.onReady(function () {
             type: 'ajax',
             url: dataUrl,
             extraParams: {op: 'LIST_ENTITY'}
+        },
+        listeners: {
+          load: function(me, node, records, successfull, eOpts){
+              var response = me.proxy.reader.jsonData;
+              if(response.errorMessage)
+                Ext.MessageBox.alert("", response.errorMessage);
+          }
         },
         folderSort: true
     });
