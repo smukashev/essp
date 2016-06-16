@@ -1,6 +1,7 @@
 package com.bsbnb.creditregistry.portlets.approval.data;
 
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.util.ReportStatus;
 
 import java.util.Date;
@@ -26,8 +27,6 @@ public interface DataProvider {
 
     public Report getReport(Creditor creditor, Date reportDate);
 
-    public CrossCheck getLastCrossCheck(Creditor creditor, Date reportDate);
-
     public void updateReportStatus(Report report, ReportStatus status);
 
     public void updateLastManualEditDate(Report report);
@@ -37,4 +36,6 @@ public interface DataProvider {
     public void sendApprovalNotifications(Creditor creditor, Report report, String username, Date sendDate, String text);
 
     public Date getLastReportDate(Creditor creditor);
+
+    public EavGlobal getGlobal(long globalId);
 }
