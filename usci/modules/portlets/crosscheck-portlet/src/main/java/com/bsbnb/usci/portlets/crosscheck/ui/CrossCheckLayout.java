@@ -320,9 +320,12 @@ public class CrossCheckLayout extends VerticalLayout {
                         updatedLayout.removeComponent(helpMessage);
 
                     if (message.getHelp() != null && message.getHelp().length() > 0) {
-                        helpMessage = new Label(message.getHelp(), Label.CONTENT_XHTML);
+                        CrossCheck currentCrossCheck = (CrossCheck) crossCheckTable.getValue();
+                        String messageTypeText = message.getHelp()
+                                .replace("%REPORT_DATE%", DEFAULT_DATE_FORMAT.format(currentCrossCheck.getReportDate()))
+                                .replace("%BANK_ID%", currentCrossCheck.getCreditor().getId().toString());
+                        helpMessage = new Label(messageTypeText, Label.CONTENT_XHTML);
                         updatedLayout.addComponent(helpMessage);
-
                     }
                 }
             }

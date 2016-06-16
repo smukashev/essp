@@ -353,7 +353,7 @@ public class ZipFilesMonitor {
     }
 
     boolean waitForSignature(String filename, Batch batch, BatchInfo batchInfo) {
-        if (!StaticRouter.isInMode(filename))
+        if (StaticRouter.isInMode(filename))
             return false;
 
         String digitalSignArguments = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,

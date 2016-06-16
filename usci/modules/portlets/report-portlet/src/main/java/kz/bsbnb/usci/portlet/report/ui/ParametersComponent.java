@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.portlet.report.ui;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -281,5 +283,40 @@ public class ParametersComponent extends VerticalLayout {
         }
         textField.setComponentError(null);
         return value;
+    }
+
+    public void setParameterValues(Properties properties) {
+        for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
+            ReportInputParameter parameter = parameters[parameterIndex];
+            if (properties.containsKey(parameter.getParameterName())) {
+                String value = properties.getProperty(parameter.getParameterName());
+                Component parameterComponent = parameterComponents[parameterIndex];
+                if (parameterComponent instanceof DateField) {
+                    DateField dateField = (DateField) parameterComponent;
+                    DateFormat dateFormat = new SimpleDateFormat(dateField.getDateFormat());
+                    try {
+                        Date dateValue = dateFormat.parse(value);
+                        dateField.setValue(dateValue);
+                    } catch (ParseException pe) {
+                        //do nothing
+                    }
+                } else if (parameterComponent instanceof ComboBox) {
+                    ComboBox comboBox = (ComboBox) parameterComponent;
+                    Object selectedItem = null;
+                    for (Object itemId : comboBox.getItemIds()) {
+                        ValuePair item = (ValuePair) itemId;
+                        if (value.equalsIgnoreCase(item.getValue())) {
+                            selectedItem = item;
+                        }
+                    }
+                    if (selectedItem != null) {
+                        comboBox.setValue(selectedItem);
+                    }
+                } else if (parameterComponent instanceof TextField) {
+                    TextField textField = (TextField) parameterComponent;
+                    textField.setValue(value);
+                }
+            }
+        }
     }
 }

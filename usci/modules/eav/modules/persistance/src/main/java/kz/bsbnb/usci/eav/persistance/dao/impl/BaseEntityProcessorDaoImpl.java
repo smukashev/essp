@@ -174,9 +174,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
 
                             if (childBaseEntity.getValueCount() != 0) {
-                                childBaseEntity.getAdditionalInfo().isSet = true;
-                                childBaseEntity.getAdditionalInfo().attributeId = metaAttribute.getId();
-                                childBaseEntity.getAdditionalInfo().parentId = baseEntity.getId();
+                                childBaseEntity.setAddInfo(baseEntity, true, metaAttribute.getId());
 
                                 prepare((IBaseEntity) childBaseValue.getValue(), creditorId);
                             }
@@ -185,9 +183,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
 
                         if (childBaseEntity.getValueCount() != 0) {
-                            childBaseEntity.getAdditionalInfo().isSet = false;
-                            childBaseEntity.getAdditionalInfo().attributeId = metaAttribute.getId();
-                            childBaseEntity.getAdditionalInfo().parentId = baseEntity.getId();
+                            childBaseEntity.setAddInfo(baseEntity, false, metaAttribute.getId());
 
                             prepare(childBaseEntity, creditorId);
                         }
