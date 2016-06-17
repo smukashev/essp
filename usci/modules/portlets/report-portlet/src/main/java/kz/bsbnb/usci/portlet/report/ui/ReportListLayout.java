@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.portlet.report.ui;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
@@ -17,6 +18,7 @@ import kz.bsbnb.usci.portlet.report.export.*;
 import org.apache.log4j.Logger;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 
 /**
@@ -28,6 +30,8 @@ public class ReportListLayout extends VerticalLayout {
     private static final String LOCALIZATION_PREFIX = "MAIN-LAYOUT";
     private static final String[] COLUMN_ORDER = new String[]{"localizedName"};
     private DatabaseConnect connect;
+    private List<Report> reports;
+    private ReportComponent reportComponent;
 
     private String getResourceString(String key) {
         return ReportApplication.getResourceString(LOCALIZATION_PREFIX + "." + key);
@@ -58,7 +62,7 @@ public class ReportListLayout extends VerticalLayout {
         displayReportHeader(Localization.START_HEADER.getValue());
 
         ReportController reportController = new ReportController();
-        List<Report> reports = reportController.loadReports(connect);
+        reports = reportController.loadReports(connect);
         BeanItemContainer<Report> reportsContainer = new BeanItemContainer<Report>(Report.class, reports);
         reportsTable = new Table(Localization.REPORTS_TABLE_CAPTION.getValue(), reportsContainer);
         reportsTable.setVisibleColumns(COLUMN_ORDER);
@@ -92,6 +96,34 @@ public class ReportListLayout extends VerticalLayout {
         reportComponentLayout = new VerticalLayout();
         reportComponentLayout.setWidth("100%");
         reportComponentLayout.setVisible(false);
+
+
+        final UriFragmentUtility ufu = new UriFragmentUtility();
+        ufu.addListener(new UriFragmentUtility.FragmentChangedListener() {
+            @Override
+            public void fragmentChanged(UriFragmentUtility.FragmentChangedEvent source) {
+                try {
+                    String fragment = source.getUriFragmentUtility().getFragment();
+                    String[] keyValuePairs = fragment.split(",");
+                    Properties properties = new Properties();
+                    for (String keyValuePair : keyValuePairs) {
+                        int splitIndex = keyValuePair.indexOf('=');
+                        if (splitIndex >= 0) {
+                            String key = keyValuePair.substring(0, splitIndex).toUpperCase();
+                            String value = keyValuePair.substring(splitIndex + 1);
+                            properties.setProperty(key, value);
+                        }
+                    }
+                    navigateFromUrl(properties);
+                } catch (Property.ReadOnlyException e) {
+                    e.printStackTrace();
+                } catch (Property.ConversionException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
         //
         //MainLayout
         //
@@ -102,15 +134,27 @@ public class ReportListLayout extends VerticalLayout {
         addComponent(headerLayout);
         addComponent(reportsTable);
         addComponent(reportComponentLayout);
+        addComponent(ufu);
     }
 
     private String getReportHeaderString(String reportName) {
         return String.format(Localization.SELECTED_REPORT_HEADER.getValue(), reportName);
     }
 
+    private void navigateFromUrl(Properties properties) {
+        String reportName = properties.getProperty("REPORT");
+        for (Report report : reports) {
+            if (report.getName().equalsIgnoreCase(reportName)) {
+                displayReport(report);
+                reportComponent.setParameters(properties);
+                break;
+            }
+        }
+    }
+
     private void displayReport(Report report) {
         displayReportHeader(getReportHeaderString(report.getLocalizedName()));
-        ReportComponent reportComponent = new ReportComponent(report, connect);
+        reportComponent = new ReportComponent(report, connect);
         String reportName = report.getName();
         if ("BanksWithData".equalsIgnoreCase(reportName)) {
             reportComponent.addReportExporter(new BanksWithDataTableReportExporter());

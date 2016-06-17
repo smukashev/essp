@@ -1,8 +1,6 @@
 package kz.bsbnb.usci.porltet.entity_editor;
 
 import com.google.gson.Gson;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
@@ -10,6 +8,7 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.liferay.util.portlet.PortletProps;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
+import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.form.ISearcherFormService;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
@@ -38,11 +37,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MainPortlet extends MVCPortlet {
+    public static final SimpleDateFormat dFormat = new SimpleDateFormat("dd.MM.yyyy");
     private IMetaFactoryService metaFactoryService;
     private IEntityService entityService;
     private IBatchEntryService batchEntryService;
     private ISearcherFormService searcherFormService;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
+    private ReportBeanRemoteBusiness reportBusiness;
     private final Logger logger = Logger.getLogger(MainPortlet.class);
     private boolean retry;
 
@@ -89,6 +90,14 @@ public class MainPortlet extends MVCPortlet {
 
             portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+
+            // reportBeanRemoteBusiness
+            RmiProxyFactoryBean reportBusinessFactoryBean = new RmiProxyFactoryBean();
+            reportBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1099/reportBeanRemoteBusiness");
+            reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
+            reportBusinessFactoryBean.afterPropertiesSet();
+            reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
 
         } catch (Exception e) {
             throw new RuntimeException(Errors.getError(Errors.E286));
@@ -146,7 +155,8 @@ public class MainPortlet extends MVCPortlet {
         GET_FORM,
         LIST_ATTRIBUTES,
         LIST_BY_CLASS_SHORT,
-        LIST_CREDITORS
+        LIST_CREDITORS,
+        GET_REPORT_DATE
     }
 
     private String testNull(String str) {
@@ -163,7 +173,7 @@ public class MainPortlet extends MVCPortlet {
     private String entityToJson(BaseEntity entity, String title, String code, IMetaAttribute attr,
                                 boolean asRoot,
                                 boolean isNb,
-                                long creditorId) {
+                                long creditorId, Date repDate) {
 
         MetaClass meta = entity.getMeta();
 
@@ -186,6 +196,7 @@ public class MainPortlet extends MVCPortlet {
         str += "\"value\": \"" + entity.getId() + "\",";
         str += "\"simple\": false,";
         str += "\"array\": false,";
+        str += "\"date\": \"" + (repDate == null ? "" : dFormat.format(repDate)) +"\",";
         str += "\"ref\": " + entity.getMeta().isReference() + ",";
         str += "\"isKey\": " + (attr != null ? attr.isKey() : false) + ",";
         str += "\"isRequired\": " + (attr != null ? attr.isRequired() : false) + ",";
@@ -213,7 +224,7 @@ public class MainPortlet extends MVCPortlet {
                 }
 
                 str +=  entityToJson((BaseEntity)(value.getValue()), attrTitle, innerClassesNames,
-                        meta.getMetaAttribute(innerClassesNames), false, isNb, creditorId);
+                        meta.getMetaAttribute(innerClassesNames), false, isNb, creditorId, value.getRepDate());
             }
 
         }
@@ -258,6 +269,7 @@ public class MainPortlet extends MVCPortlet {
                     "\"title\":\"" + attrTitle + "\",\n" +
                     "\"code\":\"" + innerClassesNames + "\",\n" +
                     "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+                    "\"date\": \"" + dFormat.format(value.getRepDate()) +"\"," +
                     "\"simple\": true,\n" +
                     "\"array\": false,\n" +
                     "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
@@ -270,13 +282,14 @@ public class MainPortlet extends MVCPortlet {
                     Object dtVal = value.getValue();
                     String dtStr = "";
                     if (dtVal != null) {
-                        dtStr = new SimpleDateFormat("dd.MM.yyyy").format(dtVal);
+                        dtStr = dFormat.format(dtVal);
                     }
 
                     str +=  "{" +
                             "\"title\":\"" + attrTitle + "\",\n" +
                             "\"code\":\"" + innerClassesNames + "\",\n" +
                             "\"value\":\"" + dtStr + "\",\n" +
+                            "\"date\": \""+dFormat.format(value.getRepDate())+"\",\n" +
                             "\"simple\": true,\n" +
                             "\"array\": false,\n" +
                             "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
@@ -365,7 +378,7 @@ public class MainPortlet extends MVCPortlet {
                     }
 
                     str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]", "[" + i + "]",
-                            null, false, isNb, creditorId);
+                            null, false, isNb, creditorId, value.getRepDate());
                     i++;
                 }
 
@@ -395,7 +408,7 @@ public class MainPortlet extends MVCPortlet {
                         Object dtVal = value.getValue();
                         String dtStr = "";
                         if (dtVal != null) {
-                            dtStr = new SimpleDateFormat("dd.MM.yyyy").format(dtVal);
+                            dtStr = dFormat.format(dtVal);
                         }
 
                         str +=  "{" +
@@ -426,8 +439,7 @@ public class MainPortlet extends MVCPortlet {
 
         try {
 
-            if (metaFactoryService == null)
-                connectToServices();
+            connectToServices();
 
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
             User currentUser = PortalUtil.getUser(resourceRequest);
@@ -598,7 +610,7 @@ public class MainPortlet extends MVCPortlet {
 
                         sJson = "{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entity, entity.getMeta().getClassTitle(),
-                                        entity.getMeta().getClassName(), null, asRoot, isNb, creditorId) +
+                                        entity.getMeta().getClassName(), null, asRoot, isNb, creditorId, null) +
                                 "]}";
 
                         out.write(sJson.getBytes());
@@ -639,7 +651,7 @@ public class MainPortlet extends MVCPortlet {
                                 break;
                             BaseEntity currentEntity = it.next();
                             sb.append(entityToJson(currentEntity, currentEntity.getMeta().getClassTitle(),
-                                    currentEntity.getMeta().getClassName(), null, true, isNb, creditorId));
+                                    currentEntity.getMeta().getClassName(), null, true, isNb, creditorId, null));
 
                             if(it.hasNext()) sb.append(",");
                         } while(true);
@@ -685,6 +697,12 @@ public class MainPortlet extends MVCPortlet {
                         sb.append("]}");
                         out.write(sb.toString().getBytes());
                     }
+                    break;
+                case GET_REPORT_DATE:
+                    creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
+                    String reportDate = new SimpleDateFormat("dd.MM.yyyy")
+                            .format(reportBusiness.getReportDate(creditorId));
+                    out.write(JsonMaker.getJson(reportDate).getBytes());
                     break;
                 default:
                     break;

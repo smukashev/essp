@@ -114,15 +114,20 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
     public List<Batch> getBatchListToSign(long creditorId) {
         EavGlobal statusCompleted = eavGlobalDao.get(BatchStatuses.COMPLETED.type(), BatchStatuses.COMPLETED.code());
         EavGlobal statusSign = eavGlobalDao.get(BatchStatuses.WAITING_FOR_SIGNATURE.type(), BatchStatuses.WAITING_FOR_SIGNATURE.code());
+        EavGlobal statusError = eavGlobalDao.get(BatchStatuses.ERROR.type(), BatchStatuses.ERROR.code());
 
         Select select = context.select().from(EAV_BATCHES)
                         .join(context.select(DSL.max(EAV_BATCH_STATUSES.STATUS_ID).as("STATUS_ID"), EAV_BATCH_STATUSES.BATCH_ID)
-                        .from(EAV_BATCH_STATUSES)
-                        .where(EAV_BATCH_STATUSES.STATUS_ID.ne(statusCompleted.getId()))
-                        .groupBy(EAV_BATCH_STATUSES.BATCH_ID).asTable("bs"))
+                                .from(EAV_BATCH_STATUSES)
+                                .where(EAV_BATCH_STATUSES.STATUS_ID.ne(statusCompleted.getId()))
+                                .groupBy(EAV_BATCH_STATUSES.BATCH_ID).asTable("bs"))
                         .on(EAV_BATCHES.ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class)))
                 .where(EAV_BATCHES.CREDITOR_ID.eq(creditorId))
                 .and(EAV_BATCHES.SIGN.isNull())
+                .andNotExists(context.select().from(EAV_BATCH_STATUSES)
+                        .where((EAV_BATCH_STATUSES.STATUS_ID.eq(statusCompleted.getId())).or(EAV_BATCH_STATUSES.STATUS_ID.eq(statusError.getId())))
+                        .and(EAV_BATCH_STATUSES.BATCH_ID.eq(DSL.field("\"bs\".\"BATCH_ID\"", Long.class))))
+
                 .and(DSL.field("\"bs\".STATUS_ID").eq(statusSign.getId()));
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 

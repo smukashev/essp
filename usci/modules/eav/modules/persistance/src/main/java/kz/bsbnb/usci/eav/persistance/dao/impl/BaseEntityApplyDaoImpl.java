@@ -89,6 +89,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             return foundProcessedBaseEntity;
 
         IBaseEntity baseEntityApplied = new BaseEntity(baseEntitySaving.getMeta(), baseEntitySaving.getReportDate(), creditorId);
+        if (baseEntitySaving.getAddInfo() != null)
+            baseEntityApplied.setAddInfo(baseEntitySaving.getAddInfo().parentEntity, baseEntitySaving.getAddInfo().isSet,
+                    baseEntitySaving.getAddInfo().attributeId);
 
         for (String attribute : baseEntitySaving.getAttributes()) {
             IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attribute);
@@ -321,6 +324,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         } else {
             baseEntityApplied.calculateValueCount(null);
         }
+
+        if (baseEntitySaving.getAddInfo() != null)
+            baseEntityApplied.setAddInfo(baseEntitySaving.getAddInfo().parentEntity, baseEntitySaving.getAddInfo().isSet,
+                    baseEntitySaving.getAddInfo().attributeId);
 
         IBaseEntityReportDate baseEntityReportDate = baseEntityApplied.getBaseEntityReportDate();
 

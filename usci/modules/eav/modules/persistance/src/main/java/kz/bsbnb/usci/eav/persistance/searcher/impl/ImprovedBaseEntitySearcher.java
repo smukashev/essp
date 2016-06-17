@@ -93,8 +93,13 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         MetaClass metaClass = entity.getMeta();
         String entityAlias = (entityName == null ? "root" : "e_" + entityName);
 
-        SelectJoinStep joins = context.select(EAV_BE_ENTITIES.as(entityAlias).ID.as("inner_id"))
-                .from(EAV_BE_ENTITIES.as(entityAlias));
+        SelectJoinStep joins;
+
+        if (entity.getMeta().parentIsKey()) {
+            joins = context.selectDistinct(EAV_BE_ENTITIES.as(entityAlias).ID.as("inner_id")).from(EAV_BE_ENTITIES.as(entityAlias));
+        } else {
+            joins = context.select(EAV_BE_ENTITIES.as(entityAlias).ID.as("inner_id")).from(EAV_BE_ENTITIES.as(entityAlias));
+        }
 
         if (metaClass == null)
             throw new IllegalArgumentException(Errors.compose(Errors.E176));
@@ -262,21 +267,21 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         }
 
         if (entity.getMeta().parentIsKey()) {
-            if (entity.getAdditionalInfo().parentId == 0)
+            if (entity.getAddInfo().parentEntity == null || entity.getAddInfo().parentEntity.getId() == 0)
                 return null;
 
-            if (entity.getAdditionalInfo().isSet) {
+            if (entity.getAddInfo().isSet) {
                 final String ecs ="ebecs";
                 final String cv = "ebcsv";
 
-                joins.join(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs)).on(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs).ENTITY_ID.eq(entity.getAdditionalInfo().parentId))
-                        .and(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs).ATTRIBUTE_ID.eq(entity.getAdditionalInfo().attributeId))
+                joins.join(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs)).on(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs).ENTITY_ID.eq(entity.getAddInfo().parentEntity.getId()))
+                        .and(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs).ATTRIBUTE_ID.eq(entity.getAddInfo().attributeId))
                         .join(EAV_BE_COMPLEX_SET_VALUES.as(cv)).on(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs).ID.eq(EAV_BE_COMPLEX_SET_VALUES.as(cv).SET_ID))
                             .and(EAV_BE_COMPLEX_SET_VALUES.as(cv).ENTITY_VALUE_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID));
             } else {
                 final String cv = "ebcv";
-                joins.join(EAV_BE_COMPLEX_VALUES.as(cv)).on(EAV_BE_COMPLEX_VALUES.as(cv).ENTITY_ID.eq(entity.getAdditionalInfo().parentId))
-                        .and(EAV_BE_COMPLEX_VALUES.as(cv).ATTRIBUTE_ID.eq(entity.getAdditionalInfo().attributeId))
+                joins.join(EAV_BE_COMPLEX_VALUES.as(cv)).on(EAV_BE_COMPLEX_VALUES.as(cv).ENTITY_ID.eq(entity.getAddInfo().parentEntity.getId()))
+                        .and(EAV_BE_COMPLEX_VALUES.as(cv).ATTRIBUTE_ID.eq(entity.getAddInfo().attributeId))
                         .and(EAV_BE_COMPLEX_VALUES.as(cv).ENTITY_VALUE_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID));
             }
         }

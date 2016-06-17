@@ -11,6 +11,7 @@ import kz.bsbnb.usci.portlet.report.export.ProtocolsTableReportExporter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 /**
  *
@@ -100,5 +101,9 @@ public class ReportComponent extends VerticalLayout {
      */
     public DatabaseConnect getConnect() {
         return connect;
+    }
+
+    public void setParameters(Properties properties) {
+        parametersComponent.setParameterValues(properties);
     }
 }
