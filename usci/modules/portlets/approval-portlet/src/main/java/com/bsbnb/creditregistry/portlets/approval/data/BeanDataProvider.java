@@ -127,14 +127,6 @@ public class BeanDataProvider implements DataProvider {
     }
 
     @Override
-    public CrossCheck getLastCrossCheck(Creditor creditor, Date reportDate) {
-        /* todo: implement */
-//        List<CrossCheck> crossChecks = crossCheckBusiness.loadCrossCheck(Arrays.asList(creditor.getId()), reportDate);
-//        return crossChecks.isEmpty() ? null : crossChecks.get(0);
-        return null;
-    }
-
-    @Override
     public void updateReportStatus(Report report, ReportStatus status) {
         EavGlobal eavGlobal = globalService.getGlobal(status);
         report.setStatusId(eavGlobal.getId());
@@ -171,5 +163,10 @@ public class BeanDataProvider implements DataProvider {
     public void updateLastManualEditDate(Report report) {
         report.setLastManualEditDate(new Date());
         reportBusiness.updateReport(report);
+    }
+
+    @Override
+    public EavGlobal getGlobal(long globalId) {
+        return globalService.getGlobal(globalId);
     }
 }

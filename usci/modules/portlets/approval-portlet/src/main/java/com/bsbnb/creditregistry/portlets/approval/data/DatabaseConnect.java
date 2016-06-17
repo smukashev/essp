@@ -7,8 +7,10 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
+import kz.bsbnb.usci.eav.util.DataUtils;
 import oracle.jdbc.OracleCallableStatement;
 import oracle.jdbc.OracleTypes;
+import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.log4j.Logger;
 
 import javax.naming.Context;
@@ -16,6 +18,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -198,5 +202,55 @@ public class DatabaseConnect {
         }
 
         return null;
+    }
+
+    public Long getLastCrossCheckStatus(long creditorId, Date reportDate) {
+
+        long statusId = 0;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        String query = "select * from cross_check   where creditor_id=?  and report_date = ? order by date_begin desc";
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement(query);
+            stmt.setLong(1, creditorId);
+            stmt.setDate(2, DataUtils.convert(reportDate));
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                statusId = rs.getLong("status_id");
+            }
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException se) {
+            logger.error(null, se);
+        } finally {
+            try {
+                if (stmt != null)
+                    stmt.close();
+            } catch (SQLException se2) {
+            }
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+
+        return statusId;
+    }
+
+    public static void main(String args[]){
+        DatabaseConnect db = new DatabaseConnect();
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+
+        try {
+            long statusId = db.getLastCrossCheckStatus((long) 4375, format.parse("01.01.2015"));
+            System.out.println(statusId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

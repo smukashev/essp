@@ -15,9 +15,9 @@ import java.util.logging.Level;
  */
 class SaveQueryDialog extends FavoritesDialog implements Button.ClickListener {
 
-    private static final String UPDATE_SQL = "UPDATE MAINTENANCE.SAVED_QUERY SET SQL_TEXT='%s' WHERE ID = %s";
-    private static final String INSERT_SQL = "INSERT INTO MAINTENANCE.SAVED_QUERY(ID, NAME, SQL_TEXT) "
-            + "VALUES(MAINTENANCE.SAVED_QUERY_SEQ.NEXTVAL,'%s','%s')";
+    private static final String UPDATE_SQL = "UPDATE SAVED_QUERY_MAINTENANCE SET SQL_TEXT='%s' WHERE ID = %s";
+    private static final String INSERT_SQL = "INSERT INTO SAVED_QUERY_MAINTENANCE(ID, NAME, SQL_TEXT) "
+            + "VALUES(SAVED_QUERY_MAINTENANCE_SEQ.NEXTVAL,'%s','%s')";
 
     private final String sqlText;
 
@@ -76,7 +76,7 @@ class SaveQueryDialog extends FavoritesDialog implements Button.ClickListener {
         SqlExecutor executor = getExecutor();
         executor.setQueryType(QueryType.INSERT_OR_UPDATE);
         executor.setUsingConnectionPool(true);
-        executor.runQuery(query);
+        executor.runQuery(query,true);
     }
 
 }

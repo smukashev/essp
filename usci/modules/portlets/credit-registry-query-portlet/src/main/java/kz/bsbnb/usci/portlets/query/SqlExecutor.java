@@ -52,6 +52,7 @@ class SqlExecutor {
     private int rowsCount;
     private String exceptionMessage;
     private int sqlErrorPosition = -1;
+    private boolean isMaintenance;
 
     public final Logger logger = Logger.getLogger(SqlExecutor.class);
 
@@ -98,9 +99,28 @@ class SqlExecutor {
         return conn;
     }
 
+    private Connection getReporterConnection() {
+        Connection conn = null;
+        try {
+            Class.forName("oracle.jdbc.OracleDriver");
+            conn = DriverManager.getConnection("jdbc:oracle:thin:@10.8.1.85:1521:showcase", "reporter", "reporter_2015");
+            //conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "REPORTER", "REPORTER_2015");
+        } catch (SQLException ex) {
+            saveException(ex);
+        } catch (ClassNotFoundException ex) {
+            saveException(ex);
+        }
+        return conn;
+    }
+
     private void saveException(Exception ex) {
         logger.error(null, ex);
         exceptionMessage = ex.getMessage();
+    }
+
+    public void runQuery(String query,boolean isMaintenance) {
+        this.isMaintenance = isMaintenance;
+        runQuery(query);
     }
 
     public void runQuery(String query) {
@@ -114,7 +134,11 @@ class SqlExecutor {
         sqlErrorPosition = -1;
         queryResultTable = null;
         try {
-            conn = getConnection();
+            if(isMaintenance)
+                conn = getReporterConnection();
+            else
+                conn = getConnection();
+
             if (conn == null) {
                 return;
             }
@@ -139,6 +163,7 @@ class SqlExecutor {
             sqlErrorPosition = retrieveErrorPosition(conn, query);
             saveException(ex);
         } finally {
+            isMaintenance = false;
             if (resultSet != null) {
                 try {
                     resultSet.close();
