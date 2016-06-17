@@ -60,6 +60,7 @@ public interface IBaseEntity extends IBaseContainer {
     void setAddInfo(IBaseEntity parentEntity, boolean isSet, long attributeId);
 
     class AdditionalInfo implements Serializable {
+        private static final long serialVersionUID = 1L;;
         public IBaseEntity parentEntity;
         public boolean isSet;
         public Long attributeId;
