@@ -777,9 +777,9 @@ Ext.onReady(function () {
         },
         listeners: {
           load: function(me, node, records, successfull, eOpts){
-              var response = me.proxy.reader.jsonData;
+              /*var response = me.proxy.reader.jsonData;
               if(response.errorMessage)
-                Ext.MessageBox.alert("", response.errorMessage);
+                Ext.MessageBox.alert("", response.errorMessage);*/
           }
         },
         folderSort: true
