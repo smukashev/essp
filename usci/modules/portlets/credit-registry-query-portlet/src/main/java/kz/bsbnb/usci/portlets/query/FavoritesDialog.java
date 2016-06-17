@@ -21,8 +21,8 @@ import java.util.Iterator;
  */
 class FavoritesDialog extends Window implements FieldEvents.TextChangeListener {
 
-    private static final String SAVED_QUERIES_SQL = "SELECT ID, NAME FROM MAINTENANCE.SAVED_QUERY ORDER BY ID";
-    private static final String REMOVE_QUERY_SQL = "DELETE FROM MAINTENANCE.SAVED_QUERY WHERE ID = %s";
+    private static final String SAVED_QUERIES_SQL = "SELECT ID, NAME FROM SAVED_QUERY_MAINTENANCE ORDER BY ID";
+    private static final String REMOVE_QUERY_SQL = "DELETE FROM SAVED_QUERY_MAINTENANCE WHERE ID = %s";
 
     private final SqlExecutor executor;
 
@@ -88,7 +88,7 @@ class FavoritesDialog extends Window implements FieldEvents.TextChangeListener {
     private ResultsTable getSavedQueriesTable() {
         executor.setQueryType(QueryType.SELECT);
         executor.setUsingConnectionPool(true);
-        executor.runQuery(SAVED_QUERIES_SQL);
+        executor.runQuery(SAVED_QUERIES_SQL,true);
         ResultsTable resultsTable = executor.getQueryResultTable();
         resultsTable.setMultiSelect(false);
         resultsTable.setSelectable(true);
