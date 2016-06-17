@@ -6,6 +6,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
+import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchEntry;
@@ -22,6 +23,7 @@ import java.security.AccessControlException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -39,6 +41,7 @@ public class MainPortlet extends MVCPortlet {
     private Logger logger = Logger.getLogger(MainPortlet.class);
     private Exception currentException;
     private boolean retry;
+    private ReportBeanRemoteBusiness reportBusiness;
 
     public void connectToServices() {
         try {
@@ -67,6 +70,14 @@ public class MainPortlet extends MVCPortlet {
 
             portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+
+            // reportBeanRemoteBusiness
+            RmiProxyFactoryBean reportBusinessFactoryBean = new RmiProxyFactoryBean();
+            reportBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1099/reportBeanRemoteBusiness");
+            reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
+            reportBusinessFactoryBean.afterPropertiesSet();
+            reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
         } catch (Exception e) {
             throw new RuntimeException(Errors.getError(Errors.E286));
         }
@@ -101,7 +112,7 @@ public class MainPortlet extends MVCPortlet {
         LIST_ENTRIES,
         SEND_XML,
         GET_ENTRY,
-        DELETE_ENTRY
+        GET_REPORT_DATE, DELETE_ENTRY
     }
 
     @Override
@@ -136,9 +147,10 @@ public class MainPortlet extends MVCPortlet {
                 return;
             }
 
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
             switch (operationType) {
                 case LIST_ENTRIES:
-                    DateFormat dfRep = new SimpleDateFormat("dd.MM.yyyy");
+                    DateFormat dfRep = dateFormat;
                     DateFormat dfUpd = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
                     List<BatchEntry> entries = batchEntryService.getListByUser(currentUser.getUserId());
@@ -169,10 +181,19 @@ public class MainPortlet extends MVCPortlet {
                 case SEND_XML:
                     entries = batchEntryService.getListByUser(currentUser.getUserId());
 
-                    DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+                    DateFormat df = dateFormat;
                     Document document = null;
                     DocumentBuilder documentBuilder = null;
                     List<Long> batchEntryIds = new ArrayList<Long>();
+                    Creditor creditor = getCreditor(currentUser);
+                    String creditorName = creditor.getName();
+                    String creditorCode = creditor.getCode();
+                    String creditorBIN = creditor.getBIN();
+                    String creditorBIK = creditor.getBIK();
+
+                    Date reportDate = reportBusiness.getReportDate(creditor.getId());
+
+
 
                     for (BatchEntry batchEntry : entries) {
                         String sRepDate = df.format(batchEntry.getRepDate());
@@ -186,24 +207,16 @@ public class MainPortlet extends MVCPortlet {
 
                         xml += "\n</entities>\n" +
                                 "</batch>";
-                        List<Creditor> creditors = portalUserBusiness.getMainCreditorsInAlphabeticalOrder(currentUser.getUserId());
 
-                        if(creditors.size() < 1)
-                            throw new RuntimeException("Нет доступных кредиторов");
-
-                        Creditor creditor = creditors.get(0);
-                        String creditorName = creditor.getName();
-                        String creditorCode = creditor.getCode();
-                        String creditorBIN = creditor.getBIN();
-                        String creditorBIK = creditor.getBIK();
                         String manifest = "<manifest>\n" +
                                 "\t<type>1</type>\n" +
                                 "\t<name>data.xml</name>\n" +
                                 "\t<userid>" + currentUser.getUserId() + "</userid>\n" +
-                                "\t<size>10</size>\n" +
+                                "\t<size>1</size>\n" +
                                 "\t<date>" +
                                 sRepDate +
                                 "</date>\n" +
+                                (batchEntry.getRepDate().compareTo(reportDate) < 0 && !isNB ? "\t<maintenance>true</maintenance>\n" : "") +
                                 "\t<properties>"+
                                     "\t<property>" +
                                         "\t<name>CODE</name>\n"+
@@ -249,9 +262,9 @@ public class MainPortlet extends MVCPortlet {
                         batchProcessService.processBatch(f.getPath(), currentUser.getUserId(), isNB);
 
                         batchEntryIds.add(batchEntry.getId());
-                        writer.write("{ \"success\": true}");
                     }
 
+                    writer.write("{ \"success\": true}");
                     batchEntryService.delete(batchEntryIds);
 
                     break;
@@ -264,6 +277,13 @@ public class MainPortlet extends MVCPortlet {
                 case DELETE_ENTRY: {
                     String id = resourceRequest.getParameter("id");
                     batchEntryService.delete(Long.valueOf(id));
+                    break;
+                }
+                case GET_REPORT_DATE: {
+                    creditor = getCreditor(currentUser);
+                    reportDate = reportBusiness.getReportDate(creditor.getId());
+                    writer.write("{ \"success\": true, \"data\": \""
+                            + dateFormat.format(reportDate)+ "\"}");
                     break;
                 }
                 default:
@@ -294,6 +314,15 @@ public class MainPortlet extends MVCPortlet {
         }
 
 
+    }
+
+    private Creditor getCreditor(User currentUser) {
+        List<Creditor> creditors = portalUserBusiness.getMainCreditorsInAlphabeticalOrder(currentUser.getUserId());
+
+        if(creditors.size() < 1)
+            throw new RuntimeException("Нет доступных кредиторов");
+
+        return creditors.get(0);
     }
 
     private String castJsonString(Exception e) {

@@ -8,6 +8,7 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.liferay.util.portlet.PortletProps;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
+import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.form.ISearcherFormService;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
@@ -42,6 +43,7 @@ public class MainPortlet extends MVCPortlet {
     private IBatchEntryService batchEntryService;
     private ISearcherFormService searcherFormService;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
+    private ReportBeanRemoteBusiness reportBusiness;
     private final Logger logger = Logger.getLogger(MainPortlet.class);
     private boolean retry;
 
@@ -88,6 +90,14 @@ public class MainPortlet extends MVCPortlet {
 
             portalUserBeanRemoteBusinessFactoryBean.afterPropertiesSet();
             portalUserBusiness = (PortalUserBeanRemoteBusiness) portalUserBeanRemoteBusinessFactoryBean.getObject();
+
+            // reportBeanRemoteBusiness
+            RmiProxyFactoryBean reportBusinessFactoryBean = new RmiProxyFactoryBean();
+            reportBusinessFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1099/reportBeanRemoteBusiness");
+            reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
+            reportBusinessFactoryBean.afterPropertiesSet();
+            reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
 
         } catch (Exception e) {
             throw new RuntimeException(Errors.getError(Errors.E286));
@@ -145,7 +155,8 @@ public class MainPortlet extends MVCPortlet {
         GET_FORM,
         LIST_ATTRIBUTES,
         LIST_BY_CLASS_SHORT,
-        LIST_CREDITORS
+        LIST_CREDITORS,
+        GET_REPORT_DATE
     }
 
     private String testNull(String str) {
@@ -428,8 +439,7 @@ public class MainPortlet extends MVCPortlet {
 
         try {
 
-            if (metaFactoryService == null)
-                connectToServices();
+            connectToServices();
 
             OperationTypes operationType = OperationTypes.valueOf(resourceRequest.getParameter("op"));
             User currentUser = PortalUtil.getUser(resourceRequest);
@@ -687,6 +697,12 @@ public class MainPortlet extends MVCPortlet {
                         sb.append("]}");
                         out.write(sb.toString().getBytes());
                     }
+                    break;
+                case GET_REPORT_DATE:
+                    creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
+                    String reportDate = new SimpleDateFormat("dd.MM.yyyy")
+                            .format(reportBusiness.getReportDate(creditorId));
+                    out.write(JsonMaker.getJson(reportDate).getBytes());
                     break;
                 default:
                     break;
