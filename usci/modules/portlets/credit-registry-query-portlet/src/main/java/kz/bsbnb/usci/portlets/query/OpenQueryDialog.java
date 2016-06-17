@@ -58,7 +58,7 @@ class OpenQueryDialog extends FavoritesDialog implements Button.ClickListener {
         SqlExecutor executor = getExecutor();
         executor.setQueryType(QueryType.SELECT);
         executor.setUsingConnectionPool(true);
-        executor.runQuery("SELECT SQL_TEXT FROM MAINTENANCE.SAVED_QUERY WHERE ID=" + id);
+        executor.runQuery("SELECT SQL_TEXT FROM SAVED_QUERY_MAINTENANCE WHERE ID=" + id, true);
         ResultsTable table = executor.getQueryResultTable();
         Item textItem = table.getItem(table.getItemIds().toArray()[0]);
         Object textObject = textItem.getItemProperty(textItem.getItemPropertyIds().toArray()[0]).getValue();

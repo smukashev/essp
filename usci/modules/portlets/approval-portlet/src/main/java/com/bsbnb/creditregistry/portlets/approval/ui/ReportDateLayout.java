@@ -17,12 +17,14 @@ import com.vaadin.ui.RichTextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.BaseTheme;
 import kz.bsbnb.usci.cr.model.*;
+import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.util.ReportStatus;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -73,10 +75,17 @@ public class ReportDateLayout extends VerticalLayout {
 
         HorizontalLayout crossCheckStatusLayout = new HorizontalLayout();
         Label crossCheckStatusLabel = new Label("<b>" + environment.getResourceString(Localization.CROSS_CHECK_RESULT_LABEL_CAPTION) + ": </b>", Label.CONTENT_XHTML);
-        Report rep = provider.getReport(creditor,reportDate);
-        String crossCheckLinkCaption = (rep == null)
-                ? environment.getResourceString(Localization.CROSS_CHECK_DID_NOT_RUN)
-                : rep.getStatus().getNameRu();
+
+        DatabaseConnect db = new DatabaseConnect(environment.getUser());
+        long crossCheckStatusId = db.getLastCrossCheckStatus(creditor.getId(), reportDate);
+
+        String crossCheckLinkCaption = null;
+        if (crossCheckStatusId == 0) {
+            crossCheckLinkCaption = environment.getResourceString(Localization.CROSS_CHECK_DID_NOT_RUN);
+        } else {
+            EavGlobal eavGlobal = provider.getGlobal(crossCheckStatusId);
+            crossCheckLinkCaption = eavGlobal.getDescription();
+        }
 
         CrossCheckLink crossCheckLink = new CrossCheckLink(crossCheckLinkCaption, creditor.getId(), reportDate);
         crossCheckStatusLayout.addComponent(crossCheckStatusLabel);
