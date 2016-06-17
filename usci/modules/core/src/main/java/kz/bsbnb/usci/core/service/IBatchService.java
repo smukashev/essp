@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.core.service;
 
+import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
@@ -33,6 +34,8 @@ public interface IBatchService {
     void signBatch(long batchId, String sign);
 
     List<Batch> getAll(Date repDate);
+
+    List<Batch> getAll(Date repDate, List<Creditor> creditorsList);
 
     boolean incrementActualCounts(Map<Long, Long> batchesToUpdate);
 

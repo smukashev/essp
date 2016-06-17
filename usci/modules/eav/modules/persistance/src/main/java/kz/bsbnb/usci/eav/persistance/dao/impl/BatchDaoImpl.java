@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.persistance.dao.IBatchDao;
@@ -142,6 +143,33 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
 
         if (repDate != null) {
             select.where(EAV_BATCHES.REP_DATE.eq(DataUtils.convert(repDate)));
+        }
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        List<Batch> batchList = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            batchList.add(fillBatch(new Batch(), row));
+        }
+
+        return batchList;
+    }
+
+    @Override
+    public List<Batch> getAll(java.util.Date repDate, List<Creditor> creditorsList) {
+        SelectWhereStep select = context.selectFrom(EAV_BATCHES);
+
+//        select.limit(100);
+
+        // one creditor must exists!
+        select.where(EAV_BATCHES.CREDITOR_ID.eq(creditorsList.get(0).getId()));
+        for (int i = 1; i < creditorsList.size(); i++) {
+            select.where().or(EAV_BATCHES.CREDITOR_ID.eq(creditorsList.get(i).getId()));
+        }
+
+        if (repDate != null) {
+            select.where().and(EAV_BATCHES.REP_DATE.eq(DataUtils.convert(repDate)));
         }
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());

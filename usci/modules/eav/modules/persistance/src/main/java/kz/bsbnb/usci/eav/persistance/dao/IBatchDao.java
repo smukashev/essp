@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
 
+import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
 
 import java.util.Date;
@@ -17,6 +18,8 @@ public interface IBatchDao {
     List<Batch> getBatchListToSign(long creditorId);
 
     List<Batch> getAll(Date repDate);
+
+    List<Batch> getAll(Date repDate, List<Creditor> creditorsList);
 
     void incrementActualCount(long batchId, long count);
 
