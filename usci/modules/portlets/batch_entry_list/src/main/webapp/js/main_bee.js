@@ -12,24 +12,71 @@ Ext.onReady(function() {
         id: "entityEditorShowBtn",
         text: label_SEND,
         handler : function (){
+            var sendXml = function() {
+                Ext.Ajax.request({
+                    url: dataUrl,
+                    method: 'POST',
+                    params: {
+                        op: 'SEND_XML'
+                    },
+                    success: function(info) {
+                        var response = JSON.parse(info.responseText);
+                        if(response.success) {
+                            Ext.MessageBox.alert(LABEL_SUCCESS, LABEL_SEND_APPROVAL);
+                            store.load();
+                        } else {
+                            Ext.MessageBox.alert("Ошибка",response.errorMessage);
+                        }
+
+                    },
+                    failure: function() {
+                        console.log('woops');
+                    }
+                });
+            };
+
             Ext.Ajax.request({
                 url: dataUrl,
-                method: 'POST',
+                method: 'GET',
                 params: {
-                    op: 'SEND_XML'
+                    op: 'GET_REPORT_DATE'
                 },
                 success: function(info) {
                     var response = JSON.parse(info.responseText);
-                    if(response.success) {
-                        Ext.MessageBox.alert(LABEL_SUCCESS, LABEL_SEND_APPROVAL);
-                        store.load();
-                    } else {
-                        Ext.MessageBox.alert("Ошибка",response.errorMessage);
-                    }
+                    var reportDate;
 
-                },
-                failure: function() {
-                    console.log('woops');
+                    if(response.success) {
+                        reportDate = response.data;
+                        var hasNotReportingChanges = false;
+                        for(var i=0 ;i<store.getCount();i++)
+                            if( store.getAt(i).get('rep_date') != reportDate) {
+                                hasNotReportingChanges = true;
+                            }
+
+                        if(hasNotReportingChanges && !isNb) {
+                            Ext.MessageBox.alert({
+                                title: '',
+                                msg: 'Обнаружены изменения за период, отличные от отчитвываемого, ' +
+                                'они попадут в отдельную очередь и требуют согласования пользователя НБ',
+                                buttons: Ext.MessageBox.YESNO,
+                                buttonText:{
+                                    yes: "Да",
+                                    no: "Нет"
+                                },
+                                fn: function(val){
+                                    if(val == 'yes') {
+                                        sendXml();
+                                    }
+                                }
+                            });
+
+                        } else {
+                            sendXml();
+                        }
+
+                    } else {
+                        Ext.MessageBox.alert("",response.errorMessage);
+                    }
                 }
             });
         }

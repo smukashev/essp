@@ -757,7 +757,8 @@ Ext.onReady(function () {
                             if(data.success) {
                                 Ext.getCmp('edDate').setValue(data.data);
                             } else {
-                                Ext.MessageBox.alert("", data.errorMessage);
+                                console.log(data.errorMessage);
+                                Ext.getCmp('edDate').setValue(new Date());
                             }
                         }
                     });
