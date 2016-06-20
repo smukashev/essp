@@ -76,6 +76,9 @@ public class InfoReader extends MainReader {
                 }
                 data.setLength(0);
                 break;
+            case "name":
+                data.setLength(0);
+                break;
         }
 
         return false;
