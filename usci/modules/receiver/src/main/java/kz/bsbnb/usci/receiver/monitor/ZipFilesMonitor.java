@@ -249,9 +249,8 @@ public class ZipFilesMonitor {
     public void saveData(BatchInfo batchInfo, String filename, byte[] bytes, boolean isNB) {
         receiverStatusSingleton.batchReceived();
 
-        IBatchService batchService = serviceFactory.getBatchService();
-
         Batch batch = new Batch();
+        batch.setId(batchInfo.getBatchId());
         batch.setUserId(batchInfo.getUserId());
         batch.setFileName(filename);
         batch.setContent(bytes);
@@ -674,7 +673,14 @@ public class ZipFilesMonitor {
     }
 
     public void readFiles(String filename, Long userId, boolean isNB) {
+        Batch batch = new Batch();
+        batch.setUserId(userId);
+        batch.setFileName(filename);
+        batch.setReceiptDate(new Date());
+        batch.setId(batchService.save(batch));
+
         BatchInfo batchInfo = new BatchInfo();
+        batchInfo.setBatchId(batch.getId());
 
         try {
             ZipFile zipFile = new ZipFile(filename);
@@ -791,7 +797,7 @@ public class ZipFilesMonitor {
                 saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            failFast(batch.getId(), "Не корректный XML файл");
         }
     }
 
