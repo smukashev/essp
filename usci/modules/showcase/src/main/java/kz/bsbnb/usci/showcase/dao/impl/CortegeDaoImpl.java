@@ -653,27 +653,51 @@ public class CortegeDaoImpl extends CommonDao {
     }
 
     private boolean checkMaps(Map<ValueElement, Object> savingMap, Map<String, Object> dbMap) {
-        boolean equalityFlag = true;
+        Map<String, Object> tmpSavingMap = new HashMap<>();
+        Map<String, Object> tmpDbMap = new HashMap<>();
 
         for (Map.Entry<ValueElement, Object> innerEntry : savingMap.entrySet()) {
+            tmpSavingMap.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
+        }
+
+        for (Map.Entry<String, Object> innerEntry : dbMap.entrySet()) {
+            String key = innerEntry.getKey().toUpperCase();
+
+            if (key.equals("CLOSE_DATE") || key.equals("OPEN_DATE"))
+                continue;
+
+            tmpDbMap.put(key, innerEntry.getValue());
+        }
+
+        for (Map.Entry<String, Object> innerEntry : tmpSavingMap.entrySet()) {
             Object savingValue = innerEntry.getValue();
-            Object dbValue = dbMap.get(innerEntry.getKey().columnName.toUpperCase());
+            Object dbValue = tmpDbMap.get(innerEntry.getKey());
 
             if (savingValue == null && dbValue == null)
                 continue;
 
-            if (savingValue == null || dbValue == null) {
-                equalityFlag = false;
-                break;
-            }
+            if (savingValue == null || dbValue == null)
+                return false;
 
-            if (!compareValue(savingValue, dbValue)) {
-                equalityFlag = false;
-                break;
-            }
+            if (!compareValue(savingValue, dbValue))
+                return false;
         }
 
-        return equalityFlag;
+        for (Map.Entry<String, Object> innerEntry : tmpDbMap.entrySet()) {
+            Object dbValue = innerEntry.getValue();
+            Object savingValue = tmpSavingMap.get(innerEntry.getKey());
+
+            if (savingValue == null && dbValue == null)
+                continue;
+
+            if (savingValue == null || dbValue == null)
+                return false;
+
+            if (!compareValue(savingValue, dbValue))
+                return false;
+        }
+
+        return true;
     }
 
     @Transactional
