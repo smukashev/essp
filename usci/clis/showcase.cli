@@ -847,6 +847,25 @@ showcase addIndex nonunique credit_id
 showcase save
 
 #=================================================================================
+# REMAINS_VERT -- CUSTOM SUPPORT
+#=================================================================================
+showcase set meta credit
+showcase set name CUST_REMAINS_VERT
+showcase set tableName CUST_REMAINS_VERT
+showcase set final true
+
+showcase list add amount value
+showcase list add amount curr_value
+
+showcase list addCustom credit root creditor_id
+showcase list addCustom credit root account_id
+
+showcase list addCustom credit root type_code
+showcase list addCustom credit root type_id
+
+showcase save
+
+#=================================================================================
 # PORTFOLIO_FLOW_KFN
 #=================================================================================
 showcase set meta credit

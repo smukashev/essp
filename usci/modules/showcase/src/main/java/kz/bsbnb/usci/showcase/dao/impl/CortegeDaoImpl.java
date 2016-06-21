@@ -36,13 +36,22 @@ public class CortegeDaoImpl extends CommonDao {
     @SuppressWarnings("unchecked")
     @Transactional
     public void generate(IBaseEntity globalEntityApplied, ShowCase showCase) {
-        if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0) {
-            List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath());
-
-            rootCortegeGenerate(globalEntityApplied, allApplied, showCase);
+        if (showCase.getTableName().equals("CORE_REMAINS_VERT")) {
+            remainsCortegeGenerate(globalEntityApplied, showCase);
         } else {
-            rootCortegeGenerate(globalEntityApplied, Collections.singletonList((BaseEntity) globalEntityApplied), showCase);
+            if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0) {
+                List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath());
+
+                rootCortegeGenerate(globalEntityApplied, allApplied, showCase);
+            } else {
+                rootCortegeGenerate(globalEntityApplied, Collections.singletonList((BaseEntity) globalEntityApplied), showCase);
+            }
         }
+    }
+
+    private void remainsCortegeGenerate(IBaseEntity globalEntity, ShowCase showCase) {
+        final long creditId = globalEntity.getId();
+        final long creditorId = globalEntity.getBaseEntityReportDate().getCreditorId();
     }
 
     /* Performs main operations on showcase  */
