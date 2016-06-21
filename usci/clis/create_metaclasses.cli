@@ -874,7 +874,7 @@ sql update eav_m_simple_attributes set title='Четырехзначный но�
 sql update eav_m_simple_attributes set title='Имя' where name='firstname'
 sql update eav_m_simple_attributes set title='Ликвидность' where name='is_liquid_all'
 sql update eav_m_simple_attributes set title='Дата выпуска' where name='actual_issue_date'
-sql update eav_m_simple_attributes set title='Дата погашения займа' where name='contract_maturity_date'
+sql update eav_m_simple_attributes set title='Дата погашения займа по условиям договора' where name='contract_maturity_date'
 sql update eav_m_simple_attributes set title='Годовая процентная ставка' where name='interest_rate_yearly'
 sql update eav_m_simple_attributes set title='Допустимое количество знаков' where name='sign_count'
 sql update eav_m_simple_attributes set title='Признак принадлежности к юридическим лицам' where name='is_organization_doc'
