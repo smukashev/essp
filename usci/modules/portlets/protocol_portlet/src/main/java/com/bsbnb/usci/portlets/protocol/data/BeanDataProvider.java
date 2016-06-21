@@ -76,7 +76,8 @@ public class BeanDataProvider implements DataProvider {
         List<ProtocolDisplayBean> result = new ArrayList<>();
 
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-        String sRepDate = df.format(inputInfo.getInputInfo().getReportDate());
+        Date reportDate = inputInfo.getInputInfo().getReportDate();
+        String sRepDate = (reportDate == null) ? "" : df.format(reportDate);
 
         for (Protocol protocol : protocols) {
             ProtocolDisplayBean pr = new ProtocolDisplayBean(protocol);

@@ -2,6 +2,7 @@ package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.IBatchService;
 import kz.bsbnb.usci.core.service.IGlobalService;
+import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EavGlobal;
@@ -203,6 +204,11 @@ public class BatchServiceImpl implements IBatchService {
     @Override
     public List<Batch> getAll(Date repDate) {
         return batchDao.getAll(repDate);
+    }
+
+    @Override
+    public List<Batch> getAll(Date repDate, List<Creditor> creditorsList) {
+        return batchDao.getAll(repDate, creditorsList);
     }
 
     private void setHash(Batch batch) {
