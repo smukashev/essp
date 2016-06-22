@@ -856,11 +856,11 @@ showcase set final true
 
 showcase list add amount value
 showcase list add amount curr_value
+showcase list add creditor.name type_code
 
 showcase list addCustom credit root creditor_id
 showcase list addCustom credit root account_id
 
-showcase list addCustom credit root type_code
 showcase list addCustom credit root type_id
 
 showcase save

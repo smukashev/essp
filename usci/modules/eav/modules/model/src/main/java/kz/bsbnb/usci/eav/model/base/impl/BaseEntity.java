@@ -557,7 +557,17 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return true;
     }
 
+    @Override
+    public Object getInnerValue(String attributeName) {
+        IBaseValue baseValue = getBaseValue(attributeName);
 
+        if (baseValue != null)
+            return baseValue.getValue();
+
+        return null;
+    }
+
+    @Override
     public IBaseValue safeGetValue(String name) {
         if (this.getAttributes().contains(name)) {
             return getBaseValue(name);
