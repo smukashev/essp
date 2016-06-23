@@ -33,11 +33,13 @@ public class CortegeDaoImpl extends CommonDao {
     private static final String ROOT = "root";
     private static final String ROOT_DOT = "root.";
 
+    private final String custRemainsVert = "CUST_REMAINS_VERT";
+
     @SuppressWarnings("unchecked")
     @Transactional
-    public void generate(IBaseEntity globalEntityApplied, ShowCase showCase) {
-        if (showCase.getTableName().equals("CUST_REMAINS_VERT")) {
-            remainsCortegeGenerate(globalEntityApplied, showCase);
+    public void generate(final IBaseEntity globalEntityApplied, final ShowCase showCase) {
+        if (showCase.getTableName().equals(custRemainsVert)) {
+            remainsCortegeGenerate(globalEntityApplied);
         } else {
             if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0) {
                 List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath());
@@ -49,7 +51,7 @@ public class CortegeDaoImpl extends CommonDao {
         }
     }
 
-    private void remainsCortegeGenerate(IBaseEntity globalEntity, ShowCase showCase) {
+    private void remainsCortegeGenerate(IBaseEntity globalEntity) {
         final Long creditId = globalEntity.getId();
         final Long creditorId = globalEntity.getBaseEntityReportDate().getCreditorId();
         final Date repDate = globalEntity.getReportDate();
@@ -293,11 +295,6 @@ public class CortegeDaoImpl extends CommonDao {
         jdbcTemplateSC.update(sql, sql,
                 new Object[] {globalEntity.getId(), globalEntity.getReportDate()});
 
-        sql = "DELETE FROM R_CORE_CREDIT_FLOW WHERE credit_id = ? and rep_date = ?";
-
-        jdbcTemplateSC.update("DELETE FROM R_CUST_REMAINS_VERT WHERE credit_id = ? ", sql,
-                new Object[] {globalEntity.getId(), globalEntity.getReportDate()});
-
         for(Map<String, Object> map : mapList) {
             simpleInsertString(map, "R_CUST_REMAINS_VERT");
         }
@@ -321,7 +318,7 @@ public class CortegeDaoImpl extends CommonDao {
 
     /* Performs main operations on showcase  */
     @Transactional
-    private void rootCortegeGenerate(IBaseEntity globalEntity, List<BaseEntity> entities, ShowCase showCase) {
+    private void rootCortegeGenerate(final IBaseEntity globalEntity, final List<BaseEntity> entities, final ShowCase showCase) {
         String sql;
 
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = new HashMap<>();
@@ -531,11 +528,6 @@ public class CortegeDaoImpl extends CommonDao {
                     }
                 }
             } else {
-                sql = "DELETE FROM %s WHERE " + historyKeyElement.queryKeys + " and rep_date = ?";
-
-                jdbcTemplateSC.update("DELETE FROM %s WHERE + historyKeyElement.queryKeys + and rep_date = ?", String.format(sql, getActualTableName(showCase), COLUMN_PREFIX,
-                        showCase.getRootClassName()), getObjectArray(false, historyKeyElement.values, entity.getReportDate()));
-
                 entryMap.put(new ValueElement("REP_DATE", 0L, 0), entity.getReportDate());
                 simpleInsertValueElement(entryMap, getActualTableName(showCase));
             }
@@ -855,8 +847,10 @@ public class CortegeDaoImpl extends CommonDao {
         }
     }
 
+    @Transactional
     private void cleanCurrentReportDate (ShowCase showCase, KeyElement rootKeyElement, IBaseEntity entity) {
         String sql;
+
         if (!showCase.isFinal()) {
             sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys + " and open_date = ?";
 
@@ -867,6 +861,8 @@ public class CortegeDaoImpl extends CommonDao {
                     showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
         } else {
             sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys + " and rep_date = ?";
+
+            System.out.println(showCase.getTableName());
 
             jdbcTemplateSC.update("DELETE FROM %s WHERE + rootKeyElement.queryKeys + and rep_date = ?", String.format(sql, getActualTableName(showCase), COLUMN_PREFIX,
                     showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
