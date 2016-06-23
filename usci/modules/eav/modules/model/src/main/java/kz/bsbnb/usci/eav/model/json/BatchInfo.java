@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class BatchInfo {
+    private long batchId;
     private String batchType;
     private String batchName;
     private Long size;
@@ -26,6 +27,7 @@ public class BatchInfo {
     }
 
     public BatchInfo(Batch batch) {
+        setBatchId(batch.getId());
         setReportId(batch.getReportId());
         setRepDate(batch.getRepDate());
         setBatchType(batch.getBatchType());
@@ -36,6 +38,14 @@ public class BatchInfo {
         setCreditorId(batch.getCreditorId());
         setContentSize(batch.getContent() == null ? 0 : batch.getContent().length);
         setReceiptDate(batch.getReceiptDate());
+    }
+
+    public long getBatchId() {
+        return batchId;
+    }
+
+    public void setBatchId(long batchId) {
+        this.batchId = batchId;
     }
 
     public String getBatchName() {

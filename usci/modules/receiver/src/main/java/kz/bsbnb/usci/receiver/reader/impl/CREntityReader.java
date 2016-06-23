@@ -85,7 +85,7 @@ public class CREntityReader<T> extends CommonReader<T> {
             batchService.addBatchStatus(new BatchStatus()
                     .setBatchId(batchId)
                     .setStatus(BatchStatuses.ERROR)
-                    .setDescription(e.getMessage())
+                    .setDescription("XML не прошёл проверку XSD: " + e.getMessage())
                     .setReceiptDate(new Date()));
 
             throw new RuntimeException(e);

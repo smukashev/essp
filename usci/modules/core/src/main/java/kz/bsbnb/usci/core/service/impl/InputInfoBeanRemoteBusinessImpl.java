@@ -41,7 +41,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             inputCreditors.put(cred.getId(), cred);
         }
 
-        List<Batch> batchList = batchService.getAll(reportDate);
+        List<Batch> batchList = batchService.getAll(reportDate, creditorsList);
 
         for (Batch batch : batchList) {
             Creditor currentCreditor = inputCreditors.get(batch.getCreditorId());

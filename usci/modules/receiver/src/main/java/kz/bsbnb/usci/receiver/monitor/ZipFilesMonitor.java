@@ -249,9 +249,8 @@ public class ZipFilesMonitor {
     public void saveData(BatchInfo batchInfo, String filename, byte[] bytes, boolean isNB) {
         receiverStatusSingleton.batchReceived();
 
-        IBatchService batchService = serviceFactory.getBatchService();
-
         Batch batch = new Batch();
+        batch.setId(batchInfo.getBatchId());
         batch.setUserId(batchInfo.getUserId());
         batch.setFileName(filename);
         batch.setContent(bytes);
@@ -674,7 +673,34 @@ public class ZipFilesMonitor {
     }
 
     public void readFiles(String filename, Long userId, boolean isNB) {
+        Batch batch = new Batch();
+        batch.setUserId(userId);
+        batch.setFileName(filename);
+        batch.setReceiptDate(new Date());
+        batch.setCreditorId(0L);
+
+        if (userId != null && userId > 0 && !isNB) {
+            List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(userId);
+
+            if (cList.size() == 0) {
+                batch.setId(batchService.save(batch));
+                failFast(batch.getId(), "Нет доступных кредиторов для " + userId);
+                return;
+            }
+
+            if (cList.size() == 1) {
+                batch.setCreditorId(cList.get(0).getId());
+            } else {
+                batch.setId(batchService.save(batch));
+                failFast(batch.getId(), "Доступно больше одного кредитора для " + userId);
+                return;
+            }
+        }
+
+        batch.setId(batchService.save(batch));
+
         BatchInfo batchInfo = new BatchInfo();
+        batchInfo.setBatchId(batch.getId());
 
         try {
             ZipFile zipFile = new ZipFile(filename);
@@ -791,7 +817,7 @@ public class ZipFilesMonitor {
                 saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            failFast(batch.getId(), "Не корректный XML файл");
         }
     }
 
