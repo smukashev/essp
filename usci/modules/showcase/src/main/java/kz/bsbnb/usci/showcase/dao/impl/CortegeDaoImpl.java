@@ -862,8 +862,6 @@ public class CortegeDaoImpl extends CommonDao {
         } else {
             sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys + " and rep_date = ?";
 
-            System.out.println(showCase.getTableName());
-
             jdbcTemplateSC.update("DELETE FROM %s WHERE + rootKeyElement.queryKeys + and rep_date = ?", String.format(sql, getActualTableName(showCase), COLUMN_PREFIX,
                     showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values, entity.getReportDate()));
         }
