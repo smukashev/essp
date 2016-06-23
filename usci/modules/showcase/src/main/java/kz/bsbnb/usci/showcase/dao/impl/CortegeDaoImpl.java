@@ -288,10 +288,11 @@ public class CortegeDaoImpl extends CommonDao {
             }
         }
 
-        String sql = "DELETE FROM %s WHERE credit_id = ?";
+        String sql = "DELETE FROM %s WHERE credit_id = ? and rep_date = ?";
         sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
 
-        jdbcTemplateSC.update("DELETE FROM R_CUST_REMAINS_VERT WHERE credit_id = ? ", sql, new Object[] {globalEntity.getId()});
+        jdbcTemplateSC.update("DELETE FROM R_CUST_REMAINS_VERT WHERE credit_id = ? ", sql,
+                new Object[] {globalEntity.getId(), globalEntity.getReportDate()});
 
         for(Map<String, Object> map : mapList) {
             simpleInsertString(map, "R_CUST_REMAINS_VERT");
