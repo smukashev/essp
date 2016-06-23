@@ -677,6 +677,26 @@ public class ZipFilesMonitor {
         batch.setUserId(userId);
         batch.setFileName(filename);
         batch.setReceiptDate(new Date());
+        batch.setCreditorId(0L);
+
+        if (userId != null && userId > 0 && !isNB) {
+            List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(userId);
+
+            if (cList.size() == 0) {
+                batch.setId(batchService.save(batch));
+                failFast(batch.getId(), "Нет доступных кредиторов для " + userId);
+                return;
+            }
+
+            if (cList.size() == 1) {
+                batch.setCreditorId(cList.get(0).getId());
+            } else {
+                batch.setId(batchService.save(batch));
+                failFast(batch.getId(), "Доступно больше одного кредитора для " + userId);
+                return;
+            }
+        }
+
         batch.setId(batchService.save(batch));
 
         BatchInfo batchInfo = new BatchInfo();

@@ -1,38 +1,26 @@
 package com.bsbnb.usci.portlets.protocol;
 
-import java.io.IOException;
-import java.security.AccessControlException;
-
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.EventRequest;
-import javax.portlet.EventResponse;
-import javax.portlet.PortletContext;
-import javax.portlet.PortletException;
-import javax.portlet.PortletRequestDispatcher;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
-
 import com.bsbnb.usci.portlets.protocol.data.BeanDataProvider;
 import com.bsbnb.usci.portlets.protocol.data.DataProvider;
-import com.bsbnb.usci.portlets.protocol.ui.Localization;
 import com.bsbnb.usci.portlets.protocol.ui.ProtocolLayout;
-import com.bsbnb.vaadin.messagebox.MessageBox;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.process.ExceptionProcessCallable;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.vaadin.Application;
+import com.vaadin.terminal.DownloadStream;
+import com.vaadin.terminal.FileResource;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
+import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.apache.log4j.Logger;
+
+import javax.portlet.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.math.BigInteger;
+import java.security.AccessControlException;
 
 public class ProtocolApplication extends Application {
     private static final long serialVersionUID = 2096197512742005243L;
@@ -92,11 +80,49 @@ public class ProtocolApplication extends Application {
                 DataProvider provider = new BeanDataProvider();
                 mainWindow.addComponent(new ProtocolLayout(provider));
                 setMainWindow(mainWindow);
+
+                if (user != null) {
+                    for (Role role : user.getRoles()) {
+                        if (role.getName().equals("Administrator")) {
+                            String batchIdString = PortalUtil.getOriginalServletRequest(PortalUtil.getHttpServletRequest(request)).getParameter("batchId");
+                            if (batchIdString != null) {
+                                for (String batchId : batchIdString.split("\\|")) {
+                                    DownloadBatch(mainWindow, provider, batchId);
+                                }
+                            }
+                        }
+                    }
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
                 getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
             }
+        }
+
+        private void DownloadBatch(final Window mainWindow, DataProvider provider, String batchIdString) {
+            final BigInteger batchId = new BigInteger(batchIdString);
+
+            final BatchFullJModel batchFullJModel = provider.getBatchFullModel(batchId);
+
+            final File batchFile = new File("batch_" + batchId + ".zip");
+
+            FileResource resource = new FileResource(batchFile, mainWindow.getApplication()) {
+                @Override
+                public DownloadStream getStream() {
+                    final DownloadStream ds = new DownloadStream(
+                            new ByteArrayInputStream(batchFullJModel.getContent()),
+                            "application/zip",
+                            new File(batchFullJModel.getFileName()).getName()
+                    );
+
+                    ds.setParameter("Content-Length", String.valueOf(batchFullJModel.getContent()));
+                    ds.setCacheTime(DownloadStream.DEFAULT_CACHETIME);
+                    return ds;
+                }
+            };
+
+            mainWindow.getWindow().open(resource, "_blank");
         }
 
         @Override

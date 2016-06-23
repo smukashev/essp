@@ -33,21 +33,308 @@ public class CortegeDaoImpl extends CommonDao {
     private static final String ROOT = "root";
     private static final String ROOT_DOT = "root.";
 
+    private static final String custRemainsVert = "CUST_REMAINS_VERT";
+
     @SuppressWarnings("unchecked")
     @Transactional
-    public void generate(IBaseEntity globalEntityApplied, ShowCase showCase) {
-        if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0) {
-            List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath());
-
-            rootCortegeGenerate(globalEntityApplied, allApplied, showCase);
+    public void generate(final IBaseEntity globalEntityApplied, final ShowCase showCase) {
+        if (showCase.getTableName().equals(custRemainsVert)) {
+            remainsCortegeGenerate(globalEntityApplied);
         } else {
-            rootCortegeGenerate(globalEntityApplied, Collections.singletonList((BaseEntity) globalEntityApplied), showCase);
+            if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0) {
+                List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath());
+
+                rootCortegeGenerate(globalEntityApplied, allApplied, showCase);
+            } else {
+                rootCortegeGenerate(globalEntityApplied, Collections.singletonList((BaseEntity) globalEntityApplied), showCase);
+            }
         }
+    }
+
+    @Transactional
+    private void remainsCortegeGenerate(IBaseEntity globalEntity) {
+        final Long creditId = globalEntity.getId();
+        final Long creditorId = globalEntity.getBaseEntityReportDate().getCreditorId();
+        final Date repDate = globalEntity.getReportDate();
+
+        final List<Map<String, Object>> mapList = new ArrayList<>();
+
+        final IBaseValue changeBaseValue = globalEntity.getBaseValue("change");
+
+        if (changeBaseValue == null || changeBaseValue.getValue() == null)
+            return;
+
+        final IBaseEntity changeBaseEntity = (IBaseEntity) changeBaseValue.getValue();
+
+        final IBaseValue remainsBaseValue = changeBaseEntity.getBaseValue("remains");
+        final IBaseValue creditFlowBaseValue = changeBaseEntity.getBaseValue("credit_flow");
+
+        // remains
+        if (remainsBaseValue != null && remainsBaseValue.getValue() != null) {
+            IBaseEntity remainsBaseEntity = (IBaseEntity) remainsBaseValue.getValue();
+
+            // limit
+            IBaseValue limitBaseValue = remainsBaseEntity.getBaseValue("limit");
+            if (limitBaseValue != null && limitBaseValue.getValue() != null) {
+                IBaseEntity limitEntity = (IBaseEntity) limitBaseValue.getValue();
+
+                Long balanceAccountId = null;
+
+                if (limitEntity.getInnerValue("balance_account") != null) {
+                    balanceAccountId = ((IBaseEntity) limitEntity.getInnerValue("balance_account")).getId();
+                }
+
+                constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
+                        limitEntity.getInnerValue("value"),
+                        limitEntity.getInnerValue("value_currency"), "10", 102L, null, null, null);
+            }
+
+            // interest
+            IBaseValue interestBaseValue = remainsBaseEntity.getBaseValue("interest");
+            if (interestBaseValue != null && interestBaseValue.getValue() != null) {
+                IBaseEntity interestBaseEntity = (IBaseEntity) interestBaseValue.getValue();
+
+                // current
+                IBaseValue currentBaseValue = interestBaseEntity.getBaseValue("current");
+                if (currentBaseValue != null && currentBaseValue.getValue() != null) {
+                    IBaseEntity currentBaseEntity = (IBaseEntity) currentBaseValue.getValue();
+
+                    Long balanceAccountId = null;
+
+                    if (currentBaseEntity.getInnerValue("balance_account") != null) {
+                        balanceAccountId = ((IBaseEntity) currentBaseEntity.getInnerValue("balance_account")).getId();
+                    }
+
+                    constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
+                            currentBaseEntity.getInnerValue("value"),
+                            currentBaseEntity.getInnerValue("value_currency"), "4", 58L, null, null, null);
+                }
+
+                // pastdue
+                IBaseValue pastdueBaseValue = interestBaseEntity.getBaseValue("pastdue");
+                if (pastdueBaseValue != null && pastdueBaseValue.getValue() != null) {
+                    IBaseEntity pastdueBaseEntity = (IBaseEntity) pastdueBaseValue.getValue();
+
+                    Long balanceAccountId = null;
+
+                    if (pastdueBaseEntity.getInnerValue("balance_account") != null) {
+                        balanceAccountId = ((IBaseEntity) pastdueBaseEntity.getInnerValue("balance_account")).getId();
+                    }
+
+                    Date openDate = (Date) pastdueBaseEntity.getInnerValue("open_date");
+                    Date closeDate = (Date) pastdueBaseEntity.getInnerValue("close_date");
+
+                    constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
+                            pastdueBaseEntity.getInnerValue("value"),
+                            pastdueBaseEntity.getInnerValue("value_currency"), "5", 59L,
+                            openDate, closeDate, null);
+                }
+
+                // write_off
+                IBaseValue wrtBaseValue = interestBaseEntity.getBaseValue("write_off");
+                if (wrtBaseValue != null && wrtBaseValue.getValue() != null) {
+                    IBaseEntity wrtBaseEntity = (IBaseEntity) wrtBaseValue.getValue();
+
+                    Date date = (Date) wrtBaseEntity.getInnerValue("date");
+
+                    constructRemainsMap(mapList, creditId, creditorId, repDate, null,
+                            wrtBaseEntity.getInnerValue("value"),
+                            wrtBaseEntity.getInnerValue("value_currency"), "6", 60L, null, null, date);
+                }
+            }
+
+            // debt
+            IBaseValue debtBaseValue = remainsBaseEntity.getBaseValue("debt");
+            if (debtBaseValue != null && debtBaseValue.getValue() != null) {
+                IBaseEntity debtBaseEntity = (IBaseEntity) debtBaseValue.getValue();
+
+                // current
+                IBaseValue currentBaseValue = debtBaseEntity.getBaseValue("current");
+                if (currentBaseValue != null && currentBaseValue.getValue() != null) {
+                    IBaseEntity currentBaseEntity = (IBaseEntity) currentBaseValue.getValue();
+
+                    Long balanceAccountId = null;
+
+                    if (currentBaseEntity.getInnerValue("balance_account") != null) {
+                        balanceAccountId = ((IBaseEntity) currentBaseEntity.getInnerValue("balance_account")).getId();
+                    }
+
+                    constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
+                            currentBaseEntity.getInnerValue("value"),
+                            currentBaseEntity.getInnerValue("value_currency"), "1", 55L, null, null, null);
+                }
+
+                // pastdue
+                IBaseValue pastdueBaseValue = debtBaseEntity.getBaseValue("pastdue");
+                if (pastdueBaseValue != null && pastdueBaseValue.getValue() != null) {
+                    IBaseEntity pastdueBaseEntity = (IBaseEntity) pastdueBaseValue.getValue();
+
+                    Long balanceAccountId = null;
+
+                    if (pastdueBaseEntity.getInnerValue("balance_account") != null) {
+                        balanceAccountId = ((IBaseEntity) pastdueBaseEntity.getInnerValue("balance_account")).getId();
+                    }
+
+                    Date openDate = (Date) pastdueBaseEntity.getInnerValue("open_date");
+                    Date closeDate = (Date) pastdueBaseEntity.getInnerValue("close_date");
+
+                    constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
+                            pastdueBaseEntity.getInnerValue("value"),
+                            pastdueBaseEntity.getInnerValue("value_currency"), "2", 56L, openDate, closeDate, null);
+                }
+
+                // write_off
+                IBaseValue wrtBaseValue = debtBaseEntity.getBaseValue("write_off");
+                if (wrtBaseValue != null && wrtBaseValue.getValue() != null) {
+                    IBaseEntity wrtBaseEntity = (IBaseEntity) wrtBaseValue.getValue();
+
+                    Long balanceAccountId = null;
+
+                    if (wrtBaseEntity.getInnerValue("balance_account") != null) {
+                        balanceAccountId = ((IBaseEntity) wrtBaseEntity.getInnerValue("balance_account")).getId();
+                    }
+
+                    Date date = (Date) wrtBaseEntity.getInnerValue("date");
+
+                    constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
+                            wrtBaseEntity.getInnerValue("value"),
+                            wrtBaseEntity.getInnerValue("value_currency"), "3", 57L, null, null, date);
+                }
+            }
+
+            // discount
+            IBaseValue discountBaseValue = remainsBaseEntity.getBaseValue("discount");
+            if (discountBaseValue != null && discountBaseValue.getValue() != null) {
+                IBaseEntity discountEntity = (IBaseEntity) discountBaseValue.getValue();
+
+                Long balanceAccountId = null;
+
+                if (discountEntity.getInnerValue("balance_account") != null) {
+                    balanceAccountId = ((IBaseEntity) discountEntity.getInnerValue("balance_account")).getId();
+                }
+
+                constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
+                        discountEntity.getInnerValue("value"),
+                        discountEntity.getInnerValue("value_currency"), "7", 61L, null, null, null);
+            }
+
+            // discounted_value
+            IBaseValue discountedValueBaseValue = remainsBaseEntity.getBaseValue("discounted_value");
+            if (discountedValueBaseValue != null && discountedValueBaseValue.getValue() != null) {
+                IBaseEntity discountedValueBaseEntity = (IBaseEntity) discountedValueBaseValue.getValue();
+                constructRemainsMap(mapList, creditId, creditorId, repDate, null,
+                        discountedValueBaseEntity.getInnerValue("value"),
+                        discountedValueBaseEntity.getInnerValue("value"), "9", 63L, null, null, null);
+            }
+
+            // correction
+            IBaseValue correctionBaseValue = remainsBaseEntity.getBaseValue("correction");
+            if (correctionBaseValue != null && correctionBaseValue.getValue() != null) {
+                IBaseEntity correctionEntity = (IBaseEntity) correctionBaseValue.getValue();
+
+                Long balanceAccountId = null;
+
+                if (correctionEntity.getInnerValue("balance_account") != null) {
+                    balanceAccountId = ((IBaseEntity) correctionEntity.getInnerValue("balance_account")).getId();
+                }
+
+                constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
+                        correctionEntity.getInnerValue("value"),
+                        correctionEntity.getInnerValue("value_currency"), "8", 62L, null, null, null);
+            }
+        }
+
+        if (creditFlowBaseValue != null && creditFlowBaseValue.getValue() != null) {
+            IBaseEntity creditFlowBaseEntity = (IBaseEntity) creditFlowBaseValue.getValue();
+
+            // provision
+            IBaseValue provisionBaseValue = creditFlowBaseEntity.getBaseValue("provision");
+            if (provisionBaseValue != null && provisionBaseValue.getValue() != null) {
+                IBaseEntity provisionEntity = (IBaseEntity) provisionBaseValue.getValue();
+
+                // provision_kfn
+                IBaseValue provisionKfnBaseValue = provisionEntity.getBaseValue("provision_kfn");
+                if (provisionKfnBaseValue != null && provisionKfnBaseValue.getValue() != null) {
+                    IBaseEntity provisionKfnBaseEntity = (IBaseEntity) provisionKfnBaseValue.getValue();
+
+                    Long balanceAccountId = null;
+
+                    if (provisionKfnBaseEntity.getInnerValue("balance_account") != null) {
+                        balanceAccountId = ((IBaseEntity) provisionKfnBaseEntity.getInnerValue("balance_account")).getId();
+                    }
+
+                    constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
+                            provisionKfnBaseEntity.getInnerValue("value"),
+                            provisionKfnBaseEntity.getInnerValue("value"), "11", 103L, null, null, null);
+                }
+
+                // provision_msfo
+                IBaseValue provisionMsfoBaseValue = provisionEntity.getBaseValue("provision_msfo");
+                if (provisionMsfoBaseValue != null && provisionMsfoBaseValue.getValue() != null) {
+                    IBaseEntity provisionMsfoBaseEntity = (IBaseEntity) provisionMsfoBaseValue.getValue();
+
+                    Long balanceAccountId = null;
+
+                    if (provisionMsfoBaseEntity.getInnerValue("balance_account") != null) {
+                        balanceAccountId = ((IBaseEntity) provisionMsfoBaseEntity.getInnerValue("balance_account")).getId();
+                    }
+
+                    constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
+                            provisionMsfoBaseEntity.getInnerValue("value"),
+                            provisionMsfoBaseEntity.getInnerValue("value"), "12", 104L, null, null, null);
+                }
+
+                // provision_msfo_ob
+                IBaseValue provisionMsfoObBaseValue = provisionEntity.getBaseValue("provision_msfo_over_balance");
+                if (provisionMsfoObBaseValue != null && provisionMsfoObBaseValue.getValue() != null) {
+                    IBaseEntity provisionMsfoObBaseEntity = (IBaseEntity) provisionMsfoObBaseValue.getValue();
+
+                    Long balanceAccountId = null;
+
+                    if (provisionMsfoObBaseEntity.getInnerValue("balance_account") != null) {
+                        balanceAccountId = ((IBaseEntity) provisionMsfoObBaseEntity.getInnerValue("balance_account")).getId();
+                    }
+
+                    constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
+                            provisionMsfoObBaseEntity.getInnerValue("value"),
+                            provisionMsfoObBaseEntity.getInnerValue("value"), "13", 129L, null, null, null);
+                }
+            }
+        }
+
+        String sql = "DELETE FROM R_CUST_REMAINS_VERT WHERE credit_id = ? and rep_date = ?";
+
+        jdbcTemplateSC.update(sql, sql,
+                new Object[] {globalEntity.getId(), globalEntity.getReportDate()});
+
+        for(Map<String, Object> map : mapList) {
+            simpleInsertString(map, "R_CUST_REMAINS_VERT");
+        }
+    }
+
+    private void constructRemainsMap (List<Map<String, Object>> mapList, Long creditId, Long creditorId, Date repDate,
+                                      Long accountId, Object value, Object currValue, String typeCode, Long typeId,
+                                      Date pastdueOpenDate, Date pastdueCloseDate, Date writeOffDate) {
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("CREDIT_ID", creditId);
+        map.put("CREDITOR_ID", creditorId);
+        map.put("REP_DATE", repDate);
+        map.put("ACCOUNT_ID", accountId);
+        map.put("VALUE",  value);
+        map.put("CURR_VALUE", currValue);
+        map.put("TYPE_CODE", typeCode);
+        map.put("TYPE_ID", typeId);
+        map.put("PASTDUE_OPEN_DATE", pastdueOpenDate);
+        map.put("PASTDUE_CLOSE_DATE", pastdueCloseDate);
+        map.put("WRITE_OFF_DATE", writeOffDate);
+
+        mapList.add(map);
     }
 
     /* Performs main operations on showcase  */
     @Transactional
-    private void rootCortegeGenerate(IBaseEntity globalEntity, List<BaseEntity> entities, ShowCase showCase) {
+    private void rootCortegeGenerate(final IBaseEntity globalEntity, final List<BaseEntity> entities, final ShowCase showCase) {
         String sql;
 
         HashMap<ArrayElement, HashMap<ValueElement, Object>> savingMap = new HashMap<>();
@@ -257,11 +544,6 @@ public class CortegeDaoImpl extends CommonDao {
                     }
                 }
             } else {
-                sql = "DELETE FROM %s WHERE " + historyKeyElement.queryKeys + " and rep_date = ?";
-
-                jdbcTemplateSC.update("DELETE FROM %s WHERE + historyKeyElement.queryKeys + and rep_date = ?", String.format(sql, getActualTableName(showCase), COLUMN_PREFIX,
-                        showCase.getRootClassName()), getObjectArray(false, historyKeyElement.values, entity.getReportDate()));
-
                 entryMap.put(new ValueElement("REP_DATE", 0L, 0), entity.getReportDate());
                 simpleInsertValueElement(entryMap, getActualTableName(showCase));
             }
@@ -581,8 +863,10 @@ public class CortegeDaoImpl extends CommonDao {
         }
     }
 
+    @Transactional
     private void cleanCurrentReportDate (ShowCase showCase, KeyElement rootKeyElement, IBaseEntity entity) {
         String sql;
+
         if (!showCase.isFinal()) {
             sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys + " and open_date = ?";
 
@@ -653,27 +937,51 @@ public class CortegeDaoImpl extends CommonDao {
     }
 
     private boolean checkMaps(Map<ValueElement, Object> savingMap, Map<String, Object> dbMap) {
-        boolean equalityFlag = true;
+        Map<String, Object> tmpSavingMap = new HashMap<>();
+        Map<String, Object> tmpDbMap = new HashMap<>();
 
         for (Map.Entry<ValueElement, Object> innerEntry : savingMap.entrySet()) {
+            tmpSavingMap.put(innerEntry.getKey().columnName.toUpperCase(), innerEntry.getValue());
+        }
+
+        for (Map.Entry<String, Object> innerEntry : dbMap.entrySet()) {
+            String key = innerEntry.getKey().toUpperCase();
+
+            if (key.equals("CLOSE_DATE") || key.equals("OPEN_DATE"))
+                continue;
+
+            tmpDbMap.put(key, innerEntry.getValue());
+        }
+
+        for (Map.Entry<String, Object> innerEntry : tmpSavingMap.entrySet()) {
             Object savingValue = innerEntry.getValue();
-            Object dbValue = dbMap.get(innerEntry.getKey().columnName.toUpperCase());
+            Object dbValue = tmpDbMap.get(innerEntry.getKey());
 
             if (savingValue == null && dbValue == null)
                 continue;
 
-            if (savingValue == null || dbValue == null) {
-                equalityFlag = false;
-                break;
-            }
+            if (savingValue == null || dbValue == null)
+                return false;
 
-            if (!compareValue(savingValue, dbValue)) {
-                equalityFlag = false;
-                break;
-            }
+            if (!compareValue(savingValue, dbValue))
+                return false;
         }
 
-        return equalityFlag;
+        for (Map.Entry<String, Object> innerEntry : tmpDbMap.entrySet()) {
+            Object dbValue = innerEntry.getValue();
+            Object savingValue = tmpSavingMap.get(innerEntry.getKey());
+
+            if (savingValue == null && dbValue == null)
+                continue;
+
+            if (savingValue == null || dbValue == null)
+                return false;
+
+            if (!compareValue(savingValue, dbValue))
+                return false;
+        }
+
+        return true;
     }
 
     @Transactional

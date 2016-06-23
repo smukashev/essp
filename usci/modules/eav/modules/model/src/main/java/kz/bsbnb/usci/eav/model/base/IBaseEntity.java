@@ -31,6 +31,8 @@ public interface IBaseEntity extends IBaseContainer {
 
     List<Object> getElWithArrays(String path);
 
+    Object getInnerValue(String attributeName);
+
     IBaseValue safeGetValue(String name);
 
     void calculateValueCount(IBaseEntity baseEntityLoaded);
