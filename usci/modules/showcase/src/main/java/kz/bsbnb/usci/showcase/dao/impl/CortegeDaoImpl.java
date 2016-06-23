@@ -51,6 +51,7 @@ public class CortegeDaoImpl extends CommonDao {
         }
     }
 
+    @Transactional
     private void remainsCortegeGenerate(IBaseEntity globalEntity) {
         final Long creditId = globalEntity.getId();
         final Long creditorId = globalEntity.getBaseEntityReportDate().getCreditorId();
