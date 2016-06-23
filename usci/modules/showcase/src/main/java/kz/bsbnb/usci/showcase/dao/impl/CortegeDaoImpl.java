@@ -271,7 +271,7 @@ public class CortegeDaoImpl extends CommonDao {
                 }
 
                 // provision_msfo_ob
-                IBaseValue provisionMsfoObBaseValue = provisionEntity.getBaseValue("provision_msfo");
+                IBaseValue provisionMsfoObBaseValue = provisionEntity.getBaseValue("provision_msfo_over_balance");
                 if (provisionMsfoObBaseValue != null && provisionMsfoObBaseValue.getValue() != null) {
                     IBaseEntity provisionMsfoObBaseEntity = (IBaseEntity) provisionMsfoObBaseValue.getValue();
 
@@ -288,8 +288,12 @@ public class CortegeDaoImpl extends CommonDao {
             }
         }
 
-        String sql = "DELETE FROM %s WHERE credit_id = ? and rep_date = ?";
-        sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+        String sql = "DELETE FROM R_CUST_REMAINS_VERT WHERE credit_id = ? and rep_date = ?";
+
+        jdbcTemplateSC.update(sql, sql,
+                new Object[] {globalEntity.getId(), globalEntity.getReportDate()});
+
+        sql = "DELETE FROM R_CORE_CREDIT_FLOW WHERE credit_id = ? and rep_date = ?";
 
         jdbcTemplateSC.update("DELETE FROM R_CUST_REMAINS_VERT WHERE credit_id = ? ", sql,
                 new Object[] {globalEntity.getId(), globalEntity.getReportDate()});
