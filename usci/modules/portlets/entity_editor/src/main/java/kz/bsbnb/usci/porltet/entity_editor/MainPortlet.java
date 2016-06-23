@@ -165,8 +165,9 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
-    private String clearSlashes(String str) {
-        String outStr = str.replaceAll("\"", "\\\\\"");
+    private String escapeSlashesAndQuotes(String str) {
+        String outStr = str.replaceAll("\\\\","\\\\\\\\");
+        outStr = outStr.replaceAll("\"", "\\\\\"");
         return outStr;
     }
 
@@ -268,7 +269,7 @@ public class MainPortlet extends MVCPortlet {
                     str +=  "{" +
                     "\"title\":\"" + attrTitle + "\",\n" +
                     "\"code\":\"" + innerClassesNames + "\",\n" +
-                    "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+                    "\"value\":\"" + escapeSlashesAndQuotes(testNull(value.getValue().toString())) + "\",\n" +
                     "\"date\": \"" + dFormat.format(value.getRepDate()) +"\"," +
                     "\"simple\": true,\n" +
                     "\"array\": false,\n" +
@@ -397,7 +398,7 @@ public class MainPortlet extends MVCPortlet {
                         str +=  "{" +
                             "\"title\":\"" + "[" + i + "]" + "\",\n" +
                             "\"code\":\"" + "[" + i + "]" + "\",\n" +
-                            "\"value\":\"" + clearSlashes(testNull(value.getValue().toString())) + "\",\n" +
+                            "\"value\":\"" + escapeSlashesAndQuotes(testNull(value.getValue().toString())) + "\",\n" +
                             "\"simple\": true,\n" +
                             "\"array\": false,\n" +
                             "\"type\": \"" + ((MetaValue)type).getTypeCode() + "\",\n" +
