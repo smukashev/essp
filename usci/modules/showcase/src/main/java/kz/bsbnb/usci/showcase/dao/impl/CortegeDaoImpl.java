@@ -33,7 +33,7 @@ public class CortegeDaoImpl extends CommonDao {
     private static final String ROOT = "root";
     private static final String ROOT_DOT = "root.";
 
-    private final String custRemainsVert = "CUST_REMAINS_VERT";
+    private static final String custRemainsVert = "CUST_REMAINS_VERT";
 
     @SuppressWarnings("unchecked")
     @Transactional
