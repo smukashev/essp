@@ -86,7 +86,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                 constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
                         limitEntity.getInnerValue("value"),
-                        limitEntity.getInnerValue("value_currency"), "10", 102L);
+                        limitEntity.getInnerValue("value_currency"), "10", 102L, null, null, null);
             }
 
             // interest
@@ -107,7 +107,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                     constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
                             currentBaseEntity.getInnerValue("value"),
-                            currentBaseEntity.getInnerValue("value_currency"), "4", 58L);
+                            currentBaseEntity.getInnerValue("value_currency"), "4", 58L, null, null, null);
                 }
 
                 // pastdue
@@ -121,9 +121,13 @@ public class CortegeDaoImpl extends CommonDao {
                         balanceAccountId = ((IBaseEntity) pastdueBaseEntity.getInnerValue("balance_account")).getId();
                     }
 
+                    Date openDate = (Date) pastdueBaseEntity.getInnerValue("open_date");
+                    Date closeDate = (Date) pastdueBaseEntity.getInnerValue("close_date");
+
                     constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
                             pastdueBaseEntity.getInnerValue("value"),
-                            pastdueBaseEntity.getInnerValue("value_currency"), "5", 59L);
+                            pastdueBaseEntity.getInnerValue("value_currency"), "5", 59L,
+                            openDate, closeDate, null);
                 }
 
                 // write_off
@@ -131,9 +135,11 @@ public class CortegeDaoImpl extends CommonDao {
                 if (wrtBaseValue != null && wrtBaseValue.getValue() != null) {
                     IBaseEntity wrtBaseEntity = (IBaseEntity) wrtBaseValue.getValue();
 
+                    Date date = (Date) wrtBaseEntity.getInnerValue("date");
+
                     constructRemainsMap(mapList, creditId, creditorId, repDate, null,
                             wrtBaseEntity.getInnerValue("value"),
-                            wrtBaseEntity.getInnerValue("value_currency"), "6", 60L);
+                            wrtBaseEntity.getInnerValue("value_currency"), "6", 60L, null, null, date);
                 }
             }
 
@@ -155,7 +161,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                     constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
                             currentBaseEntity.getInnerValue("value"),
-                            currentBaseEntity.getInnerValue("value_currency"), "1", 55L);
+                            currentBaseEntity.getInnerValue("value_currency"), "1", 55L, null, null, null);
                 }
 
                 // pastdue
@@ -169,9 +175,12 @@ public class CortegeDaoImpl extends CommonDao {
                         balanceAccountId = ((IBaseEntity) pastdueBaseEntity.getInnerValue("balance_account")).getId();
                     }
 
+                    Date openDate = (Date) pastdueBaseEntity.getInnerValue("open_date");
+                    Date closeDate = (Date) pastdueBaseEntity.getInnerValue("close_date");
+
                     constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
                             pastdueBaseEntity.getInnerValue("value"),
-                            pastdueBaseEntity.getInnerValue("value_currency"), "2", 56L);
+                            pastdueBaseEntity.getInnerValue("value_currency"), "2", 56L, openDate, closeDate, null);
                 }
 
                 // write_off
@@ -185,9 +194,11 @@ public class CortegeDaoImpl extends CommonDao {
                         balanceAccountId = ((IBaseEntity) wrtBaseEntity.getInnerValue("balance_account")).getId();
                     }
 
+                    Date date = (Date) wrtBaseEntity.getInnerValue("date");
+
                     constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
                             wrtBaseEntity.getInnerValue("value"),
-                            wrtBaseEntity.getInnerValue("value_currency"), "3", 57L);
+                            wrtBaseEntity.getInnerValue("value_currency"), "3", 57L, null, null, date);
                 }
             }
 
@@ -204,7 +215,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                 constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
                         discountEntity.getInnerValue("value"),
-                        discountEntity.getInnerValue("value_currency"), "7", 61L);
+                        discountEntity.getInnerValue("value_currency"), "7", 61L, null, null, null);
             }
 
             // discounted_value
@@ -213,7 +224,7 @@ public class CortegeDaoImpl extends CommonDao {
                 IBaseEntity discountedValueBaseEntity = (IBaseEntity) discountedValueBaseValue.getValue();
                 constructRemainsMap(mapList, creditId, creditorId, repDate, null,
                         discountedValueBaseEntity.getInnerValue("value"),
-                        discountedValueBaseEntity.getInnerValue("value"), "9", 63L);
+                        discountedValueBaseEntity.getInnerValue("value"), "9", 63L, null, null, null);
             }
 
             // correction
@@ -229,7 +240,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                 constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
                         correctionEntity.getInnerValue("value"),
-                        correctionEntity.getInnerValue("value_currency"), "8", 62L);
+                        correctionEntity.getInnerValue("value_currency"), "8", 62L, null, null, null);
             }
         }
 
@@ -254,7 +265,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                     constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
                             provisionKfnBaseEntity.getInnerValue("value"),
-                            provisionKfnBaseEntity.getInnerValue("value"), "11", 103L);
+                            provisionKfnBaseEntity.getInnerValue("value"), "11", 103L, null, null, null);
                 }
 
                 // provision_msfo
@@ -270,7 +281,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                     constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
                             provisionMsfoBaseEntity.getInnerValue("value"),
-                            provisionMsfoBaseEntity.getInnerValue("value"), "12", 104L);
+                            provisionMsfoBaseEntity.getInnerValue("value"), "12", 104L, null, null, null);
                 }
 
                 // provision_msfo_ob
@@ -286,7 +297,7 @@ public class CortegeDaoImpl extends CommonDao {
 
                     constructRemainsMap(mapList, creditId, creditorId, repDate, balanceAccountId,
                             provisionMsfoObBaseEntity.getInnerValue("value"),
-                            provisionMsfoObBaseEntity.getInnerValue("value"), "13", 129L);
+                            provisionMsfoObBaseEntity.getInnerValue("value"), "13", 129L, null, null, null);
                 }
             }
         }
@@ -301,8 +312,9 @@ public class CortegeDaoImpl extends CommonDao {
         }
     }
 
-    private void constructRemainsMap (List<Map<String, Object>> mapList, Long creditId, Long creditorId, Date repDate, Long accountId,
-                                                     Object value, Object currValue, String typeCode, Long typeId) {
+    private void constructRemainsMap (List<Map<String, Object>> mapList, Long creditId, Long creditorId, Date repDate,
+                                      Long accountId, Object value, Object currValue, String typeCode, Long typeId,
+                                      Date pastdueOpenDate, Date pastdueCloseDate, Date writeOffDate) {
         Map<String, Object> map = new HashMap<>();
 
         map.put("CREDIT_ID", creditId);
@@ -313,6 +325,9 @@ public class CortegeDaoImpl extends CommonDao {
         map.put("CURR_VALUE", currValue);
         map.put("TYPE_CODE", typeCode);
         map.put("TYPE_ID", typeId);
+        map.put("PASTDUE_OPEN_DATE", pastdueOpenDate);
+        map.put("PASTDUE_CLOSE_DATE", pastdueCloseDate);
+        map.put("WRITE_OFF_DATE", writeOffDate);
 
         mapList.add(map);
     }

@@ -858,6 +858,10 @@ showcase list add amount value
 showcase list add amount curr_value
 showcase list add creditor.name type_code
 
+showcase list add maturity_date pastdue_open_date
+showcase list add maturity_date pastdue_close_date
+showcase list add maturity_date write_off_date
+
 showcase list addCustom credit root creditor_id
 showcase list addCustom credit root account_id
 
