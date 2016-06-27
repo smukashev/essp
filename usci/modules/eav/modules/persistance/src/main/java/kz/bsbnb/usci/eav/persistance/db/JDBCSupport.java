@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.db;
 
 import kz.bsbnb.usci.eav.StaticRouter;
-import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import kz.bsbnb.usci.eav.model.stats.SQLQueriesStats;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;

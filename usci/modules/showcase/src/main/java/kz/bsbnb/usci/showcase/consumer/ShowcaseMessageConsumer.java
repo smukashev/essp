@@ -3,7 +3,7 @@ package kz.bsbnb.usci.showcase.consumer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
-import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import kz.bsbnb.usci.eav.model.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.showcase.dao.impl.CortegeDaoImpl;
 import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;

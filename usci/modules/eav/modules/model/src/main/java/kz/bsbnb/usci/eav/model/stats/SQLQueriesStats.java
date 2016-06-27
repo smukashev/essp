@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav.stats;
+package kz.bsbnb.usci.eav.model.stats;
 
 import kz.bsbnb.usci.eav.StaticRouter;
 import org.springframework.beans.factory.InitializingBean;
