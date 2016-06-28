@@ -105,7 +105,8 @@ public class ProtocolApplication extends Application {
 
             final BatchFullJModel batchFullJModel = provider.getBatchFullModel(batchId);
 
-            final File batchFile = new File("batch_" + batchId + ".zip");
+            final String fileName = "batch_" + batchId + ".zip";
+            final File batchFile = new File(fileName);
 
             FileResource resource = new FileResource(batchFile, mainWindow.getApplication()) {
                 @Override
@@ -113,7 +114,7 @@ public class ProtocolApplication extends Application {
                     final DownloadStream ds = new DownloadStream(
                             new ByteArrayInputStream(batchFullJModel.getContent()),
                             "application/zip",
-                            new File(batchFullJModel.getFileName()).getName()
+                            fileName
                     );
 
                     ds.setParameter("Content-Length", String.valueOf(batchFullJModel.getContent()));
