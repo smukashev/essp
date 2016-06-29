@@ -390,7 +390,7 @@ function addField(form, attr, idSuffix, node) {
                     labelWidth: labelWidth,
                     width: width,
                     value: attr.value,
-                    minValue: 0,
+                    /*minValue: 0,*/
                     allowDecimals: attr.type == "DOUBLE",
                     forcePrecision: attr.type == "DOUBLE",
                     readOnly: readOnly,
