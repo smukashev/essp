@@ -147,15 +147,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 throw new RuntimeException(e.getMessage());
             } finally {
                 synchronized (entities) {
-                    boolean deleted;
-                    try {
-                        deleted = entities.remove(currentEntity);
-                    } catch (Exception e) {
-                        throw e;
-                    }
-
-                    if (!deleted)
-                        throw new IllegalStateException(Errors.compose(Errors.E289));
+                    entities.remove(currentEntity);
 
                     sqlQueriesStats.put("java::onMessage", (System.currentTimeMillis() - onMessageTime));
                 }
