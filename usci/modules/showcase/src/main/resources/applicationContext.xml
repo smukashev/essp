@@ -14,7 +14,7 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <context:component-scan base-package="kz.bsbnb.usci.showcase"/>
-    <context:component-scan base-package="kz.bsbnb.usci.eav.stats"/>
+    <context:component-scan base-package="kz.bsbnb.usci.eav.model.stats"/>
 
     <context:annotation-config/>
 

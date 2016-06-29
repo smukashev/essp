@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.showcase.service.impl;
 
 import kz.bsbnb.usci.eav.showcase.ShowCase;
-import kz.bsbnb.usci.eav.stats.QueryEntry;
+import kz.bsbnb.usci.eav.model.stats.QueryEntry;
 import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;
 import kz.bsbnb.usci.showcase.driver.ShowCaseJdbcTemplate;
 import kz.bsbnb.usci.showcase.service.ShowcaseService;

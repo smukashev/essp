@@ -2,7 +2,7 @@ package kz.bsbnb.usci.eav.showcase;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
-import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import kz.bsbnb.usci.eav.model.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,11 +1,9 @@
 package kz.bsbnb.usci.core.service;
 
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
-import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
-import kz.bsbnb.usci.eav.stats.QueryEntry;
+import kz.bsbnb.usci.eav.model.stats.QueryEntry;
 
 import java.util.*;
 

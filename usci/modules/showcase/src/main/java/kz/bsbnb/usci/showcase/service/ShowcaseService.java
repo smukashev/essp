@@ -1,7 +1,7 @@
 package kz.bsbnb.usci.showcase.service;
 
 import kz.bsbnb.usci.eav.showcase.ShowCase;
-import kz.bsbnb.usci.eav.stats.QueryEntry;
+import kz.bsbnb.usci.eav.model.stats.QueryEntry;
 
 import java.util.List;
 import java.util.Map;

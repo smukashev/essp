@@ -2,8 +2,8 @@ package kz.bsbnb.usci.receiver.service.impl;
 
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputInfo;
-import kz.bsbnb.usci.eav.stats.QueryEntry;
-import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import kz.bsbnb.usci.eav.model.stats.QueryEntry;
+import kz.bsbnb.usci.eav.model.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
@@ -12,7 +12,6 @@ import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;

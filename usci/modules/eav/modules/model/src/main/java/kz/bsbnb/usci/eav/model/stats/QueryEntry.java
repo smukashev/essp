@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav.stats;
+package kz.bsbnb.usci.eav.model.stats;
 
 import java.io.Serializable;
 

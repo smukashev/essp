@@ -119,7 +119,7 @@ meta add --name=ref_creditor --attribute=subject_type --type=meta_class --childn
 meta add --name=ref_creditor --attribute=docs --type=meta_class --childname=document --array --keytype=any --cumulative
 meta key --name=ref_creditor --attribute=docs
 meta key --name=ref_creditor --attribute=code --optional
-meta add --name=ref_creditor --attribute=region --type=meta_class --childname=ref_region --keytype=any --immutable
+
 
 #====================================
 #= REF_CONTACT_TYPE
@@ -727,6 +727,7 @@ meta add --name=ref_exclusive_doc --attribute=doc_type --type=meta_class --child
 meta key --name=ref_exclusive_doc --attribute=code
 meta key --name=ref_exclusive_doc --attribute=doc_type
 
+meta add --name=ref_creditor --attribute=region --type=meta_class --childname=ref_region --keytype=any --immutable
 
 #====================================
 # Clear metadata cache

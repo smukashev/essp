@@ -56,13 +56,18 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
     }
 
     protected long insert(long baseEntityId, long creditorId, long metaAttributeId, Date reportDate, Object value, boolean closed, boolean last) {
+        String strValue = (String) value;
+
+        if (strValue == null || strValue.length() ==0)
+            strValue = " ";
+
         Insert insert = context
                 .insertInto(EAV_BE_STRING_VALUES)
                 .set(EAV_BE_STRING_VALUES.ENTITY_ID, baseEntityId)
                 .set(EAV_BE_STRING_VALUES.CREDITOR_ID, creditorId)
                 .set(EAV_BE_STRING_VALUES.ATTRIBUTE_ID, metaAttributeId)
                 .set(EAV_BE_STRING_VALUES.REPORT_DATE, DataUtils.convert(reportDate))
-                .set(EAV_BE_STRING_VALUES.VALUE, (String) value)
+                .set(EAV_BE_STRING_VALUES.VALUE, strValue)
                 .set(EAV_BE_STRING_VALUES.IS_CLOSED, DataUtils.convert(closed))
                 .set(EAV_BE_STRING_VALUES.IS_LAST, DataUtils.convert(last));
 
@@ -83,8 +88,12 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                 baseValue.isLast());
     }
 
-    protected void update(long id, long baseEntityId, long creditorId, long metaAttributeId, Date reportDate,
-                          Object value, boolean closed, boolean last) {
+    protected void update(long id, long baseEntityId, long creditorId, long metaAttributeId, Date reportDate, Object value, boolean closed, boolean last) {
+        String strValue = (String) value;
+
+        if (strValue == null || strValue.length() ==0)
+            strValue = " ";
+
         String tableAlias = "sv";
         Update update = context
                 .update(EAV_BE_STRING_VALUES.as(tableAlias))
@@ -92,7 +101,7 @@ public class BaseEntityStringValueDaoImpl extends JDBCSupport implements IBaseEn
                 .set(EAV_BE_STRING_VALUES.as(tableAlias).CREDITOR_ID, creditorId)
                 .set(EAV_BE_STRING_VALUES.as(tableAlias).ATTRIBUTE_ID, metaAttributeId)
                 .set(EAV_BE_STRING_VALUES.as(tableAlias).REPORT_DATE, DataUtils.convert(reportDate))
-                .set(EAV_BE_STRING_VALUES.as(tableAlias).VALUE, (String) value)
+                .set(EAV_BE_STRING_VALUES.as(tableAlias).VALUE, strValue)
                 .set(EAV_BE_STRING_VALUES.as(tableAlias).IS_CLOSED, DataUtils.convert(closed))
                 .set(EAV_BE_STRING_VALUES.as(tableAlias).IS_LAST, DataUtils.convert(last))
                 .where(EAV_BE_STRING_VALUES.as(tableAlias).ID.equal(id));

@@ -3,7 +3,7 @@ package kz.bsbnb.usci.showcase.consumer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.showcase.QueueEntry;
 import kz.bsbnb.usci.eav.showcase.ShowCase;
-import kz.bsbnb.usci.eav.stats.SQLQueriesStats;
+import kz.bsbnb.usci.eav.model.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.showcase.dao.impl.CortegeDaoImpl;
 import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl;
@@ -132,7 +132,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 if (found) {
                     for (Map.Entry<ShowCase, Future> entry : showCaseFutureMap.entrySet()) {
                         try {
-                            entry.getValue().get(600, TimeUnit.SECONDS);
+                            entry.getValue().get(3600, TimeUnit.SECONDS);
                         } catch (Exception e) {
                             System.err.println(entry.getKey().toString());
                             throw e;
@@ -147,15 +147,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                 throw new RuntimeException(e.getMessage());
             } finally {
                 synchronized (entities) {
-                    boolean deleted;
-                    try {
-                        deleted = entities.remove(currentEntity);
-                    } catch (Exception e) {
-                        throw e;
-                    }
-
-                    if (!deleted)
-                        throw new IllegalStateException(Errors.compose(Errors.E289));
+                    entities.remove(currentEntity);
 
                     sqlQueriesStats.put("java::onMessage", (System.currentTimeMillis() - onMessageTime));
                 }

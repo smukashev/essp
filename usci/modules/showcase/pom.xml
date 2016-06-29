@@ -178,16 +178,6 @@
         </dependency>
         <dependency>
             <groupId>kz.bsbnb.usci</groupId>
-            <artifactId>cr</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>kz.bsbnb.usci.eav</groupId>
-            <artifactId>persistance</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>kz.bsbnb.usci</groupId>
             <artifactId>core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
