@@ -139,9 +139,6 @@ public class ShowcaseMessageConsumer implements MessageListener {
                         }
                     }
                 }
-
-                if(!found)
-                    message.acknowledge();
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e.getMessage());
