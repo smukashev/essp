@@ -22,9 +22,6 @@ public class BaseEntityOutput {
 
         MetaClass meta = entity.getMeta();
 
-        if (meta.isReference() && prefix != null && prefix.length() > 0)
-            return entity.getId() + "*";
-
         for (String memberName : meta.getMemberNames()) {
             IMetaAttribute attribute = meta.getMetaAttribute(memberName);
             IMetaType type = attribute.getMetaType();
