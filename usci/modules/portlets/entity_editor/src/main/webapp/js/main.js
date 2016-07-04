@@ -192,7 +192,9 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
     for (var i = 0; i < children.length; i++) {
 
         if(children[i].data.markedAsDeleted) {
-            xmlStr += offset + "  " + "<" + children[i].data.code + " xsi:nil=\"true\" />\n";
+            if(!children[i].data.code.match(/\d+/))
+                xmlStr += offset + "  " + "<" + children[i].data.code + " xsi:nil=\"true\" />\n";
+
             continue;
         }
 
