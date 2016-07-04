@@ -302,8 +302,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
 
-                    /*if (rulesEnabled)
-                        processLogicControl(baseEntityApplied);*/
+                    if (rulesEnabled)
+                        processLogicControl(baseEntityApplied);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
