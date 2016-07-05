@@ -17,6 +17,8 @@ BEGIN
 
 
    -- add here another rulefix
+   lx_pastdue_cd_rd_fill();
+   --lx_pastdue_cd_rd_fix();
 
 end;
 
