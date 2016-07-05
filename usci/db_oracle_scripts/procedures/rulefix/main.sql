@@ -20,5 +20,9 @@ BEGIN
    lx_pastdue_cd_rd_fill();
    --lx_pastdue_cd_rd_fix();
 
+   lx_pastdue_od_vs_cd_fill();
+   --lx_pastdue_od_vs_cd_fix();
+
+
 end;
 
