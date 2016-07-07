@@ -237,18 +237,18 @@ meta add --name=remains_limit --attribute=balance_account --type=meta_class --ch
 #====================================
 
 meta create --name=remains_debt
-meta add --name=remains_debt --attribute=current --type=meta_class --childname=remains_debt_current --final
-meta add --name=remains_debt --attribute=pastdue --type=meta_class --childname=remains_debt_pastdue --final
-meta add --name=remains_debt --attribute=write_off --type=meta_class --childname=remains_debt_write_off --final
+meta add --name=remains_debt --attribute=current --type=meta_class --childname=remains_debt_current --final --nullable
+meta add --name=remains_debt --attribute=pastdue --type=meta_class --childname=remains_debt_pastdue --final --nullable
+meta add --name=remains_debt --attribute=write_off --type=meta_class --childname=remains_debt_write_off --final --nullable
 
 #====================================
 #= REMAINS_INTEREST
 #====================================
 
 meta create --name=remains_interest
-meta add --name=remains_interest --attribute=current --type=meta_class --childname=remains_interest_current --final
-meta add --name=remains_interest --attribute=pastdue --type=meta_class --childname=remains_interest_pastdue --final
-meta add --name=remains_interest --attribute=write_off --type=meta_class --childname=remains_interest_write_off --final
+meta add --name=remains_interest --attribute=current --type=meta_class --childname=remains_interest_current --final --nullable
+meta add --name=remains_interest --attribute=pastdue --type=meta_class --childname=remains_interest_pastdue --final --nullable
+meta add --name=remains_interest --attribute=write_off --type=meta_class --childname=remains_interest_write_off --final --nullable
 
 #====================================
 #= REMAINS_CORRECTION
