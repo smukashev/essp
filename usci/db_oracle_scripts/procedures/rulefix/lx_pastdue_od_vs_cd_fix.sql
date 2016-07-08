@@ -49,7 +49,7 @@ create or replace PROCEDURE "LX_PASTDUE_OD_VS_CD_FIX" IS
           --              and attribute_id = 53;
         END IF;
 
-        IF crOpenDate <> null and crCloseDate <> null and crOpenDate < crCloseDate THEN
+        IF crOpenDate is not null and crCloseDate is not null and crOpenDate < crCloseDate THEN
           dbms_output.put_line('MKR open_date and close_date incorrect, can not fix for ESSP credit_id : '||pd.credit_id);
         END IF;
 

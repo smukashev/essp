@@ -765,7 +765,7 @@ Ext.onReady(function() {
                 return;
             }
 
-            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true, "INSERT");
+            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true);
 
             Ext.Ajax.request({
                 url: dataUrl,
