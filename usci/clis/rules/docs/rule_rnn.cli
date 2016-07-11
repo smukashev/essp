@@ -98,6 +98,20 @@ $$$
 
 rule save
 
+rule read $$$
+title: документ юр лица РНН ИП
+rule "документ юр лица РНН ИП"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			&& ($r : getInvalidRNNs((List)getEls("{get}subject[is_organization=true][organization_info.is_se=true]docs[doc_type.code=11]no"), true) && $r.size() > 0))
+then
+	$entity.addValidationError("" + $r);
+end
+$$$
+
+rule save
+
+
 
 rule read $$$
 title: документ рук юр лица РНН
