@@ -40,7 +40,7 @@ public class MainLayout extends VerticalLayout {
 
             maintenanceComponent = new MaintenanceComponent(environment, dataProvider);
             maintenanceTab = mainTabSheet.addTab(maintenanceComponent);
-            maintenanceTab.setCaption(environment.getString(Localization.ADMIN_TAB_NAME));
+            maintenanceTab.setCaption(environment.getString(Localization.ADMIN_TAB_MAINTENANCE_NAME));
 
             mainTabSheet.setSizeFull();
             mainTabSheet.addListener(new TabSheet.SelectedTabChangeListener() {
