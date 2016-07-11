@@ -7,7 +7,8 @@ function List getInvalidRNNs(List rnns, Boolean isPerson) {
         try {
             rnnCorrect((String) rnn, isPerson);
         } catch(Exception e) {
-            ret.add(rnn + ": " + e.getMessage());
+            if(!isExclusiveRNN((String)rnn))
+                ret.add(rnn + ": " + e.getMessage());
         }
     }
     return ret;
