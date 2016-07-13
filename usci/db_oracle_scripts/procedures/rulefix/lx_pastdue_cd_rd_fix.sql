@@ -36,14 +36,22 @@ BEGIN
                 AND lx.P_CONT_DATE   =pd.p_cont_date;
 
 
-          --if MKR dates are correct, update ESSP dates
-          IF  (pd.close_date != crCloseDate and  crCloseDate < crReportDate) THEN
-              --update close date
+          IF crCloseDate <> pd.close_date THEN
+              --update open date
               dbms_output.put_line('update eav_be_date_values set value='||crCloseDate||' where entity_id = '||pd.pastdue_id||' and attribute_id = 53');
---              UPDATE eav_be_date_values
---                  SET value        = crCloseDate
---              WHERE entity_id  = pd.pastdue_id
---                  AND attribute_id = 53;
+--              update eav_be_date_values
+--              set value=crCloseDate
+--              where entity_id = pd.pastdue_id
+--              and attribute_id = 53;
+          END IF;
+
+          IF crReportDate <> pd.report_date THEN
+              --update open date
+              dbms_output.put_line('incorrect report_date');
+          END IF;
+
+          IF  (crCloseDate > crReportDate) THEN
+              dbms_output.put_line('MKR dates are incorrect');
           END IF;
 
        EXCEPTION
