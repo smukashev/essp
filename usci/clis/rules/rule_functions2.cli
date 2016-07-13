@@ -102,10 +102,10 @@ rule save
 
 
 rule read $$$
-title: функция исключительный документе
+title: функция исключительный документ
 function boolean isExclusiveIIN(String iin) {
     try{
-        //  поиск ислючитльного иин
+        //  поиск исключительного иин
         //  все классы с префиксом ref - справочники
 
         IBaseEntityProcessorDao baseEntityProcessorDao = BRMSHelper.rulesLoadDao;
@@ -118,6 +118,36 @@ function boolean isExclusiveIIN(String iin) {
         BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), new Date());
 
         docType.put("code", new BaseValue("06"));
+
+        //заполняем параметры поиска
+        be.put("code",new BaseValue(iin));
+        be.put("doc_type", new BaseValue(docType));
+
+        //Поиск сущности
+        IBaseEntity res = baseEntityProcessorDao.prepare(be, 0L);
+
+        //если идентификатор больше нуля - данное соответвие присутсвтует в базе
+        return res.getId() > 0;
+    } catch (Exception e) {
+        return false;
+    }
+}
+
+function boolean isExclusiveRNN(String iin) {
+    try{
+        //  поиск исключительного рнн
+        //  все классы с префиксом ref - справочники
+
+        IBaseEntityProcessorDao baseEntityProcessorDao = BRMSHelper.rulesLoadDao;
+        IMetaClassRepository metaClassRepository = BRMSHelper.rulesMetaDao;
+
+
+        //Инициализация сущности - для поиска
+        BaseEntity be = new BaseEntity(metaClassRepository.getMetaClass("ref_exclusive_doc"), new Date());
+
+        BaseEntity docType = new BaseEntity(metaClassRepository.getMetaClass("ref_doc_type"), new Date());
+
+        docType.put("code", new BaseValue("11"));
 
         //заполняем параметры поиска
         be.put("code",new BaseValue(iin));
