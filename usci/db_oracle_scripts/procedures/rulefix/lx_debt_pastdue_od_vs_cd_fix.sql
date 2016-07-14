@@ -1,7 +1,7 @@
-create or replace PROCEDURE "LX_PASTDUE_OD_VS_CD_FIX" IS
+create or replace PROCEDURE "LX_DEBT_PASTDUE_OD_VS_CD_FIX" IS
   BEGIN
 
-    for pd in (select * from LX_PASTDUE_OD_VS_CD)
+    for pd in (select * from LX_DEBT_PASTDUE_OD_VS_CD)
     loop
       declare
         crCreditId number;
@@ -19,13 +19,13 @@ create or replace PROCEDURE "LX_PASTDUE_OD_VS_CD_FIX" IS
               AND dr.type_id              =56
               AND dr.rep_date             =pd.report_date;
 
-        UPDATE LX_PASTDUE_OD_VS_CD lx
+        UPDATE LX_DEBT_PASTDUE_OD_VS_CD lx
         SET lx.cr_open_date=crOpenDate
         WHERE
           lx.P_CONT_NO   =pd.p_cont_no
           AND lx.P_CONT_DATE   =pd.p_cont_date;
 
-        UPDATE LX_PASTDUE_OD_VS_CD lx
+        UPDATE LX_DEBT_PASTDUE_OD_VS_CD lx
         SET lx.cr_close_date = crCloseDate
         WHERE
           lx.P_CONT_NO   =pd.p_cont_no
@@ -55,7 +55,7 @@ create or replace PROCEDURE "LX_PASTDUE_OD_VS_CD_FIX" IS
 
         EXCEPTION
         WHEN no_data_found THEN
-        update lx_pastdue_od_vs_cd set cr_not_found=1 where pastdue_id=pd.pastdue_id;
+        update LX_DEBT_PASTDUE_OD_VS_CD set cr_not_found=1 where pastdue_id=pd.pastdue_id;
         dbms_output.put_line('MKR credit not foud for ESSP credit_id : '||pd.credit_id);
         WHEN TOO_MANY_ROWS THEN
         dbms_output.put_line('MKR too many debt_remains, may be report_date problem for ESSP credit_id : '||pd.credit_id);
@@ -64,4 +64,4 @@ create or replace PROCEDURE "LX_PASTDUE_OD_VS_CD_FIX" IS
       end;
     end loop;
 
-  END LX_PASTDUE_OD_VS_CD_FIX;
+  END LX_DEBT_PASTDUE_OD_VS_CD_FIX;
