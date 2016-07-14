@@ -21,7 +21,7 @@ function  boolean iinCorrect(String iin){
     if(!isDateValid(iin.substring(0,6),"yyMMdd"))
         return false;
 
-    if(iin.charAt(6) < '1' || iin.charAt(6) > '6')
+    if(iin.charAt(6) < '0' || iin.charAt(6) > '6')
         return false;
 
     for(int i=0;i<11;i++)
