@@ -352,15 +352,36 @@ function addField(form, attr, idSuffix, node) {
         }));
         }
     } else {
+        //ref_portfolio auto insert code
         if(attr.code=="code" && attr.metaId=="36"){
-            refStore.load();
+            //refStore.load();
             form.add(Ext.create("Ext.form.field.Text",
                 {
                     id: attr.code + "FromItem" + idSuffix,
                     fieldLabel: (attr.isRequired ? "<b style='color:red'>*</b> " : "") + attr.title,
                     labelWidth: "60%",
                     width: "40%",
-                    value: maxId,
+                    value: function(){
+                        Ext.Ajax.request({
+                            url: dataUrl,
+                            async: false,
+                            params: {
+                                op: 'LIST_BY_CLASS',
+                                metaId: attr.metaId,
+                                date: new Date(),
+                                withHis: true
+                            },
+                            success: function (result) {
+                                var json = JSON.parse(result.responseText);
+                                maxId = 0;
+                                for (i = 0; i< json.data.length;i++) {
+                                    maxId = Math.max(maxId, parseInt(json.data[i].code) + 1);
+                                }
+                            }
+                        });
+
+                        return maxId;
+                    }(),
                     readOnly: readOnly,
                     allowBlank: allowBlank,
                     blankText: label_REQUIRED_FIELD,
