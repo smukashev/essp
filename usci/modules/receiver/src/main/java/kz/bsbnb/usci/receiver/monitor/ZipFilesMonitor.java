@@ -269,7 +269,8 @@ public class ZipFilesMonitor {
 
         if (batchInfo.getUserId() != 100500L) {
             if (cList.size() > 0) {
-                cId = getCreditor(batchInfo, cList);
+                batch.setCreditor(getCreditor(batchInfo, cList));
+                cId = batch.getCreditor().getId();
 
                 if (cId <= 0) {
                     String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
@@ -297,7 +298,7 @@ public class ZipFilesMonitor {
                 haveError = true;
             }
         } else {
-            cId = getCreditor(batchInfo, creditors);
+            cId = getCreditor(batchInfo, creditors).getId();
             if (cId <= 0) {
                 String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
                 String docValue = batchInfo.getAdditionalParams().get("DOC_VALUE");
@@ -334,6 +335,7 @@ public class ZipFilesMonitor {
                             .setReceiptDate(new Date())
                     );
 
+                    serviceFactory.getMailMessageBeanCommonBusiness().notifyNBMaintenance(batch);
                     return;
                 }
 
@@ -399,8 +401,9 @@ public class ZipFilesMonitor {
         batchService.endBatch(batchId);
     }
 
-    private Long getCreditor(BatchInfo batchInfo, List<Creditor> creditors) {
-        Long cId = -1L;
+    private Creditor getCreditor(BatchInfo batchInfo, List<Creditor> creditors) {
+        Creditor ret = new Creditor();
+        ret.setId(-1L);
 
         if (batchInfo.getAdditionalParams() != null && batchInfo.getAdditionalParams().size() > 0) {
             String docType = batchInfo.getAdditionalParams().get("DOC_TYPE");
@@ -416,46 +419,46 @@ public class ZipFilesMonitor {
 
             for (Creditor creditor : creditors) {
                 if (creditor.getBIK() != null && docType.equals("15") && creditor.getBIK().equals(docValue)) {
-                    cId = creditor.getId();
+                    ret = creditor;
                     break;
                 }
 
                 if (creditor.getBIN() != null && docType.equals("07") && creditor.getBIN().equals(docValue)) {
-                    cId = creditor.getId();
+                    ret = creditor;
                     break;
                 }
 
                 if (creditor.getRNN() != null && docType.equals("11") && creditor.getRNN().equals(docValue)) {
-                    cId = creditor.getId();
+                    ret = creditor;
                     break;
                 }
 
                 if (code != null && code.length() > 0 && creditor.getCode() != null
                         && creditor.getCode().length() > 0 && code.equals(creditor.getCode())) {
-                    cId = creditor.getId();
+                    ret = creditor;
                     break;
                 }
 
                 if (bin != null && bin.length() > 0 && creditor.getBIN() != null
                         && creditor.getBIN().length() > 0 && bin.equals(creditor.getBIN())) {
-                    cId = creditor.getId();
+                    ret = creditor;
                     break;
                 }
 
                 if (bik != null && bik.length() > 0 && creditor.getBIK() != null
                         && creditor.getBIK().length() > 0 && bik.equals(creditor.getBIK())) {
-                    cId = creditor.getId();
+                    ret = creditor;
                     break;
                 }
 
                 if (rnn != null && rnn.length() > 0 && creditor.getRNN() != null
                         && creditor.getRNN().length() > 0 && rnn.equals(creditor.getRNN())) {
-                    cId = creditor.getId();
+                    ret = creditor;
                     break;
                 }
             }
         }
-        return cId;
+        return ret;
     }
 
     private boolean checkAndFillEavReport(long creditorId, BatchInfo batchInfo, long batchId) {

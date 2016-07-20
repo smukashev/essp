@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.core.service;
 
+import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.mail.MailMessage;
 import kz.bsbnb.usci.eav.model.mail.MailMessageParameter;
 import kz.bsbnb.usci.eav.model.mail.UserMailTemplate;
@@ -29,4 +30,6 @@ public interface MailMessageBeanCommonBusiness {
     Long getLastLaunchTime();
 
     void setLastLaunchMillis(long millis);
+
+    void notifyNBMaintenance(Batch batch);
 }

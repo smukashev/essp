@@ -1,7 +1,9 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.usci.cr.model.PortalUser;
+import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.mail.*;
+import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IMailDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -114,7 +116,8 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
                 templ.field(MAIL_TEMPLATE.TEXT))
                 .from(root).join(templ)
                 .on(root.field(MAIL_MESSAGE.MAIL_TEMPLATE_ID).eq(templ.field(MAIL_TEMPLATE.ID)))
-                .where(root.field(MAIL_MESSAGE.RECIPIENT_USER_ID).eq(userId));
+                .where(root.field(MAIL_MESSAGE.RECIPIENT_USER_ID).eq(userId))
+                .orderBy(root.field(MAIL_MESSAGE.ID).desc());
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
         List<MailMessage> ret = new LinkedList<>();
@@ -390,6 +393,37 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
                 updateWithStats(insert.getSQL(), insert.getBindValues().toArray());
             }
         }
+    }
 
+    protected List<Long> getNBUsers(Long creditorId){
+        Select select = context.select(EAV_A_USER.USER_ID)
+                .from(EAV_A_USER)
+                .where(EAV_A_USER.EMAIL.like("%nationalbank.kz"))
+                .and(DSL.exists(context.select(EAV_A_CREDITOR_USER.USER_ID)
+                        .from(EAV_A_CREDITOR_USER)
+                        .where(EAV_A_CREDITOR_USER.USER_ID.eq(EAV_A_USER.USER_ID)
+                        .and(EAV_A_CREDITOR_USER.CREDITOR_ID.eq(creditorId)))));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+        List<Long> ret = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            ret.add(((BigDecimal) row.get(EAV_A_USER.USER_ID.getName())).longValue());
+        }
+
+        return ret;
+    }
+
+    @Override
+    public void notifyNBMaintenance(Batch batch) {
+        List<Long> userIds = getNBUsers(batch.getCreditorId());
+
+        for (Long userId : userIds) {
+            Properties p = new Properties();
+            p.setProperty("REPORT_DATE", DataTypes.dateFormatDot.format(batch.getRepDate()));
+            p.setProperty("ORG", batch.getCreditor().getName());
+            p.setProperty("FILE_NAME", batch.getFormattedFileName());
+            sendMailMessage(MailTemplate.MAINTENANCE_REQUEST, userId, p);
+        }
     }
 }

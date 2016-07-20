@@ -1,11 +1,15 @@
 package kz.bsbnb.usci.eav.model;
 
+import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
 import kz.bsbnb.usci.eav.util.DataUtils;
 
 import java.util.Date;
 
 public class Batch extends Persistable {
+
+    private static final long serialVersionUID = 1L;
+
     private Date receiptDate;
     private Date repDate;
     private Long userId;
@@ -21,6 +25,7 @@ public class Batch extends Persistable {
     private Long statusId;
     private boolean maintenance;
     private Boolean maintenanceApproved;
+    private Creditor creditor;
 
     public Batch() {
         super();
@@ -126,6 +131,12 @@ public class Batch extends Persistable {
         return fileName;
     }
 
+    public String getFormattedFileName(){
+        if(fileName == null)
+            return "без имени";
+        return fileName.substring(fileName.lastIndexOf('/') + 1);
+    }
+
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
@@ -225,5 +236,13 @@ public class Batch extends Persistable {
 
     public Boolean isMaintenanceApproved() {
         return maintenanceApproved;
+    }
+
+    public Creditor getCreditor() {
+        return creditor;
+    }
+
+    public void setCreditor(Creditor creditor) {
+        this.creditor = creditor;
     }
 }
