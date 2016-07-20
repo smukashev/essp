@@ -36,7 +36,7 @@ BEGIN
               null;
               --update contract maturity date
               --update eav_be_date_values
-              --set value=v_cr_a_issue_date
+              --set value=v_cr_maturity_date
               --where entity_id = cr.credit_id and attribute_id = 156;
           END IF;
 
@@ -44,7 +44,7 @@ BEGIN
               null;
               --update actual issue date
               --update eav_be_date_values
-              --set value=v_cr_a_issue_date
+              --set value=v_cr_issue_date
               --where entity_id = cr.credit_id and attribute_id = 154;
           END IF;
 
