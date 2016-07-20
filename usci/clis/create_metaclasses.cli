@@ -773,7 +773,7 @@ sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enable
 sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enabled) (select user_id as portal_user_id, 2002 as mail_template_id, 1 as enabled   from eav_a_user)
 sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enabled) (select user_id as portal_user_id, 3001 as mail_template_id, 1 as enabled   from eav_a_user)
 sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enabled) (select user_id as portal_user_id, 4002 as mail_template_id, 1 as enabled   from eav_a_user)
-sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enabled) (select user_id as portal_user_id, 4002 as mail_template_id, 1 as enabled   from eav_a_user where email like '%nationalbank.kz')
+sql insert into MAIL_USER_MAIL_TEMPLATE(portal_user_id, mail_template_id, enabled) (select user_id as portal_user_id, 2003 as mail_template_id, 1 as enabled   from eav_a_user where email like '%nationalbank.kz')
 #----------------------------------------------------------------------------------------------
 
 
