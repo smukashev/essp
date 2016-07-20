@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.MailMessageBeanCommonBusiness;
+import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.mail.MailMessage;
 import kz.bsbnb.usci.eav.model.mail.MailMessageParameter;
 import kz.bsbnb.usci.eav.model.mail.MailTemplate;
@@ -94,5 +95,10 @@ public class MailMessageBeanCommonBusinessImpl implements MailMessageBeanCommonB
     @Override
     public void setLastLaunchMillis(long millis) {
         mailDao.setLastLaunchMillis(millis);
+    }
+
+    @Override
+    public void notifyNBMaintenance(Batch batch) {
+        mailDao.notifyNBMaintenance(batch);
     }
 }

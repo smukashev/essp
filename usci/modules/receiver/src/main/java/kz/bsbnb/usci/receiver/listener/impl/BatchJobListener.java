@@ -2,6 +2,7 @@ package kz.bsbnb.usci.receiver.listener.impl;
 
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.exceptions.BatchNotFoundException;
+import kz.bsbnb.usci.eav.model.mail.MailTemplate;
 import kz.bsbnb.usci.receiver.listener.IListener;
 import kz.bsbnb.usci.receiver.queue.JobLauncherQueue;
 import kz.bsbnb.usci.receiver.repository.IServiceRepository;
@@ -47,8 +48,8 @@ public class BatchJobListener implements IListener {
         Batch batch = batchService.getBatch(batchId);
 
         Properties properties = new Properties();
-        properties.put("FILENAME", batch.getFileName());
-        serviceFactory.getMailMessageBeanCommonBusiness().sendMailMessage("FILE_PROCESSING_COMPLETED",
+        properties.put("FILENAME", batch.getFormattedFileName());
+        serviceFactory.getMailMessageBeanCommonBusiness().sendMailMessage(MailTemplate.FILE_PROCESSING_COMPLETED,
             batch.getUserId(), properties);
 
         batchService.endBatch(batchId);

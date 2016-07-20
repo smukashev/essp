@@ -14,6 +14,9 @@ import java.math.BigInteger;
 */
 public class MailTemplate implements Serializable {
 
+    public static final String FILE_PROCESSING_COMPLETED = "FILE_PROCESSING_COMPLETED";
+    public static final String MAINTENANCE_REQUEST = "MAINTENANCE_REQUEST";
+
     private static final long serialVersionUID = 1L;
     /*@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "MAIL_TEMPLATE_SEQUENCE")
