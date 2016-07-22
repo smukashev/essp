@@ -31,16 +31,16 @@ BEGIN
             for pledge in(
                   SELECT cr.id credit_id, pl.id id, pl.contract_no contract_no, pl.type_id type_id, pl.value_ value
                   FROM credit@credits cr
-                  left outer join v_creditor_map cmap on cmap.ref_creditor_id=2364
+                  left outer join v_creditor_map cmap on cmap.ref_creditor_id=credit.creditor
                   left outer join pledge@credits pl on pl.credit_id=cr.id
-                  WHERE cr.PRIMARY_CONTRACT_NO = '27-07/364/31-12(40833)'
-                      AND cr.PRIMARY_CONTRACT_DATE = to_date('18.02.2013','dd.mm.yyyy')
+                  WHERE cr.PRIMARY_CONTRACT_NO = credit.p_cont_no
+                      AND cr.PRIMARY_CONTRACT_DATE = credit.p_cont_date
                       AND cr.creditor_id = cmap.creditor_id
                       and pl.id is not null
             )
             loop
 
-
+            /*
               if credit_id != pledge.credit_id then
                 --add complex set to credit
                 update eav_be_entity_report_dates set complex_sets_count=complex_sets_count+1 where entity_id=pledge.credit_id;
@@ -99,6 +99,7 @@ BEGIN
 
               insert into EAV_BE_COMPLEX_VALUES(entity_id, attribute_id,creditor_id, report_date, entity_value_id, is_closed, is_last)
               values(pledge_id, 53, credit.creditor_id, credit.report_date, pledge_type_id, 0, 1);
+              */
             end loop;
 
       EXCEPTION
