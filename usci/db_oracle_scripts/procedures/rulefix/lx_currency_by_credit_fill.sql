@@ -6,6 +6,8 @@ AS
   v_creditor_id number;
   v_cid number;
   v_error VARCHAR2(250);
+  v_short_name VARCHAR2(100);
+  v_currency_id number;
   BEGIN
 
     delete from lx_currency_by_credit;
@@ -16,7 +18,6 @@ AS
       left outer join eav_be_complex_values c1 on c1.attribute_id = 65 and c1.entity_id = ebe.id
       left outer join eav_be_complex_values c2 on c2.attribute_id = 64 and c2.entity_id = ebe.id
       where ebe.class_id= 59
-      and ebe.id = 214716346
       ) where entity_value_id is null and type_id not in (2244,2249) /*creditnaia linia, uslovnie obiazatelsva po zaimam */);
 
     for cr in (select * from lx_currency_by_credit)
@@ -34,6 +35,32 @@ AS
                  creditor_id = v_creditor_id,
                  cid = v_cid
           where entity_id = cr.entity_id;
+
+
+    begin
+      select (select short_name from ref.currency@credits where id = vch.currency_id) into v_short_name
+        from v_credit_his@credits vch
+       where vch.primary_contract_no = v_pno
+         and vch.primary_contract_date = v_pdate
+         and vch.creditor_id = v_cid
+         and vch.currency_id is not null
+         and rownum = 1;
+
+      select entity_id into v_currency_id
+        from eav_be_string_values
+      where attribute_id = 133
+        and value = v_short_name;
+
+
+      update lx_currency_by_credit
+         set f_currency_sn = v_short_name,
+             f_currency_id = v_currency_id
+        where entity_id = cr.entity_id;
+
+      EXCEPTION
+        when no_data_found then
+           continue;
+    end;
 
     END LOOP;
 

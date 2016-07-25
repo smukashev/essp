@@ -8,6 +8,7 @@ BEGIN
    --rule amount
    if v_fill_data = 1 THEN
       lx_amount_fill();
+      LX_CURRENCY_BY_CREDIT_FILL();
       LX_RINTEREST_CURRENT_BA5_FILL();
       lx_econ_trade_fill();
       lx_pastdue_cd_rd_fill();
