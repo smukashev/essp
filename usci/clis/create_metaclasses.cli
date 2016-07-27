@@ -448,6 +448,10 @@ meta add --name=subject --attribute=creditor_info --type=meta_class --childname=
 meta add --name=subject --attribute=is_person --type=boolean
 meta add --name=subject --attribute=is_organization --type=boolean
 meta add --name=subject --attribute=is_creditor --type=boolean
+meta key --name=subject --attribute=is_person
+meta key --name=subject --attribute=is_organization
+meta key --name=subject --attribute=is_creditor
+
 
 
 #====================================
