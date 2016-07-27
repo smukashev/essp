@@ -234,16 +234,16 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         if (!baseEntity.getMeta().isReference() && baseEntity.getBaseEntityReportDate().getCreditorId() == 0)
             throw new IllegalStateException(Errors.compose(Errors.E197));
 
-        /* Проверка сущности на бизнес правила */
-        if (!baseEntity.getMeta().isReference())
-            checkForRules((BaseEntity) baseEntity);
-
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
         baseEntityManager.registerCreditorId(creditorId);
 
         long prepareTime = System.currentTimeMillis();
         baseEntityPostPrepared = prepare(((BaseEntity) baseEntity).clone(), creditorId);
         sqlStats.put("java::prepare", (System.currentTimeMillis() - prepareTime));
+
+        /* Проверка сущности на бизнес правила */
+        if (!baseEntity.getMeta().isReference())
+            checkForRules((BaseEntity) baseEntity);
 
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
