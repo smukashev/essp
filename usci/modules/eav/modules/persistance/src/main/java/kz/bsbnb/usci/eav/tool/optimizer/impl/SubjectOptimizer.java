@@ -29,6 +29,32 @@ public class SubjectOptimizer {
     public static String getKeyString(final IBaseEntity iBaseEntity) {
         StringBuilder stringBuilder = new StringBuilder();
 
+        IBaseValue isPersonBaseValue = iBaseEntity.getBaseValue("is_person");
+        IBaseValue isOrganizationBaseValue = iBaseEntity.getBaseValue("is_organization");
+        IBaseValue isCreditorBaseValue = iBaseEntity.getBaseValue("is_creditor");
+
+        boolean isPerson = false;
+        boolean isOrganization = false;
+        boolean isCreditor = false;
+
+        if (isPersonBaseValue != null && isPersonBaseValue.getValue() != null) {
+            isPerson = (boolean) isPersonBaseValue.getValue();
+        }
+
+        if (isOrganizationBaseValue != null && isOrganizationBaseValue.getValue() != null) {
+            isOrganization = (boolean) isOrganizationBaseValue.getValue();
+        }
+
+        if (isCreditorBaseValue != null && isCreditorBaseValue.getValue() != null) {
+            isCreditor = (boolean) isCreditorBaseValue.getValue();
+        }
+
+        if (!((isPerson && !isOrganization && !isCreditor) ||
+                (!isPerson && isOrganization && !isCreditor) ||
+                (!isPerson && !isOrganization && isCreditor))) {
+            throw new KnownException(Errors.compose(Errors.E293));
+        }
+
         IBaseValue docsBaseValue = iBaseEntity.getBaseValue("docs");
 
         if (docsBaseValue == null || docsBaseValue.getValue() == null)
@@ -67,6 +93,15 @@ public class SubjectOptimizer {
                 stringBuilder.append(",");
 
             stringBuilder.append(tmpEntity.getId());
+        }
+
+        stringBuilder.append(Errors.SEPARATOR);
+        if (isPerson) {
+            stringBuilder.append("100");
+        } else if(isOrganization) {
+            stringBuilder.append("010");
+        } else if (isCreditor) {
+            stringBuilder.append("001");
         }
 
         return stringBuilder.toString();
