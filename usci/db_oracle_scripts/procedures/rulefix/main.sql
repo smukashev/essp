@@ -17,6 +17,7 @@ BEGIN
       lx_pastdue_val1_fill();
       lx_pastdue_val2_fill();
       lx_pastdue_vs_report_date_fill();
+      lx_bank_relation_050_fill();
    end if;
 
    if v_fix_data = 1 THEN
@@ -28,6 +29,7 @@ BEGIN
       lx_pastdue_val1_fix();
       lx_pastdue_val2_fix();
       lx_pastdue_vs_report_date_fix();
+      lx_bank_relation_050_fix();
    end if;
    --end of rule amount
 
