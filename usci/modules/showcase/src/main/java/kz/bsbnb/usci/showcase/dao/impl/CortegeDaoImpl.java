@@ -103,8 +103,11 @@ public class CortegeDaoImpl extends CommonDao {
                 rootExecutionFlag = true;
             }
 
-            if (globalEntity.getOperation() != null && globalEntity.getOperation().equals(OperationType.DELETE))
+            if (globalEntity.getOperation() != null && globalEntity.getOperation().equals(OperationType.DELETE)) {
+                cleanAllReportDate(showCase, rootKeyElement, entity);
                 continue;
+            }
+
 
             if (!showCase.isFinal()) {
                 Date maxOpenDate;
@@ -863,6 +866,25 @@ public class CortegeDaoImpl extends CommonDao {
         }
     }
 
+    @Transactional
+    private void cleanAllReportDate (ShowCase showCase, KeyElement rootKeyElement, IBaseEntity entity) {
+        String sql;
+
+        if (!showCase.isFinal()) {
+            sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys;
+
+            jdbcTemplateSC.update("DELETE FROM ACTUAL WHERE  + rootKeyElement.queryKeys", String.format(sql, getActualTableName(showCase), COLUMN_PREFIX,
+                    showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values));
+
+            jdbcTemplateSC.update("DELETE FROM HISTORY WHERE  + rootKeyElement.queryKeys", String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX,
+                    showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values));
+        } else {
+            sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys;
+
+            jdbcTemplateSC.update("DELETE FROM %s WHERE + rootKeyElement.queryKeys", String.format(sql, getActualTableName(showCase), COLUMN_PREFIX,
+                    showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values));
+        }
+    }
     /* Returns array elementArray + elements in  both order */
     private Object[] getObjectArray(boolean reverse, Object[] elementArray, Object... elements) {
         Object[] newObjectArray = new Object[elementArray.length + elements.length];
