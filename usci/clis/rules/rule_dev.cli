@@ -1,0 +1,49 @@
+rule read $$$
+title: BANK_RELATION_BLOCK_INVALID
+rule "BANK_RELATION_BLOCK_INVALID"
+//MES921
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+        && (
+            (getEls("{count}subject[is_person=true]person_info.bank_relations.bank_relation") > 1
+            && getEls("{count}subject[is_person=true]person_info.bank_relations[bank_relation.code=50]") > 0)
+            ||
+            (getEls("{count}subject[is_organization=true]organization_info.bank_relations.bank_relation") > 1
+            && getEls("{count}subject[is_organization=true]organization_info.bank_relations[bank_relation.code=50]") > 0)
+        ))
+then
+  $entity.addValidationError("Ошибка по признаку связанности: Значение \"Не связан\" не может использоваться с иными значениями");
+end
+
+$$$
+
+rule save
+
+rule read $$$
+title: признак ИП - тип юр лица
+rule "признак ИП - тип юр лица"
+when:
+ $entity: BaseEntity( getMeta().getClassName == "credit"
+                && (getEls("{setString(01,04,07)}subject[is_organization=true]organization_info[is_se=true]enterprise_type.code") > 0
+                   ||
+                    getEls("{setString(02,03,05,06,08,09)}subject[is_organization=true]organization_info[is_se=false]enterprise_type.code") > 0))
+then
+ $entity.addValidationError("Код субъекта частного предпринимательства не соответствует типу субъекта кредитной истории");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: Руководитель юридического лица
+rule "head juridical"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+            && getEls("{setString(17,18,19,24)}credit_type.code") == 0
+            && getEls("{count}subject[is_organization=true]organization_info[is_se!=true][head=null]") > 0)
+then
+  $entity.addValidationError("Не заполнен руководитель юридического лица");
+end
+$$$
+
+rule save

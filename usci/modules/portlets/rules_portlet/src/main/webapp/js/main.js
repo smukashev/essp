@@ -527,7 +527,8 @@ Ext.onReady(function(){
             type: 'ajax',
             url: dataUrl,
             extraParams: {
-                op: 'PACKAGE_ALL'
+                op: 'PACKAGE_ALL',
+                dev: Ext.util.Cookies.get('isDevMode')
             },
             listeners : {
                 exception: function(proxy, response, operation, eOpts) {

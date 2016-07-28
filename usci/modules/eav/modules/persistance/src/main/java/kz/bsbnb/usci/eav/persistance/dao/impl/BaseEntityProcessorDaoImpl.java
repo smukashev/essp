@@ -309,8 +309,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
 
-                    /*if (rulesEnabled)
-                        processLogicControl(baseEntityApplied);*/
+                    if (rulesEnabled)
+                        //processLogicControl(baseEntityApplied);
+                        tempLogicControlUpdate(baseEntityApplied);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
@@ -332,6 +333,22 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             refRepository.installRef(baseEntityApplied);
 
         return baseEntityApplied;
+    }
+
+    private void tempLogicControlUpdate(IBaseEntity baseEntityApplied) {
+        if (metaRules == null) {
+            String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
+            metaRules = new HashSet<>(Arrays.asList(metaArray));
+        }
+
+        if (metaRules.contains(baseEntityApplied.getMeta().getClassName())) {
+            rulesSingleton.runRules(baseEntityApplied, "dev_process",
+                    baseEntityApplied.getReportDate());
+
+            if (baseEntityApplied.getValidationErrors().size() > 0)
+                throw new KnownIterativeException(baseEntityApplied.getValidationErrors());
+        }
+
     }
 
     private void processLogicControl(IBaseEntity baseEntityApplied) {
