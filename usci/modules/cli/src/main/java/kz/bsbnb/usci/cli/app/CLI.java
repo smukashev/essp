@@ -2348,7 +2348,6 @@ public class CLI {
                             try {
                                 conn.close();
                             } catch (SQLException e1) {
-                                e1.printStackTrace();
                             }
                             return;
                         }
@@ -2376,12 +2375,10 @@ public class CLI {
 
                         Thread.sleep(5000);
                     } catch (Exception e){
-                        e.printStackTrace();
                         try {
                             if (conn != null)
                                 conn.close();
                         } catch (Exception ex) {
-                            ex.printStackTrace();
                         }
                     }
                 }
