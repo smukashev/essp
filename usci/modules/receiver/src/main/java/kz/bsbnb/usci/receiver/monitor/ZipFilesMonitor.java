@@ -105,6 +105,10 @@ public class ZipFilesMonitor {
                         .setReceiptDate(new Date())
                 );
 
+                List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
+                batch.setCreditor(getCreditor(batchInfo, cList));
+
+                serviceFactory.getMailMessageBeanCommonBusiness().notifyNBMaintenance(batch);
                 return false;
             }
            // EavGlobal signGlobal = serviceFactory.getGlobalService().getGlobal(batch.getStatusId());
