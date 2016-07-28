@@ -10,3 +10,20 @@ end
 $$$
 
 rule save
+
+
+rule read $$$
+title: проверка кредитора
+rule "проверка кредитора"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getBaseEntityReportDate() != null
+       && getEl("creditor") != null
+       && getBaseEntityReportDate().getCreditorId() != ((BaseEntity) getEl("creditor")).getId()
+    )
+then
+   $entity.addValidationError("Неправильно установлен кредитор");
+end
+$$$
+
+rule save
