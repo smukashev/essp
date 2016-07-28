@@ -203,11 +203,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             metaRules = new HashSet<>(Arrays.asList(metaArray));
         }
 
-        if (!rulesEnabled || baseEntity.getOperation() == null)
-            return;
-
-        if((baseEntity.getOperation().equals(OperationType.INSERT) || baseEntity.getOperation().equals(OperationType.UPDATE))
-                && metaRules.contains(baseEntity.getMeta().getClassName())) {
+        if(rulesEnabled && metaRules.contains(baseEntity.getMeta().getClassName())) {
             List<String> errors = new ArrayList<>();
             try {
                 rulesSingleton.runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
