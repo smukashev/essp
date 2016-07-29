@@ -423,7 +423,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public void loadBaseValues(final IBaseEntity baseEntity, final Date existingReportDate, final Date savingReportDate) {
         IMetaClass metaClass = baseEntity.getMeta();
 
-        Date loadingDate = savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+        Date loadingDate = savingReportDate == null ? existingReportDate  : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
 
         Table tableOfAttributes = EAV_M_COMPLEX_ATTRIBUTES.as("a");
         Table tableOfValues = EAV_BE_COMPLEX_VALUES.as("v");

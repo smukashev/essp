@@ -388,7 +388,7 @@ public class BaseSetDoubleValueDaoImpl extends JDBCSupport implements IBaseSetDo
         Table tableOfValues = EAV_BE_DOUBLE_SET_VALUES.as("ssv");
         Select select;
 
-        Date loadingDate = savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+        Date loadingDate = savingReportDate == null ? existingReportDate  : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
 
         Table tableNumbering = context
                 .select(DSL.rank().over()

@@ -437,7 +437,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         Table tableOfValues = EAV_BE_DOUBLE_VALUES.as("v");
         Select select;
 
-        Date loadingDate = savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+        Date loadingDate = savingReportDate == null ? existingReportDate  : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
 
         Table tableNumbering = context
                 .select(DSL.rank().over()
