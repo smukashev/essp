@@ -239,7 +239,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         /* Проверка сущности на бизнес правила */
         if (!baseEntity.getMeta().isReference())
-            checkForRules((BaseEntity) baseEntity);
+            checkForRules((BaseEntity) baseEntityPostPrepared);
 
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {

@@ -162,7 +162,16 @@ public class RulesPortlet extends MVCPortlet{
 
             switch(operationType){
                 case PACKAGE_ALL:
-                       writer.write(JsonMaker.getJson(batchService.getAllPackages()));
+                    List<RulePackage> allPackages = batchService.getAllPackages();
+                    Iterator<RulePackage> iterator = allPackages.iterator();
+
+                    if(resourceRequest.getParameter("dev") == null || !resourceRequest.getParameter("dev").equals("true")) {
+                        while (iterator.hasNext()) {
+                            if (iterator.next().getName().startsWith("dev"))
+                                iterator.remove();
+                        }
+                    }
+                    writer.write(JsonMaker.getJson(allPackages));
                     break;
                 case PACKAGE_VERSIONS:
                     batchId = Long.parseLong(resourceRequest.getParameter("packageId"));

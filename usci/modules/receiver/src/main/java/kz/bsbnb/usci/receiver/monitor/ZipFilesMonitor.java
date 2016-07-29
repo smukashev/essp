@@ -106,9 +106,14 @@ public class ZipFilesMonitor {
                 );
 
                 List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
-                batch.setCreditor(getCreditor(batchInfo, cList));
 
-                serviceFactory.getMailMessageBeanCommonBusiness().notifyNBMaintenance(batch);
+                if(cList.size() != 1) {
+                    logger.error("Неправильное количество кредиторов ожидаемое = 1, " +
+                            "получено = " + cList.size() + ", пользователь = " + batchInfo.getUserId());
+                } else {
+                    batch.setCreditor(cList.get(0));
+                    serviceFactory.getMailMessageBeanCommonBusiness().notifyNBMaintenance(batch);
+                }
                 return false;
             }
            // EavGlobal signGlobal = serviceFactory.getGlobalService().getGlobal(batch.getStatusId());

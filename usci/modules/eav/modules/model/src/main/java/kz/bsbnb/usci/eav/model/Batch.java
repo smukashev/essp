@@ -134,6 +134,10 @@ public class Batch extends Persistable {
     public String getFormattedFileName(){
         if(fileName == null)
             return "без имени";
+
+        if(fileName.contains("\\"))
+            return fileName.substring(fileName.lastIndexOf('\\') + 1);
+
         return fileName.substring(fileName.lastIndexOf('/') + 1);
     }
 
