@@ -198,9 +198,7 @@ public class ReportDateLayout extends VerticalLayout {
         reportStatusLabel.setSizeUndefined();
 
         Button approveReportButton = null;
-        if (!ReportStatus.COMPLETED.code().equals(report.getStatus().getCode())
-                && !ReportStatus.ORGANIZATION_APPROVED.code().equals(report.getStatus().getCode())
-                && !ReportStatus.ORGANIZATION_APPROVING.code().equals(report.getStatus().getCode())) {
+        if (!ReportStatus.COMPLETED.code().equals(report.getStatus().getCode())) {
             String approveReportButtonCaption = environment.getResourceString(Localization.APPROVE_REPORT_BUTTON_CAPTION);
             if (environment.isNbUser()) {
                 approveReportButton = new Button(approveReportButtonCaption, new Button.ClickListener() {
