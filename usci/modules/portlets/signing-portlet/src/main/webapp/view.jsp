@@ -190,7 +190,7 @@
     <c:choose>
         <c:when test="${hasCanceledFiles}">
             <div class="portlet-msg-info">
-                <liferay-ui:message key="message-files-canceled" arguments="${canceledFilesCount}"/>
+               Количество отмененных файлов: ${canceledFilesCount}
             </div>
         </c:when>
     </c:choose>
