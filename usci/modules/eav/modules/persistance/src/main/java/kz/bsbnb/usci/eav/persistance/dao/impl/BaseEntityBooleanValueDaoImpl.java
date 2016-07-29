@@ -457,6 +457,8 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
         Table tableOfValues = EAV_BE_BOOLEAN_VALUES.as("v");
         Select select;
 
+        Date loadingDate = savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+
         Table tableNumbering = context
                 .select(DSL.rank().over()
                                 .partitionBy(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.ATTRIBUTE_ID))
@@ -471,7 +473,7 @@ public class BaseEntityBooleanValueDaoImpl extends JDBCSupport implements IBaseE
                         tableOfValues.field(EAV_BE_BOOLEAN_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.ENTITY_ID).eq(baseEntity.getId()))
-                .and(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(existingReportDate)))
+                .and(tableOfValues.field(EAV_BE_BOOLEAN_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(loadingDate)))
                 .asTable("vn");
 
         select = context
