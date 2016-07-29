@@ -9,16 +9,18 @@ AS
   v_subject_id number;
 begin
 
-  delete from lx_bank_relation_050;
+  delete from lx_bank_relation_050p;
 
-  insert into lx_bank_relation_050
+  insert into lx_bank_relation_050p
+    select tm.set_id, sets.entity_id as person_info_id from
     (select set_id from eav_be_complex_set_values where set_id in (
       (select sets.id as set_Id from eav_be_entity_complex_sets sets
         join eav_be_complex_set_values sv on sets.id = sv.set_id
         join eav_be_complex_values cv on sv.entity_value_id = cv.entity_id
-      where sets.attribute_id in (5,9)
+      where sets.attribute_id = 9
             and cv.entity_value_id = 1931))
     group by set_id
-    having count(1) > 1);
+    having count(1) > 1) tm
+    left outer join eav_be_entity_complex_sets sets on tm.set_id = sets.id;
 
 end lx_bank_relation_050_fill;
