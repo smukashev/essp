@@ -60,6 +60,7 @@ Ext.onReady(function() {
                     if(totalCount) {
                         userNavHistory.success(totalCount);
                     }
+                    Ext.getCmp('entityEditorShowBtn').enable();
                 }});
         }
     };
