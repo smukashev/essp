@@ -231,7 +231,8 @@ public class ReportDateLayout extends VerticalLayout {
         Button undoApproveReportButton = null;
         if (environment.isNbUser()
                 && (report.getStatus().getCode().equals(ReportStatus.COMPLETED.code())
-                || report.getStatus().getCode().equals(ReportStatus.ORGANIZATION_APPROVED.code()))) {
+                || report.getStatus().getCode().equals(ReportStatus.ORGANIZATION_APPROVED.code())
+                || report.getStatus().getCode().equals(ReportStatus.ORGANIZATION_APPROVING.code()))) {
             String undoApproveReportButtonCaption = environment.getResourceString(Localization.UNDO_APPROVE_REPORT_BUTTON_CAPTION);
             undoApproveReportButton = new Button(undoApproveReportButtonCaption, new Button.ClickListener() {
                 public void buttonClick(Button.ClickEvent event) {
