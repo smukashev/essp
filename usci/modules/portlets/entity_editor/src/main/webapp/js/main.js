@@ -816,6 +816,7 @@ Ext.onReady(function () {
         handler: function () {
             //entityId = Ext.getCmp("entityId");
             userNavHistory.init();
+            Ext.getCmp('entityEditorShowBtn').disable();
             Ext.getCmp('form-area').doSearch();
             return;
             var keySearchComponent = document.getElementById('inp-1-' + currentMeta + '-null');
