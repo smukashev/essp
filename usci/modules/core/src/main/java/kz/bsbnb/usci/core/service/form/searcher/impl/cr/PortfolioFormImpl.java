@@ -68,7 +68,7 @@ public class PortfolioFormImpl extends JDBCSupport implements ISearcherForm {
         ISearchResult ret = new NonPaginableSearchResult();
 
         for (Long portfolioDataId : portfolioDatas) {
-            entities.add(((BaseEntity) baseEntityLoadDao.load(portfolioDataId)));
+            entities.add(((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(portfolioDataId, reportDate)));
         }
         ret.setData(entities);
 
