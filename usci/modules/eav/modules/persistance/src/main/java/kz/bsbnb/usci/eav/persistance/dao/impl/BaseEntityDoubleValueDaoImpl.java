@@ -437,6 +437,8 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
         Table tableOfValues = EAV_BE_DOUBLE_VALUES.as("v");
         Select select;
 
+        Date loadingDate = savingReportDate == null ? existingReportDate  : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+
         Table tableNumbering = context
                 .select(DSL.rank().over()
                                 .partitionBy(tableOfValues.field(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID))
@@ -451,8 +453,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                         tableOfValues.field(EAV_BE_DOUBLE_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_DOUBLE_VALUES.ENTITY_ID).eq(baseEntity.getId()))
-                .and(tableOfValues.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE)
-                        .lessOrEqual(DataUtils.convert(existingReportDate)))
+                .and(tableOfValues.field(EAV_BE_DOUBLE_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(loadingDate)))
                 .asTable("vn");
 
         select = context
@@ -465,8 +466,7 @@ public class BaseEntityDoubleValueDaoImpl extends JDBCSupport implements IBaseEn
                         tableNumbering.field(EAV_BE_DOUBLE_VALUES.IS_LAST))
                 .from(tableNumbering)
                 .join(tableOfAttributes)
-                .on(tableNumbering.field(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID)
-                        .eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
+                .on(tableNumbering.field(EAV_BE_DOUBLE_VALUES.ATTRIBUTE_ID).eq(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.ID)))
                 .where((tableNumbering.field("num_pp").cast(Integer.class).equal(1)
                 .and(tableNumbering.field(EAV_BE_DOUBLE_VALUES.IS_CLOSED).equal(false))
                 .and(tableOfAttributes.field(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL).equal(false)))

@@ -53,7 +53,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
     private IBaseContainer currentContainer;
 
-    private Long index = 1L, level = 0L;
+    private Long index = 0L, level = 0L;
 
     private boolean hasMembers = false;
 

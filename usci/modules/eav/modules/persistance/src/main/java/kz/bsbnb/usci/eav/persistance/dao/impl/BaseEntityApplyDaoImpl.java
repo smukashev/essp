@@ -1953,74 +1953,93 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseEntity.put(metaAttribute.getName(), baseValueApplied);
                     baseEntityManager.registerAsUpdated(baseValueApplied);
                 }
-            }
 
-            // case#6
-            if (baseValueClosed == null) {
-                IBaseValue baseValueNext = baseValueDao.getNextBaseValue(baseValueSaving);
+                // case#6
+                if (baseValueClosed == null) {
+                    IBaseValue baseValueNext = baseValueDao.getNextBaseValue(baseValueSaving);
 
-                if (baseValueNext != null) {
-                    reportDateLoaded = baseValueNext.getRepDate();
+                    if (baseValueNext != null) {
+                        reportDateLoaded = baseValueNext.getRepDate();
 
-                    childBaseSetLoaded = (IBaseSet) baseValueNext.getValue();
-                    childBaseSetApplied = new BaseSet(baseValueNext.getId(), childMetaType, creditorId);
-
-                    IBaseValue baseValueApplied = BaseValueFactory.create(
-                            MetaContainerTypes.META_CLASS,
-                            metaType,
-                            baseValueNext.getId(),
-                            creditorId,
-                            new Date(baseValueSaving.getRepDate().getTime()),
-                            childBaseSetApplied,
-                            baseValueNext.isClosed(),
-                            baseValueNext.isLast());
-
-                    baseValueApplied.setBaseContainer(baseEntity);
-                    baseValueApplied.setMetaAttribute(metaAttribute);
-
-                    baseEntityManager.registerAsUpdated(baseValueApplied);
-                } else {
-                    IBaseValue baseValueExisting = baseValueDao.getExistingBaseValue(baseValueSaving);
-
-                    if (baseValueExisting != null) {
-                        reportDateLoaded = baseValueExisting.getRepDate();
-
-                        childBaseSetLoaded = (IBaseSet) baseValueExisting.getValue();
-                        childBaseSetApplied = new BaseSet(baseValueExisting.getId(), childMetaType, creditorId);
+                        childBaseSetLoaded = (IBaseSet) baseValueNext.getValue();
+                        childBaseSetApplied = new BaseSet(baseValueNext.getId(), childMetaType, creditorId);
 
                         IBaseValue baseValueApplied = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
-                                baseValueExisting.getId(),
-                                baseValueExisting.getCreditorId(),
-                                baseValueExisting.getRepDate(),
-                                childBaseSetApplied,
-                                baseValueExisting.isClosed(),
-                                baseValueExisting.isLast());
-
-                        baseValueApplied.setBaseContainer(baseEntity);
-                        baseValueApplied.setMetaAttribute(metaAttribute);
-                    } else {
-                        childBaseSetApplied = new BaseSet(childMetaType, creditorId);
-                        baseEntityManager.registerAsInserted(childBaseSetApplied);
-
-                        IBaseValue baseValueApplied = BaseValueFactory.create(
-                                MetaContainerTypes.META_CLASS,
-                                metaType,
-                                0,
+                                baseValueNext.getId(),
                                 creditorId,
                                 new Date(baseValueSaving.getRepDate().getTime()),
                                 childBaseSetApplied,
-                                false,
-                                true);
+                                baseValueNext.isClosed(),
+                                baseValueNext.isLast());
 
                         baseValueApplied.setBaseContainer(baseEntity);
                         baseValueApplied.setMetaAttribute(metaAttribute);
 
-                        baseEntity.put(metaAttribute.getName(), baseValueApplied);
-                        baseEntityManager.registerAsInserted(baseValueApplied);
+                        baseEntityManager.registerAsUpdated(baseValueApplied);
+                    } else {
+                        IBaseValue baseValueExisting = baseValueDao.getExistingBaseValue(baseValueSaving);
+
+                        if (baseValueExisting != null) {
+                            reportDateLoaded = baseValueExisting.getRepDate();
+
+                            childBaseSetLoaded = (IBaseSet) baseValueExisting.getValue();
+                            childBaseSetApplied = new BaseSet(baseValueExisting.getId(), childMetaType, creditorId);
+
+                            IBaseValue baseValueApplied = BaseValueFactory.create(
+                                    MetaContainerTypes.META_CLASS,
+                                    metaType,
+                                    baseValueExisting.getId(),
+                                    baseValueExisting.getCreditorId(),
+                                    baseValueExisting.getRepDate(),
+                                    childBaseSetApplied,
+                                    baseValueExisting.isClosed(),
+                                    baseValueExisting.isLast());
+
+                            baseValueApplied.setBaseContainer(baseEntity);
+                            baseValueApplied.setMetaAttribute(metaAttribute);
+                        } else {
+                            childBaseSetApplied = new BaseSet(childMetaType, creditorId);
+                            baseEntityManager.registerAsInserted(childBaseSetApplied);
+
+                            IBaseValue baseValueApplied = BaseValueFactory.create(
+                                    MetaContainerTypes.META_CLASS,
+                                    metaType,
+                                    0,
+                                    creditorId,
+                                    new Date(baseValueSaving.getRepDate().getTime()),
+                                    childBaseSetApplied,
+                                    false,
+                                    true);
+
+                            baseValueApplied.setBaseContainer(baseEntity);
+                            baseValueApplied.setMetaAttribute(metaAttribute);
+
+                            baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                            baseEntityManager.registerAsInserted(baseValueApplied);
+                        }
                     }
                 }
+            } else {
+                childBaseSetApplied = new BaseSet(childMetaType, creditorId);
+                baseEntityManager.registerAsInserted(childBaseSetApplied);
+
+                IBaseValue baseValueApplied = BaseValueFactory.create(
+                        MetaContainerTypes.META_CLASS,
+                        metaType,
+                        0,
+                        creditorId,
+                        new Date(baseValueSaving.getRepDate().getTime()),
+                        childBaseSetApplied,
+                        false,
+                        true);
+
+                baseValueApplied.setBaseContainer(baseEntity);
+                baseValueApplied.setMetaAttribute(metaAttribute);
+
+                baseEntity.put(metaAttribute.getName(), baseValueApplied);
+                baseEntityManager.registerAsInserted(baseValueApplied);
             }
         }
 

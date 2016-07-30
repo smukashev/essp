@@ -101,7 +101,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
             throw new IllegalStateException(Errors.compose(Errors.E87, count, persistable.getId()));
     }
 
-    private IBaseValue constructValue(Map<String, Object> row, IMetaClass metaClass, IMetaType metaType, Date savingReportDate) {
+    private IBaseValue constructValue(Map<String, Object> row, IMetaClass metaClass, IMetaType metaType, Date loadingReportDate) {
         long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.ID.getName())).longValue();
 
         long creditorId = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.CREDITOR_ID.getName())).longValue();
@@ -112,10 +112,10 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
         IBaseEntity childBaseEntity;
 
-        if (savingReportDate == null) {
+        if (loadingReportDate == null) {
             childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, reportDate);
         } else {
-            childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, savingReportDate);
+            childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, loadingReportDate);
         }
 
         boolean closed = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;
@@ -423,6 +423,8 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
     public void loadBaseValues(final IBaseEntity baseEntity, final Date existingReportDate, final Date savingReportDate) {
         IMetaClass metaClass = baseEntity.getMeta();
 
+        Date loadingDate = savingReportDate == null ? existingReportDate  : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+
         Table tableOfAttributes = EAV_M_COMPLEX_ATTRIBUTES.as("a");
         Table tableOfValues = EAV_BE_COMPLEX_VALUES.as("v");
         Select select;
@@ -442,7 +444,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
                         tableOfValues.field(EAV_BE_COMPLEX_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_COMPLEX_VALUES.ENTITY_ID).eq(baseEntity.getId()))
-                .and(tableOfValues.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(savingReportDate)))
+                .and(tableOfValues.field(EAV_BE_COMPLEX_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(loadingDate)))
                 .asTable("vn");
 
         select = context
@@ -471,7 +473,7 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
             IMetaType metaType = metaClass.getMemberType(attribute);
 
-            baseEntity.put(attribute, constructValue(row, metaClass, metaType, savingReportDate));
+            baseEntity.put(attribute, constructValue(row, metaClass, metaType, loadingDate));
         }
     }
 
