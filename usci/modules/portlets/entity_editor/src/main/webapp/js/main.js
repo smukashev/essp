@@ -878,7 +878,7 @@ Ext.onReady(function () {
                     op: 'SAVE_XML'
                 },
                 success: function () {
-                    Ext.MessageBox.alert("", "Сохранено успешно");
+                    Ext.MessageBox.alert("", "Сохранено успешно. Необходимо отправить изменения через портлет \"Отправка изменений\"");
                 }
             });
         },
