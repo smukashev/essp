@@ -388,6 +388,8 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         Table tableOfComplexSets = EAV_M_COMPLEX_SET.as("cs");
         Table tableOfEntityComplexSets = EAV_BE_ENTITY_COMPLEX_SETS.as("ecs");
 
+        Date loadingDate = savingReportDate == null ? existingReportDate  : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+
         Select select;
 
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
@@ -405,7 +407,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                 .from(tableOfEntityComplexSets)
                 .where(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.ENTITY_ID).eq(baseEntity.getId()))
                 .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.CREDITOR_ID).eq(creditorId))
-                .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE).lessOrEqual(DataUtils.convert(existingReportDate)))
+                .and(tableOfEntityComplexSets.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE).lessOrEqual(DataUtils.convert(loadingDate)))
                 .asTable("essn");
 
         select = context
@@ -429,7 +431,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
         for (Map<String, Object> row : rows) {
             String attribute = (String) row.get(EAV_M_COMPLEX_SET.NAME.getName());
-            baseEntity.put(attribute, constructValue(row, baseEntity.getMeta(), baseEntity.getMemberType(attribute), savingReportDate));
+            baseEntity.put(attribute, constructValue(row, baseEntity.getMeta(), baseEntity.getMemberType(attribute), loadingDate));
         }
     }
 
@@ -444,7 +446,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
     }
 
-    private IBaseValue constructValue(final Map<String, Object> row, final IMetaClass metaClass, final IMetaType metaType, final Date savingReportDate) {
+    private IBaseValue constructValue(final Map<String, Object> row, final IMetaClass metaClass, final IMetaType metaType, final Date loadingDate) {
         IMetaSet metaSet = (IMetaSet) metaType;
 
         long id = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
@@ -459,7 +461,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
         IBaseSet baseSet = new BaseSet(id, metaSet.getMemberType(), creditorId);
 
-        baseSetComplexValueDao.loadBaseValues(baseSet, reportDate, savingReportDate);
+        baseSetComplexValueDao.loadBaseValues(baseSet, reportDate, loadingDate);
 
         return BaseValueFactory.create(
                 metaClass.getType(),

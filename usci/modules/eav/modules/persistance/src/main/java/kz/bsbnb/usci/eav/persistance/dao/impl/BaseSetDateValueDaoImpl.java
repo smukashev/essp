@@ -383,6 +383,8 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
         Table tableOfValues = EAV_BE_DATE_SET_VALUES.as("ssv");
         Select select;
 
+        Date loadingDate = savingReportDate == null ? existingReportDate  : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+
         Table tableNumbering = context
                 .select(DSL.rank().over()
                                 .partitionBy(tableOfValues.field(EAV_BE_DATE_SET_VALUES.VALUE))
@@ -395,7 +397,7 @@ public class BaseSetDateValueDaoImpl extends JDBCSupport implements IBaseSetDate
                         tableOfValues.field(EAV_BE_DATE_SET_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_DATE_SET_VALUES.SET_ID).eq(baseSet.getId()))
-                .and(tableOfValues.field(EAV_BE_DATE_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(existingReportDate)))
+                .and(tableOfValues.field(EAV_BE_DATE_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(loadingDate)))
                 .asTable("ssvn");
 
         select = context

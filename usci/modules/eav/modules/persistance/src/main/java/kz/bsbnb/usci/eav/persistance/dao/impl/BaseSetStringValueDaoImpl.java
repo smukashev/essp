@@ -397,6 +397,8 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
         Table tableOfValues = EAV_BE_STRING_SET_VALUES.as("ssv");
         Select select;
 
+        Date loadingDate = savingReportDate == null ? existingReportDate  : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+
         Table tableNumbering = context
                 .select(DSL.rank().over()
                             .partitionBy(tableOfValues.field(EAV_BE_STRING_SET_VALUES.VALUE))
@@ -410,7 +412,7 @@ public class BaseSetStringValueDaoImpl extends JDBCSupport implements IBaseSetSt
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_STRING_SET_VALUES.SET_ID).eq(baseSet.getId()))
                 .and(tableOfValues.field(EAV_BE_STRING_SET_VALUES.CREDITOR_ID).eq(baseSet.getCreditorId()))
-                .and(tableOfValues.field(EAV_BE_STRING_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(existingReportDate)))
+                .and(tableOfValues.field(EAV_BE_STRING_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(loadingDate)))
                 .asTable("ssvn");
 
         select = context

@@ -365,6 +365,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         Table tableOfValues = EAV_BE_COMPLEX_SET_VALUES.as("csv");
         Select select;
 
+        Date loadingDate = savingReportDate == null ? existingReportDate  : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+
         Table tableNumbering = context
                 .select(DSL.rank().over()
                         .partitionBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID))
@@ -377,7 +379,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.SET_ID).eq(baseSet.getId()))
-                .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(savingReportDate)))
+                .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(loadingDate)))
                 .asTable("csvn");
 
         select = context
@@ -406,7 +408,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
-            IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, savingReportDate);
+            IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, loadingDate);
 
             baseSet.put(BaseValueFactory.create(
                     MetaContainerTypes.META_SET,

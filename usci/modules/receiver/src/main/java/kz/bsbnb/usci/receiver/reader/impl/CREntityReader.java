@@ -92,7 +92,7 @@ public class CREntityReader<T> extends CommonReader<T> {
         }
 
         try {
-            crParser.parse(xmlEventReader, batch, 1L, creditorId);
+            crParser.parse(xmlEventReader, batch, 0L, creditorId);
         } catch (SAXException e) {
             e.printStackTrace();
         }
