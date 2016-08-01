@@ -482,7 +482,7 @@ when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
                 && getEls("{count}subject.docs[doc_type.code!=16][name!=null]") > 0 )
 then
- $entity.addValidationError("Присутсвует излишнее наименование документа");
+ $entity.addValidationError("Присутствует излишнее наименование документа");
 end
 $$$
 
