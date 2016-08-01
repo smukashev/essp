@@ -111,13 +111,13 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         baseValueCounts.put(BaseEntityComplexSet.class, baseEntityReportDate.getComplexSetsCount());
 
         for (Class<? extends IBaseValue> baseValueClass : baseValueCounts.keySet()) {
-            long baseValuesCount = baseValueCounts.get(baseValueClass);
-            if (baseValuesCount > 0) {
+            //long baseValuesCount = baseValueCounts.get(baseValueClass);
+            //if (baseValuesCount > 0) {
                 IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
                         .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
 
                 baseEntityValueDao.loadBaseValues(baseEntity, existingReportDate, savingReportDate);
-            }
+            //}
         }
 
         return baseEntity;
