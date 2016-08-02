@@ -40,6 +40,7 @@ public class XSDGenerator {
         ps.println("<xsd:enumeration value=\"DELETE\"/>");
         ps.println("<xsd:enumeration value=\"CLOSE\"/>");
         ps.println("<xsd:enumeration value=\"INSERT\"/>");
+        ps.println("<xsd:enumeration value=\"NEW\"/>");
         ps.println("</xsd:restriction>");
         ps.println("</xsd:simpleType>");
 
@@ -72,6 +73,7 @@ public class XSDGenerator {
 
             for (String attrName : metaClass.getAttributeNames()) {
                 IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attrName);
+                metaAttribute.getMetaType().setReference(metaClass.isReference());
                 printAttribute(metaAttribute, ps, setMemberTypes);
             }
 
@@ -138,7 +140,7 @@ public class XSDGenerator {
         } else {
             MetaValue metaValue = (MetaValue) metaAttribute.getMetaType();
             element = Element.create(
-                    metaAttribute.getName(), getSimpleType(metaValue.getTypeCode()), minOccurs, maxOccurs, nillable);
+                    metaAttribute.getName(), getSimpleType(metaValue.getTypeCode()), minOccurs, maxOccurs, nillable, metaAttribute.isKey() && !metaValue.isReference());
         }
 
         printElement(ps, element);
@@ -167,23 +169,43 @@ public class XSDGenerator {
         private final String minOccurs;
         private final String maxOccurs;
         private final String nillable;
+        private final boolean isSimpleKey;
 
-        private Element(String name, String type, String minOccurs, String maxOccurs, String nillable) {
+        private Element(String name, String type, String minOccurs, String maxOccurs, String nillable, boolean isSimpleKey) {
             this.name = name;
             this.type = type;
             this.minOccurs = minOccurs;
             this.maxOccurs = maxOccurs;
             this.nillable = nillable;
+            this.isSimpleKey = isSimpleKey;
         }
 
         public static Element create(String name, String type, String minOccurs, String maxOccurs, String nillable) {
-            return new Element(name, type, minOccurs, maxOccurs, nillable);
+            return new Element(name, type, minOccurs, maxOccurs, nillable, false);
+        }
+
+        public static Element create(String name, String type, String minOccurs, String maxOccurs, String nillable, boolean isSimpleKey) {
+            return new Element(name, type, minOccurs, maxOccurs, nillable, isSimpleKey);
         }
     }
 
     private void printElement(PrintStream ps, Element element) {
-        ps.printf("<xsd:element name=\"%s\" type=\"%s\" minOccurs=\"%s\" maxOccurs=\"%s\" nillable=\"%s\"/>\n",
-                element.name, element.type, element.minOccurs, element.maxOccurs, element.nillable);
+        if (element.isSimpleKey) {
+            ps.printf("<xsd:element name=\"%s\" minOccurs=\"%s\" maxOccurs=\"%s\" nillable=\"%s\">\n",
+                    element.name, element.minOccurs, element.maxOccurs, element.nillable);
+                ps.println("<xsd:complexType>");
+                    ps.println("<xsd:simpleContent>");
+                        ps.printf("<xsd:extension base=\"%s\">\n", element.type);
+                            ps.println("<xsd:attribute type=\"operation\" name=\"operation\" use=\"optional\"/>");
+                            ps.printf("<xsd:attribute type=\"%s\" name=\"data\" use=\"optional\"/>\n", element.type);
+                        ps.println("</xsd:extension>");
+                    ps.println("</xsd:simpleContent>");
+                ps.println("</xsd:complexType>");
+            ps.println("</xsd:element>");
+        } else {
+            ps.printf("<xsd:element name=\"%s\" type=\"%s\" minOccurs=\"%s\" maxOccurs=\"%s\" nillable=\"%s\"/>\n",
+                    element.name, element.type, element.minOccurs, element.maxOccurs, element.nillable);
+        }
     }
 
 }
