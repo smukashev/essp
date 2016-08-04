@@ -73,6 +73,12 @@ global add --type=DIGITAL_SIGNING_SETTINGS --code=DIGITAL_SIGNING_ORGANIZATIONS_
 global add --type=LOGIC_RULE_SETTING --code=LOGIC_RULE_META --value=credit,ref_creditor,ref_creditor_branch,ref_exclusive_doc --desc=Метаклассы правил
 
 #
+# BVUNO SETTINGS
+#
+global add --type=BVUNO_SETTING --code=BVUNO_IDS --value=2288,2290,2293,2297,2300,2303,2306,2310,2313,2316,2320,2323,2326,2329,2332,2335,2339,2343,2346,2350,2354,2357,2361,2364,2367,2371,2374,2377,2381,2385,2388,2392,2395,2398,2401,2404,2409,2413,2417,2420,2423,2426,2429,2432,2436,2439,2441,2444 --desc=Список_БВУНО
+
+
+#
 # FIRST REPORT DATE SETTINGS
 #
 global add --type=ORG_FIRST_DATE_SETTING --code=DEFAULT_DATE_VALUE --value=01.04.2013 --desc=Первая_отчетная_дата_по_умолчанию

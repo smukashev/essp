@@ -44,6 +44,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     private static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
     private static final String LOGIC_RULE_META = "LOGIC_RULE_META";
+    private static final String BVUNO_SETTING = "BVUNO_SETTING";
+    private static final String BVUNO_IDS = "BVUNO_IDS";
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -82,6 +84,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Autowired
     private IRefRepository refRepository;
+
+    private Set bvunoSet;
 
     @Autowired
     public void setApplyListener(IDaoListener applyListener) {
@@ -309,9 +313,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
 
-                    if (rulesEnabled)
-                        //processLogicControl(baseEntityApplied);
-                        tempLogicControlUpdate(baseEntityApplied);
+                    if (rulesEnabled) {
+                        if(isBvuno(baseEntityApplied.getBaseEntityReportDate().getCreditorId()))
+                            tempLogicControlUpdate(baseEntityApplied);
+                        else
+                            processLogicControl(baseEntityApplied);
+                    }
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
@@ -323,8 +330,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
             sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
-            if(rulesEnabled)
-                tempLogicControlUpdate(baseEntityApplied);
+            if (rulesEnabled) {
+                if(isBvuno(baseEntityApplied.getBaseEntityReportDate().getCreditorId()))
+                    tempLogicControlUpdate(baseEntityApplied);
+                else
+                    processLogicControl(baseEntityApplied);
+            }
 
             baseEntityApplyDao.applyToDb(baseEntityManager);
         }
@@ -336,6 +347,24 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             refRepository.installRef(baseEntityApplied);
 
         return baseEntityApplied;
+    }
+
+    private boolean isBvuno(long creditorId) {
+
+        if(bvunoSet == null || bvunoSet.size() < 1) {
+            try {
+                bvunoSet = new HashSet();
+                String[] str = globalDao.get(BVUNO_SETTING, BVUNO_IDS).getValue().split(",");
+
+                for (String s : str) {
+                    bvunoSet.add(Long.parseLong(s));
+                }
+            } catch (Exception e) {
+                logger.error("bvuno map is empty !!! " + e.getMessage());
+            }
+        }
+
+        return bvunoSet.contains(creditorId);
     }
 
     private void tempLogicControlUpdate(IBaseEntity baseEntityApplied) {
