@@ -97,16 +97,6 @@ meta add --name=ref_country --attribute=short_name_kz --type=string
 meta add --name=ref_country --attribute=short_name_ru --type=string
 
 #====================================
-#= REF_REGION
-#====================================
-
-meta create --name=ref_region --reference
-meta add --name=ref_region --attribute=code --type=string --required
-meta key --name=ref_region --attribute=code
-meta add --name=ref_region --attribute=name_kz --type=string --required
-meta add --name=ref_region --attribute=name_ru --type=string --required
-
-#====================================
 #= REF_CREDITOR
 #====================================
 
@@ -119,6 +109,16 @@ meta add --name=ref_creditor --attribute=subject_type --type=meta_class --childn
 meta add --name=ref_creditor --attribute=docs --type=meta_class --childname=document --array --keytype=any --cumulative
 meta key --name=ref_creditor --attribute=docs
 meta key --name=ref_creditor --attribute=code --optional
+
+#====================================
+#= REF_REGION
+#====================================
+
+meta create --name=ref_region --reference
+meta add --name=ref_region --attribute=code --type=string --required
+meta key --name=ref_region --attribute=code
+meta add --name=ref_region --attribute=name_kz --type=string --required
+meta add --name=ref_region --attribute=name_ru --type=string --required
 
 
 #====================================
