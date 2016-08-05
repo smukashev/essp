@@ -185,6 +185,11 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
+    public List<BatchStatus> getBatchStatuses(List<Long> batchIds) {
+        return batchStatusDao.getStatuses(batchIds);
+    }
+
+    @Override
     public List<Batch> getPendingBatchList() {
         return batchDao.getPendingBatchList();
     }

@@ -27,6 +27,9 @@ public interface IBatchService {
 
     List<BatchStatus> getBatchStatusList(long batchId);
 
+
+    List<BatchStatus> getBatchStatuses(List<Long> batchIds);
+
     List<Batch> getPendingBatchList();
 
     List<Batch> getBatchListToSign(long creditorId);

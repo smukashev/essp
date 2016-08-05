@@ -65,6 +65,25 @@ public class BatchStatusDaoImpl extends JDBCSupport implements IBatchStatusDao {
         return batchStatusList;
     }
 
+    @Override
+    public List<BatchStatus> getStatuses(List<Long> batchIds) {
+        Select select = context.selectFrom(
+                EAV_BATCH_STATUSES)
+                .where(EAV_BATCH_STATUSES.BATCH_ID.in(batchIds))
+                .orderBy(EAV_BATCH_STATUSES.RECEIPT_DATE.desc(), EAV_BATCH_STATUSES.STATUS_ID.asc());
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        List<BatchStatus> batchStatusList = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            BatchStatus batchStatus = toBatchStatus(row);
+            batchStatusList.add(batchStatus);
+        }
+
+        return batchStatusList;
+    }
+
     private BatchStatus toBatchStatus(Map<String, Object> row) {
         BatchStatus batchStatus = new BatchStatus();
         batchStatus.setId(((BigDecimal) row.get(EAV_BATCH_STATUSES.ID.getName())).longValue());

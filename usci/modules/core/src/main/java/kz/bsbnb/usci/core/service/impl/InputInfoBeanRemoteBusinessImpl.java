@@ -43,6 +43,23 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         List<Batch> batchList = batchService.getAll(reportDate, creditorsList);
 
+        List<Long> bathsIds = new LinkedList<>();
+        for (Batch batch : batchList) {
+            bathsIds.add(batch.getId());
+        }
+
+        List<BatchStatus> batchStatuses = batchService.getBatchStatuses(bathsIds);
+
+        Map<Long, List<BatchStatus> > batchStatusMap = new HashMap<>();
+
+        for (BatchStatus batchStatus : batchStatuses) {
+            if(!batchStatusMap.containsKey(batchStatus.getBatchId())) {
+                batchStatusMap.put(batchStatus.getBatchId(), new LinkedList<BatchStatus>());
+            }
+
+            batchStatusMap.get(batchStatus.getBatchId()).add(batchStatus);
+        }
+
         for (Batch batch : batchList) {
             Creditor currentCreditor = inputCreditors.get(batch.getCreditorId());
 
@@ -50,7 +67,9 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 continue;
             }
 
-            List<BatchStatus> batchStatusList = batchService.getBatchStatusList(batch.getId());
+            //List<BatchStatus> batchStatusList = batchService.getBatchStatusList(batch.getId());
+            List<BatchStatus> batchStatusList = batchStatusMap.get(batch.getId());
+
 
             InputInfo ii = getInputInfo(batch, currentCreditor, batchStatusList);
 
