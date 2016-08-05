@@ -3,7 +3,6 @@ package kz.bsbnb.usci.receiver.queue.impl;
 import kz.bsbnb.usci.core.service.IGlobalService;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputInfo;
-import kz.bsbnb.usci.eav.model.EavGlobal;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
 import kz.bsbnb.usci.receiver.queue.JobInfo;
@@ -38,7 +37,8 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
 
     @Value("${concurrencyLimit}")
     private int concurrencyLimit;
-    private int activeJobCount;
+    //private int activeJobCount;
+    private Set<Long> activeCreditors = new HashSet<>();
     Set<Long> creditorsWithPriority = new HashSet<>();
     QueueOrderType currentOrderType = null;
     QueueOrder order;
@@ -52,11 +52,16 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
 
     @Override
     public JobInfo getNextJob() {
-        if(activeJobCount < concurrencyLimit) {
+        if(activeCreditors.size() < concurrencyLimit) {
             synchronized (this) {
                 if(queue.size() > 0) {
-                    activeJobCount++;
                     JobInfo ret = next(queue);
+                    if(ret != null) {
+                        long creditorId = ret.getBatchInfo().getCreditorId();
+                        if(!activeCreditors.contains(creditorId)) {
+                            activeCreditors.add(creditorId);
+                        }
+                    }
                     queue.remove(ret);
                     return ret;
                 }
@@ -70,7 +75,7 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
         StringBuilder sb = new StringBuilder();
         sb.append("JobLauncherStatus:\n");
         sb.append("queue size = " + queue.size() + ", order(Impl):" + order.getClass().getName() + ", " +
-                "activeJobCount = " + activeJobCount);
+                "activeJobCount = " + activeCreditors.size() + ", activeCreidtors = " + activeCreditors + ",");
 
         sb.append("queue state:\n");
         if(queue.size() == 0) sb.append("(empty)");
@@ -79,6 +84,7 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
             sb.append("batchId = " + jobInfo.getBatchId());
             sb.append(", batchName = " + jobInfo.getBatchInfo().getBatchName());
             sb.append(", size = " + jobInfo.getBatchInfo().getContentSize());
+            sb.append(", creditorId = " + jobInfo.getBatchInfo().getCreditorId());
             sb.append("\n");
         }
 
@@ -87,8 +93,9 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
 
 
     @Override
-    public synchronized void jobFinished(){
-        activeJobCount --;
+    public synchronized void jobFinished(Long creditorId){
+        //activeJobCount --;
+        activeCreditors.remove(creditorId);
     }
 
     @Override
@@ -110,6 +117,11 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
         Set<Long> creditorIds = new HashSet<>();*/
         Map<Long, JobInfo> firstFilesByEachCreditor = new HashMap<>();
         for (JobInfo jobInfo : queue) {
+
+            //Уникальность кредитора должна быть сохранена
+            if(activeCreditors.contains(jobInfo.getBatchInfo().getCreditorId()))
+                continue;
+
             if (!firstFilesByEachCreditor.containsKey(jobInfo.getBatchInfo().getCreditorId())) {
                 firstFilesByEachCreditor.put(jobInfo.getBatchInfo().getCreditorId(), jobInfo);
             } else {

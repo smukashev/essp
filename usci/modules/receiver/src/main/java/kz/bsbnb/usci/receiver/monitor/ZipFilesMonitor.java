@@ -240,7 +240,7 @@ public class ZipFilesMonitor {
 
                         sleep(1000);
                     } catch (Exception e) {
-                        jobLauncherQueue.jobFinished();
+                        jobLauncherQueue.jobFinished(nextJob.getBatchInfo().getCreditorId());
                         e.printStackTrace();
                     }
                 } else {

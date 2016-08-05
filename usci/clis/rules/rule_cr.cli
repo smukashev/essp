@@ -373,6 +373,24 @@ $$$
 
 rule save
 
+rule read $$$
+title: BANK_RELATION_EMPTY
+rule "BANK_RELATION_EMPTY"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+  && (
+        getEls("{count}subject[is_person=true]person_info.bank_relations.bank_relation.code") == 0 ||
+        getEls("{count}subject[is_organization=true]organization_info.bank_relations.bank_relation.code") == 0
+     ))
+then
+  $entity.addValidationError("Не заполнен блок связанности");
+end
+
+$$$
+
+rule save
+
+
 #rule read $$$
 #title: PLEDGE_DUPLICATE
 #rule "PLEDGE_DUPLICATE"

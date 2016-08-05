@@ -4,7 +4,6 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.eav.model.json.BatchInfo;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
-import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 
 import java.util.List;
 import java.util.Set;
@@ -17,7 +16,7 @@ public interface JobLauncherQueue {
 
     String getStatus();
 
-    void jobFinished();
+    void jobFinished(Long creditorId);
 
     void addJob(long batchId, BatchInfo batchInfo);
 

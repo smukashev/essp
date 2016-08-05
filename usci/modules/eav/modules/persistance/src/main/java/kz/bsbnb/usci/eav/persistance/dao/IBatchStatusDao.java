@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.dao;
 
 
+import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 
 import java.util.List;
@@ -13,5 +14,7 @@ public interface IBatchStatusDao {
     Long insert(BatchStatus batchStatus);
 
     List<BatchStatus> getList(long batchId);
+
+    List<BatchStatus> getStatuses(List<Long> batchIds);
 
 }
