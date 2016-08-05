@@ -54,7 +54,7 @@ public class BatchJobListener implements IListener {
 
         batchService.endBatch(batchId);
         receiverStatusSingleton.batchEnded();
-        jobLauncherQueue.jobFinished();
+        jobLauncherQueue.jobFinished(batch.getCreditorId());
 
         double secs = Math.round((System.currentTimeMillis() - lastTime) / 1000);
         double minutes = Math.round(secs / 60);
