@@ -27,3 +27,131 @@ end
 $$$
 
 rule save
+
+rule read $$$
+title: не заполнен язык руководителя
+rule "не заполнен язык руководителя"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEls("{count}subject.organization_info.head.names[lang=null]") > 0
+    )
+then
+   $entity.addValidationError("Не заполнен язык при наименовании руководителя");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: не заполнен язык из списка для руководителя
+rule "не заполнен язык из списка для руководителя"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEls("{setString(EN,KZ,RU)}subject.organization_info.head.names.lang") !=
+          getEls("{count}subject.organization_info.head.names.lang")
+    )
+then
+   $entity.addValidationError("Не заполнен язык из списка EN, KZ, RU для руководителя");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: дупликат языка руководителя
+rule "дупликат языка руководителя"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEls("{hasDuplicates(subject.organization_info.head.names)}lang") == true
+    )
+then
+   $entity.addValidationError("дупликат языка руководителя");
+end
+$$$
+
+rule save
+
+
+rule read $$$
+title: не заполнен язык наименования для организации
+rule "не заполнен язык наименования для организации"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEls("{count}subject.organization_info.names[lang=null]") > 0
+    )
+then
+   $entity.addValidationError("Не заполнен язык наименования для организации");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: не заполнен язык из списка для организации
+rule "не заполнен язык из списка для организации"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEls("{setString(EN,KZ,RU)}subject.organization_info.names.lang") !=
+          getEls("{count}subject.organization_info.names.lang")
+    )
+then
+   $entity.addValidationError("Не заполнен язык из списка EN, KZ, RU для организации");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: дупликат языка наименования для организации
+rule "дупликат языка наименования для организации"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEls("{hasDuplicates(subject.organization_info.names)}lang") == true
+    )
+then
+   $entity.addValidationError("дупликат языка наименования для организации");
+end
+$$$
+
+rule read $$$
+title: не заполнен язык наименования для физ лица
+rule "не заполнен язык наименования для физ лица"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEls("{count}subject.person_info.names[lang=null]") > 0
+    )
+then
+   $entity.addValidationError("Не заполнен язык наименования для физ лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: не заполнен язык из списка для физ лица
+rule "не заполнен язык из списка для физ лица"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEls("{setString(EN,KZ,RU)}subject.person_info.names.lang") !=
+          getEls("{count}subject.person_info.names.lang")
+    )
+then
+   $entity.addValidationError("Не заполнен язык из списка EN, KZ, RU для физ лица");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: дупликат языка наименования для физ лица
+rule "дупликат языка наименования для физ лица"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEls("{hasDuplicates(subject.person_info.names)}lang") == true
+    )
+then
+   $entity.addValidationError("дупликат языка наименования для физ лица");
+end
+$$$
+
+rule save
