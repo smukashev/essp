@@ -170,56 +170,70 @@ function find(control) {
 }
 
 function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
-    var xmlStr = "";
+
+    var ret = {
+        xml: "",
+        childCnt : 0
+    }
 
     var children = currentNode.childNodes;
 
     if (arrayEl) {
-        xmlStr += offset + "<item>\n";
+        ret.xml += offset + "<item>\n";
     } else {
         if (first) {
 
             if(currentNode.data.markedAsDeleted)
                 operation = 'DELETE';
 
-            xmlStr += offset + "<" + currentNode.data.code +
+            ret.xml += offset + "<" + currentNode.data.code +
                 (operation ? " operation=\"" + operation + "\"" : "") + ">\n";
         } else {
-            xmlStr += offset + "<" + currentNode.data.code + ">\n";
+            ret.xml += offset + "<" + currentNode.data.code + ">\n";
         }
     }
 
     for (var i = 0; i < children.length; i++) {
-
         if(children[i].data.markedAsDeleted) {
             if(!children[i].data.code.match(/\d+/))
-                xmlStr += offset + "  " + "<" + children[i].data.code + " xsi:nil=\"true\" />\n";
+                ret.xml += offset + "  " + "<" + children[i].data.code + " xsi:nil=\"true\" />\n";
 
             continue;
         }
 
         if (children[i].data.simple) {
             if (currentNode.data.array) {
-                xmlStr += offset + "  " + "<item>";
-                xmlStr += children[i].data.value;
-                xmlStr += "</item>\n";
+                ret.xml += offset + "  " + "<item>";
+                ret.xml += children[i].data.value;
+                ret.xml += "</item>\n";
             } else {
-                xmlStr += offset + "  " + "<" + children[i].data.code + ">";
-                xmlStr += children[i].data.value;
-                xmlStr += "</" + children[i].data.code + ">\n";
+                ret.xml += offset + "  " + "<" + children[i].data.code + ">";
+                ret.xml += children[i].data.value;
+                ret.xml += "</" + children[i].data.code + ">\n";
             }
+
+            ret.childCnt ++;
         } else {
-            xmlStr += createXML(children[i], false, offset + "    ", currentNode.data.array, false);
+            childRet = createXML(children[i], false, offset + "    ", currentNode.data.array, false);
+            if(childRet.childCnt > 0) {
+                ret.xml += childRet.xml;
+                ret.childCnt ++;
+            }
         }
     }
 
     if (arrayEl) {
-        xmlStr += offset + "</item>\n";
+        ret.xml += offset + "</item>\n";
     } else {
-        xmlStr += offset + "</" + currentNode.data.code + ">\n";
+        ret.xml += offset + "</" + currentNode.data.code + ">\n";
     }
 
-    return xmlStr;
+    if(ret.childCnt == 0) {
+        ret.xml = offset + "<" + currentNode.data.code + "/>\n";
+        ret.childCnt = 1;
+    }
+
+    return ret;
 }
 
 function addArrayElementButton(form) {
@@ -866,7 +880,7 @@ Ext.onReady(function () {
                 if (hasEmptyKeyAttr(rootNode.childNodes[i])) {
                     return;
                 }
-                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true);
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true).xml;
             }
 
             Ext.Ajax.request({
@@ -895,7 +909,7 @@ Ext.onReady(function () {
             var xmlStr = "";
 
             for (var i = 0; i < rootNode.childNodes.length; i++) {
-                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true);
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true).xml;
             }
 
             var buttonClose = Ext.create('Ext.button.Button', {
@@ -1000,7 +1014,7 @@ Ext.onReady(function () {
             var xmlStr = "";
 
             for (var i = 0; i < rootNode.childNodes.length; i++) {
-                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, "CLOSE");
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, "CLOSE").xml;
             }
 
             Ext.Ajax.request({
