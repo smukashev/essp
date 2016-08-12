@@ -1,39 +1,14 @@
 rule read $$$
-title: бин у юр лиц с кодам 02 является иином
-rule "бин у юр лиц с кодам 02 является иином"
+title: Неправильный ИИН у субъекта предпринимательства ИП
+rule "Неправильный ИИН у субъекта предпринимательства ИП"
 when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
-                && $r: getInvalidIINs((List) getEls("{get}subject[organization_info.enterprise_type.code=02]docs[doc_type.code=07]no") )
-                && $r.size() > 0 )
+                && getEls("{setString(02,05,08)}subject.organization_info.enterprise_type.code") > 0
+                && $r : getInvalidIINs((List) getEls("{get}subject.docs[doc_type.code=07]no"))
+                && $r.size() > 0
+)
 then
- $entity.addValidationError("Не правильный БИН у юр лица" + $r);
-end
-$$$
-
-rule save
-
-rule read $$$
-title: бин у юр лиц с кодам 05 является иином
-rule "бин у юр лиц с кодам 05 является иином"
-when:
- $entity: BaseEntity( getMeta().getClassName == "credit"
-                && getInvalidIINs((List) getEls("{get}subject[organization_info.enterprise_type.code=08]docs[doc_type.code=07]no")).size() > 0)
-then
- $entity.addValidationError("Не правильный БИН у юр лица" );
-end
-$$$
-
-rule save
-
-rule read $$$
-title: бин у юр лиц с кодам 08 является иином
-rule "бин у юр лиц с кодам 08 является иином"
-when:
- $entity: BaseEntity( getMeta().getClassName == "credit"
-                && $r: getInvalidIINs((List) getEls("{get}subject[organization_info.enterprise_type.code=08]docs[doc_type.code=07]no") )
-                && $r.size() > 0 )
-then
- $entity.addValidationError("Не правильный БИН у юр лица" + $r);
+ $entity.addValidationError("Неправильный ИИН у субъекта предпринимательства ИП " + $r);
 end
 $$$
 
