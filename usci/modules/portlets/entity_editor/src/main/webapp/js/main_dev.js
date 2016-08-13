@@ -633,6 +633,100 @@ function hasEmptyKeyAttr(mainNode) {
     return false;
 }
 
+function editorForm(node) {
+
+    var items = [];
+
+    switch(node.data.type) {
+        case 'DOUBLE':
+        case 'INTEGER':
+            items.push(Ext.create(Ext.form.NumberField,
+                {
+                    labelWidth: '0%',
+                    width: '100%',
+                    value: node.data.value,
+                    accept: function(){
+                        node.data.value = this.value;
+                    }
+                }));
+            break;
+        case 'STRING':
+            items.push(Ext.create("Ext.form.field.Text",
+                {
+                    labelWidth: '0%',
+                    width: '100%',
+                    value: node.data.value,
+                    accept: function(){
+                        node.data.value = this.value;
+                    }
+                }));
+            break;
+        case 'DATE':
+            items.push(Ext.create("Ext.form.field.Date",
+                {
+                    labelWidth: '0%',
+                    width: '100%',
+                    format: 'd.m.Y',
+                    value: node.data.value ? new Date(node.data.value.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$3-$2-$1')) : null,
+                    accept: function(){
+                        node.data.value = this.getSubmitValue();
+                    }
+                    /*readOnly: readOnly,
+                     allowBlank: allowBlank,
+                     blankText: label_REQUIRED_FIELD*/
+                }));
+            break;
+        case 'BOOLEAN':
+            items.push(Ext.create("Ext.form.field.ComboBox",
+                {
+                    /*id: attr.code + "FromItem" + idSuffix,
+                     fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                     labelWidth: labelWidth,
+                     width: width,
+                     readOnly: readOnly,
+                     allowBlank: allowBlank,
+                     blankText: label_REQUIRED_FIELD,
+                     editable: false,*/
+                    store: Ext.create('Ext.data.Store', {
+                        fields: ['value', 'title'],
+                        data: [
+                            {value: 'true', title: 'Да'},
+                            {value: 'false', title: 'Нет'}
+                        ]
+                    }),
+                    displayField: 'title',
+                    valueField: 'value',
+                    value: node.data.value,
+                    accept: function(){
+                        node.data.value = this.value;
+                    }
+                })
+            );
+            break;
+
+    }
+
+    Ext.create("Ext.Window", {
+        title: node.data.title,
+        width: 400,
+        modal: true,
+        closable: true,
+        closeAction: 'hide',
+        items: items,
+        tbar: [{
+            text: 'Сохранить новую запись',
+            handler: function () {
+                items[0].accept();
+                Ext.getCmp('entityTreeView').getView().refresh();
+                /*var form = Ext.getCmp('ArrayElFormPanel');
+                 if (form.isValid()) {
+                 saveFormValues(FORM_ADD_ARRAY_EL);
+                 }*/
+            }
+        }]
+    }).show();
+
+}
 Ext.onReady(function () {
 
     Ext.override(Ext.data.proxy.Ajax, {timeout: 120000});
@@ -1235,7 +1329,11 @@ Ext.onReady(function () {
                         text: 'Изменить',
                         handler: function(){
                             editorAction.edit = true;
-                            refPicker(record);
+                            if(record.data.ref)
+                                refPicker(record);
+                            else {
+                                editorForm(record);
+                            }
                         },
                         disabled: (action > 0 && !editorAction.edit) || !(record.data.ref || record.data.simple)
                     });

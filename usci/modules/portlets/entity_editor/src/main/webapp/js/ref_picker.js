@@ -62,7 +62,7 @@ function refPicker(node){
             new Ext.Window({
                 id: 'refSelectForm',
                 modal: 'true',
-                title: 'Выбор справочника',
+                title: 'Выбор справочника \"' + node.data.title + '\"',
                 items: [
                     Ext.create('Ext.form.Panel',{
                         region: 'center',
