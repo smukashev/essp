@@ -71,6 +71,7 @@
 <script src="<%=request.getContextPath()%>/js/s_person_fio.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/s_org_name.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/s_portfolio.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/ref_picker.js" type="text/javascript"></script>
 
 <script src="<%=request.getContextPath()%>/js/lang/default.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/lang/<%= ((ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY)).getLocale() %>.js" type="text/javascript"></script>

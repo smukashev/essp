@@ -55,6 +55,9 @@ var userNavHistory = {
 };
 var forms = [];
 
+var editorAction = {
+}
+
 function getForm() {
     currentSearch = Ext.getCmp('edSearch').value;
     currentMeta = Ext.getCmp('edSearch').displayTplData[0].metaName;
@@ -1191,43 +1194,50 @@ Ext.onReady(function () {
          }*/],
         listeners: {
             itemmousedown: function(me, record, item, index, e, eOpts) {
-                if(e.button == 0) {
-                    nextArrayIndex = 0;
-                    newArrayElements = [];
-                    Ext.getCmp('btnConfirmChanges').show();
-                    var tree = Ext.getCmp('entityTreeView');
-                    var selectedNode = tree.getSelectionModel().getLastSelected();
-                    var children = selectedNode.childNodes;
+                if(e.button > 0) {
+                    var items = [];
 
-                    var form = Ext.getCmp('EntityEditorFormPanel');
-                    form.removeAll();
+                    var action = 0;
 
-                    if (!selectedNode.data.simple) {
-                        if (!selectedNode.data.array) {
-                            loadAttributes(form, selectedNode);
-                        } else {
-                            Ext.getCmp('btnConfirmChanges').hide();
+                    if(editorAction.edit)
+                        action ++;
+                    if(editorAction.insert)
+                        action++;
+                    if(editorAction.delete)
+                        action++;
 
-                            addArrayElementButton(form);
+                    if(editorAction.close)
+                        action++;
 
-                            for (var i = 0; i < children.length; i++) {
-                                addField(form, children[i].data, true, selectedNode.data);
-                            }
-                        }
-                    }
-
-                    form.doLayout();
-                } else {
-                    var menu = new Ext.menu.Menu({
-                        items: [{
-                            text: 'Изменить'
-                        }, {
-                            text: 'Удалить'
-                        },{
-                            text: 'Закрыть'
-                        }]
+                    items.push({
+                        text: 'Изменить',
+                        handler: function(){
+                            editorAction.edit = true;
+                            refPicker(Ext.getCmp('entityTreeView').getSelectionModel().getLastSelected());
+                        },
+                        disabled: (action > 0 && !editorAction.edit)
                     });
 
+                    items.push({
+                        text: 'Удалить',
+                        handler: function(){
+                            editorAction.delete = true;
+                        },
+                        disabled: (action > 0 && !editorAction.delete)
+                    });
+
+                    items.push({
+                        text: 'close',
+                        handler: function(){
+                            editorAction.close = true;
+                        },
+                        disabled: (action > 0 && !editorAction.close)
+                    });
+
+
+                    var menu = new Ext.menu.Menu({
+                        items: items
+                    });
 
                     menu.showAt(e.xy);
                 }
