@@ -1209,11 +1209,33 @@ Ext.onReady(function () {
                     if(editorAction.close)
                         action++;
 
+                    if(record.data.depth == 1) {
+                        items.push({
+                            text: 'Отправить изменения',
+                            handler: function(){
+                                alert(333);
+                            }
+                        });
+                        items.push({
+                            text: 'XML',
+                            handler: function(){
+                                buttonShowXML.handler();
+                            }
+                        });
+                        items.push({
+                            text: 'Закрыть',
+                            handler: function(){
+                                editorAction.close = true;
+                            },
+                            disabled: (action > 0 && !editorAction.close)
+                        });
+                    }
+
                     items.push({
                         text: 'Изменить',
                         handler: function(){
                             editorAction.edit = true;
-                            refPicker(Ext.getCmp('entityTreeView').getSelectionModel().getLastSelected());
+                            refPicker(record);
                         },
                         disabled: (action > 0 && !editorAction.edit) || !(record.data.ref || record.data.simple)
                     });
@@ -1222,18 +1244,10 @@ Ext.onReady(function () {
                         text: 'Удалить',
                         handler: function(){
                             editorAction.delete = true;
+                            buttonDelete.handler();
                         },
                         disabled: (action > 0 && !editorAction.delete)
                     });
-
-                    items.push({
-                        text: 'close',
-                        handler: function(){
-                            editorAction.close = true;
-                        },
-                        disabled: (action > 0 && !editorAction.close)
-                    });
-
 
                     var menu = new Ext.menu.Menu({
                         items: items
