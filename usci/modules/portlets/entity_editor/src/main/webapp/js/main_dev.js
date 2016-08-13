@@ -1215,7 +1215,7 @@ Ext.onReady(function () {
                             editorAction.edit = true;
                             refPicker(Ext.getCmp('entityTreeView').getSelectionModel().getLastSelected());
                         },
-                        disabled: (action > 0 && !editorAction.edit)
+                        disabled: (action > 0 && !editorAction.edit) || !(record.data.ref || record.data.simple)
                     });
 
                     items.push({
