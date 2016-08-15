@@ -56,6 +56,64 @@ var userNavHistory = {
 var forms = [];
 
 var editorAction = {
+    lastAction: 'none',
+    canEdit: function () {
+        return this.lastAction == 'none' || this.lastAction == 'edit';
+    },
+    canDelete: function () {
+        return this.lastAction == 'none' || this.lastAction == 'delete';
+    },
+    canClose: function () {
+        return this.lastAction == 'none' || this.lastAction == 'close';
+    },
+    commitEdit: function () {
+        this.lastAction = 'edit';
+        Ext.getCmp('lblOperation').setText('редактирование');
+    },
+    commitDelete: function () {
+        this.lastAction = 'delete';
+        Ext.getCmp('lblOperation').setText('удаление');
+    },
+    commitClose: function () {
+        this.lastAction = 'close';
+        Ext.getCmp('lblOperation').setText('закрытие');
+    },
+    aquire: function (node, callback) {
+        if (!this.reportDate) {
+            Ext.create("Ext.Window", {
+                id: 'editorActionWindow',
+                title: 'Выбор отчетной даты',
+                width: 400,
+                modal: true,
+                closeable: true,
+                closeAction: 'hide',
+                items: [Ext.create("Ext.form.field.Date", {
+                    id: 'dtEditorAction',
+                    format: 'd.m.y',
+                    accept: function () {
+                        console.log(this.getSubmitValue());
+                        editorAction.reportDate = this.getSubmitValue();
+                        Ext.getCmp('lblReportDate').setText(this.getSubmitValue());
+                        callback();
+                    }
+                })],
+                tbar: [{
+                    text: 'Выбрать',
+                    handler: function () {
+                        Ext.getCmp('dtEditorAction').accept();
+                        Ext.getCmp('editorActionWindow').close();
+                    }
+
+                }]
+            }).show();
+        } else {
+            callback();
+        }
+    },
+    aquireForce: function (node, callback) {
+        console.log(node.data.date);
+    }
+
 }
 
 function getForm() {
@@ -635,96 +693,102 @@ function hasEmptyKeyAttr(mainNode) {
 
 function editorForm(node) {
 
-    var items = [];
+    return function () {
 
-    switch(node.data.type) {
-        case 'DOUBLE':
-        case 'INTEGER':
-            items.push(Ext.create(Ext.form.NumberField,
-                {
-                    labelWidth: '0%',
-                    width: '100%',
-                    value: node.data.value,
-                    accept: function(){
-                        node.data.value = this.value;
-                    }
-                }));
-            break;
-        case 'STRING':
-            items.push(Ext.create("Ext.form.field.Text",
-                {
-                    labelWidth: '0%',
-                    width: '100%',
-                    value: node.data.value,
-                    accept: function(){
-                        node.data.value = this.value;
-                    }
-                }));
-            break;
-        case 'DATE':
-            items.push(Ext.create("Ext.form.field.Date",
-                {
-                    labelWidth: '0%',
-                    width: '100%',
-                    format: 'd.m.Y',
-                    value: node.data.value ? new Date(node.data.value.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$3-$2-$1')) : null,
-                    accept: function(){
-                        node.data.value = this.getSubmitValue();
-                    }
-                    /*readOnly: readOnly,
-                     allowBlank: allowBlank,
-                     blankText: label_REQUIRED_FIELD*/
-                }));
-            break;
-        case 'BOOLEAN':
-            items.push(Ext.create("Ext.form.field.ComboBox",
-                {
-                    /*id: attr.code + "FromItem" + idSuffix,
-                     fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
-                     labelWidth: labelWidth,
-                     width: width,
-                     readOnly: readOnly,
-                     allowBlank: allowBlank,
-                     blankText: label_REQUIRED_FIELD,
-                     editable: false,*/
-                    store: Ext.create('Ext.data.Store', {
-                        fields: ['value', 'title'],
-                        data: [
-                            {value: 'true', title: 'Да'},
-                            {value: 'false', title: 'Нет'}
-                        ]
-                    }),
-                    displayField: 'title',
-                    valueField: 'value',
-                    value: node.data.value,
-                    accept: function(){
-                        node.data.value = this.value;
-                    }
-                })
-            );
-            break;
+        var items = [];
 
+        switch(node.data.type) {
+            case 'DOUBLE':
+            case 'INTEGER':
+                items.push(Ext.create(Ext.form.NumberField,
+                    {
+                        labelWidth: '0%',
+                        width: '100%',
+                        value: node.data.value,
+                        accept: function () {
+                            node.data.value = this.value;
+                        }
+                    }));
+                break;
+            case 'STRING':
+                items.push(Ext.create("Ext.form.field.Text",
+                    {
+                        labelWidth: '0%',
+                        width: '100%',
+                        value: node.data.value,
+                        accept: function () {
+                            node.data.value = this.value;
+                        }
+                    }));
+                break;
+            case 'DATE':
+                items.push(Ext.create("Ext.form.field.Date",
+                    {
+                        labelWidth: '0%',
+                        width: '100%',
+                        format: 'd.m.Y',
+                        value: node.data.value ? new Date(node.data.value.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$3-$2-$1')) : null,
+                        accept: function () {
+                            node.data.value = this.getSubmitValue();
+                        }
+                        /*readOnly: readOnly,
+                         allowBlank: allowBlank,
+                         blankText: label_REQUIRED_FIELD*/
+                    }));
+                break;
+            case 'BOOLEAN':
+                items.push(Ext.create("Ext.form.field.ComboBox",
+                    {
+                        /*id: attr.code + "FromItem" + idSuffix,
+                         fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                         labelWidth: labelWidth,
+                         width: width,
+                         readOnly: readOnly,
+                         allowBlank: allowBlank,
+                         blankText: label_REQUIRED_FIELD,
+                         editable: false,*/
+                        store: Ext.create('Ext.data.Store', {
+                            fields: ['value', 'title'],
+                            data: [
+                                {value: 'true', title: 'Да'},
+                                {value: 'false', title: 'Нет'}
+                            ]
+                        }),
+                        displayField: 'title',
+                        valueField: 'value',
+                        value: node.data.value,
+                        accept: function () {
+                            node.data.value = this.value;
+                        }
+                    })
+                );
+                break;
+
+        }
+
+        Ext.create("Ext.Window", {
+            title: node.data.title,
+            width: 400,
+            modal: true,
+            closable: true,
+            closeAction: 'hide',
+            items: items,
+            tbar: [{
+                text: 'Обновить запись',
+                handler: function () {
+                    editorAction.aquire(node, function () {
+                        items[0].accept();
+                        Ext.getCmp('entityTreeView').getView().refresh();
+                        editorAction.commitEdit();
+                        /*var form = Ext.getCmp('ArrayElFormPanel');
+                         if (form.isValid()) {
+                         saveFormValues(FORM_ADD_ARRAY_EL);
+                         }*/
+                    });
+                }
+            }]
+        }).show();
     }
-
-    Ext.create("Ext.Window", {
-        title: node.data.title,
-        width: 400,
-        modal: true,
-        closable: true,
-        closeAction: 'hide',
-        items: items,
-        tbar: [{
-            text: 'Сохранить новую запись',
-            handler: function () {
-                items[0].accept();
-                Ext.getCmp('entityTreeView').getView().refresh();
-                /*var form = Ext.getCmp('ArrayElFormPanel');
-                 if (form.isValid()) {
-                 saveFormValues(FORM_ADD_ARRAY_EL);
-                 }*/
-            }
-        }]
-    }).show();
 
 }
 Ext.onReady(function () {
@@ -861,23 +925,23 @@ Ext.onReady(function () {
                 if(records.length == 1)
                     Ext.getCmp('edCreditor').setValue(records[0].get('id'));
 
-                    Ext.Ajax.request({
-                        url: dataUrl,
-                        method: 'POST',
-                        params: {
-                            creditorId: Ext.getCmp('edCreditor').value,
-                            op: 'GET_REPORT_DATE'
-                        },
-                        success: function (response) {
-                            var data = JSON.parse(response.responseText);
-                            if(data.success) {
-                                Ext.getCmp('edDate').setValue(data.data);
-                            } else {
-                                console.log(data.errorMessage);
-                                Ext.getCmp('edDate').setValue(new Date());
-                            }
+                Ext.Ajax.request({
+                    url: dataUrl,
+                    method: 'POST',
+                    params: {
+                        creditorId: Ext.getCmp('edCreditor').value,
+                        op: 'GET_REPORT_DATE'
+                    },
+                    success: function (response) {
+                        var data = JSON.parse(response.responseText);
+                        if (data.success) {
+                            Ext.getCmp('edDate').setValue(data.data);
+                        } else {
+                            console.log(data.errorMessage);
+                            Ext.getCmp('edDate').setValue(new Date());
                         }
-                    });
+                    }
+                });
             }
         }
     });
@@ -1287,64 +1351,52 @@ Ext.onReady(function () {
          sortable: true
          }*/],
         listeners: {
-            itemmousedown: function(me, record, item, index, e, eOpts) {
-                if(e.button > 0) {
+            itemmousedown: function (me, node, item, index, e, eOpts) {
+                if (e.button > 0) {
                     var items = [];
 
-                    var action = 0;
-
-                    if(editorAction.edit)
-                        action ++;
-                    if(editorAction.insert)
-                        action++;
-                    if(editorAction.delete)
-                        action++;
-
-                    if(editorAction.close)
-                        action++;
-
-                    if(record.data.depth == 1) {
+                    if (node.data.depth == 1) {
                         items.push({
                             text: 'Отправить изменения',
-                            handler: function(){
+                            handler: function () {
                                 alert(333);
                             }
                         });
                         items.push({
                             text: 'XML',
-                            handler: function(){
+                            handler: function () {
                                 buttonShowXML.handler();
                             }
                         });
                         items.push({
                             text: 'Закрыть',
-                            handler: function(){
+                            handler: function () {
                                 editorAction.close = true;
                             },
-                            disabled: (action > 0 && !editorAction.close)
+                            disabled: !editorAction.canClose()
                         });
                     }
 
                     items.push({
                         text: 'Изменить',
-                        handler: function(){
-                            editorAction.edit = true;
-                            if(record.data.ref)
-                                refPicker(record);
+                        handler: function () {
+                            //editorAction.edit = true;
+                            if (node.data.ref)
+                                editorAction.aquire(node, refPicker(node));
                             else {
-                                editorForm(record);
+                                editorAction.aquire(node, editorForm(node));
                             }
                         },
-                        disabled: (action > 0 && !editorAction.edit) || !(record.data.ref || record.data.simple)
+                        disabled: !editorAction.canEdit() || !(node.data.ref || node.data.simple)
                     });
 
                     items.push({
                         text: 'Удалить',
-                        handler: function(){
+                        handler: function () {
                             editorAction.delete = true;
                             buttonDelete.handler();
                         },
-                        disabled: (action > 0 && !editorAction.delete)
+                        disabled: !editorAction.canDelete()
                     });
 
                     var menu = new Ext.menu.Menu({
@@ -1483,7 +1535,11 @@ Ext.onReady(function () {
                     }
                 },
                 {xtype: 'label', text: 'Всего результатов:'},
-                {xtype: 'label', text: '0', id: 'totalCount'}
+                {xtype: 'label', text: '0', id: 'totalCount'},
+                {xtype: 'label', text: ', Отчетная дата:'},
+                {xtype: 'label', text: 'Не выбрана', id: 'lblReportDate'},
+                {xtype: 'label', text: ', Изменение:'},
+                {xtype: 'label', text: 'нет', id: 'lblOperation'},
             ]
         }, devModule]
     });
