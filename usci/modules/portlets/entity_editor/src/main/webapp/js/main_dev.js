@@ -92,7 +92,7 @@ var editorAction = {
                 closeAction: 'hide',
                 items: [Ext.create("Ext.form.field.Date", {
                     id: 'dtEditorAction',
-                    format: 'd.m.y',
+                    format: 'd.m.Y',
                     accept: function () {
                         console.log(this.getSubmitValue());
                         editorAction.reportDate = this.getSubmitValue();
@@ -277,8 +277,13 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
                 ret.xml += children[i].data.value;
                 ret.xml += "</item>\n";
             } else {
-                ret.xml += offset + "  " + "<" + children[i].data.code + ">";
-                ret.xml += children[i].data.value;
+                if(children[i].data.isKey && children[i].data.oldValue) {
+                    ret.xml += offset + " " + "<" + children[i].data.code + " data=\"" + children[i].data.value + "\" operation=\"NEW\">";
+                    ret.xml += children[i].data.oldValue;
+                } else {
+                    ret.xml += offset + "  " + "<" + children[i].data.code + ">";
+                    ret.xml += children[i].data.value;
+                }
                 ret.xml += "</" + children[i].data.code + ">\n";
             }
 
@@ -786,6 +791,8 @@ function editorForm(node) {
                 text: 'Обновить запись',
                 handler: function () {
                     editorAction.aquire(node, function () {
+                        if(node.data.isKey)
+                            node.data.oldValue = node.data.oldValue ? node.data.oldValue : node.data.value;
                         items[0].accept();
                         Ext.getCmp('entityTreeView').getView().refresh();
                         editorAction.commitEdit();
@@ -1087,7 +1094,7 @@ Ext.onReady(function () {
                 method: 'POST',
                 params: {
                     xml_data: xmlStr,
-                    date: Ext.getCmp('edDate').value,
+                    date: editorAction.reportDate,
                     op: 'SAVE_XML'
                 },
                 success: function () {
@@ -1394,7 +1401,7 @@ Ext.onReady(function () {
                         items.push({
                             text: 'Отправить изменения',
                             handler: function () {
-                                alert(333);
+                                buttonXML.handler();
                             },
                             disabled: !editorAction.hasUnsavedAction()
                         });
@@ -1435,7 +1442,7 @@ Ext.onReady(function () {
                                 Ext.MessageBox.alert("","Нельзя удалить на разные отчетные даты");
                             });
                         },
-                        disabled: !editorAction.canDelete()
+                        disabled: !editorAction.canDelete() || node.data.depth == 1 || (node.data.isKey)
                     });
 
                     var menu = new Ext.menu.Menu({
