@@ -28,6 +28,7 @@ function refPicker(node) {
                 {name: 'is_convertible', type: 'boolean'},
                 {name: 'rating', type: 'string'},
                 {name: 'name_kz', type: 'string'},
+                {name: 'no_', type: 'string'},
             ]
         });
 
@@ -55,9 +56,16 @@ function refPicker(node) {
                 var displayVal = 'name';
                 var displayFormat = '{name} ({code})';
 
-                if (json.data[0].name_ru) {
+                //ref_currency
+                if (json.data[0].short_name) {
                     displayVal = 'name_ru';
                     displayFormat = '{name_ru} ({short_name})';
+                }
+
+                //ref_balance_account
+                if (json.data[0].no_) {
+                    displayVal = 'name_ru';
+                    displayFormat = '{name_ru} ({no_})';
                 }
 
                 new Ext.Window({
@@ -94,9 +102,11 @@ function refPicker(node) {
                                                     refStore.clearFilter();
                                                     var val = this.getRawValue();
                                                     refStore.filterBy(function (record, id) {
+                                                        val = val.toLowerCase();
                                                         return record.get('name').toLowerCase().indexOf(val) > -1 ||
                                                             record.get('name_ru').toLowerCase().indexOf(val) > -1 ||
-                                                            record.get('short_name').toLowerCase().indexOf(val) > -1;
+                                                            record.get('short_name').toLowerCase().indexOf(val) > -1 ||
+                                                            record.get('no_').toLowerCase().indexOf(val) > -1;
                                                     });
                                                 }
                                             }
