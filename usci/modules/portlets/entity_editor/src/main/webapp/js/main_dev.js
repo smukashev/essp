@@ -57,6 +57,9 @@ var forms = [];
 
 var editorAction = {
     lastAction: 'none',
+    hasUnsavedAction: function(){
+        return this.lastAction != 'none';
+    },
     canEdit: function () {
         return this.lastAction == 'none' || this.lastAction == 'edit';
     },
@@ -110,8 +113,14 @@ var editorAction = {
             callback();
         }
     },
-    aquireForce: function (node, callback) {
-        console.log(node.data.date);
+    aquireForce: function (node, callback, errorHandler) {
+        if(!this.reportDate || this.reportDate == node.data.date) {
+            this.reportDate = node.data.date;
+            Ext.getCmp('lblReportDate').setText(this.reportDate);
+            callback();
+        } else {
+            errorHandler();
+        }
     }
 
 }
@@ -791,6 +800,32 @@ function editorForm(node) {
     }
 
 }
+
+function deleteForm(node){
+    return function(){
+
+        Ext.MessageBox.alert({
+            title: 'Потверждение на удаление?',
+            msg: 'Вы точно хотите отметить на удаление? ' + node.data.title + ' значение: ' + node.data.value,
+            buttons: Ext.MessageBox.YESNO,
+            buttonText:{
+                yes: "Да",
+                no: "Нет"
+            },
+            fn: function(val){
+                if(val == 'yes') {
+                    node.data.markedAsDeleted = true;
+                    Ext.MessageBox.alert("", "Операция выполнена успешно. Необходимо " +
+                        "сохранить данные и отправить на обработку");
+                    editorAction.commitDelete();
+                    node.set('iconCls','deleted');
+                }
+            }
+        });
+    }
+}
+
+
 Ext.onReady(function () {
 
     Ext.override(Ext.data.proxy.Ajax, {timeout: 120000});
@@ -956,11 +991,11 @@ Ext.onReady(function () {
             extraParams: {op: 'LIST_ENTITY'}
         },
         listeners: {
-          load: function(me, node, records, successfull, eOpts){
-              /*var response = me.proxy.reader.jsonData;
-              if(response.errorMessage)
-                Ext.MessageBox.alert("", response.errorMessage);*/
-          }
+            load: function(me, node, records, successfull, eOpts){
+                /*var response = me.proxy.reader.jsonData;
+                 if(response.errorMessage)
+                 Ext.MessageBox.alert("", response.errorMessage);*/
+            }
         },
         folderSort: true
     });
@@ -1146,21 +1181,21 @@ Ext.onReady(function () {
                         Ext.MessageBox.alert("", "Операция выполнена успешно. Необходимо " +
                             "сохранить данные и отправить на обработку");
                         /*for (var i = 0; i < rootNode.childNodes.length; i++) {
-                            xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, "DELETE");
-                        }
+                         xmlStr += createXML(rootNode.childNodes[i], true, "", false, true, "DELETE");
+                         }
 
-                        Ext.Ajax.request({
-                            url: dataUrl,
-                            method: 'POST',
-                            params: {
-                                xml_data: xmlStr,
-                                date: Ext.getCmp('edDate').value,
-                                op: 'SAVE_XML'
-                            },
-                            success: function (response) {
-                                Ext.MessageBox.alert("", "Операция выполнена успешно");
-                            }
-                        });*/
+                         Ext.Ajax.request({
+                         url: dataUrl,
+                         method: 'POST',
+                         params: {
+                         xml_data: xmlStr,
+                         date: Ext.getCmp('edDate').value,
+                         op: 'SAVE_XML'
+                         },
+                         success: function (response) {
+                         Ext.MessageBox.alert("", "Операция выполнена успешно");
+                         }
+                         });*/
                     }
                 }
             });
@@ -1360,7 +1395,8 @@ Ext.onReady(function () {
                             text: 'Отправить изменения',
                             handler: function () {
                                 alert(333);
-                            }
+                            },
+                            disabled: !editorAction.hasUnsavedAction()
                         });
                         items.push({
                             text: 'XML',
@@ -1393,8 +1429,11 @@ Ext.onReady(function () {
                     items.push({
                         text: 'Удалить',
                         handler: function () {
-                            editorAction.delete = true;
-                            buttonDelete.handler();
+                            //editorAction.delete = true;
+                            //buttonDelete.handler();
+                            editorAction.aquireForce(node, deleteForm(node), function(){
+                                Ext.MessageBox.alert("","Нельзя удалить на разные отчетные даты");
+                            });
                         },
                         disabled: !editorAction.canDelete()
                     });

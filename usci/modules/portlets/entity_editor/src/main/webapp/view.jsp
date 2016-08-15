@@ -7,7 +7,7 @@
 <portlet:defineObjects />
 
 <%
-//    List<BaseEntity> baseEntityList = (List<BaseEntity>)renderRequest.getAttribute("entityList");
+    //    List<BaseEntity> baseEntityList = (List<BaseEntity>)renderRequest.getAttribute("entityList");
 %>
 
 <portlet:resourceURL var="getDataURL">
@@ -53,15 +53,19 @@
         color: red;
         margin-left: 2px;
     }
+
+    .deleted {
+        background-image: url("/static-usci/ext/resources/ext-theme-classic/images/tree/drop-no.gif");
+    }
 </style>
 
 <script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/dev.js" type="text/javascript"></script>
 
 <% if (getDataURL.contains("dev_editor")) { %>
-   <script src="<%=request.getContextPath()%>/js/main_dev.js" type="text/javascript"></script>
+    <script src="<%=request.getContextPath()%>/js/main_dev.js" type="text/javascript"></script>
 <% }  else { %>
-   <script src="<%=request.getContextPath()%>/js/main.js" type="text/javascript"></script>
+    <script src="<%=request.getContextPath()%>/js/main.js" type="text/javascript"></script>
 <% } %>
 
 <script src="<%=request.getContextPath()%>/js/st_format.js" type="text/javascript"></script>
