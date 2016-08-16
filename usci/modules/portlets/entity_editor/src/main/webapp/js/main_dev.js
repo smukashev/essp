@@ -69,6 +69,9 @@ var editorAction = {
     canClose: function () {
         return this.lastAction == 'none' || this.lastAction == 'close';
     },
+    canInsert: function () {
+        return this.lastAction == 'none' || this.lastAction == 'insert';
+    },
     commitEdit: function () {
         this.lastAction = 'edit';
         Ext.getCmp('lblOperation').setText('редактирование');
@@ -80,6 +83,10 @@ var editorAction = {
     commitClose: function () {
         this.lastAction = 'close';
         Ext.getCmp('lblOperation').setText('закрытие');
+    },
+    commitInsert: function () {
+        this.lastAction = 'insert';
+        Ext.getCmp('lblOperation').setText('вставка');
     },
     aquire: function (node, callback) {
         if (!this.reportDate) {
@@ -448,69 +455,69 @@ function addField(form, attr, idSuffix, node) {
 
     if (attr.array || (!attr.simple && !attr.ref)) {
         form.add(Ext.create("MyCheckboxField",
-                {
-                    id: attr.code + "FromItem" + idSuffix,
-                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
-                    labelWidth: labelWidth,
-                    width: width,
-                    readOnly: readOnly,
-                    allowBlank: allowBlank,
-                    blankText: label_REQUIRED_FIELD,
-                    checked: (attr.isKey || attr.value)
-                })
+            {
+                id: attr.code + "FromItem" + idSuffix,
+                fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                labelWidth: labelWidth,
+                width: width,
+                readOnly: readOnly,
+                allowBlank: allowBlank,
+                blankText: label_REQUIRED_FIELD,
+                checked: (attr.isKey || attr.value)
+            })
         );
     } else if (attr.type == "DATE") {
         form.add(Ext.create("Ext.form.field.Date",
-                {
-                    id: attr.code + "FromItem" + idSuffix,
-                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
-                    labelWidth: labelWidth,
-                    width: width,
-                    format: 'd.m.Y',
-                    value: attr.value ? new Date(attr.value.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$3-$2-$1')) : null,
-                    readOnly: readOnly,
-                    allowBlank: allowBlank,
-                    blankText: label_REQUIRED_FIELD
-                })
+            {
+                id: attr.code + "FromItem" + idSuffix,
+                fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                labelWidth: labelWidth,
+                width: width,
+                format: 'd.m.Y',
+                value: attr.value ? new Date(attr.value.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$3-$2-$1')) : null,
+                readOnly: readOnly,
+                allowBlank: allowBlank,
+                blankText: label_REQUIRED_FIELD
+            })
         );
     } else if (attr.type == "INTEGER" || attr.type == "DOUBLE") {
         form.add(Ext.create(Ext.form.NumberField,
-                {
-                    id: attr.code + "FromItem" + idSuffix,
-                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
-                    labelWidth: labelWidth,
-                    width: width,
-                    value: attr.value,
-                    /*minValue: 0,*/
-                    allowDecimals: attr.type == "DOUBLE",
-                    forcePrecision: attr.type == "DOUBLE",
-                    readOnly: readOnly,
-                    allowBlank: allowBlank,
-                    blankText: label_REQUIRED_FIELD
-                })
+            {
+                id: attr.code + "FromItem" + idSuffix,
+                fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                labelWidth: labelWidth,
+                width: width,
+                value: attr.value,
+                /*minValue: 0,*/
+                allowDecimals: attr.type == "DOUBLE",
+                forcePrecision: attr.type == "DOUBLE",
+                readOnly: readOnly,
+                allowBlank: allowBlank,
+                blankText: label_REQUIRED_FIELD
+            })
         );
     } else if (attr.type == "BOOLEAN") {
         form.add(Ext.create("Ext.form.field.ComboBox",
-                {
-                    id: attr.code + "FromItem" + idSuffix,
-                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
-                    labelWidth: labelWidth,
-                    width: width,
-                    readOnly: readOnly,
-                    allowBlank: allowBlank,
-                    blankText: label_REQUIRED_FIELD,
-                    editable: false,
-                    store: Ext.create('Ext.data.Store', {
-                        fields: ['value', 'title'],
-                        data: [
-                            {value: 'true', title: 'Да'},
-                            {value: 'false', title: 'Нет'}
-                        ]
-                    }),
-                    displayField: 'title',
-                    valueField: 'value',
-                    value: attr.value
-                })
+            {
+                id: attr.code + "FromItem" + idSuffix,
+                fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                labelWidth: labelWidth,
+                width: width,
+                readOnly: readOnly,
+                allowBlank: allowBlank,
+                blankText: label_REQUIRED_FIELD,
+                editable: false,
+                store: Ext.create('Ext.data.Store', {
+                    fields: ['value', 'title'],
+                    data: [
+                        {value: 'true', title: 'Да'},
+                        {value: 'false', title: 'Нет'}
+                    ]
+                }),
+                displayField: 'title',
+                valueField: 'value',
+                value: attr.value
+            })
         );
     } else if (attr.ref) {
         form.add(Ext.create("Ext.form.field.ComboBox", {
@@ -548,16 +555,16 @@ function addField(form, attr, idSuffix, node) {
         }));
     } else {
         form.add(Ext.create("Ext.form.field.Text",
-                {
-                    id: attr.code + "FromItem" + idSuffix,
-                    fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
-                    labelWidth: labelWidth,
-                    width: width,
-                    value: attr.value,
-                    readOnly: readOnly,
-                    allowBlank: allowBlank,
-                    blankText: label_REQUIRED_FIELD
-                })
+            {
+                id: attr.code + "FromItem" + idSuffix,
+                fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
+                labelWidth: labelWidth,
+                width: width,
+                value: attr.value,
+                readOnly: readOnly,
+                allowBlank: allowBlank,
+                blankText: label_REQUIRED_FIELD
+            })
         );
     }
 }
@@ -829,6 +836,28 @@ function deleteForm(node){
                 }
             }
         });
+    }
+}
+
+
+function insertForm(node){
+    return function(){
+
+        if(node.data.array) {
+            if(node.data.simple) {
+
+
+            } else {
+                formBasic(node, function(form){
+                    form.elem.data.title = '['+node.childNodes.length+']';
+                    node.data.value = node.childNodes.length + 1;
+                    node.appendChild(form.elem);
+                    editorAction.commitInsert();
+                    Ext.getCmp('entityTreeView').getView().refresh();
+                });
+            }
+
+        }
     }
 }
 
@@ -1420,6 +1449,17 @@ Ext.onReady(function () {
                         });
                     }
 
+                    if(node.data.array) {
+                        items.push({
+                            text: 'Добавить элемент',
+                            handler: function(){
+                                insertForm(node)();
+                            },
+                            disbled: !editorAction.canInsert()
+                        });
+                    }
+
+
                     items.push({
                         text: 'Изменить',
                         handler: function () {
@@ -1443,6 +1483,14 @@ Ext.onReady(function () {
                             });
                         },
                         disabled: !editorAction.canDelete() || node.data.depth == 1 || (node.data.isKey)
+                    });
+
+
+                    items.push({
+                        text: 'log',
+                        handler: function(){
+                            console.log(node);
+                        }
                     });
 
                     var menu = new Ext.menu.Menu({
