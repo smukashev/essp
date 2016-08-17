@@ -22,9 +22,9 @@ function void binCorrect(String bin,String entCode) {
         };
 
     Set<String> SE_CODES = new HashSet<String>(Arrays.asList("03","06","09"));
-    if("02".equals(entCode)  || "05".equals(entCode) ) {
+    if("02".equals(entCode)  || "05".equals(entCode) || "08".equals(entCode)) {
        if(getInvalidIINs(Arrays.asList(bin)).size() > 0)
-           throw new RuntimeException("Бин заполнен не верно для СЧП 02, 05 (проверка как ИИН)");
+           throw new RuntimeException("Бин заполнен не верно для СЧП 02, 05, 08 (проверка как ИИН)");
 
        return;
     }
