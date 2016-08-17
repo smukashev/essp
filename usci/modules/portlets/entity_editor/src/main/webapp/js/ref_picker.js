@@ -1,5 +1,33 @@
 var refStore;
 
+function refChange(node, refId, callback) {
+
+    node.removeAll();
+
+    var myMask = new Ext.LoadMask(Ext.getBody(), {msg: "Идет загрузка..."});
+    myMask.show();
+
+    subEntityStore.load({
+        params: {
+            op: 'LIST_ENTITY',
+            entityId: refId,
+            date: new Date(),
+            asRoot: false
+        },
+        callback: function (records, operation, success) {
+            node.data.value = records[0].data.value;
+
+            while (records[0].childNodes.length > 0) {
+                node.appendChild(records[0].childNodes[0]);
+            }
+
+            myMask.hide();
+            if(callback)
+                callback();
+        }
+    });
+}
+
 function refPicker(node) {
 
     return function () {
@@ -53,20 +81,27 @@ function refPicker(node) {
                 refStore.add(json.data);
 
 
-                var displayVal = 'name';
-                var displayFormat = '{name} ({code})';
+                var displayVal;
+                var displayFormat;
 
-                //ref_currency
-                if (json.data[0].short_name) {
+                if(json.data[0].name) {
+                    displayVal = 'name';
+                    displayFormat = '{name}';
+                } else if(json.data[0].name_ru) {
                     displayVal = 'name_ru';
-                    displayFormat = '{name_ru} ({short_name})';
+                    displayFormat = '{name_ru}';
                 }
 
-                //ref_balance_account
-                if (json.data[0].no_) {
-                    displayVal = 'name_ru';
-                    displayFormat = '{name_ru} ({no_})';
+                displayFormat += ' ';
+
+                if(json.data[0].short_name) {
+                    displayFormat += '({short_name})';
+                } else if(json.data[0].no_) {
+                    displayFormat += '({no_})';
+                } else if(json.data[0].code) {
+                    displayFormat += '({code})';
                 }
+
 
                 new Ext.Window({
                     id: 'refSelectForm',
@@ -116,33 +151,10 @@ function refPicker(node) {
                                             handler: function () {
                                                 var refId = Ext.getCmp('refSelectCombo').value;
                                                 refStore.clearFilter();
-                                                var model = refStore.getAt(refStore.find('ID', refId));
-                                                console.log(model.data);
-                                                node.removeAll();
-
-                                                var myMask = new Ext.LoadMask(Ext.getCmp("refSelectForm"), {msg: "Идет загрузка..."});
-                                                myMask.show();
-
-
-                                                subEntityStore.load({
-                                                    params: {
-                                                        op: 'LIST_ENTITY',
-                                                        entityId: model.data.ID,
-                                                        date: Ext.getCmp('edDate').value,
-                                                        asRoot: false
-                                                    },
-                                                    callback: function (records, operation, success) {
-                                                        node.data.value = records[0].data.value;
-
-                                                        while (records[0].childNodes.length > 0) {
-                                                            node.appendChild(records[0].childNodes[0]);
-                                                        }
-
-                                                        editorAction.commitEdit();
-                                                        myMask.hide();
-                                                        Ext.getCmp('refSelectForm').close();
-                                                        Ext.getCmp('entityTreeView').getView().refresh();
-                                                    }
+                                                refChange(node, refId, function(){
+                                                    Ext.getCmp('refSelectForm').close();
+                                                    Ext.getCmp('entityTreeView').getView().refresh();
+                                                    editorAction.commitEdit();
                                                 });
                                             }
 

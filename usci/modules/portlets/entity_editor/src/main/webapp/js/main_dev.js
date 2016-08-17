@@ -88,30 +88,33 @@ var editorAction = {
         this.lastAction = 'insert';
         Ext.getCmp('lblOperation').setText('вставка');
     },
+    //makes sure client choosed reportDate
     aquire: function (node, callback) {
         if (!this.reportDate) {
-            Ext.create("Ext.Window", {
-                id: 'editorActionWindow',
+            var dateField = Ext.create("Ext.form.field.Date", {
+                format: 'd.m.Y',
+                accept: function () {
+                    console.log(this.getSubmitValue());
+                    editorAction.reportDate = this.getSubmitValue();
+                    Ext.getCmp('lblReportDate').setText(this.getSubmitValue());
+                    callback();
+                }
+            });
+
+            var wdw = Ext.create("Ext.Window", {
                 title: 'Выбор отчетной даты',
                 width: 400,
                 modal: true,
                 closeable: true,
                 closeAction: 'hide',
-                items: [Ext.create("Ext.form.field.Date", {
-                    id: 'dtEditorAction',
-                    format: 'd.m.Y',
-                    accept: function () {
-                        console.log(this.getSubmitValue());
-                        editorAction.reportDate = this.getSubmitValue();
-                        Ext.getCmp('lblReportDate').setText(this.getSubmitValue());
-                        callback();
-                    }
-                })],
+                items: [dateField],
                 tbar: [{
                     text: 'Выбрать',
                     handler: function () {
-                        Ext.getCmp('dtEditorAction').accept();
-                        Ext.getCmp('editorActionWindow').close();
+                        //Ext.getCmp('dtEditorAction').accept();
+                        //Ext.getCmp('editorActionWindow').close();
+                        dateField.accept();
+                        wdw.close();
                     }
 
                 }]
@@ -120,6 +123,7 @@ var editorAction = {
             callback();
         }
     },
+    //make sure client don't choose wrong reportDate
     aquireForce: function (node, callback, errorHandler) {
         if(!this.reportDate || this.reportDate == node.data.date) {
             this.reportDate = node.data.date;
@@ -1453,9 +1457,9 @@ Ext.onReady(function () {
                         items.push({
                             text: 'Добавить элемент',
                             handler: function(){
-                                insertForm(node)();
+                                editorAction.aquire(node, insertForm(node));
                             },
-                            disbled: !editorAction.canInsert()
+                            disabled: !editorAction.canInsert()
                         });
                     }
 
@@ -1485,13 +1489,12 @@ Ext.onReady(function () {
                         disabled: !editorAction.canDelete() || node.data.depth == 1 || (node.data.isKey)
                     });
 
-
-                    items.push({
-                        text: 'log',
-                        handler: function(){
-                            console.log(node);
-                        }
-                    });
+                    /*items.push({
+                     text: 'log',
+                     handler: function(){
+                     console.log(node);
+                     }
+                     });*/
 
                     var menu = new Ext.menu.Menu({
                         items: items

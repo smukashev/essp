@@ -67,7 +67,15 @@ function formBasic(node, callback){
                             value: attr.value,
                             editable: false,
                             commit: function(){
-                                console.log(this.getSubmitValue());
+                                if(this.getValue()) {
+                                    var refNode = Ext.create('entityModel', {
+                                        title: attr.title,
+                                        code: 'code',
+                                        value: this.getValue()
+                                    });
+                                    form.elem.appendChild(refNode);
+                                    refChange(refNode, this.getValue());
+                                }
                             }
                         }));
                     } else {
