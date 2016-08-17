@@ -88,7 +88,7 @@ var editorAction = {
         this.lastAction = 'insert';
         Ext.getCmp('lblOperation').setText('вставка');
     },
-    //makes sure client choosed reportDate
+    //makes sure client chosed reportDate
     aquire: function (node, callback) {
         if (!this.reportDate) {
             var dateField = Ext.create("Ext.form.field.Date", {
@@ -266,6 +266,9 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
 
             if(currentNode.data.markedAsDeleted)
                 operation = 'DELETE';
+
+            if(currentNode.data.markedAsClosed)
+                operation = 'CLOSE';
 
             ret.xml += offset + "<" + currentNode.data.code +
                 (operation ? " operation=\"" + operation + "\"" : "") + ">\n";
@@ -821,7 +824,6 @@ function editorForm(node) {
 
 function deleteForm(node){
     return function(){
-
         Ext.MessageBox.alert({
             title: 'Потверждение на удаление?',
             msg: 'Вы точно хотите отметить на удаление? ' + node.data.title + ' значение: ' + node.data.value,
@@ -831,12 +833,24 @@ function deleteForm(node){
                 no: "Нет"
             },
             fn: function(val){
-                if(val == 'yes') {
+                var notify = function(){
                     node.data.markedAsDeleted = true;
                     Ext.MessageBox.alert("", "Операция выполнена успешно. Необходимо " +
                         "сохранить данные и отправить на обработку");
                     editorAction.commitDelete();
                     node.set('iconCls','deleted');
+                }
+
+                if(val == 'yes') {
+                    if(node.data.depth == 1) {
+                        editorAction.aquire(node, function() {
+                            node.data.markedAsDeleted = true;
+                            notify();
+                        } )
+                    } else {
+                        notify();
+                    }
+
                 }
             }
         });
@@ -865,6 +879,16 @@ function insertForm(node){
     }
 }
 
+
+function closeForm(node) {
+    return function(){
+        node.data.markedAsClosed = true;
+        node.set('iconCls','deleted');
+        editorAction.commitClose();
+        Ext.getCmp('entityTreeView').getView().refresh();
+        node.collapse();
+    }
+}
 
 Ext.onReady(function () {
 
@@ -1447,7 +1471,7 @@ Ext.onReady(function () {
                         items.push({
                             text: 'Закрыть',
                             handler: function () {
-                                editorAction.close = true;
+                                editorAction.aquire(node, closeForm(node));
                             },
                             disabled: !editorAction.canClose()
                         });
@@ -1486,7 +1510,7 @@ Ext.onReady(function () {
                                 Ext.MessageBox.alert("","Нельзя удалить на разные отчетные даты");
                             });
                         },
-                        disabled: !editorAction.canDelete() || node.data.depth == 1 || (node.data.isKey)
+                        disabled: !editorAction.canDelete() || (node.data.isKey)
                     });
 
                     /*items.push({
