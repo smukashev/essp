@@ -62,8 +62,9 @@
 <script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/dev.js" type="text/javascript"></script>
 
-<% if (getDataURL.contains("dev_editor")) { %>
+<% if (getDataURL.contains("editor")) { %>
     <script src="<%=request.getContextPath()%>/js/main_dev.js" type="text/javascript"></script>
+    <script src="<%=request.getContextPath()%>/js/insert.js" type="text/javascript"></script>
 <% }  else { %>
     <script src="<%=request.getContextPath()%>/js/main.js" type="text/javascript"></script>
 <% } %>
