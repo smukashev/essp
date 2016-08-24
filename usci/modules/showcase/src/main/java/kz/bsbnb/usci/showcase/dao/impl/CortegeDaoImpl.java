@@ -45,9 +45,26 @@ public class CortegeDaoImpl extends CommonDao {
                 List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath());
 
                 rootCortegeGenerate(globalEntityApplied, allApplied, showCase);
+
+                if (allApplied.size() == 0) {
+                    // todo: make beautiful
+                    // todo: remove hardcode
+                    cleanEmptyDownPath(globalEntityApplied, showCase);
+                }
             } else {
                 rootCortegeGenerate(globalEntityApplied, Collections.singletonList((BaseEntity) globalEntityApplied), showCase);
             }
+        }
+    }
+
+    public void cleanEmptyDownPath(final IBaseEntity globalEntityApplied, final ShowCase showcase) {
+        if (showcase.getTableName().equals("CORE_REMAINS")) {
+            String sql = "DELETE FROM %s WHERE credit_id = ? and rep_date = ?";
+
+            Object os[] = new Object[]{globalEntityApplied.getId(), globalEntityApplied.getReportDate()};
+
+            jdbcTemplateSC.update("DELETE FROM %s WHERE + rootKeyElement.queryKeys + and rep_date = ?",
+                    String.format(sql, getActualTableName(showcase), COLUMN_PREFIX, showcase.getRootClassName()), os);
         }
     }
 
@@ -73,8 +90,10 @@ public class CortegeDaoImpl extends CommonDao {
             savingMap.putAll(tmpMap);
         }
 
-        if (savingMap.size() == 0)
+        if (savingMap.size() == 0) {
+
             return;
+        }
 
         boolean rootExecutionFlag = false;
 
