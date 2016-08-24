@@ -2354,9 +2354,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             eavOptimizerDao.update(eod);
         }
         sqlStats.put("java::applyToDb", (System.currentTimeMillis() - applyToDbTime));
-
-        if(1==1)
-            throw new RuntimeException("cannot");
     }
 
     private Object returnCastedValue(IMetaValue metaValue, IBaseValue baseValue) {
