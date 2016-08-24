@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
@@ -34,6 +35,11 @@ public class SubjectOrganizationHeadNamesParser extends BatchParser {
                 break;
             case "name":
                 currentBaseEntity = new BaseEntity(personNameMeta, batch.getRepDate(), creditorId);
+
+                currentBaseEntity.put("lang",
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(),
+                                event.asStartElement().getAttributeByName(new QName("lang")).getValue(), false, true));
+
                 break;
             case "firstname":
                 event = (XMLEvent) xmlReader.next();
