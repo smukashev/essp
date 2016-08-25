@@ -16,6 +16,7 @@ import kz.bsbnb.usci.showcase.element.ArrayElement;
 import kz.bsbnb.usci.showcase.element.KeyElement;
 import kz.bsbnb.usci.showcase.element.PathElement;
 import kz.bsbnb.usci.showcase.element.ValueElement;
+import kz.bsbnb.usci.showcase.generated.Showcase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
@@ -39,15 +40,32 @@ public class CortegeDaoImpl extends CommonDao {
     @Transactional
     public void generate(final IBaseEntity globalEntityApplied, final ShowCase showCase) {
         if (showCase.getTableName().equals(custRemainsVert)) {
-            remainsCortegeGenerate(globalEntityApplied);
+            remainsCortegeGenerate(globalEntityApplied, showCase);
         } else {
             if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0) {
                 List<BaseEntity> allApplied = (List<BaseEntity>) globalEntityApplied.getEls("{get}" + showCase.getDownPath());
 
                 rootCortegeGenerate(globalEntityApplied, allApplied, showCase);
+
+                if (allApplied.size() == 0) {
+                    // todo: make beautiful
+                    // todo: remove hardcode
+                    cleanEmptyDownPath(globalEntityApplied, showCase);
+                }
             } else {
                 rootCortegeGenerate(globalEntityApplied, Collections.singletonList((BaseEntity) globalEntityApplied), showCase);
             }
+        }
+    }
+
+    public void cleanEmptyDownPath(final IBaseEntity globalEntityApplied, final ShowCase showcase) {
+        if (showcase.getTableName().equals("CORE_REMAINS") ||showcase.getTableName().equals(custRemainsVert)) {
+            String sql = "DELETE FROM %s WHERE credit_id = ? and rep_date = ?";
+
+            Object os[] = new Object[]{globalEntityApplied.getId(), globalEntityApplied.getReportDate()};
+
+            jdbcTemplateSC.update("DELETE FROM %s WHERE + rootKeyElement.queryKeys + and rep_date = ?",
+                    String.format(sql, getActualTableName(showcase), COLUMN_PREFIX, showcase.getRootClassName()), os);
         }
     }
 
@@ -73,8 +91,10 @@ public class CortegeDaoImpl extends CommonDao {
             savingMap.putAll(tmpMap);
         }
 
-        if (savingMap.size() == 0)
+        if (savingMap.size() == 0) {
+
             return;
+        }
 
         boolean rootExecutionFlag = false;
 
@@ -273,7 +293,7 @@ public class CortegeDaoImpl extends CommonDao {
     }
 
     @Transactional
-    private void remainsCortegeGenerate(IBaseEntity globalEntity) {
+    private void remainsCortegeGenerate(IBaseEntity globalEntity, final ShowCase showCase) {
         final Long creditId = globalEntity.getId();
         final Long creditorId = globalEntity.getBaseEntityReportDate().getCreditorId();
         final Date repDate = globalEntity.getReportDate();
@@ -282,9 +302,10 @@ public class CortegeDaoImpl extends CommonDao {
 
         final IBaseValue changeBaseValue = globalEntity.getBaseValue("change");
 
-        if (changeBaseValue == null || changeBaseValue.getValue() == null)
+        if (changeBaseValue == null || changeBaseValue.getValue() == null) {
+            cleanEmptyDownPath(globalEntity, showCase);
             return;
-
+        }
         final IBaseEntity changeBaseEntity = (IBaseEntity) changeBaseValue.getValue();
 
         final IBaseValue remainsBaseValue = changeBaseEntity.getBaseValue("remains");

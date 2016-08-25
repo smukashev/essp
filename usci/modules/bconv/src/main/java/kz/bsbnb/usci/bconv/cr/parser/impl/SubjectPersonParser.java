@@ -2,6 +2,7 @@ package kz.bsbnb.usci.bconv.cr.parser.impl;
 
 import kz.bsbnb.usci.bconv.cr.parser.BatchParser;
 import kz.bsbnb.usci.bconv.cr.parser.exceptions.UnknownTagException;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
@@ -110,6 +111,11 @@ public class SubjectPersonParser extends BatchParser {
 
                 bankRelation.put("bank_relation",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), refBankRelation, false, true));
+
+                IBaseEntity creditorAsEntity = baseEntityLoadDao.load(creditorId);
+
+                bankRelation.put("creditor",
+                        new BaseEntityComplexValue(0, creditorId,batch.getRepDate(), creditorAsEntity, false, true));
 
                 bankRelations.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), bankRelation, false, true));
                 break;

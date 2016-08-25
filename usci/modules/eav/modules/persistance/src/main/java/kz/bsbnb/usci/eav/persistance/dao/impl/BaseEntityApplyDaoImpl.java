@@ -2228,9 +2228,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     if (childBaseValueNext == null || !childBaseValueNext.isClosed()) {
 
-                        /* Не идентифицируемый эдемент массива не может быт закрыт */
-                        if (!childMetaClass.isSearchable())
+                        /* Не идентифицируемый элемент массива не может быт закрыт */
+                        if (!childMetaClass.isSearchable()) {
+                            childBaseSetApplied.put(childBaseValueLoaded);
                             continue;
+                        }
 
                         IBaseValue childBaseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_SET,

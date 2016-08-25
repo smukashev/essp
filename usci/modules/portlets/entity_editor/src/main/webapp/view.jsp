@@ -7,7 +7,7 @@
 <portlet:defineObjects />
 
 <%
-//    List<BaseEntity> baseEntityList = (List<BaseEntity>)renderRequest.getAttribute("entityList");
+    //    List<BaseEntity> baseEntityList = (List<BaseEntity>)renderRequest.getAttribute("entityList");
 %>
 
 <portlet:resourceURL var="getDataURL">
@@ -53,11 +53,22 @@
         color: red;
         margin-left: 2px;
     }
+
+    .deleted {
+        background-image: url("/static-usci/ext/resources/ext-theme-classic/images/tree/drop-no.gif");
+    }
 </style>
 
 <script src="/static-usci/ext/ext-all.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/dev.js" type="text/javascript"></script>
-<script src="<%=request.getContextPath()%>/js/main.js" type="text/javascript"></script>
+
+<% if (getDataURL.contains("editor")) { %>
+    <script src="<%=request.getContextPath()%>/js/main_dev.js" type="text/javascript"></script>
+    <script src="<%=request.getContextPath()%>/js/insert.js" type="text/javascript"></script>
+<% }  else { %>
+    <script src="<%=request.getContextPath()%>/js/main.js" type="text/javascript"></script>
+<% } %>
+
 <script src="<%=request.getContextPath()%>/js/st_format.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/s_subject_doc.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/w_search_doc.js" type="text/javascript"></script>
@@ -65,6 +76,7 @@
 <script src="<%=request.getContextPath()%>/js/s_person_fio.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/s_org_name.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/s_portfolio.js" type="text/javascript"></script>
+<script src="<%=request.getContextPath()%>/js/ref_picker.js" type="text/javascript"></script>
 
 <script src="<%=request.getContextPath()%>/js/lang/default.js" type="text/javascript"></script>
 <script src="<%=request.getContextPath()%>/js/lang/<%= ((ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY)).getLocale() %>.js" type="text/javascript"></script>
