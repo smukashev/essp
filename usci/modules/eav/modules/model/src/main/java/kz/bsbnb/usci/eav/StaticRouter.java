@@ -19,17 +19,17 @@ public final class StaticRouter {
     private final static String prodAsIP = "10.8.1.116";
 
     /* Core Schema IP */
-    private final static String stendDBCoreIP = "10.10.32.27";
+    private final static String stendDBCoreIP = "170.7.15.69";
     private final static String devDBCoreIP = "localhost";
     private final static String prodDBCoreIp = "10.8.1.200";
 
     /* Showcase Schema IP */
-    private final static String stendDBShowcaseIP = "10.10.32.27";
+    private final static String stendDBShowcaseIP = "170.7.15.69";
     private final static String devDBShowcaseIP = "localhost";
     private final static String prodDBShowcaseIP = "10.8.1.85";
 
     /* Reporter Schema IP */
-    private final static String stendDBReporterIP = "10.10.32.27";
+    private final static String stendDBReporterIP = "170.7.15.69";
     private final static String devDBReporterIP = "localhost";
     private final static String prodDBReporterIP = "10.8.1.85";
 
@@ -44,17 +44,17 @@ public final class StaticRouter {
     private final static String prodPortalPort = "80";
 
     /* Core Schema name */
-    private final static String stendCoreSchemaName = "C##CORE";
+    private final static String stendCoreSchemaName = "CORE";
     private final static String devCoreSchemaName = "C##CORE";
     private final static String prodCoreSchemaName = "CORE";
 
     /* Showcase Schema name */
-    private final static String stendShowcaseSchemaName = "C##SHOWCASE";
+    private final static String stendShowcaseSchemaName = "SHOWCASE";
     private final static String devShowcaseSchemaName = "C##SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHOWCASE";
 
     /* Credit Registry DB IP */
-    private final static String stendCRDBIP = "10.10.32.44";
+    private final static String stendCRDBIP = "10.8.1.250";
     private final static String devCRDBIP = "10.10.32.44";
     private final static String prodCRDBIP  = "10.8.1.250";
 
@@ -78,7 +78,7 @@ public final class StaticRouter {
     private final static String devReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
     private final static String prodReportFilesFolder = "C:\\Portal_afn\\generated_reports\\";
 
-    private final static boolean stendStatsEnabled = false;
+    private final static boolean stendStatsEnabled = true;
     private final static boolean devStatsEnabled = true;
     private final static boolean prodStatsEnabled = true;
 
