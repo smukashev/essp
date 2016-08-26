@@ -37,7 +37,7 @@ public class RulesPortlet extends MVCPortlet{
 
     public void connectToServices() throws PortletException {
         try {
-            ApplicationContext context = new ClassPathXmlApplicationContext("applicationContextPortlet.xml");
+            //ApplicationContext context = new ClassPathXmlApplicationContext("applicationContextPortlet.xml");
 
             RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
             entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1098/entityService");
@@ -223,9 +223,9 @@ public class RulesPortlet extends MVCPortlet{
                     errors = ruleService.getPackageErrorsOnRuleDelete(new Rule(ruleId, date));
                     if(errors != null)
                         throw new RuntimeException(errors);
-                    //ruleService.deleteRule(ruleId, new RulePackage(packageId, pkgName));
-                    //writer.write(JsonMaker.getJson(true));
-                    writer.write(JsonMaker.getNegativeJson("Настройки отключены для удаления"));
+                    ruleService.deleteRule(ruleId, new RulePackage(packageId, pkgName));
+                    writer.write(JsonMaker.getJson(true));
+                    //writer.write(JsonMaker.getNegativeJson("Настройки отключены для удаления"));
                     break;
                 case NEW_RULE:
                     getWriteAccess(resourceRequest);

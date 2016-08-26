@@ -21,7 +21,8 @@ function deleteRule(rowIndex){
             ruleId: editor.ruleId,
             //batchVersionId: editor.batchVersionId //Ext.getCmp("elemCombokage").value
             packageId: Ext.getCmp('elemComboPackage').value,
-            pkgName: Ext.getCmp('elemComboPackage').getRawValue()
+            pkgName: Ext.getCmp('elemComboPackage').getRawValue(),
+            date: Ext.getCmp('elemPackageVersionCombo').value
         },
         reader: {
             type: 'json'
@@ -31,15 +32,27 @@ function deleteRule(rowIndex){
             root: 'data'
         },
         success: function(response, opts) {
-            rowIndex = (typeof rowIndex === 'undefined') ? -1 : rowIndex;
 
-            ruleListGrid.store.removeAt(rowIndex);
+            var r = JSON.parse(response.responseText);
 
-            if(ruleListGrid.store.data.length == 0)
-                reset();
-            else{
-                ruleListGrid.getSelectionModel().select(0);
-                ruleListGrid.fireEvent("cellclick",ruleListGrid, null, 1, ruleListGrid.getSelectionModel().getLastSelected());
+            var c = Ext.getCmp('errorPanel');
+
+            if(!r.success) {
+                c.update(r.errorMessage);
+                c.expand();
+            } else {
+                c.update("");
+                c.collapse();
+                rowIndex = (typeof rowIndex === 'undefined') ? -1 : rowIndex;
+
+                ruleListGrid.store.removeAt(rowIndex);
+
+                if (ruleListGrid.store.data.length == 0)
+                    reset();
+                else {
+                    ruleListGrid.getSelectionModel().select(0);
+                    ruleListGrid.fireEvent("cellclick", ruleListGrid, null, 1, ruleListGrid.getSelectionModel().getLastSelected());
+                }
             }
         },
         failure: function(response, opts) {

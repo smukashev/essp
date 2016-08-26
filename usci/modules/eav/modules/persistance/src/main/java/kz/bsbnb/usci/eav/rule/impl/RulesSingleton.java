@@ -329,9 +329,11 @@ public class RulesSingleton {
 
                 List<Rule> rules = ruleDao.load(packageVersion);
 
-                for (Rule ruleInPackage : rules) {
-                    if (ruleInPackage.getId() == rule.getId()) {
-                        rules.iterator().remove();
+                Iterator<Rule> iterator = rules.iterator();
+
+                while(iterator.hasNext()) {
+                    if (iterator.next().getId() == rule.getId()) {
+                        iterator.remove();
                         break;
                     }
                 }
