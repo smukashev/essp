@@ -70,8 +70,15 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.annotation.PostConstruct;
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.text.DateFormat;
@@ -1996,24 +2003,81 @@ public class CLI {
                 System.out.println("ok saved: ruleId = " + ruleId);
             } else if (args.get(0).equals("run")) {
 
+                String fileName = "/home/bauka/cr.xml";
                 DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
-                Date reportDate = dateFormatter.parse("02.05.2015");
+                Date reportDate = dateFormatter.parse("01.08.2016");
+
+                Batch b = new Batch();
+                b.setRepDate(reportDate);
+                Long creditorId = -1L;
+                boolean packageTagFound = false;
 
                 try {
-                    long creditorId = 0L;
-                    CLIXMLReader reader = new CLIXMLReader("C:\\a.xml", metaClassRepository, batchService,
-                            reportDate, creditorId);
-                    currentBaseEntity = reader.read();
-                    reader.close();
+                    byte[] bytes;
+
+                    int size;
+                    byte[] buffer = new byte[1024];
+                    InputStream is = new FileInputStream(fileName);
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+                    while ((size = is.read(buffer, 0, buffer.length)) != -1) {
+                        byteArrayOutputStream.write(buffer, 0, size);
+                        if(new String(buffer).contains("<package"))
+                            packageTagFound = true;
+                    }
+                    bytes = byteArrayOutputStream.toByteArray();
+                    RmiProxyFactoryBean batchProcessServiceFactoryBean;
+                    IBatchProcessService batchProcessService;
+
+                    try {
+                        batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+                        batchProcessServiceFactoryBean.setServiceUrl("rmi://127.0.0.1:1097/batchProcessService");
+                        batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+                        batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+                        batchProcessServiceFactoryBean.afterPropertiesSet();
+                        batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+                        creditorId = batchProcessService.parseCreditorId(bytes);
+                    } catch(Exception e) {
+                        //batchProcessService is down
+                    }
+                    //System.out.println(creditorId);
+
+                    //credit-registry
+                    if(creditorId != -1) {
+                        //check for schema
+                        Source xml = new StreamSource(new ByteArrayInputStream(bytes));
+                        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                        URL schemaURL = getClass().getClassLoader().getResource("credit-registry.xsd");
+                        Schema schema = schemaFactory.newSchema(schemaURL);
+                        Validator validator = schema.newValidator();
+                        validator.validate(xml);
+
+                        crParser.setCreditorId(creditorId);
+                        crParser.parse(new ByteArrayInputStream(bytes), b);
+                        currentBaseEntity = crParser.getCurrentBaseEntity();
+                        is.close();
+                    } else {
+                        if(packageTagFound)
+                            throw new RuntimeException("cr file found, did you run receiver ?");
+
+                        CLIXMLReader reader = new CLIXMLReader(fileName, metaClassRepository, batchService,
+                                reportDate, creditorId);
+                        currentBaseEntity = reader.read();
+                        reader.close();
+                    }
+
+                    currentBaseEntity = (BaseEntity) baseEntityProcessorDao.prepare(currentBaseEntity, creditorId);
+                    if(currentBaseEntity.getEl("creditor") != null) {
+                        creditorId = ((BaseEntity) currentBaseEntity.getEl("creditor")).getId();
+                        currentBaseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
+                    }
+
                     List<String> errors = ruleService.runRules(currentBaseEntity, currentPackageName, currentDate);
-
                     for (String s : errors)
-                        System.out.println("Validation error:" + s);
-
-                } catch (FileNotFoundException e) {
+                    System.out.println("Validation error:" + s);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-
 
             } else if (args.get(0).equals("set")) {
 

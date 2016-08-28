@@ -255,6 +255,44 @@ public class ZipFilesMonitor {
         }
     }
 
+    public long parseCreditorId(byte[] bytes) {
+
+        try {
+            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            XMLEventReader eventReader = inputFactory.createXMLEventReader(new ByteArrayInputStream(bytes));
+            InfoReader infoReader = new InfoReader();
+            infoReader.parse(eventReader);
+            InfoData infoData = infoReader.getInfoData();
+            Date repDate = infoData.getReportDate();
+            DataUtils.toBeginningOfTheMonth(repDate);
+            DataUtils.toBeginningOfTheDay(repDate);
+            BatchInfo batchInfo = new BatchInfo();
+            batchInfo.setRepDate(repDate);
+            batchInfo.setSize(infoData.getActualCreditCount());
+            batchInfo.setActualCount(infoData.getActualCreditCount());
+            batchInfo.setTotalCount(0);
+            batchInfo.setMaintenance(infoData.isMaintenance());
+            String code = infoData.getCode();
+            if (code != null && code.length() > 0) {
+                batchInfo.addParam("CODE", code.trim());
+            } else {
+                String docType = infoData.getDocType();
+                String docValue = infoData.getDocValue();
+
+                if (docType != null && docValue != null &&
+                        docType.length() > 0 && docValue.length() > 0) {
+                    batchInfo.addParam("DOC_TYPE", docType.trim());
+                    batchInfo.addParam("DOC_VALUE", docValue.trim());
+                }
+            }
+
+            return getCreditor(batchInfo, creditors).getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1L;
+        }
+    }
+
     public void saveData(BatchInfo batchInfo, String filename, byte[] bytes, boolean isNB) {
         receiverStatusSingleton.batchReceived();
 

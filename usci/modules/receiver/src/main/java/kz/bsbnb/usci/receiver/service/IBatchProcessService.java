@@ -31,4 +31,6 @@ public interface IBatchProcessService {
 
     List<InputInfo> getQueueListPreview(List<Creditor> creditors,
                                         Set<Long> priorityCreditors, QueueOrderType queueOrderType);
+
+    long parseCreditorId(byte[] bytes);
 }

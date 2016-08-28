@@ -100,4 +100,7 @@ public abstract class BatchParser {
         return data.trim();
     }
 
+    public void setCreditorId(long creditorId) {
+        this.creditorId = creditorId;
+    }
 }

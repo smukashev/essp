@@ -94,4 +94,9 @@ public class BatchProcessServiceImpl implements IBatchProcessService {
     public List<InputInfo> getQueueListPreview(List<Creditor> creditors, Set<Long> priorityCreditors, QueueOrderType queueOrderType) {
         return zipFilesMonitor.getJobLauncherQueue().getOrderedFiles(creditors, priorityCreditors, queueOrderType);
     }
+
+    @Override
+    public long parseCreditorId(byte[] bytes) {
+        return zipFilesMonitor.parseCreditorId(bytes);
+    }
 }
