@@ -2003,7 +2003,7 @@ public class CLI {
                 System.out.println("ok saved: ruleId = " + ruleId);
             } else if (args.get(0).equals("run")) {
 
-                String fileName = "/home/bauka/cr.xml";
+                String fileName = "/home/bauka/a.xml";
                 DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
                 Date reportDate = dateFormatter.parse("01.08.2016");
 
@@ -2067,7 +2067,9 @@ public class CLI {
                     }
 
                     currentBaseEntity = (BaseEntity) baseEntityProcessorDao.prepare(currentBaseEntity, creditorId);
-                    if(currentBaseEntity.getEl("creditor") != null) {
+
+                    if(currentBaseEntity.getEl("creditor") != null && currentBaseEntity.getBaseEntityReportDate().getCreditorId() < 1) {
+                        //careful: creditorId is auto injected
                         creditorId = ((BaseEntity) currentBaseEntity.getEl("creditor")).getId();
                         currentBaseEntity.getBaseEntityReportDate().setCreditorId(creditorId);
                     }
