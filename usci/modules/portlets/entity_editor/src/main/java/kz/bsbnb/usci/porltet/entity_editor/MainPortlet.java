@@ -245,7 +245,7 @@ public class MainPortlet extends MVCPortlet {
                     first = false;
                 }
 
-                str +=  setToJson((BaseSet) (value.getValue()), attrTitle, innerClassesNames, value.getMetaAttribute(),
+                str +=  setToJson(value, attrTitle, innerClassesNames,
                         isNb, creditorId);
             }
         }
@@ -308,9 +308,13 @@ public class MainPortlet extends MVCPortlet {
         return str;
     }
 
-    private String setToJson(BaseSet set, String title, String code, IMetaAttribute attr,
+    private String setToJson(IBaseValue baseSetValue, String title, String code,
                              boolean isNb,
                              long creditorId) {
+
+        BaseSet set = ((BaseSet) baseSetValue.getValue());
+        IMetaAttribute attr = baseSetValue.getMetaAttribute();
+
         IMetaType type = set.getMemberType();
 
         if (title == null) {
@@ -322,6 +326,7 @@ public class MainPortlet extends MVCPortlet {
         str += "\"title\": \"" + title + "\",";
         str += "\"code\": \"" + code + "\",";
         str += "\"value\": \"" + set.get().size() + "\",";
+        str += "\"date\": \"" + dFormat.format(baseSetValue.getRepDate()) +"\",";
         str += "\"simple\": " + !attr.getMetaType().isComplex() + ",";
         str += "\"array\": true,";
         str += "\"isCumulative\": " + attr.isCumulative() + ",";
