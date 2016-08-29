@@ -983,7 +983,8 @@ Ext.onReady(function () {
             {name: 'metaId', type: 'string'},
             {name: 'childMetaId', type: 'string'},
             {name: 'childType', type: 'string'},
-            {name: 'date', type: 'string'}
+            {name: 'date', type: 'string'},
+            {name: 'isCumulative', type: 'boolean'}
         ]
     });
 
@@ -1501,17 +1502,19 @@ Ext.onReady(function () {
                         disabled: !editorAction.canEdit() || !(node.data.ref || node.data.simple)
                     });
 
-                    items.push({
-                        text: 'Удалить',
-                        handler: function () {
-                            //editorAction.delete = true;
-                            //buttonDelete.handler();
-                            editorAction.aquireForce(node, deleteForm(node), function(){
-                                Ext.MessageBox.alert("","Нельзя удалить на разные отчетные даты");
-                            });
-                        },
-                        disabled: !editorAction.canDelete() || (node.data.isKey)
-                    });
+                    if( !(node.parentNode.data.array && node.parentNode.data.isCumulative) ) {
+                        items.push({
+                            text: 'Удалить',
+                            handler: function () {
+                                //editorAction.delete = true;
+                                //buttonDelete.handler();
+                                editorAction.aquireForce(node, deleteForm(node), function () {
+                                    Ext.MessageBox.alert("", "Нельзя удалить на разные отчетные даты");
+                                });
+                            },
+                            disabled: !editorAction.canDelete() || (node.data.isKey)
+                        });
+                    }
 
                     /*items.push({
                      text: 'log',

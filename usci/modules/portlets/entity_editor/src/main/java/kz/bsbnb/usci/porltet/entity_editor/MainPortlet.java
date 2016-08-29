@@ -324,6 +324,7 @@ public class MainPortlet extends MVCPortlet {
         str += "\"value\": \"" + set.get().size() + "\",";
         str += "\"simple\": " + !attr.getMetaType().isComplex() + ",";
         str += "\"array\": true,";
+        str += "\"isCumulative\": " + attr.isCumulative() + ",";
         str += "\"isKey\": " + attr.isKey() + ",";
         str += "\"type\": \"META_SET\",";
         str += "\"iconCls\":\"folder\",";
