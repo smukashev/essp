@@ -26,9 +26,12 @@ when:
  $entity: BaseEntity( getMeta().getClassName == "credit"
                 && (getEls("{setString(01,04,07)}subject[is_organization=true]organization_info[is_se=true]enterprise_type.code") > 0
                    ||
-                    getEls("{setString(02,03,05,06,08,09)}subject[is_organization=true]organization_info[is_se=false]enterprise_type.code") > 0))
+                    getEls("{setString(02,03,05,06,08,09)}subject[is_organization=true]organization_info[is_se=false]enterprise_type.code") > 0
+                   ||
+                    getEls("{count}subject[is_organization=true]organization_info[is_se=true][enterprise_type.code=null]") > 0)
+                   )
 then
- $entity.addValidationError("Код субъекта частного предпринимательства не соответствует типу субъекта кредитной истории");
+ $entity.addValidationError("Код субъекта частного предпринимательства указан некорректно");
 end
 $$$
 
