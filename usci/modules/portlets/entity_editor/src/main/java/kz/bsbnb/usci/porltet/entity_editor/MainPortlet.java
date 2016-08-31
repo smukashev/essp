@@ -360,7 +360,16 @@ public class MainPortlet extends MVCPortlet {
         int i = 0;
 
         if (type.isComplex()) {
-            for (IBaseValue value : set.get()) {
+
+            IBaseValue[] values = set.get().toArray(new IBaseValue[0]);
+            Arrays.sort(values, new Comparator<IBaseValue>() {
+                @Override
+                public int compare(IBaseValue o1, IBaseValue o2) {
+                    return ((BaseEntity) o1.getValue()).getId() >= ((BaseEntity) o2.getValue()).getId() ? 1 : -1;
+                }
+            });
+
+            for (IBaseValue value : values) {
                 if (value != null && value.getValue() != null) {
 
                     //bank relation check
