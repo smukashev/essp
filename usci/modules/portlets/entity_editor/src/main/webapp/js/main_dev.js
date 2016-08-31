@@ -702,8 +702,9 @@ function hasEmptyKeyAttr(mainNode) {
 
         if (currentNode.data.simple) {
             if (!currentNode.data.value) {
-                Ext.MessageBox.alert(label_ERROR, "Не заполнен ключевой атрибут: " + currentNode.data.title);
-                return true;
+                //Ext.MessageBox.alert(label_ERROR, "Не заполнен ключевой атрибут: " + currentNode.data.title);
+                //return true;
+                return false;
             }
         } else {
             if (currentNode.data.isKey && currentNode.childNodes.length == 0) {
@@ -1377,6 +1378,7 @@ Ext.onReady(function () {
             flex: 4,
             dataIndex: 'code',
             sortable: true,
+            visible: false,
             renderer: function (val, meta, record) {
                 if (val == 'subject') {
                     var subjectName;
