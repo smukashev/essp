@@ -64,3 +64,17 @@ end
 $$$
 
 rule save
+
+rule read $$$
+title: PLEDGE_DUPLICATE
+rule "PLEDGE_DUPLICATE"
+//MES836
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+  && getEls("{hasDuplicates(pledges)}pledge_type.code,contract") == true)
+then
+  $entity.addValidationError("Ошибка по обеспечению: Дублируются записи \"Номер договора залога\", \"Вид обеспечения\"");
+end
+$$$
+
+rule save
