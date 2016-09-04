@@ -449,4 +449,56 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     public IBaseEntityLoadDao getBaseEntityLoadDao() {
         return baseEntityLoadDao;
     }
+
+    @Override
+    public void prepareClosedDates(IBaseEntity baseEntity, long creditorId) {
+        for(String attrName: baseEntity.getAttributes()) {
+            IMetaAttribute metaAttribute = baseEntity.getMeta().getMetaAttribute(attrName);
+            IMetaType metaType = baseEntity.getMemberType(attrName);
+            IBaseValue baseValue = baseEntity.getBaseValue(attrName);
+
+            IBaseValueDao valueDao = persistableDaoPool.getPersistableDao(baseValue.getClass(), IBaseValueDao.class);
+
+            IBaseValue baseValueClosed = valueDao.getNextBaseValue(baseValue);
+
+            if(baseValueClosed == null)
+                baseValueClosed = valueDao.getClosedBaseValue(baseValue);
+
+            if(baseValueClosed != null) {
+                baseValue.setCloseDate(baseValueClosed.getRepDate());
+            }
+
+            if(metaType.isComplex()) {
+                if(metaType.isSet()) {
+                    IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
+
+                    for(IBaseValue childBaseValue : childBaseSet.get()) {
+                        IBaseSetValueDao setValueDao = persistableDaoPool
+                                .getPersistableDao(childBaseValue.getClass(), IBaseSetValueDao.class);
+
+                        IBaseValue childBaseValueClosed = setValueDao.getNextBaseValue(childBaseValue);
+
+                        if(childBaseValueClosed == null)
+                            childBaseValueClosed = setValueDao.getClosedBaseValue(childBaseValue);
+
+                        if(childBaseValueClosed != null) {
+                            childBaseValue.setCloseDate(childBaseValueClosed.getRepDate());
+                        }
+
+                        prepareClosedDates(((IBaseEntity) childBaseValue.getValue()), creditorId);
+                    }
+
+
+                } else {
+                    IBaseEntity childBaseEntity = (IBaseEntity) baseValue.getValue();
+
+                    if (childBaseEntity.getValueCount() != 0)
+                        prepareClosedDates(childBaseEntity, creditorId);
+
+                }
+            }
+
+        }
+
+    }
 }

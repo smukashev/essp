@@ -17,6 +17,8 @@ import java.util.*;
 
 public class BaseValue<T> extends Persistable implements IBaseValue<T> {
 
+    private static final long serialVersionUID = 1L;
+
     public static final boolean DEFAULT_LAST = true;
 
     public static final boolean DEFAULT_CLOSED = false;
@@ -38,6 +40,8 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
     private boolean last = DEFAULT_LAST;
 
     private boolean closed = DEFAULT_CLOSED;
+
+    private Date closeDate;
 
     public BaseValue(long creditorId, Date reportDate, T value) {
         this(DEFAULT_ID, creditorId, reportDate, value, DEFAULT_CLOSED, DEFAULT_LAST);
@@ -329,5 +333,14 @@ public class BaseValue<T> extends Persistable implements IBaseValue<T> {
             return null;
 
         return getValue().toString();
+    }
+
+    @Override
+    public Date getCloseDate() {
+        return closeDate;
+    }
+
+    public void setCloseDate(Date closeDate) {
+        this.closeDate = closeDate;
     }
 }

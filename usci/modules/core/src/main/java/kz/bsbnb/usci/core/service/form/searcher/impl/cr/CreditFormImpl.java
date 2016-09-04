@@ -92,7 +92,9 @@ public class CreditFormImpl extends JDBCSupport implements ISearcherForm {
         SearchPagination pagination = new SearchPagination(0);
         result.setPagination(pagination);
         if(id != null && id > 0 ) {
-            entityList.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
+            BaseEntity entity = (BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate);
+            baseEntityProcessorDao.prepareClosedDates(entity, creditorId);
+            entityList.add(entity);
             pagination.setTotalCount(1);
         }
         return result;

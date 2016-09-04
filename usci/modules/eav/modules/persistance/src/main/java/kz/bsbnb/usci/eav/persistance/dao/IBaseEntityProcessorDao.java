@@ -23,4 +23,6 @@ public interface IBaseEntityProcessorDao {
     boolean remove(long baseEntityId);
 
     IBaseEntityLoadDao getBaseEntityLoadDao();
+
+    void prepareClosedDates(IBaseEntity entity, long creditorId);
 }

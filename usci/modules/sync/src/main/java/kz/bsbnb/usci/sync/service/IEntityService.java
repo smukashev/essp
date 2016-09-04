@@ -2,7 +2,6 @@ package kz.bsbnb.usci.sync.service;
 
 
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
-import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.tool.status.SyncStatus;
@@ -29,4 +28,6 @@ public interface IEntityService {
     RefColumnsResponse getRefColumns(long metaClassId);
 
     RefListResponse getRefListApprox(long metaClassId);
+
+    BaseEntity loadForDisplay(long entityId, Date reportDate);
 }

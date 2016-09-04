@@ -174,7 +174,7 @@ public class MainPortlet extends MVCPortlet {
     private String entityToJson(BaseEntity entity, String title, String code, IMetaAttribute attr,
                                 boolean asRoot,
                                 boolean isNb,
-                                long creditorId, Date repDate) {
+                                long creditorId, Date repDate, Date closeDate) {
 
         MetaClass meta = entity.getMeta();
 
@@ -198,6 +198,7 @@ public class MainPortlet extends MVCPortlet {
         str += "\"simple\": false,";
         str += "\"array\": false,";
         str += "\"date\": \"" + (repDate == null ? "" : dFormat.format(repDate)) +"\",";
+        str += "\"closeDate\": \"" + (closeDate == null ? "" : dFormat.format(closeDate)) +"\",";
         str += "\"ref\": " + entity.getMeta().isReference() + ",";
         str += "\"isKey\": " + (attr != null ? attr.isKey() : false) + ",";
         str += "\"isRequired\": " + (attr != null ? attr.isRequired() : false) + ",";
@@ -225,7 +226,7 @@ public class MainPortlet extends MVCPortlet {
                 }
 
                 str +=  entityToJson((BaseEntity)(value.getValue()), attrTitle, innerClassesNames,
-                        meta.getMetaAttribute(innerClassesNames), false, isNb, creditorId, value.getRepDate());
+                        meta.getMetaAttribute(innerClassesNames), false, isNb, creditorId, value.getRepDate(), value.getCloseDate());
             }
 
         }
@@ -271,6 +272,7 @@ public class MainPortlet extends MVCPortlet {
                     "\"code\":\"" + innerClassesNames + "\",\n" +
                     "\"value\":\"" + escapeSlashesAndQuotes(testNull(value.getValue().toString())) + "\",\n" +
                     "\"date\": \"" + dFormat.format(value.getRepDate()) +"\"," +
+                    "\"closeDate\": \"" + (value.getCloseDate() == null ? "" : dFormat.format(value.getCloseDate())) +"\"," +
                     "\"simple\": true,\n" +
                     "\"array\": false,\n" +
                     "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +
@@ -394,7 +396,7 @@ public class MainPortlet extends MVCPortlet {
                     }
 
                     str +=  entityToJson((BaseEntity)(value.getValue()), "[" + i + "]", "[" + i + "]",
-                            null, false, isNb, creditorId, value.getRepDate());
+                            null, false, isNb, creditorId, value.getRepDate(), value.getCloseDate());
                     i++;
                 }
 
@@ -622,11 +624,11 @@ public class MainPortlet extends MVCPortlet {
                         if(date == null)
                             date = new Date();
 
-                        BaseEntity entity = entityService.load(Integer.parseInt(entityId), date);
+                        BaseEntity entity = entityService.loadForDisplay(Long.parseLong(entityId), date);
 
                         sJson = "{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entity, entity.getMeta().getClassTitle(),
-                                        entity.getMeta().getClassName(), null, asRoot, isNb, creditorId, null) +
+                                        entity.getMeta().getClassName(), null, asRoot, isNb, creditorId, null, null) +
                                 "]}";
 
                         out.write(sJson.getBytes());
@@ -662,53 +664,12 @@ public class MainPortlet extends MVCPortlet {
                         sb = sb.append(",\"children\":[\n");
 
                         Iterator<BaseEntity> it = searchResult.getData().iterator();
-                        do {
-                            if(!it.hasNext())
-                                break;
+                        while(it.hasNext()) {
                             BaseEntity currentEntity = it.next();
                             sb.append(entityToJson(currentEntity, currentEntity.getMeta().getClassTitle(),
-                                    currentEntity.getMeta().getClassName(), null, true, isNb, creditorId, null));
-
+                                    currentEntity.getMeta().getClassName(), null, true, isNb, creditorId, null, null));
                             if(it.hasNext()) sb.append(",");
-                        } while(true);
-
-                        sb.append("]}");
-                        out.write(sb.toString().getBytes());
-
-                        if(1==1)
-                            return;
-
-                        //search by parameters
-
-                        list = resourceRequest.getParameterNames();
-                        metaName = resourceRequest.getParameter("metaClass");
-                        searchClassName = resourceRequest.getParameter("searchName");
-
-                        metaClass = metaFactoryService.getMetaClass(metaName);
-                        parameters = new HashMap<String,String>();
-
-                        while(list.hasMoreElements()) {
-                            String attribute = list.nextElement();
-                            if(attribute.equals("op") || attribute.equals("metaClass") || attribute.equals("searchName"))
-                                continue;
-                            parameters.put(attribute, resourceRequest.getParameter(attribute));
                         }
-
-                        searchResult = searcherFormService.search(searchClassName, parameters, metaClass, "", creditorId);
-                        if(searchResult.getData() == null)
-                            throw new IllegalArgumentException(Errors.compose(Errors.E242));
-                        /*
-                        StringBuilder sb = new StringBuilder("{\"text\":\".\",\"children\": [\n");
-                        Iterator<BaseEntity> it = searchResult.iterator();
-                        do {
-                            if(!it.hasNext())
-                                break;
-                            BaseEntity currentEntity = it.next();
-                            sb.append(entityToJson(currentEntity, currentEntity.getMeta().getClassTitle(),
-                                    currentEntity.getMeta().getClassName(), null, true, isNb, creditorId));
-
-                            if(it.hasNext()) sb.append(",");
-                        } while(true);*/
 
                         sb.append("]}");
                         out.write(sb.toString().getBytes());

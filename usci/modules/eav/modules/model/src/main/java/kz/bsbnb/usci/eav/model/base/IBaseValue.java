@@ -15,6 +15,10 @@ public interface IBaseValue<T> extends IPersistable, Cloneable {
 
     long getCreditorId();
 
+    Date getCloseDate();
+
+    void setCloseDate(Date closeDate);
+
     void setCreditorId(long creditorId);
 
     IMetaAttribute getMetaAttribute();

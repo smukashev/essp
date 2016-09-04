@@ -985,6 +985,7 @@ Ext.onReady(function () {
             {name: 'childMetaId', type: 'string'},
             {name: 'childType', type: 'string'},
             {name: 'date', type: 'string'},
+            {name: 'closeDate', type: 'string'},
             {name: 'isCumulative', type: 'boolean'}
         ]
     });
@@ -1422,9 +1423,14 @@ Ext.onReady(function () {
                 return subjectName;
             }
         },{
-            text: 'Дата',
-            flex: 1,
+            text: 'Дата открытия',
+            flex: 5,
             dataIndex: 'date',
+            sortable: true
+        },{
+            text: 'Дата закрытия',
+            flex: 6,
+            dataIndex: 'closeDate',
             sortable: true
         }/*,{
          text: label_CODE,

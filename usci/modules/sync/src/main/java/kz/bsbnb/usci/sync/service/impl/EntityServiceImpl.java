@@ -1,7 +1,6 @@
 package kz.bsbnb.usci.sync.service.impl;
 
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
-import kz.bsbnb.usci.eav.model.RefListItem;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.job.impl.DataJob;
@@ -80,5 +79,10 @@ public class EntityServiceImpl implements IEntityService {
     @Override
     public RefListResponse getRefListApprox(long metaClassId) {
         return remoteEntityService.getRefListApprox(metaClassId);
+    }
+
+    @Override
+    public BaseEntity loadForDisplay(long entityId, Date reportDate) {
+        return remoteEntityService.loadForDisplay(entityId, reportDate);
     }
 }

@@ -21,4 +21,6 @@ public interface IEntityService {
     Map<String, QueryEntry> getSQLStats();
 
     RefListResponse getRefListApprox(long metaClassId);
+
+    BaseEntity loadForDisplay(long entityId, Date reportDate);
 }

@@ -144,6 +144,13 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
+    public BaseEntity loadForDisplay(long entityId, Date reportDate) {
+        BaseEntity baseEntity = (BaseEntity) baseEntityLoadDao.loadByMaxReportDate(entityId, reportDate);
+        baseEntityProcessorDao.prepareClosedDates(baseEntity, baseEntity.getBaseEntityReportDate().getCreditorId());
+        return baseEntity;
+    }
+
+    @Override
     public RefColumnsResponse getRefColumns(long metaClassId) {
         return refProcessorDao.getRefColumns(metaClassId);
     }
