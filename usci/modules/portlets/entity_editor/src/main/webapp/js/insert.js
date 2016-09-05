@@ -71,7 +71,9 @@ function formBasic(node, callback){
                                     var refNode = Ext.create('entityModel', {
                                         title: attr.title,
                                         code: 'code',
-                                        value: this.getValue()
+                                        value: this.getValue(),
+                                        ref: true,
+                                        metaId: attr.metaId
                                     });
                                     form.elem.appendChild(refNode);
                                     refChange(refNode, this.getValue());
@@ -95,7 +97,8 @@ function formBasic(node, callback){
                                         code: attr.code,
                                         leaf: true,
                                         value: this.getValue(),
-                                        simple: true
+                                        simple: true,
+                                        type: attr.type
                                     });
                                 }
                             }

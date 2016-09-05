@@ -61,36 +61,34 @@ var editorAction = {
         return this.lastAction != 'none';
     },
     canEdit: function () {
-        return this.lastAction == 'none' || this.lastAction == 'edit';
+        //return this.lastAction == 'none' || this.lastAction == 'edit';
+        return true;
     },
     canDelete: function () {
-        return this.lastAction == 'none' || this.lastAction == 'delete';
-    },
-    canClose: function () {
-        return this.lastAction == 'none' || this.lastAction == 'close';
+        //return this.lastAction == 'none' || this.lastAction == 'delete';
+        return true;
     },
     canInsert: function () {
-        return this.lastAction == 'none' || this.lastAction == 'insert';
+        //return this.lastAction == 'none' || this.lastAction == 'insert';
+        return true;
     },
     commitEdit: function () {
         this.lastAction = 'edit';
-        Ext.getCmp('lblOperation').setText('редактирование');
+        Ext.getCmp('lblOperation').setText('Есть несохраненные данные');
     },
     commitDelete: function () {
-        this.lastAction = 'delete';
-        Ext.getCmp('lblOperation').setText('удаление');
-    },
-    commitClose: function () {
-        this.lastAction = 'close';
-        Ext.getCmp('lblOperation').setText('закрытие');
+        /*this.lastAction = 'delete';
+        Ext.getCmp('lblOperation').setText('удаление');*/
+        this.commitEdit();
     },
     commitInsert: function () {
-        this.lastAction = 'insert';
-        Ext.getCmp('lblOperation').setText('вставка');
+        /*this.lastAction = 'insert';
+        Ext.getCmp('lblOperation').setText('вставка');*/
+        this.commitEdit();
     },
     //makes sure client chosed reportDate
     aquire: function (node, callback) {
-        if (!this.reportDate) {
+        /*if (!this.reportDate) {
             var dateField = Ext.create("Ext.form.field.Date", {
                 format: 'd.m.Y',
                 accept: function () {
@@ -121,17 +119,19 @@ var editorAction = {
             }).show();
         } else {
             callback();
-        }
+        }*/
+        callback();
     },
     //make sure client don't choose wrong reportDate
     aquireForce: function (node, callback, errorHandler) {
-        if(!this.reportDate || this.reportDate == node.data.date) {
+        /*if(!this.reportDate || this.reportDate == node.data.date) {
             this.reportDate = node.data.date;
             Ext.getCmp('lblReportDate').setText(this.reportDate);
             callback();
         } else {
             errorHandler();
-        }
+        }*/
+        callback();
     }
 
 }
@@ -795,7 +795,7 @@ function editorForm(node) {
 
         }
 
-        Ext.create("Ext.Window", {
+        var editorWindow = Ext.create("Ext.Window", {
             title: node.data.title,
             width: 400,
             modal: true,
@@ -811,6 +811,7 @@ function editorForm(node) {
                         items[0].accept();
                         Ext.getCmp('entityTreeView').getView().refresh();
                         editorAction.commitEdit();
+                        editorWindow.close();
                         /*var form = Ext.getCmp('ArrayElFormPanel');
                          if (form.isValid()) {
                          saveFormValues(FORM_ADD_ARRAY_EL);
@@ -877,17 +878,6 @@ function insertForm(node){
             }
 
         }
-    }
-}
-
-
-function closeForm(node) {
-    return function(){
-        node.data.markedAsClosed = true;
-        node.set('iconCls','deleted');
-        editorAction.commitClose();
-        Ext.getCmp('entityTreeView').getView().refresh();
-        node.collapse();
     }
 }
 
@@ -1154,7 +1144,7 @@ Ext.onReady(function () {
                 method: 'POST',
                 params: {
                     xml_data: xmlStr,
-                    date: editorAction.reportDate,
+                    date: Ext.getCmp('edDate').value,
                     op: 'SAVE_XML'
                 },
                 success: function () {
@@ -1477,13 +1467,6 @@ Ext.onReady(function () {
                                 buttonShowXML.handler();
                             }
                         });
-                        items.push({
-                            text: 'Закрыть',
-                            handler: function () {
-                                editorAction.aquire(node, closeForm(node));
-                            },
-                            disabled: !editorAction.canClose()
-                        });
                     }
 
                     if(node.data.array) {
@@ -1668,8 +1651,8 @@ Ext.onReady(function () {
                 },
                 {xtype: 'label', text: 'Всего результатов:'},
                 {xtype: 'label', text: '0', id: 'totalCount'},
-                {xtype: 'label', text: ', Отчетная дата:'},
-                {xtype: 'label', text: 'Не выбрана', id: 'lblReportDate'},
+                /*{xtype: 'label', text: ', Отчетная дата:'},
+                {xtype: 'label', text: 'Не выбрана', id: 'lblReportDate'},*/
                 {xtype: 'label', text: ', Изменение:'},
                 {xtype: 'label', text: 'нет', id: 'lblOperation'},
             ]
