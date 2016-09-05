@@ -15,7 +15,7 @@ Ext.onReady(function() {
                 op : 'LIST_ENTITY',
                 metaClass: 'organization_info',
                 searchName: serviceCode,
-                timeout: 120000,
+                timeout: timeout,
                 name: Ext.getCmp('edName').value,
                 date: Ext.getCmp('edDate').value,
                 creditorId: Ext.getCmp('edCreditor').value,
@@ -43,6 +43,8 @@ Ext.onReady(function() {
                             error = operation.request.proxy.reader.rawData.errorMessage;
                         Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(error));
                     }
+
+                    Ext.getCmp('entityEditorShowBtn').enable();
                     if(records && records.length == 0)
                         Ext.MessageBox.alert(label_INFO, 'Поиск вернул 0 результатов');
 
