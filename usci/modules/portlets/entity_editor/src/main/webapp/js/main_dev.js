@@ -31,6 +31,8 @@ var arrayElWindow;
 
 var fetchSize = 50;
 
+var timeout = 300000;
+
 var userNavHistory = {
     currentPage: 1,
     nextPage: 1,
@@ -387,7 +389,7 @@ function loadAttributes(form, selectedNode, arrayElAddition) {
             op: 'LIST_ATTRIBUTES',
             metaId: metaId
         },
-        timeout: 120000,
+        timeout: timeout,
         success: function (result) {
             myMask.hide();
             var json = JSON.parse(result.responseText);
@@ -552,7 +554,7 @@ function addField(form, attr, idSuffix, node) {
                     }
                 },
                 autoLoad: true,
-                timeout: 120000,
+                timeout: timeout,
                 remoteSort: true
             }),
             displayField: 'title',
@@ -883,7 +885,7 @@ function insertForm(node){
 
 Ext.onReady(function () {
 
-    Ext.override(Ext.data.proxy.Ajax, {timeout: 120000});
+    Ext.override(Ext.data.proxy.Ajax, {timeout: timeout});
     document.oncontextmenu = function(event){
         return false;
     }
@@ -1096,7 +1098,7 @@ Ext.onReady(function () {
                 loadEntity(entityId, Ext.getCmp('edDate').value, currentSearch);
             } else {
                 //for custom implementations
-                var params = {op: 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch, timeout: 120000};
+                var params = {op: 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch, timeout: timeout};
                 var inputs = document.getElementById("entity-editor-form").childNodes;
                 for (i = 0; i < inputs.length; i++) {
                     if (inputs[i].tagName == 'INPUT') {

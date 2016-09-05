@@ -26,12 +26,12 @@ Ext.onReady(function() {
                 margin: 10
             }));
 
-        panel.doSearch = function(){
+        panel.doSearch = function(onSuccess, onFail){
             var params = {
                 op : 'LIST_ENTITY',
                 metaClass: 'subject',
                 searchName: serviceCode,
-                timeout: 120000,
+                timeout: timeout,
                 firstName: Ext.getCmp('edFirstName').value,
                 lastName: Ext.getCmp('edLastName').value,
                 middleName: Ext.getCmp('edMiddleName').value,
@@ -61,6 +61,8 @@ Ext.onReady(function() {
                             error = operation.request.proxy.reader.rawData.errorMessage;
                         Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(error));
                     }
+                    
+                    Ext.getCmp('entityEditorShowBtn').enable();
                     if(records && records.length == 0)
                         Ext.MessageBox.alert(label_INFO, 'Поиск вернул 0 результатов');
 
