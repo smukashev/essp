@@ -932,6 +932,24 @@ showcase addIndex nonunique portfolio_data_id portfolio_flow_msfo_id details_id
 
 showcase save
 
+#=================================================================================
+# CREDIT_DELETE_LOG
+#=================================================================================
+showcase set meta credit
+showcase set name CORE_DELETE_LOG
+showcase set tableName CORE_DELETE_LOG
+showcase set final true
+
+showcase list add creditor creditor_id
+
+showcase list addRootKey credit_id credit_id
+showcase list addRootKey credit_id credit_id
+showcase list addHistoryKey credit_id credit_id
+
+showcase addIndex nonunique credit_id
+
+showcase save
+
 showcase sql run usci/db_oracle_scripts/showcase_table_range_partitioning.sql
 
 quit

@@ -31,6 +31,8 @@ var arrayElWindow;
 
 var fetchSize = 50;
 
+var timeout = 300000;
+
 var userNavHistory = {
     currentPage: 1,
     nextPage: 1,
@@ -61,36 +63,34 @@ var editorAction = {
         return this.lastAction != 'none';
     },
     canEdit: function () {
-        return this.lastAction == 'none' || this.lastAction == 'edit';
+        //return this.lastAction == 'none' || this.lastAction == 'edit';
+        return true;
     },
     canDelete: function () {
-        return this.lastAction == 'none' || this.lastAction == 'delete';
-    },
-    canClose: function () {
-        return this.lastAction == 'none' || this.lastAction == 'close';
+        //return this.lastAction == 'none' || this.lastAction == 'delete';
+        return true;
     },
     canInsert: function () {
-        return this.lastAction == 'none' || this.lastAction == 'insert';
+        //return this.lastAction == 'none' || this.lastAction == 'insert';
+        return true;
     },
     commitEdit: function () {
         this.lastAction = 'edit';
-        Ext.getCmp('lblOperation').setText('редактирование');
+        Ext.getCmp('lblOperation').setText('Есть несохраненные данные');
     },
     commitDelete: function () {
-        this.lastAction = 'delete';
-        Ext.getCmp('lblOperation').setText('удаление');
-    },
-    commitClose: function () {
-        this.lastAction = 'close';
-        Ext.getCmp('lblOperation').setText('закрытие');
+        /*this.lastAction = 'delete';
+        Ext.getCmp('lblOperation').setText('удаление');*/
+        this.commitEdit();
     },
     commitInsert: function () {
-        this.lastAction = 'insert';
-        Ext.getCmp('lblOperation').setText('вставка');
+        /*this.lastAction = 'insert';
+        Ext.getCmp('lblOperation').setText('вставка');*/
+        this.commitEdit();
     },
     //makes sure client chosed reportDate
     aquire: function (node, callback) {
-        if (!this.reportDate) {
+        /*if (!this.reportDate) {
             var dateField = Ext.create("Ext.form.field.Date", {
                 format: 'd.m.Y',
                 accept: function () {
@@ -121,17 +121,19 @@ var editorAction = {
             }).show();
         } else {
             callback();
-        }
+        }*/
+        callback();
     },
     //make sure client don't choose wrong reportDate
     aquireForce: function (node, callback, errorHandler) {
-        if(!this.reportDate || this.reportDate == node.data.date) {
+        /*if(!this.reportDate || this.reportDate == node.data.date) {
             this.reportDate = node.data.date;
             Ext.getCmp('lblReportDate').setText(this.reportDate);
             callback();
         } else {
             errorHandler();
-        }
+        }*/
+        callback();
     }
 
 }
@@ -387,7 +389,7 @@ function loadAttributes(form, selectedNode, arrayElAddition) {
             op: 'LIST_ATTRIBUTES',
             metaId: metaId
         },
-        timeout: 120000,
+        timeout: timeout,
         success: function (result) {
             myMask.hide();
             var json = JSON.parse(result.responseText);
@@ -552,7 +554,7 @@ function addField(form, attr, idSuffix, node) {
                     }
                 },
                 autoLoad: true,
-                timeout: 120000,
+                timeout: timeout,
                 remoteSort: true
             }),
             displayField: 'title',
@@ -795,7 +797,7 @@ function editorForm(node) {
 
         }
 
-        Ext.create("Ext.Window", {
+        var editorWindow = Ext.create("Ext.Window", {
             title: node.data.title,
             width: 400,
             modal: true,
@@ -811,6 +813,7 @@ function editorForm(node) {
                         items[0].accept();
                         Ext.getCmp('entityTreeView').getView().refresh();
                         editorAction.commitEdit();
+                        editorWindow.close();
                         /*var form = Ext.getCmp('ArrayElFormPanel');
                          if (form.isValid()) {
                          saveFormValues(FORM_ADD_ARRAY_EL);
@@ -880,20 +883,9 @@ function insertForm(node){
     }
 }
 
-
-function closeForm(node) {
-    return function(){
-        node.data.markedAsClosed = true;
-        node.set('iconCls','deleted');
-        editorAction.commitClose();
-        Ext.getCmp('entityTreeView').getView().refresh();
-        node.collapse();
-    }
-}
-
 Ext.onReady(function () {
 
-    Ext.override(Ext.data.proxy.Ajax, {timeout: 120000});
+    Ext.override(Ext.data.proxy.Ajax, {timeout: timeout});
     document.oncontextmenu = function(event){
         return false;
     }
@@ -1106,7 +1098,7 @@ Ext.onReady(function () {
                 loadEntity(entityId, Ext.getCmp('edDate').value, currentSearch);
             } else {
                 //for custom implementations
-                var params = {op: 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch, timeout: 120000};
+                var params = {op: 'LIST_ENTITY', metaClass: currentMeta, searchName: currentSearch, timeout: timeout};
                 var inputs = document.getElementById("entity-editor-form").childNodes;
                 for (i = 0; i < inputs.length; i++) {
                     if (inputs[i].tagName == 'INPUT') {
@@ -1154,7 +1146,7 @@ Ext.onReady(function () {
                 method: 'POST',
                 params: {
                     xml_data: xmlStr,
-                    date: editorAction.reportDate,
+                    date: Ext.getCmp('edDate').value,
                     op: 'SAVE_XML'
                 },
                 success: function () {
@@ -1477,13 +1469,6 @@ Ext.onReady(function () {
                                 buttonShowXML.handler();
                             }
                         });
-                        items.push({
-                            text: 'Закрыть',
-                            handler: function () {
-                                editorAction.aquire(node, closeForm(node));
-                            },
-                            disabled: !editorAction.canClose()
-                        });
                     }
 
                     if(node.data.array) {
@@ -1668,8 +1653,8 @@ Ext.onReady(function () {
                 },
                 {xtype: 'label', text: 'Всего результатов:'},
                 {xtype: 'label', text: '0', id: 'totalCount'},
-                {xtype: 'label', text: ', Отчетная дата:'},
-                {xtype: 'label', text: 'Не выбрана', id: 'lblReportDate'},
+                /*{xtype: 'label', text: ', Отчетная дата:'},
+                {xtype: 'label', text: 'Не выбрана', id: 'lblReportDate'},*/
                 {xtype: 'label', text: ', Изменение:'},
                 {xtype: 'label', text: 'нет', id: 'lblOperation'},
             ]

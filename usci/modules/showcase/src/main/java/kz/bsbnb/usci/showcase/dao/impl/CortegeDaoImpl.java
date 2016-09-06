@@ -35,11 +35,14 @@ public class CortegeDaoImpl extends CommonDao {
     private static final String ROOT_DOT = "root.";
 
     private static final String custRemainsVert = "CUST_REMAINS_VERT";
+    private static final String custDeleteLog = "CORE_DELETE_LOG";
 
     @SuppressWarnings("unchecked")
     @Transactional
     public void generate(final IBaseEntity globalEntityApplied, final ShowCase showCase) {
-        if (showCase.getTableName().equals(custRemainsVert)) {
+        if(showCase.getTableName().equals(custDeleteLog)) {
+            deleteLogCortegeGenerate(globalEntityApplied, showCase);
+        } else if (showCase.getTableName().equals(custRemainsVert)) {
             remainsCortegeGenerate(globalEntityApplied, showCase);
         } else {
             if (showCase.getDownPath() != null && showCase.getDownPath().length() > 0) {
@@ -554,6 +557,15 @@ public class CortegeDaoImpl extends CommonDao {
         }
     }
 
+    @Transactional
+    private void deleteLogCortegeGenerate(IBaseEntity globalEntity, ShowCase showCase) {
+        if(globalEntity.getOperation() != null && globalEntity.getOperation() == OperationType.DELETE) {
+            jdbcTemplateSC.update("INSERT INTO LOGS", "insert into r_core_delete_log (credit_id, creditor_id, cdc) values (?,?, sysdate)",
+                    new Object[]{globalEntity.getId(), globalEntity.getBaseEntityReportDate().getCreditorId()});
+
+        }
+    }
+
     private HashMap<ArrayElement, HashMap<ValueElement, Object>> generateMap(IBaseEntity entity, ShowCase ShowCase) {
         HashSet<PathElement> keyPaths = new HashSet<>();
         HashMap<String, HashSet<PathElement>> paths = generatePaths(entity, ShowCase, keyPaths);
@@ -899,6 +911,10 @@ public class CortegeDaoImpl extends CommonDao {
 
             jdbcTemplateSC.update("DELETE FROM HISTORY WHERE  + rootKeyElement.queryKeys", String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX,
                     showCase.getRootClassName()), getObjectArray(false, rootKeyElement.values));
+
+            //jdbcTemplateSC.update("INSERT INTO LOGS", "insert into r_core_log (entity_id, creditor_id, cdc) values (?,?, sysdate)",
+            //        new Object[]{entity.getId(), entity.getBaseEntityReportDate().getCreditorId()});
+
         } else {
             sql = "DELETE FROM %s WHERE " + rootKeyElement.queryKeys;
 
