@@ -138,34 +138,6 @@ var editorAction = {
 
 }
 
-function getForm() {
-    currentSearch = Ext.getCmp('edSearch').value;
-    currentMeta = Ext.getCmp('edSearch').displayTplData[0].metaName;
-    Ext.Ajax.request({
-        url: dataUrl,
-        method: 'POST',
-        params: {
-            op: 'GET_FORM',
-            search: currentSearch,
-            metaName: currentMeta
-        },
-        success: function (data) {
-            document.getElementById('entity-editor-form').innerHTML = data.responseText;
-            var all = document.getElementsByClassName("usci-date");
-            for (var i = 0; i < all.length; i++) {
-                var info = all[i].id.match(regex);
-                Ext.create('Ext.form.DateField', {
-                    renderTo: all[i].id,
-                    fieldLabel: 'дата',
-                    labelWidth: 27,
-                    id: 'inp-' + info[1],
-                    format: 'd.m.Y',
-                });
-            }
-        }
-    });
-}
-
 var errors = [];
 
 function filterLeaf(control, queryObject) {
@@ -198,58 +170,6 @@ function filterNode(control, queryObject) {
             break;
         }
     }
-}
-
-function find(control) {
-    var nextDiv = control.parentNode.nextSibling;
-    var inputDiv = control.previousSibling.previousSibling;
-
-    var info = inputDiv.id.match(regex);
-
-
-    var params = {op: 'FIND_ACTION', metaClass: info[2], searchName: currentSearch};
-    for (var i = 0; i < errors.length; i++)
-        errors[i].style.display = 'none';
-
-    errors = [];
-
-    for (var i = 0; i < nextDiv.childNodes.length; i++) {
-        var preKeyElem = nextDiv.childNodes[i];
-        if (preKeyElem.className.indexOf('leaf') > -1) {
-            filterLeaf(preKeyElem, params);
-        } else {
-            filterNode(preKeyElem, params);
-        }
-    }
-
-    if (errors.length > 0) {
-        for (var i = 0; i < errors.length; i++) {
-            errors[i].style.display = 'inline';
-        }
-        return;
-    } else {
-        var loadDiv = control.nextSibling;
-        loadDiv.style.display = 'inline';
-    }
-
-
-    Ext.Ajax.request({
-        url: dataUrl,
-        method: 'POST',
-        params: params,
-        success: function (response) {
-            var data = JSON.parse(response.responseText);
-            if (data.data > -1)
-                inputDiv.value = data.data;
-            else
-                inputDiv.value = '';
-
-            loadDiv.style.display = 'none';
-        },
-        failure: function () {
-            console.log('woops');
-        }
-    });
 }
 
 function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
@@ -879,6 +799,11 @@ function insertForm(node){
                 });
             }
 
+        } else {
+            formAdvanced(node, function(form){
+                node.appendChild(form.elem);
+                Ext.getCmp('entityTreeView').getView().refresh();
+            });
         }
     }
 }
@@ -1471,15 +1396,15 @@ Ext.onReady(function () {
                         });
                     }
 
-                    if(node.data.array) {
-                        items.push({
-                            text: 'Добавить элемент',
-                            handler: function(){
-                                editorAction.aquire(node, insertForm(node));
-                            },
-                            disabled: !editorAction.canInsert()
-                        });
-                    }
+
+                    items.push({
+                        text: 'Добавить элемент',
+                        handler: function(){
+                            insertForm(node) ();
+                        },
+                        disabled: !editorAction.canInsert()
+                    });
+
 
 
                     items.push({
