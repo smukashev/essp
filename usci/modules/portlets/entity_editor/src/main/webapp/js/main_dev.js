@@ -886,9 +886,9 @@ function insertForm(node){
 Ext.onReady(function () {
 
     Ext.override(Ext.data.proxy.Ajax, {timeout: timeout});
-    document.oncontextmenu = function(event){
+    /*document.oncontextmenu = function(event){
         return false;
-    }
+    }*/
 
     Ext.define('MyCheckboxField', {
         extend: 'Ext.form.field.Checkbox',
@@ -1451,7 +1451,7 @@ Ext.onReady(function () {
          sortable: true
          }*/],
         listeners: {
-            itemmousedown: function (me, node, item, index, e, eOpts) {
+            itemcontextmenu: function (me, node, item, index, e, eOpts) {
                 if (e.button > 0) {
                     var items = [];
 
@@ -1521,6 +1521,7 @@ Ext.onReady(function () {
                     });
 
                     menu.showAt(e.xy);
+                    e.stopEvent();
                 }
             }
         }
