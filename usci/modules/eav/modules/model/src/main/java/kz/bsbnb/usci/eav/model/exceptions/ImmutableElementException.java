@@ -33,7 +33,7 @@ public class ImmutableElementException extends KnownException {
                 if(baseValue == null || baseValue.getValue() == null)
                     continue;
 
-                message = Errors.compose(Errors.E294, baseValue.getValue(), meta.getClassTitle());
+                message = Errors.compose(Errors.E295, baseValue.getValue(), meta.getClassTitle());
                 break;
             }
         }
