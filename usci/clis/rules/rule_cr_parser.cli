@@ -155,3 +155,152 @@ end
 $$$
 
 rule save
+
+
+rule read $$$
+title: Остаток - Дисконт/премия - Сумма проверка
+rule "remains_discount_value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.discount.value") != null
+                && ((String)getEl("change.remains.discount.value")).length > 18)
+then
+  $entity.addValidationError("Длинный дисконт (премия) в валюте договора");
+end
+$$$
+
+rule save
+
+
+rule read $$$
+title: сумма в обеспечение договора
+rule "remains_pledges_value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && ( $r : getIncorrectValues((List)getEls("{get}pledges.value")) && $r.size() > 0))
+then
+  $entity.addValidationError("Не правильная сумма в обеспечение договора");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: сумма в остатке начисленного вознаграждения договора
+rule "remains_interest_current_value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.interest.current.value") != null
+                && (((Double)getEl("change.remains.interest.current.value")) < 0
+                || ((String)getEl("change.remains.interest.current.value")).length > 18))
+then
+  $entity.addValidationError("Не правильная сумма в остатке начисленного вознаграждения договора");
+end
+$$$
+
+rule save
+
+
+rule read $$$
+title: сумма остатка лимита договора
+rule "remains_limit_value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.limit.value") != null
+                && (((Double)getEl("change.remains.limit.value")) < 0
+                || ((String)getEl("change.remains.limit.value")).length > 18))
+then
+  $entity.addValidationError("Не правильная сумма остатка лимита договора");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: сумма в остатке долга списанной задолженности
+rule "remains_dept_write_off_value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.debt.write_off.value") != null
+                && (((Double)getEl("change.remains.debt.write_off.value")) < 0
+                || ((String)getEl("change.remains.debt.write_off.value")).length > 18))
+then
+  $entity.addValidationError("Не правильная сумма в остатке долга списанной задолженности");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: сумма в остатке начисленного вознаграждения договора
+rule "remains_interest_write_off_value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.interest.write_off.value") != null
+                && (((Double)getEl("change.remains.interest.write_off.value")) < 0
+                || ((String)getEl("change.remains.interest.write_off.value")).length > 18))
+then
+  $entity.addValidationError("Не правильная сумма в остатке начисленного вознаграждения договора");
+end
+$$$
+
+rule save
+
+
+rule read $$$
+title: сумма дисконтированной стоимости договора
+rule "remains_discounted_value_value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.discounted_value.value") != null
+                && (((Double)getEl("change.remains.discounted_value.value")) < 0
+                || ((String)getEl("change.remains.discounted_value.value")).length > 18))
+then
+  $entity.addValidationError("Не правильная сумма дисконтированной стоимости договора");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: сумма в корректировке договора
+rule "remains_correction_value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.correction.value") != null
+                && (((Double)getEl("change.remains.correction.value")) < 0
+                || ((String)getEl("change.remains.correction.value")).length > 18))
+then
+  $entity.addValidationError("Не правильная сумма в корректировке договора");
+end
+$$$
+
+rule read $$$
+title: сумма в просроченной задолженности по начисленному вознаграждению договора
+rule "remains_interest_pastdue_value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.interest.pastdue.value") != null
+                && (((Double)getEl("change.remains.interest.pastdue.value")) < 0
+                || ((String)getEl("change.remains.interest.pastdue.value")).length > 18))
+then
+  $entity.addValidationError("Не правильная сумма в просроченной задолженности по начисленному вознаграждению договора");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: сумма в просроченной задолженности по основному долгу договора
+rule "remains_debt_pastdue_value"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+                && getEl("change.remains.debt.pastdue.value") != null
+                && (((Double)getEl("change.remains.debt.pastdue.value")) < 0
+                || ((String)getEl("change.remains.debt.pastdue.value")).length > 18))
+then
+  $entity.addValidationError("Не правильная сумма в просроченной задолженности по основному долгу договора");
+end
+$$$
+
+rule save
