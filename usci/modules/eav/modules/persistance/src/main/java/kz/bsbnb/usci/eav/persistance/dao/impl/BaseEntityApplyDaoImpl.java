@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseContainerType;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
+import kz.bsbnb.usci.eav.model.exceptions.ImmutableElementException;
 import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
@@ -134,7 +135,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
 
                     if (metaAttribute.isImmutable() && childBaseEntity.getValueCount() != 0 && childBaseEntity.getId() < 1)
-                        throw new KnownException(Errors.compose(Errors.E62, childBaseEntity.getMeta().getClassName()));
+                        throw new ImmutableElementException(childBaseEntity);
 
                     IBaseEntity childBaseEntityApplied = apply(creditorId, childBaseEntity, null, baseEntityManager);
 
@@ -172,7 +173,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     if (childBaseEntity.getValueCount() != 0) {
                         if (childBaseEntity.getId() < 1)
-                            throw new KnownException(Errors.compose(Errors.E62, childBaseEntity.getMeta().getClassName()));
+                            throw new ImmutableElementException(childBaseEntity);
 
                         IBaseEntity childBaseEntityImmutable = baseEntityLoadDao.loadByMaxReportDate(
                                 childBaseEntity.getId(), childBaseEntity.getReportDate());
@@ -905,7 +906,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseEntity baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
 
             if (metaAttribute.isImmutable() && baseEntitySaving.getId() == 0)
-                throw new KnownException(Errors.compose(Errors.E62, baseEntitySaving.getMeta().getClassName()));
+                throw new ImmutableElementException(baseEntitySaving);
 
             if (baseEntitySaving.getId() == baseEntityLoaded.getId() || !metaClass.isSearchable()) {
                 IBaseEntity baseEntityApplied;

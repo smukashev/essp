@@ -323,7 +323,7 @@ public enum Errors {
         errors.put("E292", "Запись не может быть удалена. На запись ссылаются другие объекты");
         errors.put("E293", "Субъект может быть физ.лицом, юр.лицом или кредитором");
         errors.put("E294", "Ссылка на XSD файл неверная: #path");
-        errors.put("E295", "");
+        errors.put("E295", "[#val] не найден в справочнике #metaclass");
         errors.put("E296", "");
         errors.put("E297", "");
         errors.put("E298", "");
