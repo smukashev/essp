@@ -1397,11 +1397,11 @@ Ext.onReady(function () {
 
 
                     items.push({
-                        text: 'Добавить элемент',
+                        text: 'Добавить',
                         handler: function(){
                             insertForm(node) ();
                         },
-                        disabled: !editorAction.canInsert()
+                        disabled: !editorAction.canInsert() || node.data.simple
                     });
 
 
