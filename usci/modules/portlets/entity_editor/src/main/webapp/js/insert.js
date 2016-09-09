@@ -1,4 +1,4 @@
-function getForm(){
+function getForm(node){
     var form =  Ext.create('Ext.form.Panel',{
         bodyPadding: '5 5 0',
         width: "100%",
@@ -6,7 +6,7 @@ function getForm(){
             anchor: '100%'
         },
         autoScroll: true,
-        elem: Ext.create('entityModel', {
+        elem: node ? node : Ext.create('entityModel', {
             title: 'test',
             code: 'code',
             simple: false,
@@ -106,7 +106,7 @@ function getForm(){
                                     title: attr.title,
                                     code: attr.code,
                                     leaf: true,
-                                    value: this.getValue(),
+                                    value: this.getSubmitValue(),
                                     simple: true,
                                     type: attr.type
                                 });
@@ -129,6 +129,14 @@ function getForm(){
                         allowBlank: allowBlank,
                         blankText: label_REQUIRED_FIELD,
                         commit: function(){
+                            form.elem.appendChild({
+                                title: attr.title,
+                                code: attr.code,
+                                leaf: true,
+                                value: this.getValue(),
+                                simple: true,
+                                type: attr.type
+                            });
 
                         }
                     })
@@ -144,7 +152,14 @@ function getForm(){
                         allowBlank: allowBlank,
                         blankText: label_REQUIRED_FIELD,
                         commit: function(){
-
+                            form.elem.appendChild({
+                                title: attr.title,
+                                code: attr.code,
+                                leaf: true,
+                                value: this.getValue(),
+                                simple: true,
+                                type: attr.type
+                            });
                         },
                         editable: false,
                         store: Ext.create('Ext.data.Store', {
@@ -170,7 +185,16 @@ function getForm(){
                         allowBlank: allowBlank,
                         blankText: label_REQUIRED_FIELD,
                         commit: function(){
-
+                            if(this.checked) {
+                                form.elem.appendChild({
+                                    title: attr.title,
+                                    code: attr.code,
+                                    //value: this.getValue(),
+                                    metaId: attr.metaId,
+                                    simple: false,
+                                    type: attr.type
+                                });
+                            }
                         },
                         checked: (attr.isKey || attr.value)
                     })
@@ -249,7 +273,7 @@ function formAdvanced(node, callback){
             attrStore.add(json.data);
             var attributes = attrStore.getRange();
 
-            var form = getForm();
+            var form = getForm(node);
 
             var wdw = Ext.create("Ext.Window", {
                 title: 'Добавление в ' + node.data.title,
@@ -274,8 +298,23 @@ function formAdvanced(node, callback){
             }).show();
 
 
+            var totalEditableFields = 0;
             for(var i=0;i<attributes.length;i++) {
-                form.addField(attributes[i].data);
+                var alreadyHas = false;
+                for(var j=0;j< node.childNodes.length; j++) {
+                    if(attributes[i].data.code == node.childNodes[j].data.code)
+                        alreadyHas = true;
+                }
+
+                if(!alreadyHas) {
+                    form.addField(attributes[i].data);
+                    totalEditableFields ++;
+                }
+            }
+            
+            if(totalEditableFields == 0) {
+                wdw.close();
+                Ext.MessageBox.alert("", "Вся информация по " + node.data.title  + " уже добавлена");
             }
         },
         failure: function(){

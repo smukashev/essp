@@ -801,7 +801,6 @@ function insertForm(node){
 
         } else {
             formAdvanced(node, function(form){
-                node.appendChild(form.elem);
                 Ext.getCmp('entityTreeView').getView().refresh();
             });
         }
