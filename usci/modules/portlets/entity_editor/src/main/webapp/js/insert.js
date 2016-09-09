@@ -191,7 +191,9 @@ function getForm(node){
                                     code: attr.code,
                                     //value: this.getValue(),
                                     metaId: attr.metaId,
+                                    childMetaId: attr.childMetaId,
                                     simple: false,
+                                    array: attr.array,
                                     type: attr.type
                                 });
                             }
@@ -322,4 +324,51 @@ function formAdvanced(node, callback){
             //myMask.hide();
         }
     });
+}
+
+function insertNewCredit() {
+    var tree = Ext.getCmp('entityTreeView');
+    var rootNode = tree.getRootNode();
+
+    var creditor = Ext.create('entityModel', {
+        title: 'БВУ/НО',
+        code: 'creditor',
+        metaId: 8,
+        ref: true,
+    });
+
+    rootNode.appendChild(Ext.create('entityModel',{
+        title: 'Договор займа/условного обязательства(кредит)',
+        code: 'credit',
+        ref: false,
+        metaId: 59,
+        children: [
+            creditor,
+            Ext.create('entityModel', {
+                title: 'Договор',
+                code: 'primary_contract',
+                ref: false,
+                metaId: 58,
+                children:[
+                    Ext.create('entityModel', {
+                        title: 'sample title',
+                        code: 'Номер',
+                        value: Ext.getCmp('edPrimaryContractNO').value,
+                        ref: false,
+                        leaf: true,
+                        type: 'STRING'
+                    }),
+                    Ext.create('entityModel', {
+                        title: 'Дата',
+                        code: 'date',
+                        format: 'd.m.Y',
+                        value: Ext.getCmp('edPrimaryContractDate').value,
+                        ref: false,
+                        leaf: true,
+                        type: 'DATE'
+                    })
+                ]
+            })]}));
+
+    refChange(creditor, Ext.getCmp('edCreditor').value);
 }
