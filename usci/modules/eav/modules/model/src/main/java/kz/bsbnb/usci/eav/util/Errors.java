@@ -90,7 +90,7 @@ public enum Errors {
         errors.put("E59", "Родитель атрибута #baseValueSaving.getMetaAttribute().getName() должна быть сущность");
         errors.put("E60", "Атрибут должен содержать мета данные");
         errors.put("E61", "Поддержка массив массивов не реализовано");
-        errors.put("E62", "Справочник #metaclass не найдена;");
+        errors.put("E62", "не найден в справочнике #metaclass;");
         errors.put("E63", "В базе нет данных для записи #baseEntityId до отчетной даты(включительно): #reportDate");
         errors.put("E64", "Комплексный элелемент не содержит внутренних элементов #metaclass");
         errors.put("E65", "Оперативные атрибуты могут сожержать только оперативные данные. Мета: #metaclass , атрибут: #attribute");
@@ -322,7 +322,7 @@ public enum Errors {
         errors.put("E291", "Справочник не имеет ID;");
         errors.put("E292", "Запись не может быть удалена. На запись ссылаются другие объекты");
         errors.put("E293", "Субъект может быть физ.лицом, юр.лицом или кредитором");
-        errors.put("E294", "");
+        errors.put("E294", "Ссылка на XSD файл неверная: #path");
         errors.put("E295", "");
         errors.put("E296", "");
         errors.put("E297", "");
