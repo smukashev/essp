@@ -53,8 +53,22 @@ Ext.onReady(function() {
                             error = operation.request.proxy.reader.rawData.errorMessage;
                         Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(error));
                     }
-                    if(records && records.length == 0)
-                        Ext.MessageBox.alert(label_INFO, 'Поиск вернул 0 результатов');
+                    if(records && records.length == 0) {
+                        Ext.MessageBox.alert({
+                            //title: 'Потверждение на удаление?',
+                            msg: 'Поиск вернул 0 результатов, желаете добавить новый договор ?',
+                            buttons: Ext.MessageBox.YESNO,
+                            buttonText:{
+                                yes: "Да",
+                                no: "Нет"
+                            },
+                            fn: function(val){
+                                if(val == 'yes') {
+                                    insertNewCredit();
+                                }
+                            }
+                        });
+                    }
 
                     var totalCount = operation.request.proxy.reader.rawData.totalCount;
                     if(totalCount) {

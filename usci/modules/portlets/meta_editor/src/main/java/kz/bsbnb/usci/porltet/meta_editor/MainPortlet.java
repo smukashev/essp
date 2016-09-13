@@ -6,6 +6,7 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -354,6 +355,7 @@ public class MainPortlet extends MVCPortlet {
                         Boolean is_nullable  = false;
                         Boolean is_final = false;
                         Boolean is_disabled = false;
+                        Boolean is_immutable = false;
                         if (dotIndex < 0) {
                             className = attrPath;
                         } else {
@@ -419,11 +421,13 @@ public class MainPortlet extends MVCPortlet {
                                 is_nullable  = Boolean.parseBoolean(resourceRequest.getParameter("is_Nullable"));
                                 is_final  = Boolean.parseBoolean(resourceRequest.getParameter("is_Final"));
                                 is_disabled  = Boolean.parseBoolean(resourceRequest.getParameter("is_Disabled"));
+                                is_immutable = Boolean.parseBoolean(resourceRequest.getParameter("is_Immutable"));
                                 attrToAdd.setKey(is_key);
                                 attrToAdd.setRequired(is_required);
                                 attrToAdd.setNullable(is_nullable);
                                 attrToAdd.setFinal(is_final);
                                 attrToAdd.setDisabled(is_disabled);
+                                attrToAdd.setImmutable(is_immutable);
                                 metaParent.setMetaAttribute(attrPathCode, attrToAdd);
 
                             }
@@ -482,7 +486,9 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"is_required\": \"" + meta.getElAttribute(attrName).isRequired() + "\", ");
                                 writer.write("\"is_nullable\": \"" + meta.getElAttribute(attrName).isNullable() + "\", ");
                                 writer.write("\"is_final\": \"" + meta.getElAttribute(attrName).isFinal() + "\", ");
+                                writer.write("\"is_immutable\": \"" + meta.getElAttribute(attrName).isImmutable() + "\", ");
                                 writer.write("\"is_disabled\": \"" + meta.getElAttribute(attrName).isDisabled() + "\"");
+
                                 writer.write("}}");
                             } else {
                                 MetaValue value = (MetaValue)attribute;
@@ -497,6 +503,7 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"is_required\": \"" + meta.getElAttribute(attrName).isRequired() + "\", ");
                                 writer.write("\"is_nullable\": \"" + meta.getElAttribute(attrName).isNullable() + "\", ");
                                 writer.write("\"is_final\": \"" + meta.getElAttribute(attrName).isFinal() + "\", ");
+                                writer.write("\"is_immutable\": \"" + meta.getElAttribute(attrName).isImmutable() + "\", ");
                                 writer.write("\"is_disabled\": \"" + meta.getElAttribute(attrName).isDisabled() + "\"");
                                 writer.write("}}");
                             }
@@ -515,6 +522,7 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"is_required\": \"" + meta.getElAttribute(attrName).isRequired() + "\", ");
                                 writer.write("\"is_nullable\": \"" + meta.getElAttribute(attrName).isNullable() + "\",");
                                 writer.write("\"is_final\": \"" + meta.getElAttribute(attrName).isFinal() + "\", ");
+                                writer.write("\"is_immutable\": \"" + meta.getElAttribute(attrName).isImmutable() + "\", ");
                                 writer.write("\"is_disabled\": \"" + meta.getElAttribute(attrName).isDisabled() + "\"");
                                 writer.write("}}");
                             } else {
@@ -528,6 +536,7 @@ public class MainPortlet extends MVCPortlet {
                                 writer.write("\"is_required\": \"" + meta.getElAttribute(attrName).isRequired() + "\", ");
                                 writer.write("\"is_nullable\": \"" + meta.getElAttribute(attrName).isNullable() + "\",");
                                 writer.write("\"is_final\": \"" + meta.getElAttribute(attrName).isFinal() + "\", ");
+                                writer.write("\"is_immutable\": \"" + meta.getElAttribute(attrName).isImmutable() + "\", ");
                                 writer.write("\"is_disabled\": \"" + meta.getElAttribute(attrName).isDisabled() + "\"");
                                 writer.write("}}");
                             }

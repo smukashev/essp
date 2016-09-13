@@ -41,6 +41,7 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                             is_Nullable = Ext.getCmp('is_Nullable');
                             is_Final = Ext.getCmp('is_Final');
                             is_Deleted = Ext.getCmp('is_Deleted');
+                            is_Immutable = Ext.getCmp('is_Immutable');
                             if(attrTypeField.getValue() == 1 || attrTypeField.getValue() == 3) {
                                 callback(attrPathPart.getValue() + attrPathCode.getValue(),
                                     attrTitle.getValue(), true);
@@ -317,6 +318,24 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                 queryMode:'local'
             },
             {
+                fieldLabel: 'Не изменная запись',
+                id: 'is_Immutable',
+                name: 'is_Immutable',
+                xtype: 'combobox',
+                store: new Ext.data.SimpleStore({
+                    id:0,
+                    fields:
+                        [
+                            'Id',
+                            'Text'
+                        ],
+                    data: attributeRequireType
+                }),
+                valueField:'Id',
+                displayField:'Text',
+                queryMode:'local'
+            },
+            {
                 fieldLabel: 'Признак активности',
                 id: 'is_Disabled',
                 name: 'is_Disabled',
@@ -388,6 +407,8 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                     is_Final.setValue(data.data.is_final);
                     is_Disabled = Ext.getCmp('is_Disabled');
                     is_Disabled.setValue(data.data.is_disabled);
+                    is_Immutable = Ext.getCmp('is_Immutable');
+                    is_Immutable.setValue(data.data.is_immutable);
                     if(data.data.is_key=='false')
                     {
                         is_Nullable = Ext.getCmp('is_Nullable');
