@@ -977,5 +977,8 @@ sql update eav_m_complex_set  set title='Признак связанности �
 sql update eav_m_complex_set  set title='Адрес' where name='addresses'
 sql update eav_m_complex_set  set title='Контакты' where name='contacts'
 
+#----------------------------------------------------------------------------------------------
+sql run usci/db_oracle_scripts/eav_tables_partitioning.sql
+
 
 quit
