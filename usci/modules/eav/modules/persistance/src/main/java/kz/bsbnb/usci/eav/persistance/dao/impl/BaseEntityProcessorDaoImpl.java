@@ -158,6 +158,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 if (baseEntityId > 0)
                     baseEntity.setId(baseEntityId);
             }
+
+            if(metaClass.parentIsKey() && baseEntity.getId() == 0) {
+                baseEntity.setId(search(baseEntity, creditorId));
+            }
         }
 
         for (String attrName : baseEntity.getAttributes()) {

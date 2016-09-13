@@ -291,7 +291,8 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
         if (condition != null) {
             where = where.and(condition);
         } else {
-            return null;
+            if(!entity.getMeta().parentIsKey())
+                return null;
         }
 
         return where;
