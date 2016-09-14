@@ -11,7 +11,7 @@ public final class StaticRouter {
     }
 
     /* Set up before compiling */
-    private static final MODE mode = MODE.PROD;
+    private static final MODE mode = MODE.DEV;
 
     /* Application Server IP */
     private final static String stendAsIP = "10.10.32.28";
@@ -45,12 +45,12 @@ public final class StaticRouter {
 
     /* Core Schema name */
     private final static String stendCoreSchemaName = "CORE";
-    private final static String devCoreSchemaName = "C##CORE";
+    private final static String devCoreSchemaName = "CORE";
     private final static String prodCoreSchemaName = "CORE";
 
     /* Showcase Schema name */
     private final static String stendShowcaseSchemaName = "SHOWCASE";
-    private final static String devShowcaseSchemaName = "C##SHOWCASE";
+    private final static String devShowcaseSchemaName = "SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHOWCASE";
 
     /* Credit Registry DB IP */
@@ -70,13 +70,22 @@ public final class StaticRouter {
 
     /* Report files catalog */
     private final static String stendReportFilesCatalog = "/home/essp/Portal_afn/Report/";
-    private final static String devReportFilesCatalog = "/home/essp/Portal_afn/Report/";
+    private final static String devReportFilesCatalog = "/home/baur/essp/Portal_afn/Report/";
     private final static String prodReportFilesCatalog = "C:\\Portal_afn\\Report\\";
 
     /* Report files folder */
     private final static String stendReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
-    private final static String devReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
+    private final static String devReportFilesFolder = "/home/baur/essp/Portal_afn/generated_reports/";
     private final static String prodReportFilesFolder = "C:\\Portal_afn\\generated_reports\\";
+
+
+    private final static String stendXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";//todo: change that path
+    private final static String devXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";
+    private final static String prodXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";//todo: change that path
+
+    private final static String stendXSDTargetFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/target/classes/usci.xsd"; //todo: change that path
+    private final static String devXSDTargetFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/target/classes/usci.xsd";
+    private final static String prodXSDTargetFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/target/classes/usci.xsd"; //todo: change that path
 
     private final static boolean stendStatsEnabled = true;
     private final static boolean devStatsEnabled = true;
@@ -97,6 +106,32 @@ public final class StaticRouter {
                 return devAsIP;
             case PROD:
                 return prodAsIP;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
+    public static String getXSDSourceFilePath() {
+        switch(mode) {
+            case STEND:
+                return stendXSDSourceFilePath;
+            case DEV:
+                return devXSDSourceFilePath;
+            case PROD:
+                return prodXSDSourceFilePath;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
+    public static String getXSDTargetFilePath() {
+        switch(mode) {
+            case STEND:
+                return stendXSDTargetFilePath;
+            case DEV:
+                return devXSDTargetFilePath;
+            case PROD:
+                return prodXSDTargetFilePath;
             default:
                 throw new IllegalStateException(Errors.compose(Errors.E284));
         }

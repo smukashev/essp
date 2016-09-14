@@ -9,6 +9,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
