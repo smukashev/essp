@@ -3,6 +3,7 @@ package kz.bsbnb.usci.core.service;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 public interface IMetaFactoryService {

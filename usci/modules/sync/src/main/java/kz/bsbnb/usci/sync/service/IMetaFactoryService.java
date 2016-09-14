@@ -3,6 +3,7 @@ package kz.bsbnb.usci.sync.service;
 import kz.bsbnb.usci.eav.model.meta.MetaClassName;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ public interface IMetaFactoryService {
 
     MetaClass getMetaClass(Long metaId);
 
-    boolean saveMetaClass(MetaClass meta);
+    boolean saveMetaClass(MetaClass meta) throws FileNotFoundException;
 
     boolean delMetaClass(String className);
 }

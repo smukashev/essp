@@ -8,6 +8,7 @@
     <import resource="applicationContextEAVPersistance.xml" />
 
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
+    <context:component-scan base-package="kz.bsbnb.usci.bconv" />
     <context:component-scan base-package="kz.bsbnb.usci.core.service" />
 
     <context:annotation-config/>
