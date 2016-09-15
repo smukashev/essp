@@ -55,6 +55,11 @@
         </dependency>
         <dependency>
             <groupId>kz.bsbnb.usci</groupId>
+            <artifactId>bconv</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>kz.bsbnb.usci</groupId>
             <artifactId>cr</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

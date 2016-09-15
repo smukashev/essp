@@ -9,6 +9,8 @@ import kz.bsbnb.usci.cr.model.Message;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.Shared;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -87,7 +89,7 @@ public class ProtocolDisplayBean {
     }
 
     public String getDescription() {
-        return protocol.getTypeDescription();
+        return protocol.getTypeDescription()==null ? protocol.getTypeDescription() : protocol.getTypeDescription().split(" \\| ")[0];
     }
 
     public String getTypeName() {
@@ -110,8 +112,8 @@ public class ProtocolDisplayBean {
         return protocol.getNote();
     }
 
-    public Date getPrimaryContractDate() {
-        return protocol.getPrimaryContractDate();
+    public Date getPrimaryContractDate() throws ParseException {
+        return protocol.getPrimaryContractDate()!=null?protocol.getPrimaryContractDate(): protocol.getTypeDescription()!=null?new SimpleDateFormat("dd.MM.yyyy").parse(protocol.getTypeDescription().split(" \\| ")[1]):protocol.getPrimaryContractDate();
     }
 
     public boolean isError() {

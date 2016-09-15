@@ -16,6 +16,7 @@
     <aop:aspectj-autoproxy/>
 
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
+    <context:component-scan base-package="kz.bsbnb.usci.bconv" />
 
     <!-- Add this tag to enable annotations transactions -->
     <tx:annotation-driven transaction-manager="txManager"/>
