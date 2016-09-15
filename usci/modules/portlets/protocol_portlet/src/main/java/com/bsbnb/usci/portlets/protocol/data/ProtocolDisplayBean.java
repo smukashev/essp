@@ -8,7 +8,10 @@ import com.vaadin.ui.Link;
 import kz.bsbnb.usci.cr.model.Message;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.Shared;
+import org.apache.log4j.Logger;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -21,7 +24,7 @@ public class ProtocolDisplayBean {
     private String text;
     private Embedded statusIcon;
     private Link link;
-
+    public final Logger logger = Logger.getLogger(ProtocolDisplayBean.class);
     private final HashMap<String, String> messageTypeString = new HashMap<String, String>();
 
 
@@ -87,7 +90,7 @@ public class ProtocolDisplayBean {
     }
 
     public String getDescription() {
-        return protocol.getTypeDescription();
+        return protocol.getTypeDescription()==null ? protocol.getTypeDescription() : protocol.getTypeDescription().split(" \\| ")[0];
     }
 
     public String getTypeName() {
@@ -111,7 +114,15 @@ public class ProtocolDisplayBean {
     }
 
     public Date getPrimaryContractDate() {
-        return protocol.getPrimaryContractDate();
+        Date primaryContractDate=null;
+        try{
+            primaryContractDate = protocol.getPrimaryContractDate()!=null?protocol.getPrimaryContractDate(): protocol.getTypeDescription()!=null?new SimpleDateFormat("dd.MM.yyyy").parse(protocol.getTypeDescription().split(" \\| ")[1]):protocol.getPrimaryContractDate();
+
+        }
+        catch(ParseException e){
+            logger.error(e.getMessage(),e);
+        }
+        return primaryContractDate;
     }
 
     public boolean isError() {
