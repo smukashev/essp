@@ -33,7 +33,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
 
     private VerticalLayout statusPanel;
 
-    private static final String UPLOADS_PATH = "\\\\" + StaticRouter.getAsIP() + "\\tmp$\\";
+    private static final String UPLOADS_PATH = "\\\\" + StaticRouter.getAsIP() + "\\download$\\";
 
     public static final long MAX_FILE_LENGTH = 5 * (1L << 20);
 
@@ -157,7 +157,7 @@ public abstract class AbstractUploadComponent extends VerticalLayout {
             String path = saveFileOnDisk(array, fileName);
             logger.info("Path: "+path);
             logger.info("### " + path);
-            batchProcessService.processBatch(path, portletEnvironment.getUserID(), portletEnvironment.isNB());
+            batchProcessService.processBatch(StaticRouter.convertUploadPortletPath(path), portletEnvironment.getUserID(), portletEnvironment.isNB());
             addStatusMessage(String.format(getResourceString(Localization.UPLOAD_SUCCEDED_MESSAGE.getKey()),
                     fileName), false);
         } catch (IOException ioe) {

@@ -319,6 +319,18 @@ public final class StaticRouter {
         }
     }
 
+    public static String convertUploadPortletPath(String path){
+        switch (mode) {
+            case STEND:
+            case DEV:
+                return path;
+            case PROD:
+                return path.replace("\\\\" + StaticRouter.getAsIP() + "\\download$\\","E:\\download\\");
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
     public static boolean isGODMode(String filename) {
         for (String tmpStr : GODModes) {
             if (filename.contains(tmpStr))
