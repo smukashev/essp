@@ -180,7 +180,8 @@ title: сумма в обеспечение договора
 rule "remains_pledges_value"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
-                && ( $r : getIncorrectValues((List)getEls("{get}pledges.value")) && $r.size() > 0))
+                && ( $r : getIncorrectValues((List)getEls("{get}pledges.value"))
+                && $r.size() > 0))
 then
   $entity.addValidationError("Не правильная сумма в обеспечение договора");
 end
@@ -195,7 +196,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.interest.current.value"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в остатке начисленного вознаграждения договора");
 end
@@ -210,7 +211,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.interest.current.value_currency"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в валюте остатка начисленного вознаграждения договора");
 end
@@ -225,7 +226,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.limit.value"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма остатка лимита договора");
 end
@@ -240,7 +241,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.limit.value_currency"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в валюте остатка лимита договора");
 end
@@ -256,7 +257,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.debt.write_off.value"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в остатке долга списанной задолженности");
 end
@@ -271,7 +272,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.debt.write_off.value_currency"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в валюте остатка долга списанной задолженности");
 end
@@ -286,7 +287,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.interest.write_off.value"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в остатке начисленного вознаграждения договора");
 end
@@ -301,7 +302,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.interest.write_off.value_currency"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в валюте остатка начисленного вознаграждения договора");
 end
@@ -317,7 +318,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.discounted_value.value"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма дисконтированной стоимости договора");
 end
@@ -332,7 +333,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.correction.value"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в корректировке договора");
 end
@@ -349,7 +350,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.correction.value_currency"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в валюте в корректировке договора");
 end
@@ -365,7 +366,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.interest.pastdue.value"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в просроченной задолженности по начисленному вознаграждению договора");
 end
@@ -380,7 +381,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.interest.pastdue.value_currency"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в валюте в просроченной задолженности по начисленному вознаграждению договора");
 end
@@ -396,7 +397,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.debt.pastdue.value"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в просроченной задолженности по основному долгу договора");
 end
@@ -411,7 +412,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && ($r : getEl("change.remains.debt.pastdue.value_currency"))
                 && $r != null
-                && toDouble($r) < 0)
+                && (Double)$r < 0)
 then
   $entity.addValidationError("Не правильная сумма в валюте в просроченной задолженности по основному долгу договора");
 end
