@@ -115,8 +115,18 @@ public class ProtocolDisplayBean {
 
     public Date getPrimaryContractDate() {
         Date primaryContractDate=null;
+        String[] PrimaryContract;
         try{
-            primaryContractDate = protocol.getPrimaryContractDate()!=null?protocol.getPrimaryContractDate(): protocol.getTypeDescription()!=null?new SimpleDateFormat("dd.MM.yyyy").parse(protocol.getTypeDescription().split(" \\| ")[1]):protocol.getPrimaryContractDate();
+            if(protocol.getTypeDescription()!=null){
+                PrimaryContract = protocol.getTypeDescription().split(" \\| ");
+                if(PrimaryContract.length>1)
+                    primaryContractDate = new SimpleDateFormat("dd.MM.yyyy").parse(protocol.getTypeDescription().split(" \\| ")[1]);
+                else
+                    primaryContractDate = protocol.getPrimaryContractDate();
+            }
+            else
+                primaryContractDate = protocol.getPrimaryContractDate();
+
 
         }
         catch(ParseException e){
