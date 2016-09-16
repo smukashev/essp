@@ -509,13 +509,6 @@
             <xsd:element name="credit_type" type="ref_credit_type" minOccurs="1" maxOccurs="1" nillable="false"/>
         </xsd:all>
     </xsd:complexType>
-
-    <xsd:complexType name="101">
-        <xsd:all>
-            <xsd:element name="operation" type="date" minOccurs="1" maxOccurs="1" nillable="false"/>
-        </xsd:all>
-    </xsd:complexType>
-
     <xsd:complexType name="primary_contract">
         <xsd:all>
             <xsd:element name="no" minOccurs="1" maxOccurs="1" nillable="false">
