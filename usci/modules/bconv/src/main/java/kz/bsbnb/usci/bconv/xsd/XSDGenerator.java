@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.bconv.xsd;
 
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
@@ -47,19 +48,15 @@ public class XSDGenerator {
         ps.println();
         ps.println("<xsd:complexType name=\"entities\">");
         ps.println("<xsd:choice minOccurs=\"1\" maxOccurs=\"unbounded\">");
-
-        for (MetaClass metaClass : metaClasses) {
-            ps.println("<xsd:element name=\"" + metaClass.getClassName() + "\">");
-            ps.println("<xsd:complexType>");
-            ps.println("<xsd:complexContent>");
-            ps.println("<xsd:extension base=\"" + metaClass.getClassName() + "\">");
-            ps.println("<xsd:attribute name=\"operation\" type=\"operation\" use=\"optional\"/>");
-            ps.println("</xsd:extension>");
-            ps.println("</xsd:complexContent>");
-            ps.println("</xsd:complexType>");
-            ps.println("</xsd:element>");
-        }
-
+        ps.println("<xsd:element name=\"credit\">");
+        ps.println("<xsd:complexType>");
+        ps.println("<xsd:complexContent>");
+        ps.println("<xsd:extension base=\"credit\">");
+        ps.println("<xsd:attribute name=\"operation\" type=\"operation\" use=\"optional\"/>");
+        ps.println("</xsd:extension>");
+        ps.println("</xsd:complexContent>");
+        ps.println("</xsd:complexType>");
+        ps.println("</xsd:element>");
         ps.println("</xsd:choice>");
         ps.println("</xsd:complexType>");
 
@@ -73,8 +70,7 @@ public class XSDGenerator {
 
             for (String attrName : metaClass.getAttributeNames()) {
                 IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attrName);
-                metaAttribute.getMetaType().setReference(metaClass.isReference());
-                printAttribute(metaAttribute, ps, setMemberTypes);
+                printAttribute(metaClass, metaAttribute, ps, setMemberTypes);
             }
 
             ps.println("</xsd:all>");
@@ -113,7 +109,7 @@ public class XSDGenerator {
         ps.println("</xsd:simpleType>");
     }
 
-    private void printAttribute(IMetaAttribute metaAttribute, PrintStream ps, Map<String, Boolean> setTypes) {
+    private void printAttribute(MetaClass metaClass, IMetaAttribute metaAttribute, PrintStream ps, Map<String, Boolean> setTypes) {
         Element element;
         String minOccurs = metaAttribute.isKey() ? "1" : "0";
         String maxOccurs = "1";
@@ -134,13 +130,13 @@ public class XSDGenerator {
                 setTypes.put(memberTypeCode.name(), false);
             }
         } else if (metaAttribute.getMetaType().isComplex()) {
-            MetaClass metaClass = (MetaClass) metaAttribute.getMetaType();
+            MetaClass mClass = (MetaClass) metaAttribute.getMetaType();
             element = Element.create(
-                    metaAttribute.getName(), metaClass.getClassName(), minOccurs, maxOccurs, nillable);
+                    metaAttribute.getName(), mClass.getClassName(), minOccurs, maxOccurs, nillable);
         } else {
             MetaValue metaValue = (MetaValue) metaAttribute.getMetaType();
             element = Element.create(
-                    metaAttribute.getName(), getSimpleType(metaValue.getTypeCode()), minOccurs, maxOccurs, nillable, metaAttribute.isKey() && !metaValue.isReference());
+                    metaAttribute.getName(), getSimpleType(metaValue.getTypeCode()), minOccurs, maxOccurs, nillable, !metaClass.isReference() && metaAttribute.isKey());
         }
 
         printElement(ps, element);
