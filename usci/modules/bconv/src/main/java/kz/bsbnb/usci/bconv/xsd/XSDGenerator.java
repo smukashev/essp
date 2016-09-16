@@ -48,17 +48,22 @@ public class XSDGenerator {
         ps.println();
         ps.println("<xsd:complexType name=\"entities\">");
         ps.println("<xsd:choice minOccurs=\"1\" maxOccurs=\"unbounded\">");
-        ps.println("<xsd:element name=\"credit\">");
-        ps.println("<xsd:complexType>");
-        ps.println("<xsd:complexContent>");
-        ps.println("<xsd:extension base=\"credit\">");
-        ps.println("<xsd:attribute name=\"operation\" type=\"operation\" use=\"optional\"/>");
-        ps.println("</xsd:extension>");
-        ps.println("</xsd:complexContent>");
-        ps.println("</xsd:complexType>");
-        ps.println("</xsd:element>");
+
+        for (MetaClass metaClass : metaClasses) {
+            ps.println("<xsd:element name=\"" + metaClass.getClassName() + "\">");
+            ps.println("<xsd:complexType>");
+            ps.println("<xsd:complexContent>");
+            ps.println("<xsd:extension base=\"" + metaClass.getClassName() + "\">");
+            ps.println("<xsd:attribute name=\"operation\" type=\"operation\" use=\"optional\"/>");
+            ps.println("</xsd:extension>");
+            ps.println("</xsd:complexContent>");
+            ps.println("</xsd:complexType>");
+            ps.println("</xsd:element>");
+        }
+
         ps.println("</xsd:choice>");
         ps.println("</xsd:complexType>");
+
 
         // true if complex
         Map<String, Boolean> setMemberTypes = new HashMap<>();
