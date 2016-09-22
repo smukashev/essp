@@ -2,10 +2,13 @@ package kz.bsbnb.usci.receiver.service;
 
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputInfo;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.stats.QueryEntry;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 
+import javax.xml.stream.XMLStreamException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -33,4 +36,6 @@ public interface IBatchProcessService {
                                         Set<Long> priorityCreditors, QueueOrderType queueOrderType);
 
     long parseCreditorId(byte[] bytes);
+
+    IBaseEntity parse(String xml, Date reportDate, long creditorId) throws XMLStreamException;
 }

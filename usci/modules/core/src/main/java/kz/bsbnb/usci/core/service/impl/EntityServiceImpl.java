@@ -2,6 +2,7 @@ package kz.bsbnb.usci.core.service.impl;
 
 import kz.bsbnb.usci.core.service.IBatchService;
 import kz.bsbnb.usci.core.service.IEntityService;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
@@ -33,6 +34,10 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Qualifier("baseEntityProcessorDaoImpl")
     @Autowired
     private IBaseEntityProcessorDao baseEntityProcessorDao;
+
+    @Qualifier("rulesStatelessProcessor")
+    @Autowired
+    private IBaseEntityProcessorDao ruleProcessorDao;
 
     @Autowired
     private IRefProcessorDao refProcessorDao;
@@ -153,5 +158,28 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public RefColumnsResponse getRefColumns(long metaClassId) {
         return refProcessorDao.getRefColumns(metaClassId);
+    }
+
+    @Override
+    public List<String> getValidationErrors(IBaseEntity baseEntity) {
+
+        List<String> errors = new ArrayList<>();
+
+        try {
+            ruleProcessorDao.process(baseEntity);
+        } catch (Exception e) {
+            if(e instanceof KnownIterativeException) {
+                for(String s : ((KnownIterativeException) e).getMessages()) {
+                    errors.add(s);
+                }
+
+                return errors;
+            }
+
+            throw e;
+
+        }
+
+        return errors;
     }
 }

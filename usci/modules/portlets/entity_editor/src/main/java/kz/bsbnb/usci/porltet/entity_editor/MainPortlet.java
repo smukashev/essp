@@ -7,6 +7,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.liferay.util.portlet.PortletProps;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
+import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.form.ISearcherFormService;
@@ -14,6 +15,7 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.model.RefListResponse;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.meta.*;
@@ -22,8 +24,9 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.Errors;
-import kz.bsbnb.usci.sync.service.IEntityService;
+import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -59,7 +62,7 @@ public class MainPortlet extends MVCPortlet {
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
-            entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1098/entityService");
+            entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/entityService");
             entityServiceFactoryBean.setServiceInterface(IEntityService.class);
             entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
@@ -102,6 +105,18 @@ public class MainPortlet extends MVCPortlet {
         } catch (Exception e) {
             throw new RuntimeException(Errors.getError(Errors.E286));
         }
+    }
+
+    public IBatchProcessService getReceiverService(){
+        RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+        batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                + ":1097/batchProcessService");
+        batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+        batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+        batchProcessServiceFactoryBean.afterPropertiesSet();
+        IBatchProcessService batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+        return batchProcessService;
     }
 
     private List<String> classesFilter;
@@ -562,16 +577,27 @@ public class MainPortlet extends MVCPortlet {
                     String xml = resourceRequest.getParameter("xml_data");
                     String sDate = resourceRequest.getParameter("date");
                     Date date = (Date) DataTypes.getCastObject(DataTypes.DATE, sDate);
+                    creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
 
-                    BatchEntry batchEntry = new BatchEntry();
+                    IBaseEntity baseEntity = getReceiverService().parse(xml, date, creditorId);
+                    List<String> errors = entityService.getValidationErrors(baseEntity);
 
-                    batchEntry.setValue(xml);
-                    batchEntry.setRepDate(date);
-                    batchEntry.setUserId(currentUser.getUserId());
+                    if(errors.size() > 0) {
+                        Map m = new HashedMap();
+                        Gson g = new Gson();
+                        m.put("success", false);
+                        m.put("errors", errors);
+                        out.write(g.toJson(m).getBytes());
+                    } else {
+                        BatchEntry batchEntry = new BatchEntry();
 
-                    batchEntryService.save(batchEntry);
+                        batchEntry.setValue(xml);
+                        batchEntry.setRepDate(date);
+                        batchEntry.setUserId(currentUser.getUserId());
 
-                    out.write(("{\"success\": true }").getBytes());
+                        //batchEntryService.save(batchEntry);
+                        out.write(("{\"success\": true }").getBytes());
+                    }
 
                     break;
                 case LIST_ATTRIBUTES:

@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ import java.util.*;
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Repository
+@Primary
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
@@ -73,10 +75,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private RulesSingleton rulesSingleton;
 
     @Value("${rules.enabled}")
-    private boolean rulesEnabled;
+    public boolean rulesEnabled;
 
     @Autowired
     private IEavGlobalDao globalDao;
+
+    public boolean isStateful = true;
 
     private IDaoListener applyListener;
 
@@ -320,7 +324,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                             processLogicControl(baseEntityApplied);
                     }
 
-                    baseEntityApplyDao.applyToDb(baseEntityManager);
+                    if(isStateful)
+                        baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
                 default:
                     throw new UnsupportedOperationException(Errors.compose(Errors.E118, baseEntityPostPrepared.getOperation()));
@@ -331,13 +336,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
             if (rulesEnabled) {
-                if(isBvuno(baseEntityApplied.getBaseEntityReportDate().getCreditorId()))
-                    tempLogicControlUpdate(baseEntityApplied);
-                else
-                    processLogicControl(baseEntityApplied);
+                processLogicControl(baseEntityApplied);
             }
 
-            baseEntityApplyDao.applyToDb(baseEntityManager);
+            if(isStateful)
+                baseEntityApplyDao.applyToDb(baseEntityManager);
         }
 
         if (applyListener != null)
@@ -500,5 +503,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         }
 
+    }
+
+    public void setStateful(Boolean stateful) {
+        isStateful = stateful;
+    }
+
+    public void setRulesEnabled(boolean rulesEnabled) {
+        this.rulesEnabled = rulesEnabled;
     }
 }

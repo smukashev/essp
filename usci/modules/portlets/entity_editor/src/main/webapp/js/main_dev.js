@@ -1049,6 +1049,29 @@ Ext.onReady(function () {
         shadow: true
     });
 
+    var buttonRunRules = Ext.create('Ext.button.Button', {
+        id: "entityRunRulesBtn",
+        text: 'runrules',
+        handler: function () {
+
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
+                    op: 'RUN_RULES'
+                },
+                success: function () {
+                    //Ext.MessageBox.alert("", "Сохранено успешно. Необходимо отправить изменения через портлет \"Отправка изменений\"");
+                }
+            });
+
+        },
+        maxWidth: 70,
+        shadow: true
+    });
+
     var buttonXML = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
@@ -1071,10 +1094,18 @@ Ext.onReady(function () {
                 params: {
                     xml_data: xmlStr,
                     date: Ext.getCmp('edDate').value,
-                    op: 'SAVE_XML'
+                    op: 'SAVE_XML',
+                    creditorId: Ext.getCmp('edCreditor').value
                 },
-                success: function () {
-                    Ext.MessageBox.alert("", "Сохранено успешно. Необходимо отправить изменения через портлет \"Отправка изменений\"");
+                success: function (response) {
+                    var data = JSON.parse(response.responseText);
+
+                    if(!data.success) {
+                        for(var i=0;i<data.errors.length;i++)
+                            console.log(data.errors[i]);
+                    } else {
+                        Ext.MessageBox.alert("", "Сохранено успешно. Необходимо отправить изменения через портлет \"Отправка изменений\"");
+                    }
                 }
             });
         },
@@ -1385,7 +1416,7 @@ Ext.onReady(function () {
                             handler: function () {
                                 buttonXML.handler();
                             },
-                            disabled: !editorAction.hasUnsavedAction()
+                            disabled: false/*!editorAction.hasUnsavedAction()*/
                         });
                         items.push({
                             text: 'XML',

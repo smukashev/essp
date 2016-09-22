@@ -2,6 +2,7 @@ package kz.bsbnb.usci.core.service;
 
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
 import kz.bsbnb.usci.eav.model.RefListResponse;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.stats.QueryEntry;
 
@@ -23,4 +24,6 @@ public interface IEntityService {
     RefListResponse getRefListApprox(long metaClassId);
 
     BaseEntity loadForDisplay(long entityId, Date reportDate);
+
+    List<String> getValidationErrors(IBaseEntity baseEntity);
 }
