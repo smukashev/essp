@@ -152,9 +152,10 @@ meta add --name=head --attribute=names --type=meta_class --childname=person_name
 #= ADDRESS
 #====================================
 
-meta create --name=address
+meta create --name=address --parent_is_key
 meta add --name=address --attribute=details --type=string
 meta add --name=address --attribute=type --type=string
+meta key --name=address --attribute=type
 meta add --name=address --attribute=region --type=meta_class --childname=ref_region --keytype=any --immutable
 
 #====================================
@@ -978,7 +979,7 @@ sql update eav_m_complex_set  set title='Адрес' where name='addresses'
 sql update eav_m_complex_set  set title='Контакты' where name='contacts'
 
 #----------------------------------------------------------------------------------------------
-sql run usci/db_oracle_scripts/eav_tables_partitioning.sql
+#sql run usci/db_oracle_scripts/eav_tables_partitioning.sql
 
 
 quit
