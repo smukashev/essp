@@ -40,11 +40,11 @@ function List get12ZeroStrings(List docs){
     return ret;
 }
 
-function List getIncorrectValues(List values){
+function List getNegativesFromDoubles(List values){
     List ret = new ArrayList();
         for(Object value : values) {
-            if((Double)value < 0)
-                ret.add(value);
+            if( (Double) value < 0)
+               ret.add(value);
         }
     return ret;
 }

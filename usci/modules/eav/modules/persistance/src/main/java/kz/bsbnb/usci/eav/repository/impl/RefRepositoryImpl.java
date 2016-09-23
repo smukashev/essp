@@ -54,7 +54,11 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
     public long prepareRef(final IBaseEntity baseEntity) {
         semaphore.readLock().lock();
         try {
-            List<Map<String, Object>> mapList = prepareMap.get(baseEntity.getMeta().getId());
+            List<Map<String, Object>> mapList=null;
+            if(prepareMap.get(baseEntity.getMeta().getId())==null)
+                prepareMap.put(baseEntity.getMeta().getId(), sqlGenerator.getSimpleResult(baseEntity.getMeta().getId(), true));
+                mapList = prepareMap.get(baseEntity.getMeta().getId());
+
             List<Map<String, Object>> currentEntityMapList = convert(baseEntity);
 
             for (Map<String, Object> map : mapList) {
