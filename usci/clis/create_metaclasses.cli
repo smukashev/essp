@@ -77,9 +77,10 @@ meta add --name=ref_balance_account --attribute=sixth_sign --type=string
 #= PERSON_NAME
 #====================================
 
-meta create --name=person_name
+meta create --name=person_name --parent_is_key
 meta add --name=person_name --attribute=firstname --type=string
 meta add --name=person_name --attribute=lang --type=string
+meta key --name=person_name --attribute=lang
 meta add --name=person_name --attribute=lastname --type=string
 meta add --name=person_name --attribute=middlename --type=string
 
@@ -143,17 +144,18 @@ meta add --name=provision --attribute=balance_account --type=meta_class --childn
 #= HEAD
 #====================================
 
-meta create --name=head
+meta create --name=head --parent_is_key
 meta add --name=head --attribute=docs --type=meta_class --childname=document --array  --cumulative
-meta add --name=head --attribute=names --type=meta_class --childname=person_name --array
+meta add --name=head --attribute=names --type=meta_class --childname=person_name --array --cumulative
 
 #====================================
 #= ADDRESS
 #====================================
 
-meta create --name=address
+meta create --name=address --parent_is_key
 meta add --name=address --attribute=details --type=string
 meta add --name=address --attribute=type --type=string
+meta key --name=address --attribute=type
 meta add --name=address --attribute=region --type=meta_class --childname=ref_region --keytype=any --immutable
 
 #====================================
@@ -387,8 +389,9 @@ meta add --name=ref_portfolio --attribute=creditor --type=meta_class --childname
 #= ORGANIZATION_NAME
 #====================================
 
-meta create --name=organization_name
+meta create --name=organization_name --parent_is_key
 meta add --name=organization_name --attribute=lang --type=string
+meta key --name=organization_name --attribute=lang
 meta add --name=organization_name --attribute=name --type=string
 
 #====================================
@@ -403,7 +406,7 @@ meta add --name=bank_relation --attribute=creditor --type=meta_class --childname
 #= ORGANIZATION_INFO
 #====================================
 
-meta create --name=organization_info
+meta create --name=organization_info --parent_is_key
 meta add --name=organization_info --attribute=is_se --type=boolean
 meta add --name=organization_info --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
 meta add --name=organization_info --attribute=econ_trade --type=meta_class --childname=ref_econ_trade --keytype=any --immutable
@@ -411,22 +414,22 @@ meta add --name=organization_info --attribute=enterprise_type --type=meta_class 
 meta add --name=organization_info --attribute=head --type=meta_class --childname=head
 meta add --name=organization_info --attribute=legal_form --type=meta_class --childname=ref_legal_form --keytype=any --immutable
 meta add --name=organization_info --attribute=offshore --type=meta_class --childname=ref_offshore --keytype=any --immutable
-meta add --name=organization_info --attribute=addresses --type=meta_class --array --childname=address
+meta add --name=organization_info --attribute=addresses --type=meta_class --array --childname=address --cumulative
 meta add --name=organization_info --attribute=bank_relations --type=meta_class --childname=bank_relation --array --keytype=any
 meta add --name=organization_info --attribute=contacts --type=meta_class --array --childname=contact
-meta add --name=organization_info --attribute=names --type=meta_class --array --childname=organization_name
+meta add --name=organization_info --attribute=names --type=meta_class --array --childname=organization_name --cumulative
 
 #====================================
 #= PERSON_INFO
 #====================================
 
-meta create --name=person_info
+meta create --name=person_info --parent_is_key
 meta add --name=person_info --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
 meta add --name=person_info --attribute=offshore --type=meta_class --childname=ref_offshore --keytype=any --immutable
-meta add --name=person_info --attribute=addresses --type=meta_class --array --childname=address
+meta add --name=person_info --attribute=addresses --type=meta_class --array --childname=address --cumulative
 meta add --name=person_info --attribute=bank_relations --type=meta_class --childname=bank_relation --array --keytype=any
 meta add --name=person_info --attribute=contacts --type=meta_class --array --childname=contact
-meta add --name=person_info --attribute=names --type=meta_class --array --childname=person_name
+meta add --name=person_info --attribute=names --type=meta_class --array --childname=person_name --cumulative
 
 #====================================
 #= CREDITOR_INFO
@@ -976,6 +979,7 @@ sql update eav_m_complex_set  set title='Адрес' where name='addresses'
 sql update eav_m_complex_set  set title='Контакты' where name='contacts'
 
 #----------------------------------------------------------------------------------------------
-sql run usci/db_oracle_scripts/eav_tables_partitioning.sql
+#sql run usci/db_oracle_scripts/eav_tables_partitioning.sql
+
 
 quit

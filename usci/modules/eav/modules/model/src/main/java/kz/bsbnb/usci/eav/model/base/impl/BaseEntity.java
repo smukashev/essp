@@ -449,8 +449,14 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
             }
         }
 
-        if (this.meta.parentIsKey() && !this.getAddInfo().equals(that.getAddInfo()))
-            return false;
+        if (this.meta.parentIsKey()) {
+            //non-searchable entities NPE
+            if(this.getAddInfo() == null || that.getAddInfo() == null)
+                return false;
+
+            if(!this.getAddInfo().equals(that.getAddInfo()))
+                return false;
+        }
 
         return true;
     }
