@@ -97,7 +97,7 @@ entity read  C:/refs/01.01.2013/ref_legal_form_01_01_2013.xml 01.01.2013
 entity read  C:/refs/01.04.2013/ref_legal_form_01_04_2013.xml 01.04.2013
 entity read  C:/refs/01.01.2012/ref_offshore_01_01_2012.xml 01.01.2012
 entity read  C:/refs/01.01.2012/ref_pledge_type_01_01_2012.xml 01.01.2012
-entity read  C:/refs/01.12.2014/ref_portfolio_01_12_2014.xml 01.12.2014
+#entity read  C:/refs/01.12.0014/ref_portfolio_01_12_0014.xml 01.12.0014
 entity read  C:/refs/01.01.2012/ref_portfolio_01_01_2012.xml 01.01.2012
 entity read  C:/refs/01.04.2012/ref_portfolio_01_04_2012.xml 01.04.2012
 entity read  C:/refs/01.07.2012/ref_portfolio_01_07_2012.xml 01.07.2012
