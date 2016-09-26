@@ -414,7 +414,7 @@ meta add --name=organization_info --attribute=enterprise_type --type=meta_class 
 meta add --name=organization_info --attribute=head --type=meta_class --childname=head
 meta add --name=organization_info --attribute=legal_form --type=meta_class --childname=ref_legal_form --keytype=any --immutable
 meta add --name=organization_info --attribute=offshore --type=meta_class --childname=ref_offshore --keytype=any --immutable
-meta add --name=organization_info --attribute=addresses --type=meta_class --array --childname=address
+meta add --name=organization_info --attribute=addresses --type=meta_class --array --childname=address --cumulative
 meta add --name=organization_info --attribute=bank_relations --type=meta_class --childname=bank_relation --array --keytype=any
 meta add --name=organization_info --attribute=contacts --type=meta_class --array --childname=contact
 meta add --name=organization_info --attribute=names --type=meta_class --array --childname=organization_name --cumulative
@@ -426,7 +426,7 @@ meta add --name=organization_info --attribute=names --type=meta_class --array --
 meta create --name=person_info --parent_is_key
 meta add --name=person_info --attribute=country --type=meta_class --childname=ref_country --keytype=any --immutable
 meta add --name=person_info --attribute=offshore --type=meta_class --childname=ref_offshore --keytype=any --immutable
-meta add --name=person_info --attribute=addresses --type=meta_class --array --childname=address
+meta add --name=person_info --attribute=addresses --type=meta_class --array --childname=address --cumulative
 meta add --name=person_info --attribute=bank_relations --type=meta_class --childname=bank_relation --array --keytype=any
 meta add --name=person_info --attribute=contacts --type=meta_class --array --childname=contact
 meta add --name=person_info --attribute=names --type=meta_class --array --childname=person_name --cumulative
