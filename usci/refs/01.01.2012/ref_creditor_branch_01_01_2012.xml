@@ -1355,6 +1355,18 @@
       <short_name>филиал в г.Алматы</short_name>
       <docs>
         <item>
+          <no>020941005110</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+        <item>
           <no>600900509246</no>
           <doc_type>
             <name_ru>Регистрационный номер налогоплательщика </name_ru>
@@ -1368,8 +1380,8 @@
         </item>
       </docs>
       <main_office>
-        <name>АО "ДБ "Punjab National Bank"-Казахстан"</name>
-        <short_name>АО "ДБ "PNB"</short_name>
+        <name>АО "Tengri Bank"</name>
+        <short_name>АО "Tengri Bank"</short_name>
         <code>620</code>
         <docs>
           <item>
@@ -1385,7 +1397,7 @@
             </doc_type>
           </item>
           <item>
-            <no>DABNKZ2P</no>
+            <no>TNGRKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -1394,6 +1406,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>30</weight>
               <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>451700027971</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -1416,6 +1440,18 @@
       <short_name>филиал в г.Астана</short_name>
       <docs>
         <item>
+          <no>061141011999</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+        <item>
           <no>620300283336</no>
           <doc_type>
             <name_ru>Регистрационный номер налогоплательщика </name_ru>
@@ -1429,8 +1465,8 @@
         </item>
       </docs>
       <main_office>
-        <name>АО "ДБ "Punjab National Bank"-Казахстан"</name>
-        <short_name>АО "ДБ "PNB"</short_name>
+        <name>АО "Tengri Bank"</name>
+        <short_name>АО "Tengri Bank"</short_name>
         <code>620</code>
         <docs>
           <item>
@@ -1446,7 +1482,7 @@
             </doc_type>
           </item>
           <item>
-            <no>DABNKZ2P</no>
+            <no>TNGRKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -1455,6 +1491,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>30</weight>
               <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>451700027971</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -1477,6 +1525,18 @@
       <short_name>филиал в г. Павлодар</short_name>
       <docs>
         <item>
+          <no>060941000385</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+        <item>
           <no>451500240182</no>
           <doc_type>
             <name_ru>Регистрационный номер налогоплательщика </name_ru>
@@ -1490,8 +1550,8 @@
         </item>
       </docs>
       <main_office>
-        <name>АО "ДБ "Punjab National Bank"-Казахстан"</name>
-        <short_name>АО "ДБ "PNB"</short_name>
+        <name>АО "Tengri Bank"</name>
+        <short_name>АО "Tengri Bank"</short_name>
         <code>620</code>
         <docs>
           <item>
@@ -1507,7 +1567,7 @@
             </doc_type>
           </item>
           <item>
-            <no>DABNKZ2P</no>
+            <no>TNGRKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -1516,6 +1576,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>30</weight>
               <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>451700027971</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -1538,6 +1610,18 @@
       <short_name>филиал в г. Караганды</short_name>
       <docs>
         <item>
+          <no>970641002340</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+        <item>
           <no>300400210184</no>
           <doc_type>
             <name_ru>Регистрационный номер налогоплательщика </name_ru>
@@ -1551,8 +1635,8 @@
         </item>
       </docs>
       <main_office>
-        <name>АО "ДБ "Punjab National Bank"-Казахстан"</name>
-        <short_name>АО "ДБ "PNB"</short_name>
+        <name>АО "Tengri Bank"</name>
+        <short_name>АО "Tengri Bank"</short_name>
         <code>620</code>
         <docs>
           <item>
@@ -1568,7 +1652,7 @@
             </doc_type>
           </item>
           <item>
-            <no>DABNKZ2P</no>
+            <no>TNGRKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -1577,6 +1661,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>30</weight>
               <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>451700027971</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -4727,8 +4823,8 @@
     </ref_creditor_branch>
     <ref_creditor_branch>
       <code>922</code>
-      <name>АО "ДБ "RBS (Kazakhstan)"</name>
-      <short_name>АО "ДБ "RBS (Kazakhstan)"</short_name>
+      <name>Акционерное общество "Банк ЭкспоКредит"</name>
+      <short_name>АО "Банк ЭкспоКредит"</short_name>
       <docs>
         <item>
           <no>ABNAKZKX</no>
@@ -4754,10 +4850,22 @@
             <code>07</code>
           </doc_type>
         </item>
+        <item>
+          <no>600900000141</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика </name_ru>
+            <name_kz>Регистрационный номер налогоплательщика </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
       </docs>
       <main_office>
-        <name>АО "ДБ "RBS (Kazakhstan)"</name>
-        <short_name>АО "ДБ "RBS (Kazakhstan)"</short_name>
+        <name>Акционерное общество "Банк ЭкспоКредит"</name>
+        <short_name>АО "Банк ЭкспоКредит"</short_name>
         <code>922</code>
         <docs>
           <item>
@@ -4782,6 +4890,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>10</weight>
               <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900000141</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -8362,8 +8482,8 @@
     </ref_creditor_branch>
     <ref_creditor_branch>
       <code>620</code>
-      <name>АО "ДБ "Punjab National Bank"-Казахстан"</name>
-      <short_name>АО "ДБ "PNB"</short_name>
+      <name>АО "Tengri Bank"</name>
+      <short_name>АО "Tengri Bank"</short_name>
       <docs>
         <item>
           <no>950740000130</no>
@@ -8378,7 +8498,7 @@
           </doc_type>
         </item>
         <item>
-          <no>DABNKZ2P</no>
+          <no>TNGRKZKX</no>
           <doc_type>
             <name_ru>Банковский идентификационный код </name_ru>
             <name_kz>Банковский идентификационный код </name_kz>
@@ -8389,10 +8509,22 @@
             <code>15</code>
           </doc_type>
         </item>
+        <item>
+          <no>451700027971</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика </name_ru>
+            <name_kz>Регистрационный номер налогоплательщика </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
       </docs>
       <main_office>
-        <name>АО "ДБ "Punjab National Bank"-Казахстан"</name>
-        <short_name>АО "ДБ "PNB"</short_name>
+        <name>АО "Tengri Bank"</name>
+        <short_name>АО "Tengri Bank"</short_name>
         <code>620</code>
         <docs>
           <item>
@@ -8408,7 +8540,7 @@
             </doc_type>
           </item>
           <item>
-            <no>DABNKZ2P</no>
+            <no>TNGRKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -8417,6 +8549,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>30</weight>
               <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>451700027971</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -8548,6 +8692,18 @@
             <code>15</code>
           </doc_type>
         </item>
+        <item>
+          <no>600900133859</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика </name_ru>
+            <name_kz>Регистрационный номер налогоплательщика </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
       </docs>
       <main_office>
         <name>АО "Altyn Bank" (ДБ АО "Народный Банк Казахстана")</name>
@@ -8576,6 +8732,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>30</weight>
               <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900133859</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -17584,8 +17752,8 @@
         </item>
       </docs>
       <main_office>
-        <name>АО "ДБ "RBS (Kazakhstan)"</name>
-        <short_name>АО "ДБ "RBS (Kazakhstan)"</short_name>
+        <name>Акционерное общество "Банк ЭкспоКредит"</name>
+        <short_name>АО "Банк ЭкспоКредит"</short_name>
         <code>922</code>
         <docs>
           <item>
@@ -17610,6 +17778,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>10</weight>
               <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900000141</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -17645,8 +17825,8 @@
         </item>
       </docs>
       <main_office>
-        <name>АО "ДБ "RBS (Kazakhstan)"</name>
-        <short_name>АО "ДБ "RBS (Kazakhstan)"</short_name>
+        <name>Акционерное общество "Банк ЭкспоКредит"</name>
+        <short_name>АО "Банк ЭкспоКредит"</short_name>
         <code>922</code>
         <docs>
           <item>
@@ -17671,6 +17851,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>10</weight>
               <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900000141</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
@@ -17706,6 +17898,18 @@
           </doc_type>
         </item>
         <item>
+          <no>600700017765</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика </name_ru>
+            <name_kz>Регистрационный номер налогоплательщика </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+        <item>
           <no>SENIKZKA</no>
           <doc_type>
             <name_ru>Банковский идентификационный код </name_ru>
@@ -17736,6 +17940,18 @@
             </doc_type>
           </item>
           <item>
+            <no>600700017765</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+          <item>
             <no>SENIKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
@@ -17763,7 +17979,7 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО Банк Позитив в г.Атырау</name>
+      <name>Филиал Акционерного общества "EU Bank (Дочерний банк АО "Евразийский банк")" в городе Атырау</name>
       <short_name>филиал АО Банк Позитив в г.Атырау</short_name>
       <docs>
         <item>
@@ -17776,6 +17992,18 @@
             <is_person_doc>1</is_person_doc>
             <weight>25</weight>
             <code>11</code>
+          </doc_type>
+        </item>
+        <item>
+          <no>000741001236</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
           </doc_type>
         </item>
       </docs>
@@ -17922,7 +18150,7 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>филиал АО Банк Позитив в г.Астана</name>
+      <name>Филиал Акционерного общества "EU Bank (Дочерний банк АО "Евразийский банк") в городе Астана</name>
       <short_name>филиал АО Банк Позитив в г.Астана</short_name>
       <docs>
         <item>
@@ -17935,6 +18163,18 @@
             <is_person_doc>1</is_person_doc>
             <weight>25</weight>
             <code>11</code>
+          </doc_type>
+        </item>
+        <item>
+          <no>050841003087</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
           </doc_type>
         </item>
       </docs>
@@ -18057,14 +18297,26 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>Центральный филиал в г. Алматы</name>
+      <name>Центральный филиал Акционерного общества "EU Bank (Дочерний банк АО "Евразийский банк")" в городе Алматы</name>
       <short_name>Центральный филиал в г. Алматы</short_name>
       <docs>
         <item>
-          <no>000000100149</no>
+          <no>070341003449</no>
           <doc_type>
-            <name_ru>Регистрационный номер налогоплательщика</name_ru>
-            <name_kz>Регистрационный номер налогоплательщика</name_kz>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
+        <item>
+          <no>600700586352</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика </name_ru>
+            <name_kz>Регистрационный номер налогоплательщика </name_kz>
             <is_identification>1</is_identification>
             <is_organization_doc>1</is_organization_doc>
             <is_person_doc>1</is_person_doc>
@@ -20359,50 +20611,6 @@
       </region>
     </ref_creditor_branch>
     <ref_creditor_branch>
-      <name>Тестовая организация</name>
-      <short_name>Тестовая организация</short_name>
-      <docs>
-        <item>
-          <no>TTTTKA</no>
-          <doc_type>
-            <name_ru>Банковский идентификационный код </name_ru>
-            <name_kz>Банковский идентификационный код </name_kz>
-            <is_identification>0</is_identification>
-            <is_organization_doc>1</is_organization_doc>
-            <is_person_doc>0</is_person_doc>
-            <weight>30</weight>
-            <code>15</code>
-          </doc_type>
-        </item>
-      </docs>
-      <main_office>
-        <name>test</name>
-        <short_name>test</short_name>
-        <code>100500</code>
-        <docs>
-          <item>
-            <no>TTTTKA</no>
-            <doc_type>
-              <name_ru>Банковский идентификационный код </name_ru>
-              <name_kz>Банковский идентификационный код </name_kz>
-              <is_identification>0</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>30</weight>
-              <code>15</code>
-            </doc_type>
-          </item>
-        </docs>
-        <subject_type>
-          <kind_id>31</kind_id>
-          <name_kz>Банк второго уровня</name_kz>
-          <name_ru>Банк второго уровня</name_ru>
-          <code>0001</code>
-          <report_period_duration_months>1</report_period_duration_months>
-        </subject_type>
-      </main_office>
-    </ref_creditor_branch>
-    <ref_creditor_branch>
       <name>Филиал в г.Актау</name>
       <short_name>Филиал в г.Актау</short_name>
       <docs>
@@ -21515,6 +21723,18 @@
               <code>15</code>
             </doc_type>
           </item>
+          <item>
+            <no>600900133859</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
         </docs>
         <subject_type>
           <kind_id>31</kind_id>
@@ -21649,6 +21869,18 @@
               <code>15</code>
             </doc_type>
           </item>
+          <item>
+            <no>600900133859</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
         </docs>
         <subject_type>
           <kind_id>31</kind_id>
@@ -21752,6 +21984,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>10</weight>
               <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700017765</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
           <item>
@@ -21900,6 +22144,18 @@
               <code>15</code>
             </doc_type>
           </item>
+          <item>
+            <no>600900133859</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
         </docs>
         <subject_type>
           <kind_id>31</kind_id>
@@ -22008,6 +22264,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>10</weight>
               <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700017765</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
           <item>
@@ -22130,6 +22398,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>10</weight>
               <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700017765</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
           <item>
@@ -23125,6 +23405,18 @@
             </doc_type>
           </item>
           <item>
+            <no>600700017765</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+          <item>
             <no>SENIKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
@@ -23183,6 +23475,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>10</weight>
               <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600700017765</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
           <item>
@@ -24287,6 +24591,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>30</weight>
               <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900133859</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>

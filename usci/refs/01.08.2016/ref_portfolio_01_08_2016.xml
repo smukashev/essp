@@ -2,16 +2,16 @@
 <batch>
   <entities>
     <ref_portfolio>
-      <code>1072</code>
-      <name_kz>Портфель краткосрочных займов МСБ Qazaq Banki</name_kz>
-      <name_ru>Портфель краткосрочных займов МСБ Qazaq Banki</name_ru>
+      <code>1100</code>
+      <name_kz>Просроченные бланковые ФЛ</name_kz>
+      <name_ru>Просроченные бланковые ФЛ</name_ru>
       <creditor>
-        <name>АО "Qazaq Banki" (прежнее наименование АО "СЕНИМ-БАНК")</name>
-        <short_name>АО "Qazaq Banki"</short_name>
-        <code>549</code>
+        <name>АО "Bank RBK"</name>
+        <short_name>АО "Bank RBK"</short_name>
+        <code>821</code>
         <docs>
           <item>
-            <no>950140000367</no>
+            <no>920440001102</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -23,19 +23,7 @@
             </doc_type>
           </item>
           <item>
-            <no>600700017765</no>
-            <doc_type>
-              <name_ru>Регистрационный номер налогоплательщика </name_ru>
-              <name_kz>Регистрационный номер налогоплательщика </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>1</is_person_doc>
-              <weight>25</weight>
-              <code>11</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>SENIKZKA</no>
+            <no>KINCKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -44,6 +32,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>30</weight>
               <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900038006</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>
