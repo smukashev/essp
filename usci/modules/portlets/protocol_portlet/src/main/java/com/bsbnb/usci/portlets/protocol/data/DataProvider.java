@@ -15,12 +15,18 @@ import java.util.Map;
 public interface DataProvider {
     List<Creditor> getCreditorsList();
 
-    List<InputInfoDisplayBean> getInputInfosByCreditors(List<Creditor> creditors, Date reportDate);
-
     List<ProtocolDisplayBean> getProtocolsByInputInfo(InputInfoDisplayBean inputInfo);
 
     Map<SharedDisplayBean, Map<String, List<ProtocolDisplayBean>>>
         getProtocolsByInputInfoGrouped(InputInfoDisplayBean inputInfo);
 
     BatchFullJModel getBatchFullModel(BigInteger batchId);
+
+    int countFiles(List<Creditor> selectedCreditors, Date date);
+
+    List<InputInfoDisplayBean> loadFiles(List<Creditor> creditors, Date reportDate, int firstIndex, int count);
+
+    int countProtocols(InputInfoDisplayBean inputInfoDisplayBean);
+
+    List<ProtocolDisplayBean> loadProtocols(InputInfoDisplayBean inputInfo, int firstIndex, int count);
 }

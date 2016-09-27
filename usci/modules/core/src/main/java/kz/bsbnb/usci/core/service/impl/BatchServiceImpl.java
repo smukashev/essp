@@ -180,6 +180,11 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
+    public List<EntityStatus> getEntityStatusList(long batchId, int firstIndex, int count) {
+        return entityStatusDao.getList(batchId, firstIndex, count);
+    }
+
+    @Override
     public List<BatchStatus> getBatchStatusList(long batchId) {
         return batchStatusDao.getList(batchId);
     }
@@ -214,6 +219,11 @@ public class BatchServiceImpl implements IBatchService {
     @Override
     public List<Batch> getAll(Date repDate, List<Creditor> creditorsList) {
         return batchDao.getAll(repDate, creditorsList);
+    }
+
+    @Override
+    public List<Batch> getAll(Date repDate, List<Creditor> creditorsList, int firstIndex, int count) {
+        return batchDao.getAll(repDate, creditorsList, firstIndex, count);
     }
 
     private void setHash(Batch batch) {
@@ -255,5 +265,15 @@ public class BatchServiceImpl implements IBatchService {
     @Override
     public void approveMaintenance(List<Long> approvedBatchIds) {
         batchDao.approveMaintenance(approvedBatchIds);
+    }
+
+    @Override
+    public int getBatchCount(List<Creditor> creditors, Date reportDate) {
+        return batchDao.getBatchCount(creditors, reportDate);
+    }
+
+    @Override
+    public int getEntityStatusCount(long batchId) {
+        return entityStatusDao.getCount(batchId);
     }
 }

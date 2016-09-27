@@ -81,6 +81,56 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
         return list;
     }
 
+    @Override
+    public List<InputInfo>  getAllInputInfos(List<Creditor> creditorsList, Date reportDate, int firstIndex, int count) {
+        ArrayList<InputInfo> list = new ArrayList<>();
+
+        HashMap<Long, Creditor> inputCreditors = new HashMap<>();
+
+        for (Creditor cred : creditorsList) {
+            inputCreditors.put(cred.getId(), cred);
+        }
+
+        List<Batch> batchList = batchService.getAll(reportDate, creditorsList, firstIndex, count);
+
+        List<Long> bathsIds = new LinkedList<>();
+        for (Batch batch : batchList) {
+            bathsIds.add(batch.getId());
+        }
+
+        List<BatchStatus> batchStatuses = batchService.getBatchStatuses(bathsIds);
+
+        Map<Long, List<BatchStatus> > batchStatusMap = new HashMap<>();
+
+        for (BatchStatus batchStatus : batchStatuses) {
+            if(!batchStatusMap.containsKey(batchStatus.getBatchId())) {
+                batchStatusMap.put(batchStatus.getBatchId(), new LinkedList<BatchStatus>());
+            }
+
+            batchStatusMap.get(batchStatus.getBatchId()).add(batchStatus);
+        }
+
+        for (Batch batch : batchList) {
+            Creditor currentCreditor = inputCreditors.get(batch.getCreditorId());
+
+            if (currentCreditor == null) {
+                continue;
+            }
+
+            //List<BatchStatus> batchStatusList = batchService.getBatchStatusList(batch.getId());
+            List<BatchStatus> batchStatusList = batchStatusMap.get(batch.getId());
+
+
+            InputInfo ii = getInputInfo(batch, currentCreditor, batchStatusList);
+
+            if (reportDate == null || DataUtils.compareBeginningOfTheDay(ii.getReportDate(), reportDate) == 0) {
+                list.add(ii);
+            }
+        }
+
+        return list;
+    }
+
     private InputInfo getInputInfo(Batch batch, Creditor currentCreditor, List<BatchStatus> batchStatusList) {
         InputInfo ii = new InputInfo();
 
@@ -312,5 +362,10 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     @Override
     public void approveMaintenance(List<Long> approvedBatchIds) {
         batchService.approveMaintenance(approvedBatchIds);
+    }
+
+    @Override
+    public int countInputInfos(List<Creditor> creditors, Date reportDate) {
+        return batchService.getBatchCount(creditors, reportDate);
     }
 }

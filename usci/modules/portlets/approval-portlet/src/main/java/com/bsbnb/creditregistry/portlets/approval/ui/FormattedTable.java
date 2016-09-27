@@ -44,7 +44,7 @@ public class FormattedTable extends Table {
             alwaysRecalculateColumnWidths = true;
         }
 
-    public void addDateFormat(Object propertyId, String formatString) {
+    public void addFormat(Object propertyId, String formatString) {
         formatData.put(propertyId, formatString);
     }
 

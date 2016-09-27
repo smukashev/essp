@@ -21,6 +21,8 @@ public interface IBatchDao {
 
     List<Batch> getAll(Date repDate, List<Creditor> creditorsList);
 
+    List<Batch> getAll(Date repDate, List<Creditor> creditorsList, int firstIndex, int count);
+
     void incrementActualCount(long batchId, long count);
 
     void clearActualCount(long batchId);
@@ -28,4 +30,7 @@ public interface IBatchDao {
     List<Batch> getMaintenanceBatches(Date reportDate);
 
     void approveMaintenance(List<Long> approvedBatchIds);
+
+    int getBatchCount(List<Creditor> creditors, Date reportDate);
+
 }

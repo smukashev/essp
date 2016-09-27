@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
 
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
 import com.bsbnb.usci.portlets.protocol.ProtocolApplication;
@@ -21,8 +20,11 @@ import com.bsbnb.usci.portlets.protocol.data.SharedDisplayBean;
 import com.bsbnb.usci.portlets.protocol.export.XlsProtocolExporter;
 import com.bsbnb.usci.portlets.protocol.export.XmlProtocolExporter;
 import com.bsbnb.usci.portlets.protocol.export.ZippedProtocolExporter;
+import com.bsbnb.vaadin.formattedtable.FormattedTable;
 import com.bsbnb.vaadin.messagebox.MessageBoxButtons;
 import com.bsbnb.vaadin.messagebox.MessageBoxType;
+import com.bsbnb.vaadin.paged.table.control.PagedDataProvider;
+import com.bsbnb.vaadin.paged.table.control.PagedTableControl;
 import jxl.write.WriteException;
 import com.bsbnb.usci.portlets.protocol.data.DataProvider;
 import com.bsbnb.usci.portlets.protocol.data.ProtocolDisplayBean;
@@ -59,6 +61,9 @@ import org.apache.log4j.Logger;
  * @author Marat.Madybayev
  */
 public class ProtocolLayout extends VerticalLayout {
+
+    private static final int PROTOCOL_TABLE_PAGE_SIZE = 5;
+    private static final int FILES_TABLE_PAGE_SIZE = 5;
     private static final String LOCALIZATION_PREFIX = "PROTOCOL-LAYOUT.";
 
     private boolean isProtocolGrouped = false;
@@ -71,17 +76,24 @@ public class ProtocolLayout extends VerticalLayout {
     private BeanItemContainer<InputInfoDisplayBean> inputInfoContainer;
     private FormattedTable filesTable;
     private VerticalLayout filesTableLayout;
+    private PagedTableControl<InputInfoDisplayBean> filesPagedControl;
     private HorizontalLayout typesOfProtocolLayout;
     private Tree groupsOfProtocolTree;
     private Panel groupsTreePanel;
     private BeanItemContainer<ProtocolDisplayBean> protocolsContainer;
     private FormattedTable tableProtocol;
+    private PagedTableControl<ProtocolDisplayBean> protocolsTableControl;
     private VerticalLayout protocolLayout;
     private Label noProtocolsLabel;
     public final Logger logger = Logger.getLogger(ProtocolLayout.class);
 
+    private List<Creditor> selectedCreditors = new ArrayList<Creditor>();
+
     private static final String[] FILES_TABLE_VISIBLE_COLUMNS = new String[]{
         "creditorName", "fileLink", "receiverDate", "startDate", "completionDate", "statusName", "reportDate"};
+
+    private static final String[] FILES_TABLE_VISIBLE_COLUMNS_FOR_BANK_USER = new String[]{
+            "fileLink", "receiverDate", "startDate", "completionDate", "statusName", "reportDate"};
 
     private static final String[] FILES_TABLE_COLUMN_NAMES = new String[]{
         "creditorName", "fileLink", "fileName", "receiverDate", "completionDate", "statusName", "startDate",
@@ -154,16 +166,8 @@ public class ProtocolLayout extends VerticalLayout {
         Button filesTableExportToXLSButton = new Button(Localization.EXPORT_TO_XLS_CAPTION.getValue(),
                 new Button.ClickListener() {
             public void buttonClick(ClickEvent event) {
-                try {
                     filesTable.downloadXls("files.xls", FILES_TABLE_COLUMNS_TO_EXPORT,
                             getResourceStrings(FILES_TABLE_COLUMNS_TO_EXPORT));
-                } catch (IOException ioe) {
-                    logger.warn("Input info export failed", ioe);
-                    MessageBox.Show(Localization.MESSAGE_EXPORT_FAILED.getValue(), getWindow());
-                } catch (WriteException we) {
-                    logger.warn("Input info export failed", we);
-                    MessageBox.Show(Localization.MESSAGE_EXPORT_FAILED.getValue(), getWindow());
-                }
             }
         });
 
@@ -176,21 +180,52 @@ public class ProtocolLayout extends VerticalLayout {
         filesTableHeaderLayout.setComponentAlignment(filesTableExportToXLSButton, Alignment.MIDDLE_RIGHT);
         filesTableHeaderLayout.setWidth("100%");
 
-        filesTable = new FormattedTable();
+        filesPagedControl = new PagedTableControl<InputInfoDisplayBean>(InputInfoDisplayBean.class, FILES_TABLE_PAGE_SIZE, new PagedDataProvider<InputInfoDisplayBean>() {
+            @Override
+            public int getCount() {
+                return provider.countFiles(selectedCreditors, (Date) reportDateField.getValue());
+            }
 
-        inputInfoContainer = new BeanItemContainer<>(InputInfoDisplayBean.class);
-        filesTable.setContainerDataSource(inputInfoContainer);
+            @Override
+            public List<InputInfoDisplayBean> getRecords(int firstIndex, int count) {
+
+                if (PortletEnvironmentFacade.get().isNB()) {
+                    Creditor nb = new Creditor();
+                    nb.setId(0L);
+                    nb.setName("НБРК");
+                    nb.setShortName("НБРК");
+                    selectedCreditors.add(nb);
+                }
+
+                List<InputInfoDisplayBean> files = provider.loadFiles(selectedCreditors, (Date) reportDateField.getValue(), firstIndex, count);
+                if (!files.isEmpty()) {
+                    filesTableLayout.setVisible(true);
+                } else {
+                    MessageBox.Show(Localization.MESSAGE_NO_DATA.getValue(), getWindow());
+                }
+                return files;
+            }
+        });
+
+        filesTable = filesPagedControl.getTable();
+        filesTable.setStyleName("wordwrap-table");
         filesTable.setVisibleColumns(FILES_TABLE_COLUMN_NAMES);
         filesTable.setColumnHeaders(getResourceStrings(FILES_TABLE_COLUMN_NAMES));
-        filesTable.setVisibleColumns(FILES_TABLE_VISIBLE_COLUMNS);
+        if (PortletEnvironmentFacade.get().isNB()) {
+            filesTable.setVisibleColumns(FILES_TABLE_VISIBLE_COLUMNS);
+            filesTable.setColumnWidth("creditorName", 200);
+        } else {
+            filesTable.setVisibleColumns(FILES_TABLE_VISIBLE_COLUMNS_FOR_BANK_USER);
+        }
         filesTable.setWidth("100%");
+        filesTable.setHeight("400px");
         filesTable.setSelectable(true);
         filesTable.setMultiSelect(false);
         filesTable.setImmediate(true);
-        filesTable.addDateFormat("receiverDate", "dd/MM/yyyy HH:mm:ss");
-        filesTable.addDateFormat("reportDate", "dd/MM/yyyy");
-        filesTable.addDateFormat("completionDate", "dd/MM/yyyy HH:mm:ss");
-        filesTable.addDateFormat("startDate", "dd/MM/yyyy HH:mm:ss");
+        filesTable.addFormat("receiverDate", "dd/MM/yyyy HH:mm:ss");
+        filesTable.addFormat("reportDate", "dd/MM/yyyy");
+        filesTable.addFormat("completionDate", "dd/MM/yyyy HH:mm:ss");
+        filesTable.addFormat("startDate", "dd/MM/yyyy HH:mm:ss");
 
         filesTable.addListener(new Property.ValueChangeListener() {
             public void valueChange(ValueChangeEvent event) {
@@ -201,7 +236,7 @@ public class ProtocolLayout extends VerticalLayout {
 
         filesTableLayout = new VerticalLayout();
         filesTableLayout.addComponent(filesTableHeaderLayout);
-        filesTableLayout.addComponent(filesTable);
+        filesTableLayout.addComponent(filesPagedControl);
         filesTableLayout.setSpacing(false);
         filesTableLayout.setWidth("100%");
         filesTableLayout.setVisible(false);
@@ -308,6 +343,7 @@ public class ProtocolLayout extends VerticalLayout {
                 if (protocols == null) {
                     return;
                 }
+                protocolsContainer = protocolsTableControl.getContainer();
                 protocolsContainer.removeAllItems();
                 protocolsContainer.addAll(protocols);
             }
@@ -319,18 +355,29 @@ public class ProtocolLayout extends VerticalLayout {
         groupsTreePanel.setWidth("300px");
         groupsTreePanel.setHeight("100%");
 
-        tableProtocol = new FormattedTable();
+        protocolsTableControl = new PagedTableControl<ProtocolDisplayBean>(ProtocolDisplayBean.class, PROTOCOL_TABLE_PAGE_SIZE, new PagedDataProvider<ProtocolDisplayBean>() {
+            @Override
+            public int getCount() {
+                return provider.countProtocols((InputInfoDisplayBean) filesTable.getValue());
+            }
+
+            @Override
+            public List<ProtocolDisplayBean> getRecords(int firstIndex, int count) {
+                listOfProtocols = provider.loadProtocols((InputInfoDisplayBean) filesTable.getValue(), firstIndex, count);
+                showProtocolTable();
+                return listOfProtocols;
+            }
+        });
+        tableProtocol = protocolsTableControl.getTable();
         tableProtocol.setStyleName("wordwrap-table");
-        protocolsContainer = new BeanItemContainer<>(ProtocolDisplayBean.class);
-        tableProtocol.setContainerDataSource(protocolsContainer);
-        tableProtocol.addDateFormat("primaryContractDate", "dd.MM.yyyy");
+        tableProtocol.addFormat("primaryContractDate", "dd.MM.yyyy");
         tableProtocol.setImmediate(true);
         tableProtocol.setSizeFull();
 
         HorizontalLayout layoutOfProtocolTable = new HorizontalLayout();
         layoutOfProtocolTable.addComponent(groupsTreePanel);
-        layoutOfProtocolTable.addComponent(tableProtocol);
-        layoutOfProtocolTable.setExpandRatio(tableProtocol, 1.0f);
+        layoutOfProtocolTable.addComponent(protocolsTableControl);
+        layoutOfProtocolTable.setExpandRatio(protocolsTableControl, 1.0f);
         layoutOfProtocolTable.setWidth("100%");
         layoutOfProtocolTable.setImmediate(true);
 
@@ -393,6 +440,7 @@ public class ProtocolLayout extends VerticalLayout {
     }
 
     private void setProtocolColumns(String[] columns) {
+        tableProtocol = protocolsTableControl.getTable();
         tableProtocol.setVisibleColumns(columns);
         tableProtocol.setColumnHeaders(getResourceStrings(columns));
         tableProtocol.setColumnWidth("note", 300);
@@ -401,27 +449,26 @@ public class ProtocolLayout extends VerticalLayout {
 
     private void showProtocol(InputInfoDisplayBean ii) throws UnsupportedOperationException {
         groupsOfProtocolTree.removeAllItems();
-        protocolsContainer.removeAllItems();
         typesOfProtocolLayout.removeAllComponents();
         groupsMapProtocol = new HashMap<>();
         if (isProtocolGrouped) {
             showGroupedProtocol(ii);
         } else {
-            showProtocolTable(ii);
+            protocolsTableControl.reload();
         }
     }
 
-    private void showProtocolTable(InputInfoDisplayBean ii) throws UnsupportedOperationException {
+    private void showProtocolTable() throws UnsupportedOperationException {
         typesOfProtocolLayout.setVisible(true);
+        typesOfProtocolLayout.removeAllComponents();
         groupsTreePanel.setVisible(false);
-
         prohibitedMessageTypes.clear();
-        listOfProtocols = provider.getProtocolsByInputInfo(ii);
-        Set<String> messageTypeCodes = new HashSet<>();
 
         if (listOfProtocols.isEmpty()) {
+            noProtocolsLabel.setVisible(true);
+            protocolLayout.setVisible(false);
 
-            Map<String, Long> weightsByErrorCode = new HashMap<>();
+            /*Map<String, Long> weightsByErrorCode = new HashMap<>();
             weightsByErrorCode.put(BatchStatuses.ERROR.code(), 1000L);
             weightsByErrorCode.put(BatchStatuses.COMPLETED.code(), 999L);
             weightsByErrorCode.put(BatchStatuses.MAINTENANCE_REQUEST.code(), 20L);
@@ -443,34 +490,40 @@ public class ProtocolLayout extends VerticalLayout {
             }
 
             if (p != null)
-                listOfProtocols.add(new ProtocolDisplayBean(p));
+                listOfProtocols.add(new ProtocolDisplayBean(p));*/
 
-            /*boolean errorStatus = false;
-            for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
-                if("ERROR".equals(batchStatus.getMessageType().getCode())){
-                    errorStatus = true;
-                    break;
-                }
-            }
-
-            for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
-                if(!errorStatus || "ERROR".equals(batchStatus.getMessageType().getCode())){
-                    listOfProtocols.add(new ProtocolDisplayBean(batchStatus));
-                }
-            }*/
+            return;
         }
 
-        if (listOfProtocols.isEmpty()) {
-            noProtocolsLabel.setVisible(true);
-            protocolLayout.setVisible(false);
-        } else {
-            for (ProtocolDisplayBean protocolDisplayBean : listOfProtocols) {
-                addProtocol(protocolDisplayBean, messageTypeCodes);
+        Set<String> messageTypeCodes = new HashSet<String>();
+        for (final ProtocolDisplayBean protocol : listOfProtocols) {
+            if (!messageTypeCodes.contains(protocol.getMessageTypeCode())) {
+                messageTypeCodes.add(protocol.getMessageTypeCode());
+                Button filterButton = new Button("", new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(ClickEvent event) {
+                        Button button = event.getButton();
+                        String styleName = button.getStyleName();
+                        if ("v-button v-pressed".equals(styleName)) {
+                            button.setStyleName("v-button");
+                            prohibitedMessageTypes.add(protocol.getMessageTypeCode());
+                        } else {
+                            button.setStyleName("v-button v-pressed");
+                            prohibitedMessageTypes.remove(protocol.getMessageTypeCode());
+                        }
+                        updateProtocolTable();
+                    }
+                });
+                filterButton.setStyleName("v-button v-pressed");
+                filterButton.setIcon(protocol.getStatusIcon().getSource());
+                filterButton.setDescription(protocol.getMessageTypeName());
+                filterButton.setImmediate(true);
+                typesOfProtocolLayout.addComponent(filterButton);
             }
-            setProtocolColumns(EXTENDED_PROTOCOL_TABLE_COLUMNS);
-            noProtocolsLabel.setVisible(false);
-            protocolLayout.setVisible(true);
         }
+        setProtocolColumns(EXTENDED_PROTOCOL_TABLE_COLUMNS);
+        noProtocolsLabel.setVisible(false);
+        protocolLayout.setVisible(true);
     }
 
     private void addProtocol(final ProtocolDisplayBean protocol, Set<String> messageTypes) {
@@ -552,14 +605,14 @@ public class ProtocolLayout extends VerticalLayout {
     }
 
     private void updateProtocolTable() {
-        protocolsContainer.removeAllItems();
+        protocolsTableControl.getContainer().removeAllItems();
         List<ProtocolDisplayBean> filteredProtocols = new ArrayList<>();
         for (ProtocolDisplayBean protocol : listOfProtocols) {
             if (!prohibitedMessageTypes.contains(protocol.getMessageType())) {
                 filteredProtocols.add(protocol);
             }
         }
-        protocolsContainer.addAll(filteredProtocols);
+        protocolsTableControl.getContainer().addAll(filteredProtocols);
     }
 
     private void loadCreditorInfo() {
@@ -572,31 +625,10 @@ public class ProtocolLayout extends VerticalLayout {
     }
 
     private void loadCreditorInfo(List<Creditor> creditors) {
+        selectedCreditors = creditors;
         filesTableLayout.setVisible(false);
         protocolLayout.setVisible(false);
-        tableProtocol.removeAllItems();
-        inputInfoContainer.removeAllItems();
-        Date reportDate = (Date) reportDateField.getValue();
-        List<Creditor> newList = new ArrayList<>(creditors);
-        if (PortletEnvironmentFacade.get().isNB()) {
-            Creditor nb = new Creditor();
-            nb.setId(0L);
-            nb.setName("НБРК");
-            nb.setShortName("НБРК");
-            newList.add(nb);
-        }
-        List<InputInfoDisplayBean> inputInfoList = provider.getInputInfosByCreditors(newList, reportDate);
-        inputInfoContainer.addAll(inputInfoList);
-
-        filesTable.setSortContainerPropertyId("receiverDate");
-        filesTable.setSortAscending(false);
-        filesTable.sort();
-
-        if (!inputInfoList.isEmpty()) {
-            filesTableLayout.setVisible(true);
-        } else {
-            MessageBox.Show(Localization.MESSAGE_NO_DATA.getValue(), getWindow());
-        }
+        filesPagedControl.reload();
     }
 
     private void exportProtocolData(ProtocolExporter exporter) {

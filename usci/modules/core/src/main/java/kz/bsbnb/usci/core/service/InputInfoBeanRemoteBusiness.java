@@ -11,6 +11,8 @@ import java.util.List;
 public interface InputInfoBeanRemoteBusiness {
     List<InputInfo> getAllInputInfos(List<Creditor> creditorsList, Date reportDate);
 
+    List<InputInfo> getAllInputInfos(List<Creditor> creditorsList, Date reportDate, int firstIndex, int count);
+
     List<InputInfo> getPendingBatches(List<Creditor> creditorsList);
 
     BatchFullJModel getBatchFullModel(BigInteger batchId);
@@ -18,4 +20,6 @@ public interface InputInfoBeanRemoteBusiness {
     List<InputInfo> getMaintenanceInfo(List<Creditor> creditors, Date reportDate);
 
     void approveMaintenance(List<Long> approvedInputInfos);
+
+    int countInputInfos(List<Creditor> selectedCreditors, Date date);
 }

@@ -190,6 +190,53 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         return batchList;
     }
 
+    @Override
+    public List<Batch> getAll(java.util.Date repDate, List<Creditor> creditorsList, int firstIndex, int count) {
+        SelectWhereStep select = context.selectFrom(EAV_BATCHES);
+
+        // one creditor must exists!
+        select.where(EAV_BATCHES.CREDITOR_ID.eq(creditorsList.get(0).getId()));
+        for (int i = 1; i < creditorsList.size(); i++) {
+            select.where().or(EAV_BATCHES.CREDITOR_ID.eq(creditorsList.get(i).getId()));
+        }
+
+        if (repDate != null) {
+            select.where().and(EAV_BATCHES.REP_DATE.eq(DataUtils.convert(repDate)));
+        }
+
+        select.orderBy(EAV_BATCHES.RECEIPT_DATE.desc());
+
+        select.limit(count).offset(firstIndex);
+
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        List<Batch> batchList = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            batchList.add(fillBatch(new Batch(), row));
+        }
+
+        return batchList;
+    }
+
+    @Override
+    public int getBatchCount(List<Creditor> creditorsList, Date reportDate) {
+        SelectWhereStep select = context
+                .select(DSL.count(EAV_BATCHES.ID).as("batch_count"))
+                .from(EAV_BATCHES);
+
+        for (int i = 1; i < creditorsList.size(); i++) {
+            select.where().or(EAV_BATCHES.CREDITOR_ID.eq(creditorsList.get(i).getId()));
+        }
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+
+        return ((BigDecimal) rows.get(0).get("batch_count")).intValue();
+    }
+
     private long insertBatch(Batch batch) {
         Insert insert = context.insertInto(EAV_BATCHES,
                 EAV_BATCHES.USER_ID,

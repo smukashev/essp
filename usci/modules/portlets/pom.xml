@@ -22,6 +22,7 @@
         <module>vaadin-messagebox</module>
         <module>vaadin-filterable-selector</module>
         <module>vaadin-formatted-table</module>
+        <module>vaadin-paged-table-control</module>
         <module>portlet-base-vaadin</module>
         <module>static</module>
         <module>translit-util</module>

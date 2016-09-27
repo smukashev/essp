@@ -221,8 +221,8 @@ public class CreditorsListLayout extends VerticalLayout implements ReportDisplay
         String[] columnCaptions = environment.getResourceString(Localization.CREDITORS_TABLE_COLUMN_CAPTIONS).split("\\|");
         reportsTable.setVisibleColumns(columnNames);
         reportsTable.setColumnHeaders(columnCaptions);
-        reportsTable.addDateFormat("beginDate", "dd.MM.yyyy HH:mm:ss");
-        reportsTable.addDateFormat("endDate", "dd.MM.yyyy HH:mm:ss");
+        reportsTable.addFormat("beginDate", "dd.MM.yyyy HH:mm:ss");
+        reportsTable.addFormat("endDate", "dd.MM.yyyy HH:mm:ss");
         reportsTable.setColumnWidth("creditorNameLink", 200);
         reportsTable.setColumnWidth("actualCount", 140);
         reportsTable.setColumnWidth("beginDate", 150);

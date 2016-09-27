@@ -8,6 +8,7 @@ import kz.bsbnb.usci.eav.util.EntityStatuses;
 import org.jooq.DSLContext;
 import org.jooq.Insert;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -51,7 +52,7 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
     @Override
     public List<EntityStatus> getList(long batchId) {
         Select select = context
-                .select(EAV_ENTITY_STATUSES.ID, EAV_ENTITY_STATUSES.BATCH_ID, EAV_ENTITY_STATUSES.ENTITY_ID, EAV_ENTITY_STATUSES.STATUS_ID, EAV_ENTITY_STATUSES.DESCRIPTION, EAV_ENTITY_STATUSES.ERROR_CODE, EAV_ENTITY_STATUSES.DEV_DESCRIPTION, EAV_ENTITY_STATUSES.ENTITY_ID, EAV_ENTITY_STATUSES.RECEIPT_DATE, EAV_ENTITY_STATUSES.INDEX_, EAV_GLOBAL.CODE, EAV_BE_STRING_VALUES.VALUE)
+                .select(EAV_ENTITY_STATUSES.ID, EAV_ENTITY_STATUSES.BATCH_ID, EAV_ENTITY_STATUSES.ENTITY_ID, EAV_ENTITY_STATUSES.STATUS_ID, EAV_ENTITY_STATUSES.DESCRIPTION, EAV_ENTITY_STATUSES.ERROR_CODE, EAV_ENTITY_STATUSES.DEV_DESCRIPTION, EAV_ENTITY_STATUSES.RECEIPT_DATE, EAV_ENTITY_STATUSES.INDEX_, EAV_GLOBAL.CODE, EAV_BE_STRING_VALUES.VALUE)
                 .from(EAV_ENTITY_STATUSES
                                 .join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID))
                                 .leftOuterJoin(EAV_BE_STRING_VALUES)
@@ -75,6 +76,56 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
         }
 
         return entityStatusList;
+    }
+
+    @Override
+    public List<EntityStatus> getList(long batchId, int firstIndex, int count) {
+        Select select = context
+                .select(EAV_ENTITY_STATUSES.ID, EAV_ENTITY_STATUSES.BATCH_ID, EAV_ENTITY_STATUSES.ENTITY_ID, EAV_ENTITY_STATUSES.STATUS_ID, EAV_ENTITY_STATUSES.DESCRIPTION, EAV_ENTITY_STATUSES.ERROR_CODE, EAV_ENTITY_STATUSES.DEV_DESCRIPTION, EAV_ENTITY_STATUSES.RECEIPT_DATE, EAV_ENTITY_STATUSES.INDEX_, EAV_GLOBAL.CODE, EAV_BE_STRING_VALUES.VALUE)
+                .from(EAV_ENTITY_STATUSES
+                        .join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID))
+                        .leftOuterJoin(EAV_BE_STRING_VALUES)
+                        .on((EAV_BE_STRING_VALUES.ENTITY_ID.eq(EAV_ENTITY_STATUSES.ENTITY_ID))/*.and(EAV_BE_STRING_VALUES.ATTRIBUTE_ID.eq(new Long(153)))*/)
+                        .leftOuterJoin(EAV_M_SIMPLE_ATTRIBUTES)
+                        .on(EAV_M_SIMPLE_ATTRIBUTES.ID.eq(EAV_BE_STRING_VALUES.ATTRIBUTE_ID))
+                        .leftOuterJoin(EAV_M_CLASSES)
+                        .on((EAV_M_CLASSES.ID.eq(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID)).and(EAV_M_CLASSES.TITLE.eq("primary_contract")))
+                )
+                .where(EAV_ENTITY_STATUSES.BATCH_ID.eq(batchId))
+                .orderBy(EAV_ENTITY_STATUSES.STATUS_ID, EAV_ENTITY_STATUSES.RECEIPT_DATE)
+                .limit(count).offset(firstIndex);
+
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        List<EntityStatus> entityStatusList = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            EntityStatus entityStatus = toEntityStatus(row);
+            entityStatusList.add(entityStatus);
+        }
+
+        return entityStatusList;
+    }
+
+    @Override
+    public int getCount(long batchId) {
+        Select select = context
+                .select(DSL.count(EAV_ENTITY_STATUSES.ID).as("entity_status_count"))
+                .from(EAV_ENTITY_STATUSES
+                        .join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID))
+                        .leftOuterJoin(EAV_BE_STRING_VALUES)
+                        .on((EAV_BE_STRING_VALUES.ENTITY_ID.eq(EAV_ENTITY_STATUSES.ENTITY_ID)))
+                        .leftOuterJoin(EAV_M_SIMPLE_ATTRIBUTES)
+                        .on(EAV_M_SIMPLE_ATTRIBUTES.ID.eq(EAV_BE_STRING_VALUES.ATTRIBUTE_ID))
+                        .leftOuterJoin(EAV_M_CLASSES)
+                        .on((EAV_M_CLASSES.ID.eq(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID)).and(EAV_M_CLASSES.TITLE.eq("primary_contract")))
+                )
+                .where(EAV_ENTITY_STATUSES.BATCH_ID.eq(batchId));
+
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        return ((BigDecimal) rows.get(0).get("entity_status_count")).intValue();
     }
 
     private EntityStatus toEntityStatus(Map<String, Object> row) {

@@ -25,6 +25,8 @@ public interface IBatchService {
 
     List<EntityStatus> getEntityStatusList(long batchId);
 
+    List<EntityStatus> getEntityStatusList(long batchId, int firstIndex, int count);
+
     List<BatchStatus> getBatchStatusList(long batchId);
 
 
@@ -40,6 +42,8 @@ public interface IBatchService {
 
     List<Batch> getAll(Date repDate, List<Creditor> creditorsList);
 
+    List<Batch> getAll(Date repDate, List<Creditor> creditorsList, int firstIndex, int count);
+
     boolean incrementActualCounts(Map<Long, Long> batchesToUpdate);
 
     boolean clearActualCount(long batchId);
@@ -47,4 +51,8 @@ public interface IBatchService {
     List<Batch> getMaintenanceBatches(Date reportDate);
 
     void approveMaintenance(List<Long> approvedBatchIds);
+
+    int getBatchCount(List<Creditor> creditors, Date reportDate);
+
+    int getEntityStatusCount(long batchId);
 }

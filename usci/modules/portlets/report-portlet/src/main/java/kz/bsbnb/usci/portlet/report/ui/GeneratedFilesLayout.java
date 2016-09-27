@@ -81,8 +81,8 @@ class GeneratedFilesLayout extends VerticalLayout {
         loadsContainer = new BeanItemContainer<ReportLoad>(ReportLoad.class);
 
         loadsTable = new FormattedTable("");
-        loadsTable.addDateFormat("startTime", "dd/MM/yyyy HH:mm:ss");
-        loadsTable.addDateFormat("finishTime", "dd/MM/yyyy HH:mm:ss");
+        loadsTable.addFormat("startTime", "dd/MM/yyyy HH:mm:ss");
+        loadsTable.addFormat("finishTime", "dd/MM/yyyy HH:mm:ss");
         loadsTable.setContainerDataSource(loadsContainer);
         loadsTable.setVisibleColumns(LOADS_TABLE_COLUMNS);
         loadsTable.setColumnHeaders(getColumnHeaders(LOADS_TABLE_PREFIX, LOADS_TABLE_COLUMNS));

@@ -50,6 +50,30 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         return list;
     }
 
+    @Override
+    public List<Protocol> getProtocolsBy_InputInfo(InputInfo inputInfoId, int firstIndex, int count) {
+        ArrayList<Protocol> list = new ArrayList<>();
+
+        long batchId = inputInfoId.getId().longValue();
+
+        List<EntityStatus> entityStatusList = batchService.getEntityStatusList(batchId, firstIndex, count);
+
+        Batch batch = batchService.getBatch(batchId);
+
+        for (EntityStatus entityStatus : entityStatusList) {
+            if (protocolsToDisplay.contains(entityStatus.getStatus())) {
+                fillProtocol(entityStatus, inputInfoId, list, batch);
+            }
+        }
+
+        return list;
+    }
+
+    @Override
+    public int countProtocolsByInputInfo(InputInfo inputInfoId) {
+        return batchService.getEntityStatusCount(inputInfoId.getId().longValue());
+    }
+
     private void fillProtocol(EntityStatus entityStatus, InputInfo inputInfoId, ArrayList<Protocol> list, Batch batch) {
 
         Protocol protocol = new Protocol();

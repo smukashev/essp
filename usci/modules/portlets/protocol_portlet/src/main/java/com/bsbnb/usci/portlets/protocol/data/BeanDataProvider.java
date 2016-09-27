@@ -91,20 +91,6 @@ public class BeanDataProvider implements DataProvider {
         return result;
     }
 
-    public List<InputInfoDisplayBean> getInputInfosByCreditors(List<Creditor> creditors, Date reportDate) {
-        List<InputInfo> inputInfoList = inputInfoBusiness.getAllInputInfos(creditors, reportDate);
-        List<InputInfoDisplayBean> result = new ArrayList<>(inputInfoList.size());
-        for (InputInfo inputInfo : inputInfoList) {
-            if (inputInfo != null && inputInfo.getCreditor() != null && !StaticRouter.isDEVILMode(inputInfo.getFileName())) {
-                if (StaticRouter.isGODMode(inputInfo.getFileName())) {
-                    inputInfo.setFileName(cutGodMode(inputInfo.getFileName()));
-                }
-                result.add(new InputInfoDisplayBean(inputInfo, this));
-            }
-        }
-        return result;
-    }
-
     public String cutGodMode(String filename) {
         for (String tmpStr : StaticRouter.getGODModes()) {
             if (filename.indexOf(tmpStr) >= 0) {
@@ -142,5 +128,51 @@ public class BeanDataProvider implements DataProvider {
 
     public BatchFullJModel getBatchFullModel(BigInteger batchId) {
         return inputInfoBusiness.getBatchFullModel(batchId);
+    }
+
+    @Override
+    public int countFiles(List<Creditor> selectedCreditors, Date date) {
+        return inputInfoBusiness.countInputInfos(selectedCreditors,date);
+    }
+
+    @Override
+    public List<InputInfoDisplayBean> loadFiles(List<Creditor> creditors, Date reportDate, int firstIndex, int count) {
+        List<InputInfo> inputInfoList = inputInfoBusiness.getAllInputInfos(creditors, reportDate, firstIndex, count);
+        List<InputInfoDisplayBean> result = new ArrayList<>(inputInfoList.size());
+        for (InputInfo inputInfo : inputInfoList) {
+            if (inputInfo != null && inputInfo.getCreditor() != null && !StaticRouter.isDEVILMode(inputInfo.getFileName())) {
+                if (StaticRouter.isGODMode(inputInfo.getFileName())) {
+                    inputInfo.setFileName(cutGodMode(inputInfo.getFileName()));
+                }
+                result.add(new InputInfoDisplayBean(inputInfo, this));
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public int countProtocols(InputInfoDisplayBean inputInfoDisplayBean) {
+        return protocolBusiness.countProtocolsByInputInfo(inputInfoDisplayBean.getInputInfo());
+    }
+
+    @Override
+    public List<ProtocolDisplayBean> loadProtocols(InputInfoDisplayBean inputInfo, int firstIndex, int count) {
+        List<Protocol> protocols = protocolBusiness.getProtocolsBy_InputInfo(inputInfo.getInputInfo(), firstIndex, count);
+        List<ProtocolDisplayBean> result = new ArrayList<>();
+
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        Date reportDate = inputInfo.getInputInfo().getReportDate();
+        String sRepDate = (reportDate == null) ? "" : df.format(reportDate);
+
+        for (Protocol protocol : protocols) {
+            ProtocolDisplayBean pr = new ProtocolDisplayBean(protocol);
+            if (protocol.getMessageType().getCode().equals("COMPLETED"))
+                pr.setLink(new Link("Просмотр",
+                        new ExternalResource(ENTITY_EDITOR_PAGE + "?entityId=" +
+                                protocol.getNote() + "&repDate=" + sRepDate)));
+
+            result.add(pr);
+        }
+        return result;
     }
 }
