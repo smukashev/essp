@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_portfolio>
+      <code>1077</code>
+      <name_kz>Егінжай</name_kz>
+      <name_ru>Егинжай</name_ru>
+      <creditor>
+        <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
+        <short_name>АО "ФФПСХ"</short_name>
+        <docs>
+          <item>
+            <no>980840000675</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>031400130793</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1073</code>
+      <name_kz>Бұрынғы бағдарламалар</name_kz>
+      <name_ru>Старые программы</name_ru>
+      <creditor>
+        <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
+        <short_name>АО "ФФПСХ"</short_name>
+        <docs>
+          <item>
+            <no>980840000675</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>031400130793</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1076</code>
+      <name_kz>Сыбаға</name_kz>
+      <name_ru>Сыбага</name_ru>
+      <creditor>
+        <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
+        <short_name>АО "ФФПСХ"</short_name>
+        <docs>
+          <item>
+            <no>980840000675</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>031400130793</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1079</code>
+      <name_kz>Жас бағдарламалары</name_kz>
+      <name_ru>Молодые программы</name_ru>
+      <creditor>
+        <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
+        <short_name>АО "ФФПСХ"</short_name>
+        <docs>
+          <item>
+            <no>980840000675</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>031400130793</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1075</code>
+      <name_kz>ДКЗ-ДКБ</name_kz>
+      <name_ru>ДКЗ-ДКБ</name_ru>
+      <creditor>
+        <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
+        <short_name>АО "ФФПСХ"</short_name>
+        <docs>
+          <item>
+            <no>980840000675</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>031400130793</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1078</code>
+      <name_kz>КҚ сапасы нашарлаған бағдарламалары</name_kz>
+      <name_ru>Программы с ухудш качества КП</name_ru>
+      <creditor>
+        <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
+        <short_name>АО "ФФПСХ"</short_name>
+        <docs>
+          <item>
+            <no>980840000675</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>031400130793</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1074</code>
+      <name_kz>ШНҰ</name_kz>
+      <name_ru>МКО</name_ru>
+      <creditor>
+        <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
+        <short_name>АО "ФФПСХ"</short_name>
+        <docs>
+          <item>
+            <no>980840000675</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>031400130793</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1080</code>
+      <name_kz>Құнсызданбаған жеке маңызды несиелер</name_kz>
+      <name_ru>Не обесцененные индивидуально значимые зйамы</name_ru>
+      <creditor>
+        <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
+        <short_name>АО "ФФПСХ"</short_name>
+        <docs>
+          <item>
+            <no>980840000675</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>031400130793</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+  </entities>
+</batch>

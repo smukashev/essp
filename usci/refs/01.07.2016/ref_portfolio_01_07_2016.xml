@@ -2,16 +2,16 @@
 <batch>
   <entities>
     <ref_portfolio>
-      <code>1072</code>
-      <name_kz>Портфель краткосрочных займов МСБ Qazaq Banki</name_kz>
-      <name_ru>Портфель краткосрочных займов МСБ Qazaq Banki</name_ru>
+      <code>1099</code>
+      <name_kz>беззалоговый Кредит 2 МСФО нерезидент</name_kz>
+      <name_ru>беззалоговый Кредит 2 МСФО нерезидент</name_ru>
       <creditor>
-        <name>АО "Qazaq Banki" (прежнее наименование АО "СЕНИМ-БАНК")</name>
-        <short_name>АО "Qazaq Banki"</short_name>
-        <code>549</code>
+        <name>АО "Capital Bank Kazakhstan"</name>
+        <short_name>АО "Capital Bank Kazakhstan"</short_name>
+        <code>781</code>
         <docs>
           <item>
-            <no>950140000367</no>
+            <no>920140000143</no>
             <doc_type>
               <name_ru>Бизнес - идентификационный номер </name_ru>
               <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -23,19 +23,7 @@
             </doc_type>
           </item>
           <item>
-            <no>600700017765</no>
-            <doc_type>
-              <name_ru>Регистрационный номер налогоплательщика </name_ru>
-              <name_kz>Регистрационный номер налогоплательщика </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>1</is_person_doc>
-              <weight>25</weight>
-              <code>11</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>SENIKZKA</no>
+            <no>TBKBKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>

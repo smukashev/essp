@@ -6,8 +6,8 @@
       <name_kz>Біртекті кредит қоржыны</name_kz>
       <name_ru>Портфель однородных займов</name_ru>
       <creditor>
-        <name>АО "ДБ "Punjab National Bank"-Казахстан"</name>
-        <short_name>АО "ДБ "PNB"</short_name>
+        <name>АО "Tengri Bank"</name>
+        <short_name>АО "Tengri Bank"</short_name>
         <code>620</code>
         <docs>
           <item>
@@ -23,7 +23,7 @@
             </doc_type>
           </item>
           <item>
-            <no>DABNKZ2P</no>
+            <no>TNGRKZKX</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -32,6 +32,18 @@
               <is_person_doc>0</is_person_doc>
               <weight>30</weight>
               <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>451700027971</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
             </doc_type>
           </item>
         </docs>

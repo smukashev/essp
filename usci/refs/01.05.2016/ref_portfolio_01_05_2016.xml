@@ -2,28 +2,16 @@
 <batch>
   <entities>
     <ref_portfolio>
-      <code>0957</code>
-      <name_kz>Корпоративный портфель - Средний бизнес</name_kz>
-      <name_ru>Корпоративный портфель - Средний бизнес</name_ru>
+      <code>1090</code>
+      <name_kz>ПОС Бизнес-Вмиг БА</name_kz>
+      <name_ru>ПОС Бизнес-Вмиг БА</name_ru>
       <creditor>
-        <name>АО "Altyn Bank" (ДБ АО "Народный Банк Казахстана")</name>
-        <short_name>АО "Altyn Bank"</short_name>
-        <code>949</code>
+        <name>АО "Банк Астаны"</name>
+        <short_name>АО "Банк Астаны"</short_name>
+        <code>450</code>
         <docs>
           <item>
-            <no>980740000057</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>ATYNKZKA</no>
+            <no>ASFBKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -35,7 +23,7 @@
             </doc_type>
           </item>
           <item>
-            <no>600900133859</no>
+            <no>600900607832</no>
             <doc_type>
               <name_ru>Регистрационный номер налогоплательщика </name_ru>
               <name_kz>Регистрационный номер налогоплательщика </name_kz>
@@ -44,6 +32,18 @@
               <is_person_doc>1</is_person_doc>
               <weight>25</weight>
               <code>11</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>080540014021</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
             </doc_type>
           </item>
         </docs>
@@ -57,28 +57,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0933</code>
-      <name_kz>Несие Карточкасы</name_kz>
-      <name_ru>Кредитные карты</name_ru>
+      <code>1088</code>
+      <name_kz>ПОС Авто БА</name_kz>
+      <name_ru>ПОС Авто БА</name_ru>
       <creditor>
-        <name>АО "Altyn Bank" (ДБ АО "Народный Банк Казахстана")</name>
-        <short_name>АО "Altyn Bank"</short_name>
-        <code>949</code>
+        <name>АО "Банк Астаны"</name>
+        <short_name>АО "Банк Астаны"</short_name>
+        <code>450</code>
         <docs>
           <item>
-            <no>980740000057</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>ATYNKZKA</no>
+            <no>ASFBKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -90,7 +78,7 @@
             </doc_type>
           </item>
           <item>
-            <no>600900133859</no>
+            <no>600900607832</no>
             <doc_type>
               <name_ru>Регистрационный номер налогоплательщика </name_ru>
               <name_kz>Регистрационный номер налогоплательщика </name_kz>
@@ -99,6 +87,18 @@
               <is_person_doc>1</is_person_doc>
               <weight>25</weight>
               <code>11</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>080540014021</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
             </doc_type>
           </item>
         </docs>
@@ -112,28 +112,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0956</code>
-      <name_kz>Корпоративный портфель</name_kz>
-      <name_ru>Корпоративный портфель</name_ru>
+      <code>1089</code>
+      <name_kz>ПОС Кредитные карты БА</name_kz>
+      <name_ru>ПОС Кредитные карты БА</name_ru>
       <creditor>
-        <name>АО "Altyn Bank" (ДБ АО "Народный Банк Казахстана")</name>
-        <short_name>АО "Altyn Bank"</short_name>
-        <code>949</code>
+        <name>АО "Банк Астаны"</name>
+        <short_name>АО "Банк Астаны"</short_name>
+        <code>450</code>
         <docs>
           <item>
-            <no>980740000057</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>ATYNKZKA</no>
+            <no>ASFBKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -145,7 +133,7 @@
             </doc_type>
           </item>
           <item>
-            <no>600900133859</no>
+            <no>600900607832</no>
             <doc_type>
               <name_ru>Регистрационный номер налогоплательщика </name_ru>
               <name_kz>Регистрационный номер налогоплательщика </name_kz>
@@ -154,6 +142,18 @@
               <is_person_doc>1</is_person_doc>
               <weight>25</weight>
               <code>11</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>080540014021</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
             </doc_type>
           </item>
         </docs>
@@ -167,28 +167,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0935</code>
-      <name_kz>Кепілсіз Несие</name_kz>
-      <name_ru>Потребительские займы</name_ru>
+      <code>1086</code>
+      <name_kz>ПОС Залоговые БА</name_kz>
+      <name_ru>ПОС Залоговые БА</name_ru>
       <creditor>
-        <name>АО "Altyn Bank" (ДБ АО "Народный Банк Казахстана")</name>
-        <short_name>АО "Altyn Bank"</short_name>
-        <code>949</code>
+        <name>АО "Банк Астаны"</name>
+        <short_name>АО "Банк Астаны"</short_name>
+        <code>450</code>
         <docs>
           <item>
-            <no>980740000057</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>ATYNKZKA</no>
+            <no>ASFBKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -200,7 +188,7 @@
             </doc_type>
           </item>
           <item>
-            <no>600900133859</no>
+            <no>600900607832</no>
             <doc_type>
               <name_ru>Регистрационный номер налогоплательщика </name_ru>
               <name_kz>Регистрационный номер налогоплательщика </name_kz>
@@ -209,6 +197,18 @@
               <is_person_doc>1</is_person_doc>
               <weight>25</weight>
               <code>11</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>080540014021</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
             </doc_type>
           </item>
         </docs>
@@ -222,28 +222,16 @@
       </creditor>
     </ref_portfolio>
     <ref_portfolio>
-      <code>0934</code>
-      <name_kz>Ипотекалық қарыз</name_kz>
-      <name_ru>Ипотечные займы</name_ru>
+      <code>1087</code>
+      <name_kz>ПОС Экспресс-кредиты БА</name_kz>
+      <name_ru>ПОС Экспресс-кредиты БА</name_ru>
       <creditor>
-        <name>АО "Altyn Bank" (ДБ АО "Народный Банк Казахстана")</name>
-        <short_name>АО "Altyn Bank"</short_name>
-        <code>949</code>
+        <name>АО "Банк Астаны"</name>
+        <short_name>АО "Банк Астаны"</short_name>
+        <code>450</code>
         <docs>
           <item>
-            <no>980740000057</no>
-            <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
-              <is_organization_doc>1</is_organization_doc>
-              <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
-            </doc_type>
-          </item>
-          <item>
-            <no>ATYNKZKA</no>
+            <no>ASFBKZKA</no>
             <doc_type>
               <name_ru>Банковский идентификационный код </name_ru>
               <name_kz>Банковский идентификационный код </name_kz>
@@ -255,7 +243,7 @@
             </doc_type>
           </item>
           <item>
-            <no>600900133859</no>
+            <no>600900607832</no>
             <doc_type>
               <name_ru>Регистрационный номер налогоплательщика </name_ru>
               <name_kz>Регистрационный номер налогоплательщика </name_kz>
@@ -264,6 +252,73 @@
               <is_person_doc>1</is_person_doc>
               <weight>25</weight>
               <code>11</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>080540014021</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Банк второго уровня</name_kz>
+          <name_ru>Банк второго уровня</name_ru>
+          <code>0001</code>
+          <report_period_duration_months>1</report_period_duration_months>
+        </subject_type>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1085</code>
+      <name_kz>ПОС Ипотека БА</name_kz>
+      <name_ru>ПОС Ипотека БА</name_ru>
+      <creditor>
+        <name>АО "Банк Астаны"</name>
+        <short_name>АО "Банк Астаны"</short_name>
+        <code>450</code>
+        <docs>
+          <item>
+            <no>ASFBKZKA</no>
+            <doc_type>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>30</weight>
+              <code>15</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>600900607832</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>080540014021</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
             </doc_type>
           </item>
         </docs>

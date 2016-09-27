@@ -2,11 +2,23 @@
 <batch>
   <entities>
     <ref_creditor_branch>
-      <name>Карагандинский Областной Филиал АО "Qazaq Banki"</name>
-      <short_name>Карагандинский Областной Филиал АО "Qazaq Banki"</short_name>
+      <name>Усть-Каменогорский филиал Акционерного общества "Банк Астаны" </name>
+      <short_name>Усть-Каменогорский филиал АО "Банк Астаны" </short_name>
       <docs>
         <item>
-          <no>141241011276</no>
+          <no>181600311712</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика </name_ru>
+            <name_kz>Регистрационный номер налогоплательщика </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+        <item>
+          <no>160241016199</no>
           <doc_type>
             <name_ru>Бизнес - идентификационный номер </name_ru>
             <name_kz>Бизнес - идентификационный номер </name_kz>
@@ -19,24 +31,24 @@
         </item>
       </docs>
       <main_office>
-        <name>АО "Qazaq Banki" (прежнее наименование АО "СЕНИМ-БАНК")</name>
-        <short_name>АО "Qazaq Banki"</short_name>
-        <code>549</code>
+        <name>АО "Банк Астаны"</name>
+        <short_name>АО "Банк Астаны"</short_name>
+        <code>450</code>
         <docs>
           <item>
-            <no>950140000367</no>
+            <no>ASFBKZKA</no>
             <doc_type>
-              <name_ru>Бизнес - идентификационный номер </name_ru>
-              <name_kz>Бизнес - идентификационный номер </name_kz>
-              <is_identification>1</is_identification>
+              <name_ru>Банковский идентификационный код </name_ru>
+              <name_kz>Банковский идентификационный код </name_kz>
+              <is_identification>0</is_identification>
               <is_organization_doc>1</is_organization_doc>
               <is_person_doc>0</is_person_doc>
-              <weight>10</weight>
-              <code>07</code>
+              <weight>30</weight>
+              <code>15</code>
             </doc_type>
           </item>
           <item>
-            <no>600700017765</no>
+            <no>600900607832</no>
             <doc_type>
               <name_ru>Регистрационный номер налогоплательщика </name_ru>
               <name_kz>Регистрационный номер налогоплательщика </name_kz>
@@ -48,15 +60,15 @@
             </doc_type>
           </item>
           <item>
-            <no>SENIKZKA</no>
+            <no>080540014021</no>
             <doc_type>
-              <name_ru>Банковский идентификационный код </name_ru>
-              <name_kz>Банковский идентификационный код </name_kz>
-              <is_identification>0</is_identification>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
               <is_organization_doc>1</is_organization_doc>
               <is_person_doc>0</is_person_doc>
-              <weight>30</weight>
-              <code>15</code>
+              <weight>10</weight>
+              <code>07</code>
             </doc_type>
           </item>
         </docs>
@@ -69,9 +81,9 @@
         </subject_type>
       </main_office>
       <region>
-        <code>35</code>
-        <name_kz>Қарағанды облысы</name_kz>
-        <name_ru>Карагандинская область</name_ru>
+        <code>63</code>
+        <name_kz>Шығыс Қазақстан облысы</name_kz>
+        <name_ru>Восточно-Казахстанская область</name_ru>
       </region>
     </ref_creditor_branch>
   </entities>
