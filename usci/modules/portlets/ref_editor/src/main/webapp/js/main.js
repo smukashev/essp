@@ -898,6 +898,35 @@ Ext.onReady(function() {
         }
     });
 
+    var buttonOpen = Ext.create('Ext.button.Button', {
+        id: "buttonOpen",
+        text: label_OPEN,
+        maxWidth: 200,
+        hidden:!isNb,
+        handler : function (){
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+
+            var xmlStr = createXML(rootNode.childNodes[0], true, "", false, true, "OPEN");
+
+            var selected = grid.getSelectionModel().getLastSelected();
+
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    /*date: selected.data.open_date,*/
+                    date: Ext.getCmp('edDate').value,
+                    op: 'SAVE_XML'
+                },
+                success: function(response) {
+                    Ext.MessageBox.alert("", "Операция на открытия отправлено успешно.");
+                }
+            });
+        }
+    });
+
     var buttonClose = Ext.create('Ext.button.Button', {
         id: "buttonClose",
         text: label_CLOSE,
@@ -1201,11 +1230,13 @@ Ext.onReady(function() {
                                 buttonXML.show();
                                 buttonDelete.show();
                                 buttonClose.show();
+                                buttonOpen.show();
                             }else{
                                 buttonAdd.hide();
                                 buttonXML.hide();
                                 buttonDelete.hide();
                                 buttonClose.hide();
+                                buttonOpen.hide();
                             }
                         }
 
@@ -1267,7 +1298,7 @@ Ext.onReady(function() {
             }
         ],
         tbar: [
-            buttonAdd, buttonXML, buttonShowXML, buttonDelete, buttonClose, buttonExport
+            buttonAdd, buttonXML, buttonShowXML, buttonDelete, buttonOpen, buttonClose, buttonExport
         ]
     });
 });

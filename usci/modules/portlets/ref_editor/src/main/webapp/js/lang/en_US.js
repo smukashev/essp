@@ -20,6 +20,7 @@ var label_ITEMS = 'Элементы';
 var label_ENTITY_ID = 'Идентификатор сущности';
 var label_Date = 'Дата';
 var label_DEL = 'Удалить';
+var label_OPEN = 'Открыть';
 var label_CLOSE = "Закрыть";
 var label_CONFIRM_CHANGES = "Подтвердить изменения";
 var label_REQUIRED_FIELD = "Обязательное поле";

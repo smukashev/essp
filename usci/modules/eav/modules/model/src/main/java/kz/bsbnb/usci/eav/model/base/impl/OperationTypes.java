@@ -6,4 +6,5 @@ public class OperationTypes {
     public static final int CLOSE = 3;
     public static final int INSERT = 4;
     public static final int UPDATE = 5;
+    public static final int OPEN = 6;
 }

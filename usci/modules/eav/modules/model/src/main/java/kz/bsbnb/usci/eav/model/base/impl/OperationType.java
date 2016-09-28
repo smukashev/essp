@@ -3,6 +3,7 @@ package kz.bsbnb.usci.eav.model.base.impl;
 public enum OperationType {
     NEW(OperationTypes.NEW),
     DELETE(OperationTypes.DELETE),
+    OPEN(OperationTypes.OPEN),
     CLOSE(OperationTypes.CLOSE),
     INSERT(OperationTypes.INSERT),
     UPDATE(OperationTypes.UPDATE);

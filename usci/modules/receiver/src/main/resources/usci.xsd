@@ -14,6 +14,7 @@
     <xsd:simpleType name="operation">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="DELETE"/>
+            <xsd:enumeration value="OPEN"/>
             <xsd:enumeration value="CLOSE"/>
             <xsd:enumeration value="INSERT"/>
             <xsd:enumeration value="NEW"/>

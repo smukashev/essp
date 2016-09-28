@@ -300,6 +300,42 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
+                case OPEN:
+                    if (baseEntityPostPrepared.getId() <= 0)
+                        throw new KnownException(Errors.compose(Errors.E114));
+
+                    IBaseEntityReportDateDao berdDao = persistableDaoPool.getPersistableDao(
+                            BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+
+                    Date minRepDate = berdDao.getMinReportDate(baseEntityPostPrepared.getId());
+                    if (minRepDate.compareTo(baseEntityPostPrepared.getReportDate()) >= 0)
+                        throw new IllegalStateException(Errors.compose(Errors.E115));
+
+                    boolean repDateExists = berdDao.exists(baseEntityPostPrepared.getId(), baseEntityPostPrepared.getReportDate());
+
+                    IBaseEntityReportDate baseEntityRepDate;
+
+                    if (repDateExists) {
+                        baseEntityRepDate = berdDao.load(baseEntityPostPrepared.getId(),
+                                baseEntityPostPrepared.getReportDate());
+
+                        baseEntityRepDate.setBaseEntity(baseEntityPostPrepared);
+                    } else {
+                        baseEntityRepDate = baseEntityPostPrepared.getBaseEntityReportDate();
+                        baseEntityPostPrepared.calculateValueCount(null);
+                    }
+
+                    baseEntityRepDate.setClosed(false);
+
+                    if (repDateExists) {
+                        baseEntityManager.registerAsUpdated(baseEntityRepDate);
+                    } else {
+                        baseEntityManager.registerAsInserted(baseEntityRepDate);
+                    }
+
+                    baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
+                    baseEntityApplyDao.applyToDb(baseEntityManager);
+                    break;
                 case INSERT:
                     if (baseEntityPostPrepared.getId() > 0)
                         throw new KnownException(Errors.compose(Errors.E196, baseEntityPostPrepared.getId()));

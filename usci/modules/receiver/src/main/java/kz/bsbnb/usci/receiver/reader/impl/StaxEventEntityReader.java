@@ -151,6 +151,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             if (hasOperationDelete(startElement))
                 baseEntity.setOperation(OperationType.DELETE);
 
+            if (hasOperationOpen(startElement))
+                baseEntity.setOperation(OperationType.OPEN);
+
             if (hasOperationClose(startElement))
                 baseEntity.setOperation(OperationType.CLOSE);
 
@@ -227,7 +230,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     .setStatus(EntityStatuses.ERROR)
                     .setDescription(e.getLocalizedMessage())
                     .setReceiptDate(new Date()));
-            
+
             return null;
         }
     }
@@ -353,6 +356,12 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
                 startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
                         .equalsIgnoreCase(OperationType.DELETE.toString());
+    }
+
+    private boolean hasOperationOpen(StartElement startElement) {
+        return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
+                startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
+                        .equalsIgnoreCase(OperationType.OPEN.toString());
     }
 
     private boolean hasOperationClose(StartElement startElement) {

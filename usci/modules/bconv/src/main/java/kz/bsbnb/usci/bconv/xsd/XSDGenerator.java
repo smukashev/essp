@@ -39,6 +39,7 @@ public class XSDGenerator {
         ps.println("<xsd:simpleType name=\"operation\">");
         ps.println("<xsd:restriction base=\"xsd:string\">");
         ps.println("<xsd:enumeration value=\"DELETE\"/>");
+        ps.println("<xsd:enumeration value=\"OPEN\"/>");
         ps.println("<xsd:enumeration value=\"CLOSE\"/>");
         ps.println("<xsd:enumeration value=\"INSERT\"/>");
         ps.println("<xsd:enumeration value=\"NEW\"/>");
