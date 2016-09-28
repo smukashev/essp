@@ -51,6 +51,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 import kz.bsbnb.usci.cr.model.Creditor;
+import kz.bsbnb.usci.cr.model.InputInfo;
 import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.SubjectType;
 import kz.bsbnb.usci.eav.util.BatchStatuses;
@@ -85,6 +86,8 @@ public class ProtocolLayout extends VerticalLayout {
     private PagedTableControl<ProtocolDisplayBean> protocolsTableControl;
     private VerticalLayout protocolLayout;
     private Label noProtocolsLabel;
+    private InputInfo currentInputInfo;
+
     public final Logger logger = Logger.getLogger(ProtocolLayout.class);
 
     private List<Creditor> selectedCreditors = new ArrayList<Creditor>();
@@ -188,15 +191,6 @@ public class ProtocolLayout extends VerticalLayout {
 
             @Override
             public List<InputInfoDisplayBean> getRecords(int firstIndex, int count) {
-
-                if (PortletEnvironmentFacade.get().isNB()) {
-                    Creditor nb = new Creditor();
-                    nb.setId(0L);
-                    nb.setName("НБРК");
-                    nb.setShortName("НБРК");
-                    selectedCreditors.add(nb);
-                }
-
                 List<InputInfoDisplayBean> files = provider.loadFiles(selectedCreditors, (Date) reportDateField.getValue(), firstIndex, count);
                 if (!files.isEmpty()) {
                     filesTableLayout.setVisible(true);
@@ -455,6 +449,7 @@ public class ProtocolLayout extends VerticalLayout {
             showGroupedProtocol(ii);
         } else {
             protocolsTableControl.reload();
+            currentInputInfo = ii.getInputInfo();
         }
     }
 
@@ -468,7 +463,7 @@ public class ProtocolLayout extends VerticalLayout {
             noProtocolsLabel.setVisible(true);
             protocolLayout.setVisible(false);
 
-            /*Map<String, Long> weightsByErrorCode = new HashMap<>();
+            Map<String, Long> weightsByErrorCode = new HashMap<>();
             weightsByErrorCode.put(BatchStatuses.ERROR.code(), 1000L);
             weightsByErrorCode.put(BatchStatuses.COMPLETED.code(), 999L);
             weightsByErrorCode.put(BatchStatuses.MAINTENANCE_REQUEST.code(), 20L);
@@ -478,7 +473,7 @@ public class ProtocolLayout extends VerticalLayout {
             long maxWeight = 0;
             Protocol p = null;
 
-            for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
+            for (Protocol batchStatus : currentInputInfo.getBatchStatuses()) {
                 Long weight = weightsByErrorCode.get(batchStatus.getMessageType().getCode());
                 if (weight == null)
                     weight = 0L;
@@ -490,7 +485,7 @@ public class ProtocolLayout extends VerticalLayout {
             }
 
             if (p != null)
-                listOfProtocols.add(new ProtocolDisplayBean(p));*/
+                listOfProtocols.add(new ProtocolDisplayBean(p));
 
             return;
         }
@@ -625,7 +620,15 @@ public class ProtocolLayout extends VerticalLayout {
     }
 
     private void loadCreditorInfo(List<Creditor> creditors) {
-        selectedCreditors = creditors;
+        List<Creditor> newList = new ArrayList<>(creditors);
+        if (PortletEnvironmentFacade.get().isNB()) {
+            Creditor nb = new Creditor();
+            nb.setId(0L);
+            nb.setName("НБРК");
+            nb.setShortName("НБРК");
+            newList.add(nb);
+        }
+        selectedCreditors = newList;
         filesTableLayout.setVisible(false);
         protocolLayout.setVisible(false);
         filesPagedControl.reload();
