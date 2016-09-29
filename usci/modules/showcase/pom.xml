@@ -135,6 +135,35 @@
                     </generator>
                 </configuration>
             </plugin>
+            <!-- Uncomment this to delete R_ like tables  -->
+            <!--
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>kz.bsbnb.usci.eav</groupId>
+                        <artifactId>tool</artifactId>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <configuration>
+                    <mainClass>kz.bsbnb.usci.tool.ddl.showcase.ShowcaseDrop</mainClass>
+                </configuration>
+            </plugin>
+            -->
             <!-- Uncomment this to recreate the database  -->
             <!--<plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -166,7 +195,8 @@
                         <argument>${basedir}/src/main/resources/applicationContextDDL.xml</argument>
                     </arguments>
                 </configuration>
-            </plugin>-->
+            </plugin>
+            -->
         </plugins>
     </build>
 
