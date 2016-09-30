@@ -26,6 +26,8 @@ begin
 
   delete from eav_entity_statuses where entity_id > maxId or entity_id <= 0;
 
+  delete from EAV_BATCHES where FILE_NAME not like 'ref%';
+
   delete from R_CORE_CREDIT@showcase;
   delete from R_CORE_CREDIT_FLOW@showcase;
   delete from R_CORE_CREDIT_HIS@showcase;

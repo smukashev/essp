@@ -63,8 +63,8 @@ import org.apache.log4j.Logger;
  */
 public class ProtocolLayout extends VerticalLayout {
 
-    private static final int PROTOCOL_TABLE_PAGE_SIZE = 5;
-    private static final int FILES_TABLE_PAGE_SIZE = 5;
+    private static final int PROTOCOL_TABLE_PAGE_SIZE = 5000;
+    private static final int FILES_TABLE_PAGE_SIZE = 100;
     private static final String LOCALIZATION_PREFIX = "PROTOCOL-LAYOUT.";
 
     private boolean isProtocolGrouped = false;
