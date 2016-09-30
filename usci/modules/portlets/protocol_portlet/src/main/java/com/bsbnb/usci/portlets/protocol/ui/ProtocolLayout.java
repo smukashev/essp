@@ -487,7 +487,6 @@ public class ProtocolLayout extends VerticalLayout {
             if (p != null)
                 listOfProtocols.add(new ProtocolDisplayBean(p));
 
-            return;
         }
 
         Set<String> messageTypeCodes = new HashSet<String>();
