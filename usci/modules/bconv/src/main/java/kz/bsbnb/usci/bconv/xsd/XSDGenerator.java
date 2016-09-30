@@ -117,9 +117,18 @@ public class XSDGenerator {
 
     private void printAttribute(MetaClass metaClass, IMetaAttribute metaAttribute, PrintStream ps, Map<String, Boolean> setTypes) {
         Element element;
-        String minOccurs = metaAttribute.isKey() ? "1" : "0";
+        String minOccurs;
+        String nillable;
+        if(metaClass.getClassName().equals("portfolio_flow_detail")) {
+            minOccurs="0";
+            nillable="true";
+        } else {
+            minOccurs = metaAttribute.isKey() ? "1" : "0";
+            nillable= metaAttribute.isKey() ? "false" : "true";
+        }
+
         String maxOccurs = "1";
-        String nillable = metaAttribute.isKey() ? "false" : "true";
+
 
         if (metaAttribute.getMetaType().isSet()) {
             if (metaAttribute.getMetaType().isComplex()) {
