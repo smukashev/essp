@@ -63,8 +63,8 @@ import org.apache.log4j.Logger;
  */
 public class ProtocolLayout extends VerticalLayout {
 
-    private static final int PROTOCOL_TABLE_PAGE_SIZE = 5000;
-    private static final int FILES_TABLE_PAGE_SIZE = 100;
+    private static final int PROTOCOL_TABLE_PAGE_SIZE = 100;
+    private static final int FILES_TABLE_PAGE_SIZE = 10;
     private static final String LOCALIZATION_PREFIX = "PROTOCOL-LAYOUT.";
 
     private boolean isProtocolGrouped = false;
@@ -489,31 +489,9 @@ public class ProtocolLayout extends VerticalLayout {
 
         }
 
-        Set<String> messageTypeCodes = new HashSet<String>();
+        Set<String> messageTypes = new HashSet<String>();
         for (final ProtocolDisplayBean protocol : listOfProtocols) {
-            if (!messageTypeCodes.contains(protocol.getMessageTypeCode())) {
-                messageTypeCodes.add(protocol.getMessageTypeCode());
-                Button filterButton = new Button("", new Button.ClickListener() {
-                    @Override
-                    public void buttonClick(ClickEvent event) {
-                        Button button = event.getButton();
-                        String styleName = button.getStyleName();
-                        if ("v-button v-pressed".equals(styleName)) {
-                            button.setStyleName("v-button");
-                            prohibitedMessageTypes.add(protocol.getMessageTypeCode());
-                        } else {
-                            button.setStyleName("v-button v-pressed");
-                            prohibitedMessageTypes.remove(protocol.getMessageTypeCode());
-                        }
-                        updateProtocolTable();
-                    }
-                });
-                filterButton.setStyleName("v-button v-pressed");
-                filterButton.setIcon(protocol.getStatusIcon().getSource());
-                filterButton.setDescription(protocol.getMessageTypeName());
-                filterButton.setImmediate(true);
-                typesOfProtocolLayout.addComponent(filterButton);
-            }
+            addProtocol(protocol, messageTypes);
         }
         setProtocolColumns(EXTENDED_PROTOCOL_TABLE_COLUMNS);
         noProtocolsLabel.setVisible(false);
