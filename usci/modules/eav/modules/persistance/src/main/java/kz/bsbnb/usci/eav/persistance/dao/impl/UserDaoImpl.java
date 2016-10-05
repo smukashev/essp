@@ -192,7 +192,8 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
                 EAV_A_USER.MIDDLE_NAME,
                 EAV_A_USER.SCREEN_NAME,
                 EAV_A_USER.EMAIL,
-                EAV_A_USER.MODIFIED_DATE
+                EAV_A_USER.MODIFIED_DATE,
+                EAV_A_USER.IS_ACTIVE
         ).from(EAV_A_USER);
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
@@ -208,6 +209,7 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
             user.setScreenName((String) row.get(EAV_A_USER.SCREEN_NAME.getName()));
             user.setEmailAddress((String) row.get(EAV_A_USER.EMAIL.getName()));
             user.setModifiedDate(DataUtils.convert((Timestamp) row.get(EAV_A_USER.MODIFIED_DATE.getName())));
+            user.setActive(((BigDecimal) row.get(EAV_A_USER.IS_ACTIVE.getName())).longValue() == 1L);
 
             usersFromDB.put(user.getUserId(), user);
         }
@@ -265,6 +267,7 @@ public class UserDaoImpl extends JDBCSupport implements IUserDao {
                     .set(EAV_A_USER.SCREEN_NAME, pu.getScreenName())
                     .set(EAV_A_USER.EMAIL, pu.getEmailAddress())
                     .set(EAV_A_USER.MODIFIED_DATE, DataUtils.convert(pu.getModifiedDate()))
+                    .set(EAV_A_USER.IS_ACTIVE, DataUtils.convert(pu.isActive()))
                     .where(EAV_A_USER.USER_ID.equal(id))
                     .and(EAV_A_USER.MODIFIED_DATE.lessThan(DataUtils.convert(pu.getModifiedDate())));
 
