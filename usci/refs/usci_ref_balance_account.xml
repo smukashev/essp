@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_balance_account>
+      <name_kz>Фиктивный присвоенный счет</name_kz>
+      <display_no>0000 000</display_no>
+      <fifth_sign>0</fifth_sign>
+      <first_fourth_signs>0000</first_fourth_signs>
+      <is_in_balance>0</is_in_balance>
+      <name_ru>Фиктивный присвоенный счет</name_ru>
+      <no_>0000000</no_>
+      <seventh_sign>0</seventh_sign>
+      <sixth_sign>0</sixth_sign>
+    </ref_balance_account>
+  </entities>
+</batch>
