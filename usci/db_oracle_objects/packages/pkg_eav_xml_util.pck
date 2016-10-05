@@ -4212,6 +4212,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         FROM dual;
     END IF;
 
+    --do not generate <doc></doc> !!!
+    select case existsNode(v_xml, '/docs/no')
+                  when 1 then
+                     v_xml
+                  else
+                     null
+                  end
+           into v_xml
+           from dual;
+
     RETURN v_xml;
   END;
 
