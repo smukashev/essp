@@ -4229,7 +4229,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END IF;
 
     --do not generate <doc></doc> !!!
-    select case existsNode(v_xml, '/docs/no')
+    select case existsNode(v_xml, '/docs/item/no')
                   when 1 then
                      v_xml
                   else
