@@ -57,6 +57,10 @@ public interface IBaseEntity extends IBaseContainer {
 
     void setOperation(OperationType type);
 
+    void setUserId(Long userId);
+
+    Long getUserId();
+
     AdditionalInfo getAddInfo();
 
     void setAddInfo(IBaseEntity parentEntity, boolean isSet, long attributeId);

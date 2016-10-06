@@ -8,7 +8,7 @@ BEGIN
     --and rp.CREDITOR_ID=3436242
   )
   loop
-    update eav_report set status_id=7 where id=report.id;
+    update eav_report set status_id=5 where id=report.id;
 
     PKG_NOTIFICATION.SEND_APPROVAL_NOTIFICATION(report.creditor_id, report.creditor_name, 'Пользователь НБ', report.report_date);
 

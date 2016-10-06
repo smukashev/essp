@@ -643,7 +643,16 @@
             <xsd:element name="middlename" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="lastname" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="firstname" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="lang" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="lang" minOccurs="1" maxOccurs="1" nillable="false">
+                <xsd:complexType>
+                    <xsd:simpleContent>
+                        <xsd:extension base="xsd:string">
+                            <xsd:attribute type="operation" name="operation" use="optional"/>
+                            <xsd:attribute type="xsd:string" name="data" use="optional"/>
+                        </xsd:extension>
+                    </xsd:simpleContent>
+                </xsd:complexType>
+            </xsd:element>
         </xsd:all>
     </xsd:complexType>
 
@@ -946,7 +955,16 @@
     <xsd:complexType name="organization_name">
         <xsd:all>
             <xsd:element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="lang" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="lang" minOccurs="1" maxOccurs="1" nillable="false">
+                <xsd:complexType>
+                    <xsd:simpleContent>
+                        <xsd:extension base="xsd:string">
+                            <xsd:attribute type="operation" name="operation" use="optional"/>
+                            <xsd:attribute type="xsd:string" name="data" use="optional"/>
+                        </xsd:extension>
+                    </xsd:simpleContent>
+                </xsd:complexType>
+            </xsd:element>
         </xsd:all>
     </xsd:complexType>
 
@@ -1213,8 +1231,7 @@
 
     <xsd:complexType name="portfolio_flow_detail">
         <xsd:all>
-            <xsd:element name="balance_account" type="ref_balance_account" minOccurs="1" maxOccurs="1"
-                         nillable="false"/>
+            <xsd:element name="balance_account" type="ref_balance_account" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="value" type="xsd:double" minOccurs="0" maxOccurs="1" nillable="true"/>
         </xsd:all>
     </xsd:complexType>
@@ -1257,7 +1274,16 @@
         <xsd:all>
             <xsd:element name="region" type="ref_region" minOccurs="0" maxOccurs="1" nillable="true"/>
             <xsd:element name="details" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
-            <xsd:element name="type" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+            <xsd:element name="type" minOccurs="1" maxOccurs="1" nillable="false">
+                <xsd:complexType>
+                    <xsd:simpleContent>
+                        <xsd:extension base="xsd:string">
+                            <xsd:attribute type="operation" name="operation" use="optional"/>
+                            <xsd:attribute type="xsd:string" name="data" use="optional"/>
+                        </xsd:extension>
+                    </xsd:simpleContent>
+                </xsd:complexType>
+            </xsd:element>
         </xsd:all>
     </xsd:complexType>
 
