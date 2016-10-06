@@ -560,8 +560,8 @@ public class CortegeDaoImpl extends CommonDao {
     @Transactional
     private void deleteLogCortegeGenerate(IBaseEntity globalEntity, ShowCase showCase) {
         if(globalEntity.getOperation() != null && globalEntity.getOperation() == OperationType.DELETE) {
-            jdbcTemplateSC.update("INSERT INTO LOGS", "insert into r_core_delete_log (credit_id, creditor_id, cdc) values (?,?, sysdate)",
-                    new Object[]{globalEntity.getId(), globalEntity.getBaseEntityReportDate().getCreditorId()});
+            jdbcTemplateSC.update("INSERT INTO LOGS", "insert into r_core_delete_log (credit_id, creditor_id, rep_date, cdc) values (?,?,?,sysdate)",
+                    new Object[]{globalEntity.getId(), globalEntity.getBaseEntityReportDate().getCreditorId(), globalEntity.getReportDate()});
 
         }
     }
