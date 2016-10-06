@@ -26,8 +26,9 @@ class ActualCountJob extends Thread {
     public void run() {
         //noinspection InfiniteLoopStatement
         while (true) {
-            if (actualCountMap.size() > 0 && batchService.incrementActualCounts(actualCountMap)) {
-                synchronized (this) {
+            synchronized (this) {
+                if (actualCountMap.size() > 0 && batchService.incrementActualCounts(actualCountMap)) {
+
                     actualCountMap.clear();
                 }
             }
