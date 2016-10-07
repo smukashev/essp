@@ -17,6 +17,8 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
 
     private boolean isOptionKey = false;
 
+    private boolean isNullableKey = false;
+
     private boolean isFinal = false;
 
     private boolean isRequired = false;
@@ -154,6 +156,7 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
 
         if (isKey != that.isKey) return false;
         if (isOptionKey != that.isOptionKey) return false;
+        if (isNullableKey != that.isNullableKey) return false;
         if (isFinal != that.isFinal) return false;
         if (isRequired != that.isRequired) return false;
         if (isImmutable != that.isImmutable) return false;
@@ -198,5 +201,15 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
                 ", isNullable=" + isNullable +
                 ", isDisabled=" + isDisabled +
                 '}';
+    }
+
+    @Override
+    public boolean isNullableKey() {
+        return isNullableKey;
+    }
+
+    @Override
+    public void setNullableKey(boolean isNullableKey) {
+        this.isNullableKey = isNullableKey;
     }
 }

@@ -19,6 +19,8 @@ public class MetaKeyCommand extends AbstractCommand implements IMetaCommand {
     public static final String LONG_OPTION_ATTRIBUTE = "attribute";
     public static final String OPTION_OPTIONAL = "o";
     public static final String LONG_OPTION_OPTIONAL = "optional";
+    public static final String OPTION_NULLABLE_KEY = "nk";
+    public static final String LONG_OPTION_NULLABLE_KEY = "nullable_key";
 
     public static final Long DEFAULT_ID = null;
     public static final String DEFAULT_NAME = null;
@@ -56,6 +58,13 @@ public class MetaKeyCommand extends AbstractCommand implements IMetaCommand {
         optionalOption.setOptionalArg(true);
         optionalOption.setType(String.class);
         options.addOption(optionalOption);
+
+        Option nullableOptional = new Option(OPTION_NULLABLE_KEY, LONG_OPTION_NULLABLE_KEY, false, "Attribute name to set the nullable optional key.");
+        nullableOptional.setRequired(false);
+        nullableOptional.setArgs(0);
+        nullableOptional.setOptionalArg(true);
+        nullableOptional.setType(String.class);
+        options.addOption(nullableOptional);
     }
 
     @Override
@@ -65,6 +74,7 @@ public class MetaKeyCommand extends AbstractCommand implements IMetaCommand {
         String name = DEFAULT_NAME;
         String attribute = DEFAULT_ATTRIBUTE;
         boolean isOptional = false;
+        boolean isNullableKey = false;
 
         try {
             CommandLine commandLine = commandLineParser.parse(options, args);
@@ -93,6 +103,12 @@ public class MetaKeyCommand extends AbstractCommand implements IMetaCommand {
             if (commandLine.hasOption(OPTION_OPTIONAL)) {
                 isOptional = true;
             }
+
+            if (commandLine.hasOption(OPTION_NULLABLE_KEY)) {
+                isNullableKey = true;
+            }
+
+
         } catch (ParseException e) {
             System.err.println(e.getMessage());
             helpFormatter.printHelp(getCustomUsageString("meta key", options), options);
@@ -119,7 +135,10 @@ public class MetaKeyCommand extends AbstractCommand implements IMetaCommand {
             IMetaAttribute attr = meta.getMetaAttribute(attribute);
 
             if (attr != null) {
-                if (isOptional) {
+                if(isNullableKey) {
+                    attr.setNullableKey(true);
+                    attr.setKey(false);
+                } else if (isOptional) {
                     attr.setOptionalKey(true);
                     attr.setKey(false);
                 } else {

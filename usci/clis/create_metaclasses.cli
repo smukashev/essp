@@ -592,10 +592,12 @@ meta add --name=ref_credit_type --attribute=name_ru --type=string --required
 #= PLEDGE
 #====================================
 
-meta create --name=pledge
+meta create --name=pledge --parent_is_key
 meta add --name=pledge --attribute=contract --type=string
+meta key --name=pledge --attribute=contract --nullable_key
 meta add --name=pledge --attribute=value --type=double
 meta add --name=pledge --attribute=pledge_type --type=meta_class --childname=ref_pledge_type --keytype=any --immutable
+meta key --name=pledge --attribute=pledge_type
 
 #====================================
 #= CHANGE
@@ -640,7 +642,7 @@ meta add --name=credit --attribute=currency --type=meta_class --childname=ref_cu
 meta add --name=credit --attribute=finance_source --type=meta_class --childname=ref_finance_source --keytype=any --immutable
 meta add --name=credit --attribute=portfolio --type=meta_class --childname=portfolio
 meta add --name=credit --attribute=change --type=meta_class --childname=change --final
-meta add --name=credit --attribute=pledges --type=meta_class --array --childname=pledge --final
+meta add --name=credit --attribute=pledges --type=meta_class --array --childname=pledge
 meta add --name=credit --attribute=maturity_date --type=date
 meta add --name=credit --attribute=prolongation_date --type=date
 

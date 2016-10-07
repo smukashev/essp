@@ -115,7 +115,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
             IBaseValue baseValue = entity.getBaseValue(name);
 
-            if (metaAttribute.isOptionalKey()) {
+            if (metaAttribute.isOptionalKey() || metaAttribute.isNullableKey()) {
                 if (baseValue == null || baseValue.getValue() == null)
                     continue;
 
@@ -129,7 +129,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
 
                 condition = simpleTable.as(valueAlias).field("VALUE").eq(simpleValue);
 
-                hasOptionalKey = true;
+                hasOptionalKey = !metaAttribute.isNullableKey();
 
                 break;
             }

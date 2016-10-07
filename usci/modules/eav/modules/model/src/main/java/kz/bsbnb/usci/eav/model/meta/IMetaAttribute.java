@@ -47,4 +47,8 @@ public interface IMetaAttribute extends IPersistable {
     String getName();
 
     void setName(String name);
+
+    boolean isNullableKey();
+
+    void setNullableKey(boolean isNullableKey);
 }
