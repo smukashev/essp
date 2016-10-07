@@ -9,6 +9,7 @@
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
 		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<column name="parent_is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
+		<column name="is_closable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_reference" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<unique name ="emc_UN_n">
 			<unique-column name="name"/>

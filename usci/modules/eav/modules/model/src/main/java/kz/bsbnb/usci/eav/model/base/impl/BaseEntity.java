@@ -449,6 +449,19 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                         return false;
                 }
             }
+
+            if(metaAttribute.isNullableKey()) {
+                if(!metaType.isComplex()) {
+                    IBaseValue thisBaseValue = this.getBaseValue(name);
+                    IBaseValue thatBaseValue = that.getBaseValue(name);
+
+                    if(thisBaseValue == null && thatBaseValue != null) return false;
+                    if(thisBaseValue != null && thatBaseValue == null) return false;
+
+                    if(!thisBaseValue.getValue().equals(thatBaseValue.getValue()))
+                        return false;
+                }
+            }
         }
 
         if (this.meta.parentIsKey()) {

@@ -13,5 +13,7 @@ public interface IMetaClass extends IMetaContainer {
 
     boolean isSearchable();
 
+    boolean isClosable();
+
     Set<String> getAttributeNames();
 }

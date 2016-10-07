@@ -23,6 +23,8 @@ public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
     public static final String LONG_OPTION_KEY_TYPE = "keytype";
     public static final String OPTION_PARENT_KEY = "pk";
     public static final String LONG_OPTION_PARENT_KEY = "parent_is_key";
+    public static final String OPTION_IS_CLOSABLE = "ic";
+    public static final String LONG_OPTION_IS_CLOSABLE = "closable";
     public static final String DEFAULT_NAME = null;
     public static final boolean DEFAULT_REFERENCE = false;
     public static final boolean DEFAULT_PARENT_KEY = false;
@@ -59,6 +61,12 @@ public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
         parentKeyOption.setArgs(0);
         parentKeyOption.setRequired(false);
         options.addOption(parentKeyOption);
+
+        Option isClosableOption = new Option(OPTION_IS_CLOSABLE, LONG_OPTION_IS_CLOSABLE, false,
+                "is_closable flag for new instance of MetaClass.");
+        isClosableOption.setArgs(0);
+        isClosableOption.setRequired(false);
+        options.addOption(isClosableOption);
     }
 
     @Override
@@ -66,6 +74,7 @@ public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
         String name = DEFAULT_NAME;
         boolean isReference = DEFAULT_REFERENCE;
         boolean isParentKey = DEFAULT_PARENT_KEY;
+        boolean isClosable = false;
         AttributeKeyType keyType = DEFAULT_KEY_TYPE;
 
         try {
@@ -85,6 +94,10 @@ public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
 
             if (commandLine.hasOption(OPTION_PARENT_KEY)) {
                 isParentKey = true;
+            }
+
+            if (commandLine.hasOption(OPTION_IS_CLOSABLE)) {
+                isClosable = true;
             }
 
             if(commandLine.hasOption(OPTION_KEY_TYPE)) {
@@ -108,6 +121,7 @@ public class MetaCreateCommand extends AbstractCommand implements IMetaCommand {
         MetaClass meta = new MetaClass(name);
         meta.setReference(isReference);
         meta.setParentIsKey(isParentKey);
+        meta.setClosable(isClosable);
         meta.setComplexKeyType(keyType.getComplexKeyType());
 
         metaClassRepository.saveMetaClass(meta);

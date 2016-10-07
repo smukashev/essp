@@ -44,6 +44,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_CLASSES.TITLE,
                 EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                 EAV_M_CLASSES.PARENT_IS_KEY,
+                EAV_M_CLASSES.IS_CLOSABLE,
                 EAV_M_CLASSES.IS_DISABLED,
                 EAV_M_CLASSES.IS_REFERENCE)
                 .from(EAV_M_CLASSES)
@@ -72,6 +73,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         metaClass.setComplexKeyType(ComplexKeyTypes.valueOf((String) row.get("complex_key_type")));
         metaClass.setReference(((BigDecimal) row.get("is_reference")).longValue() == 1);
         metaClass.setParentIsKey(((BigDecimal) row.get("parent_is_key")).longValue() == 1);
+        metaClass.setClosable(((BigDecimal) row.get("is_closable")).longValue() == 1);
     }
 
     public List<MetaClass> loadAll() {
@@ -97,6 +99,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.TITLE,
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
+                        EAV_M_CLASSES.IS_CLOSABLE,
                         EAV_M_CLASSES.IS_REFERENCE)
                         .from(EAV_M_CLASSES)
                         .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
@@ -112,6 +115,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.TITLE,
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
+                        EAV_M_CLASSES.IS_CLOSABLE,
                         EAV_M_CLASSES.IS_REFERENCE)
                         .from(EAV_M_CLASSES)
                         .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
@@ -129,6 +133,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_CLASSES.TITLE,
                     EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                     EAV_M_CLASSES.PARENT_IS_KEY,
+                    EAV_M_CLASSES.IS_CLOSABLE,
                     EAV_M_CLASSES.IS_REFERENCE)
                     .from(EAV_M_CLASSES)
                     .where(EAV_M_CLASSES.ID.equal(metaClass.getId()));
@@ -169,6 +174,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.TITLE,
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
+                        EAV_M_CLASSES.IS_CLOSABLE,
                         EAV_M_CLASSES.IS_REFERENCE)
                         .from(EAV_M_CLASSES)
                         .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
@@ -185,6 +191,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.TITLE,
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
+                        EAV_M_CLASSES.IS_CLOSABLE,
                         EAV_M_CLASSES.IS_REFERENCE)
                         .from(EAV_M_CLASSES)
                         .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
@@ -201,6 +208,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_CLASSES.TITLE,
                     EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                     EAV_M_CLASSES.PARENT_IS_KEY,
+                    EAV_M_CLASSES.IS_CLOSABLE,
                     EAV_M_CLASSES.IS_REFERENCE)
                     .from(EAV_M_CLASSES)
                     .where(EAV_M_CLASSES.ID.equal(metaClass.getId()))
@@ -235,12 +243,14 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_CLASSES.BEGIN_DATE,
                 EAV_M_CLASSES.IS_DISABLED,
                 EAV_M_CLASSES.PARENT_IS_KEY,
+                EAV_M_CLASSES.IS_CLOSABLE,
                 EAV_M_CLASSES.IS_REFERENCE
         ).values(metaClass.getClassName(), metaClass.getClassTitle(),
                 metaClass.getComplexKeyType().toString(),
                 DataUtils.convert(metaClass.getBeginDate()),
                 DataUtils.convert(metaClass.isDisabled()),
                 DataUtils.convert(metaClass.parentIsKey()),
+                DataUtils.convert(metaClass.isClosable()),
                 DataUtils.convert(metaClass.isReference()));
 
         logger.debug(insert.toString());
@@ -266,6 +276,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 set(EAV_M_CLASSES.IS_DISABLED, DataUtils.convert(metaClass.isDisabled())).
                 set(EAV_M_CLASSES.IS_REFERENCE, DataUtils.convert(metaClass.isReference())).
                 set(EAV_M_CLASSES.PARENT_IS_KEY, DataUtils.convert(metaClass.parentIsKey())).
+                set(EAV_M_CLASSES.IS_CLOSABLE, DataUtils.convert(metaClass.isClosable())).
                 where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
 
         jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());

@@ -29,6 +29,8 @@ public class MetaClass extends MetaContainer implements IMetaClass {
 
     private boolean parentIsKey = false;
 
+    private boolean isClosable = false;
+
     private HashMap<String, IMetaAttribute> members = new HashMap<>();
 
     private ComplexKeyTypes complexKeyType = ComplexKeyTypes.ALL;
@@ -50,6 +52,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         this.complexKeyType = meta.complexKeyType;
         this.reference = meta.reference;
         this.parentIsKey = meta.parentIsKey;
+        this.isClosable = meta.isClosable;
 
         members.putAll(meta.members);
     }
@@ -432,6 +435,15 @@ public class MetaClass extends MetaContainer implements IMetaClass {
 
     public void setParentIsKey(boolean parentIsKey) {
         this.parentIsKey = parentIsKey;
+    }
+
+    @Override
+    public boolean isClosable() {
+        return isClosable;
+    }
+
+    public void setClosable(boolean closable) {
+        isClosable = closable;
     }
 
     public Set<String> getSimpleAttributesNames(DataTypes dataType) {

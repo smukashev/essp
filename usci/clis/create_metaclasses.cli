@@ -398,7 +398,7 @@ meta add --name=organization_name --attribute=name --type=string
 #= BANK_RELATION
 #====================================
 
-meta create --name=bank_relation
+meta create --name=bank_relation --closable
 meta add --name=bank_relation --attribute=bank_relation --type=meta_class --childname=ref_bank_relation --keytype=any --immutable
 meta add --name=bank_relation --attribute=creditor --type=meta_class --childname=ref_creditor --keytype=any --immutable
 
@@ -981,7 +981,7 @@ sql update eav_m_complex_set  set title='Адрес' where name='addresses'
 sql update eav_m_complex_set  set title='Контакты' where name='contacts'
 
 #----------------------------------------------------------------------------------------------
-sql run usci/db_oracle_scripts/eav_tables_partitioning.sql
+#sql run usci/db_oracle_scripts/eav_tables_partitioning.sql
 
 
 quit
