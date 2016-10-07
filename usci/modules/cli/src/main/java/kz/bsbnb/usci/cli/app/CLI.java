@@ -2573,33 +2573,45 @@ public class CLI {
         if (args.size() > 1)
             targetFolder = args.get(1);
 
-        String copy = "cp";
-        try {
-            if (System.getProperty("os.name").toLowerCase().contains("windows"))
-                copy = "copy";
-        } catch (Exception e) {
-            System.out.println("using cp as command to copy");
-        }
-
-        int cnt = 0;
-
         File[] files = new File(sourceFolder).listFiles();
         Arrays.sort(files);
-        for (File file : files) {
-            if (file.isDirectory())
+        for (File source : files) {
+            if (source.isDirectory())
                 continue;
-            try {
-                Process p = Runtime.getRuntime().exec("cmd /c " + copy + " " + file.getAbsolutePath() + " " + targetFolder);
-                p.waitFor();
-                cnt++;
-                Thread.sleep(3000);
-                System.out.println(file.getName() + " copied");
-            } catch (Exception e) {
-                e.printStackTrace();
+
+            File dest = new File(targetFolder+"/"+source.getName());
+
+            try{
+
+                File lockFile =  new File(dest.getAbsolutePath()+".lock");
+                lockFile.createNewFile();
+
+                InputStream is = null;
+                OutputStream os = null;
+                try {
+                    is = new FileInputStream(source);
+                    os = new FileOutputStream(dest);
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = is.read(buffer)) > 0) {
+                        os.write(buffer, 0, length);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    is.close();
+                    os.close();
+                }
+
+                lockFile.delete();
+
+            }catch (Exception ex){
+                ex.printStackTrace();
             }
+
         }
 
-        System.out.println("Done " + cnt + " files copied.");
+        System.out.println("Done " + files.length + " files copied.");
     }
 
     private void commandMaintenance(String line) {
