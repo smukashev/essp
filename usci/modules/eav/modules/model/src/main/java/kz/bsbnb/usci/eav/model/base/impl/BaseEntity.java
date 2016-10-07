@@ -457,9 +457,11 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
                     if(thisBaseValue == null && thatBaseValue != null) return false;
                     if(thisBaseValue != null && thatBaseValue == null) return false;
+                    if(thisBaseValue == null || thatBaseValue == null) return false;
 
                     if(thisBaseValue.getValue() == null && thatBaseValue.getValue() != null) return false;
                     if(thisBaseValue.getValue() != null && thatBaseValue.getValue() == null) return false;
+                    if(thisBaseValue.getValue() == null || thatBaseValue.getValue() == null) return false;
 
                     if(!thisBaseValue.getValue().equals(thatBaseValue.getValue()))
                         return false;
