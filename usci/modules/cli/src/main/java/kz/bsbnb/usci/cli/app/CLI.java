@@ -1347,6 +1347,9 @@ public class CLI {
                         String fileName = result2.getString("file_name");
                         Blob blob = result2.getBlob("file_content");
 
+                        File lockFile = new File(tempDir.getAbsolutePath() + "/" + fileName + ".zip.lock");
+                        lockFile.createNewFile();
+
                         File newFile = new File(tempDir.getAbsolutePath() + "/" + fileName + ".zip");
                         newFile.createNewFile();
 
@@ -1361,6 +1364,8 @@ public class CLI {
                         }
 
                         fout.close();
+
+                        lockFile.delete();
 
                         System.out.println(fileNumber + " - Sending file: " + newFile.getCanonicalFile());
 
