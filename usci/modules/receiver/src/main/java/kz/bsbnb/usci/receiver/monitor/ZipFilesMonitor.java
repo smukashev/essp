@@ -873,7 +873,7 @@ public class ZipFilesMonitor {
 
     public void monitor(Path path) throws InterruptedException, IOException {
         WatchService watchService = FileSystems.getDefault().newWatchService();
-        path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);
+        path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,StandardWatchEventKinds.ENTRY_DELETE);
 
         IEntityService entityService = serviceFactory.getEntityService();
 
@@ -892,20 +892,26 @@ public class ZipFilesMonitor {
 
             WatchKey watchKey = watchService.take();
 
+
             for (WatchEvent<?> event : watchKey.pollEvents()) {
-                if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
-                    String fileName = event.context().toString();
-                    System.out.println("Поступил батч : " + fileName);
+                String fileName = event.context().toString();
 
-                    Thread.sleep(1000);
-
-                    readFiles(path + "/" + fileName);
+                if (!StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind()) && fileName.contains(".lock")) {
+                    continue;
                 }
+
+                if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
+                    System.out.println("Поступил батч : " + fileName);
+                } else if(StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())){
+                } else if(StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind()) && event.context().toString().contains(".lock")){
+                    readFiles(path + "/" + fileName.substring(0,fileName.length()-5));
+                }
+
             }
+
             valid = watchKey.reset();
 
         } while (valid);
-
     }
 
     private String parseFileNameFromPath(String fileName) {
