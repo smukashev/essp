@@ -100,6 +100,7 @@ public class BeanDataProvider implements DataProvider {
         portalUser.setLastName(liferayUser.getLastName());
         portalUser.setMiddleName(liferayUser.getMiddleName());
         portalUser.setScreenName(liferayUser.getScreenName());
+        portalUser.setActive(liferayUser.isActive());
 
         return portalUser;
     }

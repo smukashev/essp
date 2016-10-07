@@ -150,12 +150,12 @@
   ) RETURN XMLTYPE;
 
   FUNCTION get_ref_balance_account_xml
-    (
-      p_balance_account_id IN NUMBER,
-      p_report_date IN DATE,
-      p_creditor_subject_type IN NUMBER DEFAULT 0,
-      p_tag_name IN VARCHAR2 DEFAULT 'balance_account'
-    ) RETURN XMLTYPE;
+  (
+    p_balance_account_id IN NUMBER,
+    p_report_date IN DATE,
+    p_creditor_subject_type IN NUMBER DEFAULT 0,
+    p_tag_name IN VARCHAR2 DEFAULT 'balance_account'
+  ) RETURN XMLTYPE;
 
   FUNCTION get_ref_credit_object_xml
   (
@@ -2619,7 +2619,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
   END;
 
-
   FUNCTION get_ref_balance_account_xml
   (
     p_balance_account_id IN NUMBER,
@@ -2631,29 +2630,29 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
 
-    IF (p_balance_account_id IS NULL AND p_creditor_subject_type != 7) THEN
-             SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
-                INTO v_xml
-                FROM dual;
-        ELSIF (p_balance_account_id IS NULL AND p_creditor_subject_type = 7) THEN
-            --p_balance_account_id := c_default_balance_account_id;
-            SELECT xmlelement(evalname(p_tag_name), xmlelement("no_", t.no_))
-                    INTO v_xml
-                    FROM ref.balance_account t
-                   WHERE t.parent_id = (select id from ref.balance_account where no_=c_default_balance_account_no)
-                     AND t.open_date <= p_report_date
-                     AND (t.close_date > p_report_date OR t.close_date IS NULL);
+      IF (p_balance_account_id IS NULL AND p_creditor_subject_type != 3) THEN
+           SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+              INTO v_xml
+              FROM dual;
+      ELSIF (p_balance_account_id IS NULL AND p_creditor_subject_type = 3) THEN
+          --p_balance_account_id := c_default_balance_account_id;
+          SELECT xmlelement(evalname(p_tag_name), xmlelement("no_", t.no_))
+                  INTO v_xml
+                  FROM ref.balance_account t
+                 WHERE t.parent_id = (select id from ref.balance_account where no_=c_default_balance_account_no)
+                   AND t.open_date <= p_report_date
+                   AND (t.close_date > p_report_date OR t.close_date IS NULL);
 
-        END IF;
+      END IF;
 
-        IF (p_balance_account_id IS NOT NULL) THEN
-            SELECT xmlelement(evalname(p_tag_name), xmlelement("no_", t.no_))
-                    INTO v_xml
-                    FROM ref.balance_account t
-                   WHERE t.parent_id = p_balance_account_id
-                     AND t.open_date <= p_report_date
-                     AND (t.close_date > p_report_date OR t.close_date IS NULL);
-        END IF;
+      IF (p_balance_account_id IS NOT NULL) THEN
+          SELECT xmlelement(evalname(p_tag_name), xmlelement("no_", t.no_))
+                  INTO v_xml
+                  FROM ref.balance_account t
+                 WHERE t.parent_id = p_balance_account_id
+                   AND t.open_date <= p_report_date
+                   AND (t.close_date > p_report_date OR t.close_date IS NULL);
+      END IF;
 
     RETURN v_xml;
   END;
@@ -4229,6 +4228,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         FROM dual;
     END IF;
 
+    --do not generate <doc></doc> !!!
+    select case existsNode(v_xml, '/docs/item/no')
+                  when 1 then
+                     v_xml
+                  else
+                     null
+                  end
+           into v_xml
+           from dual;
+
     RETURN v_xml;
   END;
 
@@ -4629,8 +4638,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                          (select xmlelement("details",
                                    xmlagg(
                                      xmlelement("item",
-                                       pkg_eav_xml_util.get_ref_balance_account_xml(pfv.provision_account_id, p_report_date, (select subject_type from ref.creditor where id = p_creditor_id), 'balance_account'),
-                                            nillable_xml('value', pfv.provision_value)
+                                       pkg_eav_xml_util.get_ref_balance_account_xml(pfv.provision_account_id, p_report_date,  (select subject_type from ref.creditor where id = p_creditor_id), 'balance_account'),
+                                       nillable_xml('value', pfv.provision_value)
                                      )
                                    )
                                  )

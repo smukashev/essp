@@ -205,13 +205,17 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntity;
     }
 
+    boolean rulesEnabledForUser(IBaseEntity baseEntity){
+        return baseEntity.getUserId() == null || baseEntity.getUserId() != 100500L;
+    }
+
     private void checkForRules(BaseEntity baseEntity) {
         if (metaRules == null) {
             String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
             metaRules = new HashSet<>(Arrays.asList(metaArray));
         }
 
-        if(rulesEnabled && metaRules.contains(baseEntity.getMeta().getClassName())) {
+        if( rulesEnabledForUser(baseEntity) && metaRules.contains(baseEntity.getMeta().getClassName())) {
             List<String> errors = new ArrayList<>();
             try {
                 rulesSingleton.runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
@@ -342,7 +346,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
 
-                    if (rulesEnabled)
+                    if (rulesEnabledForUser(baseEntity))
                         processLogicControl(baseEntityApplied);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
@@ -353,11 +357,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
 
-                    if (rulesEnabled) {
-                        if(isBvuno(baseEntityApplied.getBaseEntityReportDate().getCreditorId()))
-                            tempLogicControlUpdate(baseEntityApplied);
-                        else
-                            processLogicControl(baseEntityApplied);
+                    if (rulesEnabledForUser(baseEntity)) {
+                        processLogicControl(baseEntityApplied);
                     }
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
@@ -370,11 +371,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
             sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
-            if (rulesEnabled) {
-                if(isBvuno(baseEntityApplied.getBaseEntityReportDate().getCreditorId()))
-                    tempLogicControlUpdate(baseEntityApplied);
-                else
-                    processLogicControl(baseEntityApplied);
+            if (rulesEnabledForUser(baseEntity)) {
+                processLogicControl(baseEntityApplied);
             }
 
             baseEntityApplyDao.applyToDb(baseEntityManager);

@@ -26,8 +26,12 @@ class ActualCountJob extends Thread {
     public void run() {
         //noinspection InfiniteLoopStatement
         while (true) {
-            if (actualCountMap.size() > 0 && batchService.incrementActualCounts(actualCountMap))
-                actualCountMap.clear();
+            synchronized (this) {
+                if (actualCountMap.size() > 0 && batchService.incrementActualCounts(actualCountMap)) {
+
+                    actualCountMap.clear();
+                }
+            }
 
             try {
                 Thread.sleep(5000);
@@ -37,7 +41,7 @@ class ActualCountJob extends Thread {
         }
     }
 
-    void insertBatchId(Long batchId) {
+    synchronized void insertBatchId(Long batchId) {
         Long count = actualCountMap.get(batchId);
         count = count == null ? 0 : count;
         actualCountMap.put(batchId, count + 1);

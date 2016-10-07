@@ -40,6 +40,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     private Long index;
 
+    private Long userId;
+
     private final List<IBaseEntity> keyElements = new ArrayList<>();
 
     private boolean keyElementsInstalled = false;
@@ -1085,6 +1087,16 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
     @Override
     public Long getBatchIndex() {
         return index;
+    }
+
+    @Override
+    public Long getUserId() {
+        return userId;
+    }
+
+    @Override
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public boolean isInsert() {

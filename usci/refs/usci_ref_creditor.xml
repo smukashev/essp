@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+    <entities>
+        <ref_creditor>
+            <name>Тестовая организация</name>
+            <short_name>Тестовая организация</short_name>
+            <docs>
+                <item>
+                    <no>TTTTKA</no>
+                    <doc_type>
+                        <name_ru>Банковский идентификационный код</name_ru>
+                        <name_kz>Банковский идентификационный код</name_kz>
+                        <is_identification>0</is_identification>
+                        <is_organization_doc>1</is_organization_doc>
+                        <is_person_doc>0</is_person_doc>
+                        <weight>30</weight>
+                        <code>15</code>
+                    </doc_type>
+                </item>
+            </docs>
+            <subject_type>
+                <kind_id>31</kind_id>
+                <name_kz>Банк второго уровня</name_kz>
+                <name_ru>Банк второго уровня</name_ru>
+                <code>0001</code>
+                <report_period_duration_months>1</report_period_duration_months>
+            </subject_type>
+            <region>
+                <code>75</code>
+                <name_kz>Алматы қ.</name_kz>
+                <name_ru>г.Алматы</name_ru>
+            </region>
+        </ref_creditor>
+    </entities>
+</batch>
