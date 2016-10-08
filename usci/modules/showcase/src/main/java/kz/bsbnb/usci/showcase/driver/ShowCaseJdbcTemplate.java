@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -20,6 +21,17 @@ public class ShowCaseJdbcTemplate {
     @Autowired
     public void setDataSourceSC(DataSource dataSourceSC) {
         this.jdbcTemplateSC = new JdbcTemplate(dataSourceSC);
+    }
+
+    public List<Map<String, Object>> queryForList(String description, String sql, Object values[]) {
+        if (StaticRouter.getStatsEnabled()) {
+            long t1 = System.currentTimeMillis();
+            List<Map<String, Object>> mapList = jdbcTemplateSC.queryForList(sql, values);
+            sqlStats.put(description, (System.currentTimeMillis() - t1));
+            return mapList;
+        } else {
+            return jdbcTemplateSC.queryForList(sql, values);
+        }
     }
 
     public Map<String, Object> queryForMap(String description, String sql, Object values[]) {

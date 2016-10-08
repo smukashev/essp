@@ -465,6 +465,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
                     if(!thisBaseValue.getValue().equals(thatBaseValue.getValue()))
                         return false;
+                } else {
+                    //TODO: isComplex isNullableKey not implemented
                 }
             }
         }

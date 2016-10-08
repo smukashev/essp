@@ -100,6 +100,7 @@ public class CortegeDaoImpl extends CommonDao {
         }
 
         boolean rootExecutionFlag = false;
+        List<Map<String, Object>> dbGlobalMapList = new ArrayList<>();
 
         for (Map.Entry<ArrayElement, HashMap<ValueElement, Object>> entry : savingMap.entrySet()) {
             BaseEntity entity  = entry.getKey().entity;
@@ -120,6 +121,135 @@ public class CortegeDaoImpl extends CommonDao {
 
             /* Deletes data by root ids */
             if (!rootExecutionFlag) {
+                if(showCase.getTableName().equals("CORE_PLEDGE")) {
+                    sql = "SELECT * FROM %s WHERE open_date < ? AND " + rootKeyElement.queryKeys;
+                    sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                    dbGlobalMapList = jdbcTemplateSC.queryForList("SELECT * FROM %s WHERE + historyKeyElement.queryKeys",
+                            sql, getObjectArray(true, rootKeyElement.values, entity.getReportDate()));
+
+                    Iterator<Map<String, Object>> dpIterator = dbGlobalMapList.iterator();
+                    while(dpIterator.hasNext()) {
+                        Map<String, Object> dbMap = dpIterator.next();
+                        dbMap.remove("CDC");
+                        dbMap.remove("ID");
+
+                        for(Map.Entry<ArrayElement, HashMap<ValueElement, Object>> innerEntry : savingMap.entrySet()) {
+                            HashMap<ValueElement, Object> innerEntryMap = innerEntry.getValue();
+                            BigDecimal bd1 = BigDecimal.ZERO;
+
+                            // todo: tmp solution
+                            for (ValueElement vl : innerEntryMap.keySet()) {
+                                if (vl.columnName.toUpperCase().equals("PLEDGE_ID")) {
+                                    bd1 = BigDecimal.valueOf((Long)innerEntryMap.get(vl));
+                                    break;
+                                }
+                            }
+
+                            BigDecimal bd2 = (BigDecimal) dbMap.get("PLEDGE_ID");
+                            if (bd1.equals(bd2)) {
+                                dpIterator.remove();
+                            }
+                        }
+                    }
+
+                    for(Map<String, Object> dbMap : dbGlobalMapList) {
+                        dbMap.put("CLOSE_DATE", entity.getReportDate());
+
+                        simpleInsertString(dbMap, getHistoryTableName(showCase));
+
+                        sql = "DELETE FROM %s WHERE credit_id = ? and pledge_id = ?";
+                        sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                        jdbcTemplateSC.update(sql, sql, new Object[] {dbMap.get("CREDIT_ID"), dbMap.get("PLEDGE_ID")});
+                    }
+
+                } else if (showCase.getTableName().equals("CORE_PERSON_DI")) {
+                    sql = "SELECT * FROM %s WHERE open_date < ? AND " + rootKeyElement.queryKeys;
+                    sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                    dbGlobalMapList = jdbcTemplateSC.queryForList("SELECT * FROM %s WHERE + historyKeyElement.queryKeys",
+                            sql, getObjectArray(true, rootKeyElement.values, entity.getReportDate()));
+
+                    Iterator<Map<String, Object>> dpIterator = dbGlobalMapList.iterator();
+                    while(dpIterator.hasNext()) {
+                        Map<String, Object> dbMap = dpIterator.next();
+                        dbMap.remove("CDC");
+                        dbMap.remove("ID");
+
+                        for(Map.Entry<ArrayElement, HashMap<ValueElement, Object>> innerEntry : savingMap.entrySet()) {
+                            HashMap<ValueElement, Object> innerEntryMap = innerEntry.getValue();
+                            BigDecimal bd1 = BigDecimal.ZERO;
+
+                            // todo: tmp solution
+                            for (ValueElement vl : innerEntryMap.keySet()) {
+                                if (vl.columnName.toUpperCase().equals("PERSON_BANK_RELATION_ID")) {
+                                    bd1 = BigDecimal.valueOf((Long)innerEntryMap.get(vl));
+                                    break;
+                                }
+                            }
+
+                            BigDecimal bd2 = (BigDecimal) dbMap.get("PERSON_BANK_RELATION_ID");
+                            if (bd1.equals(bd2)) {
+                                dpIterator.remove();
+                            }
+                        }
+                    }
+
+                    for(Map<String, Object> dbMap : dbGlobalMapList) {
+                        dbMap.put("CLOSE_DATE", entity.getReportDate());
+
+                        simpleInsertString(dbMap, getHistoryTableName(showCase));
+
+                        sql = "DELETE FROM %s WHERE subject_id = ? and person_bank_relation_id = ?";
+                        sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                        jdbcTemplateSC.update(sql, sql, new Object[] {dbMap.get("SUBJECT_ID"), dbMap.get("PERSON_BANK_RELATION_ID")});
+                    }
+                } else if (showCase.getTableName().equals("CORE_ORG_DI")) {
+                    sql = "SELECT * FROM %s WHERE open_date < ? AND " + rootKeyElement.queryKeys;
+                    sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                    dbGlobalMapList = jdbcTemplateSC.queryForList("SELECT * FROM %s WHERE + historyKeyElement.queryKeys",
+                            sql, getObjectArray(true, rootKeyElement.values, entity.getReportDate()));
+
+                    Iterator<Map<String, Object>> dpIterator = dbGlobalMapList.iterator();
+                    while(dpIterator.hasNext()) {
+                        Map<String, Object> dbMap = dpIterator.next();
+                        dbMap.remove("CDC");
+                        dbMap.remove("ID");
+
+                        for(Map.Entry<ArrayElement, HashMap<ValueElement, Object>> innerEntry : savingMap.entrySet()) {
+                            HashMap<ValueElement, Object> innerEntryMap = innerEntry.getValue();
+                            BigDecimal bd1 = BigDecimal.ZERO;
+
+                            // todo: tmp solution
+                            for (ValueElement vl : innerEntryMap.keySet()) {
+                                if (vl.columnName.toUpperCase().equals("ORG_BANK_RELATION_ID")) {
+                                    bd1 = BigDecimal.valueOf((Long)innerEntryMap.get(vl));
+                                    break;
+                                }
+                            }
+
+                            BigDecimal bd2 = (BigDecimal) dbMap.get("ORG_BANK_RELATION_ID");
+                            if (bd1.equals(bd2)) {
+                                dpIterator.remove();
+                            }
+                        }
+                    }
+
+                    for(Map<String, Object> dbMap : dbGlobalMapList) {
+                        dbMap.put("CLOSE_DATE", entity.getReportDate());
+
+                        simpleInsertString(dbMap, getHistoryTableName(showCase));
+
+                        sql = "DELETE FROM %s WHERE subject_id = ? and ORG_BANK_RELATION_ID = ?";
+                        sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
+
+                        jdbcTemplateSC.update(sql, sql, new Object[] {dbMap.get("SUBJECT_ID"), dbMap.get("ORG_BANK_RELATION_ID")});
+                    }
+                }
+
                 cleanCurrentReportDate(showCase, rootKeyElement, entity);
 
                 /* Execute only ones */
