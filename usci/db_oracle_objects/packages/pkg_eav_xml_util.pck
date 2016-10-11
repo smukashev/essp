@@ -149,6 +149,11 @@
     p_val     in varchar2
   ) RETURN XMLTYPE;
 
+  FUNCTION checked_xml
+  (
+      p_xml in XMLTYPE
+  ) RETURN XMLTYPE;
+
   FUNCTION get_ref_balance_account_xml
   (
     p_balance_account_id IN NUMBER,
@@ -2314,12 +2319,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- AMOUNT
                  nillable_xml('amount', vch.amount),
                  -- CONTRACT
-                 xmlelement("contract",
+                 checked_xml(xmlelement("contract",
                    -- NO
                    nillable_xml('no', vch.contract_no),
                    -- DATE
                    nillable_xml('date', to_char(vch.contract_date, c_date_format))
-                 ),
+                 )),
                  -- CONTRACT_MATURITY_DATE
                  nillable_xml('contract_maturity_date', to_char(vch.contract_maturity_date, c_date_format)),
                  -- MATURITY_DATE
@@ -2341,56 +2346,56 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- PROLONGATION_DATE
                  nillable_xml('prolongation_date', to_char(vch.prolongation_date, c_date_format)),
                  -- PORTFOLIO
-                 xmlelement("portfolio",
+                 checked_xml(xmlelement("portfolio",
                    -- PORTFOLIO
-                   get_ref_portfolio_xml(vch.portfolio_id, v_report_date, 'portfolio'),
+                   checked_xml(get_ref_portfolio_xml(vch.portfolio_id, v_report_date, 'portfolio')),
                    -- PORTFOLIO_MSFO
-                   get_ref_portfolio_xml(vch.portfolio_msfo_id, v_report_date, 'portfolio_msfo')
-                 ),
+                   checked_xml(get_ref_portfolio_xml(vch.portfolio_msfo_id, v_report_date, 'portfolio_msfo'))
+                 )),
                  -- CHANGE
-                 xmlelement("change",
+                 checked_xml(xmlelement("change",
                    -- REMAINS
-                   xmlelement("remains",
+                   checked_xml(xmlelement("remains",
                      -- CORRECTION
-                     get_debt_remains_xml(vch.id, c_drt_correction, v_report_date),
+                     checked_xml(get_debt_remains_xml(vch.id, c_drt_correction, v_report_date)),
                      -- DEBT
-                     xmlelement("debt",
+                     checked_xml(xmlelement("debt",
                        -- CURRENT
-                       get_debt_remains_xml(vch.id, c_drt_debt_current, v_report_date),
+                       checked_xml(get_debt_remains_xml(vch.id, c_drt_debt_current, v_report_date)),
                        -- PASTDUE
-                       get_debt_remains_xml(vch.id, c_drt_debt_pastdue, v_report_date),
+                       checked_xml(get_debt_remains_xml(vch.id, c_drt_debt_pastdue, v_report_date)),
                        -- WRITE_OFF
-                       get_debt_remains_xml(vch.id, c_drt_debt_write_off, v_report_date)
-                     ),
+                       checked_xml(get_debt_remains_xml(vch.id, c_drt_debt_write_off, v_report_date))
+                     )),
                      -- DISCOUNT
-                     get_debt_remains_xml(vch.id, c_drt_discount, v_report_date),
+                     checked_xml(get_debt_remains_xml(vch.id, c_drt_discount, v_report_date)),
                      -- DISCOUNTED_VALUE
-                     get_debt_remains_xml(vch.id, c_drt_discounted_value, v_report_date),
+                     checked_xml(get_debt_remains_xml(vch.id, c_drt_discounted_value, v_report_date)),
                      -- INTEREST
-                     xmlelement("interest",
+                     checked_xml(xmlelement("interest",
                        -- CURRENT
-                       get_debt_remains_xml(vch.id, c_drt_interest_current, v_report_date),
+                       checked_xml(get_debt_remains_xml(vch.id, c_drt_interest_current, v_report_date)),
                        -- PASTDUE
-                       get_debt_remains_xml(vch.id, c_drt_interest_pastdue, v_report_date),
+                       checked_xml(get_debt_remains_xml(vch.id, c_drt_interest_pastdue, v_report_date)),
                        -- WRITE_OFF
-                       get_debt_remains_xml(vch.id, c_drt_interest_write_off, v_report_date)
-                     ),
+                       checked_xml(get_debt_remains_xml(vch.id, c_drt_interest_write_off, v_report_date))
+                     )),
                      -- LIMIT
-                     get_debt_remains_xml(vch.id, c_drt_limit, v_report_date)
-                   ),
+                     checked_xml(get_debt_remains_xml(vch.id, c_drt_limit, v_report_date))
+                   )),
                    -- CREDIT_FLOW
-                   get_credit_flow_xml(vch.id, v_report_date),
+                   checked_xml(get_credit_flow_xml(vch.id, v_report_date)),
                    -- TURNOVER
-                   xmlelement("turnover",
+                   checked_xml(xmlelement("turnover",
                      -- ISSUE
-                     xmlelement("issue",
+                     checked_xml(xmlelement("issue",
                        -- DEBT
-                       get_turnover_xml(vch.id, c_tt_issue_debt, v_report_date),
+                       checked_xml(get_turnover_xml(vch.id, c_tt_issue_debt, v_report_date)),
                        -- INTEREST
-                       get_turnover_xml(vch.id, c_tt_issue_interest, v_report_date)
-                     )
-                   )
-                 ),
+                       checked_xml(get_turnover_xml(vch.id, c_tt_issue_interest, v_report_date))
+                     ))
+                   ))
+                 )),
                  get_subject(vch.id, v_report_date, vch.creditor_id),
                  --PLEDGES
                  get_pledges_xml(vch.id, v_report_date),
@@ -2509,12 +2514,43 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
         INTO v_xml
         FROM dual;
     ELSE
-      SELECT xmlelement(evalname(p_xml_tag), xmlattributes('true' AS "xsi:nil"), NULL)
-        INTO v_xml
-        FROM dual;
+      return null;
     END IF;
     RETURN v_xml;
   END;
+
+  FUNCTION checked_xml
+    (
+      p_xml in XMLTYPE
+    ) RETURN XMLTYPE
+    IS
+      p_has_elem number;
+      p_has_text number;
+    BEGIN
+      select case existsNode(p_xml, '/*/*')
+                            when 1 then
+                               1
+                            else
+                               0
+                            end
+                     into p_has_elem
+                     from dual;
+
+      select case existsNode(p_xml, '/*/text()')
+                                when 1 then
+                                   1
+                                else
+                                   0
+                                end
+                         into p_has_text
+                         from dual;
+
+      if(p_has_text = 0 and p_has_elem = 0) then
+         return null;
+      end if;
+
+      return p_xml;
+    END;
 
   PROCEDURE generate_portfolio_xml
   (
@@ -2631,7 +2667,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
   BEGIN
 
       IF (p_balance_account_id IS NULL AND p_creditor_subject_type != 3) THEN
-           SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+           SELECT xmlelement(evalname(p_tag_name), null)
               INTO v_xml
               FROM dual;
       ELSIF (p_balance_account_id IS NULL AND p_creditor_subject_type = 3) THEN
@@ -2667,9 +2703,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_credit_object_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
-        INTO v_xml
-        FROM dual;
+      return null;
     ELSE
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
@@ -2692,7 +2726,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_credit_type_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2717,9 +2751,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_credit_purpose_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
-        INTO v_xml
-        FROM dual;
+      return null;
     ELSE
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
@@ -2742,9 +2774,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_currency_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
-        INTO v_xml
-        FROM dual;
+      return null;
     ELSE
       SELECT xmlelement(evalname(p_tag_name), xmlelement("short_name", t.short_name))
         INTO v_xml
@@ -2767,9 +2797,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_portfolio_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
-        INTO v_xml
-        FROM dual;
+      return null;
     ELSE
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
@@ -2792,9 +2820,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_finance_source_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
-        INTO v_xml
-        FROM dual;
+      return null;
     ELSE
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
@@ -2817,9 +2843,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_doc_type_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
-        INTO v_xml
-        FROM dual;
+      return null;
     ELSE
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
@@ -2842,9 +2866,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_classification_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
-        INTO v_xml
-        FROM dual;
+      return null;
     ELSE
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
@@ -2867,9 +2889,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_country_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
-        INTO v_xml
-        FROM dual;
+      return null;
     ELSE
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code_numeric", t.code_numeric))
         INTO v_xml
@@ -2892,9 +2912,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_legal_form_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
-        INTO v_xml
-        FROM dual;
+      return null;
     ELSE
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
@@ -2917,9 +2935,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_offshore_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
-        INTO v_xml
-        FROM dual;
+      return null;
     ELSE
       SELECT xmlelement(evalname(p_tag_name), xmlelement("code", t.code))
         INTO v_xml
@@ -2942,7 +2958,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_econ_trade_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2967,7 +2983,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_enterprise_type_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -2992,7 +3008,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_contact_type_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -3017,7 +3033,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_region_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -3042,7 +3058,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_bank_relation_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -3067,7 +3083,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_pledge_type_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -3092,12 +3108,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_creditor_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     ELSE
       SELECT xmlelement(evalname(p_tag_name),
-               nillable_xml('code', vch.code),
+               checked_xml(nillable_xml('code', vch.code)),
                xmlelement("docs",
                  (SELECT xmlagg(
                            -- ITEM
@@ -3159,7 +3175,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -3177,7 +3193,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     IF (p_creditor_id IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     ELSE
@@ -3322,7 +3338,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
          AND dr.rep_date = p_report_date;
     EXCEPTION
       WHEN no_data_found THEN
-        SELECT xmlelement(evalname(v_tag_name), xmlattributes('true' as "xsi:nil"),null)
+        SELECT xmlelement(evalname(v_tag_name),null)
           INTO v_xml
           FROM dual;
     END;
@@ -3374,7 +3390,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
          AND t.rep_date = p_report_date;
     EXCEPTION
       WHEN no_data_found THEN
-        SELECT xmlelement(evalname(v_tag_name), xmlattributes('true' as "xsi:nil"),null)
+        SELECT xmlelement(evalname(v_tag_name),null)
           INTO v_xml
           FROM dual;
     END;
@@ -3391,36 +3407,24 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     v_xml xmltype;
   BEGIN
     BEGIN
-      SELECT xmlelement("credit_flow",
-               get_ref_classification_xml(cf.classification_id, p_report_date),
-               xmlelement("provision",
+      SELECT checked_xml(xmlelement("credit_flow",
+               checked_xml(get_ref_classification_xml(cf.classification_id, p_report_date)),
+               checked_xml(xmlelement("provision",
                  -- PROVISION_KFN
-                 get_debt_remains_xml(p_credit_id, c_drt_provision_kfn, p_report_date),
+                 checked_xml(get_debt_remains_xml(p_credit_id, c_drt_provision_kfn, p_report_date)),
                  -- PROVISION_MSFO
-                 get_debt_remains_xml(p_credit_id, c_drt_provision_msfo, p_report_date),
+                 checked_xml(get_debt_remains_xml(p_credit_id, c_drt_provision_msfo, p_report_date)),
                  -- PROVISION_MSFO_OVER_BALANCE
-                 get_debt_remains_xml(p_credit_id, c_drt_provision_msfo_ob, p_report_date)
-               )
-             )
+                 checked_xml(get_debt_remains_xml(p_credit_id, c_drt_provision_msfo_ob, p_report_date))
+               ))
+             ))
         INTO v_xml
         FROM core.credit_flow cf
        WHERE cf.credit_id = p_credit_id
          AND cf.rep_date = p_report_date;
     EXCEPTION
       WHEN no_data_found THEN
-        SELECT xmlelement("credit_flow",
-                 nillable_xml('classification', null),
-                 xmlelement("provision",
-                   -- PROVISION_KFN
-                   get_debt_remains_xml(p_credit_id, c_drt_provision_kfn, p_report_date),
-                   -- PROVISION_MSFO
-                   get_debt_remains_xml(p_credit_id, c_drt_provision_msfo, p_report_date),
-                   -- PROVISION_MSFO_OVER_BALANCE
-                   get_debt_remains_xml(p_credit_id, c_drt_provision_msfo_ob, p_report_date)
-                 )
-               )
-          INTO v_xml
-          FROM dual;
+        return null;
     END;
 
     RETURN v_xml;
@@ -4098,7 +4102,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END IF;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -4161,7 +4165,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END IF;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -4223,7 +4227,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -4273,7 +4277,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"),null)
+      SELECT xmlelement(evalname(p_tag_name),null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -4319,7 +4323,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -4361,7 +4365,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -4405,7 +4409,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -4449,7 +4453,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -4492,7 +4496,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
     END;
 
     IF (v_xml IS NULL) THEN
-      SELECT xmlelement(evalname(p_tag_name), xmlattributes('true' as "xsi:nil"), null)
+      SELECT xmlelement(evalname(p_tag_name), null)
         INTO v_xml
         FROM dual;
     END IF;
@@ -4607,9 +4611,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
     SELECT xmlelement("subject",
                   v_doc_xml,
-                  get_person_xml(v_person_id, p_report_date, p_creditor_id, 'person_info' ),
-                  get_organization_xml(v_org_id, p_report_date, p_creditor_id, 'organization_info'),
-                  get_ref_creditor_info(v_creditor_id, p_report_date),
+                  checked_xml(get_person_xml(v_person_id, p_report_date, p_creditor_id, 'person_info' )),
+                  checked_xml(get_organization_xml(v_org_id, p_report_date, p_creditor_id, 'organization_info')),
+                  checked_xml(get_ref_creditor_info(v_creditor_id, p_report_date)),
                   nillable_xml('is_creditor', decode(v_creditor_id, NULL, 0, 1)),
                   nillable_xml('is_person', decode(v_person_id, NULL, 0, 1)),
                   nillable_xml('is_organization', decode(v_org_id, NULL, 0, 1))
@@ -4655,7 +4659,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
              and pfg.rep_date = p_report_date;
 
     IF(v_xml IS NULL) THEN
-      SELECT xmlelement("portfolio_flows_kfn", xmlattributes('true' as "xsi:nil"))
+      SELECT xmlelement("portfolio_flows_kfn")
         INTO v_xml
         FROM dual;
     ELSE
@@ -4714,7 +4718,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
 
 
     IF v_xml IS NULL THEN
-      SELECT xmlelement("portfolio_flows_msfo", xmlattributes('true' as "xsi:nil"))
+      SELECT xmlelement("portfolio_flows_msfo")
         INTO v_xml
         FROM dual;
     ELSE
