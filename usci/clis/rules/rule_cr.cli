@@ -607,5 +607,22 @@ $$$
 
 rule save
 
+rule read $$$
+title: Дата договора < Отчетная дата
+rule "Дата договора < Отчетная дата"
+//MES838
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+    && pDate: getEl("primary_contract.date")
+    && pDate!=null
+    && pDate >= getReportDate())
+then
+  $entity.addValidationError("Дата договора должна быть раньше отчетной даты");
+end
+
+$$$
+
+rule save
+
 
 quit
