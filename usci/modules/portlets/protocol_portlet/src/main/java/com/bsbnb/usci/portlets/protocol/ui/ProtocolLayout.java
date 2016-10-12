@@ -448,8 +448,8 @@ public class ProtocolLayout extends VerticalLayout {
         if (isProtocolGrouped) {
             showGroupedProtocol(ii);
         } else {
-            protocolsTableControl.reload();
             currentInputInfo = ii.getInputInfo();
+            protocolsTableControl.reload();
         }
     }
 
@@ -458,10 +458,9 @@ public class ProtocolLayout extends VerticalLayout {
         typesOfProtocolLayout.removeAllComponents();
         groupsTreePanel.setVisible(false);
         prohibitedMessageTypes.clear();
+        Set<String> messageTypes = new HashSet<String>();
 
         if (listOfProtocols.isEmpty()) {
-            noProtocolsLabel.setVisible(true);
-            protocolLayout.setVisible(false);
 
             Map<String, Long> weightsByErrorCode = new HashMap<>();
             weightsByErrorCode.put(BatchStatuses.ERROR.code(), 1000L);
@@ -489,13 +488,17 @@ public class ProtocolLayout extends VerticalLayout {
 
         }
 
-        Set<String> messageTypes = new HashSet<String>();
-        for (final ProtocolDisplayBean protocol : listOfProtocols) {
-            addProtocol(protocol, messageTypes);
+        if (listOfProtocols.isEmpty()) {
+            noProtocolsLabel.setVisible(true);
+            protocolLayout.setVisible(false);
+        } else {
+            for (final ProtocolDisplayBean protocol : listOfProtocols) {
+                addProtocol(protocol, messageTypes);
+            }
+            setProtocolColumns(EXTENDED_PROTOCOL_TABLE_COLUMNS);
+            noProtocolsLabel.setVisible(false);
+            protocolLayout.setVisible(true);
         }
-        setProtocolColumns(EXTENDED_PROTOCOL_TABLE_COLUMNS);
-        noProtocolsLabel.setVisible(false);
-        protocolLayout.setVisible(true);
     }
 
     private void addProtocol(final ProtocolDisplayBean protocol, Set<String> messageTypes) {
