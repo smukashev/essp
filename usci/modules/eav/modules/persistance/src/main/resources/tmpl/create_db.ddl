@@ -27,7 +27,7 @@
 		<column name="containing_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="container_type" required="true" type="NUMERIC" size="10,0"/>
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
+		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_optional_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_nullable_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
@@ -50,7 +50,7 @@
 		<column name="containing_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="container_type" required="true" type="NUMERIC" size="10,0"/>
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
+		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_required" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
@@ -71,7 +71,7 @@
 		<column name="containing_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="container_type" required="true" type="NUMERIC" size="10,0"/>
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
+		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_optional_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_nullable_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
@@ -94,7 +94,7 @@
 		<column name="containing_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="container_type" required="true" type="NUMERIC" size="10,0"/>
 		<column name="name" primaryKey="false" required="true" type="VARCHAR" size="64" autoIncrement="false"/>
-		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="127" autoIncrement="false"/>
+		<column name="title" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<column name="is_key" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_nullable" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
 		<column name="is_required" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false"/>
