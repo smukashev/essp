@@ -226,7 +226,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 .select(DSL.count(EAV_BATCHES.ID).as("batch_count"))
                 .from(EAV_BATCHES);
 
-        for (int i = 1; i < creditorsList.size(); i++) {
+        for (int i = 0; i < creditorsList.size(); i++) {
             select.where().or(EAV_BATCHES.CREDITOR_ID.eq(creditorsList.get(i).getId()));
         }
 

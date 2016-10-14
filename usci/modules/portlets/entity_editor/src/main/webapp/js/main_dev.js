@@ -499,6 +499,9 @@ function addField(form, attr, idSuffix, node) {
 }
 
 function loadEntity(entityId, date, currentSearch) {
+    var bodymask = new Ext.LoadMask(Ext.getCmp('mainPanel'), {msg:label_LOADING});
+    bodymask.show();
+
     entityStore.load({
         params: {
             op: 'LIST_ENTITY',
@@ -511,6 +514,7 @@ function loadEntity(entityId, date, currentSearch) {
             if (!success) {
                 Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(operation.request.proxy.reader.rawData.errorMessage));
             }
+            bodymask.hide();
         }
     });
 }
@@ -1334,7 +1338,7 @@ Ext.onReady(function () {
                             });
                         }
                     });
-
+                    bodymask.hide();
                 }
                 return subjectName;
             }
@@ -1490,6 +1494,7 @@ Ext.onReady(function () {
         height: 500,
         renderTo: 'entity-editor-content',
         title: '&nbsp',
+        id: 'mainPanel',
         //preventHeader: true,
         layout: 'border',
         items: [{
