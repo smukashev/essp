@@ -129,15 +129,16 @@ function getForm(node){
                         allowBlank: allowBlank,
                         blankText: label_REQUIRED_FIELD,
                         commit: function(){
-                            form.elem.appendChild({
-                                title: attr.title,
-                                code: attr.code,
-                                leaf: true,
-                                value: this.getValue(),
-                                simple: true,
-                                type: attr.type
-                            });
-
+                            if(this.getValue()) {
+                                form.elem.appendChild({
+                                    title: attr.title,
+                                    code: attr.code,
+                                    leaf: true,
+                                    value: this.getValue(),
+                                    simple: true,
+                                    type: attr.type
+                                });
+                            }
                         }
                     })
                 );
@@ -152,14 +153,16 @@ function getForm(node){
                         allowBlank: allowBlank,
                         blankText: label_REQUIRED_FIELD,
                         commit: function(){
-                            form.elem.appendChild({
-                                title: attr.title,
-                                code: attr.code,
-                                leaf: true,
-                                value: this.getValue(),
-                                simple: true,
-                                type: attr.type
-                            });
+                            if(this.getValue()) {
+                                form.elem.appendChild({
+                                    title: attr.title,
+                                    code: attr.code,
+                                    leaf: true,
+                                    value: this.getValue(),
+                                    simple: true,
+                                    type: attr.type
+                                });
+                            }
                         },
                         editable: false,
                         store: Ext.create('Ext.data.Store', {
