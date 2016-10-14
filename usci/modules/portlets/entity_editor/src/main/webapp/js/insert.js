@@ -55,7 +55,7 @@ function getForm(node){
                         if(this.getValue()) {
                             var refNode = Ext.create('entityModel', {
                                 title: attr.title,
-                                code: 'code',
+                                code: attr.code,
                                 value: this.getValue(),
                                 ref: true,
                                 metaId: attr.metaId
