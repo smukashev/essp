@@ -32,6 +32,7 @@ import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.security.AccessControlException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -553,6 +554,36 @@ public class MainPortlet extends MVCPortlet {
                         refListResponse = entityService.getRefListApprox(Long.parseLong(metaId));
                     } else {
                         refListResponse = entityService.getRefListResponse(Long.parseLong(metaId), null, false);
+
+                        if (mc.getClassName().equals("ref_creditor")) {
+                            creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
+
+
+                            List<Map<String, Object>> data = new ArrayList<>();
+
+                            for (Map<String, Object> ref : refListResponse.getData()) {
+                                for (Creditor creditor : creditors) {
+                                    if (creditor.getId() == ((BigDecimal) ref.get("ID")).longValue()) {
+                                        data.add(ref);
+                                    }
+                                }
+                            }
+                            refListResponse = new RefListResponse(data);
+                        } else if (mc.getClassName().equals("ref_creditor_branch")) {
+                            creditors = portalUserBusiness.getPortalUserCreditorList(currentUser.getUserId());
+
+                            List<Map<String, Object>> data = new ArrayList<>();
+
+                            for (Map<String, Object> ref : refListResponse.getData()) {
+                                for (Creditor creditor : creditors) {
+                                    if (creditor.getName().equals(ref.get("main_office"))) {
+                                        data.add(ref);
+                                    }
+                                }
+                            }
+                            refListResponse = new RefListResponse(data);
+                        }
+
                     }
                     refListResponse = refListToShort(refListResponse);
                     String sJson = gson.toJson(refListResponse);

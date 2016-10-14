@@ -20,7 +20,7 @@ function getForm(node){
 
             if(attr.ref) {
                 this.add(Ext.create("Ext.form.field.ComboBox", {
-                    //id: attr.code + "FromItem" + idSuffix,
+                    id: attr.code + "FromItem",
                     fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
                     labelWidth: labelWidth,
                     width: width,
@@ -45,7 +45,14 @@ function getForm(node){
                         },
                         autoLoad: true,
                         timeout: 120000,
-                        remoteSort: true
+                        remoteSort: true,
+                        listeners: {
+                            load: function(me,records,options) {
+                                if(records.length == 1)
+                                    Ext.getCmp(attr.code + "FromItem").setValue(records[0].get('ID'));
+
+                            }
+                        }
                     }),
                     displayField: 'title',
                     valueField: 'ID',
