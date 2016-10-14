@@ -205,12 +205,7 @@ public class ProtocolLayout extends VerticalLayout {
         filesTable.setStyleName("wordwrap-table");
         filesTable.setVisibleColumns(FILES_TABLE_COLUMN_NAMES);
         filesTable.setColumnHeaders(getResourceStrings(FILES_TABLE_COLUMN_NAMES));
-        if (PortletEnvironmentFacade.get().isNB()) {
-            filesTable.setVisibleColumns(FILES_TABLE_VISIBLE_COLUMNS);
-            filesTable.setColumnWidth("creditorName", 200);
-        } else {
-            filesTable.setVisibleColumns(FILES_TABLE_VISIBLE_COLUMNS_FOR_BANK_USER);
-        }
+        filesTable.setVisibleColumns(FILES_TABLE_VISIBLE_COLUMNS);
         filesTable.setWidth("100%");
         filesTable.setHeight("400px");
         filesTable.setSelectable(true);
