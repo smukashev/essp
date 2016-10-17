@@ -122,9 +122,18 @@ public class MailHandler implements Runnable {
         message.setFrom(new InternetAddress(sender));
         message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
 
-        if(email != null && email.toLowerCase().endsWith("liferay.com")) {
-            logger.info("emails @liferay.com are skipped");
-            return;
+        if(email != null) {
+            boolean skip = false;
+            if(email.toLowerCase().endsWith("liferay.com"))
+                skip = true;
+
+            if(email.toLowerCase().endsWith("oldbank.kz"))
+                skip = true;
+
+            if(skip) {
+                logger.info("email in exception list so skipped");
+                return;
+            }
         }
         message.setSubject(provider.getMessageSubject(mailMessage));
         message.setText(provider.getMessageText(mailMessage), "utf-8", "html");
