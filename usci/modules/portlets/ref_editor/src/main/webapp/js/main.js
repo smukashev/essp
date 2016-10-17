@@ -1228,9 +1228,9 @@ Ext.onReady(function() {
                             if(selectedRef.data['className']  == 'ref_portfolio'){
                                 buttonAdd.show();
                                 buttonXML.show();
-                                buttonDelete.show();
-                                buttonClose.show();
-                                buttonOpen.show();
+                                //buttonDelete.show();
+                                //buttonClose.show();
+                                //buttonOpen.show();
                             }else{
                                 buttonAdd.hide();
                                 buttonXML.hide();
