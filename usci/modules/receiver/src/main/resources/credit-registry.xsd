@@ -974,7 +974,7 @@ person-> names -> name-> firstname, person-> names -> name-> lastname, person-> 
 						<xsd:element name="detail" maxOccurs="unbounded">
 							<xsd:complexType>
 								<xsd:sequence>
-									<xsd:element ref="balance_account" minOccurs="1"/>
+									<xsd:element ref="balance_account" minOccurs="0"/>
 									<xsd:element name="value" type="st_non_negative_value">
 										<xsd:annotation>
 											<xsd:documentation>Фактически сформировання сумма провизий (резервов) на весь портфель</xsd:documentation>
