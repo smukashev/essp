@@ -20,7 +20,7 @@ function getForm(node){
 
             if(attr.ref) {
                 this.add(Ext.create("Ext.form.field.ComboBox", {
-                    //id: attr.code + "FromItem" + idSuffix,
+                    id: attr.code + "FromItem",
                     fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
                     labelWidth: labelWidth,
                     width: width,
@@ -45,7 +45,14 @@ function getForm(node){
                         },
                         autoLoad: true,
                         timeout: 120000,
-                        remoteSort: true
+                        remoteSort: true,
+                        listeners: {
+                            load: function(me,records,options) {
+                                if(records.length == 1)
+                                    Ext.getCmp(attr.code + "FromItem").setValue(records[0].get('ID'));
+
+                            }
+                        }
                     }),
                     displayField: 'title',
                     valueField: 'ID',
@@ -55,7 +62,7 @@ function getForm(node){
                         if(this.getValue()) {
                             var refNode = Ext.create('entityModel', {
                                 title: attr.title,
-                                code: 'code',
+                                code: attr.code,
                                 value: this.getValue(),
                                 ref: true,
                                 metaId: attr.metaId
@@ -129,15 +136,16 @@ function getForm(node){
                         allowBlank: allowBlank,
                         blankText: label_REQUIRED_FIELD,
                         commit: function(){
-                            form.elem.appendChild({
-                                title: attr.title,
-                                code: attr.code,
-                                leaf: true,
-                                value: this.getValue(),
-                                simple: true,
-                                type: attr.type
-                            });
-
+                            if(this.getValue()) {
+                                form.elem.appendChild({
+                                    title: attr.title,
+                                    code: attr.code,
+                                    leaf: true,
+                                    value: this.getValue(),
+                                    simple: true,
+                                    type: attr.type
+                                });
+                            }
                         }
                     })
                 );
@@ -152,14 +160,16 @@ function getForm(node){
                         allowBlank: allowBlank,
                         blankText: label_REQUIRED_FIELD,
                         commit: function(){
-                            form.elem.appendChild({
-                                title: attr.title,
-                                code: attr.code,
-                                leaf: true,
-                                value: this.getValue(),
-                                simple: true,
-                                type: attr.type
-                            });
+                            if(this.getValue()) {
+                                form.elem.appendChild({
+                                    title: attr.title,
+                                    code: attr.code,
+                                    leaf: true,
+                                    value: this.getValue(),
+                                    simple: true,
+                                    type: attr.type
+                                });
+                            }
                         },
                         editable: false,
                         store: Ext.create('Ext.data.Store', {
