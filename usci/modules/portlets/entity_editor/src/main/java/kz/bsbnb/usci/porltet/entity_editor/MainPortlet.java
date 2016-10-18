@@ -294,6 +294,7 @@ public class MainPortlet extends MVCPortlet {
                             "\"code\":\"" + innerClassesNames + "\",\n" +
                             "\"value\":\"" + dtStr + "\",\n" +
                             "\"date\": \""+dFormat.format(value.getRepDate())+"\",\n" +
+                            "\"closeDate\": \"" + (value.getCloseDate() == null ? "" : dFormat.format(value.getCloseDate())) +"\"," +
                             "\"simple\": true,\n" +
                             "\"array\": false,\n" +
                             "\"type\": \"" + ((MetaValue)meta.getMemberType(innerClassesNames)).getTypeCode() + "\",\n" +

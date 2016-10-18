@@ -1338,7 +1338,6 @@ Ext.onReady(function () {
                             });
                         }
                     });
-                    bodymask.hide();
                 }
                 return subjectName;
             }
