@@ -433,7 +433,7 @@ function addArrayElementButton(form) {
     }));
 }
 
-function loadAttributes(form, selectedNode, arrayElAddition) {
+function loadAttributes(form, selectedNode, arrayElAddition,callback) {
     var children;
     var metaId;
     var selectedNodeData;
@@ -478,6 +478,10 @@ function loadAttributes(form, selectedNode, arrayElAddition) {
 
             for(var i = 0; i < attributes.length; i++) {
                 addField(form, attributes[i].data, idSuffix, selectedNodeData);
+            }
+
+            if(callback) {
+                callback();
             }
         }
     });
@@ -1054,7 +1058,9 @@ Ext.onReady(function() {
                 return;
             }
 
-            loadAttributes(form)
+            var loadMask = new Ext.LoadMask(Ext.getBody(), {msg:label_LOADING});
+            loadMask.show();
+            loadAttributes(form, null,null, function() { loadMask.hide()} );
 
             modalWindow.show();
         }

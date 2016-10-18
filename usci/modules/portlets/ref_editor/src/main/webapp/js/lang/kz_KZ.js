@@ -25,3 +25,4 @@ var label_CLOSE = "Закрыть";
 var label_CONFIRM_CHANGES = "Подтвердить изменения";
 var label_REQUIRED_FIELD = "Обязательное поле";
 var label_EXPORT = "Экспорт";
+var label_LOADING = "Жүктеп жатыр...";
