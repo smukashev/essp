@@ -158,6 +158,8 @@ Ext.onReady(function() {
                     }
                     if(records && records.length == 0)
                         Ext.MessageBox.alert(label_INFO, 'Поиск вернул 0 результатов');
+
+                    Ext.getCmp('entityEditorShowBtn').enable();
                 }});
         }
     };
