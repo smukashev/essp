@@ -118,12 +118,6 @@ public class SubjectOrganizationParser extends BatchParser {
 
                 bankRelation.put("bank_relation",
                         new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), refBankRelation, false, true));
-
-                IBaseEntity creditorAsEntity = baseEntityLoadDao.load(creditorId);
-
-                bankRelation.put("creditor",
-                        new BaseEntityComplexValue(0, creditorId,batch.getRepDate(), creditorAsEntity, false, true));
-
                 bankRelations.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), bankRelation, false, true));
                 break;
             case "addresses":
