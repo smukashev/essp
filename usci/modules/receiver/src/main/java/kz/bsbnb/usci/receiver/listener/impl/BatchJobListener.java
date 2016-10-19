@@ -56,7 +56,7 @@ public class BatchJobListener implements IListener {
                     batch.getUserId(), properties);
         }
 
-        batchService.endBatch(batchId);
+        //batchService.endBatch(batchId);
         receiverStatusSingleton.batchEnded();
         jobLauncherQueue.jobFinished(batch.getCreditorId());
 

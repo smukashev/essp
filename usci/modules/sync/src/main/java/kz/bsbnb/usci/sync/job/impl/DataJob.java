@@ -5,6 +5,7 @@ import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.util.Errors;
+import kz.bsbnb.usci.eav.util.SetUtils;
 import kz.bsbnb.usci.sync.job.AbstractDataJob;
 import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.SyncStatusSingleton;
@@ -13,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -98,6 +97,8 @@ public final class DataJob extends AbstractDataJob {
 
                 if (processingJobs.size() > 0)
                     removeDeadJobs();
+
+                setFinishStatusToBatches();
 
                 if (entities.size() == 0 && entitiesInProcess.size() == 0) {
                     Thread.sleep(SLEEP_TIME_NORMAL);
@@ -204,5 +205,24 @@ public final class DataJob extends AbstractDataJob {
         }
 
         return currentIntersection;
+    }
+
+    private void setFinishStatusToBatches(){
+        Set<Long> activeBatches = new HashSet<>();
+
+        for (BaseEntity entity : entities) {
+            activeBatches.add(entity.getBatchId());
+        }
+
+        for (InProcessTester entitiesInProces : entitiesInProcess) {
+            activeBatches.add(entitiesInProces.getMyEntity().getBatchId());
+        }
+
+        Set<Long> difference = SetUtils.difference(batches, activeBatches);
+
+        for (Long batchId : difference) {
+            batchService.endBatch(batchId);
+            batches.remove(batchId);
+        }
     }
 }

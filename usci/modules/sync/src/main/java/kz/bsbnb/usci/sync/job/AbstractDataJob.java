@@ -4,7 +4,9 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.sync.job.impl.ProcessJob;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author k.tulbassiyev
@@ -31,7 +33,13 @@ public abstract class AbstractDataJob extends Thread {
     /* Number of processed entities to show stats */
     protected final int STAT_INTERVAL = 1000;
 
+    protected Set<Long> batches = new HashSet<>();
+
     public final synchronized void addAll(List<BaseEntity> entities) {
+        for (BaseEntity entity : entities) {
+            batches.add(entity.getBatchId());
+        }
+
         this.entities.addAll(entities);
     }
 
