@@ -4470,7 +4470,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                    -- BANK_RELATION
                    get_ref_bank_relation_xml(di.bank_relation_id, p_report_date),
                    -- CREDITOR
-                   get_ref_creditor_xml(di.creditor_id, p_report_date, 'creditor')
+                   --get_ref_creditor_xml(di.creditor_id, p_report_date, 'creditor')
                  )
                )
              )
