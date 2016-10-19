@@ -209,20 +209,26 @@ public final class DataJob extends AbstractDataJob {
 
     private void setFinishStatusToBatches(){
         Set<Long> activeBatches = new HashSet<>();
+        Set<Long> difference;
 
-        for (BaseEntity entity : entities) {
-            activeBatches.add(entity.getBatchId());
+        synchronized (this) {
+            for (BaseEntity entity : entities) {
+                activeBatches.add(entity.getBatchId());
+            }
+
+            for (InProcessTester entitiesInProces : entitiesInProcess) {
+                activeBatches.add(entitiesInProces.getMyEntity().getBatchId());
+            }
+
+            difference = SetUtils.difference(batches, activeBatches);
+
+            for (Long batchId : difference) {
+                batches.remove(batchId);
+            }
         }
-
-        for (InProcessTester entitiesInProces : entitiesInProcess) {
-            activeBatches.add(entitiesInProces.getMyEntity().getBatchId());
-        }
-
-        Set<Long> difference = SetUtils.difference(batches, activeBatches);
 
         for (Long batchId : difference) {
             batchService.endBatch(batchId);
-            batches.remove(batchId);
         }
     }
 }
