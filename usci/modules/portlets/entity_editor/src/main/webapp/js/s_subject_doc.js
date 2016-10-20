@@ -35,7 +35,7 @@ Ext.onReady(function() {
         "children" : [{
             "title": "Документы",
             "code": "docs",
-            "value": "2",
+            "value": "0",
             "simple": false,
             "array": true,
             "isKey": true,
@@ -47,6 +47,84 @@ Ext.onReady(function() {
     };
 
     var rootNode = store.setRootNode(data);
+
+    subjectTypeModalWindow = Ext.create("Ext.Window", {
+        title: 'Тип кредитора',
+        width: 400,
+        modal: true,
+        closable: true,
+        closeAction: 'hide',
+        items: [
+            {
+                xtype: 'form',
+                bodyPadding: '5 5 0',
+                width: "100%",
+                defaults: {
+                    anchor: '100%'
+                },
+                autoScroll: true,
+                items: [
+                    {
+                        xtype: 'radiogroup',
+                        columns: 3,
+                        id: 'subjectTypeGroup',
+                        vertical: true,
+                        items: [
+                            {boxLabel: 'Юр лицо', name: 'type', inputValue: 'isOrganization', checked: true},
+                            {boxLabel: 'Физ лицо', name: 'type', inputValue: 'isPerson'},
+                            {boxLabel: 'Банк', name: 'type', inputValue: 'isCreditor'}
+                        ]
+                    }
+                ],
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    padding: '2 0 2 0',
+                    dock: 'bottom',
+                    ui: 'footer',
+                    items: [
+                        {
+                            xtype: 'tbfill'
+                        },
+                        {
+                            xtype: 'tbfill'
+                        },
+                        {
+                            xtype: 'tbfill'
+                        },
+                        {
+                            text: 'Далее',
+                            listeners: {
+                                scope: this,
+                                click: function (txtField, e) {
+                                    subjectTypeModalWindow.close();
+                                    var tree = Ext.getCmp('s_person_doc_tree');
+                                    var node = tree.getRootNode().getChildAt(0);
+                                    formBasic(node, function (form) {
+                                        form.elem.data.title = '[' + node.childNodes.length + ']';
+                                        node.data.value = node.childNodes.length + 1;
+                                        node.appendChild(form.elem);
+                                        editorAction.commitInsert();
+                                        Ext.getCmp('entityTreeView').getView().refresh();
+                                    });
+                                }
+                            }
+                        },
+                        {
+                            text: 'Отмена',
+                            listeners: {
+                                scope: this,
+                                click: function (txtField, e) {
+                                    console.log('click cancel')
+                                }
+                            }
+                        }
+                    ]
+                }]
+
+            }]
+
+    });
+
 
     forms[serviceCode] = function (panel) {
         panel.removeAll();
@@ -98,12 +176,7 @@ Ext.onReady(function() {
                 tbar: [{
                     text: 'добавить документ поиска',
                     handler: function(){
-                        var tree = Ext.getCmp('s_person_doc_tree');
-                        var docNode = tree.getRootNode().getChildAt(0);
-                        var form = Ext.getCmp('modalDocSearchForm');
-                        form.removeAll();
-                        loadAttributes(form, docNode, true);
-                        Ext.getCmp('modalDocSearchWindow').show();
+                            subjectTypeModalWindow.show();
                     }
                 }, {
                     text: 'Очистить',
@@ -114,6 +187,7 @@ Ext.onReady(function() {
             }));
 
         panel.doSearch = function(){
+            var subjectType =  Ext.getCmp('subjectTypeGroup').getValue();
             var docs = Ext.getCmp('s_person_doc_tree').getRootNode().getChildAt(0);
             var params = {
                 op: 'LIST_ENTITY',
@@ -121,7 +195,8 @@ Ext.onReady(function() {
                 searchName: serviceCode,
                 timeout: 120000,
                 date: Ext.getCmp('edDate').value,
-                creditorId: Ext.getCmp('edCreditor').value
+                creditorId: Ext.getCmp('edCreditor').value,
+                subjectType: subjectType
             };
             params.childCnt = docs.childNodes.length;
             for(var i = 0; i< params.childCnt; i++) {

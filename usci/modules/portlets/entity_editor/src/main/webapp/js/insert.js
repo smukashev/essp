@@ -19,8 +19,7 @@ function getForm(node){
             var allowBlank = !(attr.isRequired || attr.isKey);
 
             if(attr.ref) {
-                this.add(Ext.create("Ext.form.field.ComboBox", {
-                    id: attr.code + "FromItem",
+                var refElement = Ext.create("Ext.form.field.ComboBox", {
                     fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
                     labelWidth: labelWidth,
                     width: width,
@@ -49,8 +48,7 @@ function getForm(node){
                         listeners: {
                             load: function(me,records,options) {
                                 if(records.length == 1)
-                                    Ext.getCmp(attr.code + "FromItem").setValue(records[0].get('ID'));
-
+                                    refElement.setValue(records[0].get('ID'));
                             }
                         }
                     }),
@@ -71,7 +69,8 @@ function getForm(node){
                             refChange(refNode, this.getValue());
                         }
                     }
-                }));
+                });
+                this.add(refElement);
             } else if(attr.type == 'STRING'){
                 form.add(Ext.create("Ext.form.field.Text", {
                     //id: attr.code + "FromItem" + idSuffix,
