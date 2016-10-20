@@ -1454,7 +1454,7 @@ Ext.onReady(function () {
                                     Ext.MessageBox.alert("", "Нельзя удалить на разные отчетные даты");
                                 });
                             },
-                            disabled: !editorAction.canDelete() || (node.data.isKey)
+                            disabled: !editorAction.canDelete() || (node.data.isKey) || (node.data.depth == 1 && !isDevMode)
                         });
                     }
 
