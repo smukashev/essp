@@ -60,6 +60,8 @@ Ext.onReady(function() {
                     if(records && records.length == 0)
                         Ext.MessageBox.alert(label_INFO, 'Поиск вернул 0 результатов');
 
+                    Ext.getCmp('entityEditorShowBtn').enable();
+
                     var totalCount = operation.request.proxy.reader.rawData.totalCount;
                     if(totalCount) {
                         userNavHistory.success(totalCount);

@@ -1302,7 +1302,7 @@ Ext.onReady(function () {
             visible: false,
             renderer: function (val, meta, record) {
                 if (val == 'subject') {
-                    var subjectName;
+                    var name;
                     record.eachChild(function (n) {
                         if (n.get('code') == 'person_info') {
                             var lastname;
@@ -1323,14 +1323,14 @@ Ext.onReady(function () {
                                     }
                                 }
                             });
-                            subjectName = "{0} {1} {2}".format(lastname ? lastname : '', firstname ? firstname : '', middlename ? middlename : '')
+                            name = "{0} {1} {2}".format(lastname ? lastname : '', firstname ? firstname : '', middlename ? middlename : '')
                         } else if (n.get('code') == 'organization_info') {
                             n.eachChild(function (n) {
                                 if (n.get('code') == 'names') {
                                     if (n.firstChild) {
                                         n.firstChild.eachChild(function (n) {
                                             if (n.get('code') == 'name') {
-                                                subjectName = n.get('value')
+                                                name = n.get('value')
                                             }
                                         });
                                     }
@@ -1338,8 +1338,30 @@ Ext.onReady(function () {
                             });
                         }
                     });
+                } else if(val.match(/\[\d+\]/)) {
+                    record.eachChild(function (node) {
+                        if(node.get('code') == 'portfolio') {
+
+                            for (var i = 0; i < node.childNodes.length; i++) {
+                                var childNode = node.childNodes[i];
+
+                                if(childNode.data.code == 'name_ru') {
+                                    name = childNode.data.value;
+                                }
+                            }
+                        } else if(node.get('code') == 'balance_account') {
+                            for (var i = 0; i < node.childNodes.length; i++) {
+                                var childNode = node.childNodes[i];
+
+                                if(childNode.data.code == 'no_') {
+                                    name = childNode.data.value;
+                                }
+                            }
+                        }
+                    });
                 }
-                return subjectName;
+
+                return name;
             }
         },{
             text: 'Дата открытия',
@@ -1432,7 +1454,7 @@ Ext.onReady(function () {
                                     Ext.MessageBox.alert("", "Нельзя удалить на разные отчетные даты");
                                 });
                             },
-                            disabled: !editorAction.canDelete() || (node.data.isKey)
+                            disabled: !editorAction.canDelete() || (node.data.isKey) || (node.data.depth == 1 && !isDevMode)
                         });
                     }
 

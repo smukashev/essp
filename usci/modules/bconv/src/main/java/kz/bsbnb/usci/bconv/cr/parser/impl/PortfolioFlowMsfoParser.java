@@ -12,6 +12,8 @@ import org.xml.sax.SAXException;
 
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @Scope("prototype")
@@ -24,6 +26,9 @@ public class PortfolioFlowMsfoParser extends BatchParser {
     private BaseEntity currentDetail;
 
     private MetaClass refPortfolioMeta, portfolioFlowDetailMeta, refBalanceAccountMeta;
+
+    //balance account control
+    private Map<String, BaseEntity> balanceAccountMap;
 
     @Override
     public void init() {
@@ -52,6 +57,7 @@ public class PortfolioFlowMsfoParser extends BatchParser {
                 break;
             case "details":
                 currentDetails = new BaseSet(portfolioFlowDetailMeta, creditorId);
+                balanceAccountMap = new HashMap<>();
                 break;
             case "detail":
                 currentDetail = new BaseEntity(portfolioFlowDetailMeta, batch.getRepDate(), creditorId);
@@ -61,8 +67,12 @@ public class PortfolioFlowMsfoParser extends BatchParser {
 
                 event = (XMLEvent) xmlReader.next();
 
+                String balanceAccountNo = trim(event.asCharacters().getData());
+
+                balanceAccountMap.put(balanceAccountNo, currentDetail);
+
                 ba.put("no_",
-                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), trim(event.asCharacters().getData()), false, true));
+                        new BaseEntityStringValue(0, creditorId, batch.getRepDate(), balanceAccountNo, false, true));
 
                 currentDetail.put(localName, new BaseEntityComplexValue(0, creditorId, batch.getRepDate(), ba, false, true));
                 break;
@@ -95,9 +105,15 @@ public class PortfolioFlowMsfoParser extends BatchParser {
             case "details":
                 currentBaseEntity.put(localName,
                         new BaseEntityComplexSet(0, creditorId, batch.getRepDate(), currentDetails, false, true));
+
+                for (String no : balanceAccountMap.keySet()) {
+                    currentDetails.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(),
+                            balanceAccountMap.get(no), false, true));
+                }
+
                 break;
             case "detail":
-                currentDetails.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentDetail, false, true));
+                //currentDetails.put(new BaseSetComplexValue(0, creditorId, batch.getRepDate(), currentDetail, false, true));
                 break;
             case "balance_account":
                 break;

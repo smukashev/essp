@@ -376,21 +376,6 @@ public class MainPortlet extends MVCPortlet {
             for (IBaseValue value : values) {
                 if (value != null && value.getValue() != null) {
 
-                    //bank relation check
-                    try {
-                        if(!isNb) {
-                            if ("bank_relations".equals(attr.getName())) {
-                                BaseEntity relation = (BaseEntity) value.getValue();
-                                if (((BaseEntity) relation.getEl("creditor")).getId() != creditorId)
-                                    continue;
-                            }
-                        }
-                    } catch(Exception e) {
-                        logger.error(null,e);
-                        // strict mode
-                        continue;
-                    }
-
                     if (!first) {
                         str += ",";
                     } else {

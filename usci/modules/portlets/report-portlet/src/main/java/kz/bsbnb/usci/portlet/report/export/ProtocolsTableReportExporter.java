@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.portlet.report.export;
 
+import com.liferay.portal.model.User;
 import com.mockrunner.mock.jdbc.MockResultSet;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.Protocol;
@@ -70,7 +71,7 @@ public class ProtocolsTableReportExporter {
 
     }
 
-    public ResultSet getData()  {
+    public ResultSet getData(User user)  {
 
         DataProvider provider = new BeanDataProvider();
         ResultSet rs=null;
@@ -78,7 +79,7 @@ public class ProtocolsTableReportExporter {
         List<List<Object>> TableData = new ArrayList<List<Object>>();
         HashMap<Long, Creditor> inputCreditors = new HashMap<Long, Creditor>();
 
-        List<Creditor> creditors = provider.getCreditorsList();
+        List<Creditor> creditors = provider.getCreditorsList(user);
         for(Creditor cred : creditors) {
             inputCreditors.put(cred.getId(), cred);
         }

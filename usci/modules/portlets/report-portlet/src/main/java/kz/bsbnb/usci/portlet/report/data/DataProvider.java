@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.portlet.report.data;
 
 //import com.bsbnb.creditregistry.dm.maintenance.InputFile;
+        import com.liferay.portal.model.User;
         import kz.bsbnb.usci.cr.model.Creditor;
         import kz.bsbnb.usci.cr.model.InputFile;
         import kz.bsbnb.usci.eav.model.json.BatchFullJModel;
@@ -15,7 +16,7 @@ package kz.bsbnb.usci.portlet.report.data;
  * @author Aidar.Myrzahanov
  */
 public interface DataProvider {
-    public List<Creditor> getCreditorsList();
+    public List<Creditor> getCreditorsList(User user);
     public List<InputInfoDisplayBean> getInputInfosByCreditors(List<Creditor> creditors, Date reportDate);
     public List<ProtocolDisplayBean> getProtocolsByInputInfo(InputInfoDisplayBean inputInfo);
     //public Map<String,List<ProtocolDisplayBean>> getProtocolsByInputInfoGroupedByContractNo(InputInfoDisplayBean inputInfo);
