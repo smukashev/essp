@@ -6,6 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
+
+import com.liferay.portal.model.User;
+import com.liferay.portal.util.PortalUtil;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Link;
 import kz.bsbnb.usci.core.service.*;
@@ -93,8 +96,9 @@ public class BeanDataProvider implements DataProvider {
         }
     }
 
-    public List<Creditor> getCreditorsList() {
-        return portalUserBusiness.getMainCreditorsInAlphabeticalOrder(10196);
+    public List<Creditor> getCreditorsList(User user) {
+
+        return portalUserBusiness.getMainCreditorsInAlphabeticalOrder(user.getUserId());
     }
 
     public List<ProtocolDisplayBean> getProtocolsByInputInfo(InputInfoDisplayBean inputInfo) {

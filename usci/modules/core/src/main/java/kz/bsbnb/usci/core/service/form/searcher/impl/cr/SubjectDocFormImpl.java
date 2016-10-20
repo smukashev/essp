@@ -75,7 +75,14 @@ public class SubjectDocFormImpl extends JDBCSupport implements ISearcherForm {
             }
         }
 
+        boolean isCreditor = parameters.get("subjectType").equals("isCreditor");
+        boolean isPerson = parameters.get("subjectType").equals("isPerson");
+        boolean isOrganization = parameters.get("subjectType").equals("isOrganization");
+
         subject.put("docs", new BaseValue(creditorId, reportDate, docs));
+        subject.put("is_creditor", new BaseValue(creditorId, reportDate, isCreditor));
+        subject.put("is_person", new BaseValue(creditorId, reportDate, isPerson));
+        subject.put("is_organization", new BaseValue(creditorId, reportDate, isOrganization));
         List<BaseEntity> entities = new LinkedList<>();
         ISearchResult ret = new NonPaginableSearchResult();
 
