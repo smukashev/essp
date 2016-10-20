@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.portlet.report.export;
 
+import com.liferay.portal.model.User;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -35,6 +36,18 @@ public class TableReportExporter extends AbstractReportExporter {
     private SimpleDateFormat defaultDateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private DecimalFormat defaultNumberFormat = new DecimalFormat("# ###");
     private final Logger logger = Logger.getLogger(TableReportExporter.class);
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    User user;
+
+
 
     protected Table getTable(CustomDataSource customDataSource) {
         defaultNumberFormat.setMaximumFractionDigits(3);
@@ -127,7 +140,7 @@ public class TableReportExporter extends AbstractReportExporter {
         loadStarted();
         getTargetReportComponent().clearOutputComponents();
         try {
-            CustomDataSource customDataSource = getTargetReportComponent().loadData();
+            CustomDataSource customDataSource = getTargetReportComponent().loadData(user);
             if (customDataSource == null) {
                 return;
             }

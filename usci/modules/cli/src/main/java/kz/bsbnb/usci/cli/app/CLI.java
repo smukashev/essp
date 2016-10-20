@@ -2573,7 +2573,7 @@ public class CLI {
         }
 
         String sourceFolder = args.get(0);
-        String targetFolder = "E:\\Zips";
+        String targetFolder = "/home/baur/essp/Zips";
 
         if (args.size() > 1)
             targetFolder = args.get(1);

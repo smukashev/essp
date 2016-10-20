@@ -158,16 +158,18 @@ public class ReportListLayout extends VerticalLayout {
         String reportName = report.getName();
         if ("BanksWithData".equalsIgnoreCase(reportName)) {
             reportComponent.addReportExporter(new BanksWithDataTableReportExporter());
-            reportComponent.addReportExporter(new JasperReportExporter());
+            reportComponent.addReportExporter(new JasperReportExporter(connect.getUser()));
         } else if(reportName.contains("Pledge")) {
             reportComponent.addReportExporter(new OutputFormExporter());
             logger.info("Output form exporter applied");
         } else {
             for (ExportType exportType : report.getExportTypesList()) {
                 if (ExportType.JASPER_XLS.equals(exportType.getName())) {
-                    reportComponent.addReportExporter(new JasperReportExporter());
+                    reportComponent.addReportExporter(new JasperReportExporter(connect.getUser()));
                 } else if (ExportType.TABLE_VAADIN.equals(exportType.getName())) {
-                    reportComponent.addReportExporter(new TableReportExporter());
+                    TableReportExporter tableReportExporter = new TableReportExporter();
+                    tableReportExporter.setUser(connect.getUser());
+                    reportComponent.addReportExporter(tableReportExporter);
                 } else if (ExportType.TEMPLATE_XLS.equals(exportType.getName())) {
                     reportComponent.addReportExporter(new TemplatedPagedXlsReportExporter());
                 } else {

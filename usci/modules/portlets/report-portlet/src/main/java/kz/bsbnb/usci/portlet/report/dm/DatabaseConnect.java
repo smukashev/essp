@@ -28,6 +28,11 @@ import java.util.Locale;
  */
 public class DatabaseConnect {
 
+    public User getUser() {
+        return user;
+    }
+
+
     private User user;
     private final Logger logger = Logger.getLogger(DatabaseConnect.class);
 

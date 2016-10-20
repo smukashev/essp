@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.portlet.report.ui;
 
+import com.liferay.portal.model.User;
 import kz.bsbnb.usci.portlet.report.dm.DatabaseConnect;
 import kz.bsbnb.usci.portlet.report.export.AbstractReportExporter;
 import kz.bsbnb.usci.portlet.report.dm.Report;
@@ -57,7 +58,7 @@ public class ReportComponent extends VerticalLayout {
         outputLayout.addComponent(outputComponent);
     }
     
-    public CustomDataSource loadData() throws SQLException {
+    public CustomDataSource loadData(User user) throws SQLException {
         List<Object> parameterValues = getParameterValues();
         if(parameterValues==null) {
             return null;
@@ -66,7 +67,7 @@ public class ReportComponent extends VerticalLayout {
         return getConnect().getDataSourceFromStoredProcedure(report.getProcedureName(), parameterValues);
         else
         {
-            return new CustomDataSource(new ProtocolsTableReportExporter(parameterValues,report.getName()).getData());
+            return new CustomDataSource(new ProtocolsTableReportExporter(parameterValues,report.getName()).getData(user));
         }
     }
 

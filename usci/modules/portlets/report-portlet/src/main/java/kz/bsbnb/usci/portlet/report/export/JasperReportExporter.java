@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.portlet.report.export;
 
+import com.liferay.portal.model.User;
 import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.Button;
@@ -37,6 +38,11 @@ import java.util.zip.ZipOutputStream;
  */
 public class JasperReportExporter extends AbstractReportExporter{
 
+    public JasperReportExporter(User user) {
+        this.user = user;
+    }
+
+    User user;
     private final Logger logger = Logger.getLogger(FileDownloadComponent.class);
     
     @Override
@@ -54,7 +60,7 @@ public class JasperReportExporter extends AbstractReportExporter{
     protected void exportToXls() {
         try {
             loadStarted();
-            CustomDataSource dataSource = getTargetReportComponent().loadData();
+            CustomDataSource dataSource = getTargetReportComponent().loadData(user);
             Report report = getTargetReportComponent().getReport();
             final String reportName = report.getName();
 
