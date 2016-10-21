@@ -291,9 +291,11 @@ public class BeanDataProvider implements DataProvider {
         Connection conn = getConnection();
         Calendar calendar;
         try {
+
             BigInteger creditorId = creditor.getId();
             Date firstNotApprovedDate = getFirstNotApprovedDate(creditorId);
-
+            if(facade.getRepDate()!=null)
+                return facade.getRepDate();
 
             if (firstNotApprovedDate != null)
                 return firstNotApprovedDate;
