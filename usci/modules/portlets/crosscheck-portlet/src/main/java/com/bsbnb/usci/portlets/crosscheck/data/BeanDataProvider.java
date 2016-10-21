@@ -72,7 +72,7 @@ public class BeanDataProvider implements DataProvider {
             ResultSet rs = stmt.executeQuery(query);
 
             while (rs.next()) {
-                Creditor c = ModelHelper.convertToCreditor(rs);
+                Creditor c = ModelHelper.convertToCreditor(conn, rs);
                 creditorList.add(c);
             }
 

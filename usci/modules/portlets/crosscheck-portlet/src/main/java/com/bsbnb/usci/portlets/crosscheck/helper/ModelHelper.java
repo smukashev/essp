@@ -2,11 +2,12 @@ package com.bsbnb.usci.portlets.crosscheck.helper;
 
 import com.bsbnb.usci.portlets.crosscheck.dm.*;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ModelHelper {
-    public static Creditor convertToCreditor(ResultSet rs) throws SQLException {
+    public static Creditor convertToCreditor(Connection conn, ResultSet rs) throws SQLException {
         Creditor c = new Creditor();
         c.setId(rs.getBigDecimal("ID").toBigInteger());
         c.setChangeDate(rs.getDate("CHANGE_DATE"));
@@ -15,7 +16,7 @@ public class ModelHelper {
         c.setShortName(rs.getString("SHORT_NAME"));
         c.setShutdownDate(rs.getDate("SHUTDOWN_DATE"));
         // c.setMainOfficeId();
-        // c.setSubjectType();
+         c.setSubjectType(DbHelper.getSubjectType(conn, rs.getBigDecimal("SUBJECT_TYPE_ID")));
 
         return c;
     }
@@ -61,21 +62,21 @@ public class ModelHelper {
         return m;
     }
 
-    public static SubjectType convertToSubjectType(ResultSet rs) {
+    public static SubjectType convertToSubjectType(ResultSet rs) throws SQLException {
         SubjectType st = new SubjectType();
 
-        /*st.setCloseDate();
-        st.setCode();
-        st.setCreditorList();
-        st.setId();
-        st.setIsLast();
-        st.setKindId();
-        st.setNameKz();
-        st.setNameRu();
-        st.setOpenDate();
-        st.setParentId();
-        st.setReportPeriodDurationMonths();
-        st.setSubjectTypeList();*/
+        st.setCloseDate(rs.getDate("CLOSE_DATE"));
+        st.setCode(rs.getString("CODE"));
+        //st.setCreditorList();
+        st.setId(rs.getBigDecimal("ID"));
+        st.setIsLast(new Short("1"));
+        //st.setKindId(rs.getBigDecimal("KIND_ID"));
+        st.setNameKz(rs.getString("NAME_KZ"));
+        st.setNameRu(rs.getString("NAME_RU"));
+        st.setOpenDate(rs.getDate("OPEN_DATE"));
+        //st.setParentId();
+        st.setReportPeriodDurationMonths(rs.getInt("REPORT_PERIOD_DURATION_MONTHS"));
+        //st.setSubjectTypeList();
 
         return st;
     }

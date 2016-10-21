@@ -4,9 +4,11 @@ import com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication;
 import com.bsbnb.usci.portlets.crosscheck.dm.Creditor;
 import com.bsbnb.usci.portlets.crosscheck.dm.CrossCheck;
 import com.bsbnb.usci.portlets.crosscheck.dm.Message;
+import com.bsbnb.usci.portlets.crosscheck.dm.SubjectType;
 import kz.bsbnb.usci.eav.StaticRouter;
 import org.apache.log4j.Logger;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -35,7 +37,7 @@ public class DbHelper {
             ResultSet rs = stmt.executeQuery(query);
             rs.next();
 
-            return ModelHelper.convertToCreditor(rs);
+            return ModelHelper.convertToCreditor(conn, rs);
 
         } catch (SQLException e ) {
             logger.error(null,e);
@@ -75,6 +77,27 @@ public class DbHelper {
             }
         }
 
+        return null;
+    }
+
+    public static SubjectType getSubjectType(Connection conn, BigDecimal id) {
+        Statement stmt = null;
+        String query = "SELECT ID, CODE, KIND_ID, NAME_KZ, NAME_RU, REPORT_PERIOD_DURATION_MONTHS, OPEN_DATE, CLOSE_DATE from " + StaticRouter.getShowcaseSchemaName()+".R_REF_SUBJECT_TYPE where REF_SUBJECT_TYPE_ID="+id;
+        try {
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            rs.next();
+
+            return ModelHelper.convertToSubjectType(rs);
+        } catch (SQLException e) {
+            logger.error(null,e);
+        } finally {
+            try {
+                if(stmt!=null) {stmt.close();}
+            } catch (SQLException sqle) {
+                logger.warn("Failed to cleanup", sqle);
+            }
+        }
         return null;
     }
 
