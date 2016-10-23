@@ -14,11 +14,13 @@ import kz.bsbnb.usci.eav.rule.PackageVersion;
 import kz.bsbnb.usci.eav.rule.Rule;
 import kz.bsbnb.usci.eav.rule.RulePackage;
 import kz.bsbnb.usci.eav.util.Errors;
+import kz.bsbnb.usci.porltet.model.JavaSourceFromString;
 import kz.bsbnb.usci.porltet.model.json.JsonMaker;
 import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import javax.portlet.*;
+import javax.tools.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.AccessControlException;
@@ -35,7 +37,6 @@ public class WatchPortlet extends MVCPortlet{
 
     public void connectToServices() throws PortletException {
         try {
-            //ApplicationContext context = new ClassPathXmlApplicationContext("applicationContextPortlet.xml");
 
             RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
             entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1098/entityService");
@@ -145,6 +146,31 @@ public class WatchPortlet extends MVCPortlet{
         PrintWriter writer = resourceResponse.getWriter();
 
         try {
+
+            StringBuilder sb = new StringBuilder(64);
+            sb.append("package test;\n");
+            sb.append("import model.*;\n");
+            sb.append("public class HelloWorld implements WatchInterface {\n");
+            sb.append("    public Message singleWatch(USCIServices services, WatchSetting setting) {\n");
+            sb.append("        System.out.println(\"Hello world\");\n");
+            sb.append("    }\n");
+            sb.append("}\n");
+
+            DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+
+            Iterable<? extends JavaFileObject> compilationUnit
+                    = Arrays.asList(new JavaSourceFromString("aa", sb.toString()));
+
+            JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics,
+                    null,
+                    null,
+                    compilationUnit);
+
+            if(task.call()) {
+                System.out.println("Yipe");
+            }
 
             if(batchService == null ||ruleService ==null || entityService == null)
                 connectToServices();
