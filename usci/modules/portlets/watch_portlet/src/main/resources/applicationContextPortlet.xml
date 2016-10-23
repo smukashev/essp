@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <context:component-scan base-package="kz.bsbnb.usci.eav.model"/>
+
+
+    <context:annotation-config/>
+
+
+    <!--
+    <bean id="remoteBatchService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IPackageService"/>
+    </bean>
+    -->
+    <!--
+    <bean id="remoteBatchVersionService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1097/batchVersionService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IBatchVersionService"/>
+    </bean>
+    -->
+    <!--
+    <bean id="remoteRuleService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl" value="rmi://127.0.0.1:1097/ruleService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.brms.rulemodel.service.IRuleService"/>
+    </bean>
+    -->
+</beans>
