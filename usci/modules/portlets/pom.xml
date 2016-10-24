@@ -44,6 +44,7 @@
         <module>queue-portlet</module>
         <module>server_browser</module>
         <module>credit-registry-query-portlet</module>
+        <module>watch_portlet</module>
     </modules>
 
     <distributionManagement>
