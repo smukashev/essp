@@ -18,7 +18,17 @@ public class BaseEntityOutput {
         if (entity == null) return "null";
 
         String str = entity.getMeta().getClassName() + "(" + entity.getId() + ", ";
-        str += entity.getReportDate() == null ? "-)" : DataTypes.dateFormatDot.format(entity.getReportDate()) + ");";
+        try {
+            str += entity.getReportDate() == null ? "-)" : DataTypes.dateFormatDot.format(entity.getReportDate()) + ");";
+        } catch (Exception e) {
+            if(entity.getMeta().getClassName().equals("credit")) {
+                System.out.println(entity.getEl("primary_contract.no"));
+                System.out.println(entity.getEl("primary_contract.date"));
+            }
+            System.out.println(entity);
+            System.out.println(entity.getReportDate());
+            throw e;
+        }
 
         MetaClass meta = entity.getMeta();
 
@@ -65,7 +75,17 @@ public class BaseEntityOutput {
                 if (type.isSet())
                     str += value.getId() + " : ";
 
-                str += DataTypes.dateFormatDot.format(value.getRepDate()) + " : " + valueToString;
+                try {
+                    str += DataTypes.dateFormatDot.format(value.getRepDate()) + " : " + valueToString;
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    if(entity.getMeta().getClassName().equals("credit")) {
+                        System.out.println(entity.getEl("primary_contract.no"));
+                        System.out.println(entity.getEl("primary_contract.date"));
+                    }
+                    System.out.println(entity);
+                    System.out.println(value.getRepDate());
+                    throw e;
+                }
             }
         }
 

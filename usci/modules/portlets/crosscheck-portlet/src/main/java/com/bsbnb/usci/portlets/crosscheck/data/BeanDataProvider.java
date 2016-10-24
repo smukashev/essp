@@ -72,7 +72,7 @@ public class BeanDataProvider implements DataProvider {
             ResultSet rs = stmt.executeQuery(query);
 
             while (rs.next()) {
-                Creditor c = ModelHelper.convertToCreditor(rs);
+                Creditor c = ModelHelper.convertToCreditor(conn, rs);
                 creditorList.add(c);
             }
 
@@ -221,8 +221,8 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM " + StaticRouter.getShowcaseSchemaName() +
-                ".R_REF_CREDITOR";
+        String query = "SELECT MAX(REPORT_DATE) AS MAX_CHANGE_DATE FROM EAV_REPORT@" + StaticRouter.getCoreSchemaName() +
+                " where creditor_id="+creditorId+" and status_id not in (5,6,7)";
 
         logger.info("getFirstNotApprovedDate: " + query);
 
@@ -256,8 +256,8 @@ public class BeanDataProvider implements DataProvider {
 
         Connection conn = getConnection();
         Statement stmt = null;
-        String query = "SELECT MAX(OPEN_DATE) AS MAX_CHANGE_DATE FROM " + StaticRouter.getShowcaseSchemaName() +
-                ".R_REF_CREDITOR";
+        String query = "SELECT MAX(REPORT_DATE) AS MAX_CHANGE_DATE FROM EAV_REPORT@" + StaticRouter.getCoreSchemaName() +
+                " where creditor_id="+creditorId+" and status_id in (5,6,7)";;
 
         logger.info("getLastApprovedDate: " + query);
 
@@ -289,8 +289,9 @@ public class BeanDataProvider implements DataProvider {
     @Override
     public Date getCreditorsReportDate(Creditor creditor) {
         Connection conn = getConnection();
-
+        Calendar calendar;
         try {
+
             BigInteger creditorId = creditor.getId();
             Date firstNotApprovedDate = getFirstNotApprovedDate(creditorId);
             if(facade.getRepDate()!=null)
@@ -310,16 +311,15 @@ public class BeanDataProvider implements DataProvider {
                 if (targetCreditor.getSubjectType() == null)
                     throw new RuntimeException("Subject type of the creditor with ID " + creditorId + " is null");
 
-                final Calendar calendar = Calendar.getInstance();
+                calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(lastApprovedDate.getTime());
                 calendar.add(Calendar.MONTH, targetCreditor.getSubjectType().getReportPeriodDurationMonths());
                 return calendar.getTime();
+            } else {
+                calendar = Calendar.getInstance();
+                calendar.clear();
+                calendar.set(2014, Calendar.JANUARY, 13);
             }
-
-            // TODO Пока что начальная дата как константа, нужно сделать настройку
-            Calendar calendar = Calendar.getInstance();
-            calendar.clear();
-            calendar.set(2014, Calendar.JANUARY, 13);
 
             return calendar.getTime();
 
