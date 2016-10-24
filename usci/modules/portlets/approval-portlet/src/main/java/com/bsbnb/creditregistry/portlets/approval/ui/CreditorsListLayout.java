@@ -167,7 +167,7 @@ public class CreditorsListLayout extends VerticalLayout implements ReportDisplay
         }
     }
 
-    private void displayDataForReportDate(Date reportDate, List<Creditor> selectedCreditors) {
+    private void displayDataForReportDate(final Date reportDate, List<Creditor> selectedCreditors) {
         reportDateLayout.setVisible(false);
         listLayout.setVisible(true);
         reportDateField.setValue(reportDate);
@@ -175,7 +175,7 @@ public class CreditorsListLayout extends VerticalLayout implements ReportDisplay
         Button exportToXlsButton = new Button(environment.getResourceString(Localization.EXPORT_TO_XLS_BUTTON_CAPTION), new Button.ClickListener() {
             public void buttonClick(Button.ClickEvent event) {
                 try {
-                    downloadXls("approval.xls");
+                    downloadXls("approval-"+(new SimpleDateFormat("dd.MM.yyyy").format(reportDate))+".xls");
                 } catch (WriteException we) {
                     logger.error(null, we);
                 } catch (IOException ioe) {
