@@ -1053,6 +1053,16 @@ Ext.onReady(function () {
         id: "entityRunRulesBtn",
         text: 'runrules',
         handler: function () {
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                if (hasEmptyKeyAttr(rootNode.childNodes[i])) {
+                    return;
+                }
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true).xml;
+            }
 
             Ext.Ajax.request({
                 url: dataUrl,
@@ -1063,13 +1073,35 @@ Ext.onReady(function () {
                     op: 'RUN_RULES'
                 },
                 success: function () {
-                    //Ext.MessageBox.alert("", "Сохранено успешно. Необходимо отправить изменения через портлет \"Отправка изменений\"");
+                    Ext.MessageBox.alert("", "Rule Run Success");
                 }
             });
 
         },
         maxWidth: 70,
         shadow: true
+    });
+
+    var ruleStore = new Ext.data.JsonStore({
+        fields: ['error']
+    });
+
+    var rulesModalWindow = Ext.create('Ext.window.Window', {
+        title: 'Не удалось сохранить',
+        height: 200,
+        width: 600,
+        layout: 'fit',
+        items: {
+            xtype: 'grid',
+            store: ruleStore,
+            loadMask: true,
+            columns: [
+                { header: 'Ошибки', dataIndex: 'error', width: 600, autoSizeColumn: true}
+            ],
+            viewConfig: {
+                forceFit: true
+            }
+        }
     });
 
     var buttonXML = Ext.create('Ext.button.Button', {
@@ -1095,14 +1127,19 @@ Ext.onReady(function () {
                     xml_data: xmlStr,
                     date: Ext.getCmp('edDate').value,
                     op: 'SAVE_XML',
-                    creditorId: Ext.getCmp('edCreditor').value
+                    creditorId: 2323//Ext.getCmp('edCreditor').value
                 },
                 success: function (response) {
                     var data = JSON.parse(response.responseText);
 
                     if(!data.success) {
-                        for(var i=0;i<data.errors.length;i++)
-                            console.log(data.errors[i]);
+                        var errors=new Array();
+                        for(var i=0;i<data.errors.length;i++){
+                            errors[i]=new Array();
+                            errors[i][0] = data.errors[i];
+                        }
+                        ruleStore.loadData(errors, false);
+                        rulesModalWindow.show();
                     } else {
                         Ext.MessageBox.alert("", "Сохранено успешно. Необходимо отправить изменения через портлет \"Отправка изменений\"");
                     }
