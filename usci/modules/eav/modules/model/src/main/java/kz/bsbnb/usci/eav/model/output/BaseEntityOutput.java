@@ -19,7 +19,9 @@ public class BaseEntityOutput {
 
         String str = entity.getMeta().getClassName() + "(" + entity.getId() + ", ";
         try {
-            str += entity.getReportDate() == null ? "-)" : DataTypes.dateFormatDot.format(entity.getReportDate()) + ");";
+            synchronized (BaseEntityOutput.class) {
+                str += entity.getReportDate() == null ? "-)" : DataTypes.dateFormatDot.format(entity.getReportDate()) + ");";
+            }
         } catch (Exception e) {
             if(entity.getMeta().getClassName().equals("credit")) {
                 System.out.println(entity.getEl("primary_contract.no"));
@@ -76,7 +78,9 @@ public class BaseEntityOutput {
                     str += value.getId() + " : ";
 
                 try {
-                    str += DataTypes.dateFormatDot.format(value.getRepDate()) + " : " + valueToString;
+                    synchronized (BaseEntityOutput.class) {
+                        str += DataTypes.dateFormatDot.format(value.getRepDate()) + " : " + valueToString;
+                    }
                 } catch (ArrayIndexOutOfBoundsException e) {
                     if(entity.getMeta().getClassName().equals("credit")) {
                         System.out.println(entity.getEl("primary_contract.no"));
