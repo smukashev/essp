@@ -30,6 +30,12 @@
         </property>
     </bean>
 
+    <bean id="rulesStatelessProcessor" class="kz.bsbnb.usci.eav.persistance.dao.impl.BaseEntityProcessorDaoImpl">
+        <property name="stateful" value="#{false}" />
+        <property name="applyListener" value="#{null}" />
+        <property name="rulesEnabled" value="#{true}" />
+    </bean>
+
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${jdbcPersistance.driver}"/>
         <property name="url" value="${jdbcPersistance.url}"/>

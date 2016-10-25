@@ -73,10 +73,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private RulesSingleton rulesSingleton;
 
     @Value("${rules.enabled}")
-    private boolean rulesEnabled;
+    public boolean rulesEnabled;
 
     @Autowired
     private IEavGlobalDao globalDao;
+
+    public boolean isStateful = true;
 
     private IDaoListener applyListener;
 
@@ -369,7 +371,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         processLogicControl(baseEntityApplied);
                     }
 
-                    baseEntityApplyDao.applyToDb(baseEntityManager);
+                    if(isStateful)
+                        baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
                 default:
                     throw new UnsupportedOperationException(Errors.compose(Errors.E118, baseEntityPostPrepared.getOperation()));

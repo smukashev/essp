@@ -1053,6 +1053,61 @@ Ext.onReady(function () {
         shadow: true
     });
 
+    var buttonRunRules = Ext.create('Ext.button.Button', {
+        id: "entityRunRulesBtn",
+        text: 'runrules',
+        handler: function () {
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                if (hasEmptyKeyAttr(rootNode.childNodes[i])) {
+                    return;
+                }
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true).xml;
+            }
+
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
+                    op: 'RUN_RULES'
+                },
+                success: function () {
+                    Ext.MessageBox.alert("", "Rule Run Success");
+                }
+            });
+
+        },
+        maxWidth: 70,
+        shadow: true
+    });
+
+    var ruleStore = new Ext.data.JsonStore({
+        fields: ['error']
+    });
+
+    var rulesModalWindow = Ext.create('Ext.window.Window', {
+        title: 'Не удалось сохранить',
+        height: 200,
+        width: 600,
+        layout: 'fit',
+        items: {
+            xtype: 'grid',
+            store: ruleStore,
+            loadMask: true,
+            columns: [
+                { header: 'Ошибки', dataIndex: 'error', width: 600, autoSizeColumn: true}
+            ],
+            viewConfig: {
+                forceFit: true
+            }
+        }
+    });
+
     var buttonXML = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
@@ -1075,10 +1130,23 @@ Ext.onReady(function () {
                 params: {
                     xml_data: xmlStr,
                     date: Ext.getCmp('edDate').value,
-                    op: 'SAVE_XML'
+                    op: 'SAVE_XML',
+                    creditorId: 2323//Ext.getCmp('edCreditor').value
                 },
-                success: function () {
-                    Ext.MessageBox.alert("", "Сохранено успешно. Необходимо отправить изменения через портлет \"Отправка изменений\"");
+                success: function (response) {
+                    var data = JSON.parse(response.responseText);
+
+                    if(!data.success) {
+                        var errors=new Array();
+                        for(var i=0;i<data.errors.length;i++){
+                            errors[i]=new Array();
+                            errors[i][0] = data.errors[i];
+                        }
+                        ruleStore.loadData(errors, false);
+                        rulesModalWindow.show();
+                    } else {
+                        Ext.MessageBox.alert("", "Сохранено успешно. Необходимо отправить изменения через портлет \"Отправка изменений\"");
+                    }
                 }
             });
         },
@@ -1410,7 +1478,7 @@ Ext.onReady(function () {
                             handler: function () {
                                 buttonXML.handler();
                             },
-                            disabled: !editorAction.hasUnsavedAction()
+                            disabled: false/*!editorAction.hasUnsavedAction()*/
                         });
                         items.push({
                             text: 'XML',
