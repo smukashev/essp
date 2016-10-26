@@ -167,6 +167,7 @@ public class MainPortlet extends MVCPortlet {
         LIST_CLASSES,
         LIST_ENTITY,
         SAVE_XML,
+        RUN_RULE,
         FIND_ACTION,
         GET_FORM,
         LIST_ATTRIBUTES,
@@ -613,6 +614,26 @@ public class MainPortlet extends MVCPortlet {
                         batchEntry.setUserId(currentUser.getUserId());
 
                         batchEntryService.save(batchEntry);
+                        out.write(("{\"success\": true }").getBytes());
+                    }
+
+                    break;
+                case RUN_RULE:
+                    xml = resourceRequest.getParameter("xml_data");
+                    sDate = resourceRequest.getParameter("date");
+                    date = (Date) DataTypes.getCastObject(DataTypes.DATE, sDate);
+                    creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
+
+                    baseEntity = getReceiverService().parse(xml, date, creditorId);
+                    errors = entityService.getValidationErrors(baseEntity);
+
+                    if(errors.size() > 0) {
+                        Map m = new HashedMap();
+                        Gson g = new Gson();
+                        m.put("success", false);
+                        m.put("errors", errors);
+                        out.write(g.toJson(m).getBytes());
+                    } else {
                         out.write(("{\"success\": true }").getBytes());
                     }
 

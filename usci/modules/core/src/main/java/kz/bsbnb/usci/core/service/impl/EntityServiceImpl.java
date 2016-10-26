@@ -31,7 +31,7 @@ import java.util.*;
 public class EntityServiceImpl extends UnicastRemoteObject implements IEntityService {
     private final Logger logger = LoggerFactory.getLogger(EntityServiceImpl.class);
 
-    @Qualifier("baseEntityProcessorDaoImpl")
+    @Qualifier("baseEntityProcessor")
     @Autowired
     private IBaseEntityProcessorDao baseEntityProcessorDao;
 
