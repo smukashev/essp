@@ -134,7 +134,7 @@ title: Руководитель юридического лица
 rule "head juridical"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit" 
-            && getEls("{setString(17,18,19,24)}credit_type.code") == 0
+            && getEls("{setString(12,17,18,19,24)}credit_type.code") == 0
             && getEls("{count}subject[is_organization=true]organization_info[is_se!=true][head=null]") > 0)
 then
   $entity.addValidationError("Не заполнен руководитель юридического лица");
