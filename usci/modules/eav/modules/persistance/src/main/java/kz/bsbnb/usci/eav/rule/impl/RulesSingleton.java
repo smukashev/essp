@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class RulesSingleton {
@@ -43,6 +44,8 @@ public class RulesSingleton {
 
     @Autowired
     private IMetaClassRepository metaClassRepository;
+
+    protected Map<String, BaseEntity> creditorCache;
 
     private class RuleCacheEntry implements Comparable {
         private Date repDate;
@@ -93,6 +96,7 @@ public class RulesSingleton {
 
     public RulesSingleton() {
         knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase();
+        creditorCache = new ConcurrentHashMap<>();
     }
 
     @PostConstruct
@@ -192,6 +196,7 @@ public class RulesSingleton {
 
         rulePackageErrors.clear();
         ruleCache.clear();
+        creditorCache.clear();
 
         for (RulePackage curPackage : packages) {
             List<PackageVersion> versions = ruleDao.getPackageVersions(curPackage);
@@ -239,6 +244,7 @@ public class RulesSingleton {
         // todo: rule
         kSession.setGlobal("baseEntityProcessorDao", baseEntityProcessorDao);
         kSession.setGlobal("metaClassRepository", metaClassRepository);
+        kSession.setGlobal("creditorCache", creditorCache);
 
         ArrayList<RuleCacheEntry> versions = ruleCache.get(pkgName);
         String packageName = null;

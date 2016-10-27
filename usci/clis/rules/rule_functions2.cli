@@ -167,4 +167,51 @@ $$$
 
 rule save
 
+
+rule read $$$
+title: работа со справочником кредиторов
+
+function String isBVUNODoc(List docs, IBaseEntityProcessorDao processorDao,
+                           IMetaClassRepository metaClassRepository,
+                           Map creditorCache){
+    Set<Long> uniqueCreditorIds = new HashSet<Long>();
+
+    for(Object docObject: docs) {
+        BaseEntity doc = (BaseEntity) docObject;
+        if(creditorCache.size() < 1) {
+            List<BaseEntity> creditorsDbList = processorDao.getEntityByMetaClass(
+                    metaClassRepository.getMetaClass("ref_creditor"));
+
+            for (BaseEntity creditor : creditorsDbList) {
+                BaseSet creditorDocs = (BaseSet) ((BaseValue) creditor.getBaseValue("docs")).getValue();
+                for (IBaseValue creditorDocValue : creditorDocs.get()) {
+                    BaseEntity creditorDoc = (BaseEntity) creditorDocValue.getValue();
+                    String docKey = creditorDoc.getEl("no") + " | " + creditorDoc.getEl("doc_type.code");
+                    creditorCache.put(docKey, creditor);
+                }
+            }
+        }
+
+        if(creditorCache.size() < 1)
+            throw new RuntimeException("Справочник кредиторов пуст.");
+
+
+        String docKey = doc.getEl("no") + " | " + doc.getEl("doc_type.code");
+        if(!creditorCache.containsKey(docKey))
+            return "Не существующий документ из справочника кредиторов " + docKey;
+
+        uniqueCreditorIds.add(((BaseEntity) creditorCache.get(docKey)).getId());
+    }
+
+    if(uniqueCreditorIds.size() > 1) {
+        return "Документы из разных кредиторов";
+    }
+
+    return "";
+}
+$$$
+
+rule save
+
+
 quit

@@ -401,3 +401,22 @@ end
 $$$
 
 rule save
+
+
+rule read $$$
+title: BVUNODOC
+rule "BVUNODOC"
+when
+  $entity: BaseEntity(getMeta().getClassName == "credit"
+      && getEl("subject.is_creditor") == true)
+  $r: String(length > 0) from isBVUNODoc((List) $entity.getEls("{get}subject.docs"),
+                                          baseEntityProcessorDao, metaClassRepository, creditorCache)
+then
+  $entity.addValidationError($r);
+end
+$$$
+
+rule save
+
+
+quit

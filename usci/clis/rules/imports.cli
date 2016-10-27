@@ -7,11 +7,14 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValue;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 
 global kz.bsbnb.usci.eav.repository.IMetaClassRepository metaClassRepository;
 global kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao baseEntityProcessorDao;
+global java.util.Map creditorCache;
 
 
 $$$
