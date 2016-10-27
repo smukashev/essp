@@ -208,8 +208,8 @@ public class CreditParser extends BatchParser {
         Attribute attrNullify = event.asStartElement().getAttributeByName(QName.valueOf("nullify"));
 
         if (attrNullify == null || !"true".equals(attrNullify.getValue())) {
+                event = (XMLEvent) xmlReader.next();
                 if(event.isCharacters()) {
-                    event = (XMLEvent) xmlReader.next();
                     return trim(event.asCharacters().getData());
                 }
         }
