@@ -625,4 +625,20 @@ $$$
 rule save
 
 
+rule read $$$
+title: HAS_CURRENCY_EARN
+rule "HAS_CURRENCY_EARN"
+when
+    $entity: BaseEntity(getMeta().getClassName() == "credit"
+             && getEl("currency.short_name") != null
+             && getEls("{setString(KZT)}currency.short_name") == 0
+             && getEl("has_currency_earn") == null)
+then
+    $entity.addValidationError("Не заполнен показатель «Наличие валютной выручки и (или) инструментов хеджирования у заемщика» по валютному займу (условному обязательству)");
+end
+$$$
+
+rule save
+
+
 quit
