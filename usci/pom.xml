@@ -27,7 +27,7 @@
         <module>modules/receiver</module>
         <module>modules/showcase</module>
         <module>modules/cli</module>
-        <!--<module>modules/portlets</module>-->
+        <module>modules/portlets</module>
         <module>modules/manager</module>
     </modules>
 

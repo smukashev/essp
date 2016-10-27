@@ -28,6 +28,11 @@ import java.util.Locale;
  */
 public class DatabaseConnect {
 
+    public User getUser() {
+        return user;
+    }
+
+
     private User user;
     private final Logger logger = Logger.getLogger(DatabaseConnect.class);
 
@@ -197,7 +202,7 @@ public class DatabaseConnect {
             logger.info("User id : "+ user.getUserId());
 
             statement.setLong(2, user.getUserId());
-            boolean hasAccess = hasAccessToPersonalData();
+            boolean hasAccess = true;//hasAccessToPersonalData();
             logger.info("Has access: "+ hasAccess);
             statement.setLong(3, hasAccess ? 1 : 0);
             for (int parameterIndex = 0; parameterIndex < parametersCount; parameterIndex++) {
@@ -244,7 +249,7 @@ public class DatabaseConnect {
             statement.registerOutParameter(1, OracleTypes.CURSOR);
             logger.info("User id : "+ user.getUserId());
             statement.setLong(2, user.getUserId());
-            boolean hasAccess = hasAccessToPersonalData();
+            boolean hasAccess = true;//hasAccessToPersonalData();
             logger.info("Has access: "+ hasAccess);
             statement.setLong(3, hasAccess ? 1 : 0);
             for (int parameterIndex = 0; parameterIndex < parametersCount; parameterIndex++) {

@@ -73,8 +73,9 @@ public class CrossCheckApplication extends Application {
                 String businessRulesUrl = prefs.getValue(ConfigurationActionImpl.BUSINESS_RULES_URL_KEY, "");
                 //User user = PortalUtil.getUser(request);
 
-                Date repDate =  (PortalUtil.getOriginalServletRequest(PortalUtil.getHttpServletRequest(request)).getParameter("repDate")!=null)?
-                        formatter.parse(PortalUtil.getOriginalServletRequest(PortalUtil.getHttpServletRequest(request)).getParameter("repDate")):new Date();
+                Date repDate=null;
+                if(PortalUtil.getOriginalServletRequest(PortalUtil.getHttpServletRequest(request)).getParameter("repDate")!=null)
+                    repDate = formatter.parse(PortalUtil.getOriginalServletRequest(PortalUtil.getHttpServletRequest(request)).getParameter("repDate"));
                 String creditorId =  PortalUtil.getOriginalServletRequest(PortalUtil.getHttpServletRequest(request)).getParameter("creditorId");
 
                 CrossCheckPortletEnvironmentFacade portletData =

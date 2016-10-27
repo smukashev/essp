@@ -210,23 +210,28 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     private void checkForRules(BaseEntity baseEntity) {
-        if (metaRules == null) {
-            String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
-            metaRules = new HashSet<>(Arrays.asList(metaArray));
-        }
-
-        if( rulesEnabledForUser(baseEntity) && metaRules.contains(baseEntity.getMeta().getClassName())) {
-            List<String> errors = new ArrayList<>();
-            try {
-                rulesSingleton.runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
-                for(String s : baseEntity.getValidationErrors()) errors.add(s);
-            } catch (Exception e) {
-                logger.error(Errors.compose(Errors.E290,e));
-                throw new RuntimeException(Errors.compose(Errors.E290,e));
+        long ruleTime = System.currentTimeMillis();
+        try {
+            if (metaRules == null) {
+                String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
+                metaRules = new HashSet<>(Arrays.asList(metaArray));
             }
 
-            if (errors.size() > 0)
-                throw new KnownIterativeException(errors);
+            if (rulesEnabledForUser(baseEntity) && metaRules.contains(baseEntity.getMeta().getClassName())) {
+                List<String> errors = new ArrayList<>();
+                try {
+                    rulesSingleton.runRules(baseEntity, baseEntity.getMeta().getClassName() + "_parser", baseEntity.getReportDate());
+                    for (String s : baseEntity.getValidationErrors()) errors.add(s);
+                } catch (Exception e) {
+                    logger.error(Errors.compose(Errors.E290, e));
+                    throw new RuntimeException(Errors.compose(Errors.E290, e));
+                }
+
+                if (errors.size() > 0)
+                    throw new KnownIterativeException(errors);
+            }
+        } finally {
+            sqlStats.put("checkForRules", (System.currentTimeMillis() - ruleTime));
         }
     }
 
@@ -250,8 +255,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         sqlStats.put("java::prepare", (System.currentTimeMillis() - prepareTime));
 
         /* Проверка сущности на бизнес правила */
-        if (!baseEntity.getMeta().isReference())
-            checkForRules((BaseEntity) baseEntityPostPrepared);
+        checkForRules((BaseEntity) baseEntityPostPrepared);
 
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
@@ -344,7 +348,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     if (baseEntityPostPrepared.getId() > 0)
                         throw new KnownException(Errors.compose(Errors.E196, baseEntityPostPrepared.getId()));
 
+                    long applyTime = System.currentTimeMillis();
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
+                    sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
                     if (rulesEnabledForUser(baseEntity))
                         processLogicControl(baseEntityApplied);
@@ -355,7 +361,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     if (baseEntityPostPrepared.getId() <= 0)
                         throw new KnownException(Errors.compose(Errors.E198));
 
+                    applyTime = System.currentTimeMillis();
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
+                    sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
                     if (rulesEnabledForUser(baseEntity)) {
                         processLogicControl(baseEntityApplied);
@@ -422,17 +430,23 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     private void processLogicControl(IBaseEntity baseEntityApplied) {
-        if (metaRules == null) {
-            String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
-            metaRules = new HashSet<>(Arrays.asList(metaArray));
-        }
+        long ruleTime = System.currentTimeMillis();
 
-        if (metaRules.contains(baseEntityApplied.getMeta().getClassName())) {
-            rulesSingleton.runRules(baseEntityApplied, baseEntityApplied.getMeta().getClassName() + "_process",
-                    baseEntityApplied.getReportDate());
+        try {
+            if (metaRules == null) {
+                String[] metaArray = globalDao.getValue(LOGIC_RULE_SETTING, LOGIC_RULE_META).split(",");
+                metaRules = new HashSet<>(Arrays.asList(metaArray));
+            }
 
-            if (baseEntityApplied.getValidationErrors().size() > 0)
-                throw new KnownIterativeException(baseEntityApplied.getValidationErrors());
+            if (metaRules.contains(baseEntityApplied.getMeta().getClassName())) {
+                rulesSingleton.runRules(baseEntityApplied, baseEntityApplied.getMeta().getClassName() + "_process",
+                        baseEntityApplied.getReportDate());
+
+                if (baseEntityApplied.getValidationErrors().size() > 0)
+                    throw new KnownIterativeException(baseEntityApplied.getValidationErrors());
+            }
+        } finally {
+            sqlStats.put("processLogicControl", (System.currentTimeMillis() - ruleTime));
         }
     }
 
