@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_econ_trade operation="CLOSE">
+      <code>69200</code>
+      <name_kz>Бухгалтерлік есепке алу және аудит саласындағы қызмет; салық салу бойынша кеңес беру</name_kz>
+      <name_ru>Деятельность в области бухгалтерского учета и аудита; консультации по налогообложению</name_ru>
+    </ref_econ_trade>
+    <ref_econ_trade operation="CLOSE">
+      <code>20160</code>
+      <name_kz>Пластмассаны бастапқы пішінде өндіру</name_kz>
+      <name_ru>Производство пластмасс в первичной форме</name_ru>
+    </ref_econ_trade>
+  </entities>
+</batch>

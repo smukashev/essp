@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_portfolio>
+      <code>1102</code>
+      <name_kz>9 - Просроченные займы (свыше 180 дн.)</name_kz>
+      <name_ru>9 - Просроченные займы (свыше 180 дн.)</name_ru>
+      <creditor>
+        <name>АО "Фонд финансовой поддержки сельского хозяйства"</name>
+        <short_name>АО "ФФПСХ"</short_name>
+        <docs>
+          <item>
+            <no>980840000675</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>031400130793</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Фонд ФПСХ:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+  </entities>
+</batch>
