@@ -46,19 +46,6 @@ rule import usci/clis/rules/rule_cr.cli
 rule import usci/clis/rules/ba/rule_ba_5.cli
 
 #===========================================================================================
-# dev_process
-#===========================================================================================
-rule set date 01.04.2001
-rule create package dev_process
-
-rule set package dev_process
-
-rule import usci/clis/rules/imports.cli
-rule import usci/clis/rules/rule_functions.cli
-rule import usci/clis/rules/rule_functions2.cli
-rule import usci/clis/rules/rule_dev.cli
-
-#===========================================================================================
 # ref_creditor_parser
 #===========================================================================================
 rule set date 01.04.2001
