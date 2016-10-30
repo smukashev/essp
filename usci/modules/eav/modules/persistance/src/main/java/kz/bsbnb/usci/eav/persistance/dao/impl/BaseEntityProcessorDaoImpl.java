@@ -34,6 +34,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
@@ -65,6 +66,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Autowired
     private IEavOptimizerDao eavOptimizerDao;
+
+    @Autowired
+    private IReportDao reportDao;
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
     @Autowired
     private BasicBaseEntitySearcherPool searcherPool;
@@ -344,6 +350,39 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityApplied = ((BaseEntity) baseEntityPostPrepared).clone();
                     baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
+                case CHECKED_REMOVE:
+                    if (baseEntityPostPrepared.getId() <= 0)
+                        throw new KnownException(Errors.compose(Errors.E112));
+
+                    if (baseEntityDao.isUsed(baseEntityPostPrepared.getId()))
+                        throw new KnownException(Errors.compose(Errors.E292));
+
+                    Date lastApprovedDate = reportDao.getLastApprovedDate(creditorId);
+                    if(lastApprovedDate != null) {
+                        IBaseEntity creditor = baseEntityLoadDao.load(creditorId);
+                        Integer period = (Integer) creditor.getEl("subject_type.report_period_duration_months");
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(lastApprovedDate);
+                        cal.add(Calendar.MONTH, period == null ? 1 : period);
+
+                        if (!baseEntity.getReportDate().equals(cal.getTime()))
+                            throw new KnownException(Errors.compose(Errors.E296, convertToDate(cal.getTime()), convertToDate(baseEntity.getReportDate())));
+
+                        baseEntityReportDateDao = persistableDaoPool.getPersistableDao(
+                                BaseEntityReportDate.class, IBaseEntityReportDateDao.class);
+
+                        Date previousReportDate = baseEntityReportDateDao.getPreviousReportDate(baseEntityPostPrepared.getId(), baseEntity.getReportDate());
+                        if (previousReportDate != null)
+                            throw new RuntimeException(Errors.compose(Errors.E297, convertToDate(previousReportDate)));
+                    }
+
+                    baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
+                    baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntityPostPrepared.getId(), baseEntityPostPrepared.getReportDate());
+                    baseEntityApplied.setOperation(OperationType.DELETE);
+
+                    baseEntityApplyDao.applyToDb(baseEntityManager);
+
+                    break;
                 case INSERT:
                     if (baseEntityPostPrepared.getId() > 0)
                         throw new KnownException(Errors.compose(Errors.E196, baseEntityPostPrepared.getId()));
@@ -411,6 +450,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         }
 
         return bvunoSet.contains(creditorId);
+    }
+
+    private String convertToDate(Date date){
+        synchronized (dateFormat) {
+            return dateFormat.format(date);
+        }
     }
 
     private void tempLogicControlUpdate(IBaseEntity baseEntityApplied) {

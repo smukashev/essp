@@ -159,6 +159,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
             if(hasOperationInsert(startElement))
                 baseEntity.setOperation(OperationType.INSERT);
+
+            if(hasOperationCheckedRemove(startElement))
+                baseEntity.setOperation(OperationType.CHECKED_REMOVE);
             currentContainer = baseEntity;
         } else {
             logger.debug("other: " + localName);
@@ -381,5 +384,11 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
         return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
                 startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
                         .equalsIgnoreCase(OperationType.INSERT.toString());
+    }
+
+    private boolean hasOperationCheckedRemove(StartElement startElement) {
+        return startElement.getAttributeByName(new QName(OPERATION_STR)) != null &&
+                startElement.getAttributeByName(new QName(OPERATION_STR)).getValue()
+                        .equalsIgnoreCase(OperationType.CHECKED_REMOVE.toString());
     }
 }

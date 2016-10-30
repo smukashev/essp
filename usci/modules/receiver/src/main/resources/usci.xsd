@@ -18,6 +18,7 @@
             <xsd:enumeration value="CLOSE"/>
             <xsd:enumeration value="INSERT"/>
             <xsd:enumeration value="NEW"/>
+            <xsd:enumeration value="CHECKED_REMOVE"/>
         </xsd:restriction>
     </xsd:simpleType>
 

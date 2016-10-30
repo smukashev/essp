@@ -43,6 +43,7 @@ public class XSDGenerator {
         ps.println("<xsd:enumeration value=\"CLOSE\"/>");
         ps.println("<xsd:enumeration value=\"INSERT\"/>");
         ps.println("<xsd:enumeration value=\"NEW\"/>");
+        ps.println("<xsd:enumeration value=\"CHECKED_REMOVE\"/>");
         ps.println("</xsd:restriction>");
         ps.println("</xsd:simpleType>");
 

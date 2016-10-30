@@ -324,8 +324,8 @@ public enum Errors {
         errors.put("E293", "Субъект может быть физ.лицом, юр.лицом или кредитором");
         errors.put("E294", "Ссылка на XSD файл неверная: #path");
         errors.put("E295", "[#val] не найден в справочнике #metaclass");
-        errors.put("E296", "");
-        errors.put("E297", "");
+        errors.put("E296", "Удаление невозможно на дату отличной от отчитываемой, отчитываема дата =  #reportDate,  заявлено = #claimed");
+        errors.put("E297", "Объект имеет историю отличную от отчетной даты. Удаление невозможно. Дата истории = #hisReportDate");
         errors.put("E298", "");
         errors.put("E299", "");
         errors.put("E300", "");

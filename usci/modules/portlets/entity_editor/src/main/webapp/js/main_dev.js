@@ -187,7 +187,7 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
         if (first) {
 
             if(currentNode.data.markedAsDeleted)
-                operation = 'DELETE';
+                operation = 'CHECKED_REMOVE';
 
             if(currentNode.data.markedAsClosed)
                 operation = 'CLOSE';
@@ -1454,7 +1454,7 @@ Ext.onReady(function () {
                                     Ext.MessageBox.alert("", "Нельзя удалить на разные отчетные даты");
                                 });
                             },
-                            disabled: !editorAction.canDelete() || (node.data.isKey) || (node.data.depth == 1 && !isDevMode)
+                            disabled: !editorAction.canDelete() || (node.data.isKey)
                         });
                     }
 

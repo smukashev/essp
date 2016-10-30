@@ -160,6 +160,12 @@ class CLIXMLReader {
                         .equalsIgnoreCase(OperationType.NEW.toString());
     }
 
+    private boolean hasOperationCheckedRemove(StartElement startElement) {
+        return startElement.getAttributeByName(new QName("operation")) != null &&
+                startElement.getAttributeByName(new QName("operation")).getValue()
+                        .equalsIgnoreCase(OperationType.CHECKED_REMOVE.toString());
+    }
+
     private void startElement(XMLEvent event, StartElement startElement, String localName) {
         if (localName.equals("batch")) {
             logger.info("batch");
@@ -177,6 +183,9 @@ class CLIXMLReader {
 
             if (hasOperationClose(startElement))
                 baseEntity.setOperation(OperationType.CLOSE);
+
+            if(hasOperationCheckedRemove(startElement))
+                baseEntity.setOperation(OperationType.CHECKED_REMOVE);
 
             currentContainer = baseEntity;
         } else {
