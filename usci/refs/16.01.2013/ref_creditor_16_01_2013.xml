@@ -17,6 +17,30 @@
             <code>15</code>
           </doc_type>
         </item>
+        <item>
+          <no>600400062088</no>
+          <doc_type>
+            <name_ru>Регистрационный номер налогоплательщика </name_ru>
+            <name_kz>Регистрационный номер налогоплательщика </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>1</is_person_doc>
+            <weight>25</weight>
+            <code>11</code>
+          </doc_type>
+        </item>
+        <item>
+          <no>941240001151</no>
+          <doc_type>
+            <name_ru>Бизнес - идентификационный номер </name_ru>
+            <name_kz>Бизнес - идентификационный номер </name_kz>
+            <is_identification>1</is_identification>
+            <is_organization_doc>1</is_organization_doc>
+            <is_person_doc>0</is_person_doc>
+            <weight>10</weight>
+            <code>07</code>
+          </doc_type>
+        </item>
       </docs>
       <subject_type>
         <kind_id>31</kind_id>

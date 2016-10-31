@@ -6,7 +6,8 @@ public enum OperationType {
     OPEN(OperationTypes.OPEN),
     CLOSE(OperationTypes.CLOSE),
     INSERT(OperationTypes.INSERT),
-    UPDATE(OperationTypes.UPDATE);
+    UPDATE(OperationTypes.UPDATE),
+    CHECKED_REMOVE(OperationTypes.CHECKED_REMOVE);
 
     private int value;
 

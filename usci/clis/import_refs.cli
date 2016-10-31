@@ -82,7 +82,10 @@ entity read  usci/refs/18.02.2002/ref_currency_c_18_02_2002.xml 18.02.2002
 entity read  usci/refs/13.01.2006/ref_currency_c_13_01_2006.xml 13.01.2006
 entity read  usci/refs/01.01.2012/ref_econ_trade_01_01_2012.xml 01.01.2012
 entity read  usci/refs/31.03.2016/ref_econ_trade_31_03_2016.xml 31.03.2016
+entity read  usci/refs/19.08.2016/ref_econ_trade_19_08_2016.xml 19.08.2016
+entity read  usci/refs/27.09.2016/ref_econ_trade_27_09_2016.xml 27.09.2016
 entity read  usci/refs/31.03.2016/ref_econ_trade_c_31_03_2016.xml 31.03.2016
+entity read  usci/refs/01.10.2016/ref_econ_trade_c_01_10_2016.xml 01.10.2016
 entity read  usci/refs/01.01.2012/ref_enterprise_type_01_01_2012.xml 01.01.2012
 entity read  usci/refs/01.12.2013/ref_enterprise_type_01_12_2013.xml 01.12.2013
 entity read  usci/refs/01.01.2012/ref_finance_source_01_01_2012.xml 01.01.2012
@@ -97,7 +100,7 @@ entity read  usci/refs/01.01.2013/ref_legal_form_01_01_2013.xml 01.01.2013
 entity read  usci/refs/01.04.2013/ref_legal_form_01_04_2013.xml 01.04.2013
 entity read  usci/refs/01.01.2012/ref_offshore_01_01_2012.xml 01.01.2012
 entity read  usci/refs/01.01.2012/ref_pledge_type_01_01_2012.xml 01.01.2012
-entity read  usci/refs/01.12.0014/ref_portfolio_01_12_0014.xml 01.01.2012
+entity read  usci/refs/17.11.0014/ref_portfolio_17_11_0014.xml 01.01.2012
 entity read  usci/refs/01.01.2012/ref_portfolio_01_01_2012.xml 01.01.2012
 entity read  usci/refs/01.04.2012/ref_portfolio_01_04_2012.xml 01.04.2012
 entity read  usci/refs/01.07.2012/ref_portfolio_01_07_2012.xml 01.07.2012
@@ -148,6 +151,9 @@ entity read  usci/refs/01.05.2016/ref_portfolio_01_05_2016.xml 01.05.2016
 entity read  usci/refs/01.06.2016/ref_portfolio_01_06_2016.xml 01.06.2016
 entity read  usci/refs/01.07.2016/ref_portfolio_01_07_2016.xml 01.07.2016
 entity read  usci/refs/01.08.2016/ref_portfolio_01_08_2016.xml 01.08.2016
+entity read  usci/refs/01.09.2016/ref_portfolio_01_09_2016.xml 01.09.2016
+entity read  usci/refs/15.09.2016/ref_portfolio_15_09_2016.xml 15.09.2016
+entity read  usci/refs/30.09.2016/ref_portfolio_30_09_2016.xml 30.09.2016
 entity read  usci/refs/01.01.2012/ref_ba_ct_01_01_2012.xml 01.01.2012
 entity read  usci/refs/01.01.2013/ref_ba_ct_01_01_2013.xml 01.01.2013
 entity read  usci/refs/30.04.2013/ref_ba_ct_30_04_2013.xml 30.04.2013
