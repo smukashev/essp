@@ -11,6 +11,7 @@ import kz.bsbnb.usci.cli.app.exporter.EntityExporter;
 import kz.bsbnb.usci.cli.app.mnt.Mnt;
 import kz.bsbnb.usci.cli.app.ref.BaseCrawler;
 import kz.bsbnb.usci.cli.app.ref.BaseRepository;
+import kz.bsbnb.usci.eav.model.exceptions.KnownIterativeException;
 import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.rule.impl.RulesSingleton;
 import kz.bsbnb.usci.core.service.IEntityService;
@@ -936,8 +937,14 @@ public class CLI {
                     System.out.println(entity.getMeta().getClassName() + " сохранился с ИД: " + id);
                     actualCount++;
                 } catch (Exception ex) {
-                    lastException = ex;
-                    System.out.println("Ошибка: " + Errors.decompose(ex.getMessage()));
+                    if(ex instanceof KnownIterativeException) {
+                        for (String s : ((KnownIterativeException) ex).getMessages()) {
+                            System.out.println(s);
+                        }
+                    } else {
+                        lastException = ex;
+                        System.out.println("Ошибка: " + Errors.decompose(ex.getMessage()));
+                    }
                 }
             }
             Batch batch = reader.getBatch();

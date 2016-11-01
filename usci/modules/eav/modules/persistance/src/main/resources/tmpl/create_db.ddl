@@ -218,12 +218,12 @@
 		</foreign-key>-->
 		<!-- previous value -->
 		<!-- next value -->
-		<index name="ebcsv_IN_si_ci_v_rd">
+		<unique name="ebcsv_IN_si_ci_v_rd">
 			<index-column name="set_id"/>
 			<index-column name="creditor_id"/>
 			<index-column name="report_date"/>
 			<index-column name="entity_value_id"/>
-		</index>
+		</unique>
 		<!-- closed value -->
 		<index name="ebcsv_IN_si_ci_v_rd_ic">
 			<index-column name="set_id"/>
