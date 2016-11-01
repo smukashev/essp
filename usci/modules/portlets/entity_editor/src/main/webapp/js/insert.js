@@ -382,4 +382,5 @@ function insertNewCredit() {
             })]}));
 
     refChange(creditor, Ext.getCmp('edCreditor').value);
+    editorAction.commitInsert();
 }
