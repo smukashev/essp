@@ -360,21 +360,23 @@ function insertNewCredit() {
                 metaId: 58,
                 children:[
                     Ext.create('entityModel', {
-                        title: 'sample title',
-                        code: 'Номер',
+                        title: 'Номер',
+                        code: 'no',
                         value: Ext.getCmp('edPrimaryContractNO').value,
                         ref: false,
                         leaf: true,
-                        type: 'STRING'
+                        type: 'STRING',
+                        simple: true
                     }),
                     Ext.create('entityModel', {
                         title: 'Дата',
                         code: 'date',
                         format: 'd.m.Y',
-                        value: Ext.getCmp('edPrimaryContractDate').value,
+                        value: Ext.getCmp('edPrimaryContractDate').getSubmitValue(),
                         ref: false,
                         leaf: true,
-                        type: 'DATE'
+                        type: 'DATE',
+                        simple: true
                     })
                 ]
             })]}));
