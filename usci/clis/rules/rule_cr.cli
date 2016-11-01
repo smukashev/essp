@@ -648,7 +648,7 @@ when
      $r: String() from $entity.getEls("{get}creditor.docs[doc_type.code=06]no")
      $a: String(equals($r)) from $entity.getEls("{get}subject.docs[doc_type.code=06]no")
 then
-	$entity.addValidationError("Вы не можете указывать себя в качестве субъекта кредитной истории");
+	$entity.addValidationError("Нельзя указывать себя в качестве субъекта кредитной истории");
 end
 $$$
 
@@ -662,7 +662,7 @@ when
      $r: String() from $entity.getEls("{get}creditor.docs[doc_type.code=07]no")
      $a: String(equals($r)) from $entity.getEls("{get}subject.docs[doc_type.code=07]no")
 then
-	$entity.addValidationError("Вы не можете указывать себя в качестве субъекта кредитной истории");
+	$entity.addValidationError("Нельзя указывать себя в качестве субъекта кредитной истории");
 end
 $$$
 
@@ -676,7 +676,7 @@ when
      $r: String() from $entity.getEls("{get}creditor.docs[doc_type.code=11]no")
      $a: String(equals($r)) from $entity.getEls("{get}subject.docs[doc_type.code=11]no")
 then
-	$entity.addValidationError("Вы не можете указывать себя в качестве субъекта кредитной истории");
+	$entity.addValidationError("Нельзя указывать себя в качестве субъекта кредитной истории");
 end
 $$$
 
@@ -690,7 +690,7 @@ when
      $r: String() from $entity.getEls("{get}creditor.docs[doc_type.code=17]no")
      $a: String(equals($r)) from $entity.getEls("{get}subject.docs[doc_type.code=17]no")
 then
-	$entity.addValidationError("Вы не можете указывать себя в качестве субъекта кредитной истории");
+	$entity.addValidationError("Нельзя указывать себя в качестве субъекта кредитной истории");
 end
 $$$
 
