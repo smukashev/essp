@@ -177,7 +177,7 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
     var ret = {
         xml: "",
         childCnt : 0
-    }
+    };
 
     var children = currentNode.childNodes;
 
@@ -217,6 +217,9 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
                     ret.xml += offset + " " + "<" + children[i].data.code + " data=\"" + children[i].data.value + "\" operation=\"NEW\">";
                     ret.xml += children[i].data.oldValue;
                 } else {
+                    if(currentNode.data.ref && !children[i].data.isKey)
+                        continue;
+
                     ret.xml += offset + "  " + "<" + children[i].data.code + ">";
                     ret.xml += children[i].data.value;
                 }
@@ -1458,12 +1461,12 @@ Ext.onReady(function () {
                         });
                     }
 
-                    /*items.push({
+                    items.push({
                      text: 'log',
                      handler: function(){
                      console.log(node);
                      }
-                     });*/
+                     });
 
                     var menu = new Ext.menu.Menu({
                         items: items
