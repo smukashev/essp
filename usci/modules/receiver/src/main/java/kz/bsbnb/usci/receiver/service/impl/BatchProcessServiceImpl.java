@@ -2,16 +2,20 @@ package kz.bsbnb.usci.receiver.service.impl;
 
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.InputInfo;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.stats.QueryEntry;
 import kz.bsbnb.usci.eav.model.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.util.QueueOrderType;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
+import kz.bsbnb.usci.receiver.reader.parser.ParserBuilder;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.tool.status.ReceiverStatus;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.xml.stream.XMLStreamException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -98,5 +102,22 @@ public class BatchProcessServiceImpl implements IBatchProcessService {
     @Override
     public long parseCreditorId(byte[] bytes) {
         return zipFilesMonitor.parseCreditorId(bytes);
+    }
+
+    @Autowired
+    ParserBuilder<IBaseEntity> parserBuilder;
+
+    @Override
+    public IBaseEntity parse(String xml, Date reportDate, long creditorId) throws XMLStreamException {
+        IBaseEntity ret = parserBuilder.getParser(xml, reportDate, creditorId).read();
+        if(ret == null) {
+            xml = "<batch>\n" +
+                    "<entities xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" + xml + "\n";
+            xml += "\n</entities>\n</batch>";
+
+            ret = parserBuilder.getParser(xml, reportDate,creditorId).read();
+        }
+
+        return ret;
     }
 }

@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,7 @@ import java.util.*;
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Repository
+@Primary
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
@@ -79,12 +81,12 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private RulesSingleton rulesSingleton;
 
     @Value("${rules.enabled}")
-    private boolean rulesEnabled;
+    public boolean rulesEnabled;
 
     @Autowired
     private IEavGlobalDao globalDao;
 
-    private IDaoListener applyListener;
+    public boolean isStateful = true;
 
     private Set<String> metaRules;
 
@@ -93,9 +95,16 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     private Set bvunoSet;
 
-    @Autowired
+    private IDaoListener applyListener;
+
     public void setApplyListener(IDaoListener applyListener) {
         this.applyListener = applyListener;
+    }
+
+    public boolean dbApplyEnabled;
+
+    public void setDbApplyEnabled(boolean dbApplyEnabled) {
+        this.dbApplyEnabled = dbApplyEnabled;
     }
 
     @Override
@@ -250,10 +259,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseEntity baseEntityApplied;
 
         /* Все данные кроме справочников должны иметь кредитора */
-        if (!baseEntity.getMeta().isReference() && baseEntity.getBaseEntityReportDate().getCreditorId() == 0)
-            throw new IllegalStateException(Errors.compose(Errors.E197));
+        //if (!baseEntity.getMeta().isReference() && baseEntity.getBaseEntityReportDate().getCreditorId() == 0)
+        //    throw new IllegalStateException(Errors.compose(Errors.E197));
 
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
+        creditorId = 2321;
         baseEntityManager.registerCreditorId(creditorId);
 
         long prepareTime = System.currentTimeMillis();
@@ -408,7 +418,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         processLogicControl(baseEntityApplied);
                     }
 
-                    baseEntityApplyDao.applyToDb(baseEntityManager);
+                    if(isStateful)
+                        baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
                 default:
                     throw new UnsupportedOperationException(Errors.compose(Errors.E118, baseEntityPostPrepared.getOperation()));
@@ -422,7 +433,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 processLogicControl(baseEntityApplied);
             }
 
-            baseEntityApplyDao.applyToDb(baseEntityManager);
+            if(dbApplyEnabled)
+                baseEntityApplyDao.applyToDb(baseEntityManager);
         }
 
         if (applyListener != null)
@@ -597,5 +609,13 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         }
 
+    }
+
+    public void setStateful(Boolean stateful) {
+        isStateful = stateful;
+    }
+
+    public void setRulesEnabled(boolean rulesEnabled) {
+        this.rulesEnabled = rulesEnabled;
     }
 }
