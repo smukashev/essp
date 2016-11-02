@@ -35,13 +35,11 @@
 
     <bean id="rulesStatelessProcessor" class="kz.bsbnb.usci.eav.persistance.dao.impl.BaseEntityProcessorDaoImpl">
         <property name="applyListener" value="#{null}" />
-        <property name="rulesEnabled" value="#{true}" />
         <property name="dbApplyEnabled" value="#{false}" />
     </bean>
 
     <bean id="baseEntityProcessor" class="kz.bsbnb.usci.eav.persistance.dao.impl.BaseEntityProcessorDaoImpl">
         <property name="applyListener" ref="entityProcessorListenerImpl" />
-        <property name="rulesEnabled" value="#{true}" />
         <property name="dbApplyEnabled" value="#{true}" />
     </bean>
 

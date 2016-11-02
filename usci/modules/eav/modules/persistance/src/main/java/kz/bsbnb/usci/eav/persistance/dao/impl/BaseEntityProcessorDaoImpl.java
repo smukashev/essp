@@ -80,9 +80,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     private RulesSingleton rulesSingleton;
 
-    @Value("${rules.enabled}")
-    public boolean rulesEnabled;
-
     @Autowired
     private IEavGlobalDao globalDao;
 
@@ -605,9 +602,5 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         }
 
-    }
-
-    public void setRulesEnabled(boolean rulesEnabled) {
-        this.rulesEnabled = rulesEnabled;
     }
 }
