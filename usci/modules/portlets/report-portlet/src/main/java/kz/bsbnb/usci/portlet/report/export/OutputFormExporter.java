@@ -70,8 +70,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
 
 
     @Override
-    protected boolean generatePage(String exportFilePrefix, int sheetNumber) throws WriteException, IOException, SQLException {
-        logger.info("Output report");
+    protected boolean generatePage(String exportFilePrefix, int sheetNumber) throws WriteException, IOException, SQLException {logger.info("Output report");
         WorkbookSettings settings = new WorkbookSettings();
         settings.setUseTemporaryFileDuringWrite(true);
         settings.setRationalization(false);
@@ -114,13 +113,16 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             ReportApplication.logTime("After query");
             rsmd = dataSource.getMetaData();
             int startIdIndex = idIndex;
-            while (dataSource.next()) {
-                writeRow(dataSource, currentSheet);
-                rowIndex++;
-                if (rowIndex % 1000 == 0) {
-                    ReportApplication.logTime(String.format("Row #%d", rowIndex));
+            if(dataSource!=null) {
+
+                while (dataSource.next()) {
+                    writeRow(dataSource, currentSheet);
+                    rowIndex++;
+                    if (rowIndex % 1000 == 0) {
+                        ReportApplication.logTime(String.format("Row #%d", rowIndex));
+                    }
+                    recordCounter++;
                 }
-                recordCounter++;
             }
             mergeRowIfNecessary(currentSheet);
             ReportApplication.logTime("After reading data source");
