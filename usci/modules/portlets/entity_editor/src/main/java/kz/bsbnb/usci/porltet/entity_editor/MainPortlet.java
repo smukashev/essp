@@ -48,6 +48,7 @@ public class MainPortlet extends MVCPortlet {
     private ISearcherFormService searcherFormService;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private ReportBeanRemoteBusiness reportBusiness;
+    private IBatchProcessService batchProcessService;
     private final Logger logger = Logger.getLogger(MainPortlet.class);
     private boolean retry;
 
@@ -103,21 +104,18 @@ public class MainPortlet extends MVCPortlet {
             reportBusinessFactoryBean.afterPropertiesSet();
             reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
 
+            RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+            batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1097/batchProcessService");
+            batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+            batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            batchProcessServiceFactoryBean.afterPropertiesSet();
+            batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
+
         } catch (Exception e) {
             throw new RuntimeException(Errors.getError(Errors.E286));
         }
-    }
-
-    public IBatchProcessService getReceiverService(){
-        RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
-        batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
-                + ":1097/batchProcessService");
-        batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
-        batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
-
-        batchProcessServiceFactoryBean.afterPropertiesSet();
-        IBatchProcessService batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
-        return batchProcessService;
     }
 
     private List<String> classesFilter;
@@ -595,27 +593,16 @@ public class MainPortlet extends MVCPortlet {
                     String xml = resourceRequest.getParameter("xml_data");
                     String sDate = resourceRequest.getParameter("date");
                     Date date = (Date) DataTypes.getCastObject(DataTypes.DATE, sDate);
-                    creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
 
-                    IBaseEntity baseEntity = getReceiverService().parse(xml, date, creditorId);
-                    List<String> errors = entityService.getValidationErrors(baseEntity);
+                    BatchEntry batchEntry = new BatchEntry();
 
-                    if(errors.size() > 0) {
-                        Map m = new HashedMap();
-                        Gson g = new Gson();
-                        m.put("success", false);
-                        m.put("errors", errors);
-                        out.write(g.toJson(m).getBytes());
-                    } else {
-                        BatchEntry batchEntry = new BatchEntry();
+                    batchEntry.setValue(xml);
+                    batchEntry.setRepDate(date);
+                    batchEntry.setUserId(currentUser.getUserId());
 
-                        batchEntry.setValue(xml);
-                        batchEntry.setRepDate(date);
-                        batchEntry.setUserId(currentUser.getUserId());
+                    batchEntryService.save(batchEntry);
 
-                        batchEntryService.save(batchEntry);
-                        out.write(("{\"success\": true }").getBytes());
-                    }
+                    out.write(("{\"success\": true }").getBytes());
 
                     break;
                 case RUN_RULE:
@@ -624,8 +611,8 @@ public class MainPortlet extends MVCPortlet {
                     date = (Date) DataTypes.getCastObject(DataTypes.DATE, sDate);
                     creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
 
-                    baseEntity = getReceiverService().parse(xml, date, creditorId);
-                    errors = entityService.getValidationErrors(baseEntity);
+                    IBaseEntity baseEntity = batchProcessService.parse(xml, date, creditorId);
+                    List<String> errors = entityService.getValidationErrors(baseEntity);
 
                     if(errors.size() > 0) {
                         Map m = new HashedMap();

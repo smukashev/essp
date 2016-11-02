@@ -86,7 +86,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     private IEavGlobalDao globalDao;
 
-    public boolean isStateful = true;
+    private IDaoListener applyListener;
 
     private Set<String> metaRules;
 
@@ -94,8 +94,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private IRefRepository refRepository;
 
     private Set bvunoSet;
-
-    private IDaoListener applyListener;
 
     public void setApplyListener(IDaoListener applyListener) {
         this.applyListener = applyListener;
@@ -259,11 +257,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         IBaseEntity baseEntityApplied;
 
         /* Все данные кроме справочников должны иметь кредитора */
-        //if (!baseEntity.getMeta().isReference() && baseEntity.getBaseEntityReportDate().getCreditorId() == 0)
-        //    throw new IllegalStateException(Errors.compose(Errors.E197));
+        if (!baseEntity.getMeta().isReference() && baseEntity.getBaseEntityReportDate().getCreditorId() == 0)
+            throw new IllegalStateException(Errors.compose(Errors.E197));
 
         long creditorId = baseEntity.getBaseEntityReportDate().getCreditorId();
-        creditorId = 2321;
         baseEntityManager.registerCreditorId(creditorId);
 
         long prepareTime = System.currentTimeMillis();
@@ -418,8 +415,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         processLogicControl(baseEntityApplied);
                     }
 
-                    if(isStateful)
-                        baseEntityApplyDao.applyToDb(baseEntityManager);
+                    baseEntityApplyDao.applyToDb(baseEntityManager);
                     break;
                 default:
                     throw new UnsupportedOperationException(Errors.compose(Errors.E118, baseEntityPostPrepared.getOperation()));
@@ -609,10 +605,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         }
 
-    }
-
-    public void setStateful(Boolean stateful) {
-        isStateful = stateful;
     }
 
     public void setRulesEnabled(boolean rulesEnabled) {
