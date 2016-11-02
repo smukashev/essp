@@ -56,7 +56,7 @@ public class CommonParser<T> {
 
     protected int totalCount = 0;
 
-    protected boolean rootEntityExpected = false;
+    protected boolean rootEntityExpected = true;
 
     protected String currentRootMeta = null;
 
