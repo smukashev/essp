@@ -809,7 +809,7 @@ function insertForm(node){
         } else {
             formAdvanced(node, function(form){
                 Ext.getCmp('entityTreeView').getView().refresh();
-                editorAction.commitEdit();
+                editorAction.commitInsert();
             });
         }
     }
@@ -1543,12 +1543,14 @@ Ext.onReady(function () {
                         });
                     }
 
-                    items.push({
-                     text: 'log',
-                     handler: function(){
-                     console.log(node);
-                     }
-                     });
+                    if(isDevMode) {
+                        items.push({
+                            text: 'log',
+                            handler: function () {
+                                console.log(node);
+                            }
+                        });
+                    }
 
                     var menu = new Ext.menu.Menu({
                         items: items
