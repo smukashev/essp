@@ -7,6 +7,7 @@ import java.util.*;
 
 import com.vaadin.ui.*;
 import kz.bsbnb.usci.eav.util.Errors;
+import kz.bsbnb.usci.portlet.report.data.DataProvider;
 import kz.bsbnb.usci.portlet.report.dm.DatabaseConnect;
 import kz.bsbnb.usci.portlet.report.ReportApplication;
 import kz.bsbnb.usci.portlet.report.dm.Report;
@@ -24,7 +25,6 @@ import org.apache.log4j.Logger;
  */
 public class ParametersComponent extends VerticalLayout {
     private DatabaseConnect connect;
-
     private static final String LOCALIZATION_PREFIX = "PARAMETERS-COMPONENT";
     private static final Logger logger = Logger.getLogger(ParametersComponent.class);
 
@@ -69,7 +69,11 @@ public class ParametersComponent extends VerticalLayout {
                     DateField dateField = new DateField();
                     dateField.setDateFormat("dd.MM.yyyy");
                     dateField.setCaption(localizedParameterName);
-                    dateField.setValue(new Date());
+                    if (parameter.getProcedureName() != null) {
+                        dateField.setValue(connect.getDateFromStoredProcedure(parameter.getProcedureName()));
+                    } else {
+                        dateField.setValue(new Date());
+                    }
                     parameterComponent = dateField;
                     break;
                 case TIME: 
