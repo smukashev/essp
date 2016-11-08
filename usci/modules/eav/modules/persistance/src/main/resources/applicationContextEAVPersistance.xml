@@ -30,6 +30,20 @@
         </property>
     </bean>
 
+    <bean id="entityProcessorListenerImpl" class="kz.bsbnb.usci.eav.showcase.EntityProcessorListenerImpl">
+    </bean>
+
+    <bean id="rulesStatelessProcessor" class="kz.bsbnb.usci.eav.persistance.dao.impl.BaseEntityProcessorDaoImpl">
+        <property name="applyListener" value="#{null}" />
+        <property name="dbApplyEnabled" value="#{false}" />
+    </bean>
+
+    <bean id="baseEntityProcessor" class="kz.bsbnb.usci.eav.persistance.dao.impl.BaseEntityProcessorDaoImpl">
+        <property name="applyListener" ref="entityProcessorListenerImpl" />
+        <property name="dbApplyEnabled" value="#{true}" />
+    </bean>
+
+
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${jdbcPersistance.driver}"/>
         <property name="url" value="${jdbcPersistance.url}"/>

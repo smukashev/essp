@@ -7,6 +7,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.liferay.util.portlet.PortletProps;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
+import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.form.ISearcherFormService;
@@ -14,6 +15,7 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.model.RefListResponse;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.meta.*;
@@ -22,8 +24,9 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
 import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.Errors;
-import kz.bsbnb.usci.sync.service.IEntityService;
+import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -45,6 +48,7 @@ public class MainPortlet extends MVCPortlet {
     private ISearcherFormService searcherFormService;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private ReportBeanRemoteBusiness reportBusiness;
+    private IBatchProcessService batchProcessService;
     private final Logger logger = Logger.getLogger(MainPortlet.class);
     private boolean retry;
 
@@ -60,7 +64,7 @@ public class MainPortlet extends MVCPortlet {
             metaFactoryService = (IMetaFactoryService) metaFactoryServiceFactoryBean.getObject();
 
             RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
-            entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1098/entityService");
+            entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/entityService");
             entityServiceFactoryBean.setServiceInterface(IEntityService.class);
             entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
 
@@ -99,6 +103,15 @@ public class MainPortlet extends MVCPortlet {
             reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
             reportBusinessFactoryBean.afterPropertiesSet();
             reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
+
+            RmiProxyFactoryBean batchProcessServiceFactoryBean = new RmiProxyFactoryBean();
+            batchProcessServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP()
+                    + ":1097/batchProcessService");
+            batchProcessServiceFactoryBean.setServiceInterface(IBatchProcessService.class);
+            batchProcessServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            batchProcessServiceFactoryBean.afterPropertiesSet();
+            batchProcessService = (IBatchProcessService) batchProcessServiceFactoryBean.getObject();
 
         } catch (Exception e) {
             throw new RuntimeException(Errors.getError(Errors.E286));
@@ -152,6 +165,7 @@ public class MainPortlet extends MVCPortlet {
         LIST_CLASSES,
         LIST_ENTITY,
         SAVE_XML,
+        RUN_RULE,
         FIND_ACTION,
         GET_FORM,
         LIST_ATTRIBUTES,
@@ -589,6 +603,26 @@ public class MainPortlet extends MVCPortlet {
                     batchEntryService.save(batchEntry);
 
                     out.write(("{\"success\": true }").getBytes());
+
+                    break;
+                case RUN_RULE:
+                    xml = resourceRequest.getParameter("xml_data");
+                    sDate = resourceRequest.getParameter("date");
+                    date = (Date) DataTypes.getCastObject(DataTypes.DATE, sDate);
+                    creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
+
+                    IBaseEntity baseEntity = batchProcessService.parse(xml, date, creditorId);
+                    List<String> errors = entityService.getValidationErrors(baseEntity);
+
+                    if(errors.size() > 0) {
+                        Map m = new HashedMap();
+                        Gson g = new Gson();
+                        m.put("success", false);
+                        m.put("errors", errors);
+                        out.write(g.toJson(m).getBytes());
+                    } else {
+                        out.write(("{\"success\": true }").getBytes());
+                    }
 
                     break;
                 case LIST_ATTRIBUTES:

@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,7 @@ import java.util.*;
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Repository
+@Primary
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
     private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
 
@@ -78,9 +80,6 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Autowired
     private RulesSingleton rulesSingleton;
 
-    @Value("${rules.enabled}")
-    private boolean rulesEnabled;
-
     @Autowired
     private IEavGlobalDao globalDao;
 
@@ -93,9 +92,14 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     private Set bvunoSet;
 
-    @Autowired
     public void setApplyListener(IDaoListener applyListener) {
         this.applyListener = applyListener;
+    }
+
+    public boolean dbApplyEnabled;
+
+    public void setDbApplyEnabled(boolean dbApplyEnabled) {
+        this.dbApplyEnabled = dbApplyEnabled;
     }
 
     @Override
@@ -422,7 +426,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                 processLogicControl(baseEntityApplied);
             }
 
-            baseEntityApplyDao.applyToDb(baseEntityManager);
+            if(dbApplyEnabled)
+                baseEntityApplyDao.applyToDb(baseEntityManager);
         }
 
         if (applyListener != null)

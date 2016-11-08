@@ -177,7 +177,7 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
     var ret = {
         xml: "",
         childCnt : 0
-    }
+    };
 
     var children = currentNode.childNodes;
 
@@ -217,6 +217,9 @@ function createXML(currentNode, rootFlag, offset, arrayEl, first, operation) {
                     ret.xml += offset + " " + "<" + children[i].data.code + " data=\"" + children[i].data.value + "\" operation=\"NEW\">";
                     ret.xml += children[i].data.oldValue;
                 } else {
+                    if(currentNode.data.ref && !children[i].data.isKey)
+                        continue;
+
                     ret.xml += offset + "  " + "<" + children[i].data.code + ">";
                     ret.xml += children[i].data.value;
                 }
@@ -806,6 +809,7 @@ function insertForm(node){
         } else {
             formAdvanced(node, function(form){
                 Ext.getCmp('entityTreeView').getView().refresh();
+                editorAction.commitInsert();
             });
         }
     }
@@ -1053,6 +1057,73 @@ Ext.onReady(function () {
         shadow: true
     });
 
+    var buttonRule = Ext.create('Ext.button.Button', {
+        text: 'Правила',
+        handler: function (callback) {
+            var tree = Ext.getCmp('entityTreeView');
+            rootNode = tree.getRootNode();
+            var xmlStr = "";
+
+            for (var i = 0; i < rootNode.childNodes.length; i++) {
+                if (hasEmptyKeyAttr(rootNode.childNodes[i])) {
+                    return;
+                }
+                xmlStr += createXML(rootNode.childNodes[i], true, "", false, true).xml;
+            }
+
+            Ext.Ajax.request({
+                url: dataUrl,
+                method: 'POST',
+                params: {
+                    xml_data: xmlStr,
+                    date: Ext.getCmp('edDate').value,
+                    op: 'RUN_RULE',
+                    creditorId: Ext.getCmp('edCreditor').value
+                },
+                success: function (response) {
+                    var data = JSON.parse(response.responseText);
+
+                    if(!data.success) {
+                        var errors = [];
+                        for(var i=0;i<data.errors.length;i++){
+                            errors[i] = {'error': data.errors[i]};
+                        }
+
+                        Ext.create('Ext.window.Window', {
+                            title: 'Ошибка бизнес правил',
+                            height: 500,
+                            width: 1000,
+                            layout: 'fit',
+                            items: {
+                                xtype: 'grid',
+                                store: Ext.create('Ext.data.Store',{
+                                    fields: ['error'],
+                                    data: errors
+                                }),
+                                loadMask: true,
+                                columns: [
+                                    { header: 'Ошибки', dataIndex: 'error', width: 600, autoSizeColumn: true}
+                                ],
+                                viewConfig: {
+                                    forceFit: true
+                                }
+                            }
+                        }).show();
+
+                    } else {
+                        if(callback)
+                            callback();
+                        else
+                            Ext.MessageBox.alert("", "Успешно проверено на Бизнес Правила. Нет ошибок.");
+                    }
+                }
+            });
+
+        },
+        maxWidth: 70,
+        shadow: true
+    });
+
     var buttonXML = Ext.create('Ext.button.Button', {
         id: "entityEditorXmlBtn",
         text: label_SAVE,
@@ -1069,17 +1140,24 @@ Ext.onReady(function () {
                 xmlStr += createXML(rootNode.childNodes[i], true, "", false, true).xml;
             }
 
-            Ext.Ajax.request({
-                url: dataUrl,
-                method: 'POST',
-                params: {
-                    xml_data: xmlStr,
-                    date: Ext.getCmp('edDate').value,
-                    op: 'SAVE_XML'
-                },
-                success: function () {
-                    Ext.MessageBox.alert("", "Сохранено успешно. Необходимо отправить изменения через портлет \"Отправка изменений\"");
-                }
+            buttonRule.handler(function() {
+                Ext.Ajax.request({
+                    url: dataUrl,
+                    method: 'POST',
+                    params: {
+                        xml_data: xmlStr,
+                        date: Ext.getCmp('edDate').value,
+                        op: 'SAVE_XML',
+                        creditorId: Ext.getCmp('edCreditor').value
+                    },
+                    success: function (response) {
+                        var data = JSON.parse(response.responseText);
+
+                        if (data.success) {
+                            Ext.MessageBox.alert("", "Сохранено успешно. Необходимо отправить изменения через портлет \"Отправка изменений\"");
+                        }
+                    }
+                });
             });
         },
         maxWidth: 70
@@ -1418,6 +1496,13 @@ Ext.onReady(function () {
                                 buttonShowXML.handler();
                             }
                         });
+
+                        items.push({
+                            text: 'Проверка на бизнес правила',
+                            handler: function(){
+                                buttonRule.handler();
+                            }
+                        });
                     }
 
 
@@ -1458,12 +1543,14 @@ Ext.onReady(function () {
                         });
                     }
 
-                    /*items.push({
-                     text: 'log',
-                     handler: function(){
-                     console.log(node);
-                     }
-                     });*/
+                    if(isDevMode) {
+                        items.push({
+                            text: 'log',
+                            handler: function () {
+                                console.log(node);
+                            }
+                        });
+                    }
 
                     var menu = new Ext.menu.Menu({
                         items: items
