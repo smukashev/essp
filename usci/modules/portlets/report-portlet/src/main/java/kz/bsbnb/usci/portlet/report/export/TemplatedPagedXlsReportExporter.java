@@ -264,7 +264,7 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
                 for (int columnIndex = 1; columnIndex <= dataSource.getMetaData().getColumnCount(); columnIndex++) {
                     currentSheet.addCell(new Label(columnIndex, rowIndex, dataSource.getMetaData().getColumnName(columnIndex), times12Format));
                 }
-                recordCounter++;
+                //recordCounter++;
                 rowIndex++;
             }
             while (dataSource.next()) {
