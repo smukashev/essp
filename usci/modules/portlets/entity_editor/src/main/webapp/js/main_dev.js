@@ -880,11 +880,38 @@ Ext.onReady(function () {
         model: 'attrsStoreModel'
     });
 
-    Ext.define('refStoreModel', {
+    /*Ext.define('refStoreModel', {
         extend: 'Ext.data.Model',
         fields: [
             {name: 'ID', type: 'string'},
             {name: 'title', type: 'string'}
+        ]
+    });*/
+
+    Ext.define('refStoreModel', {
+        extend: 'Ext.data.Model',
+        fields: [
+            {name: 'title', type: 'string'},
+            {name: 'code', type: 'string'},
+            {name: 'value', type: 'string'},
+            {name: 'simple', type: 'boolean'},
+            {name: 'array', type: 'boolean'},
+            {name: 'ref', type: 'boolean'},
+            {name: 'type', type: 'string'},
+            {name: 'isKey', type: 'boolean'},
+            {name: 'isRequired', type: 'boolean'},
+            {name: 'metaId', type: 'string'},
+            {name: 'childMetaId', type: 'string'},
+            {name: 'childType', type: 'string'},
+            {name: 'isHidden', type: 'boolean'},
+            {name: 'name', type: 'string'},
+            {name: 'name_ru', type: 'string'},
+            {name: 'short_name', type: 'string'},
+            {name: 'ID', type: 'integer'},
+            {name: 'is_convertible', type: 'boolean'},
+            {name: 'rating', type: 'string'},
+            {name: 'name_kz', type: 'string'},
+            {name: 'no_', type: 'string'},
         ]
     });
 

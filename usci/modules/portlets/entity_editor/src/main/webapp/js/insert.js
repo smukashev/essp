@@ -1,4 +1,6 @@
 function getForm(node){
+    var refUrl = 'ref?p_p_id=refportlet_WAR_ref_editor001SNAPSHOT&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view';
+
     var form =  Ext.create('Ext.form.Panel',{
         bodyPadding: '5 5 0',
         width: "100%",
@@ -25,14 +27,15 @@ function getForm(node){
                     width: width,
                     //readOnly: readOnly,
                     allowBlank: allowBlank,
+                    queryMode:'local',
                     blankText: label_REQUIRED_FIELD,
-                    store: Ext.create('Ext.data.Store', {
+                    store:Ext.create('Ext.data.Store', {
                         model: 'refStoreModel',
                         pageSize: 100,
                         proxy: {
                             type: 'ajax',
-                            url: dataUrl,
-                            extraParams: {op: 'LIST_BY_CLASS_SHORT', metaId: attr.metaId},
+                            url: refUrl,
+                            extraParams: {op: 'LIST_BY_CLASS', metaId: attr.metaId},
                             actionMethods: {
                                 read: 'POST'
                             },
@@ -52,10 +55,23 @@ function getForm(node){
                             }
                         }
                     }),
-                    displayField: 'title',
+                    displayField:attr.code == 'creditor_branch' ? 'name' : 'name_ru',
                     valueField: 'ID',
                     value: attr.value,
-                    editable: false,
+                    editable: true,
+                      listeners: {
+                          'change': function () {
+                              var val = this.getRawValue();
+                              this.store.clearFilter();
+                              this.store.filter(function (me) {
+                                  val = val.toLowerCase();
+                                  return me.data.name.toLowerCase().indexOf(val) > -1
+                                      || me.data.name_ru.toLowerCase().indexOf(val) > -1
+                                      || me.data.name_kz.indexOf(val) > -1
+                                      || me.data.code.indexOf(val) > -1 ;
+                              });
+                          }
+                      },
                     commit: function(){
                         if(this.getValue()) {
                             var refNode = Ext.create('entityModel', {
@@ -237,7 +253,8 @@ function formBasic(node, callback){
 
             var wdw = Ext.create("Ext.Window", {
                 title: 'Добавление в ' + node.data.title,
-                width: 400,
+                width: 800,
+                height: 600,
                 modal: true,
                 closable: true,
                 closeAction: 'hide',
@@ -288,10 +305,12 @@ function formAdvanced(node, callback){
 
             var wdw = Ext.create("Ext.Window", {
                 title: 'Добавление в ' + node.data.title,
-                width: 400,
+                width: '800px',
+                height: '600px',
                 modal: true,
                 closable: true,
                 closeAction: 'hide',
+                autoScroll:true,
                 items: [form],
                 tbar: [{
                     text: 'Сохранить новую запись',
