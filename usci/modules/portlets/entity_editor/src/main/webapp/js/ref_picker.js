@@ -33,33 +33,6 @@ function refPicker(node) {
     return function () {
         var refUrl = 'ref?p_p_id=refportlet_WAR_ref_editor001SNAPSHOT&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view';
 
-        Ext.define('refStoreModel', {
-            extend: 'Ext.data.Model',
-            fields: [
-                {name: 'title', type: 'string'},
-                {name: 'code', type: 'string'},
-                {name: 'value', type: 'string'},
-                {name: 'simple', type: 'boolean'},
-                {name: 'array', type: 'boolean'},
-                {name: 'ref', type: 'boolean'},
-                {name: 'type', type: 'string'},
-                {name: 'isKey', type: 'boolean'},
-                {name: 'isRequired', type: 'boolean'},
-                {name: 'metaId', type: 'string'},
-                {name: 'childMetaId', type: 'string'},
-                {name: 'childType', type: 'string'},
-                {name: 'isHidden', type: 'boolean'},
-                {name: 'name', type: 'string'},
-                {name: 'name_ru', type: 'string'},
-                {name: 'short_name', type: 'string'},
-                {name: 'ID', type: 'integer'},
-                {name: 'is_convertible', type: 'boolean'},
-                {name: 'rating', type: 'string'},
-                {name: 'name_kz', type: 'string'},
-                {name: 'no_', type: 'string'},
-            ]
-        });
-
         refStore = Ext.create('Ext.data.Store', {
             id: 'refStore',
             storeId: 'refStore',
