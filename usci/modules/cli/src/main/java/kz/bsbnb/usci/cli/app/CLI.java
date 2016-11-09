@@ -60,6 +60,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -110,7 +111,9 @@ public class CLI {
 
     @Autowired private MainParser crParser;
 
-    @Autowired private IBaseEntityProcessorDao baseEntityProcessorDao;
+    @Qualifier("baseEntityProcessor")
+    @Autowired
+    private IBaseEntityProcessorDao baseEntityProcessorDao;
 
     @Autowired private IBaseEntityLoadDao baseEntityLoadDao;
 

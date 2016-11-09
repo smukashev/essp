@@ -229,12 +229,12 @@ class CLIXMLReader {
                 }
 
                 IBaseValue baseValue = BaseValueFactory
-                        .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(), obj,
+                        .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId, batch.getRepDate(), obj,
                                 false, true);
 
                 if (hasOperationNew(startElement)) {
                     IBaseValue newBaseValue = BaseValueFactory.create(currentContainer.getBaseContainerType(),
-                            metaType, 0, -1, batch.getRepDate(),
+                            metaType, 0, creditorId, batch.getRepDate(),
                             getCastObject(metaValue.getTypeCode(),
                                     startElement.getAttributeByName(new QName("data")).getValue()), false, true);
 
@@ -310,7 +310,7 @@ class CLIXMLReader {
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
                         ((BaseSet) currentContainer).put(BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(),
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId, batch.getRepDate(),
                                         obj, false, true));
                         flagsStack.pop();
                         hasMembers = true;
@@ -326,13 +326,13 @@ class CLIXMLReader {
 
                     if (hasMembers) {
                         currentContainer.put(localName, BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(),
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId, batch.getRepDate(),
                                         obj, false, true));
                         flagsStack.pop();
                         hasMembers = true;
                     } else {
                         currentContainer.put(localName, BaseValueFactory
-                                .create(currentContainer.getBaseContainerType(), metaType, 0, -1, batch.getRepDate(),
+                                .create(currentContainer.getBaseContainerType(), metaType, 0, creditorId, batch.getRepDate(),
                                         null, false, true));
                         hasMembers = flagsStack.pop();
                     }

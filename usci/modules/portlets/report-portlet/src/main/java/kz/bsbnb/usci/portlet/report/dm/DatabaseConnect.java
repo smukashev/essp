@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 
 /**
  *
@@ -169,6 +170,27 @@ public class DatabaseConnect {
                 result.add(new ValuePair(cursor.getString(1), cursor.getString(2)));
             }
             return result;
+        } catch (SQLException sqle) {
+            logger.error("SQL Exception", sqle);
+        } finally {
+            closeResources(cursor, ocs, statement, connection);
+        }
+        return null;
+    }
+
+    public Date getDateFromStoredProcedure(String procedureName) {
+        Connection connection = getConnection();
+        CallableStatement statement = null;
+        OracleCallableStatement ocs = null;
+        ResultSet cursor = null;
+        try {
+            String procedureCallString = "{ call " + procedureName + "(?,?)}";
+            statement = connection.prepareCall(procedureCallString);
+            ocs = statement.unwrap(OracleCallableStatement.class);
+            statement.registerOutParameter(1, OracleTypes.DATE);
+            statement.setLong(2, user.getUserId());
+            statement.execute();
+            return ocs.getDate(1);
         } catch (SQLException sqle) {
             logger.error("SQL Exception", sqle);
         } finally {
