@@ -254,7 +254,6 @@ function formBasic(node, callback){
             var wdw = Ext.create("Ext.Window", {
                 title: 'Добавление в ' + node.data.title,
                 width: 800,
-                height: 600,
                 modal: true,
                 closable: true,
                 closeAction: 'hide',
