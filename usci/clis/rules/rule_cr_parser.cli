@@ -434,5 +434,17 @@ $$$
 
 rule save
 
+rule read $$$
+title: PLEDGE_47_CONTRACT
+rule "PLEDGE_47_CONTRACT"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEls("{count}pledges[pledge_type.code=47][contract!=null]") > 0)
+then
+  $entity.addValidationError("Присутствует излишняя информация(контракт) по обеспечению с типом «Без залога»");
+end
+$$$
+
+rule save
 
 quit
