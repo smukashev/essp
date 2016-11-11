@@ -17,10 +17,21 @@ function getForm(node){
         addField: function(attr){
             var labelWidth = "60%";
             var width = "40%";
+            var df= '';
+            var val = '';
 
             var allowBlank = !(attr.isRequired || attr.isKey);
 
             if(attr.ref) {
+
+                if (attr.code == 'creditor_branch') {
+                    df += '{name} {code} {no_}';
+                    val = 'name';
+                }else {
+                    df += '{name_ru} {code} {no_}';
+                    val = 'name_ru';
+                }
+
                 var refElement = Ext.create("Ext.form.field.ComboBox", {
                     fieldLabel: (!allowBlank ? "<b style='color:red'>*</b> " : "") + attr.title,
                     labelWidth: labelWidth,
@@ -28,6 +39,11 @@ function getForm(node){
                     //readOnly: readOnly,
                     allowBlank: allowBlank,
                     queryMode:'local',
+                    listConfig: {
+                        getInnerTpl: function () {
+                            return df
+                        }
+                    },
                     blankText: label_REQUIRED_FIELD,
                     store:Ext.create('Ext.data.Store', {
                         model: 'refStoreModel',
@@ -55,8 +71,9 @@ function getForm(node){
                             }
                         }
                     }),
-                    displayField:attr.code == 'creditor_branch' ? 'name' : 'name_ru',
+                    displayField: val,
                     valueField: 'ID',
+                    typeAhead: true,
                     value: attr.value,
                     editable: true,
                       listeners: {
@@ -68,7 +85,8 @@ function getForm(node){
                                   return me.data.name.toLowerCase().indexOf(val) > -1
                                       || me.data.name_ru.toLowerCase().indexOf(val) > -1
                                       || me.data.name_kz.indexOf(val) > -1
-                                      || me.data.code.indexOf(val) > -1 ;
+                                      || me.data.code.indexOf(val) > -1
+                                      || me.data.no_.indexOf(val) > -1 ;
                               });
                           }
                       },
@@ -254,7 +272,6 @@ function formBasic(node, callback){
             var wdw = Ext.create("Ext.Window", {
                 title: 'Добавление в ' + node.data.title,
                 width: 800,
-                height: 600,
                 modal: true,
                 closable: true,
                 closeAction: 'hide',
