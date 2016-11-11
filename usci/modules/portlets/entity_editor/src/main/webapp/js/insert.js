@@ -41,7 +41,6 @@ function getForm(node){
                     queryMode:'local',
                     listConfig: {
                         getInnerTpl: function () {
-                            console.log(df);
                             return df
                         }
                     },
