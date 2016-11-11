@@ -1102,7 +1102,7 @@ Ext.onReady(function () {
                 url: dataUrl,
                 method: 'POST',
                 params: {
-                    xml_data: xmlStr,
+                    xml_data: xmlStr.replace(new RegExp('&','g'), '&amp;'),
                     date: Ext.getCmp('edDate').value,
                     op: 'RUN_RULE',
                     creditorId: Ext.getCmp('edCreditor').value
