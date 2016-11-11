@@ -815,6 +815,10 @@ function insertForm(node){
     }
 }
 
+function escape(xmlStr){
+    return xmlStr.replace(new RegExp('&','g'), '&amp;');
+}
+
 Ext.onReady(function () {
 
     Ext.override(Ext.data.proxy.Ajax, {timeout: timeout});
@@ -1102,7 +1106,7 @@ Ext.onReady(function () {
                 url: dataUrl,
                 method: 'POST',
                 params: {
-                    xml_data: xmlStr.replace(new RegExp('&','g'), '&amp;'),
+                    xml_data: escape(xmlStr),
                     date: Ext.getCmp('edDate').value,
                     op: 'RUN_RULE',
                     creditorId: Ext.getCmp('edCreditor').value
@@ -1172,7 +1176,7 @@ Ext.onReady(function () {
                     url: dataUrl,
                     method: 'POST',
                     params: {
-                        xml_data: xmlStr,
+                        xml_data: escape(xmlStr),
                         date: Ext.getCmp('edDate').value,
                         op: 'SAVE_XML',
                         creditorId: Ext.getCmp('edCreditor').value
