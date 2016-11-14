@@ -4510,7 +4510,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  -- ITEM
                  xmlelement("item",
                    -- CONTRACT
-                   nillable_xml('contract', vph.contract_no),
+                   decode(vph.type_id, 47, null, nillable_xml('contract',vph.contract_no)),
                    -- PLEDGE_TYPE
                    get_ref_pledge_type_xml(vph.type_id, p_report_date),
 
