@@ -8,6 +8,8 @@
 
   procedure send_dev_notification(p_title in varchar2, p_text in varchar2);
 
+  procedure speed_test;
+
 end pkg_notification;
 /
 
@@ -111,6 +113,23 @@ end;
                                           value)
             values   (v_mail_message_id, 2006, p_text);
       end;
+
+
+    procedure speed_test
+    is
+        v_max_id1 number;
+        v_max_id2 number;
+    begin
+        select max(id) into v_max_id1
+          from eav_entity_statuses;
+
+        dbms_lock.sleep(60);
+
+        select max(id) into v_max_id2
+          from eav_entity_statuses;
+
+        send_dev_notification('speed test', 'Обработано ' || (v_max_id2 - v_max_id1) || '/min, maxId = ' || v_max_id2);
+    end;
 
 end pkg_notification;
 /
