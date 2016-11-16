@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.eav.util;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -326,7 +328,7 @@ public enum Errors {
         errors.put("E295", "[#val] не найден в справочнике #metaclass");
         errors.put("E296", "Удаление невозможно на дату отличной от отчитываемой, отчитываема дата =  #reportDate,  заявлено = #claimed");
         errors.put("E297", "Объект имеет историю отличную от отчетной даты. Удаление невозможно. Дата истории = #hisReportDate");
-        errors.put("E298", "");
+        errors.put("E298", "Cправочник \"#refName\" c значением \"#val\" является закрытым с даты #closedDate");
         errors.put("E299", "");
         errors.put("E300", "");
         errors.put("E301", "");
@@ -390,9 +392,18 @@ public enum Errors {
         return errors.get(code + "_" + LOCALE);
     }
 
+    public static SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+
     public static String compose(Errors error, Object... params) {
         String message = String.valueOf(error);
         for (Object obj : params) {
+
+            if(obj instanceof Date) {
+                synchronized (Errors.class) {
+                    obj = sdf.format(obj);
+                }
+            }
+
             if (String.valueOf(obj).length() > 255) {
                 obj = String.valueOf(obj).substring(0, 255);
             }
