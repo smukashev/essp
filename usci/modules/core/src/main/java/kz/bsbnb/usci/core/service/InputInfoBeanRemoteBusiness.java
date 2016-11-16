@@ -21,5 +21,7 @@ public interface InputInfoBeanRemoteBusiness {
 
     void approveMaintenance(List<Long> approvedInputInfos);
 
+    void declineMaintenance(List<Long> declinedInputInfos);
+
     int countInputInfos(List<Creditor> selectedCreditors, Date date);
 }

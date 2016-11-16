@@ -9,6 +9,8 @@ public class BatchEntry extends Persistable {
     private Date repDate;
     private Date updateDate;
     private long userId;
+    private Long entityId;
+    private Boolean isMaintenance;
 
     public String getValue() {
         return value;
@@ -40,5 +42,21 @@ public class BatchEntry extends Persistable {
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public Long getEntityId() {
+        return entityId;
+    }
+
+    public void setEntityId(Long entityId) {
+        this.entityId = entityId;
+    }
+
+    public Boolean getMaintenance() {
+        return isMaintenance;
+    }
+
+    public void setMaintenance(Boolean maintenance) {
+        isMaintenance = maintenance;
     }
 }

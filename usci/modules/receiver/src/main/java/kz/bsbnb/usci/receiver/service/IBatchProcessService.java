@@ -24,6 +24,8 @@ public interface IBatchProcessService {
     boolean restartBatch(long id);
     void CancelBatch(long id);
 
+    void declineMaintenanceBatch(long id);
+
     void reloadJobLauncherConfig();
 
     String getJobLauncherStatus();

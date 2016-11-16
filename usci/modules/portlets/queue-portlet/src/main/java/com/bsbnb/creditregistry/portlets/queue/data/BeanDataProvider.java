@@ -203,7 +203,24 @@ public class BeanDataProvider implements DataProvider {
     }
 
     @Override
-    public void sendNotification(List<InputInfoDisplayBean> inputInfoList) {
+    public void declineAndSend(List<Long> declinedInputInfos) {
+        inputInfoBusiness.declineMaintenance(declinedInputInfos);
+        for (Long declinedInputInfoId : declinedInputInfos) {
+            batchProcessService.declineMaintenanceBatch(declinedInputInfoId);
+        }
+    }
+
+    @Override
+    public void sendApprovedNotification(List<InputInfoDisplayBean> inputInfoList) {
+        sendNotification(inputInfoList, true);
+    }
+
+    @Override
+    public void sendDeclinedNotification(List<InputInfoDisplayBean> inputInfoList) {
+        sendNotification(inputInfoList, false);
+    }
+
+    public void sendNotification(List<InputInfoDisplayBean> inputInfoList, boolean maintenanceApproved) {
 
         Map<Long, Creditor> creditorsMap = new HashMap<>();
         String fileNames = "";
@@ -235,7 +252,7 @@ public class BeanDataProvider implements DataProvider {
             mailMessageParameters.setProperty("ORG", creditor.getName());
             mailMessageParameters.setProperty("FILE_NAMES", fileNames);
             for (PortalUser portalUser : notificationRecipients) {
-                mailMessageBusiness.sendMailMessage("MAINTENANCE_APPROVED", portalUser.getUserId(), mailMessageParameters);
+                mailMessageBusiness.sendMailMessage(maintenanceApproved?"MAINTENANCE_APPROVED":"MAINTENANCE_DECLINED", portalUser.getUserId(), mailMessageParameters);
             }
         }
 

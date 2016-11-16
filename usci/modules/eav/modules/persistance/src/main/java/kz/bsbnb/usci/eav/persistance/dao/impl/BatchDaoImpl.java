@@ -335,6 +335,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         batch.setReportId(getNullSafeLong(row, EAV_BATCHES.REPORT_ID));
         batch.setMaintenance(getNullSafeLong(row, EAV_BATCHES.IS_MAINTENANCE) == 1);
         batch.setMaintenanceApproved(getNullSafeLong(row, EAV_BATCHES.IS_MAINTENANCE_APPROVED) == 1);
+        batch.setMaintenanceDeclined(getNullSafeLong(row, EAV_BATCHES.IS_MAINTENANCE_DECLINED) == 1);
         return batch;
     }
 
@@ -366,7 +367,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
     public List<Batch> getMaintenanceBatches(Date reportDate) {
         SelectConditionStep select = context.selectFrom(EAV_BATCHES)
                 .where(EAV_BATCHES.IS_MAINTENANCE.eq(DataUtils.convert(true)))
-                .and(EAV_BATCHES.IS_MAINTENANCE_APPROVED.eq(DataUtils.convert(false)));
+                .and(EAV_BATCHES.IS_MAINTENANCE_APPROVED.eq(DataUtils.convert(false)))
+                .and(EAV_BATCHES.IS_MAINTENANCE_DECLINED.eq(DataUtils.convert(false)));
 
         if(reportDate != null)
             select = select.and(EAV_BATCHES.REP_DATE.eq(DataUtils.convert(reportDate)));
@@ -387,6 +389,15 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         Update update = context.update(EAV_BATCHES)
                 .set(EAV_BATCHES.IS_MAINTENANCE_APPROVED, DataUtils.convert(true))
                 .where(EAV_BATCHES.ID.in(approvedBatchIds));
+
+        updateWithStats(update.getSQL(), update.getBindValues().toArray());
+    }
+
+    @Override
+    public void declineMaintenance(List<Long> declinedBatchIds) {
+        Update update = context.update(EAV_BATCHES)
+                .set(EAV_BATCHES.IS_MAINTENANCE_DECLINED, DataUtils.convert(true))
+                .where(EAV_BATCHES.ID.in(declinedBatchIds));
 
         updateWithStats(update.getSQL(), update.getBindValues().toArray());
     }

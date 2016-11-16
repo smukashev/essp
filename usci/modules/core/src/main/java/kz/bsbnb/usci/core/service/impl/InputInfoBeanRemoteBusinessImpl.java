@@ -27,7 +27,7 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     @Autowired
     private IGlobalService globalService;
 
-    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING, CANCELLED, MAINTENANCE_REQUEST);
+    private List<BatchStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, WAITING_FOR_SIGNATURE, WAITING, PROCESSING, CANCELLED, MAINTENANCE_REQUEST, MAINTENANCE_DECLINED);
 
     private Map<Long, EavGlobal> globalMap = new HashMap<>();
 
@@ -194,6 +194,9 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
             case "MAINTENANCE_REQUEST":
                 lastStatus = "Запрос на изменение за утвержденный период";
                 break;
+            case "MAINTENANCE_DECLINED":
+                lastStatus = "Откланен запрос на изменение за утвержденный период";
+                break;
         }
 
         Shared s = new Shared();
@@ -253,6 +256,10 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
                 case  "MAINTENANCE_REQUEST":
                     s.setNameRu("Запрос на изменение за утвержденный период");
                     s.setNameKz("Запрос на изменение за утвержденный период");
+                    break;
+                case  "MAINTENANCE_DECLINED":
+                    s.setNameRu("Откланен запрос на изменение за утвержденный период");
+                    s.setNameKz("Откланен запрос на изменение за утвержденный период");
                     break;
                 default:
                     s.setNameRu(batchStatus.getStatus().code());
@@ -362,6 +369,11 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     @Override
     public void approveMaintenance(List<Long> approvedBatchIds) {
         batchService.approveMaintenance(approvedBatchIds);
+    }
+
+    @Override
+    public void declineMaintenance(List<Long> declinedBatchIds) {
+        batchService.declineMaintenance(declinedBatchIds);
     }
 
     @Override
