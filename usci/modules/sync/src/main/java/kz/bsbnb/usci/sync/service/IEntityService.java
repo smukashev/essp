@@ -8,6 +8,7 @@ import kz.bsbnb.usci.tool.status.SyncStatus;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author k.tulbassiyev
@@ -30,4 +31,6 @@ public interface IEntityService {
     RefListResponse getRefListApprox(long metaClassId);
 
     BaseEntity loadForDisplay(long entityId, Date reportDate);
+
+    Set<Long> getFinishedBatches();
 }

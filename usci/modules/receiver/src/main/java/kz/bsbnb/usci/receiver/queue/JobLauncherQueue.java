@@ -16,7 +16,7 @@ public interface JobLauncherQueue {
 
     String getStatus();
 
-    void jobFinished(Long creditorId);
+    void jobFinished(Long batchId);
 
     void addJob(long batchId, BatchInfo batchInfo);
 
