@@ -5,6 +5,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import kz.bsbnb.usci.core.service.IBatchEntryService;
+import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.core.service.PortalUserBeanRemoteBusiness;
 import kz.bsbnb.usci.core.service.ReportBeanRemoteBusiness;
 import kz.bsbnb.usci.cr.model.Creditor;
@@ -34,10 +35,11 @@ public class MainPortlet extends MVCPortlet {
 
     //должен быть отличен от C:/zips (т.е папки receiver-а)
     //private final static String TMP_FILE_DIR = "\\\\" + StaticRouter.getAsIP() + "\\batch_entry_list_temp_folder";
-    private final static String TMP_FILE_DIR = StaticRouter.isDevMode() ? "/home/usci_data/batch_entry_list_temp_folder" :
-            "\\\\" + StaticRouter.getAsIP() + "\\download$\\batch_entry_list_temp_folder";
+    private final static String TMP_FILE_DIR = StaticRouter.isDevMode() ? "/home/dtulendiyev/euss/batch_entry_list_temp_folder" :
+            "\\\\" + StaticRouter.getAsIP() + "\\tmp$\\batch_entry_list_temp_folder";
 
     private IBatchEntryService batchEntryService;
+    private IEntityService entityService;
     private Logger logger = Logger.getLogger(MainPortlet.class);
     private Exception currentException;
     private boolean retry;
@@ -78,6 +80,14 @@ public class MainPortlet extends MVCPortlet {
             reportBusinessFactoryBean.setServiceInterface(ReportBeanRemoteBusiness.class);
             reportBusinessFactoryBean.afterPropertiesSet();
             reportBusiness = (ReportBeanRemoteBusiness) reportBusinessFactoryBean.getObject();
+
+            RmiProxyFactoryBean entityServiceFactoryBean = new RmiProxyFactoryBean();
+            entityServiceFactoryBean.setServiceUrl("rmi://" + StaticRouter.getAsIP() + ":1099/entityService");
+            entityServiceFactoryBean.setServiceInterface(IEntityService.class);
+            entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+            entityServiceFactoryBean.afterPropertiesSet();
+            entityService = (IEntityService) entityServiceFactoryBean.getObject();
         } catch (Exception e) {
             throw new RuntimeException(Errors.getError(Errors.E286));
         }
@@ -193,20 +203,19 @@ public class MainPortlet extends MVCPortlet {
 
                     Date reportDate = reportBusiness.getReportDate(creditor.getId());
 
-
-
                     for (BatchEntry batchEntry : entries) {
                         String sRepDate = df.format(batchEntry.getRepDate());
 
                         String xml =
                                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
                                         "<batch>\n" +
-                                        "<entities xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n";
+                                        "<entities>\n";
 
                         xml += batchEntry.getValue() + "\n";
 
                         xml += "\n</entities>\n" +
                                 "</batch>";
+
 
                         String manifest = "<manifest>\n" +
                                 "\t<type>1</type>\n" +
@@ -215,9 +224,16 @@ public class MainPortlet extends MVCPortlet {
                                 "\t<size>1</size>\n" +
                                 "\t<date>" +
                                 sRepDate +
-                                "</date>\n" +
-                                (batchEntry.getRepDate().compareTo(reportDate) < 0 && !isNB ? "\t<maintenance>true</maintenance>\n" : "") +
-                                "\t<properties>"+
+                                "</date>\n";
+
+                                Date prevReportDate = entityService.getPreviousReportDate(batchEntry.getEntityId(), batchEntry.getRepDate());
+
+                                if ((batchEntry.getMaintenance() && prevReportDate != null
+                                        || batchEntry.getRepDate().compareTo(reportDate) < 0) && !isNB) {
+                                    manifest += "\t<maintenance>true</maintenance>\n";
+                                }
+
+                                manifest += "\t<properties>"+
                                     "\t<property>" +
                                         "\t<name>CODE</name>\n"+
                                         "\t<value>"+ creditorCode +"</value>\n"+
@@ -259,7 +275,7 @@ public class MainPortlet extends MVCPortlet {
 
                         fileOutputStream.close();
 
-                        batchProcessService.processBatch(StaticRouter.convertUploadPortletPath(f.getPath()), currentUser.getUserId(), isNB);
+                        batchProcessService.processBatch(f.getPath(), currentUser.getUserId(), isNB);
 
                         batchEntryIds.add(batchEntry.getId());
                     }

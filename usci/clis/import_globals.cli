@@ -33,6 +33,7 @@ global add --type=BATCH_STATUS --code=COMPLETED --value=COMPLETED --desc=Зав�
 global add --type=BATCH_STATUS --code=WAITING_FOR_SIGNATURE --value=WAITING_FOR_SIGNATURE --desc=Ожидает_подписи
 global add --type=BATCH_STATUS --code=CANCELLED --value=CANCELLED --desc=Отмена_загрузки
 global add --type=BATCH_STATUS --code=MAINTENANCE_REQUEST --value=MAINTENANCE_REQUEST --desc=Изменение_данных_за_утвержденный_период
+global add --type=BATCH_STATUS --code=MAINTENANCE_DECLINED --value=MAINTENANCE_DECLINED --desc=Откланен_запрос_на_изменение_данных_за_утвержденный_период
 
 #
 # NOTIFICATION

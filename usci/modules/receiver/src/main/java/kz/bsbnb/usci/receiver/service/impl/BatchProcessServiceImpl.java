@@ -82,7 +82,10 @@ public class BatchProcessServiceImpl implements IBatchProcessService {
     }
 
     @Override
-    public void CancelBatch(long id) { zipFilesMonitor.CancelBatch(id);}
+    public void CancelBatch(long id) { zipFilesMonitor.сancelBatch(id);}
+
+    @Override
+    public void declineMaintenanceBatch(long id) { zipFilesMonitor.declineMaintenanceBatch(id);}
 
     @Override
     public String getJobLauncherStatus() {

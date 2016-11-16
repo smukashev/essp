@@ -80,7 +80,9 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
                 .set(BATCH_ENTRIES.USER_ID, batch.getUserId())
                 .set(BATCH_ENTRIES.VALUE, batch.getValue())
                 .set(BATCH_ENTRIES.REPORT_DATE, new Date(batch.getRepDate().getTime()))
-                .set(BATCH_ENTRIES.UPDATED_DATE, DataUtils.convertToTimestamp(new java.util.Date()));
+                .set(BATCH_ENTRIES.UPDATED_DATE, DataUtils.convertToTimestamp(new java.util.Date()))
+                .set(BATCH_ENTRIES.ENTITY_ID, batch.getEntityId())
+                .set(BATCH_ENTRIES.IS_MAINTENANCE, DataUtils.convert(batch.getMaintenance()));
 
 
         baseEntityId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -109,7 +111,9 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
                 .select(BATCH_ENTRIES.ID,
                         BATCH_ENTRIES.UPDATED_DATE,
                         BATCH_ENTRIES.REPORT_DATE,
-                        BATCH_ENTRIES.VALUE)
+                        BATCH_ENTRIES.VALUE,
+                        BATCH_ENTRIES.ENTITY_ID,
+                        BATCH_ENTRIES.IS_MAINTENANCE)
                 .from(BATCH_ENTRIES)
                 .where(BATCH_ENTRIES.USER_ID.equal(userId));
 
@@ -123,6 +127,10 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
             batchEntry.setValue((String) row.get(BATCH_ENTRIES.VALUE.getName()));
             batchEntry.setUpdateDate(DataUtils.convert((Timestamp) row.get(BATCH_ENTRIES.UPDATED_DATE.getName())));
             batchEntry.setRepDate(DataUtils.convert((Timestamp) row.get(BATCH_ENTRIES.REPORT_DATE.getName())));
+            if (row.get(BATCH_ENTRIES.ENTITY_ID.getName()) != null)
+                batchEntry.setEntityId(((BigDecimal) row.get(BATCH_ENTRIES.ENTITY_ID.getName())).longValue());
+            if (row.get(BATCH_ENTRIES.IS_MAINTENANCE.getName()) != null)
+                batchEntry.setMaintenance(((BigDecimal) row.get(BATCH_ENTRIES.IS_MAINTENANCE.getName())).longValue() == 1);
 
             result.add(batchEntry);
         }

@@ -849,6 +849,7 @@
 		<column name="is_disabled" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="0"/>
 		<column name="is_maintenance" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="0"/>
 		<column name="is_maintenance_approved" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="0"/>
+		<column name="is_maintenance_declined" primaryKey="false" required="true" type="NUMERIC" size="1" autoIncrement="false" default="0"/>
 		<index name="eb_IN_ci">
 			<index-column name="creditor_id"/>
 		</index>
@@ -912,6 +913,8 @@
     <column name="value" primaryKey="false" required="true" type="CLOB" size="14,0" autoIncrement="false"/>
     <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
     <column name="updated_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+    <column name="entity_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+    <column name="is_maintenance" primaryKey="false" required="false" type="NUMERIC" size="1" autoIncrement="false"/>
   </table>
 	<table name="eav_optimizer">
 	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />

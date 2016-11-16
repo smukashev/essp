@@ -86,10 +86,17 @@ public class ZipFilesMonitor {
     }
 
 
-    public void CancelBatch(long batchId) {
+    public void сancelBatch(long batchId) {
         batchService.addBatchStatus(new BatchStatus()
                 .setBatchId(batchId)
                 .setStatus(BatchStatuses.CANCELLED)
+                .setReceiptDate(new Date()));
+    }
+
+    public void declineMaintenanceBatch(long batchId) {
+        batchService.addBatchStatus(new BatchStatus()
+                .setBatchId(batchId)
+                .setStatus(BatchStatuses.MAINTENANCE_DECLINED)
                 .setReceiptDate(new Date()));
     }
 
@@ -561,7 +568,7 @@ public class ZipFilesMonitor {
                 mustDate = cal.getTime();
 
                 if(batchInfo.isMaintenance()) {
-                    if(mustDate.compareTo(batchInfo.getRepDate()) <= 0) {
+                    if(mustDate.compareTo(batchInfo.getRepDate()) < 0) {
                         errMsg = "Ошибка запроса на изменение за утвержденный период. Последняя утвержденная дата = " +
                                 dateFormat.format(lastApprovedDate) + ", " + " заявлено = " + dateFormat.format(batchInfo.getRepDate())
                                 + ", шаг отчетности = " + reportPeriodDurationMonths;

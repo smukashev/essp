@@ -268,6 +268,11 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
+    public void declineMaintenance(List<Long> declinedBatchIds) {
+        batchDao.declineMaintenance(declinedBatchIds);
+    }
+
+    @Override
     public int getBatchCount(List<Creditor> creditors, Date reportDate) {
         return batchDao.getBatchCount(creditors, reportDate);
     }
