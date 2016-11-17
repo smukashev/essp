@@ -5,7 +5,6 @@ import com.vaadin.event.ShortcutAction;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import org.apache.log4j.Logger;
 
 import java.util.logging.Level;
 
@@ -20,8 +19,6 @@ class SaveQueryDialog extends FavoritesDialog implements Button.ClickListener {
             + "VALUES(SAVED_QUERY_MAINTENANCE_SEQ.NEXTVAL,'%s','%s')";
 
     private final String sqlText;
-
-    public final Logger logger = Logger.getLogger(SaveQueryDialog.class);
 
     SaveQueryDialog(SqlExecutor executor, String sqlText) {
         super(executor);
@@ -72,7 +69,6 @@ class SaveQueryDialog extends FavoritesDialog implements Button.ClickListener {
     }
 
     private void runQuery(String query) {
-        logger.info("Save query dialog query: "+ query);
         SqlExecutor executor = getExecutor();
         executor.setQueryType(QueryType.INSERT_OR_UPDATE);
         executor.setUsingConnectionPool(true);

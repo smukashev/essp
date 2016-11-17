@@ -158,10 +158,14 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             }
             if (dataSource != null) {
                 try {
+                    if(!dataSource.getStatement().isClosed()) {
+                        dataSource.getStatement().close();
+                    }
                     dataSource.close();
                 } catch (Exception e) {
                 }
             }
+
         }
     }
 

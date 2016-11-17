@@ -2,7 +2,6 @@ package kz.bsbnb.usci.portlets.query;
 
 import com.vaadin.data.util.ObjectProperty;
 import oracle.jdbc.OracleTypes;
-import org.apache.log4j.Logger;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -54,7 +53,6 @@ class SqlExecutor {
     private int sqlErrorPosition = -1;
     private boolean isMaintenance;
 
-    public final Logger logger = Logger.getLogger(SqlExecutor.class);
 
     SqlExecutor(QuerySettings settings) {
         this.settings = settings;
@@ -66,13 +64,11 @@ class SqlExecutor {
                 connectionStringProperty.setValue(connection.getMetaData().getURL());
             }
         } catch (SQLException e) {
-            logger.error(null, e);
         } finally {
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException ex) {
-                    logger.error(null, ex);
                 }
             }
         }
@@ -114,7 +110,6 @@ class SqlExecutor {
     }
 
     private void saveException(Exception ex) {
-        logger.error(null, ex);
         exceptionMessage = ex.getMessage();
     }
 
@@ -194,7 +189,6 @@ class SqlExecutor {
             callStatement.execute();
             return callStatement.getInt(2);
         } catch (SQLException ex) {
-            logger.error(null, ex);
         } finally {
             if (callStatement != null) {
                 try {

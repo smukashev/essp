@@ -34,7 +34,6 @@ import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
-import org.apache.log4j.Logger;
 
 public class FormattedTable extends Table {
     private final HashMap<Object, String> formatData = new HashMap<>();
@@ -56,8 +55,6 @@ public class FormattedTable extends Table {
         final Calendar cal = Calendar.getInstance(new SimpleTimeZone(0, "GMT"));
         DATE_FORMATTER_TO_GMT.setCalendar(cal);
     }
-
-    private final Logger logger = Logger.getLogger(FormattedTable.class);
 
     public FormattedTable() {
         this(null);
@@ -251,7 +248,6 @@ public class FormattedTable extends Table {
             final String date = DATE_FORMATTER_FROM_CURRENT.format(base);
             return DATE_FORMATTER_TO_GMT.parse(date);
         } catch (ParseException e) {
-            logger.error(e.getMessage(),e);
             return base;
         }
     }
@@ -296,9 +292,7 @@ public class FormattedTable extends Table {
             };
             getWindow().open(resource, "_blank");
         } catch (IOException ioe) {
-            logger.error(ioe.getMessage(),ioe);
         } catch (WriteException we) {
-            logger.error(we.getMessage(),we);
         }
     }
 
