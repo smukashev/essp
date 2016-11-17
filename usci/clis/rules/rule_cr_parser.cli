@@ -447,4 +447,151 @@ $$$
 
 rule save
 
+rule read $$$
+title: NO_DEBT_BALANCE_ACCOUNT_NO
+rule "NO_DEBT_BALANCE_ACCOUNT_NO"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			  && getEl("change.remains.debt.current") != null
+			  && getEl("change.remains.debt.current.balance_account.no_") == null)
+then
+	$entity.addValidationError("Не заполнен номер балансового счета основного долга (непросроченный)");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: NO_DEBT_PASTDUE_BALANCE_ACCOUNT_NO
+rule "NO_DEBT_PASTDUE_BALANCE_ACCOUNT_NO"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			  && getEl("change.remains.debt.pastdue") != null
+			  && getEl("change.remains.debt.pastdue.balance_account.no_") == null)
+then
+	$entity.addValidationError("Не заполнен номер балансового счета основного долга (просроченный)!");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: NO_DEBT_WRITE_OFF_BALANCE_ACCOUNT_NO
+rule "NO_DEBT_WRITE_OFF_BALANCE_ACCOUNT_NO"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			  && getEl("change.remains.debt.write_off") != null
+			  && getEl("change.remains.debt.write_off.balance_account.no_") == null)
+then
+	$entity.addValidationError("Не заполнен номер балансового счета основного долга (списанные)!");
+end
+$$$
+
+rule save
+
+
+rule read $$$
+title: NO_INTEREST_BALANCE_ACCOUNT_NO
+rule "NO_INTEREST_BALANCE_ACCOUNT_NO"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			  && getEl("change.remains.interest.current") != null
+			  && getEl("change.remains.interest.current.balance_account.no_") == null)
+then
+	$entity.addValidationError("Не заполнен номер балансового счета вознаграждения(непросроченная задолженность)!");
+end
+$$$
+
+rule save
+
+
+rule read $$$
+title: NO_PROVISION_KFN_BALANCE_ACCOUNT_NO
+rule "NO_PROVISION_KFN_BALANCE_ACCOUNT_NO"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			  && getEl("change.credit_flow.provision.provision_kfn") != null
+			  && getEl("change.credit_flow.provision.provision_kfn.balance_account.no_") == null)
+then
+		$entity.addValidationError("Не заполнен номер балансового счета (провизия по резервам сформированного по требованиям КФН!)");
+end
+$$$
+
+rule save
+
+
+rule read $$$
+title: NO_PROVISION_MSFO_BALANCE_ACCOUNT_NO
+rule "NO_PROVISION_MSFO_BALANCE_ACCOUNT_NO"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			  && getEl("change.credit_flow.provision.provision_msfo") != null
+			  && getEl("change.credit_flow.provision.provision_msfo.balance_account.no_") == null)
+then
+	$entity.addValidationError("Не заполнен номер балансового счета (провизия по резервам сформированного по требованиям МСФО!)");
+end
+$$$
+
+rule save
+
+
+rule read $$$
+title: NO_PROVISION_MSFO_OVER_BALANCE_ACCOUNT_NO
+rule "NO_PROVISION_MSFO_OVER_BALANCE_ACCOUNT_NO"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			  && getEl("change.credit_flow.provision.provision_msfo_over_balance") != null
+			  && getEl("change.credit_flow.provision.provision_msfo_over_balance.balance_account.no_") == null)
+then
+	$entity.addValidationError("Не заполнен номер балансового счета (провизия по резервам сформированного по требованиям МСФО по кредитным картам/овердрафту)!");
+end
+$$$
+
+rule save
+
+
+rule read $$$
+title: NO_CORRECTION_BALANCE_ACCOUNT_NO
+rule "NO_CORRECTION_BALANCE_ACCOUNT_NO"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			  && getEl("change.remains.correction") != null
+			  && getEl("change.remains.correction.balance_account.no_") == null)
+then
+	$entity.addValidationError("Не заполнен номер балансового счета (положительная/Отрицательная корректировка)!");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: NO_DISCOUNT_BALANCE_ACCOUNT_NO
+rule "NO_DISCOUNT_BALANCE_ACCOUNT_NO"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			  && getEl("change.remains.discount") != null
+			  && getEl("change.remains.discount.balance_account.no_") == null)
+then
+	$entity.addValidationError("Не заполнен номер балансового счета (дисконтированная (приведенная) стоимость будущих денежных потоков)!");
+end
+$$$
+
+rule save
+
+rule read $$$
+title: NO_LIMIT_BALANCE_ACCOUNT_NO
+rule "NO_LIMIT_BALANCE_ACCOUNT_NO"
+when
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+			  && getEl("change.remains.limit") != null
+			  && getEl("change.remains.limit.balance_account.no_") == null)
+then
+	$entity.addValidationError("Не заполнен номер балансового счета (лимит кредитной карты/овердрафта)!");
+end
+$$$
+
+rule save
+
+
+
 quit
