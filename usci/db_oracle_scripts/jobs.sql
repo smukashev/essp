@@ -13,3 +13,19 @@ begin
                             enabled => true,
                             auto_drop => true);
 end;
+
+declare
+  v_job_action VARCHAR2(1000 CHAR);
+begin
+  v_job_action := 'BEGIN ' ||
+                  '   dbms_stats.gather_schema_stats(ownname => ''CORE'',cascade => true); ' ||
+                  'END;';
+
+  dbms_scheduler.create_job(job_name  => 'ES_JOB_STAT',
+                            job_type  => 'PLSQL_BLOCK',
+                            job_action => v_job_action,
+                            start_date => systimestamp,
+                            repeat_interval => 'freq=daily',
+                            enabled => true,
+                            auto_drop => true);
+end;
