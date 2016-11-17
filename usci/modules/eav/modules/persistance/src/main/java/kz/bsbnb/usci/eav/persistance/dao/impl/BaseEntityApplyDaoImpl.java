@@ -8,7 +8,6 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
 import kz.bsbnb.usci.eav.model.exceptions.ImmutableElementException;
-import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
@@ -19,6 +18,7 @@ import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.tool.optimizer.EavOptimizerData;
 import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import kz.bsbnb.usci.eav.util.DataUtils;
+import kz.bsbnb.usci.eav.util.ErrorHandler;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -39,6 +39,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
     @Autowired
     private IEavOptimizerDao eavOptimizerDao;
+
+    @Autowired
+    ErrorHandler errorHandler;
 
     @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
@@ -181,6 +184,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         if (childBaseEntityImmutable == null)
                             throw new RuntimeException(Errors.compose(Errors.E63, childBaseEntity.getId(),
                                     childBaseEntity.getReportDate()));
+
+                        if(childBaseEntityImmutable.getBaseEntityReportDate().isClosed())
+                            errorHandler.throwClosedExceptionForImmutable(childBaseEntityImmutable);
 
                         IBaseValue baseValueApplied = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -878,6 +884,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 if (metaAttribute.isImmutable()) {
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                    if(baseEntityApplied.getBaseEntityReportDate().isClosed())
+                        errorHandler.throwClosedExceptionForImmutable(baseEntityApplied);
                 } else {
                     baseEntityApplied = metaClass.isSearchable() ?
                             apply(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager) :
@@ -909,6 +917,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 if (metaAttribute.isImmutable()) {
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                    if(baseEntityApplied.getBaseEntityReportDate().isClosed())
+                        errorHandler.throwClosedExceptionForImmutable(baseEntityApplied);
                 } else {
                     baseEntityApplied = apply(creditorId, baseEntitySaving, null, baseEntityManager);
                 }
@@ -1024,6 +1034,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                            if(baseEntityApplied.getBaseEntityReportDate().isClosed())
+                                errorHandler.throwClosedExceptionForImmutable(baseEntityApplied);
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
                                     apply(creditorId, baseEntitySaving, null, baseEntityManager) :
@@ -1044,6 +1056,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                            if(baseEntityApplied.getBaseEntityReportDate().isClosed())
+                                errorHandler.throwClosedExceptionForImmutable(baseEntityApplied);
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
                                     apply(creditorId, baseEntitySaving, baseEntityClosed, baseEntityManager) :
@@ -1066,6 +1080,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseEntity baseEntityApplied;
                         if (metaAttribute.isImmutable()) {
                             baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                            if(baseEntityApplied.getBaseEntityReportDate().isClosed())
+                                errorHandler.throwClosedExceptionForImmutable(baseEntityApplied);
                         } else {
                             baseEntityApplied = metaClass.isSearchable() ?
                                     apply(creditorId, baseEntitySaving, baseValueNext.getValue(), baseEntityManager) :
@@ -1083,6 +1099,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         if (metaAttribute.isImmutable()) {
                             baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(),
                                     baseEntitySaving.getReportDate());
+                            if(baseEntityApplied.getBaseEntityReportDate().isClosed())
+                                errorHandler.throwClosedExceptionForImmutable(baseEntityApplied);
                         } else {
                             baseEntityApplied = apply(creditorId, baseEntitySaving, null, baseEntityManager);
                         }
@@ -1107,6 +1125,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 if (metaAttribute.isImmutable()) {
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntitySaving.getId(), baseEntitySaving.getReportDate());
+                    if(baseEntityApplied.getBaseEntityReportDate().isClosed())
+                        errorHandler.throwClosedExceptionForImmutable(baseEntityApplied);
                 } else {
                     IBaseValue previousBaseValue = valueDao.getPreviousBaseValue(baseValueSaving);
 

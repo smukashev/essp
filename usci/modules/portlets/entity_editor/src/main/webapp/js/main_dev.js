@@ -33,6 +33,8 @@ var fetchSize = 50;
 
 var timeout = 300000;
 
+var isMaintenance = false;
+
 var userNavHistory = {
     currentPage: 1,
     nextPage: 1,
@@ -735,8 +737,10 @@ function editorForm(node) {
                 text: 'Обновить запись',
                 handler: function () {
                     editorAction.aquire(node, function () {
-                        if(node.data.isKey)
+                        if(node.data.isKey){
                             node.data.oldValue = node.data.oldValue ? node.data.oldValue : node.data.value;
+                            isMaintenance = true;
+                        }
                         items[0].accept();
                         Ext.getCmp('entityTreeView').getView().refresh();
                         editorAction.commitEdit();
@@ -813,6 +817,10 @@ function insertForm(node){
             });
         }
     }
+}
+
+function escape(xmlStr){
+    return xmlStr.replace(new RegExp('&','g'), '&amp;');
 }
 
 Ext.onReady(function () {
@@ -1102,7 +1110,7 @@ Ext.onReady(function () {
                 url: dataUrl,
                 method: 'POST',
                 params: {
-                    xml_data: xmlStr,
+                    xml_data: escape(xmlStr),
                     date: Ext.getCmp('edDate').value,
                     op: 'RUN_RULE',
                     creditorId: Ext.getCmp('edCreditor').value
@@ -1159,7 +1167,6 @@ Ext.onReady(function () {
             rootNode = tree.getRootNode();
 
             var xmlStr = "";
-
             for (var i = 0; i < rootNode.childNodes.length; i++) {
                 if (hasEmptyKeyAttr(rootNode.childNodes[i])) {
                     return;
@@ -1172,10 +1179,12 @@ Ext.onReady(function () {
                     url: dataUrl,
                     method: 'POST',
                     params: {
-                        xml_data: xmlStr,
+                        xml_data: escape(xmlStr),
                         date: Ext.getCmp('edDate').value,
                         op: 'SAVE_XML',
-                        creditorId: Ext.getCmp('edCreditor').value
+                        creditorId: Ext.getCmp('edCreditor').value,
+                        entityId: rootNode.childNodes[0].data.value,
+                        isMaintenance: isMaintenance
                     },
                     success: function (response) {
                         var data = JSON.parse(response.responseText);

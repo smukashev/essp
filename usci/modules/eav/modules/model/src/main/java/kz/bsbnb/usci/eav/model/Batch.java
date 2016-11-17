@@ -25,6 +25,7 @@ public class Batch extends Persistable {
     private Long statusId;
     private boolean maintenance;
     private Boolean maintenanceApproved;
+    private Boolean maintenanceDeclined;
     private Creditor creditor;
 
     public Batch() {
@@ -240,6 +241,14 @@ public class Batch extends Persistable {
 
     public Boolean isMaintenanceApproved() {
         return maintenanceApproved;
+    }
+
+    public void setMaintenanceDeclined(Boolean maintenanceDeclined) {
+        this.maintenanceDeclined = maintenanceDeclined;
+    }
+
+    public Boolean isMaintenanceDeclined() {
+        return maintenanceDeclined;
     }
 
     public Creditor getCreditor() {

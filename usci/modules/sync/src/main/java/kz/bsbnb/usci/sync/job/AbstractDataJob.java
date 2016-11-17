@@ -35,6 +35,8 @@ public abstract class AbstractDataJob extends Thread {
 
     protected Set<Long> batches = new HashSet<>();
 
+    protected Set<Long> finishedCreditors = new HashSet<>();
+
     public final synchronized void addAll(List<BaseEntity> entities) {
         for (BaseEntity entity : entities) {
             batches.add(entity.getBatchId());
@@ -45,5 +47,22 @@ public abstract class AbstractDataJob extends Thread {
 
     public int getQueueSize() {
         return entities.size();
+    }
+
+    public Set<Long> getFinishedCreditors(){
+        synchronized (this) {
+            Set<Long> ret = new HashSet<>(finishedCreditors);
+            boolean f = false;
+            if(finishedCreditors.size() > 0)
+                f = true;
+            finishedCreditors.clear();
+            if(f) {
+                System.out.println("ret is following");
+                for (Long aLong : ret) {
+                    System.out.println(ret);
+                }
+            }
+            return ret;
+        }
     }
 }

@@ -222,6 +222,10 @@ public final class DataJob extends AbstractDataJob {
 
             difference = SetUtils.difference(batches, activeBatches);
 
+            if(difference.size() > 0) {
+                finishedCreditors.addAll(difference);
+            }
+
             for (Long batchId : difference) {
                 batches.remove(batchId);
             }

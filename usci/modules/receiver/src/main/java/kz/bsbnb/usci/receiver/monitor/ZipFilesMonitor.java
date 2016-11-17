@@ -86,10 +86,17 @@ public class ZipFilesMonitor {
     }
 
 
-    public void CancelBatch(long batchId) {
+    public void сancelBatch(long batchId) {
         batchService.addBatchStatus(new BatchStatus()
                 .setBatchId(batchId)
                 .setStatus(BatchStatuses.CANCELLED)
+                .setReceiptDate(new Date()));
+    }
+
+    public void declineMaintenanceBatch(long batchId) {
+        batchService.addBatchStatus(new BatchStatus()
+                .setBatchId(batchId)
+                .setStatus(BatchStatuses.MAINTENANCE_DECLINED)
                 .setReceiptDate(new Date()));
     }
 
@@ -198,6 +205,22 @@ public class ZipFilesMonitor {
                         e.printStackTrace();
                     }
                     continue;
+                }
+
+                if(serviceFactory != null) {
+                    Set<Long> finishedBatches = serviceFactory.getEntityService().getFinishedBatches();
+
+                    if(finishedBatches.size() == 0) {
+                        try {
+                            sleep(100L);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    for (Long batchId : finishedBatches) {
+                        jobLauncherQueue.jobFinished(batchId);
+                    }
                 }
 
                 if ((nextJob = jobLauncherQueue.getNextJob()) != null) {
@@ -561,7 +584,7 @@ public class ZipFilesMonitor {
                 mustDate = cal.getTime();
 
                 if(batchInfo.isMaintenance()) {
-                    if(mustDate.compareTo(batchInfo.getRepDate()) <= 0) {
+                    if(mustDate.compareTo(batchInfo.getRepDate()) < 0) {
                         errMsg = "Ошибка запроса на изменение за утвержденный период. Последняя утвержденная дата = " +
                                 dateFormat.format(lastApprovedDate) + ", " + " заявлено = " + dateFormat.format(batchInfo.getRepDate())
                                 + ", шаг отчетности = " + reportPeriodDurationMonths;
@@ -873,7 +896,7 @@ public class ZipFilesMonitor {
 
     public void monitor(Path path) throws InterruptedException, IOException {
         WatchService watchService = FileSystems.getDefault().newWatchService();
-        path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,StandardWatchEventKinds.ENTRY_DELETE);
+        path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);
 
         IEntityService entityService = serviceFactory.getEntityService();
 
@@ -892,26 +915,20 @@ public class ZipFilesMonitor {
 
             WatchKey watchKey = watchService.take();
 
-
             for (WatchEvent<?> event : watchKey.pollEvents()) {
-                String fileName = event.context().toString();
-
-                if (!StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind()) && fileName.contains(".lock")) {
-                    continue;
-                }
-
                 if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
+                    String fileName = event.context().toString();
                     System.out.println("Поступил батч : " + fileName);
-                } else if(StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())){
-                } else if(StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind()) && event.context().toString().contains(".lock")){
-                    readFiles(path + "/" + fileName.substring(0,fileName.length()-5));
+
+                    Thread.sleep(1000);
+
+                    readFiles(path + "/" + fileName);
                 }
-
             }
-
             valid = watchKey.reset();
 
         } while (valid);
+
     }
 
     private String parseFileNameFromPath(String fileName) {

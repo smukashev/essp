@@ -154,6 +154,11 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         return members.keySet();
     }
 
+    @Override
+    public boolean hasAttribute(String name) {
+        return members.containsKey(name);
+    }
+
     public boolean equals(Object obj) {
         if (obj == this)
             return true;

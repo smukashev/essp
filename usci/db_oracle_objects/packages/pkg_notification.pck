@@ -5,6 +5,11 @@
                                       p_user_name     in varchar2,
                                       p_report_date   in varchar2);
 
+
+  procedure send_dev_notification(p_title in varchar2, p_text in varchar2);
+
+  procedure speed_test;
+
 end pkg_notification;
 /
 
@@ -80,6 +85,52 @@ v_approval_date := sysdate;
       
   end loop;  
 end;
+
+   procedure send_dev_notification(p_title in varchar2, p_text in varchar2)
+      is
+         v_mail_message_id number;
+      begin
+            insert into mail_message (recipient_user_id,
+                               status_id,
+                               mail_template_id,
+                               creation_date)
+                       values  (129405,
+                                132,
+                                3001,
+                                sysdate)
+                       returning ID into v_mail_message_id;
+
+
+            insert into mail_message_parameter(mail_message_id,
+                                   mail_template_parameter_id,
+                                   value)
+                         values   (v_mail_message_id,
+                                   2001,
+                                   p_title);
+
+            insert into mail_message_parameter(mail_message_id,
+                                          mail_template_parameter_id,
+                                          value)
+            values   (v_mail_message_id, 2006, p_text);
+      end;
+
+
+    procedure speed_test
+    is
+        v_max_id1 number;
+        v_max_id2 number;
+    begin
+        select max(id) into v_max_id1
+          from eav_entity_statuses;
+
+        dbms_lock.sleep(60);
+
+        select max(id) into v_max_id2
+          from eav_entity_statuses;
+
+        send_dev_notification('speed test', 'Обработано ' || (v_max_id2 - v_max_id1) || '/min, maxId = ' || v_max_id2);
+    end;
+
 end pkg_notification;
 /
 
