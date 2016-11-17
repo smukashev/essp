@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.jws.Oneway;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author k.tulbassiyev
@@ -64,6 +65,11 @@ public class EntityServiceImpl implements IEntityService {
     @Override
     public int getQueueSize() {
         return dataJob.getQueueSize();
+    }
+
+    @Override
+    public Set<Long> getFinishedBatches() {
+        return dataJob.getFinishedCreditors();
     }
 
     @Override

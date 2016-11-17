@@ -31,6 +31,8 @@ public interface IBatchDao {
 
     void approveMaintenance(List<Long> approvedBatchIds);
 
+    void declineMaintenance(List<Long> declinedBatchIds);
+
     int getBatchCount(List<Creditor> creditors, Date reportDate);
 
 }

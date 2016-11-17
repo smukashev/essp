@@ -51,6 +51,9 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Autowired
     private IBatchService batchService;
 
+    @Autowired
+    private IBaseEntityReportDateDao baseEntityReportDateDao;
+
     public EntityServiceImpl() throws RemoteException {
         super();
     }
@@ -181,5 +184,10 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
         }
 
         return errors;
+    }
+
+    @Override
+    public Date getPreviousReportDate(long entityId, Date reportDate) {
+        return baseEntityReportDateDao.getPreviousReportDate(entityId, reportDate);
     }
 }

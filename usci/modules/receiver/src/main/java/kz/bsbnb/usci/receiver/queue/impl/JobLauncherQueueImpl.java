@@ -43,6 +43,7 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
     QueueOrderType currentOrderType = null;
     QueueOrder order;
     List<JobInfo> queue = new LinkedList<>();
+    Map<Long, Long> batchCreditorMap = new HashMap<>();
 
     @PostConstruct
     public void init(){
@@ -93,14 +94,15 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
 
 
     @Override
-    public synchronized void jobFinished(Long creditorId){
+    public synchronized void jobFinished(Long batchId) {
         //activeJobCount --;
-        activeCreditors.remove(creditorId);
+        activeCreditors.remove(batchCreditorMap.get(batchId));
     }
 
     @Override
     public synchronized void addJob(long batchId, BatchInfo batchInfo) {
         queue.add(new JobInfo(batchId, batchInfo));
+        batchCreditorMap.put(batchId, batchInfo.getCreditorId());
     }
 
     public JobInfo next(List<JobInfo> queue){

@@ -593,12 +593,18 @@ public class MainPortlet extends MVCPortlet {
                     String xml = resourceRequest.getParameter("xml_data");
                     String sDate = resourceRequest.getParameter("date");
                     Date date = (Date) DataTypes.getCastObject(DataTypes.DATE, sDate);
+                    String sEntityId = resourceRequest.getParameter("entityId");
+                    String sIsMaintenance = resourceRequest.getParameter("isMaintenance");
+                    Boolean isMaintenance = (Boolean) DataTypes.getCastObject(DataTypes.BOOLEAN, sIsMaintenance);
 
                     BatchEntry batchEntry = new BatchEntry();
 
                     batchEntry.setValue(xml);
                     batchEntry.setRepDate(date);
                     batchEntry.setUserId(currentUser.getUserId());
+                    if (sEntityId != null && sEntityId.trim().length() > 0)
+                        batchEntry.setEntityId(Long.parseLong(sEntityId));
+                    batchEntry.setMaintenance(isMaintenance);
 
                     batchEntryService.save(batchEntry);
 

@@ -33,5 +33,9 @@ public interface DataProvider {
 
     void approveAndSend(List<Long> approvedInputInfos);
 
-    void sendNotification(List<InputInfoDisplayBean> inputInfoList);
+    void declineAndSend(List<Long> declinedInputInfos);
+
+    void sendApprovedNotification(List<InputInfoDisplayBean> inputInfoList);
+
+    void sendDeclinedNotification(List<InputInfoDisplayBean> inputInfoList);
 }

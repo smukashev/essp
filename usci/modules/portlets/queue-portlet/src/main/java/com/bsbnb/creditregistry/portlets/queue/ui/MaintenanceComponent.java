@@ -129,7 +129,7 @@ public class MaintenanceComponent  extends VerticalLayout {
                 }
 
                 dataProvider.approveAndSend(batchIds);
-                dataProvider.sendNotification(inputInfoList);
+                dataProvider.sendApprovedNotification(inputInfoList);
 
                 creditorsSelect.getSelectedElements(new SelectionCallback<Creditor>() {
                     @Override
@@ -150,6 +150,43 @@ public class MaintenanceComponent  extends VerticalLayout {
         sendFilesButton.setVisible(false);
 
 
+        final Button declineFilesButton = new Button("Отклонить", new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                List<Long> batchIds = new LinkedList<>();
+
+                Iterator<InputInfoDisplayBean> iterator = inputInfoList.iterator();
+
+                while(iterator.hasNext()) {
+                    if(!iterator.next().isSelected())
+                        iterator.remove();
+                }
+
+                for (InputInfoDisplayBean inputInfoDisplayBean : inputInfoList) {
+                    batchIds.add(inputInfoDisplayBean.getInputInfo().getId().longValue());
+                }
+
+                dataProvider.declineAndSend(batchIds);
+                dataProvider.sendDeclinedNotification(inputInfoList);
+
+                creditorsSelect.getSelectedElements(new SelectionCallback<Creditor>() {
+                    @Override
+                    public void selected(List<Creditor> creditors) {
+                        Date reportDate = (Date) reportDateField.getValue();
+                        inputInfoList = dataProvider.getMaintenanceInfo(creditors, reportDate);
+                        inputInfoContainer.removeAllItems();
+                        inputInfoContainer.addAll(inputInfoList);
+                        filesTable.setVisible(true);
+                    }
+                });
+
+                MessageBox.Show("Успешно откланен", getWindow());
+
+            }
+        });
+
+        declineFilesButton.setVisible(false);
+
         final Button loadButton = new Button(environment.getString(Localization.LOAD), new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -166,6 +203,7 @@ public class MaintenanceComponent  extends VerticalLayout {
                         inputInfoContainer.addAll(inputInfoList);
                         filesTable.setVisible(true);
                         sendFilesButton.setVisible(true);
+                        declineFilesButton.setVisible(true);
                     }
                 });
                 //loadTable();
@@ -177,7 +215,12 @@ public class MaintenanceComponent  extends VerticalLayout {
 
         addComponent(loadButton);
         addComponent(filesTable);
-        addComponent(sendFilesButton);
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.addComponent(sendFilesButton);
+        horizontalLayout.addComponent(declineFilesButton);
+
+        addComponent(horizontalLayout);
     }
 
     private String[] getResourceStrings(String[] keys) {

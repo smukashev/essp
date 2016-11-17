@@ -26,4 +26,6 @@ public interface IEntityService {
     BaseEntity loadForDisplay(long entityId, Date reportDate);
 
     List<String> getValidationErrors(IBaseEntity baseEntity);
+
+    Date getPreviousReportDate(long entityId, Date reportDate);
 }
