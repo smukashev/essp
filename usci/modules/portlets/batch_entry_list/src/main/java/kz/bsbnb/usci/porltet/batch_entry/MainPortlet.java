@@ -35,8 +35,8 @@ public class MainPortlet extends MVCPortlet {
 
     //должен быть отличен от C:/zips (т.е папки receiver-а)
     //private final static String TMP_FILE_DIR = "\\\\" + StaticRouter.getAsIP() + "\\batch_entry_list_temp_folder";
-    private final static String TMP_FILE_DIR = StaticRouter.isDevMode() ? "/home/dtulendiyev/euss/batch_entry_list_temp_folder" :
-            "\\\\" + StaticRouter.getAsIP() + "\\tmp$\\batch_entry_list_temp_folder";
+    private final static String TMP_FILE_DIR = StaticRouter.isDevMode() ? "/home/usci_data/batch_entry_list_temp_folder" :
+            "\\\\" + StaticRouter.getAsIP() + "\\download$\\batch_entry_list_temp_folder";
 
     private IBatchEntryService batchEntryService;
     private IEntityService entityService;
