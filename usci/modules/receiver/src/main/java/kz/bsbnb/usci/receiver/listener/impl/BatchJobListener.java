@@ -11,6 +11,7 @@ import kz.bsbnb.usci.sync.service.IBatchService;
 import kz.bsbnb.usci.tool.status.ReceiverStatusSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
@@ -44,6 +45,10 @@ public class BatchJobListener implements IListener {
     @AfterJob
     public void afterJob(JobExecution jobExecution) {
         long batchId = jobExecution.getJobInstance().getJobParameters().getLong("batchId");
+
+        if(jobExecution.getExitStatus().equals(ExitStatus.FAILED)) {
+            jobLauncherQueue.jobFinished(batchId);
+        }
 
         IBatchService batchService = serviceFactory.getBatchService();
         Batch batch = batchService.getBatch(batchId);
