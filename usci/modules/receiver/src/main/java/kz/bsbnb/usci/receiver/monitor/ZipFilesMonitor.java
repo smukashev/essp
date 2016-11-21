@@ -890,7 +890,11 @@ public class ZipFilesMonitor {
                 saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
             }
         } catch (Exception e) {
-            failFast(batch.getId(), "Не корректный XML файл");
+            if(e instanceof IOException) {
+                failFast(batch.getId(), "Ошибка I/O: " + e.getMessage() );
+            } else {
+                failFast(batch.getId(), "Не корректный XML файл");
+            }
         }
     }
 
