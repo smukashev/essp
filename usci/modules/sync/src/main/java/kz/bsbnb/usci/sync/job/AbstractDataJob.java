@@ -52,16 +52,7 @@ public abstract class AbstractDataJob extends Thread {
     public Set<Long> getFinishedCreditors(){
         synchronized (this) {
             Set<Long> ret = new HashSet<>(finishedCreditors);
-            boolean f = false;
-            if(finishedCreditors.size() > 0)
-                f = true;
             finishedCreditors.clear();
-            if(f) {
-                System.out.println("ret is following");
-                for (Long aLong : ret) {
-                    System.out.println(ret);
-                }
-            }
             return ret;
         }
     }
