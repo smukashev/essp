@@ -38,7 +38,7 @@ rule "DEBT_REMAINS_DEBT_PASTDUE_CLOSE_DATE_MORE_THAN_REPORT_DATE"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
                 && getEl("change.remains.debt.pastdue.close_date") != null
-                && getEl("change.remains.debt.pastdue.close_date") > getReportDate())
+                && getEl("change.remains.debt.pastdue.close_date") >= getReportDate())
 then
    $entity.addValidationError("Дата погашения просроченной задолженности по основному долгу не должна быть позднее отчетной даты")
 end
