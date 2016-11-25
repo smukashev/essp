@@ -426,7 +426,7 @@ when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
        && $md: getEl("maturity_date") !=null
        && $rd: reportDate !=null
-       && $md > $rd)
+       && $md >= $rd)
 then
   $entity.addValidationError("Ошибка по дате фактического погашения: дата фактического погашения должна быть раньше чем отчетная дата");
 end
