@@ -263,7 +263,7 @@ public class ZipFilesMonitor {
 
                         sleep(1000);
                     } catch (Exception e) {
-                        jobLauncherQueue.jobFinished(nextJob.getBatchInfo().getCreditorId());
+                        jobLauncherQueue.jobFinished(nextJob.getBatchId());
                         e.printStackTrace();
                     }
                 } else {
