@@ -34,7 +34,7 @@ class SqlExecutor {
             + "  DBMS_SQL.close_cursor(c);\n"
             + "END;";
 
-    private final ObjectProperty<String> connectionStringProperty = new ObjectProperty<String>("jdbc:oracle:thin:@10.8.1.200:1521:essp");
+    private final ObjectProperty<String> connectionStringProperty = new ObjectProperty<String>("jdbc:oracle:thin:@10.8.2.200:1521:essp");
     private final ObjectProperty<String> usernameProperty = new ObjectProperty<String>("core");
     private final ObjectProperty<String> passwordProperty = new ObjectProperty<String>("core");
     private final ObjectProperty<Integer> limitProperty = new ObjectProperty<Integer>(1000);

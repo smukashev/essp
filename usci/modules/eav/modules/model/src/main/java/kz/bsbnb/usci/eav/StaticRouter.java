@@ -21,17 +21,17 @@ public final class StaticRouter {
     /* Core Schema IP */
     private final static String stendDBCoreIP = "170.7.15.69";
     private final static String devDBCoreIP = "localhost";
-    private final static String prodDBCoreIp = "10.8.1.200";
+    private final static String prodDBCoreIp = "10.8.2.200";
 
     /* Showcase Schema IP */
     private final static String stendDBShowcaseIP = "170.7.15.69";
     private final static String devDBShowcaseIP = "localhost";
-    private final static String prodDBShowcaseIP = "10.8.1.85";
+    private final static String prodDBShowcaseIP = "10.8.1.206";
 
     /* Reporter Schema IP */
     private final static String stendDBReporterIP = "170.7.15.69";
     private final static String devDBReporterIP = "localhost";
-    private final static String prodDBReporterIP = "10.8.1.85";
+    private final static String prodDBReporterIP = "10.8.1.206";
 
     /* Portal URL */
     private final static String stendPortalUrl = "10.10.32.28";
