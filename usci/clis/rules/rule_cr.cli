@@ -644,7 +644,8 @@ rule read $$$
 title: NOT_HIMSELF_IIN
 rule "NOT_HIMSELF_IIN"
 when
-	$entity: BaseEntity(getMeta().getClassName() == "credit")
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+     &&  getEls("{setString(12,13)}credit_type.code") == 0)
      $r: String() from $entity.getEls("{get}creditor.docs[doc_type.code=06]no")
      $a: String(equals($r)) from $entity.getEls("{get}subject.docs[doc_type.code=06]no")
 then
@@ -658,7 +659,8 @@ rule read $$$
 title: NOT_HIMSELF_BIN
 rule "NOT_HIMSELF_BIN"
 when
-	$entity: BaseEntity(getMeta().getClassName() == "credit")
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+         &&  getEls("{setString(12,13)}credit_type.code") == 0)
      $r: String() from $entity.getEls("{get}creditor.docs[doc_type.code=07]no")
      $a: String(equals($r)) from $entity.getEls("{get}subject.docs[doc_type.code=07]no")
 then
@@ -672,7 +674,8 @@ rule read $$$
 title: NOT_HIMSELF_RNN
 rule "NOT_HIMSELF_RNN"
 when
-	$entity: BaseEntity(getMeta().getClassName() == "credit")
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+         &&  getEls("{setString(12,13)}credit_type.code") == 0)
      $r: String() from $entity.getEls("{get}creditor.docs[doc_type.code=11]no")
      $a: String(equals($r)) from $entity.getEls("{get}subject.docs[doc_type.code=11]no")
 then
@@ -686,7 +689,8 @@ rule read $$$
 title: NOT_HIMSELF_AIN
 rule "NOT_HIMSELF_AIN"
 when
-	$entity: BaseEntity(getMeta().getClassName() == "credit")
+	$entity: BaseEntity(getMeta().getClassName() == "credit"
+         &&  getEls("{setString(12,13)}credit_type.code") == 0)
      $r: String() from $entity.getEls("{get}creditor.docs[doc_type.code=17]no")
      $a: String(equals($r)) from $entity.getEls("{get}subject.docs[doc_type.code=17]no")
 then
