@@ -403,16 +403,22 @@ public class TemplatedPagedXlsReportExporter extends AbstractReportExporter {
                     WritableCell readCell = templateSheet.getWritableCell(colIdx, rowIdx);
                     WritableCell newCell = readCell.copyTo(colIdx, rowIdx);
                     String content = newCell.getContents();
-                    if (content.startsWith("$P")) {
 
-                        String parameterName = content.substring(2);
-                        logger.info("Found parameter template: "+ parameterName);
+                    if (content.contains("REPORT_NAME")) {
+                        String reportName = getTargetReportComponent().getReport().getLocalizedName();
+                        content = content.replaceAll("\\$", "");
+                        content = content.replaceAll("REPORT_NAME", reportName);
+                        newCell = new Label(colIdx, rowIdx, content);
+                    } else if (content.contains("$")) {
+                        String parameterName = content.substring(content.indexOf("$") + 2);
+                        parameterName = parameterName.split(" ")[0];
                         if (parameters.containsKey(parameterName)) {
-                            newCell = new Label(colIdx, rowIdx, parameters.get(parameterName).toString());
+                            content = content.replaceAll("\\$", "");
+                            content = content.replace("P" + parameterName, parameters.get(parameterName).toString());
+                            newCell = new Label(colIdx, rowIdx, content);
                         }
-                    } else if ("$REPORT_NAME".equals(content)) {
-                        newCell = new Label(colIdx, rowIdx, getTargetReportComponent().getReport().getLocalizedName());
                     }
+
                     CellFormat readFormat = readCell.getCellFormat();
                     if (readFormat != null) {
                         if (!definedFormats.containsKey(readFormat)) {

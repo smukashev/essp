@@ -133,6 +133,9 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             logger.info("Record counter: "+ recordCounter);
             if (recordCounter > 0) {
                 if (recordCounter >= firstRecordNumber) {
+                    if(exportFilePrefix.contains("CreditsList"))
+                        exportFilePrefix = exportFilePrefix.replaceAll("Pledge","");
+
                     String cleanFilename = String.format("%s%d-%d.xls", exportFilePrefix, startIdIndex, idIndex);
                     FileDownloadComponent downloadComponent = new FileDownloadComponent(cleanFilename.replace(".xls", ".zip"), cleanFilename, xlsFile);
                     downloadComponent.setCaption(String.format(Localization.LOAD_RECORDS_FROM_TO.getValue(), startIdIndex, idIndex));
