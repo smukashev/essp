@@ -423,6 +423,7 @@ title: MATURITY_DATE_2100_LISTENER
 rule "MATURITY_DATE_2100_LISTENER"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEl("maturity_date") !=null
        && $md: getStringDateV((Date) getEl("maturity_date")) == "01.01.2100"
        && $creditorId: getBaseEntityReportDate().getCreditorId()
        && $rd: reportDate)
