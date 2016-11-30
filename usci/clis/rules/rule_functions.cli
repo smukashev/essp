@@ -49,8 +49,7 @@ function List getNegativesFromDoubles(List values){
     return ret;
 }
 
-
-function String getDateStringValue(Date d){
+function String getStringDateV(Date d){
 
    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 
