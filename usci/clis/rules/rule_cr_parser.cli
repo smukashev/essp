@@ -418,6 +418,21 @@ $$$
 
 rule save
 
+rule read $$$
+title: MATURITY_DATE_2100_LISTENER
+rule "MATURITY_DATE_2100_LISTENER"
+when
+  $entity: BaseEntity(getMeta().getClassName() == "credit"
+       && getEl("maturity_date") !=null
+       && $md: getStringDateV((Date) getEl("maturity_date")) == "01.01.2100"
+       && $creditorId: getBaseEntityReportDate().getCreditorId()
+       && $rd: reportDate)
+then
+  $entity.put("maturity_date",new BaseEntityDateValue(0, $creditorId, $rd, null, false, true));
+end
+$$$
+
+rule save
 
 rule read $$$
 title: MATURITY_DATE_MISMATCH_REPORT_DATE
@@ -425,6 +440,7 @@ rule "MATURITY_DATE_MISMATCH_REPORT_DATE"
 when
   $entity: BaseEntity(getMeta().getClassName() == "credit"
        && $md: getEl("maturity_date") !=null
+       && getStringDateV((Date) getEl("maturity_date")) != "01.01.2100"
        && $rd: reportDate !=null
        && $md >= $rd)
 then

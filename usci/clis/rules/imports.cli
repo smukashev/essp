@@ -11,6 +11,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.base.impl.value.BaseEntityDateValue;
 
 global kz.bsbnb.usci.eav.repository.IMetaClassRepository metaClassRepository;
 global kz.bsbnb.usci.eav.persistance.dao.IBaseEntityProcessorDao baseEntityProcessorDao;
