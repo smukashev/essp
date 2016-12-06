@@ -518,7 +518,10 @@ when:
                    ||
                     getEls("{setString(02,03,05,06,08,09)}subject[is_organization=true]organization_info[is_se=false]enterprise_type.code") > 0
                    ||
-                    getEls("{count}subject[is_organization=true]organization_info[enterprise_type.code=null][country.code_numeric=398]") > 0)
+                    (getEls("{count}subject[is_organization=true]organization_info[enterprise_type.code=null][country.code_numeric=398]") > 0
+
+                       && getEls("{setString(08)}subject.organization_info.legal_form.code")==0 )                  )
+
                    )
 then
  $entity.addValidationError("Код субъекта частного предпринимательства указан некорректно");
