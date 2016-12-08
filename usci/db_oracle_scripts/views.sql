@@ -1,3 +1,5 @@
+declare
+  v_schema VARCHAR2(32) := ?;
 begin
   execute immediate
   'create OR REPLACE VIEW v_simple_attribute AS
