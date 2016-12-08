@@ -323,24 +323,6 @@ $$$
 
 rule save
 
-
-
-rule read $$$
-title: сумма в валюте в корректировке договора
-rule "remains_correction_value_currency"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-                && ($r : getEl("change.remains.correction.value_currency"))
-                && $r != null
-                && $r < 0)
-then
-  $entity.addValidationError("Не правильная сумма в валюте в корректировке договора");
-end
-$$$
-
-rule save
-
-
 rule read $$$
 title: сумма в просроченной задолженности по начисленному вознаграждению договора
 rule "remains_interest_pastdue_value"
