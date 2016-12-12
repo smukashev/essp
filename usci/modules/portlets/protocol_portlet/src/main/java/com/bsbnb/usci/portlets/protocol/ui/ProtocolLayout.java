@@ -63,8 +63,7 @@ import org.apache.log4j.Logger;
  */
 public class ProtocolLayout extends VerticalLayout {
 
-    private static final int PROTOCOL_TABLE_PAGE_SIZE = 5000;
-    private static final int FILES_TABLE_PAGE_SIZE = 100;
+    private static final int FILES_TABLE_PAGE_SIZE = 2;
     private static final String LOCALIZATION_PREFIX = "PROTOCOL-LAYOUT.";
 
     private boolean isProtocolGrouped = false;
@@ -83,10 +82,8 @@ public class ProtocolLayout extends VerticalLayout {
     private Panel groupsTreePanel;
     private BeanItemContainer<ProtocolDisplayBean> protocolsContainer;
     private FormattedTable tableProtocol;
-    private PagedTableControl<ProtocolDisplayBean> protocolsTableControl;
     private VerticalLayout protocolLayout;
     private Label noProtocolsLabel;
-    private InputInfo currentInputInfo;
 
     public final Logger logger = Logger.getLogger(ProtocolLayout.class);
 
@@ -332,7 +329,6 @@ public class ProtocolLayout extends VerticalLayout {
                 if (protocols == null) {
                     return;
                 }
-                protocolsContainer = protocolsTableControl.getContainer();
                 protocolsContainer.removeAllItems();
                 protocolsContainer.addAll(protocols);
             }
@@ -344,29 +340,19 @@ public class ProtocolLayout extends VerticalLayout {
         groupsTreePanel.setWidth("300px");
         groupsTreePanel.setHeight("100%");
 
-        protocolsTableControl = new PagedTableControl<ProtocolDisplayBean>(ProtocolDisplayBean.class, PROTOCOL_TABLE_PAGE_SIZE, new PagedDataProvider<ProtocolDisplayBean>() {
-            @Override
-            public int getCount() {
-                return provider.countProtocols((InputInfoDisplayBean) filesTable.getValue());
-            }
 
-            @Override
-            public List<ProtocolDisplayBean> getRecords(int firstIndex, int count) {
-                listOfProtocols = provider.loadProtocols((InputInfoDisplayBean) filesTable.getValue(), firstIndex, count);
-                showProtocolTable();
-                return listOfProtocols;
-            }
-        });
-        tableProtocol = protocolsTableControl.getTable();
+        tableProtocol = new FormattedTable();
         tableProtocol.setStyleName("wordwrap-table");
+        protocolsContainer = new BeanItemContainer<>(ProtocolDisplayBean.class);
+        tableProtocol.setContainerDataSource(protocolsContainer);
         tableProtocol.addFormat("primaryContractDate", "dd.MM.yyyy");
         tableProtocol.setImmediate(true);
         tableProtocol.setSizeFull();
 
         HorizontalLayout layoutOfProtocolTable = new HorizontalLayout();
         layoutOfProtocolTable.addComponent(groupsTreePanel);
-        layoutOfProtocolTable.addComponent(protocolsTableControl);
-        layoutOfProtocolTable.setExpandRatio(protocolsTableControl, 1.0f);
+        layoutOfProtocolTable.addComponent(tableProtocol);
+        layoutOfProtocolTable.setExpandRatio(tableProtocol, 1.0f);
         layoutOfProtocolTable.setWidth("100%");
         layoutOfProtocolTable.setImmediate(true);
 
@@ -429,7 +415,6 @@ public class ProtocolLayout extends VerticalLayout {
     }
 
     private void setProtocolColumns(String[] columns) {
-        tableProtocol = protocolsTableControl.getTable();
         tableProtocol.setVisibleColumns(columns);
         tableProtocol.setColumnHeaders(getResourceStrings(columns));
         tableProtocol.setColumnWidth("note", 300);
@@ -438,22 +423,23 @@ public class ProtocolLayout extends VerticalLayout {
 
     private void showProtocol(InputInfoDisplayBean ii) throws UnsupportedOperationException {
         groupsOfProtocolTree.removeAllItems();
+        protocolsContainer.removeAllItems();
         typesOfProtocolLayout.removeAllComponents();
         groupsMapProtocol = new HashMap<>();
         if (isProtocolGrouped) {
             showGroupedProtocol(ii);
         } else {
-            currentInputInfo = ii.getInputInfo();
-            protocolsTableControl.reload();
+            showProtocolTable(ii);
         }
     }
 
-    private void showProtocolTable() throws UnsupportedOperationException {
+    private void showProtocolTable(InputInfoDisplayBean ii) throws UnsupportedOperationException {
         typesOfProtocolLayout.setVisible(true);
-        typesOfProtocolLayout.removeAllComponents();
         groupsTreePanel.setVisible(false);
+
         prohibitedMessageTypes.clear();
-        Set<String> messageTypes = new HashSet<String>();
+        listOfProtocols = provider.getProtocolsByInputInfo(ii);
+        Set<String> messageTypeCodes = new HashSet<>();
 
         if (listOfProtocols.isEmpty()) {
 
@@ -467,7 +453,7 @@ public class ProtocolLayout extends VerticalLayout {
             long maxWeight = 0;
             Protocol p = null;
 
-            for (Protocol batchStatus : currentInputInfo.getBatchStatuses()) {
+            for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
                 Long weight = weightsByErrorCode.get(batchStatus.getMessageType().getCode());
                 if (weight == null)
                     weight = 0L;
@@ -481,14 +467,27 @@ public class ProtocolLayout extends VerticalLayout {
             if (p != null)
                 listOfProtocols.add(new ProtocolDisplayBean(p));
 
+            /*boolean errorStatus = false;
+            for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
+                if("ERROR".equals(batchStatus.getMessageType().getCode())){
+                    errorStatus = true;
+                    break;
+                }
+            }
+
+            for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
+                if(!errorStatus || "ERROR".equals(batchStatus.getMessageType().getCode())){
+                    listOfProtocols.add(new ProtocolDisplayBean(batchStatus));
+                }
+            }*/
         }
 
         if (listOfProtocols.isEmpty()) {
             noProtocolsLabel.setVisible(true);
             protocolLayout.setVisible(false);
         } else {
-            for (final ProtocolDisplayBean protocol : listOfProtocols) {
-                addProtocol(protocol, messageTypes);
+            for (ProtocolDisplayBean protocolDisplayBean : listOfProtocols) {
+                addProtocol(protocolDisplayBean, messageTypeCodes);
             }
             setProtocolColumns(EXTENDED_PROTOCOL_TABLE_COLUMNS);
             noProtocolsLabel.setVisible(false);
@@ -575,14 +574,14 @@ public class ProtocolLayout extends VerticalLayout {
     }
 
     private void updateProtocolTable() {
-        protocolsTableControl.getContainer().removeAllItems();
+        protocolsContainer.removeAllItems();
         List<ProtocolDisplayBean> filteredProtocols = new ArrayList<>();
         for (ProtocolDisplayBean protocol : listOfProtocols) {
             if (!prohibitedMessageTypes.contains(protocol.getMessageType())) {
                 filteredProtocols.add(protocol);
             }
         }
-        protocolsTableControl.getContainer().addAll(filteredProtocols);
+        protocolsContainer.addAll(filteredProtocols);
     }
 
     private void loadCreditorInfo() {
