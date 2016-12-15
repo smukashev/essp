@@ -2,11 +2,13 @@ package kz.bsbnb.usci.eav.repository.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.ISQLGenerator;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
@@ -20,20 +22,146 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Repository
 public class RefRepositoryImpl implements IRefRepository, InitializingBean {
+    private static final int CACHE_MONITOR_SIZE = 10000;
     private Map<Long, List<Map<String, Object>>> prepareMap = new HashMap<>();
 
     @Autowired
     private ISQLGenerator sqlGenerator;
+
+
+    @Autowired
+    private IBaseEntityLoadDao loadDao;
 
     @Qualifier("metaClassRepositoryImpl")
     @Autowired
     private IMetaClassRepository metaClassRepository;
 
     private ReentrantReadWriteLock semaphore = new ReentrantReadWriteLock();
+
+
+    List<IBaseEntity> queue = new LinkedList<>();
+    Map<CacheEntry, CacheEntry> cache = new ConcurrentHashMap<>();
+    private long totalHitCount = 0;
+
+    public class CacheEntry {
+        private IBaseEntity baseEntity;
+        private long hitCount;
+
+        public CacheEntry(IBaseEntity entity) {
+            this.baseEntity = entity;
+            hitCount = 0;
+        }
+
+        @Override
+        public int hashCode() {
+            return (int) baseEntity.getId() * 1234 + baseEntity.getReportDate().hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(obj instanceof CacheEntry) {
+                CacheEntry that = (CacheEntry) obj;
+                return baseEntity.getId() == that.baseEntity.getId()
+                        && (baseEntity.getReportDate().equals(that.baseEntity.getReportDate()));
+            }
+
+            return false;
+        }
+    }
+
+    @Override
+    public synchronized IBaseEntity get(IBaseEntity entity) {
+        CacheEntry ce = null;
+
+        ce = cache.get(new CacheEntry(entity));
+
+        if(ce == null) {
+            IBaseEntity entityLoaded = loadDao.loadByMaxReportDate(entity.getId(), entity.getReportDate());
+            if(entityLoaded == null) {
+                throw new RuntimeException("no ref from db");
+            }
+            entity.getBaseEntityReportDate().setReportDate(entity.getReportDate());
+            ce = new CacheEntry(entity);
+
+            cache.put(ce,ce);
+        } else {
+            totalHitCount ++;
+            if( (totalHitCount % 1000) == 0)
+                System.out.println("cacheHitCount = "  + totalHitCount + ", queue size = " + queue.size());
+        }
+
+        ce.hitCount++;
+        queue.add(ce.baseEntity);
+
+        if(queue.size() > CACHE_MONITOR_SIZE) {
+            CacheEntry leftEntry = cache.get(new CacheEntry(queue.remove(0)));
+            System.out.println(leftEntry.hitCount);
+            leftEntry.hitCount--;
+
+            if(leftEntry.hitCount == 0) {
+                cache.remove(leftEntry);
+                System.out.println("removed from cache !!!");
+            }
+
+            if(leftEntry.hitCount < 0 )
+                throw new RuntimeException("negative value !!! " + leftEntry.hitCount);
+        }
+
+        return ce.baseEntity;
+    }
+
+
+
+    //@Override
+    public IBaseEntity get2(IBaseEntity entity) {
+        CacheEntry ce = null;
+
+        synchronized (this) {
+            ce = cache.get(new CacheEntry(entity));
+        }
+
+        if(ce == null) {
+            IBaseEntity entityLoaded = loadDao.loadByMaxReportDate(entity.getId(), entity.getReportDate());
+            if(entityLoaded == null) {
+                System.out.println("too bad got null from repo");
+            }
+            ce = new CacheEntry(new BaseEntity(entityLoaded, entity.getReportDate()));
+
+            synchronized (this) {
+                cache.put(ce,ce);
+            }
+        } else {
+            totalHitCount ++;
+            if( (totalHitCount % 1000) == 0)
+                System.out.println("cacheHitCount = "  + totalHitCount + ", queue size = " + queue.size());
+        }
+
+        synchronized (this) {
+            ce.hitCount++;
+            queue.add(ce.baseEntity);
+
+            if(queue.size() > CACHE_MONITOR_SIZE) {
+                CacheEntry leftEntry = cache.get(new CacheEntry(queue.remove(0)));
+                System.out.println(leftEntry.hitCount);
+                leftEntry.hitCount--;
+
+                if(leftEntry.hitCount == 0) {
+                    cache.remove(leftEntry);
+                    System.out.println("removed from cache !!!");
+                }
+
+                if(leftEntry.hitCount <=0 )
+                    throw new RuntimeException("negative value !!!");
+            }
+        }
+
+        return ce.baseEntity;
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
