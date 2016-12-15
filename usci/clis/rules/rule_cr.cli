@@ -635,7 +635,8 @@ when
     $entity: BaseEntity(getMeta().getClassName() == "credit"
              && getEl("currency.short_name") != null
              && getEls("{setString(KZT)}currency.short_name") == 0
-             && getEl("has_currency_earn") == null)
+             && getEl("has_currency_earn") == null
+             && getEls("{setString(02,03,10,12,13,14,15,17,18,19,24,25,26)}credit_type.code") == 0)
 then
     $entity.addValidationError("Не заполнен показатель «Наличие валютной выручки и (или) инструментов хеджирования у заемщика» по валютному займу (условному обязательству)");
 end
