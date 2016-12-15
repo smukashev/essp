@@ -76,31 +76,31 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
 
     @Override
     public synchronized IBaseEntity get(IBaseEntity entity) {
-        CacheEntry ce = null;
+        CacheEntry ce = new CacheEntry(entity);
+        CacheEntry ret = cache.get(ce);
 
-        ce = cache.get(new CacheEntry(entity));
-
-        if(ce == null) {
+        if(ret == null) {
             IBaseEntity entityLoaded = loadDao.loadByMaxReportDate(entity.getId(), entity.getReportDate());
+            //refactor null policy
             if(entityLoaded == null) {
                 throw new RuntimeException("no ref from db");
             }
-            entity.getBaseEntityReportDate().setReportDate(entity.getReportDate());
-            ce = new CacheEntry(entity);
+            //entity.getBaseEntityReportDate().setReportDate(entity.getReportDate());
+            ret = new CacheEntry(entityLoaded);
 
-            cache.put(ce,ce);
+            cache.put(ce, ret);
         } else {
             totalHitCount ++;
             if( (totalHitCount % 1000) == 0)
                 System.out.println("cacheHitCount = "  + totalHitCount + ", queue size = " + queue.size());
         }
 
-        ce.hitCount++;
+        ret.hitCount++;
         queue.add(ce.baseEntity);
 
         if(queue.size() > CACHE_MONITOR_SIZE) {
             CacheEntry leftEntry = cache.get(new CacheEntry(queue.remove(0)));
-            System.out.println(leftEntry.hitCount);
+            //System.out.println(leftEntry.hitCount);
             leftEntry.hitCount--;
 
             if(leftEntry.hitCount == 0) {
@@ -112,7 +112,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
                 throw new RuntimeException("negative value !!! " + leftEntry.hitCount);
         }
 
-        return ce.baseEntity;
+        return ret.baseEntity;
     }
 
 
