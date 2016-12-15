@@ -8,4 +8,6 @@ public interface IRefRepository {
     void installRef(final IBaseEntity entity);
 
     IBaseEntity get(IBaseEntity entity);
+
+    void invalidate(IBaseEntity baseEntity);
 }

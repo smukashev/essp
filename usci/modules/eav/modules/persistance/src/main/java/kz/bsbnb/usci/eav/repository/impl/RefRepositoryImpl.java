@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -115,52 +112,23 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
         return ret.baseEntity;
     }
 
+    @Override
+    public synchronized void invalidate(IBaseEntity baseEntity) {
+        Iterator<IBaseEntity> iterator = queue.iterator();
 
+        while(iterator.hasNext()) {
+            IBaseEntity cachedEntity = iterator.next();
+            if(cachedEntity.getReportDate().compareTo(baseEntity.getReportDate()) >=0) {
+                iterator.remove();
+                CacheEntry invEntry = cache.get(cachedEntity);
+                invEntry.hitCount--;
 
-    //@Override
-    public IBaseEntity get2(IBaseEntity entity) {
-        CacheEntry ce = null;
-
-        synchronized (this) {
-            ce = cache.get(new CacheEntry(entity));
-        }
-
-        if(ce == null) {
-            IBaseEntity entityLoaded = loadDao.loadByMaxReportDate(entity.getId(), entity.getReportDate());
-            if(entityLoaded == null) {
-                System.out.println("too bad got null from repo");
-            }
-            ce = new CacheEntry(new BaseEntity(entityLoaded, entity.getReportDate()));
-
-            synchronized (this) {
-                cache.put(ce,ce);
-            }
-        } else {
-            totalHitCount ++;
-            if( (totalHitCount % 1000) == 0)
-                System.out.println("cacheHitCount = "  + totalHitCount + ", queue size = " + queue.size());
-        }
-
-        synchronized (this) {
-            ce.hitCount++;
-            queue.add(ce.baseEntity);
-
-            if(queue.size() > CACHE_MONITOR_SIZE) {
-                CacheEntry leftEntry = cache.get(new CacheEntry(queue.remove(0)));
-                System.out.println(leftEntry.hitCount);
-                leftEntry.hitCount--;
-
-                if(leftEntry.hitCount == 0) {
-                    cache.remove(leftEntry);
-                    System.out.println("removed from cache !!!");
+                if(invEntry.hitCount == 0){
+                    cache.remove(cachedEntity);
+                    System.out.println("removed from cache due to invalidate !!!");
                 }
-
-                if(leftEntry.hitCount <=0 )
-                    throw new RuntimeException("negative value !!!");
             }
         }
-
-        return ce.baseEntity;
     }
 
     @Override
