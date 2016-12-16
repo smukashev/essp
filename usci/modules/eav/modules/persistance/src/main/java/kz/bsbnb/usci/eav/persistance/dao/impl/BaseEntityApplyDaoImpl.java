@@ -3,10 +3,7 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.*;
-import kz.bsbnb.usci.eav.model.base.impl.BaseContainerType;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
-import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
+import kz.bsbnb.usci.eav.model.base.impl.*;
 import kz.bsbnb.usci.eav.model.exceptions.ImmutableElementException;
 import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
@@ -2272,6 +2269,13 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 eavOptimizerDao.insert(eod);
                             }
                         }
+
+                        if(insertedObject instanceof BaseEntityReportDate) {
+                            IBaseEntity baseEntity = ((BaseEntityReportDate) insertedObject).getBaseEntity();
+                            if(baseEntity.getMeta().isReference())
+                                refRepository.invalidate(baseEntity);
+                        }
+
                     } catch (Exception insertException) {
                         throw new IllegalStateException(Errors.compose(Errors.E76, insertedObject, insertException.getMessage()));
                     }
@@ -2288,6 +2292,13 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 for (IPersistable updatedObject : updatedObjects) {
                     try {
                         persistableDao.update(updatedObject);
+
+                        if(updatedObject instanceof BaseEntityReportDate) {
+                            IBaseEntity baseEntity = ((BaseEntityReportDate) updatedObject).getBaseEntity();
+                            if(baseEntity.getMeta().isReference())
+                                refRepository.invalidate(baseEntity);
+                        }
+
                     } catch (Exception updateException) {
                         throw new IllegalStateException(Errors.compose(Errors.E77, updatedObject, updateException.getMessage()));
                     }
@@ -2304,6 +2315,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 for (IPersistable deletedObject : deletedObjects) {
                     try {
                         persistableDao.delete(deletedObject);
+
+                        if(deletedObject instanceof IBaseEntity) {
+                            if(((IBaseEntity) deletedObject).getMeta().isReference())
+                                refRepository.invalidate(((IBaseEntity) deletedObject));
+                        }
                     } catch (Exception deleteException) {
                         throw new IllegalStateException(Errors.compose(Errors.E78, deletedObject, deleteException.getMessage()));
                     }

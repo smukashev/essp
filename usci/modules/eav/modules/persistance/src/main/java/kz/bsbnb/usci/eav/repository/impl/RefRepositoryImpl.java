@@ -118,13 +118,13 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
 
         while(iterator.hasNext()) {
             IBaseEntity cachedEntity = iterator.next();
-            if(cachedEntity.getReportDate().compareTo(baseEntity.getReportDate()) >=0) {
+            if(cachedEntity.getId() == baseEntity.getId()) {
                 iterator.remove();
-                CacheEntry invEntry = cache.get(cachedEntity);
+                CacheEntry invEntry = cache.get(new CacheEntry(cachedEntity));
                 invEntry.hitCount--;
 
                 if(invEntry.hitCount == 0){
-                    cache.remove(cachedEntity);
+                    cache.remove(new CacheEntry(cachedEntity));
                     System.out.println("removed from cache due to invalidate !!!");
                 }
             }
