@@ -1,4 +1,4 @@
-package kz.bsbnb.usci.eav.persistance.dao.impl;
+package kz.bsbnb.usci.eav.persistance.dao.impl.existing;;
 
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
@@ -10,7 +10,6 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.*;
-import kz.bsbnb.usci.eav.persistance.dao.impl.existing.ExistingBaseEntityApplyDaoImpl;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
@@ -26,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Repository
-public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityApplyDao {
+public class ExistingBaseEntityApplyDaoImpl extends JDBCSupport {
     @Autowired
     private IPersistableDaoPool persistableDaoPool;
 
@@ -45,10 +44,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Autowired
     IRefRepository refRepository;
 
-    @Autowired
-    ExistingBaseEntityApplyDaoImpl existingApplyDao;
-
-    @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
         IBaseEntity baseEntityApplied;
 
@@ -90,7 +85,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         return baseEntityApplied;
     }
 
-    @Override
     public IBaseEntity applyBaseEntityBasic(long creditorId, IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager) {
         /*IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
 
@@ -122,7 +116,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         return baseEntityApplied;
     }
 
-    @Override
     public void applyBaseValueBasic(long creditorId, IBaseEntity baseEntityApplied, IBaseValue baseValueSaving, IBaseEntityManager baseEntityManager) {
         IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
         if (metaAttribute == null)
@@ -286,7 +279,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
     }
 
-    @Override
     public IBaseEntity applyBaseEntityAdvanced(long creditorId, IBaseEntity baseEntitySaving,
                                                IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
         /*IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
@@ -359,7 +351,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         return baseEntityApplied;
     }
 
-    @Override
     public void applySimpleValue(long creditorId, IBaseEntity baseEntityApplied, IBaseValue baseValueSaving,
                                  IBaseValue baseValueLoaded, IBaseEntityManager baseEntityManager) {
         IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
@@ -553,6 +544,35 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            0,
+                            creditorId,
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            returnCastedValue(metaValue, baseValueSaving),
+                            baseValueLoaded.isClosed(),
+                            baseValueLoaded.isLast());
+
+                    baseValueApplied.setBaseContainer(baseEntityApplied);
+                    baseValueApplied.setMetaAttribute(metaAttribute);
+
+                    baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
+
+
+                    IBaseValue baseValueExisting = valueDao.getExistingBaseValue(baseValueSaving);
+
+                    if (baseValueExisting != null) {
+                        baseValueApplied = BaseValueFactory.create(
+                                MetaContainerTypes.META_CLASS,
+                                metaType,
+                                baseValueExisting.getId(),
+                                baseValueExisting.getCreditorId(),
+                                baseValueExisting.getRepDate(),
+                                returnCastedValue(metaValue, baseValueExisting),
+                                baseValueExisting.isClosed(),
+                                baseValueExisting.isLast());
+                    } else {
+                        baseValueApplied = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
                                 0,
@@ -561,13 +581,15 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 returnCastedValue(metaValue, baseValueSaving),
                                 baseValueLoaded.isClosed(),
                                 baseValueLoaded.isLast());
+                    }
 
                     baseValueApplied.setBaseContainer(baseEntityApplied);
                     baseValueApplied.setMetaAttribute(metaAttribute);
 
                     baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
 
-                    baseEntityManager.registerAsInserted(baseValueApplied);
+                    if (baseValueExisting == null)
+                        baseEntityManager.registerAsInserted(baseValueApplied);
 
                     if (baseValueLoaded.isLast()) {
                         IBaseValue baseValuePrevious = BaseValueFactory.create(
@@ -715,7 +737,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
     }
 
-    @Override
     public void applyComplexValue(long creditorId, IBaseEntity baseEntity, IBaseValue baseValueSaving,
                                   IBaseValue baseValueLoaded, IBaseEntityManager baseEntityManager) {
         IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
@@ -971,14 +992,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
-                                MetaContainerTypes.META_CLASS,
-                                metaType,
-                                0,
-                                creditorId,
-                                new Date(baseValueSaving.getRepDate().getTime()),
-                                baseEntityApplied,
-                                false,
-                                true);
+                            MetaContainerTypes.META_CLASS,
+                            metaType,
+                            0,
+                            creditorId,
+                            new Date(baseValueSaving.getRepDate().getTime()),
+                            baseEntityApplied,
+                            false,
+                            true);
 
                     baseValueApplied.setBaseContainer(baseEntity);
                     baseValueApplied.setMetaAttribute(metaAttribute);
@@ -1242,7 +1263,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
     }
 
-    @Override
     public void applySimpleSet(long creditorId, IBaseEntity baseEntity, IBaseValue baseValueSaving,
                                IBaseValue baseValueLoaded, IBaseEntityManager baseEntityManager) {
         IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
@@ -1698,7 +1718,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
     }
 
-    @Override
     public void applyComplexSet(long creditorId, IBaseEntity baseEntity, IBaseValue baseValueSaving,
                                 IBaseValue baseValueLoaded, IBaseEntityManager baseEntityManager) {
         IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
@@ -2105,7 +2124,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                                 IBaseEntity childBaseEntityPrevious = (IBaseEntity) childBaseValuePrevious.getValue();
 
-                                childBaseValuePrevious.setValue(existingApplyDao.applyBaseEntityAdvanced(creditorId,
+                                childBaseValuePrevious.setValue(applyBaseEntityAdvanced(creditorId,
                                         childBaseEntitySaving, childBaseEntityPrevious, baseEntityManager));
 
                                 if (childBaseValueClosed.isLast()) {
@@ -2249,100 +2268,6 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 if (childBaseSetApplied != null) childBaseSetApplied.put(childBaseValueLoaded);
             }
         }
-    }
-
-    @Override
-    @Transactional
-    public void applyToDb(IBaseEntityManager baseEntityManager) {
-        long applyToDbTime = System.currentTimeMillis();
-        for (int i = 0; i < BaseEntityManager.CLASS_PRIORITY.size(); i++) {
-            Class<? extends IPersistable> objectClass = BaseEntityManager.CLASS_PRIORITY.get(i);
-            List<IPersistable> insertedObjects = baseEntityManager.getInsertedObjects(objectClass);
-            if (insertedObjects != null && insertedObjects.size() != 0) {
-                IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
-
-                for (IPersistable insertedObject : insertedObjects) {
-                    try {
-                        persistableDao.insert(insertedObject);
-
-                        if (insertedObject instanceof BaseEntity) {
-                            BaseEntity be = (BaseEntity) insertedObject;
-                            if (BasicOptimizer.metaList.contains(be.getMeta().getClassName())) {
-                                EavOptimizerData eod = new EavOptimizerData(baseEntityManager.getCreditorId(),
-                                        be.getMeta().getId(), be.getId(), BasicOptimizer.getKeyString(be));
-                                eavOptimizerDao.insert(eod);
-                            }
-                        }
-
-                        if(insertedObject instanceof BaseEntityReportDate) {
-                            IBaseEntity baseEntity = ((BaseEntityReportDate) insertedObject).getBaseEntity();
-                            if(baseEntity.getMeta().isReference())
-                                refRepository.invalidate(baseEntity);
-                        }
-
-                    } catch (Exception insertException) {
-                        throw new IllegalStateException(Errors.compose(Errors.E76, insertedObject, insertException.getMessage()));
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < BaseEntityManager.CLASS_PRIORITY.size(); i++) {
-            Class<? extends IPersistable> objectClass = BaseEntityManager.CLASS_PRIORITY.get(i);
-            List<IPersistable> updatedObjects = baseEntityManager.getUpdatedObjects(objectClass);
-            if (updatedObjects != null && updatedObjects.size() != 0) {
-                IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
-
-                for (IPersistable updatedObject : updatedObjects) {
-                    try {
-                        persistableDao.update(updatedObject);
-
-                        if(updatedObject instanceof BaseEntityReportDate) {
-                            IBaseEntity baseEntity = ((BaseEntityReportDate) updatedObject).getBaseEntity();
-                            if(baseEntity.getMeta().isReference())
-                                refRepository.invalidate(baseEntity);
-                        }
-
-                    } catch (Exception updateException) {
-                        throw new IllegalStateException(Errors.compose(Errors.E77, updatedObject, updateException.getMessage()));
-                    }
-                }
-            }
-        }
-
-        for (int i = BaseEntityManager.CLASS_PRIORITY.size() - 1; i >= 0; i--) {
-            Class<? extends IPersistable> objectClass = BaseEntityManager.CLASS_PRIORITY.get(i);
-            List<IPersistable> deletedObjects = baseEntityManager.getDeletedObjects(objectClass);
-            if (deletedObjects != null && deletedObjects.size() != 0) {
-                IPersistableDao persistableDao = persistableDaoPool.getPersistableDao(objectClass);
-
-                for (IPersistable deletedObject : deletedObjects) {
-                    try {
-                        persistableDao.delete(deletedObject);
-
-                        if(deletedObject instanceof IBaseEntity) {
-                            if(((IBaseEntity) deletedObject).getMeta().isReference())
-                                refRepository.invalidate(((IBaseEntity) deletedObject));
-                        }
-                    } catch (Exception deleteException) {
-                        throw new IllegalStateException(Errors.compose(Errors.E78, deletedObject, deleteException.getMessage()));
-                    }
-                }
-            }
-        }
-
-        /* Изменение ключевых полей в оптимизаторе */
-        for (Map.Entry<Long, IBaseEntity> entry : baseEntityManager.getOptimizerEntities().entrySet()) {
-            EavOptimizerData eod = new EavOptimizerData(
-                    baseEntityManager.getCreditorId(),
-                    entry.getValue().getMeta().getId(),
-                    entry.getValue().getId(),
-                    BasicOptimizer.getKeyString(entry.getValue()));
-
-            eod.setId(eavOptimizerDao.find(entry.getValue().getId()));
-            eavOptimizerDao.update(eod);
-        }
-        sqlStats.put("java::applyToDb", (System.currentTimeMillis() - applyToDbTime));
     }
 
     private Object returnCastedValue(IMetaValue metaValue, IBaseValue baseValue) {
