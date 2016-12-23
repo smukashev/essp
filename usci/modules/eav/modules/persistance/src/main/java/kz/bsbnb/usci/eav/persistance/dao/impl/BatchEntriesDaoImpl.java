@@ -82,7 +82,7 @@ public class BatchEntriesDaoImpl extends JDBCSupport implements IBatchEntriesDao
                 .set(BATCH_ENTRIES.REPORT_DATE, new Date(batch.getRepDate().getTime()))
                 .set(BATCH_ENTRIES.UPDATED_DATE, DataUtils.convertToTimestamp(new java.util.Date()))
                 .set(BATCH_ENTRIES.ENTITY_ID, batch.getEntityId())
-                .set(BATCH_ENTRIES.IS_MAINTENANCE, DataUtils.convert(batch.getMaintenance()));
+                .set(BATCH_ENTRIES.IS_MAINTENANCE, (batch.getMaintenance() != null ? DataUtils.convert(batch.getMaintenance()) : 0));
 
 
         baseEntityId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());

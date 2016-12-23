@@ -486,5 +486,18 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
         logger.debug(delete.toString());
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+
+        deleteAllByEntityValueId(baseEntityId);
     }
+
+    public void deleteAllByEntityValueId(long baseEntityId) {
+        String tableAlias = "cv";
+        Delete delete = context
+                .delete(EAV_BE_COMPLEX_VALUES.as(tableAlias))
+                .where(EAV_BE_COMPLEX_VALUES.as(tableAlias).ENTITY_VALUE_ID.equal(baseEntityId));
+
+        logger.debug(delete.toString());
+        updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+    }
+
 }
