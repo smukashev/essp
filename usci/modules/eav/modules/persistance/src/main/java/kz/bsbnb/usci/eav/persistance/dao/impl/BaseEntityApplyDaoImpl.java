@@ -2046,7 +2046,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             baseEntityManager.registerAsDeleted(childBaseValueClosed);
 
-                            IBaseValue childBaseValuePrevious = setValueDao.getPreviousBaseValue(childBaseValueClosed);
+                            // todo: UNQ_CONST
+                            IBaseValue childBaseValuePrevious = childBaseValueClosed; //setValueDao.getPreviousBaseValue(childBaseValueClosed);
 
                             if (childBaseValuePrevious != null && childBaseValuePrevious.getValue() != null) {
                                 childBaseValuePrevious.setBaseContainer(childBaseSetApplied);
@@ -2204,6 +2205,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Transactional
     public void applyToDb(IBaseEntityManager baseEntityManager) {
         long applyToDbTime = System.currentTimeMillis();
+
+
+
         for (int i = 0; i < BaseEntityManager.CLASS_PRIORITY.size(); i++) {
             Class<? extends IPersistable> objectClass = BaseEntityManager.CLASS_PRIORITY.get(i);
             List<IPersistable> insertedObjects = baseEntityManager.getInsertedObjects(objectClass);
