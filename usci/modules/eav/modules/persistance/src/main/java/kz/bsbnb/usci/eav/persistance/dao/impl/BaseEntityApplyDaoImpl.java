@@ -291,6 +291,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         if (baseEntitySaving.getId() < 1 && baseEntityLoaded.getId() > 0)
             baseEntitySaving.setId(baseEntityLoaded.getId());
 
+
+        if (baseEntityReportDateDao.exists(baseEntitySaving.getId(), baseEntitySaving.getReportDate())) {
+            baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), baseEntitySaving.getReportDate(), baseEntitySaving.getReportDate());
+        }
+
         for (String attrName : metaClass.getAttributeNames()) {
             IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attrName);
             IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attrName);
