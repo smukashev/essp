@@ -623,9 +623,14 @@ public class MainPortlet extends MVCPortlet {
                     if(errors.size() > 0) {
                         Map m = new HashedMap();
                         Gson g = new Gson();
-                        m.put("success", false);
-                        m.put("errors", errors);
-                        out.write(g.toJson(m).getBytes());
+                        if (!xml.contains("CHECKED_REMOVE")) {
+                            m.put("success", false);
+                            m.put("errors", errors);
+                        }else {
+                            m.put("success", true);
+                            m.put("errors", "");
+                        }
+                       out.write(g.toJson(m).getBytes());
                     } else {
                         out.write(("{\"success\": true }").getBytes());
                     }
