@@ -92,10 +92,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
     @Override
     public IBaseEntity applyBaseEntityBasic(long creditorId, IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager) {
-        /*IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
+        IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
 
         if (foundProcessedBaseEntity != null)
-            return foundProcessedBaseEntity;*/
+            return foundProcessedBaseEntity;
 
         IBaseEntity baseEntityApplied = new BaseEntity(baseEntitySaving.getMeta(), baseEntitySaving.getReportDate(), creditorId);
         if (baseEntitySaving.getAddInfo() != null)
@@ -289,10 +289,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public IBaseEntity applyBaseEntityAdvanced(long creditorId, IBaseEntity baseEntitySaving,
                                                IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
-        /*IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
+        IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
 
         if (foundProcessedBaseEntity != null)
-            return foundProcessedBaseEntity;*/
+            return foundProcessedBaseEntity;
 
         IMetaClass metaClass = baseEntitySaving.getMeta();
 

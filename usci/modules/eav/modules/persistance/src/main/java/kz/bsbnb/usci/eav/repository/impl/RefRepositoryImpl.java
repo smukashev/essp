@@ -44,6 +44,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
     List<IBaseEntity> queue = new LinkedList<>();
     Map<CacheEntry, CacheEntry> cache = new ConcurrentHashMap<>();
     private long totalHitCount = 0;
+    private long cacheRemoveCount;
 
     public class CacheEntry {
         private IBaseEntity baseEntity;
@@ -88,8 +89,6 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
             cache.put(ce, ret);
         } else {
             totalHitCount ++;
-            if( (totalHitCount % 1000) == 0)
-                System.out.println("cacheHitCount = "  + totalHitCount + ", queue size = " + queue.size());
         }
 
         ret.hitCount++;
@@ -102,7 +101,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
 
             if(leftEntry.hitCount == 0) {
                 cache.remove(leftEntry);
-                System.out.println("removed from cache !!!");
+                cacheRemoveCount++;
             }
 
             if(leftEntry.hitCount < 0 )
@@ -110,6 +109,31 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
         }
 
         return ret.baseEntity;
+    }
+
+    public String getStatus(){
+        PriorityQueue<CacheEntry> pq = new PriorityQueue<>(10, new Comparator<CacheEntry>() {
+            @Override
+            public int compare(CacheEntry o1, CacheEntry o2) {
+                return o1.hitCount < o2.hitCount ? -1 : 1;
+            }
+        });
+
+        for (CacheEntry cacheEntry : cache.values()) {
+            pq.add(cacheEntry);
+            if(pq.size() > 10) {
+                pq.remove();
+            }
+        }
+
+        String top10 = "";
+
+        while(pq.size() != 0) {
+            CacheEntry cacheEntry = pq.remove();
+            top10 += cacheEntry.baseEntity + "," + cacheEntry.hitCount + "\n";
+        }
+
+        return "cacheHitCount = "  + totalHitCount + ", queue size = " + queue.size() + ", cacheRemoveCount = " + cacheRemoveCount + "\n" + top10;
     }
 
     @Override
