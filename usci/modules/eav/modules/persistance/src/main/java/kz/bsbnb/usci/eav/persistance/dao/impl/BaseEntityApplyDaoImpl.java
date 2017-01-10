@@ -397,6 +397,17 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseEntityManager.registerAsUpdated(baseValuePrevious);
                             }
                         }
+
+                        // delete closed next value
+                        IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueLoaded);
+
+                        if (baseValueNext != null && baseValueNext.isClosed()) {
+                            baseValueNext.setBaseContainer(baseEntityApplied);
+                            baseValueNext.setMetaAttribute(metaAttribute);
+
+                            baseEntityManager.registerAsDeleted(baseValueNext);
+                        }
+
                     } else {
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
@@ -422,6 +433,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseValuePrevious.setLast(true);
                                 baseEntityManager.registerAsUpdated(baseValuePrevious);
                             }
+                        }
+
+                        // delete closed next value
+                        IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueLoaded);
+
+                        if (baseValueNext != null && baseValueNext.isClosed()) {
+                            baseValueNext.setBaseContainer(baseEntityApplied);
+                            baseValueNext.setMetaAttribute(metaAttribute);
+
+                            baseEntityManager.registerAsDeleted(baseValueNext);
                         }
                     }
                 } else if (compare == 1) {
@@ -794,6 +815,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseEntityManager.registerAsDeleted(baseEntityLoaded);
                         }
 
+                        // delete next closed value
+                        IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueLoaded);
+
+                        if (baseValueNext != null && baseValueNext.isClosed()) {
+                            baseValueNext.setBaseContainer(baseEntity);
+                            baseValueNext.setMetaAttribute(metaAttribute);
+
+                            baseEntityManager.registerAsUpdated(baseValueNext);
+                        }
+
                         return;
                     } else {
                         IBaseValue baseValueDeleted = BaseValueFactory.create(
@@ -847,6 +878,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             if (!baseEntityLoaded.getMeta().isSearchable())
                                 baseEntityManager.registerAsDeleted(baseEntityLoaded);
+                        }
+
+                        // delete next closed value
+                        IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueLoaded);
+
+                        if (baseValueNext != null && baseValueNext.isClosed()) {
+                            baseValueNext.setBaseContainer(baseEntity);
+                            baseValueNext.setMetaAttribute(metaAttribute);
+
+                            baseEntityManager.registerAsUpdated(baseValueNext);
                         }
                     }
                 } else if (compare == 1) {
@@ -1281,6 +1322,19 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValuePrevious.setLast(true);
                             baseEntityManager.registerAsUpdated(baseValuePrevious);
                         }
+                    }
+
+                    // delete next closed value
+                    IBaseValueDao valueDao = persistableDaoPool
+                            .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
+
+                    IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueLoaded);
+
+                    if (baseValueNext != null && baseValueNext.isClosed()) {
+                        baseValueNext.setBaseContainer(baseEntity);
+                        baseValueNext.setMetaAttribute(metaAttribute);
+
+                        baseEntityManager.registerAsDeleted(baseValueNext);
                     }
 
                     isBaseSetDeleted = true;
@@ -1755,6 +1809,19 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
 
+                        // delete next closed value
+                        IBaseValueDao valueDao = persistableDaoPool
+                                .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
+
+                        IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueLoaded);
+
+                        if (baseValueNext != null && baseValueNext.isClosed()) {
+                            baseValueNext.setBaseContainer(baseEntity);
+                            baseValueNext.setMetaAttribute(metaAttribute);
+
+                            baseEntityManager.registerAsUpdated(baseValueNext);
+                        }
+
                         isBaseSetDeleted = true;
                         // case#2
                     } else {
@@ -1785,6 +1852,19 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 baseValuePrevious.setLast(true);
                                 baseEntityManager.registerAsUpdated(baseValuePrevious);
                             }
+                        }
+
+                        // delete next closed value
+                        IBaseValueDao valueDao = persistableDaoPool
+                                .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
+
+                        IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueLoaded);
+
+                        if (baseValueNext != null && baseValueNext.isClosed()) {
+                            baseValueNext.setBaseContainer(baseEntity);
+                            baseValueNext.setMetaAttribute(metaAttribute);
+
+                            baseEntityManager.registerAsUpdated(baseValueNext);
                         }
 
                         isBaseSetDeleted = true;
