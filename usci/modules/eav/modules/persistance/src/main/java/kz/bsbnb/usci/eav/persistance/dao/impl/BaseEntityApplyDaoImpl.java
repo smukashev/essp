@@ -822,7 +822,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueNext.setBaseContainer(baseEntity);
                             baseValueNext.setMetaAttribute(metaAttribute);
 
-                            baseEntityManager.registerAsUpdated(baseValueNext);
+                            baseEntityManager.registerAsDeleted(baseValueNext);
                         }
 
                         return;
@@ -887,7 +887,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueNext.setBaseContainer(baseEntity);
                             baseValueNext.setMetaAttribute(metaAttribute);
 
-                            baseEntityManager.registerAsUpdated(baseValueNext);
+                            baseEntityManager.registerAsDeleted(baseValueNext);
                         }
                     }
                 } else if (compare == 1) {
@@ -1819,7 +1819,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueNext.setBaseContainer(baseEntity);
                             baseValueNext.setMetaAttribute(metaAttribute);
 
-                            baseEntityManager.registerAsUpdated(baseValueNext);
+                            baseEntityManager.registerAsDeleted(baseValueNext);
                         }
 
                         isBaseSetDeleted = true;
@@ -1864,7 +1864,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             baseValueNext.setBaseContainer(baseEntity);
                             baseValueNext.setMetaAttribute(metaAttribute);
 
-                            baseEntityManager.registerAsUpdated(baseValueNext);
+                            baseEntityManager.registerAsDeleted(baseValueNext);
                         }
 
                         isBaseSetDeleted = true;
