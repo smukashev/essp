@@ -2,6 +2,7 @@ package kz.bsbnb.usci.eav.model.type;
 
 import kz.bsbnb.usci.eav.util.Errors;
 
+import javax.xml.crypto.Data;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,10 +46,14 @@ public enum DataTypes {
                 Date date = null;
 
                 try {
-                    date = dateFormatSlash.parse(value);
+                    synchronized (DataTypes.class) {
+                        date = dateFormatSlash.parse(value);
+                    }
                 } catch (ParseException e) {
                     try {
-                        date = dateFormatDot.parse(value);
+                        synchronized (DataTypes.class) {
+                            date = dateFormatDot.parse(value);
+                        }
                     } catch (ParseException ex) {
                         e.printStackTrace();
                     }
