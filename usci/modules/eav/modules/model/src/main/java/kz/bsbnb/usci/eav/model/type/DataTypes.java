@@ -45,10 +45,14 @@ public enum DataTypes {
                 Date date = null;
 
                 try {
-                    date = dateFormatSlash.parse(value);
+                    synchronized (DataTypes.class) {
+                        date = dateFormatSlash.parse(value);
+                    }
                 } catch (ParseException e) {
                     try {
-                        date = dateFormatDot.parse(value);
+                        synchronized (DataTypes.class) {
+                            date = dateFormatDot.parse(value);
+                        }
                     } catch (ParseException ex) {
                         e.printStackTrace();
                     }
