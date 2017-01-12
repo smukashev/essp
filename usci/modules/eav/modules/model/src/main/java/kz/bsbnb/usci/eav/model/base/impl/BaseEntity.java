@@ -459,14 +459,16 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
                     if(thisBaseValue == null && thatBaseValue != null) return false;
                     if(thisBaseValue != null && thatBaseValue == null) return false;
-                    if(thisBaseValue == null || thatBaseValue == null) return false;
 
-                    if(thisBaseValue.getValue() == null && thatBaseValue.getValue() != null) return false;
-                    if(thisBaseValue.getValue() != null && thatBaseValue.getValue() == null) return false;
-                    if(thisBaseValue.getValue() == null || thatBaseValue.getValue() == null) return false;
+                    if(thisBaseValue != null && thatBaseValue != null){
+                        if(thisBaseValue.getValue() == null && thatBaseValue.getValue() != null) return false;
+                        if(thisBaseValue.getValue() != null && thatBaseValue.getValue() == null) return false;
 
-                    if(!thisBaseValue.getValue().equals(thatBaseValue.getValue()))
-                        return false;
+                        if(thisBaseValue.getValue() != null && thatBaseValue.getValue() != null)
+                            if(!thisBaseValue.getValue().equals(thatBaseValue.getValue()))
+                                return false;
+                    }
+
                 } else {
                     //TODO: isComplex isNullableKey not implemented
                 }
