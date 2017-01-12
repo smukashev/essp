@@ -48,6 +48,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     private AdditionalInfo additionalInfo;
 
+    private boolean isLastInBatch;
+
     @Override
     public AdditionalInfo getAddInfo() {
         return additionalInfo;
@@ -1125,5 +1127,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     public boolean isUpdate() {
         return OperationType.UPDATE.equals(operationType);
+    }
+
+    public boolean isLastInBatch() {
+        return isLastInBatch;
+    }
+
+    public void setLastInBatch(boolean lastInBatch) {
+        isLastInBatch = lastInBatch;
     }
 }
