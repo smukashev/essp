@@ -39,7 +39,8 @@ public abstract class AbstractDataJob extends Thread {
 
     public final synchronized void addAll(List<BaseEntity> entities) {
         for (BaseEntity entity : entities) {
-            batches.add(entity.getBatchId());
+            if(entity.isLastInBatch())
+                batches.add(entity.getBatchId());
         }
 
         this.entities.addAll(entities);

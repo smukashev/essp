@@ -80,6 +80,15 @@ public class BaseEntityManager implements IBaseEntityManager {
         if (deletedObject == null)
             throw new RuntimeException(Errors.compose(Errors.E53));
 
+        List<IPersistable> objList = deletedObjects.get(deletedObject.getClass());
+
+        if(objList != null && deletedObject.getId() > 0) {
+            for (IPersistable iPersistable : objList) {
+                if(iPersistable.getId() > 0 && iPersistable.getId() == deletedObject.getId())
+                    return;
+            }
+        }
+
         registerEntity(deletedObjects, deletedObject);
     }
 
