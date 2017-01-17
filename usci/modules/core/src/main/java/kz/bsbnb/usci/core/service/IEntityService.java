@@ -28,4 +28,6 @@ public interface IEntityService {
     List<String> getValidationErrors(IBaseEntity baseEntity);
 
     Date getPreviousReportDate(long entityId, Date reportDate);
+
+    String getStatus();
 }

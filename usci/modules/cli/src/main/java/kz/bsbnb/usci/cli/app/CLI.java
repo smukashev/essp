@@ -1692,6 +1692,32 @@ public class CLI {
         }
     }
 
+    public void commandCStat() {
+        if(args.size() > 0) {
+            RmiProxyFactoryBean entityServiceFactoryBean = null;
+
+            kz.bsbnb.usci.core.service.IEntityService entityService = null;
+
+            try {
+                entityServiceFactoryBean = new RmiProxyFactoryBean();
+                entityServiceFactoryBean.setServiceUrl(args.get(0));
+                entityServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.core.service.IEntityService.class);
+                entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+                entityServiceFactoryBean.afterPropertiesSet();
+                entityService = (kz.bsbnb.usci.core.service.IEntityService) entityServiceFactoryBean.getObject();
+
+                System.out.println(entityService.getStatus());
+            } catch (Exception e) {
+                System.out.println("Can't connect to core service: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Argument needed: <core_url>");
+            System.out.println("Example: cstat rmi://127.0.0.1:1099/entityService");
+        }
+    }
+
     public void commandSQLStat() {
         if (args.size() > 0) {
             RmiProxyFactoryBean serviceFactory = null;
@@ -2540,7 +2566,9 @@ public class CLI {
                 commandRStat();
             } else if (command.equals("sstat")) {
                 commandSStat();
-            } else if (command.equals("sqlstat")) {
+            } else if (command.equals("cstat")) {
+                commandCStat();
+            }else if (command.equals("sqlstat")) {
                 commandSQLStat();
             } else if (command.equals("remotestat")) {
                 commandRemoteStat();
