@@ -72,7 +72,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
     }
 
     @Override
-    public synchronized IBaseEntity get(IBaseEntity entity) {
+    public IBaseEntity get(IBaseEntity entity) {
         CacheEntry ce = new CacheEntry(entity);
         CacheEntry ret = cache.get(ce);
 
@@ -95,7 +95,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
         ret.hitCount++;
         queue.add(ce.baseEntity);
 
-        if(queue.size() > CACHE_MONITOR_SIZE) {
+        /*if(queue.size() > CACHE_MONITOR_SIZE) {
             CacheEntry leftEntry = cache.get(new CacheEntry(queue.remove(0)));
             //System.out.println(leftEntry.hitCount);
             leftEntry.hitCount--;
@@ -107,12 +107,12 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
 
             if(leftEntry.hitCount < 0 )
                 throw new RuntimeException("negative value !!! " + leftEntry.hitCount);
-        }
+        }*/
 
         return ret.baseEntity;
     }
 
-    @Override
+    /*@Override
     public synchronized void invalidate(IBaseEntity baseEntity) {
         Iterator<IBaseEntity> iterator = queue.iterator();
 
@@ -129,7 +129,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
                 }
             }
         }
-    }
+    }*/
 
     @Override
     public void afterPropertiesSet() throws Exception {
