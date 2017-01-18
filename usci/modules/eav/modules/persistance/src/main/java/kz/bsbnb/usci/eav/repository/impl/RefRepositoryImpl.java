@@ -2,16 +2,17 @@ package kz.bsbnb.usci.eav.repository.impl;
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
+import kz.bsbnb.usci.eav.model.stats.SQLQueriesStats;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.dao.ISQLGenerator;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,10 +39,13 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
     @Autowired
     private IMetaClassRepository metaClassRepository;
 
+    @Autowired
+    SQLQueriesStats sqlStats;
+
     private ReentrantReadWriteLock semaphore = new ReentrantReadWriteLock();
 
 
-    List<IBaseEntity> queue = new LinkedList<>();
+    //List<IBaseEntity> queue = new LinkedList<>();
     Map<CacheEntry, CacheEntry> cache = new ConcurrentHashMap<>();
     private long totalHitCount = 0;
     private long cacheRemoveCount;
@@ -57,7 +61,8 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
 
         @Override
         public int hashCode() {
-            return (int) baseEntity.getId() * 1234 + baseEntity.getReportDate().hashCode();
+            return Objects.hash(baseEntity.getId(), baseEntity.getBaseEntityReportDate().getReportDate());
+            //return (int) baseEntity.getId() * 1234 + baseEntity.getBaseEntityReportDate().getReportDate().hashCode();
         }
 
         @Override
@@ -74,6 +79,11 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
 
     @Override
     public IBaseEntity get(IBaseEntity entity) {
+        long t1 = System.currentTimeMillis();
+
+        if (entity.getId() <= 0L || entity.getBaseEntityReportDate().getReportDate() == null)
+            throw new IllegalStateException(Errors.compose(Errors.E102));
+
         CacheEntry ce = new CacheEntry(entity);
         CacheEntry ret = cache.get(ce);
 
@@ -92,7 +102,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
         }
 
         ret.hitCount++;
-        queue.add(ce.baseEntity);
+        //queue.add(ce.baseEntity);
 
         /*if(queue.size() > CACHE_MONITOR_SIZE) {
             CacheEntry leftEntry = cache.get(new CacheEntry(queue.remove(0)));
@@ -107,6 +117,8 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
             if(leftEntry.hitCount < 0 )
                 throw new RuntimeException("negative value !!! " + leftEntry.hitCount);
         }*/
+
+        sqlStats.put("cache.get() ", (System.currentTimeMillis()- t1) );
 
         return ret.baseEntity;
     }
@@ -133,7 +145,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
             top10 += cacheEntry.baseEntity + "," + cacheEntry.hitCount + "\n";
         }
 
-        return "cacheHitCount = "  + totalHitCount + ", queue size = " + queue.size() + ", cacheRemoveCount = " + cacheRemoveCount + "\n" + top10;
+        return "cacheHitCount = "  + totalHitCount + ", cache size = " + cache.size() + ", cacheRemoveCount = " + cacheRemoveCount + "\n" + top10;
     }
 
     /*@Override
