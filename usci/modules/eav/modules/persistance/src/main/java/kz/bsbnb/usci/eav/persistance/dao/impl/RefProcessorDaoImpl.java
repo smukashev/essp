@@ -384,6 +384,7 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
 
     private void addOpenCloseDates(List<Map<String, Object>> rows) {
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+
         Map<String, Object> prev = null;
 
         for (Map<String, Object> row : rows) {
@@ -395,14 +396,17 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
             if (prev != null) {
                 Object id = row.get("ID");
                 Object prevId = prev.get("ID");
+                if(row.get("closed_date") != null)
+                    row.put("close_date", df.format(row.get("closed_date")));
 
                 if (id.equals(prevId)) {
                     prev.put("close_date", sRepDate);
                 }
-            }else{
-                if(row.get("closed_date") != null)
-                    row.put("close_date", df.format(row.get("closed_date")));
             }
+
+            if(row.get("closed_date") != null)
+                row.put("close_date", df.format(row.get("closed_date")));
+
             prev = row;
         }
     }
