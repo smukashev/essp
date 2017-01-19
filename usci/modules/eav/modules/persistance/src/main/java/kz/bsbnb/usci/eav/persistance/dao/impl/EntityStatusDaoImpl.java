@@ -128,6 +128,20 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
         return ((BigDecimal) rows.get(0).get("entity_status_count")).intValue();
     }
 
+
+    @Override
+    public int getErrorCount(long batchId)
+    {
+        Select select = context
+            .select(DSL.countDistinct(EAV_ENTITY_STATUSES.DESCRIPTION))
+            .from(EAV_ENTITY_STATUSES)
+            .where(EAV_ENTITY_STATUSES.BATCH_ID.eq(batchId))
+            .and(EAV_ENTITY_STATUSES.ERROR_CODE.isNotNull());
+
+        return jdbcTemplate.queryForInt(select.getSQL(), select.getBindValues().toArray());
+    }
+
+
     private EntityStatus toEntityStatus(Map<String, Object> row) {
         EntityStatus entityStatus = new EntityStatus();
         entityStatus.setId(((BigDecimal) row.get(EAV_ENTITY_STATUSES.ID.getName())).longValue());

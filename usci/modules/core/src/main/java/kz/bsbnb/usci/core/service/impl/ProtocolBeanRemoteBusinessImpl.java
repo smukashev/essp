@@ -47,6 +47,8 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
             }
         }
 
+        fillErrorCount(list, inputInfoId, batch);
+
         return list;
     }
 
@@ -65,6 +67,8 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
                 fillProtocol(entityStatus, inputInfoId, list, batch);
             }
         }
+
+        fillErrorCount(list, inputInfoId, batch);
 
         return list;
     }
@@ -87,21 +91,6 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
                 err = Errors.decompose(entityStatus.getErrorCode()+"|~~~|"+entityStatus.getDevDescription());
             else
                 err = Errors.decompose(entityStatus.getErrorCode());
-            /*err = Errors.getError(entityStatus.getErrorCode());
-            if(entityStatus.getDevDescription()!=null) {
-                String[] params = entityStatus.getDevDescription().split("\\|~~~|");
-                String[] words = err.split(" ");
-                for(String param:params) {
-                    for(int i = 0; i<words.length; i++){
-                        if(words[i].startsWith("#")){
-                            words[i] = param;
-                            break;
-                        }
-                    }
-                }
-
-                err = StringUtils.join(Arrays.copyOfRange(words, 0, words.length), " ");
-            }*/
         }
         Message message = new Message();
         message.setCode("A");
@@ -129,8 +118,8 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
             message.setNameKz("Заявленное количество:");
             protocol.setNote("" + batch.getTotalCount());
         } else if (ACTUAL_COUNT == entityStatus.getStatus()) {
-            message.setNameRu("Общее количество:");
-            message.setNameKz("Общее количество:");
+            message.setNameRu("Количество загруженных:");
+            message.setNameKz("Количество загруженных:");
             protocol.setNote("" + batch.getActualCount());
         } else {
             if (COMPLETED == entityStatus.getStatus()) {
@@ -141,6 +130,34 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
             protocol.setTypeDescription(entityStatus.getDescription());
         }
+
+        list.add(protocol);
+    }
+
+
+    private void fillErrorCount(ArrayList<Protocol> list, InputInfo inputInfoId, Batch batch)
+    {
+        Protocol protocol = new Protocol();
+        protocol.setId(1L);
+        protocol.setPackNo(-1l);
+        protocol.setInputInfo(inputInfoId);
+        Message message = new Message();
+        message.setCode("A");
+        message.setNameRu("Количество загруженных с ошибкой:");
+        message.setNameKz("Количество загруженных с ошибкой:");
+
+        Shared type = new Shared();
+        type.setCode("");
+        type.setNameRu("");
+        type.setNameKz("");
+
+        protocol.setMessage(message);
+        protocol.setProtocolType(type);
+        protocol.setMessageType(type);
+
+        int errorsCount = batchService.getErrorEntityStatusCount(batch);
+
+        protocol.setNote(String.valueOf(errorsCount));
 
         list.add(protocol);
     }
