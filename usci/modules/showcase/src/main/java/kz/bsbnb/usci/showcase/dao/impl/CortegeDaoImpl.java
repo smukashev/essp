@@ -16,7 +16,6 @@ import kz.bsbnb.usci.showcase.element.ArrayElement;
 import kz.bsbnb.usci.showcase.element.KeyElement;
 import kz.bsbnb.usci.showcase.element.PathElement;
 import kz.bsbnb.usci.showcase.element.ValueElement;
-import kz.bsbnb.usci.showcase.generated.Showcase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;

@@ -105,7 +105,7 @@ public enum Errors {
         errors.put("E72", "Дата закрытия атрибута #metaAttribute должна быть больше или равна дате открытия атрибута");
         errors.put("E73", "Запись открытия не была найдена #metaAttribute");
         errors.put("E74", "Last значение выгружено неправильно");
-        errors.put("E75", "Закрытие атрибута за прошлый период не является возможным");
+        errors.put("E75", "Закрытие атрибута за прошлый период не является возможным #attribute");
         errors.put("E76", "Ошибка при вставке #insertedObject, #e_message");
         errors.put("E77", "Ошибка при обновлений #updatedObject, #e_message");
         errors.put("E78", "Ошибка при удалений #deletedObject, #e_message");

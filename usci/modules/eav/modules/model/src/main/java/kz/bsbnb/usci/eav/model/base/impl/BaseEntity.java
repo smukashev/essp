@@ -48,6 +48,8 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     private AdditionalInfo additionalInfo;
 
+    private boolean isLastInBatch;
+
     @Override
     public AdditionalInfo getAddInfo() {
         return additionalInfo;
@@ -457,14 +459,16 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
                     if(thisBaseValue == null && thatBaseValue != null) return false;
                     if(thisBaseValue != null && thatBaseValue == null) return false;
-                    if(thisBaseValue == null || thatBaseValue == null) return false;
 
-                    if(thisBaseValue.getValue() == null && thatBaseValue.getValue() != null) return false;
-                    if(thisBaseValue.getValue() != null && thatBaseValue.getValue() == null) return false;
-                    if(thisBaseValue.getValue() == null || thatBaseValue.getValue() == null) return false;
+                    if(thisBaseValue != null && thatBaseValue != null){
+                        if(thisBaseValue.getValue() == null && thatBaseValue.getValue() != null) return false;
+                        if(thisBaseValue.getValue() != null && thatBaseValue.getValue() == null) return false;
 
-                    if(!thisBaseValue.getValue().equals(thatBaseValue.getValue()))
-                        return false;
+                        if(thisBaseValue.getValue() != null && thatBaseValue.getValue() != null)
+                            if(!thisBaseValue.getValue().equals(thatBaseValue.getValue()))
+                                return false;
+                    }
+
                 } else {
                     //TODO: isComplex isNullableKey not implemented
                 }
@@ -1125,5 +1129,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     public boolean isUpdate() {
         return OperationType.UPDATE.equals(operationType);
+    }
+
+    public boolean isLastInBatch() {
+        return isLastInBatch;
+    }
+
+    public void setLastInBatch(boolean lastInBatch) {
+        isLastInBatch = lastInBatch;
     }
 }
