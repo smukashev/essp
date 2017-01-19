@@ -47,6 +47,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
             }
         }
 
+        fillSuccessCount(list, inputInfoId, batch);
         fillErrorCount(list, inputInfoId, batch);
 
         return list;
@@ -68,6 +69,7 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
             }
         }
 
+        fillSuccessCount(list, inputInfoId, batch);
         fillErrorCount(list, inputInfoId, batch);
 
         return list;
@@ -114,12 +116,10 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         protocol.setMessageType(type);
 
         if (TOTAL_COUNT == entityStatus.getStatus()) {
-            message.setNameRu("Заявленное количество:");
-            message.setNameKz("Заявленное количество:");
-            protocol.setNote("" + batch.getTotalCount());
+            return;
         } else if (ACTUAL_COUNT == entityStatus.getStatus()) {
-            message.setNameRu("Количество загруженных:");
-            message.setNameKz("Количество загруженных:");
+            message.setNameRu("Всего:");
+            message.setNameKz("Всего:");
             protocol.setNote("" + batch.getActualCount());
         } else {
             if (COMPLETED == entityStatus.getStatus()) {
@@ -135,6 +135,34 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
     }
 
 
+    private void fillSuccessCount(ArrayList<Protocol> list, InputInfo inputInfoId, Batch batch)
+    {
+        Protocol protocol = new Protocol();
+        protocol.setId(1L);
+        protocol.setPackNo(-1l);
+        protocol.setInputInfo(inputInfoId);
+        Message message = new Message();
+        message.setCode("A");
+        message.setNameRu("Загруженно:");
+        message.setNameKz("Загруженно:");
+
+        Shared type = new Shared();
+        type.setCode("");
+        type.setNameRu("");
+        type.setNameKz("");
+
+        protocol.setMessage(message);
+        protocol.setProtocolType(type);
+        protocol.setMessageType(type);
+
+        int errorsCount = batchService.getErrorEntityStatusCount(batch);
+
+        protocol.setNote(String.valueOf(batch.getActualCount()-errorsCount));
+
+        list.add(protocol);
+    }
+
+
     private void fillErrorCount(ArrayList<Protocol> list, InputInfo inputInfoId, Batch batch)
     {
         Protocol protocol = new Protocol();
@@ -143,8 +171,8 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         protocol.setInputInfo(inputInfoId);
         Message message = new Message();
         message.setCode("A");
-        message.setNameRu("Количество загруженных с ошибкой:");
-        message.setNameKz("Количество загруженных с ошибкой:");
+        message.setNameRu("Ошибочных при загрузке:");
+        message.setNameKz("Ошибочных при загрузке:");
 
         Shared type = new Shared();
         type.setCode("");
