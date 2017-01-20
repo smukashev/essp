@@ -263,12 +263,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                         ((BaseEntity) currentContainer).setBatchId(batchId);
                         ((BaseEntity) currentContainer).setIndex(index);
                         ((BaseEntity) currentContainer).setUserId(userId);
-                        try {
-                            if (!xmlEventReader.nextEvent().isStartElement())
-                                ((BaseEntity) currentContainer).setLastInBatch(true);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
 
                         return (T) currentContainer;
                     }
@@ -280,6 +274,7 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
             }
         }
 
+        notifyBatchFinish(serviceFactory);
         saveTotalCounts();
 
         return null;

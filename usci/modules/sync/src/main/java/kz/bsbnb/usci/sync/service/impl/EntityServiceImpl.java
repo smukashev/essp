@@ -91,4 +91,9 @@ public class EntityServiceImpl implements IEntityService {
     public BaseEntity loadForDisplay(long entityId, Date reportDate) {
         return remoteEntityService.loadForDisplay(entityId, reportDate);
     }
+
+    @Override
+    public void batchFinishedInReader(Long batchId) {
+        dataJob.batchFinishedInReader(batchId);
+    }
 }

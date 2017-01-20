@@ -38,11 +38,6 @@ public abstract class AbstractDataJob extends Thread {
     protected Set<Long> finishedCreditors = new HashSet<>();
 
     public final synchronized void addAll(List<BaseEntity> entities) {
-        for (BaseEntity entity : entities) {
-            if(entity.isLastInBatch())
-                batches.add(entity.getBatchId());
-        }
-
         this.entities.addAll(entities);
     }
 
@@ -56,5 +51,9 @@ public abstract class AbstractDataJob extends Thread {
             finishedCreditors.clear();
             return ret;
         }
+    }
+
+    public final void batchFinishedInReader(Long batchId) {
+        batches.add(batchId);
     }
 }
