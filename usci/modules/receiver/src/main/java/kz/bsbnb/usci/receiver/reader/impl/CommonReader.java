@@ -130,4 +130,9 @@ public abstract class CommonReader<T> implements IReader<T> {
             }
         }
     }
+
+    void notifyBatchFinish(IServiceRepository serviceFactory) {
+        serviceFactory.batchFinishedInReader(batchId);
+    }
+
 }

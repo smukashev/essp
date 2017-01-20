@@ -33,4 +33,6 @@ public interface IEntityService {
     BaseEntity loadForDisplay(long entityId, Date reportDate);
 
     Set<Long> getFinishedBatches();
+
+    void batchFinishedInReader(Long batchId);
 }
