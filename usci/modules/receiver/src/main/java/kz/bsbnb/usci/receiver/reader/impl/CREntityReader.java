@@ -127,6 +127,7 @@ public class CREntityReader<T> extends CommonReader<T> {
             return entity;
         }
 
+        notifyBatchFinish(serviceFactory);
         saveTotalCounts();
 
         return null;

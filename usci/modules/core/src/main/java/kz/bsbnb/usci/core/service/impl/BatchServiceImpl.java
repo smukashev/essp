@@ -281,4 +281,10 @@ public class BatchServiceImpl implements IBatchService {
     public int getEntityStatusCount(long batchId) {
         return entityStatusDao.getCount(batchId);
     }
+
+    @Override
+    public int getErrorEntityStatusCount(Batch batch)
+    {
+        return entityStatusDao.getErrorCount(batch.getId());
+    }
 }

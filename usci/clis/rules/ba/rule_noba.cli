@@ -2,12 +2,9 @@ rule read $$$
 title: Функция для работы c типом субъекта
 function String getSubjectTypeCodeOfCredit(IBaseEntityProcessorDao baseEntityProcessorDao, BaseEntity credit){
   try{
-  		if(credit == null || credit.getId() < 1 || credit.getId() > 0)
+  		if(credit == null)
   		    return "";
-        //BaseEntity creditor = (BaseEntity)credit.getEl("creditor");
-        //creditor = (BaseEntity)baseEntityProcessorDao.prepare(creditor, 0L);
-        //creditor = baseEntityProcessorDao.getActualBaseEntity(creditor);
-        return ""; //(String) creditor.getEl("subject_type.code");
+        return (String) credit.getEl("creditor.subject_type.code");
     } catch (Exception e) {
         credit.addValidationError(e.getMessage());
     }

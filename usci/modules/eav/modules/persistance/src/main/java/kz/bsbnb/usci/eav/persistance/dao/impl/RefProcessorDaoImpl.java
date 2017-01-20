@@ -403,6 +403,10 @@ public class RefProcessorDaoImpl extends JDBCSupport implements IRefProcessorDao
                     prev.put("close_date", sRepDate);
                 }
             }
+
+            if(row.get("closed_date") != null)
+                row.put("close_date", df.format(row.get("closed_date")));
+
             prev = row;
         }
     }

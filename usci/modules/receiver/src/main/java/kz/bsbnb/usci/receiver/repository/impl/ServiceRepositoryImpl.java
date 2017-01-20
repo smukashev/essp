@@ -116,5 +116,10 @@ public class ServiceRepositoryImpl implements IServiceRepository {
     public IGlobalService getGlobalService() {
         return globalService;
     }
+
+    @Override
+    public void batchFinishedInReader(Long batchId) {
+        entityService.batchFinishedInReader(batchId);
+    }
 }
 
