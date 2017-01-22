@@ -265,7 +265,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         sqlStats.put("java::prepare", (System.currentTimeMillis() - prepareTime));
 
         /* Проверка сущности на бизнес правила */
-        // checkForRules((BaseEntity) baseEntityPostPrepared);
+        checkForRules((BaseEntity) baseEntityPostPrepared);
 
         if (baseEntityPostPrepared.getOperation() != null) {
             switch (baseEntityPostPrepared.getOperation()) {
@@ -423,7 +423,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
             if (rulesEnabledForUser(baseEntity)) {
-                // processLogicControl(baseEntityApplied);
+                processLogicControl(baseEntityApplied);
             }
 
             if(dbApplyEnabled)
