@@ -1739,18 +1739,28 @@ public class CLI {
             Map<String, QueryEntry> map = entityService.getSQLStats();
 
             System.out.println();
-            System.out.println("+---------+------------------+------------------------+");
             System.out.println("|  count  |     avg (ms)     |       total (ms)       |");
-            System.out.println("+---------+------------------+------------------------+");
 
             double totalInserts = 0;
             double totalSelects = 0;
             double totalProcess = 0;
             int totalProcessCount = 0;
 
-            for (String query : map.keySet()) {
-                QueryEntry qe = map.get(query);
+            for (String s : map.keySet()) {
+                QueryEntry queryEntry = map.get(s);
+                queryEntry.query = s;
+            }
 
+            List<QueryEntry> values = new LinkedList(map.values());
+            Collections.sort(values, new Comparator<QueryEntry>() {
+                @Override
+                public int compare(QueryEntry o1, QueryEntry o2) {
+                    return o1.totalTime > o2.totalTime ? -1 : 1;
+                }
+            });
+
+            for (QueryEntry qe : values) {
+                String query = qe.query;
                 System.out.printf("| %7d | %16d | %22d | %s%n", qe.count, (qe.totalTime / qe.count), qe.totalTime, query);
 
                 if (query.startsWith("insert"))

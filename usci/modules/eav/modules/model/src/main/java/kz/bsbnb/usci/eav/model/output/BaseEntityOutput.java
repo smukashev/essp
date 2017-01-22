@@ -69,7 +69,7 @@ public class BaseEntityOutput {
 
             if (!valueIsNull) {
                 if (attribute.isKey() || attribute.isOptionalKey()) {
-                    str += "\n" + prefix + "\u001B[1m" + memberName + "\u001B[0m" + " : ";
+                    str += "\n" + prefix +  memberName  + " : ";
                 } else {
                     str += "\n" + prefix + memberName + " : ";
                 }

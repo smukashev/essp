@@ -53,6 +53,7 @@ public class SQLQueriesStats implements InitializingBean {
         }
 
         flag = false;
+        clear();
         return ret;
     }
 

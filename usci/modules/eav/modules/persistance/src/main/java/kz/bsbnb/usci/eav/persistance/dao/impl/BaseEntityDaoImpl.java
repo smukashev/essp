@@ -53,6 +53,24 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Autowired
     private IEavOptimizerDao eavOptimizerDao;
 
+    private static final Map<String, Set<Class> > metaOptimizerMap = new HashMap<>();
+
+    static {
+        Set<Class> complexSet = new HashSet<>();
+        Set<Class> stringDateSet = new HashSet<>();
+        complexSet.add(BaseEntityComplexValueDaoImpl.class);
+        stringDateSet.add(BaseEntityDateValueDaoImpl.class);
+        stringDateSet.add(BaseEntityStringValueDaoImpl.class);
+        metaOptimizerMap.put("change", complexSet);
+        metaOptimizerMap.put("remains", complexSet);
+        metaOptimizerMap.put("turnover", complexSet);
+        metaOptimizerMap.put("credit_flow", complexSet);
+        metaOptimizerMap.put("turnover_issue", complexSet);
+        metaOptimizerMap.put("primary_contract", stringDateSet);
+
+
+    }
+
     @Override
     public long insert(IPersistable persistable) {
         IBaseEntity baseEntity = (IBaseEntity) persistable;
@@ -113,8 +131,13 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         for (Class<? extends IBaseValue> baseValueClass : baseValueCounts.keySet()) {
             //long baseValuesCount = baseValueCounts.get(baseValueClass);
             //if (baseValuesCount > 0) {
-                IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
-                        .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
+            Set<Class> optimizerClass = metaOptimizerMap.get(baseEntity.getMeta().getClassName());
+
+            IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
+                    .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
+
+            if(optimizerClass != null && !optimizerClass.contains(baseEntityValueDao.getClass()))
+                continue;
 
                 baseEntityValueDao.loadBaseValues(baseEntity, existingReportDate, savingReportDate);
             //}
