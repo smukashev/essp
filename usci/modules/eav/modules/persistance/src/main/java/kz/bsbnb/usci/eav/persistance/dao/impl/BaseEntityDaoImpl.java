@@ -57,16 +57,37 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     static {
         Set<Class> complexSet = new HashSet<>();
+        Set<Class> stringSet = new HashSet<>();
         Set<Class> stringDateSet = new HashSet<>();
+        Set<Class> subjectInfoSet = new HashSet<>();
+        Set<Class> documentSet = new HashSet<>();
+        Set<Class> pledgeSet = new HashSet<>();
         complexSet.add(BaseEntityComplexValueDaoImpl.class);
+        stringSet.add(BaseEntityStringValueDaoImpl.class);
         stringDateSet.add(BaseEntityDateValueDaoImpl.class);
         stringDateSet.add(BaseEntityStringValueDaoImpl.class);
+        subjectInfoSet.add(BaseEntityBooleanValueDaoImpl.class);
+        subjectInfoSet.add(BaseEntityComplexSetDaoImpl.class);
+        subjectInfoSet.add(BaseEntityComplexValueDaoImpl.class);
+        documentSet.add(BaseEntityStringValueDaoImpl.class);
+        documentSet.add(BaseEntityComplexValueDaoImpl.class);
+        pledgeSet.add(BaseEntityComplexValueDaoImpl.class);
+        pledgeSet.add(BaseEntityStringValueDaoImpl.class);
+        pledgeSet.add(BaseEntityDoubleValueDaoImpl.class);
+
         metaOptimizerMap.put("change", complexSet);
         metaOptimizerMap.put("remains", complexSet);
         metaOptimizerMap.put("turnover", complexSet);
         metaOptimizerMap.put("credit_flow", complexSet);
         metaOptimizerMap.put("turnover_issue", complexSet);
         metaOptimizerMap.put("primary_contract", stringDateSet);
+        metaOptimizerMap.put("person_info", subjectInfoSet);
+        metaOptimizerMap.put("organization_info", subjectInfoSet);
+        metaOptimizerMap.put("subject", subjectInfoSet);
+        metaOptimizerMap.put("document", documentSet);
+        metaOptimizerMap.put("person_name", stringSet);
+        metaOptimizerMap.put("organization_name", stringSet);
+        metaOptimizerMap.put("pledge", pledgeSet);
 
 
     }
