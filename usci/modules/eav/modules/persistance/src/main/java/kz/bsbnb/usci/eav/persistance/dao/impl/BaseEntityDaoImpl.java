@@ -6,7 +6,10 @@ import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.*;
@@ -25,6 +28,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -53,43 +57,49 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
     @Autowired
     private IEavOptimizerDao eavOptimizerDao;
 
-    private static final Map<String, Set<Class> > metaOptimizerMap = new HashMap<>();
+    private Map<String, Set<Class> > metaOptimizerMap;
 
-    static {
-        Set<Class> complexSet = new HashSet<>();
-        Set<Class> stringSet = new HashSet<>();
-        Set<Class> stringDateSet = new HashSet<>();
-        Set<Class> subjectInfoSet = new HashSet<>();
-        Set<Class> documentSet = new HashSet<>();
-        Set<Class> pledgeSet = new HashSet<>();
-        complexSet.add(BaseEntityComplexValueDaoImpl.class);
-        stringSet.add(BaseEntityStringValueDaoImpl.class);
-        stringDateSet.add(BaseEntityDateValueDaoImpl.class);
-        stringDateSet.add(BaseEntityStringValueDaoImpl.class);
-        subjectInfoSet.add(BaseEntityBooleanValueDaoImpl.class);
-        subjectInfoSet.add(BaseEntityComplexSetDaoImpl.class);
-        subjectInfoSet.add(BaseEntityComplexValueDaoImpl.class);
-        documentSet.add(BaseEntityStringValueDaoImpl.class);
-        documentSet.add(BaseEntityComplexValueDaoImpl.class);
-        pledgeSet.add(BaseEntityComplexValueDaoImpl.class);
-        pledgeSet.add(BaseEntityStringValueDaoImpl.class);
-        pledgeSet.add(BaseEntityDoubleValueDaoImpl.class);
+    @PostConstruct
+    public void fillMetaOptimizer() {
+        metaOptimizerMap = new HashMap<>();
 
-        metaOptimizerMap.put("change", complexSet);
-        metaOptimizerMap.put("remains", complexSet);
-        metaOptimizerMap.put("turnover", complexSet);
-        metaOptimizerMap.put("credit_flow", complexSet);
-        metaOptimizerMap.put("turnover_issue", complexSet);
-        metaOptimizerMap.put("primary_contract", stringDateSet);
-        metaOptimizerMap.put("person_info", subjectInfoSet);
-        metaOptimizerMap.put("organization_info", subjectInfoSet);
-        metaOptimizerMap.put("subject", subjectInfoSet);
-        metaOptimizerMap.put("document", documentSet);
-        metaOptimizerMap.put("person_name", stringSet);
-        metaOptimizerMap.put("organization_name", stringSet);
-        metaOptimizerMap.put("pledge", pledgeSet);
-
-
+        for (MetaClass metaClass : metaClassRepository.getMetaClasses()) {
+            String metaName = metaClass.getClassName();
+            Set<Class> daoSet = new HashSet<>();
+            metaOptimizerMap.put(metaName, daoSet);
+            for (String attribute : metaClass.getAttributeNames()) {
+                IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
+                IMetaType metaType = metaAttribute.getMetaType();
+                if(metaType.isComplex()) {
+                    if(metaType.isSet())
+                        daoSet.add(BaseEntityComplexSetDaoImpl.class);
+                    else
+                        daoSet.add(BaseEntityComplexValueDaoImpl.class);
+                } else {
+                    if(metaType.isSet())
+                        daoSet.add(BaseEntitySimpleSetDaoImpl.class);
+                    else {
+                        switch (((IMetaValue) metaType).getTypeCode()) {
+                            case BOOLEAN:
+                                daoSet.add(BaseEntityBooleanValueDaoImpl.class);
+                                break;
+                            case DATE:
+                                daoSet.add(BaseEntityDateValueDaoImpl.class);
+                                break;
+                            case DOUBLE:
+                                daoSet.add(BaseEntityDoubleValueDaoImpl.class);
+                                break;
+                            case INTEGER:
+                                daoSet.add(BaseEntityIntegerValueDaoImpl.class);
+                                break;
+                            default:
+                                daoSet.add(BaseEntityStringValueDaoImpl.class);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
