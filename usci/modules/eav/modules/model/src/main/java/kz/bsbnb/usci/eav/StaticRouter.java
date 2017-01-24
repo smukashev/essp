@@ -81,11 +81,11 @@ public final class StaticRouter {
 
     private final static String stendXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";//todo: change that path
     private final static String devXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";
-    private final static String prodXSDSourceFilePath = "C:\\Users\\BSB\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd";
+    private final static String prodXSDSourceFilePath = "C:\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd";
 
     private final static String stendXSDTargetFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/target/classes/usci.xsd"; //todo: change that path
     private final static String devXSDTargetFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/target/classes/usci.xsd";
-    private final static String prodXSDTargetFilePath = "C:\\Users\\BSB\\usci\\usci\\modules\\receiver\\target\\classes\\usci.xsd";
+    private final static String prodXSDTargetFilePath = "C:\\usci\\usci\\modules\\receiver\\target\\classes\\usci.xsd";
 
     private final static boolean stendStatsEnabled = true;
     private final static boolean devStatsEnabled = true;
