@@ -92,7 +92,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
                             case INTEGER:
                                 daoSet.add(BaseEntityIntegerValueDaoImpl.class);
                                 break;
-                            default:
+                            case STRING:
                                 daoSet.add(BaseEntityStringValueDaoImpl.class);
                                 break;
                         }
