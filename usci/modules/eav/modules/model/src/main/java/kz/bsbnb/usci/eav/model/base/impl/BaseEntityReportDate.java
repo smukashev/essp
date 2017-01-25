@@ -269,7 +269,7 @@ public class BaseEntityReportDate extends Persistable implements IBaseEntityRepo
     public String toString() {
         return "BaseEntityReportDate{" +
                 "id=" + (baseEntity == null ? 0 : baseEntity.getId()) +
-                ", reportDate=" + DataTypes.dateFormatDot.format(reportDate) +
+                ", reportDate=" + DataTypes.formatDate(reportDate) +
                 '}';
     }
 }

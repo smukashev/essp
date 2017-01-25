@@ -61,7 +61,7 @@ public class BaseEntityReportDateDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalArgumentException(Errors.compose(Errors.E122));
 
         if (rows.size() < 1)
-            throw new IllegalStateException(Errors.compose(Errors.E123, baseEntityId, DataTypes.dateFormatDot.format(reportDate)));
+            throw new IllegalStateException(Errors.compose(Errors.E123, baseEntityId, DataTypes.formatDate(reportDate)));
 
         Map<String, Object> row = rows.get(0);
 

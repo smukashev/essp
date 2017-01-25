@@ -420,7 +420,7 @@ public class MailDaoImpl extends JDBCSupport implements IMailDao {
 
         for (Long userId : userIds) {
             Properties p = new Properties();
-            p.setProperty("REPORT_DATE", DataTypes.dateFormatDot.format(batch.getRepDate()));
+            p.setProperty("REPORT_DATE", DataTypes.formatDate(batch.getRepDate()));
             p.setProperty("ORG", batch.getCreditor().getName());
             p.setProperty("FILE_NAME", batch.getFormattedFileName());
             sendMailMessage(MailTemplate.MAINTENANCE_REQUEST, userId, p);

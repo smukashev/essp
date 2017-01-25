@@ -146,6 +146,11 @@ public class CortegeDaoImpl extends CommonDao {
                             }
 
                             BigDecimal bd2 = (BigDecimal) dbMap.get("PLEDGE_ID");
+
+                            if(bd1 == null){
+                                System.out.println("saving pledgeId is null, creditId = "+globalEntity.getId()+" , reportDate = "+globalEntity.getReportDate());
+                            }
+
                             if (bd1.equals(bd2)) {
                                 dpIterator.remove();
                             }
