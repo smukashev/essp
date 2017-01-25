@@ -18,8 +18,24 @@ public enum DataTypes {
     public static final String DATE_FORMAT_SLASH = "yyyy-MM-dd";
     public static final String DATE_FORMAT_DOT = "dd.MM.yyyy";
 
-    public static final DateFormat dateFormatSlash = new SimpleDateFormat(DATE_FORMAT_SLASH);
-    public static final DateFormat dateFormatDot = new SimpleDateFormat(DATE_FORMAT_DOT);
+    private static final DateFormat dateFormatSlash = new SimpleDateFormat(DATE_FORMAT_SLASH);
+    private static final DateFormat dateFormatDot = new SimpleDateFormat(DATE_FORMAT_DOT);
+
+    public synchronized static Date parseDate(String s) throws ParseException {
+        try {
+            return dateFormatDot.parse(s);
+        } catch (ParseException e) {
+            return dateFormatSlash.parse(s);
+        }
+    }
+
+    public synchronized static Date parseSplashDate(String s) throws ParseException {
+        return dateFormatSlash.parse(s);
+    }
+
+    public synchronized static String formatDate(Date d) {
+        return dateFormatDot.format(d);
+    }
 
     public static Class<?> getDataTypeClass(DataTypes dataType) {
         switch (dataType) {
