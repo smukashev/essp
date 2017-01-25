@@ -619,6 +619,12 @@ public class MainPortlet extends MVCPortlet {
                     IBaseEntity baseEntity = batchProcessService.parse(xml, date, creditorId);
                     List<String> errors = new LinkedList<>();
 
+                    if(1==1) {
+                        //out.write(("{\"success\": false, \"errors\": [\"Правила временно отключены\"]}".getBytes()));
+                        out.write(("{\"success\": true}".getBytes()));
+                        break;
+                    }
+
                     try {
                         errors = entityService.getValidationErrors(baseEntity);
                     } catch (Exception e) {
