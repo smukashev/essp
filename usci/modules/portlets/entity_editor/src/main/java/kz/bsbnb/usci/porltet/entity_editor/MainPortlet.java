@@ -26,7 +26,6 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.service.IBatchProcessService;
 import kz.bsbnb.usci.sync.service.IMetaFactoryService;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.remoting.rmi.RmiProxyFactoryBean;
@@ -618,14 +617,25 @@ public class MainPortlet extends MVCPortlet {
                     creditorId = Long.parseLong(resourceRequest.getParameter("creditorId"));
 
                     IBaseEntity baseEntity = batchProcessService.parse(xml, date, creditorId);
-                    List<String> errors = entityService.getValidationErrors(baseEntity);
+                    List<String> errors = new LinkedList<>();
+
+                    try {
+                        errors = entityService.getValidationErrors(baseEntity);
+                    } catch (Exception e) {
+                        errors.add(Errors.decompose(castJsonString(e)));
+                    }
+
+                    List<String> errorsEscaped = new LinkedList<>();
+                    for (String error : errors) {
+                        errorsEscaped.add(error == null ? "null" : error.replaceAll("\"","&quot"));
+                    }
 
                     if(errors.size() > 0) {
-                        Map m = new HashedMap();
+                        Map m = new HashMap();
                         Gson g = new Gson();
                         if (!xml.contains("CHECKED_REMOVE")) {
                             m.put("success", false);
-                            m.put("errors", errors);
+                            m.put("errors", errorsEscaped);
                         }else {
                             m.put("success", true);
                             m.put("errors", "");
