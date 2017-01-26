@@ -19,9 +19,7 @@ public class BaseEntityOutput {
 
         String str = entity.getMeta().getClassName() + "(" + entity.getId() + ", ";
         try {
-            synchronized (BaseEntityOutput.class) {
-                str += entity.getReportDate() == null ? "-)" : DataTypes.dateFormatDot.format(entity.getReportDate()) + ");";
-            }
+            str += entity.getReportDate() == null ? "-)" : DataTypes.formatDate(entity.getReportDate()) + ");";
         } catch (Exception e) {
             if(entity.getMeta().getClassName().equals("credit")) {
                 System.out.println(entity.getEl("primary_contract.no"));
@@ -77,19 +75,7 @@ public class BaseEntityOutput {
                 if (type.isSet())
                     str += value.getId() + " : ";
 
-                try {
-                    synchronized (BaseEntityOutput.class) {
-                        str += DataTypes.dateFormatDot.format(value.getRepDate()) + " : " + valueToString;
-                    }
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    if(entity.getMeta().getClassName().equals("credit")) {
-                        System.out.println(entity.getEl("primary_contract.no"));
-                        System.out.println(entity.getEl("primary_contract.date"));
-                    }
-                    System.out.println(entity);
-                    System.out.println(value.getRepDate());
-                    throw e;
-                }
+                    str += DataTypes.formatDate(value.getRepDate()) + " : " + valueToString;
             }
         }
 
