@@ -36,12 +36,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
     private Set<String> validationErrors = new HashSet<>();
 
-    private Long batchId;
-
-    private Long index;
-
-    private Long userId;
-
     private final List<IBaseEntity> keyElements = new ArrayList<>();
 
     private boolean keyElementsInstalled = false;
@@ -1093,35 +1087,6 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
         return uuid;
     }
 
-    @Override
-    public void setBatchId(Long batchId) {
-        this.batchId = batchId;
-    }
-
-    @Override
-    public void setIndex(Long index) {
-        this.index = index;
-    }
-
-    @Override
-    public Long getBatchId() {
-        return batchId;
-    }
-
-    @Override
-    public Long getBatchIndex() {
-        return index;
-    }
-
-    @Override
-    public Long getUserId() {
-        return userId;
-    }
-
-    @Override
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public boolean isInsert() {
         return operationType == null || operationType.equals(OperationType.INSERT);

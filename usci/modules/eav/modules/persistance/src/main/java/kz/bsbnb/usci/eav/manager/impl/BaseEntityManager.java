@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.manager.impl;
 
+import kz.bsbnb.usci.eav.manager.IEAVLoggerDao;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -46,6 +47,8 @@ public class BaseEntityManager implements IBaseEntityManager {
 
     private Long creditorId;
 
+    private IEAVLoggerDao deleteLogger;
+
     private void registerEntity(Map<Class, List<IPersistable>> objects, IPersistable persistable) {
         Class objectClass = persistable.getClass();
 
@@ -88,6 +91,8 @@ public class BaseEntityManager implements IBaseEntityManager {
                     return;
             }
         }
+
+        deleteLogger.log(deletedObject);
 
         registerEntity(deletedObjects, deletedObject);
     }
@@ -154,5 +159,10 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public Long getCreditorId() {
         return creditorId;
+    }
+
+    @Override
+    public void setDeleteLogger(IEAVLoggerDao deleteLogger) {
+        this.deleteLogger = deleteLogger;
     }
 }

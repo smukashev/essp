@@ -30,4 +30,6 @@ public interface IBaseEntityManager {
     void registerCreditorId(Long creditorId);
 
     Long getCreditorId();
+
+    void setDeleteLogger(IEAVLoggerDao deleteLogger);
 }
