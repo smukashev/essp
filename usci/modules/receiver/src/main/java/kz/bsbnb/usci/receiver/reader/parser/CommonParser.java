@@ -192,7 +192,7 @@ public class CommonParser<T> {
                     } else {
                         totalCount++;
                         //((BaseEntity) currentContainer).setBatchId(batchId);
-                        ((BaseEntity) currentContainer).setIndex(index);
+                        currentContainer.setBatchIndex(index);
                         return (T) currentContainer;
                     }
                 }

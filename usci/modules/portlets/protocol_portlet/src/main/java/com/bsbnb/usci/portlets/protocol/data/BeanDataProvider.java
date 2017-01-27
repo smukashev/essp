@@ -150,29 +150,17 @@ public class BeanDataProvider implements DataProvider {
         return result;
     }
 
-    @Override
-    public int countProtocols(InputInfoDisplayBean inputInfoDisplayBean) {
-        return protocolBusiness.countProtocolsByInputInfo(inputInfoDisplayBean.getInputInfo());
-    }
 
     @Override
-    public List<ProtocolDisplayBean> loadProtocols(InputInfoDisplayBean inputInfo, int firstIndex, int count) {
-        List<Protocol> protocols = protocolBusiness.getProtocolsBy_InputInfo(inputInfo.getInputInfo(), firstIndex, count);
+    public List<ProtocolDisplayBean> getProtocolStatisticsByInputInfo(InputInfoDisplayBean inputInfo)
+    {
+        List<Protocol> protocols = protocolBusiness.getProtocolStatisticsBy_InputInfo(inputInfo.getInputInfo());
         List<ProtocolDisplayBean> result = new ArrayList<>();
 
-        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-        Date reportDate = inputInfo.getInputInfo().getReportDate();
-        String sRepDate = (reportDate == null) ? "" : df.format(reportDate);
-
         for (Protocol protocol : protocols) {
-            ProtocolDisplayBean pr = new ProtocolDisplayBean(protocol);
-            if (protocol.getMessageType().getCode().equals("COMPLETED"))
-                pr.setLink(new Link("Просмотр",
-                        new ExternalResource(ENTITY_EDITOR_PAGE + "?entityId=" +
-                                protocol.getNote() + "&repDate=" + sRepDate)));
-
-            result.add(pr);
+            result.add(new ProtocolDisplayBean(protocol));
         }
+
         return result;
     }
 }

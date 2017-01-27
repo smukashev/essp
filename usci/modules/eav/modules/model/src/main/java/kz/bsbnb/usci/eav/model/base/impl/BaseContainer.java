@@ -11,6 +11,12 @@ public abstract class BaseContainer extends BaseObject implements IBaseContainer
 
     protected long creditorId;
 
+    protected Long userId;
+
+    protected Long batchId;
+
+    protected Long index;
+
     public BaseContainer(BaseContainerType baseContainerType) {
         this.baseContainerType = baseContainerType;
     }
@@ -23,5 +29,32 @@ public abstract class BaseContainer extends BaseObject implements IBaseContainer
     @Override
     public BaseContainerType getBaseContainerType() {
         return baseContainerType;
+    }
+
+
+    @Override
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    @Override
+    public Long getBatchId() {
+        return batchId;
+    }
+
+    public void setBatchId(long batchId) {
+        this.batchId = batchId;
+    }
+
+    public Long getBatchIndex() {
+        return index;
+    }
+
+    public void setBatchIndex(long index) {
+        this.index = index;
     }
 }

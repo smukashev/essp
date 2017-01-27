@@ -29,4 +29,16 @@ public interface IBaseContainer extends IBaseObject {
     int getValueCount();
 
     BaseContainerType getBaseContainerType();
+
+    void setBatchId(long batchId);
+
+    void setUserId(long userId);
+
+    void setBatchIndex(long index);
+
+    Long getBatchId();
+
+    Long getUserId();
+
+    Long getBatchIndex();
 }
