@@ -442,7 +442,6 @@ public class ProtocolLayout extends VerticalLayout {
         Set<String> messageTypeCodes = new HashSet<>();
 
         if (listOfProtocols.isEmpty()) {
-
             Map<String, Long> weightsByErrorCode = new HashMap<>();
             weightsByErrorCode.put(BatchStatuses.ERROR.code(), 1000L);
             weightsByErrorCode.put(BatchStatuses.COMPLETED.code(), 999L);
@@ -466,20 +465,9 @@ public class ProtocolLayout extends VerticalLayout {
 
             if (p != null)
                 listOfProtocols.add(new ProtocolDisplayBean(p));
-
-            /*boolean errorStatus = false;
-            for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
-                if("ERROR".equals(batchStatus.getMessageType().getCode())){
-                    errorStatus = true;
-                    break;
-                }
-            }
-
-            for (Protocol batchStatus : ii.getInputInfo().getBatchStatuses()) {
-                if(!errorStatus || "ERROR".equals(batchStatus.getMessageType().getCode())){
-                    listOfProtocols.add(new ProtocolDisplayBean(batchStatus));
-                }
-            }*/
+        }else{
+            List<ProtocolDisplayBean> protocolStatistics = provider.getProtocolStatisticsByInputInfo(ii);
+            listOfProtocols.addAll(protocolStatistics);
         }
 
         if (listOfProtocols.isEmpty()) {
