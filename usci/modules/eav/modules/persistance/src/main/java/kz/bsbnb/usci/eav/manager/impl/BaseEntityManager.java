@@ -92,7 +92,11 @@ public class BaseEntityManager implements IBaseEntityManager {
             }
         }
 
-        deleteLogger.log(deletedObject);
+        try {
+            deleteLogger.log(deletedObject);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         registerEntity(deletedObjects, deletedObject);
     }
