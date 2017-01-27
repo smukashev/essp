@@ -30,11 +30,11 @@ public interface IBaseContainer extends IBaseObject {
 
     BaseContainerType getBaseContainerType();
 
-    void setBatchId(long batchId);
+    void setBatchId(Long batchId);
 
-    void setUserId(long userId);
+    void setUserId(Long userId);
 
-    void setBatchIndex(long index);
+    void setBatchIndex(Long index);
 
     Long getBatchId();
 
