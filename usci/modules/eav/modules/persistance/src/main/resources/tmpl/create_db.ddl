@@ -302,6 +302,9 @@
       <index-column name="attribute_id"/>
       <index-column name="creditor_id"/>
 		</index>
+		<index name="EBCV_IN_EVI">
+		  <index-column name="entity_value_id"/>
+		</index>
 	</table>
 	<table name="eav_be_date_set_values">
 		<column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true"/>
