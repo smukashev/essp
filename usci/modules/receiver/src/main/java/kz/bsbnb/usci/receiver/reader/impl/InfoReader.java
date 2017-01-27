@@ -54,7 +54,7 @@ public class InfoReader extends MainReader {
                 break;
             case "account_date":
                 try {
-                    infoData.setAccountDate(DataTypes.dateFormatSlash.parse(data.toString()));
+                    infoData.setAccountDate(DataTypes.parseSplashDate(data.toString()));
                 } catch (ParseException e) {
                     throw new RuntimeException(e.getMessage());
                 }
@@ -62,7 +62,7 @@ public class InfoReader extends MainReader {
                 break;
             case "report_date":
                 try {
-                    infoData.setReportDate(DataTypes.dateFormatSlash.parse(data.toString()));
+                    infoData.setReportDate(DataTypes.parseSplashDate(data.toString()));
                 } catch (ParseException e) {
                     throw new RuntimeException(e.getMessage());
                 }

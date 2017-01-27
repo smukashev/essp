@@ -54,7 +54,7 @@ public class ManifestReader extends MainReader {
                 break;
             case "date":
                 try {
-                    manifestData.setReportDate(DataTypes.dateFormatDot.parse(data.toString()));
+                    manifestData.setReportDate(DataTypes.parseDate(data.toString()));
                 } catch (ParseException e) {
                     throw new RuntimeException(e.getMessage());
                 }
