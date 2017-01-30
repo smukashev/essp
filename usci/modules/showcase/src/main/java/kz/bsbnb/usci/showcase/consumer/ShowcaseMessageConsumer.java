@@ -140,7 +140,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error on message exception={}", e);
                 throw new RuntimeException(e.getMessage());
             } finally {
                 synchronized (entities) {

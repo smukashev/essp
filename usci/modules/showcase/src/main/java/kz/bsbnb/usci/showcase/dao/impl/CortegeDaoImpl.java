@@ -16,6 +16,8 @@ import kz.bsbnb.usci.showcase.element.ArrayElement;
 import kz.bsbnb.usci.showcase.element.KeyElement;
 import kz.bsbnb.usci.showcase.element.PathElement;
 import kz.bsbnb.usci.showcase.element.ValueElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
@@ -27,14 +29,20 @@ import java.util.*;
 
 @Component
 public class CortegeDaoImpl extends CommonDao {
-    @Autowired
-    private ShowCaseJdbcTemplate jdbcTemplateSC;
+
+    private final Logger logger = LoggerFactory.getLogger(ShowcaseDaoImpl.class);
 
     private static final String ROOT = "root";
+
     private static final String ROOT_DOT = "root.";
 
     private static final String custRemainsVert = "CUST_REMAINS_VERT";
+
     private static final String custDeleteLog = "CORE_DELETE_LOG";
+
+    @Autowired
+    private ShowCaseJdbcTemplate jdbcTemplateSC;
+
 
     @SuppressWarnings("unchecked")
     @Transactional
@@ -127,32 +135,30 @@ public class CortegeDaoImpl extends CommonDao {
                     dbGlobalMapList = jdbcTemplateSC.queryForList("SELECT * FROM %s WHERE + historyKeyElement.queryKeys",
                             sql, getObjectArray(true, rootKeyElement.values, entity.getReportDate()));
 
-                    Iterator<Map<String, Object>> dpIterator = dbGlobalMapList.iterator();
-                    while(dpIterator.hasNext()) {
-                        Map<String, Object> dbMap = dpIterator.next();
+                    for (int i = 0; i < dbGlobalMapList.size(); i++) {
+                        Map<String, Object> dbMap = dbGlobalMapList.get(i);
                         dbMap.remove("CDC");
                         dbMap.remove("ID");
 
-                        for(Map.Entry<ArrayElement, HashMap<ValueElement, Object>> innerEntry : savingMap.entrySet()) {
+                        for (Map.Entry<ArrayElement, HashMap<ValueElement, Object>> innerEntry : savingMap.entrySet()) {
                             HashMap<ValueElement, Object> innerEntryMap = innerEntry.getValue();
                             BigDecimal bd1 = BigDecimal.ZERO;
 
                             // todo: tmp solution
                             for (ValueElement vl : innerEntryMap.keySet()) {
                                 if (vl.columnName.toUpperCase().equals("PLEDGE_ID")) {
-                                    bd1 = BigDecimal.valueOf((Long)innerEntryMap.get(vl));
+                                    bd1 = BigDecimal.valueOf((Long) innerEntryMap.get(vl));
                                     break;
                                 }
                             }
 
                             BigDecimal bd2 = (BigDecimal) dbMap.get("PLEDGE_ID");
-
-                            if(bd1 == null){
-                                System.out.println("saving pledgeId is null, creditId = "+globalEntity.getId()+" , reportDate = "+globalEntity.getReportDate());
-                            }
-
-                            if (bd1.equals(bd2)) {
-                                dpIterator.remove();
+                            try {
+                                if (bd1.equals(bd2)) {
+                                    dbGlobalMapList.remove(i);
+                                }
+                            } catch (Exception e) {
+                                logger.error("Exception on remove entity pledge_id={}, credit_id={}, exception={}", dbMap.get("pledge_id"), dbMap.get("credit_id"), e);
                             }
                         }
                     }
