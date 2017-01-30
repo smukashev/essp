@@ -40,7 +40,7 @@ public abstract class BaseContainer extends BaseObject implements IBaseContainer
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -49,7 +49,7 @@ public abstract class BaseContainer extends BaseObject implements IBaseContainer
         return batchId;
     }
 
-    public void setBatchId(long batchId) {
+    public void setBatchId(Long batchId) {
         this.batchId = batchId;
     }
 
@@ -57,7 +57,7 @@ public abstract class BaseContainer extends BaseObject implements IBaseContainer
         return index;
     }
 
-    public void setBatchIndex(long index) {
+    public void setBatchIndex(Long index) {
         this.index = index;
     }
 }
