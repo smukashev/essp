@@ -1085,4 +1085,17 @@
 	  <column name="enabled" required="true" type="NUMERIC" size="1" default="0"/>
 	</table>
   <!--END: tables for notifications portlet -->
+  <table name="eav_log_deletes">
+	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="batch_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="user_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="base_value_id" primaryKey="false" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="class_name" required="true" type="VARCHAR" size="50" />
+	  <column name="creditor_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+	  <column name="container_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+	  <column name="report_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
+	  <column name="value" primaryKey="false" required="true" type="VARCHAR" size="1024" autoIncrement="false"/>
+	  <column name="stacktrace" primaryKey="false" required="true" type="VARCHAR" size="4000" autoIncrement="false"/>
+	  <column name="RECEIPT_DATE" primaryKey="false" required="true" type="DATE" />
+	</table>
 </database>
