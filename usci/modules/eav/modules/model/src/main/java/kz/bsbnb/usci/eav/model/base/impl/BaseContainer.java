@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class BaseContainer extends BaseObject implements IBaseContainer {
+
+    private static final long serialVersionUID = 1L;
+
     private BaseContainerType baseContainerType;
 
     protected long creditorId;
