@@ -39,7 +39,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
 
     private final ExecutorService exec = Executors.newCachedThreadPool();
 
-    private final Logger logger = LoggerFactory.getLogger(ShowcaseDaoImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(ShowcaseMessageConsumer.class);
 
     private final static List<IBaseEntity> entities = new LinkedList<>();
 
@@ -134,7 +134,7 @@ public class ShowcaseMessageConsumer implements MessageListener {
                         try {
                             entry.getValue().get(3600, TimeUnit.SECONDS);
                         } catch (Exception e) {
-                            System.err.println(entry.getKey().toString());
+                            logger.error("key={}, e={}",entry.getKey().toString(), e);
                             throw e;
                         }
                     }

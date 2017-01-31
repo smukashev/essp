@@ -30,7 +30,7 @@ import java.util.*;
 @Component
 public class CortegeDaoImpl extends CommonDao {
 
-    private final Logger logger = LoggerFactory.getLogger(ShowcaseDaoImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(CortegeDaoImpl.class);
 
     private static final String ROOT = "root";
 
