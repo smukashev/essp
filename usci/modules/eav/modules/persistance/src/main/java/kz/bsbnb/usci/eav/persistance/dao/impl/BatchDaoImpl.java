@@ -204,6 +204,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
             select.where().and(EAV_BATCHES.REP_DATE.eq(DataUtils.convert(repDate)));
         }
 
+        select.where().and(EAV_BATCHES.IS_DISABLED.eq(DataUtils.convert(false)));
+
         select.orderBy(EAV_BATCHES.RECEIPT_DATE.desc());
 
         select.limit(count).offset(firstIndex);
