@@ -135,8 +135,9 @@ public class CortegeDaoImpl extends CommonDao {
                     dbGlobalMapList = jdbcTemplateSC.queryForList("SELECT * FROM %s WHERE + historyKeyElement.queryKeys",
                             sql, getObjectArray(true, rootKeyElement.values, entity.getReportDate()));
 
-                    for (int i = 0; i < dbGlobalMapList.size(); i++) {
-                        Map<String, Object> dbMap = dbGlobalMapList.get(i);
+                    Iterator<Map<String, Object>> dpIterator = dbGlobalMapList.iterator();
+                    while(dpIterator.hasNext()) {
+                        Map<String, Object> dbMap = dpIterator.next();
                         dbMap.remove("CDC");
                         dbMap.remove("ID");
 
@@ -155,10 +156,9 @@ public class CortegeDaoImpl extends CommonDao {
                             BigDecimal bd2 = (BigDecimal) dbMap.get("PLEDGE_ID");
                             try {
                                 if (bd1.equals(bd2)) {
-                                    dbGlobalMapList.remove(i);
+                                    dpIterator.remove();
                                 }
                             } catch (Exception e) {
-                                logger.error("Exception on remove entity pledge_id={}, credit_id={}, exception={}", dbMap.get("pledge_id"), dbMap.get("credit_id"), e);
                             }
                         }
                     }
