@@ -9,7 +9,7 @@ import kz.bsbnb.usci.eav.model.stats.QueryEntry;
 import java.util.*;
 
 public interface IEntityService {
-    void process(BaseEntity mockEntity);
+    boolean process(BaseEntity mockEntity);
 
     BaseEntity load(long id);
 

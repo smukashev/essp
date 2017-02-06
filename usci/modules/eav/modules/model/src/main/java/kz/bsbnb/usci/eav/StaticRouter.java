@@ -391,6 +391,19 @@ public final class StaticRouter {
         }
     }
 
+    public static boolean syncOptimizationEnabled() {
+        switch (mode) {
+            case STEND:
+            case DEV:
+            case SOFT:
+                return false;
+            case PROD:
+                return true;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
     public static boolean isGODMode(String filename) {
         for (String tmpStr : GODModes) {
             if (filename.contains(tmpStr))
