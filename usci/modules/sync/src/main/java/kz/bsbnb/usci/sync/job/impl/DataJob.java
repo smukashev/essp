@@ -16,6 +16,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -45,6 +46,7 @@ public final class DataJob extends AbstractDataJob {
     private volatile BaseEntity currentEntity;
     private volatile boolean currentIntersection;
 
+    private Map<Long, Map<String, Boolean> > documentOptimizer = new ConcurrentHashMap<>();
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private double avgTimePrev = 0;
@@ -65,6 +67,9 @@ public final class DataJob extends AbstractDataJob {
         public Boolean call() {
             try {
                 for (IBaseEntity myEntityKeyElement : myEntity.getKeyElements()) {
+                    if(syncOptimization(myEntityKeyElement))
+                        continue;
+
                     for (IBaseEntity currentEntityKeyElement : currentEntity.getKeyElements()) {
                         if (myEntityKeyElement.getMeta().getId() == currentEntityKeyElement.getMeta().getId() &&
                                 myEntityKeyElement.equalsByKey(currentEntityKeyElement)) {
@@ -77,6 +82,23 @@ public final class DataJob extends AbstractDataJob {
                 e.printStackTrace();
             }
 
+            return false;
+        }
+
+        private boolean syncOptimization(IBaseEntity myEntityKeyElement) {
+            if(myEntityKeyElement.getMeta().getClassName().equals("document")) {
+                if(myEntity.getMeta().getClassName().equals("credit") && currentEntity.getMeta().getClassName().equals("credit")) {
+                    long creditorId = myEntity.getBaseValue("creditor").getCreditorId();
+                    if(currentEntity.getBaseValue("creditor").getCreditorId() == creditorId) {
+                        String documentKey = creditorId + "|" + myEntityKeyElement.getEl("no").toString() + "|" + myEntityKeyElement.getEl("doc_type.code").toString();
+                        Map<String, Boolean> hm = documentOptimizer.get(myEntity.getBatchId());
+
+                        if(hm != null && hm.containsKey(documentKey)) {
+                            return true;
+                        }
+                    }
+                }
+            }
             return false;
         }
 
@@ -128,6 +150,8 @@ public final class DataJob extends AbstractDataJob {
             if (!processJob.isAlive()) {
                 BaseEntity entity = processJob.getBaseEntity();
 
+                syncOptimization(processJob, entity);
+
                 entityCounter++;
                 if (entityCounter < STAT_INTERVAL) {
                     avgTimeCur = (avgTimeCur * (entityCounter - 1)) / entityCounter +
@@ -156,6 +180,34 @@ public final class DataJob extends AbstractDataJob {
                     throw new IllegalStateException(Errors.compose(Errors.E280));
 
                 processJobIterator.remove();
+            }
+        }
+    }
+
+    private void syncOptimization(ProcessJob processJob, BaseEntity entity) {
+        if(entity.getMeta().getClassName().equals("credit") && processJob.statusCode) {
+            long creditorId = entity.getBaseValue("creditor").getCreditorId();
+            Map<String,Boolean> docs;
+
+            if(!documentOptimizer.containsKey(entity.getBatchId())) {
+                docs = new ConcurrentHashMap<>();
+                documentOptimizer.put(entity.getBatchId(), docs);
+            }
+
+            docs = documentOptimizer.get(entity.getBatchId());
+
+            List<IBaseEntity> documents = ((List) entity.getEls("{get}subject.docs"));
+
+            for (IBaseEntity document : documents) {
+                String documentKey = creditorId + "|" + document.getEl("no").toString() + "|" + document.getEl("doc_type.code").toString();
+                docs.put(documentKey, true);
+            }
+
+            documents = ((List) entity.getEls("{get}subject.organization_info.head.docs"));
+
+            for (IBaseEntity document : documents) {
+                String documentKey = creditorId + "|" + document.getEl("no").toString() + "|" + document.getEl("doc_type.code").toString();
+                docs.put(documentKey, true);
             }
         }
     }
@@ -237,6 +289,7 @@ public final class DataJob extends AbstractDataJob {
 
             for (Long batchId : difference) {
                 batches.remove(batchId);
+                documentOptimizer.remove(batchId);
             }
         }
 
