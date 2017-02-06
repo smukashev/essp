@@ -18,7 +18,7 @@
 		<maven.javadoc.reporting.version>2.7</maven.javadoc.reporting.version>
 		<commons.logging.version>1.1.1</commons.logging.version>
 		<log4j.version>1.2.16</log4j.version>
-		<slf4jVersion>1.6.1</slf4jVersion>
+		<slf4jVersion>1.7.12</slf4jVersion>
 		<jackson.mapper.version>1.5.6</jackson.mapper.version>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>

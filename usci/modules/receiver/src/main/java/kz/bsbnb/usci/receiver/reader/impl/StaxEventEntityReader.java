@@ -260,9 +260,9 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                         break;
                     } else {
                         totalCount++;
-                        ((BaseEntity) currentContainer).setBatchId(batchId);
-                        ((BaseEntity) currentContainer).setIndex(index);
-                        ((BaseEntity) currentContainer).setUserId(userId);
+                        currentContainer.setBatchId(batchId);
+                        currentContainer.setBatchIndex(index);
+                        currentContainer.setUserId(userId);
 
                         return (T) currentContainer;
                     }

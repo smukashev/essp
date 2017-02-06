@@ -12,6 +12,11 @@ public class SyncStatusSingleton {
         status.setAvgTime(avgTime);
     }
 
+    public void setExecutorStat(long executorCnt, double avgExecutor){
+        status.setExectuorStat(executorCnt, avgExecutor);
+
+    }
+
     public SyncStatus getStatus() {
         return status;
     }

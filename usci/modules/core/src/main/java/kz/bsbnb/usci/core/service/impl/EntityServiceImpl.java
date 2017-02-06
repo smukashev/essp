@@ -65,7 +65,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
         try {
             BaseEntity baseEntity = (BaseEntity) baseEntityProcessorDao.process(mockEntity);
             baseEntity.setBatchId(mockEntity.getBatchId());
-            baseEntity.setIndex(mockEntity.getBatchIndex());
+            baseEntity.setBatchIndex(mockEntity.getBatchIndex());
 
             stats.put("java::process", (System.currentTimeMillis() - t1));
 

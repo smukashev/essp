@@ -122,7 +122,7 @@ public class CREntityReader<T> extends CommonReader<T> {
             }
 
             ((BaseEntity) entity).setBatchId(batchId);
-            ((BaseEntity) entity).setIndex(index);
+            ((BaseEntity) entity).setBatchIndex(index);
 
             return entity;
         }

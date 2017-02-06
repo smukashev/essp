@@ -39,14 +39,6 @@ public interface IBaseEntity extends IBaseContainer {
 
     UUID getUuid();
 
-    void setBatchId(Long batchId);
-
-    void setIndex(Long index);
-
-    Long getBatchId();
-
-    Long getBatchIndex();
-
     boolean equalsByKey(IBaseEntity baseEntity);
 
     boolean containsComplexKey();
@@ -56,10 +48,6 @@ public interface IBaseEntity extends IBaseContainer {
     Set<String> getValidationErrors();
 
     void setOperation(OperationType type);
-
-    void setUserId(Long userId);
-
-    Long getUserId();
 
     AdditionalInfo getAddInfo();
 

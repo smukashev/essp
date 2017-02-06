@@ -26,7 +26,5 @@ public interface DataProvider {
 
     List<InputInfoDisplayBean> loadFiles(List<Creditor> creditors, Date reportDate, int firstIndex, int count);
 
-    int countProtocols(InputInfoDisplayBean inputInfoDisplayBean);
-
-    List<ProtocolDisplayBean> loadProtocols(InputInfoDisplayBean inputInfo, int firstIndex, int count);
+    List<ProtocolDisplayBean> getProtocolStatisticsByInputInfo(InputInfoDisplayBean inputInfo);
 }
