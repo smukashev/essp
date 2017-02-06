@@ -94,8 +94,7 @@ public final class DataJob extends AbstractDataJob {
         //noinspection InfiniteLoopStatement
         while (true) {
             try {
-                if (entities.size() > 0 && entitiesInProcess.size() < StaticRouter.getThreadLimit())
-                    processNewEntities();
+                if (entities.size() > 0 && entitiesInProcess.size() < StaticRouter.getThreadLimit() && processNewEntities());
 
                 if (processingJobs.size() > 0)
                     removeDeadJobs();
@@ -161,7 +160,7 @@ public final class DataJob extends AbstractDataJob {
         }
     }
 
-    private void processNewEntities() {
+    private boolean processNewEntities() {
         final BaseEntity entity = getClearEntity();
         final ProcessJob processJob = new ProcessJob(entityService, entity);
 
@@ -173,7 +172,10 @@ public final class DataJob extends AbstractDataJob {
 
             processJob.start();
             skip_count = 0;
+            return  true;
         }
+
+        return false;
     }
 
     private synchronized BaseEntity getClearEntity() {
