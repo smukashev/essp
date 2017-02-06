@@ -116,7 +116,7 @@ public final class DataJob extends AbstractDataJob {
         //noinspection InfiniteLoopStatement
         while (true) {
             try {
-                if (entities.size() > 0 && entitiesInProcess.size() < StaticRouter.getThreadLimit() && processNewEntities());
+                while (entities.size() > 0 && entitiesInProcess.size() < StaticRouter.getThreadLimit() && processNewEntities());
 
                 if (processingJobs.size() > 0)
                     removeDeadJobs();
