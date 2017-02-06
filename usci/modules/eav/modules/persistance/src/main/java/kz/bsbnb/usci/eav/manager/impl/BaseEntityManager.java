@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.manager.impl;
 
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.manager.IEAVLoggerDao;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
@@ -93,7 +94,9 @@ public class BaseEntityManager implements IBaseEntityManager {
         }
 
         try {
-            deleteLogger.log(deletedObject);
+            if(StaticRouter.isDeleteLogEnabled()) {
+                deleteLogger.log(deletedObject);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
