@@ -50,6 +50,8 @@ public final class DataJob extends AbstractDataJob {
     private double avgTimePrev = 0;
     private double avgTimeCur = 0;
     private long entityCounter = 0;
+    private long executorServiceCnt = 0;
+    private double avgTimeExectuor = 0;
 
     private int clearJobsIndex = 0;
 
@@ -111,6 +113,7 @@ public final class DataJob extends AbstractDataJob {
                 }
 
                 syncStatusSingleton.put(entities.size(), entitiesInProcess.size(), avgTimeCur);
+                syncStatusSingleton.setExecutorStat(executorServiceCnt, avgTimeExectuor);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -199,7 +202,11 @@ public final class DataJob extends AbstractDataJob {
         currentIntersection = false;
 
         try {
+            long t1 = System.currentTimeMillis();
             executorService.invokeAll(entitiesInProcess);
+            long t2 = System.currentTimeMillis();
+            executorServiceCnt ++;
+            avgTimeExectuor = ((executorServiceCnt - 1) * avgTimeExectuor + (t2 - t1) ) / executorServiceCnt;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
