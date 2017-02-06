@@ -205,16 +205,20 @@ public final class DataJob extends AbstractDataJob {
 
                 List<IBaseEntity> documents = ((List) entity.getEls("{get}subject.docs"));
 
-                for (IBaseEntity document : documents) {
-                    String documentKey = creditorId + "|" + document.getEl("no").toString() + "|" + document.getEl("doc_type.code").toString();
-                    docs.put(documentKey, true);
+                if(documents != null) {
+                    for (IBaseEntity document : documents) {
+                        String documentKey = creditorId + "|" + document.getEl("no").toString() + "|" + document.getEl("doc_type.code").toString();
+                        docs.put(documentKey, true);
+                    }
                 }
 
                 documents = ((List) entity.getEls("{get}subject.organization_info.head.docs"));
 
-                for (IBaseEntity document : documents) {
-                    String documentKey = creditorId + "|" + document.getEl("no").toString() + "|" + document.getEl("doc_type.code").toString();
-                    docs.put(documentKey, true);
+                if(documents != null) {
+                    for (IBaseEntity document : documents) {
+                        String documentKey = creditorId + "|" + document.getEl("no").toString() + "|" + document.getEl("doc_type.code").toString();
+                        docs.put(documentKey, true);
+                    }
                 }
             }
         } catch (Exception e) {
