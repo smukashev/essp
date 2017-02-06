@@ -377,6 +377,20 @@ public final class StaticRouter {
         }
     }
 
+    public static boolean isDeleteLogEnabled () {
+        switch (mode) {
+            case STEND:
+            case DEV:
+                return false;
+            case SOFT:
+                return true;
+            case PROD:
+                return false;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
     public static boolean isGODMode(String filename) {
         for (String tmpStr : GODModes) {
             if (filename.contains(tmpStr))
