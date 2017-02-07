@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.*;
@@ -480,14 +481,19 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueLoaded);
 
                     // check for closed in next periods
-                    if (baseValueNext != null && baseValueNext.isClosed()) {
-                        baseValueNext.setRepDate(baseValueSaving.getRepDate());
+                    if (baseValueNext != null)
+                        if (baseValueNext.isClosed()) {
+                            baseValueNext.setRepDate(baseValueSaving.getRepDate());
 
-                        baseValueNext.setBaseContainer(baseEntityApplied);
-                        baseValueNext.setMetaAttribute(metaAttribute);
+                            baseValueNext.setBaseContainer(baseEntityApplied);
+                            baseValueNext.setMetaAttribute(metaAttribute);
 
-                        baseEntityManager.registerAsUpdated(baseValueNext);
-                    } else {
+                            baseEntityManager.registerAsUpdated(baseValueNext);
+                        } else {
+                            if (StaticRouter.exceptionOnForbiddenCloseE299())
+                                throw new UnsupportedOperationException(Errors.compose(Errors.E299, DataTypes.formatDate(baseValueNext.getRepDate()), baseValueNext.getValue()));
+                        }
+                    else {
                         IBaseValue baseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
@@ -925,14 +931,20 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueLoaded);
 
                     // check for next closed value
-                    if (baseValueNext != null && baseValueNext.isClosed()) {
-                        baseValueNext.setRepDate(baseValueSaving.getRepDate());
+                    if (baseValueNext != null)
+                        if (baseValueNext.isClosed()) {
+                            baseValueNext.setRepDate(baseValueSaving.getRepDate());
 
-                        baseValueNext.setBaseContainer(baseEntity);
-                        baseValueNext.setMetaAttribute(metaAttribute);
+                            baseValueNext.setBaseContainer(baseEntity);
+                            baseValueNext.setMetaAttribute(metaAttribute);
 
-                        baseEntityManager.registerAsUpdated(baseValueNext);
-                    } else {
+                            baseEntityManager.registerAsUpdated(baseValueNext);
+                        } else  {
+                            if(StaticRouter.exceptionOnForbiddenCloseE299())
+                                throw new UnsupportedOperationException(Errors.compose(Errors.E299,
+                                        DataTypes.formatDate(baseValueNext.getRepDate()), ((IBaseEntity) baseValueNext.getValue()).getId()));
+                        }
+                    else {
                         IBaseValue baseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
