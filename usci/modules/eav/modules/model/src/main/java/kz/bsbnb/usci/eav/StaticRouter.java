@@ -402,7 +402,7 @@ public final class StaticRouter {
             case SOFT:
                 return false;
             case PROD:
-                return true;
+                return false;
             default:
                 throw new IllegalStateException(Errors.compose(Errors.E284));
         }
