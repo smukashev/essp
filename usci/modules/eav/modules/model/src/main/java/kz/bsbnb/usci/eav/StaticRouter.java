@@ -12,7 +12,7 @@ public final class StaticRouter {
     }
 
     /* Set up before compiling */
-    private static final MODE mode = MODE.PROD;
+    private static final MODE mode = MODE.SOFT;
 
     /* Application Server IP */
     private final static String stendAsIP = "10.10.32.28";
@@ -92,10 +92,12 @@ public final class StaticRouter {
 
     private final static String stendXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";//todo: change that path
     private final static String devXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";
+    private final static String softXSDSourceFilePath = "C:\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd";
     private final static String prodXSDSourceFilePath = "C:\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd";
 
     private final static String stendXSDTargetFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/target/classes/usci.xsd"; //todo: change that path
     private final static String devXSDTargetFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/target/classes/usci.xsd";
+    private final static String softXSDTargetFilePath = "C:\\usci\\usci\\modules\\receiver\\target\\classes\\usci.xsd";
     private final static String prodXSDTargetFilePath = "C:\\usci\\usci\\modules\\receiver\\target\\classes\\usci.xsd";
 
     private final static boolean stendStatsEnabled = true;
@@ -132,7 +134,7 @@ public final class StaticRouter {
             case DEV:
                 return devXSDSourceFilePath;
             case SOFT:
-                return prodXSDSourceFilePath;
+                return softXSDSourceFilePath;
             case PROD:
                 return prodXSDSourceFilePath;
             default:
@@ -146,6 +148,8 @@ public final class StaticRouter {
                 return stendXSDTargetFilePath;
             case DEV:
                 return devXSDTargetFilePath;
+            case SOFT:
+                return softXSDTargetFilePath;
             case PROD:
                 return prodXSDTargetFilePath;
             default:
