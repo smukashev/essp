@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.manager.IEAVLoggerDao;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
@@ -219,6 +220,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     boolean rulesEnabledForUser(IBaseEntity baseEntity){
+        if(!StaticRouter.rulesEnabled())
+            return false;
         return baseEntity.getUserId() == null || baseEntity.getUserId() != 100500L;
     }
 
