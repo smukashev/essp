@@ -441,8 +441,13 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
                     if (!((BaseEntity) thisBaseValue.getValue()).equalsByKey((IBaseEntity) thatBaseValue.getValue()))
                         return false;
                 } else {
-                    if (!thisBaseValue.getValue().equals(thatBaseValue.getValue()))
+                    try{
+                        if (!thisBaseValue.getValue().equals(thatBaseValue.getValue()))
+                            return false;
+                    }catch (NullPointerException ex){
+                        logger.debug("NullPointerException baseEntityId=" + baseEntity.getId() + " , batchId=" + baseEntity.getBatchId() + ", attributeName=" + name);
                         return false;
+                    }
                 }
             }
 
