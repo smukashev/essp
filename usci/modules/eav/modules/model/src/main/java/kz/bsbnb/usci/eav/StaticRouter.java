@@ -440,6 +440,10 @@ public final class StaticRouter {
         return false;
     }
 
+    public static boolean isProdMode(){
+        return mode == MODE.PROD;
+    }
+
     public static String[] getGODModes() {
         return GODModes;
     }
