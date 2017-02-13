@@ -1,10 +1,12 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
+import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -318,6 +320,15 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     if (localName.equals("creditor_branch") &&
                             ((((BaseEntity) obj).getBaseValue("docs") == null) ||
                                     ((BaseEntity) obj).getBaseValue("docs").getValue() == null)) obj = null;
+
+                    /* Для всех деталей без ключевого поля*/
+                    if(currentRootMeta.equals("portfolio_data") && localName.equals("balance_account") && !hasMembers) {
+                        if(StaticRouter.isProdMode()) {
+                            ((BaseEntity) obj).put("no_",
+                                    new BaseEntityStringValue(0L, creditorId, batch.getRepDate(), "0000000", false, true));
+                            hasMembers = true;
+                        }
+                    }
 
                     if (hasMembers) {
                         currentContainer.put(localName, BaseValueFactory
