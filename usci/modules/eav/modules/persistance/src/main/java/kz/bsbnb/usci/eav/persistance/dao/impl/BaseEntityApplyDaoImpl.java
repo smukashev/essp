@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.*;
@@ -473,14 +474,19 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueLoaded);
 
                     // check for closed in next periods
-                    if (baseValueNext != null && baseValueNext.isClosed()) {
-                        baseValueNext.setRepDate(baseValueSaving.getRepDate());
+                    if (baseValueNext != null)
+                        if (baseValueNext.isClosed()) {
+                            baseValueNext.setRepDate(baseValueSaving.getRepDate());
 
-                        baseValueNext.setBaseContainer(baseEntityApplied);
-                        baseValueNext.setMetaAttribute(metaAttribute);
+                            baseValueNext.setBaseContainer(baseEntityApplied);
+                            baseValueNext.setMetaAttribute(metaAttribute);
 
-                        baseEntityManager.registerAsUpdated(baseValueNext);
-                    } else {
+                            baseEntityManager.registerAsUpdated(baseValueNext);
+                        } else {
+                            if (StaticRouter.exceptionOnForbiddenCloseE299())
+                                throw new UnsupportedOperationException(Errors.compose(Errors.E299, DataTypes.formatDate(baseValueNext.getRepDate()), baseValueNext.getValue()));
+                        }
+                    else {
                         IBaseValue baseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
@@ -918,14 +924,20 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseValue baseValueNext = valueDao.getNextBaseValue(baseValueLoaded);
 
                     // check for next closed value
-                    if (baseValueNext != null && baseValueNext.isClosed()) {
-                        baseValueNext.setRepDate(baseValueSaving.getRepDate());
+                    if (baseValueNext != null)
+                        if (baseValueNext.isClosed()) {
+                            baseValueNext.setRepDate(baseValueSaving.getRepDate());
 
-                        baseValueNext.setBaseContainer(baseEntity);
-                        baseValueNext.setMetaAttribute(metaAttribute);
+                            baseValueNext.setBaseContainer(baseEntity);
+                            baseValueNext.setMetaAttribute(metaAttribute);
 
-                        baseEntityManager.registerAsUpdated(baseValueNext);
-                    } else {
+                            baseEntityManager.registerAsUpdated(baseValueNext);
+                        } else  {
+                            if(StaticRouter.exceptionOnForbiddenCloseE299())
+                                throw new UnsupportedOperationException(Errors.compose(Errors.E299,
+                                        DataTypes.formatDate(baseValueNext.getRepDate()), ((IBaseEntity) baseValueNext.getValue()).getId()));
+                        }
+                    else {
                         IBaseValue baseValueClosed = BaseValueFactory.create(
                                 MetaContainerTypes.META_CLASS,
                                 metaType,
@@ -2250,6 +2262,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         /* Удаляет элементы массива, если массив не накопительный или массив накопительный и родитель был удалён */
         if (childBaseSetLoaded != null &&
                 ((metaAttribute.isCumulative() && isBaseSetDeleted) || !metaAttribute.isCumulative())) {
+            //одно закрытие на несколько одинаковых записей
+            Set<Long> closedChildBaseEntityIds = new HashSet<>();
+
             for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
                 if (processedUUIDSet.contains(childBaseValueLoaded.getUuid()))
                     continue;
@@ -2300,18 +2315,23 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             continue;
                         }
 
-                        IBaseValue childBaseValueClosed = BaseValueFactory.create(
-                                MetaContainerTypes.META_SET,
-                                childMetaType,
-                                0,
-                                baseValueSaving.getCreditorId(),
-                                baseValueSaving.getRepDate(),
-                                childBaseValueLoaded.getValue(),
-                                true,
-                                childBaseValueLoaded.isLast());
+                        long closedChildBaseEntityId = ((IBaseEntity) childBaseValueLoaded.getValue()).getId();
+                        if(!closedChildBaseEntityIds.contains(closedChildBaseEntityId)) {
+                            closedChildBaseEntityIds.add(closedChildBaseEntityId);
 
-                        childBaseValueClosed.setBaseContainer(childBaseSetApplied);
-                        baseEntityManager.registerAsInserted(childBaseValueClosed);
+                            IBaseValue childBaseValueClosed = BaseValueFactory.create(
+                                    MetaContainerTypes.META_SET,
+                                    childMetaType,
+                                    0,
+                                    baseValueSaving.getCreditorId(),
+                                    baseValueSaving.getRepDate(),
+                                    childBaseValueLoaded.getValue(),
+                                    true,
+                                    childBaseValueLoaded.isLast());
+
+                            childBaseValueClosed.setBaseContainer(childBaseSetApplied);
+                            baseEntityManager.registerAsInserted(childBaseValueClosed);
+                        }
 
                         if (childBaseValueLoaded.isLast()) {
                             IBaseValue childBaseValueLast = BaseValueFactory.create(

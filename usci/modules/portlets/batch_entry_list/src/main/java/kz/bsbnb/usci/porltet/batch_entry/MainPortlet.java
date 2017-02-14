@@ -30,6 +30,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class MainPortlet extends MVCPortlet {
+    private final static String NBRK_BIN = "941240001151";
     private IBatchProcessService batchProcessService;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
 
@@ -195,7 +196,7 @@ public class MainPortlet extends MVCPortlet {
                     Document document = null;
                     DocumentBuilder documentBuilder = null;
                     List<Long> batchEntryIds = new ArrayList<Long>();
-                    Creditor creditor = getCreditor(currentUser);
+                    Creditor creditor = getCreditor(currentUser, isNB);
                     String creditorName = creditor.getName();
                     String creditorCode = creditor.getCode();
                     String creditorBIN = creditor.getBIN();
@@ -298,7 +299,7 @@ public class MainPortlet extends MVCPortlet {
                     break;
                 }
                 case GET_REPORT_DATE: {
-                    creditor = getCreditor(currentUser);
+                    creditor = getCreditor(currentUser, isNB);
                     reportDate = reportBusiness.getReportDate(creditor.getId());
                     writer.write("{ \"success\": true, \"data\": \""
                             + dateFormat.format(reportDate)+ "\"}");
@@ -334,11 +335,19 @@ public class MainPortlet extends MVCPortlet {
 
     }
 
-    private Creditor getCreditor(User currentUser) {
+    private Creditor getCreditor(User currentUser, boolean isNb) {
         List<Creditor> creditors = portalUserBusiness.getMainCreditorsInAlphabeticalOrder(currentUser.getUserId());
 
         if(creditors.size() < 1)
             throw new RuntimeException("Нет доступных кредиторов");
+
+        if(isNb){
+            for(Creditor creditor : creditors){
+                if(creditor.getBIK() != null && creditor.getBIN().equals(NBRK_BIN)){
+                    return creditor;
+                }
+            }
+        }
 
         return creditors.get(0);
     }

@@ -98,6 +98,7 @@ class CLIXMLReader {
         }
 
         this.reportDate = repDate;
+        DataUtils.moveMonthIfNecessary(this.reportDate);
         DataUtils.toBeginningOfTheMonth(this.reportDate);
         DataUtils.toBeginningOfTheDay(this.reportDate);
 

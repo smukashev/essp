@@ -399,6 +399,20 @@ public final class StaticRouter {
         switch (mode) {
             case STEND:
             case DEV:
+                return false;
+            case SOFT:
+                return true;
+            case PROD:
+                return false;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
+    public static boolean exceptionOnForbiddenCloseE299() {
+        switch (mode) {
+            case STEND:
+            case DEV:
             case SOFT:
                 return true;
             case PROD:
@@ -424,6 +438,10 @@ public final class StaticRouter {
         }
 
         return false;
+    }
+
+    public static boolean isProdMode(){
+        return mode == MODE.PROD;
     }
 
     public static String[] getGODModes() {

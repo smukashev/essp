@@ -1,10 +1,12 @@
 package kz.bsbnb.usci.receiver.reader.impl;
 
+import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.BatchStatus;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.*;
+import kz.bsbnb.usci.eav.model.base.impl.value.*;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
@@ -305,6 +307,21 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
+
+                        /* Для всех деталей без ключевого поля*/
+                        if(StaticRouter.isProdMode()) {
+                            if (obj instanceof BaseEntity) {
+                                if (((BaseEntity) obj).getMeta().getClassName().equals("portfolio_flow_detail")) {
+                                    if (((BaseEntity) obj).getEl("balance_account.no_") == null) {
+                                        BaseEntity ba = new BaseEntity(metaFactoryService.getMetaClass("ref_balance_account"), batch.getRepDate());
+                                        ba.put("no_",
+                                                new BaseEntityStringValue(0L, creditorId, batch.getRepDate(), "0000000", false, true));
+
+                                        ((BaseEntity) obj).put("balance_account", new BaseEntityComplexValue(0L, creditorId, batch.getRepDate(), ba, false, true));
+                                    }
+                                }
+                            }
+                        }
                         ((BaseSet) currentContainer).put(BaseValueFactory.create(currentContainer.getBaseContainerType(),
                                 metaType, 0, creditorId, batch.getRepDate(), obj, false, true));
                         flagsStack.pop();

@@ -953,7 +953,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 .from(EAV_M_CLASSES);
 
         if (refs)
-            select = join.where(EAV_M_CLASSES.IS_REFERENCE.eq((byte) 1));
+            select = join.where(EAV_M_CLASSES.IS_REFERENCE.eq((byte) 1))
+                    .and(EAV_M_CLASSES.IS_DISABLED.eq((byte) 0));
         else
             select = join;
 
