@@ -307,6 +307,21 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
 
                 if (currentContainer.isSet()) {
                     if (hasMembers) {
+
+                        /* Для всех деталей без ключевого поля*/
+                        if(StaticRouter.isProdMode()) {
+                            if (obj instanceof BaseEntity) {
+                                if (((BaseEntity) obj).getMeta().getClassName().equals("portfolio_flow_detail")) {
+                                    if (((BaseEntity) obj).getEl("balance_account.no_") == null) {
+                                        BaseEntity ba = new BaseEntity(metaFactoryService.getMetaClass("ref_balance_account"), batch.getRepDate());
+                                        ba.put("no_",
+                                                new BaseEntityStringValue(0L, creditorId, batch.getRepDate(), "0000000", false, true));
+
+                                        ((BaseEntity) obj).put("balance_account", new BaseEntityComplexValue(0L, creditorId, batch.getRepDate(), ba, false, true));
+                                    }
+                                }
+                            }
+                        }
                         ((BaseSet) currentContainer).put(BaseValueFactory.create(currentContainer.getBaseContainerType(),
                                 metaType, 0, creditorId, batch.getRepDate(), obj, false, true));
                         flagsStack.pop();
@@ -320,15 +335,6 @@ public class StaxEventEntityReader<T> extends CommonReader<T> {
                     if (localName.equals("creditor_branch") &&
                             ((((BaseEntity) obj).getBaseValue("docs") == null) ||
                                     ((BaseEntity) obj).getBaseValue("docs").getValue() == null)) obj = null;
-
-                    /* Для всех деталей без ключевого поля*/
-                    if(currentRootMeta.equals("portfolio_data") && localName.equals("balance_account") && !hasMembers) {
-                        if(StaticRouter.isProdMode()) {
-                            ((BaseEntity) obj).put("no_",
-                                    new BaseEntityStringValue(0L, creditorId, batch.getRepDate(), "0000000", false, true));
-                            hasMembers = true;
-                        }
-                    }
 
                     if (hasMembers) {
                         currentContainer.put(localName, BaseValueFactory
