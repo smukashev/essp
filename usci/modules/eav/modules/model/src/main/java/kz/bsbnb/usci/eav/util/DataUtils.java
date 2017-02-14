@@ -28,6 +28,16 @@ public class DataUtils {
         date.setTime(cal.getTime().getTime());
     }
 
+    public static void moveMonthIfNecessary(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        if(day != 1) {
+            cal.add(Calendar.MONTH, 1);
+            date.setTime(cal.getTime().getTime());
+        }
+    }
+
     public static void toBeginningOfTheDay(final Date date) {
         final long oldTime = date.getTime();
         final long timeZoneOffset = TimeZone.getDefault().getOffset(oldTime);

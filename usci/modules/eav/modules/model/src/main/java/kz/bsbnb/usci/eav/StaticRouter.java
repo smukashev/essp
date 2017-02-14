@@ -7,60 +7,71 @@ public final class StaticRouter {
     private enum MODE {
         STEND,
         DEV,
-        PROD
+        PROD,
+        SOFT
     }
 
     /* Set up before compiling */
-    private static final MODE mode = MODE.PROD;
+    private static final MODE mode = MODE.SOFT;
 
     /* Application Server IP */
     private final static String stendAsIP = "10.10.32.28";
     private final static String devAsIP = "localhost";
-    private final static String prodAsIP = "10.8.1.116";
+    private final static String softAsIP = "10.8.1.116";
+    private final static String prodAsIP = "10.8.1.146";
 
     /* Core Schema IP */
     private final static String stendDBCoreIP = "170.7.15.69";
     private final static String devDBCoreIP = "localhost";
-    private final static String prodDBCoreIp = "10.8.2.200";
+    private final static String softDBCoreIp = "10.8.1.200";
+    private final static String prodDBCoreIp = "10.8.1.101";
 
     /* Showcase Schema IP */
     private final static String stendDBShowcaseIP = "170.7.15.69";
     private final static String devDBShowcaseIP = "localhost";
-    private final static String prodDBShowcaseIP = "10.8.1.206";
+    private final static String softDBShowcaseIP = "10.8.1.206";
+    private final static String prodDBShowcaseIP = "10.8.1.201";
 
     /* Reporter Schema IP */
     private final static String stendDBReporterIP = "170.7.15.69";
     private final static String devDBReporterIP = "localhost";
-    private final static String prodDBReporterIP = "10.8.1.206";
+    private final static String softDBReporterIP = "10.8.1.206";
+    private final static String prodDBReporterIP = "10.8.1.201";
 
     /* Portal URL */
     private final static String stendPortalUrl = "10.10.32.28";
     private final static String devPortalUrl = "localhost";
+    private final static String softPortalUrl = "essp.nationalbank.kz";
     private final static String prodPortalUrl = "essp.nationalbank.kz";
 
     /* Portal port */
     private final static String stendPortalPort = "8080";
     private final static String devPortalPort = "80";
+    private final static String softPortalPort = "80";
     private final static String prodPortalPort = "80";
 
     /* Core Schema name */
     private final static String stendCoreSchemaName = "CORE";
     private final static String devCoreSchemaName = "CORE";
+    private final static String softCoreSchemaName = "CORE";
     private final static String prodCoreSchemaName = "CORE";
 
     /* Showcase Schema name */
     private final static String stendShowcaseSchemaName = "SHOWCASE";
     private final static String devShowcaseSchemaName = "SHOWCASE";
+    private final static String softShowcaseSchemaName = "SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHOWCASE";
 
     /* Credit Registry DB IP */
     private final static String stendCRDBIP = "10.8.1.250";
     private final static String devCRDBIP = "10.10.32.44";
+    private final static String softCRDBIP  = "10.8.1.250";
     private final static String prodCRDBIP  = "10.8.1.250";
 
     /* Credit Registry DB Username */
     private final static String stendCRDBUsername = "core";
     private final static String devCRDBUsername = "core";
+    private final static String softCRDBUsername = "core";
     private final static String prodCRDBUsername = "core";
 
     /* Credit Registry DB Password */
@@ -81,11 +92,13 @@ public final class StaticRouter {
 
     private final static String stendXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";//todo: change that path
     private final static String devXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";
-    private final static String prodXSDSourceFilePath = "C:\\Users\\BSB\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd";
+    private final static String softXSDSourceFilePath = "C:\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd";
+    private final static String prodXSDSourceFilePath = "C:\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd";
 
     private final static String stendXSDTargetFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/target/classes/usci.xsd"; //todo: change that path
     private final static String devXSDTargetFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/target/classes/usci.xsd";
-    private final static String prodXSDTargetFilePath = "C:\\Users\\BSB\\usci\\usci\\modules\\receiver\\target\\classes\\usci.xsd";
+    private final static String softXSDTargetFilePath = "C:\\usci\\usci\\modules\\receiver\\target\\classes\\usci.xsd";
+    private final static String prodXSDTargetFilePath = "C:\\usci\\usci\\modules\\receiver\\target\\classes\\usci.xsd";
 
     private final static boolean stendStatsEnabled = true;
     private final static boolean devStatsEnabled = true;
@@ -93,9 +106,10 @@ public final class StaticRouter {
 
     private final static int stendThreadLimit = 20;
     private final static int devThreadLimit = 20;
+    private final static int softThreadLimit = 100;
     private final static int prodThreadLimit = 100;
 
-    private final static String[] GODModes = new String[]{"XML_DATA_BY_CID", "XML_PORTFOLIO_DATA_BY_CID", "GGGGODGGG"};
+    private final static String[] GODModes = new String[]{"XML_DATA_BY_CID", "XML_PORTFOLIO_DATA_BY_CID", "GGGGODGGG", "XML_DIFF_BY_CID"};
     private final static String[] DEVILModes = new String[]{"GGGDEVILGGG"};
 
     public static String getAsIP() {
@@ -104,6 +118,8 @@ public final class StaticRouter {
                 return stendAsIP;
             case DEV:
                 return devAsIP;
+            case SOFT:
+                return softAsIP;
             case PROD:
                 return prodAsIP;
             default:
@@ -117,6 +133,8 @@ public final class StaticRouter {
                 return stendXSDSourceFilePath;
             case DEV:
                 return devXSDSourceFilePath;
+            case SOFT:
+                return softXSDSourceFilePath;
             case PROD:
                 return prodXSDSourceFilePath;
             default:
@@ -130,6 +148,8 @@ public final class StaticRouter {
                 return stendXSDTargetFilePath;
             case DEV:
                 return devXSDTargetFilePath;
+            case SOFT:
+                return softXSDTargetFilePath;
             case PROD:
                 return prodXSDTargetFilePath;
             default:
@@ -143,6 +163,8 @@ public final class StaticRouter {
                 return stendDBCoreIP;
             case DEV:
                 return devDBCoreIP;
+            case SOFT:
+                return softDBCoreIp;
             case PROD:
                 return prodDBCoreIp;
             default:
@@ -156,6 +178,8 @@ public final class StaticRouter {
                 return stendDBShowcaseIP;
             case DEV:
                 return devDBShowcaseIP;
+            case SOFT:
+                return softDBShowcaseIP;
             case PROD:
                 return prodDBShowcaseIP;
             default:
@@ -169,6 +193,8 @@ public final class StaticRouter {
                 return stendDBReporterIP;
             case DEV:
                 return devDBReporterIP;
+            case SOFT:
+                return softDBReporterIP;
             case PROD:
                 return prodDBReporterIP;
             default:
@@ -182,6 +208,8 @@ public final class StaticRouter {
                 return stendPortalUrl;
             case DEV:
                 return devPortalUrl;
+            case SOFT:
+                return softPortalUrl;
             case PROD:
                 return prodPortalUrl;
             default:
@@ -195,6 +223,8 @@ public final class StaticRouter {
                 return stendPortalPort;
             case DEV:
                 return devPortalPort;
+            case SOFT:
+                return softPortalPort;
             case PROD:
                 return prodPortalPort;
             default:
@@ -208,6 +238,8 @@ public final class StaticRouter {
                 return stendCoreSchemaName;
             case DEV:
                 return devCoreSchemaName;
+            case SOFT:
+                return softCoreSchemaName;
             case PROD:
                 return prodCoreSchemaName;
             default:
@@ -223,6 +255,8 @@ public final class StaticRouter {
                 return devShowcaseSchemaName;
             case PROD:
                 return prodShowcaseSchemaName;
+            case SOFT:
+                return softShowcaseSchemaName;
             default:
                 throw new IllegalStateException(Errors.compose(Errors.E284));
         }
@@ -234,6 +268,8 @@ public final class StaticRouter {
                 return stendCRDBIP;
             case DEV:
                 return devCRDBIP;
+            case SOFT:
+                return softCRDBIP;
             case PROD:
                 return prodCRDBIP;
             default:
@@ -247,6 +283,8 @@ public final class StaticRouter {
                 return stendCRDBUsername;
             case DEV:
                 return devCRDBUsername;
+            case SOFT:
+                return softCRDBUsername;
             case PROD:
                 return prodCRDBUsername;
             default:
@@ -260,6 +298,8 @@ public final class StaticRouter {
                 return stendCRDBPassword;
             case DEV:
                 return devCRDBPassword;
+            case SOFT:
+                return prodCRDBPassword;
             case PROD:
                 return prodCRDBPassword;
             default:
@@ -273,6 +313,8 @@ public final class StaticRouter {
                 return stendReportFilesCatalog;
             case DEV:
                 return devReportFilesCatalog;
+            case SOFT:
+                return prodReportFilesCatalog;
             case PROD:
                 return prodReportFilesCatalog;
             default:
@@ -286,6 +328,8 @@ public final class StaticRouter {
                 return stendReportFilesFolder;
             case DEV:
                 return devReportFilesFolder;
+            case SOFT:
+                return prodReportFilesFolder;
             case PROD:
                 return prodReportFilesFolder;
             default:
@@ -299,6 +343,8 @@ public final class StaticRouter {
                 return stendStatsEnabled;
             case DEV:
                 return devStatsEnabled;
+            case SOFT:
+                return prodStatsEnabled;
             case PROD:
                 return prodStatsEnabled;
             default:
@@ -312,6 +358,8 @@ public final class StaticRouter {
                 return stendThreadLimit;
             case DEV:
                 return devThreadLimit;
+            case SOFT:
+                return softThreadLimit;
             case PROD:
                 return prodThreadLimit;
             default:
@@ -324,8 +372,64 @@ public final class StaticRouter {
             case STEND:
             case DEV:
                 return path;
+            case SOFT:
+                return path.replace("\\\\" + StaticRouter.getAsIP() + "\\download$\\","E:\\download\\");
             case PROD:
                 return path.replace("\\\\" + StaticRouter.getAsIP() + "\\download$\\","E:\\download\\");
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
+    public static boolean isDeleteLogEnabled () {
+        switch (mode) {
+            case STEND:
+            case DEV:
+                return false;
+            case SOFT:
+                return true;
+            case PROD:
+                return false;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
+    public static boolean syncOptimizationEnabled() {
+        switch (mode) {
+            case STEND:
+            case DEV:
+            case SOFT:
+                return false;
+            case PROD:
+                return false;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
+    public static boolean rulesEnabled() {
+        switch (mode) {
+            case STEND:
+            case DEV:
+                return false;
+            case SOFT:
+                return true;
+            case PROD:
+                return false;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
+    public static boolean exceptionOnForbiddenCloseE299() {
+        switch (mode) {
+            case STEND:
+            case DEV:
+            case SOFT:
+                return true;
+            case PROD:
+                return false;
             default:
                 throw new IllegalStateException(Errors.compose(Errors.E284));
         }
@@ -347,6 +451,10 @@ public final class StaticRouter {
         }
 
         return false;
+    }
+
+    public static boolean isProdMode(){
+        return mode == MODE.PROD;
     }
 
     public static String[] getGODModes() {

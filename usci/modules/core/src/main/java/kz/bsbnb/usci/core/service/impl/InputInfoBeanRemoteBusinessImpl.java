@@ -112,14 +112,11 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
 
         for (Batch batch : batchList) {
             Creditor currentCreditor = inputCreditors.get(batch.getCreditorId());
-
-            if (currentCreditor == null) {
-                continue;
-            }
-
-            //List<BatchStatus> batchStatusList = batchService.getBatchStatusList(batch.getId());
             List<BatchStatus> batchStatusList = batchStatusMap.get(batch.getId());
 
+            if (currentCreditor == null || batchStatusList == null) {
+                continue;
+            }
 
             InputInfo ii = getInputInfo(batch, currentCreditor, batchStatusList);
 

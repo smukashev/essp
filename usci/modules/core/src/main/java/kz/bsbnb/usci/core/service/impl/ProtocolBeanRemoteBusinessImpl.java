@@ -10,6 +10,7 @@ import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.eav.util.Errors;
+import org.mvel2.ast.Proto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,10 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
 
     private final DateFormat contractDateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
-    private final List<EntityStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED, TOTAL_COUNT, ACTUAL_COUNT);
+    private final List<EntityStatuses> protocolsToDisplay = Arrays.asList(ERROR, COMPLETED);
+
+    private final List<EntityStatuses> protocolStatisticsToDisplay = Arrays.asList(ACTUAL_COUNT);
+
 
     @Override
     public List<Protocol> getProtocolsBy_InputInfo(InputInfo inputInfoId) {
@@ -47,24 +51,19 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
             }
         }
 
-        fillSuccessCount(list, inputInfoId, batch);
-        fillErrorCount(list, inputInfoId, batch);
-
         return list;
     }
 
     @Override
-    public List<Protocol> getProtocolsBy_InputInfo(InputInfo inputInfoId, int firstIndex, int count) {
+    public List<Protocol> getProtocolStatisticsBy_InputInfo(InputInfo inputInfoId)
+    {
         ArrayList<Protocol> list = new ArrayList<>();
-
         long batchId = inputInfoId.getId().longValue();
-
-        List<EntityStatus> entityStatusList = batchService.getEntityStatusList(batchId, firstIndex, count);
-
         Batch batch = batchService.getBatch(batchId);
+        List<EntityStatus> entityStatusList = batchService.getEntityStatusList(batchId);
 
         for (EntityStatus entityStatus : entityStatusList) {
-            if (protocolsToDisplay.contains(entityStatus.getStatus())) {
+            if (protocolStatisticsToDisplay.contains(entityStatus.getStatus())) {
                 fillProtocol(entityStatus, inputInfoId, list, batch);
             }
         }
@@ -75,10 +74,6 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         return list;
     }
 
-    @Override
-    public int countProtocolsByInputInfo(InputInfo inputInfoId) {
-        return batchService.getEntityStatusCount(inputInfoId.getId().longValue());
-    }
 
     private void fillProtocol(EntityStatus entityStatus, InputInfo inputInfoId, ArrayList<Protocol> list, Batch batch) {
 

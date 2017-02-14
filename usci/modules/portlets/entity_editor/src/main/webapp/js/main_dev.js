@@ -1174,7 +1174,7 @@ Ext.onReady(function () {
                 xmlStr += createXML(rootNode.childNodes[i], true, "", false, true).xml;
             }
 
-            buttonRule.handler(function() {
+            //buttonRule.handler(function() {
                 Ext.Ajax.request({
                     url: dataUrl,
                     method: 'POST',
@@ -1194,7 +1194,7 @@ Ext.onReady(function () {
                         }
                     }
                 });
-            });
+            //});
         },
         maxWidth: 70
     });
@@ -1533,12 +1533,12 @@ Ext.onReady(function () {
                             }
                         });
 
-                        items.push({
+                        /*items.push({
                             text: 'Проверка на бизнес правила',
                             handler: function(){
                                 buttonRule.handler();
                             }
-                        });
+                        });*/
                     }
 
 

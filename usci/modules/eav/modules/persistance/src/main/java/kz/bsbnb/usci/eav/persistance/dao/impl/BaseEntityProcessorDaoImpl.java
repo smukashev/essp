@@ -1,5 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
+import kz.bsbnb.usci.eav.StaticRouter;
+import kz.bsbnb.usci.eav.manager.IEAVLoggerDao;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -29,7 +31,6 @@ import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,6 +92,9 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     private IRefRepository refRepository;
 
     private Set bvunoSet;
+
+    @Autowired
+    private IEAVLoggerDao eavLoggerDao;
 
     public void setApplyListener(IDaoListener applyListener) {
         this.applyListener = applyListener;
@@ -216,6 +220,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     }
 
     boolean rulesEnabledForUser(IBaseEntity baseEntity){
+        if(!StaticRouter.rulesEnabled())
+            return false;
         return baseEntity.getUserId() == null || baseEntity.getUserId() != 100500L;
     }
 
@@ -249,6 +255,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Transactional
     public IBaseEntity process(final IBaseEntity baseEntity) {
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
+        baseEntityManager.setDeleteLogger(eavLoggerDao);
 
         IBaseEntity baseEntityPostPrepared;
         IBaseEntity baseEntityApplied;

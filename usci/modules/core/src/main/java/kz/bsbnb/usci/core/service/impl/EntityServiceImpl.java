@@ -60,12 +60,12 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
-    public void process(BaseEntity mockEntity) {
+    public boolean process(BaseEntity mockEntity) {
         long t1 = System.currentTimeMillis();
         try {
             BaseEntity baseEntity = (BaseEntity) baseEntityProcessorDao.process(mockEntity);
             baseEntity.setBatchId(mockEntity.getBatchId());
-            baseEntity.setIndex(mockEntity.getBatchIndex());
+            baseEntity.setBatchIndex(mockEntity.getBatchIndex());
 
             stats.put("java::process", (System.currentTimeMillis() - t1));
 
@@ -78,6 +78,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             entityStatus.setReceiptDate(new Date());
 
             batchService.addEntityStatus(entityStatus);
+            return true;
         } catch (Exception e) {
             stats.put("java::process_error", (System.currentTimeMillis() - t1));
 
@@ -124,6 +125,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
                 batchService.addEntityStatus(entityStatus);
             }
+
+            return false;
         }
     }
 

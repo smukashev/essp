@@ -6,6 +6,8 @@ public class SyncStatus implements Serializable {
     private long queueSize;
     private long threadsCount;
     private double avgTime;
+    private long executorCnt;
+    private double avgExecutor;
 
     public long getQueueSize() {
         return queueSize;
@@ -31,12 +33,19 @@ public class SyncStatus implements Serializable {
         this.avgTime = avgTime;
     }
 
+    public void setExectuorStat(long executorCnt, double avgTime) {
+        this.executorCnt = executorCnt;
+        this.avgExecutor = avgTime;
+    }
+
     @Override
     public String toString() {
         return "SyncStatus{" +
                 "queueSize=" + queueSize +
                 ", threadsCount=" + threadsCount +
                 ", avgTime=" + avgTime +
+                ", executorCnt=" + executorCnt +
+                ", avgExecutor=" + avgExecutor +
                 '}';
     }
 }

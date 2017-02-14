@@ -16,6 +16,7 @@ import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -45,11 +46,14 @@ public final class DataJob extends AbstractDataJob {
     private volatile BaseEntity currentEntity;
     private volatile boolean currentIntersection;
 
+    private Map<Long, Map<String, Boolean> > documentOptimizer = new ConcurrentHashMap<>();
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private double avgTimePrev = 0;
     private double avgTimeCur = 0;
     private long entityCounter = 0;
+    private long executorServiceCnt = 0;
+    private double avgTimeExectuor = 0;
 
     private int clearJobsIndex = 0;
 
@@ -63,6 +67,10 @@ public final class DataJob extends AbstractDataJob {
         public Boolean call() {
             try {
                 for (IBaseEntity myEntityKeyElement : myEntity.getKeyElements()) {
+                    if(StaticRouter.syncOptimizationEnabled())
+                        if(syncOptimization(myEntityKeyElement))
+                            continue;
+
                     for (IBaseEntity currentEntityKeyElement : currentEntity.getKeyElements()) {
                         if (myEntityKeyElement.getMeta().getId() == currentEntityKeyElement.getMeta().getId() &&
                                 myEntityKeyElement.equalsByKey(currentEntityKeyElement)) {
@@ -75,6 +83,27 @@ public final class DataJob extends AbstractDataJob {
                 e.printStackTrace();
             }
 
+            return false;
+        }
+
+        private boolean syncOptimization(IBaseEntity myEntityKeyElement) {
+            try {
+                if (myEntityKeyElement.getMeta().getClassName().equals("document")) {
+                    if (myEntity.getMeta().getClassName().equals("credit") && currentEntity.getMeta().getClassName().equals("credit")) {
+                        long creditorId = myEntity.getBaseValue("creditor").getCreditorId();
+                        if (currentEntity.getBaseValue("creditor").getCreditorId() == creditorId) {
+                            String documentKey = creditorId + "|" + myEntityKeyElement.getEl("no").toString() + "|" + myEntityKeyElement.getEl("doc_type.code").toString();
+                            Map<String, Boolean> hm = documentOptimizer.get(myEntity.getBatchId());
+
+                            if (hm != null && hm.containsKey(documentKey)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return false;
         }
 
@@ -92,8 +121,7 @@ public final class DataJob extends AbstractDataJob {
         //noinspection InfiniteLoopStatement
         while (true) {
             try {
-                if (entities.size() > 0 && entitiesInProcess.size() < StaticRouter.getThreadLimit())
-                    processNewEntities();
+                while (entities.size() > 0 && entitiesInProcess.size() < StaticRouter.getThreadLimit() && processNewEntities());
 
                 if (processingJobs.size() > 0)
                     removeDeadJobs();
@@ -111,6 +139,7 @@ public final class DataJob extends AbstractDataJob {
                 }
 
                 syncStatusSingleton.put(entities.size(), entitiesInProcess.size(), avgTimeCur);
+                syncStatusSingleton.setExecutorStat(executorServiceCnt, avgTimeExectuor);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -125,6 +154,9 @@ public final class DataJob extends AbstractDataJob {
 
             if (!processJob.isAlive()) {
                 BaseEntity entity = processJob.getBaseEntity();
+
+                if(StaticRouter.syncOptimizationEnabled())
+                    syncOptimization(processJob, entity);
 
                 entityCounter++;
                 if (entityCounter < STAT_INTERVAL) {
@@ -158,7 +190,43 @@ public final class DataJob extends AbstractDataJob {
         }
     }
 
-    private void processNewEntities() {
+    private void syncOptimization(ProcessJob processJob, BaseEntity entity) {
+        try {
+            if (entity.getMeta().getClassName().equals("credit") && processJob.statusCode) {
+                long creditorId = entity.getBaseValue("creditor").getCreditorId();
+                Map<String, Boolean> docs;
+
+                if (!documentOptimizer.containsKey(entity.getBatchId())) {
+                    docs = new ConcurrentHashMap<>();
+                    documentOptimizer.put(entity.getBatchId(), docs);
+                }
+
+                docs = documentOptimizer.get(entity.getBatchId());
+
+                List<IBaseEntity> documents = ((List) entity.getEls("{get}subject.docs"));
+
+                if(documents != null) {
+                    for (IBaseEntity document : documents) {
+                        String documentKey = creditorId + "|" + document.getEl("no").toString() + "|" + document.getEl("doc_type.code").toString();
+                        docs.put(documentKey, true);
+                    }
+                }
+
+                documents = ((List) entity.getEls("{get}subject.organization_info.head.docs"));
+
+                if(documents != null) {
+                    for (IBaseEntity document : documents) {
+                        String documentKey = creditorId + "|" + document.getEl("no").toString() + "|" + document.getEl("doc_type.code").toString();
+                        docs.put(documentKey, true);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean processNewEntities() {
         final BaseEntity entity = getClearEntity();
         final ProcessJob processJob = new ProcessJob(entityService, entity);
 
@@ -170,7 +238,10 @@ public final class DataJob extends AbstractDataJob {
 
             processJob.start();
             skip_count = 0;
+            return  true;
         }
+
+        return false;
     }
 
     private synchronized BaseEntity getClearEntity() {
@@ -199,7 +270,11 @@ public final class DataJob extends AbstractDataJob {
         currentIntersection = false;
 
         try {
+            long t1 = System.currentTimeMillis();
             executorService.invokeAll(entitiesInProcess);
+            long t2 = System.currentTimeMillis();
+            executorServiceCnt ++;
+            avgTimeExectuor = ((executorServiceCnt - 1) * avgTimeExectuor + (t2 - t1) ) / executorServiceCnt;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -228,6 +303,13 @@ public final class DataJob extends AbstractDataJob {
 
             for (Long batchId : difference) {
                 batches.remove(batchId);
+                if(StaticRouter.syncOptimizationEnabled()) {
+                    try {
+                        documentOptimizer.remove(batchId);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
 
