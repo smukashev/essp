@@ -1271,6 +1271,169 @@ public class CLI {
         }
     }
 
+
+    public void commandImportJob() throws SQLException {
+        Connection conn = null;
+        try {
+            while (true) {
+                try {
+                    try {
+                        if (conn == null || conn.isClosed())
+                            conn = connectToDB("jdbc:oracle:thin:@10.8.2.200:1521:ESSP", "core", "core");
+                    } catch (Exception e) {
+                        System.out.println("Can't connect to DB: " + e.getMessage());
+                        return;
+                    }
+
+                    PreparedStatement preparedStatement;
+                    PreparedStatement preparedStatementDone;
+                    try {
+                        preparedStatement = conn.prepareStatement("SELECT conn, login, pass, dir, rep_date from r_import where sent=0");
+                        preparedStatementDone = conn.prepareStatement("UPDATE r_import ri \n" +
+                                "   SET ri.sent = ? \n" +
+                                " WHERE ri.rep_date = ?");
+                    } catch (SQLException e) {
+                        System.out.println("Can't create prepared statement: " + e.getMessage());
+                        try {
+                            conn.close();
+                        } catch (SQLException e1) {
+                        }
+                        return;
+                    }
+
+                    ResultSet result = preparedStatement.executeQuery();
+
+                    while (result.next()) {
+                        String connString = result.getString("conn");
+                        String login = result.getString("login");
+                        String pass = result.getString("pass");
+                        String dir = result.getString("dir");
+                        String reportDate = result.getString("rep_date");
+                        Connection conn2 = null;
+                        PreparedStatement preparedSmt = null;
+                        PreparedStatement preparedStmtDone = null;
+                        ResultSet result2;
+                    try {
+
+                        try {
+                            conn2 = connectToDB(connString, login, pass);
+                        } catch (ClassNotFoundException e) {
+                            System.out.println("Error can't load driver: oracle.jdbc.OracleDriver");
+                            return;
+                        } catch (SQLException e) {
+                            System.out.println("Can't connect to DB: " + e.getMessage());
+                            return;
+                        }
+
+                        try {
+                            preparedSmt = conn2.prepareStatement("SELECT xf.id, xf.file_name, xf.file_content\n" +
+                                    "  FROM core.xml_file xf\n" +
+                                    " WHERE xf.status = 'COMPLETED'\n" +
+                                    "   AND xf.report_date = to_date('" + reportDate + "', 'dd.MM.yyyy')" +
+                                    //"   ORDER BY xf.id ASC");
+                                    "   AND xf.sent = 0 ORDER BY xf.id ASC");
+
+                            preparedStmtDone = conn2.prepareStatement("UPDATE core.xml_file xf \n" +
+                                    "   SET xf.sent = ? \n" +
+                                    " WHERE xf.id = ?");
+                        } catch (SQLException e) {
+                            System.out.println("Can't create prepared statement: " + e.getMessage());
+                            try {
+                                conn2.close();
+                            } catch (SQLException e1) {
+                                e1.printStackTrace();
+                            }
+                            return;
+                        }
+
+                        File tempDir = new File(dir);
+
+                        if (!tempDir.exists()) {
+                            System.out.println("No such directory " + dir);
+                            return;
+                        }
+
+                        if (!tempDir.isDirectory()) {
+                            System.out.println(dir + " must be a directory");
+                            return;
+                        }
+                        int fileNumber = 0;
+
+                        try {
+                            result2 = preparedSmt.executeQuery();
+                        } catch (SQLException e) {
+                            System.out.println("Can't execute db query: " + e.getMessage());
+                            break;
+                        }
+                        int id = 0;
+                        while (result2.next()) {
+                            fileNumber++;
+                            id = result2.getInt("id");
+                            String fileName = result2.getString("file_name");
+                            Blob blob = result2.getBlob("file_content");
+
+                            File lockFile = new File(tempDir.getAbsolutePath() + "/" + fileName + ".zip.lock");
+                            lockFile.createNewFile();
+
+                            File newFile = new File(tempDir.getAbsolutePath() + "/" + fileName + ".zip");
+                            newFile.createNewFile();
+
+                            InputStream in = blob.getBinaryStream();
+
+                            byte[] buffer = new byte[1024];
+
+                            FileOutputStream fout = new FileOutputStream(newFile);
+
+                            while (in.read(buffer) > 0) {
+                                fout.write(buffer);
+                            }
+                            fout.close();
+
+                            lockFile.delete();
+
+                            System.out.println(fileNumber + " - Sending file: " + newFile.getCanonicalFile());
+
+                            preparedStmtDone.setInt(Integer.valueOf(1), 1);
+                            preparedStmtDone.setInt(Integer.valueOf(2), id);
+
+
+                            if (preparedStmtDone.execute()) {
+                                System.out.println("Error can't mark sent file: " + id);
+                            }
+
+                            Thread.sleep(20000);
+                        }
+                        result2.close();
+                        preparedStatementDone.setInt(Integer.valueOf(1), 1);
+                        preparedStatementDone.setString(Integer.valueOf(2), reportDate);
+
+                        if (preparedStatementDone.execute()) {
+                            System.out.println("Error can't mark sent for report_Date : " + reportDate);
+                        }
+                    } finally {
+                            if (conn2 != null)
+                                conn2.close();
+                        }
+                    }
+
+                    result.close();
+
+                    Thread.sleep(5000);
+                } catch (Exception e){
+                    e.printStackTrace();
+                    try {
+                        if (conn != null)
+                            conn.close();
+                    } catch (Exception ex) {
+                    }
+                }
+            }
+        } finally {
+            if (conn != null)
+                conn.close();
+        }
+    }
+
     public void commandImport() {
         if (args.size() > 4) {
             Connection conn;
@@ -2534,6 +2697,8 @@ public class CLI {
                 commandRule(in);
             } else if (command.equals("import")) {
                 commandImport();
+            } else if(command.equals("importJob")) {
+                commandImportJob();
             } else if (command.equals("collectids")) {
                 commandCollectIds();
             } else if (command.equals("rstat")) {
