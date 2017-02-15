@@ -1288,7 +1288,7 @@ public class CLI {
                     PreparedStatement preparedStatement;
                     PreparedStatement preparedStatementDone;
                     try {
-                        preparedStatement = conn.prepareStatement("SELECT conn, login, pass, dir, rep_date from r_import where sent=0");
+                        preparedStatement = conn.prepareStatement("SELECT conn, login, pass, dir, rep_date from r_import where sent=0 order by rowid desc");
                         preparedStatementDone = conn.prepareStatement("UPDATE r_import ri \n" +
                                 "   SET ri.sent = ? \n" +
                                 " WHERE ri.rep_date = ?");
