@@ -1417,7 +1417,7 @@ public class CLI {
                     }
 
                     result.close();
-
+                    conn.close();
                     Thread.sleep(5000);
                 } catch (Exception e){
                     e.printStackTrace();
@@ -1426,6 +1426,9 @@ public class CLI {
                             conn.close();
                     } catch (Exception ex) {
                     }
+                } finally {
+                    if (conn != null)
+                        conn.close();
                 }
             }
         } finally {
