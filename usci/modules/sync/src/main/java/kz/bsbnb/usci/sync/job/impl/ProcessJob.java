@@ -9,6 +9,7 @@ import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 public class ProcessJob extends Thread {
     private final BaseEntity baseEntity;
     private final IEntityService entityService;
+    public boolean statusCode;
 
     private long timeSpent = 0;
 
@@ -20,7 +21,7 @@ public class ProcessJob extends Thread {
     @Override
     public void run() {
         long t1 = System.currentTimeMillis();
-        entityService.process(baseEntity);
+        this.statusCode = entityService.process(baseEntity);
         timeSpent = System.currentTimeMillis() - t1;
     }
 

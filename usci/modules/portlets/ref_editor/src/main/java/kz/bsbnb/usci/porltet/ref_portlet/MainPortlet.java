@@ -405,6 +405,7 @@ public class MainPortlet extends MVCPortlet {
                     batchEntry.setRepDate(date);
 
                     batchEntry.setUserId(currentUser.getUserId());
+                    batchEntry.setMaintenance(false);
 
                     batchEntryService.save(batchEntry);
 

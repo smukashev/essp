@@ -7,4 +7,5 @@ public class QueryEntry implements Serializable {
     public long minTime;
     public long totalTime;
     public long count;
+    public String query;
 }

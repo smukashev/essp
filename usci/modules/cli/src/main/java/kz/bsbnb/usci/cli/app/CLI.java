@@ -1270,8 +1270,6 @@ public class CLI {
             System.out.println(newFile.getAbsolutePath() + " copied;");
         }
     }
-
-
     public void commandImportJob() throws SQLException {
         Connection conn = null;
         try {
@@ -1279,7 +1277,7 @@ public class CLI {
                 try {
                     try {
                         if (conn == null || conn.isClosed())
-                            conn = connectToDB("jdbc:oracle:thin:@10.8.2.200:1521:ESSP", "core", "core");
+                            conn = connectToDB("jdbc:oracle:thin:@10.8.1.101:1521:ESSPNEW", "core", "core");
                     } catch (Exception e) {
                         System.out.println("Can't connect to DB: " + e.getMessage());
                         return;
@@ -1313,104 +1311,104 @@ public class CLI {
                         PreparedStatement preparedSmt = null;
                         PreparedStatement preparedStmtDone = null;
                         ResultSet result2;
-                    try {
-
                         try {
-                            conn2 = connectToDB(connString, login, pass);
-                        } catch (ClassNotFoundException e) {
-                            System.out.println("Error can't load driver: oracle.jdbc.OracleDriver");
-                            return;
-                        } catch (SQLException e) {
-                            System.out.println("Can't connect to DB: " + e.getMessage());
-                            return;
-                        }
 
-                        try {
-                            preparedSmt = conn2.prepareStatement("SELECT xf.id, xf.file_name, xf.file_content\n" +
-                                    "  FROM core.xml_file xf\n" +
-                                    " WHERE xf.status = 'COMPLETED'\n" +
-                                    "   AND xf.report_date = to_date('" + reportDate + "', 'dd.MM.yyyy')" +
-                                    //"   ORDER BY xf.id ASC");
-                                    "   AND xf.sent = 0 ORDER BY xf.id ASC");
-
-                            preparedStmtDone = conn2.prepareStatement("UPDATE core.xml_file xf \n" +
-                                    "   SET xf.sent = ? \n" +
-                                    " WHERE xf.id = ?");
-                        } catch (SQLException e) {
-                            System.out.println("Can't create prepared statement: " + e.getMessage());
                             try {
-                                conn2.close();
-                            } catch (SQLException e1) {
-                                e1.printStackTrace();
-                            }
-                            return;
-                        }
-
-                        File tempDir = new File(dir);
-
-                        if (!tempDir.exists()) {
-                            System.out.println("No such directory " + dir);
-                            return;
-                        }
-
-                        if (!tempDir.isDirectory()) {
-                            System.out.println(dir + " must be a directory");
-                            return;
-                        }
-                        int fileNumber = 0;
-
-                        try {
-                            result2 = preparedSmt.executeQuery();
-                        } catch (SQLException e) {
-                            System.out.println("Can't execute db query: " + e.getMessage());
-                            break;
-                        }
-                        int id = 0;
-                        while (result2.next()) {
-                            fileNumber++;
-                            id = result2.getInt("id");
-                            String fileName = result2.getString("file_name");
-                            Blob blob = result2.getBlob("file_content");
-
-                            File lockFile = new File(tempDir.getAbsolutePath() + "/" + fileName + ".zip.lock");
-                            lockFile.createNewFile();
-
-                            File newFile = new File(tempDir.getAbsolutePath() + "/" + fileName + ".zip");
-                            newFile.createNewFile();
-
-                            InputStream in = blob.getBinaryStream();
-
-                            byte[] buffer = new byte[1024];
-
-                            FileOutputStream fout = new FileOutputStream(newFile);
-
-                            while (in.read(buffer) > 0) {
-                                fout.write(buffer);
-                            }
-                            fout.close();
-
-                            lockFile.delete();
-
-                            System.out.println(fileNumber + " - Sending file: " + newFile.getCanonicalFile());
-
-                            preparedStmtDone.setInt(Integer.valueOf(1), 1);
-                            preparedStmtDone.setInt(Integer.valueOf(2), id);
-
-
-                            if (preparedStmtDone.execute()) {
-                                System.out.println("Error can't mark sent file: " + id);
+                                conn2 = connectToDB(connString, login, pass);
+                            } catch (ClassNotFoundException e) {
+                                System.out.println("Error can't load driver: oracle.jdbc.OracleDriver");
+                                return;
+                            } catch (SQLException e) {
+                                System.out.println("Can't connect to DB: " + e.getMessage());
+                                return;
                             }
 
-                            Thread.sleep(20000);
-                        }
-                        result2.close();
-                        preparedStatementDone.setInt(Integer.valueOf(1), 1);
-                        preparedStatementDone.setString(Integer.valueOf(2), reportDate);
+                            try {
+                                preparedSmt = conn2.prepareStatement("SELECT xf.id, xf.file_name, xf.file_content\n" +
+                                        "  FROM core.xml_file xf\n" +
+                                        " WHERE xf.status = 'COMPLETED'\n" +
+                                        "   AND xf.report_date = to_date('" + reportDate + "', 'dd.MM.yyyy')" +
+                                        //"   ORDER BY xf.id ASC");
+                                        "   AND xf.sent = 0 ORDER BY xf.id ASC");
 
-                        if (preparedStatementDone.execute()) {
-                            System.out.println("Error can't mark sent for report_Date : " + reportDate);
-                        }
-                    } finally {
+                                preparedStmtDone = conn2.prepareStatement("UPDATE core.xml_file xf \n" +
+                                        "   SET xf.sent = ? \n" +
+                                        " WHERE xf.id = ?");
+                            } catch (SQLException e) {
+                                System.out.println("Can't create prepared statement: " + e.getMessage());
+                                try {
+                                    conn2.close();
+                                } catch (SQLException e1) {
+                                    e1.printStackTrace();
+                                }
+                                return;
+                            }
+
+                            File tempDir = new File(dir);
+
+                            if (!tempDir.exists()) {
+                                System.out.println("No such directory " + dir);
+                                return;
+                            }
+
+                            if (!tempDir.isDirectory()) {
+                                System.out.println(dir + " must be a directory");
+                                return;
+                            }
+                            int fileNumber = 0;
+
+                            try {
+                                result2 = preparedSmt.executeQuery();
+                            } catch (SQLException e) {
+                                System.out.println("Can't execute db query: " + e.getMessage());
+                                break;
+                            }
+                            int id = 0;
+                            while (result2.next()) {
+                                fileNumber++;
+                                id = result2.getInt("id");
+                                String fileName = result2.getString("file_name");
+                                Blob blob = result2.getBlob("file_content");
+
+                                File lockFile = new File(tempDir.getAbsolutePath() + "/" + fileName + ".zip.lock");
+                                lockFile.createNewFile();
+
+                                File newFile = new File(tempDir.getAbsolutePath() + "/" + fileName + ".zip");
+                                newFile.createNewFile();
+
+                                InputStream in = blob.getBinaryStream();
+
+                                byte[] buffer = new byte[1024];
+
+                                FileOutputStream fout = new FileOutputStream(newFile);
+
+                                while (in.read(buffer) > 0) {
+                                    fout.write(buffer);
+                                }
+                                fout.close();
+
+                                lockFile.delete();
+
+                                System.out.println(fileNumber + " - Sending file: " + newFile.getCanonicalFile());
+
+                                preparedStmtDone.setInt(Integer.valueOf(1), 1);
+                                preparedStmtDone.setInt(Integer.valueOf(2), id);
+
+
+                                if (preparedStmtDone.execute()) {
+                                    System.out.println("Error can't mark sent file: " + id);
+                                }
+
+                                Thread.sleep(5000);
+                            }
+                            result2.close();
+                            preparedStatementDone.setInt(Integer.valueOf(1), 1);
+                            preparedStatementDone.setString(Integer.valueOf(2), reportDate);
+
+                            if (preparedStatementDone.execute()) {
+                                System.out.println("Error can't mark sent for report_Date : " + reportDate);
+                            }
+                        } finally {
                             if (conn2 != null)
                                 conn2.close();
                         }
@@ -1858,6 +1856,32 @@ public class CLI {
         }
     }
 
+    public void commandCStat() {
+        if(args.size() > 0) {
+            RmiProxyFactoryBean entityServiceFactoryBean = null;
+
+            kz.bsbnb.usci.core.service.IEntityService entityService = null;
+
+            try {
+                entityServiceFactoryBean = new RmiProxyFactoryBean();
+                entityServiceFactoryBean.setServiceUrl(args.get(0));
+                entityServiceFactoryBean.setServiceInterface(kz.bsbnb.usci.core.service.IEntityService.class);
+                entityServiceFactoryBean.setRefreshStubOnConnectFailure(true);
+
+                entityServiceFactoryBean.afterPropertiesSet();
+                entityService = (kz.bsbnb.usci.core.service.IEntityService) entityServiceFactoryBean.getObject();
+
+                System.out.println(entityService.getStatus());
+            } catch (Exception e) {
+                System.out.println("Can't connect to core service: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Argument needed: <core_url>");
+            System.out.println("Example: cstat rmi://127.0.0.1:1099/entityService");
+        }
+    }
+
     public void commandSQLStat() {
         if (args.size() > 0) {
             RmiProxyFactoryBean serviceFactory = null;
@@ -1879,18 +1903,28 @@ public class CLI {
             Map<String, QueryEntry> map = entityService.getSQLStats();
 
             System.out.println();
-            System.out.println("+---------+------------------+------------------------+");
             System.out.println("|  count  |     avg (ms)     |       total (ms)       |");
-            System.out.println("+---------+------------------+------------------------+");
 
             double totalInserts = 0;
             double totalSelects = 0;
             double totalProcess = 0;
             int totalProcessCount = 0;
 
-            for (String query : map.keySet()) {
-                QueryEntry qe = map.get(query);
+            for (String s : map.keySet()) {
+                QueryEntry queryEntry = map.get(s);
+                queryEntry.query = s;
+            }
 
+            List<QueryEntry> values = new LinkedList(map.values());
+            Collections.sort(values, new Comparator<QueryEntry>() {
+                @Override
+                public int compare(QueryEntry o1, QueryEntry o2) {
+                    return o1.totalTime > o2.totalTime ? -1 : 1;
+                }
+            });
+
+            for (QueryEntry qe : values) {
+                String query = qe.query;
                 System.out.printf("| %7d | %16d | %22d | %s%n", qe.count, (qe.totalTime / qe.count), qe.totalTime, query);
 
                 if (query.startsWith("insert"))
@@ -2700,7 +2734,7 @@ public class CLI {
                 commandRule(in);
             } else if (command.equals("import")) {
                 commandImport();
-            } else if(command.equals("importJob")) {
+            } else if (command.equals("importJob")) {
                 commandImportJob();
             } else if (command.equals("collectids")) {
                 commandCollectIds();
@@ -2708,7 +2742,9 @@ public class CLI {
                 commandRStat();
             } else if (command.equals("sstat")) {
                 commandSStat();
-            } else if (command.equals("sqlstat")) {
+            } else if (command.equals("cstat")) {
+                commandCStat();
+            }else if (command.equals("sqlstat")) {
                 commandSQLStat();
             } else if (command.equals("remotestat")) {
                 commandRemoteStat();

@@ -6,4 +6,8 @@ public interface IRefRepository {
     long prepareRef(final IBaseEntity baseEntity);
 
     void installRef(final IBaseEntity entity);
+
+    IBaseEntity get(IBaseEntity entity);
+
+    void invalidate(IBaseEntity baseEntity);
 }

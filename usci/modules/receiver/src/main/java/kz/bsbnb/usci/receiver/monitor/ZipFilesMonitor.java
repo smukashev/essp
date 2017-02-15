@@ -68,7 +68,7 @@ public class ZipFilesMonitor {
     SenderThread sender;
 
     public static final int ZIP_BUFFER_SIZE = 1024;
-    public static final int MAX_SYNC_QUEUE_SIZE = 2048;
+    public static final int MAX_SYNC_QUEUE_SIZE = 8192;
 
     private static final String DIGITAL_SIGNING_SETTINGS = "DIGITAL_SIGNING_SETTINGS";
     private static final String DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE = "DIGITAL_SIGNING_ORGANIZATIONS_IDS";
