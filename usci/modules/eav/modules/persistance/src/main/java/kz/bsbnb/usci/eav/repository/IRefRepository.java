@@ -9,5 +9,5 @@ public interface IRefRepository {
 
     IBaseEntity get(IBaseEntity entity);
 
-    //void invalidate(IBaseEntity baseEntity);
+    void invalidate(IBaseEntity baseEntity);
 }

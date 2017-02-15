@@ -2439,11 +2439,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             }
                         }
 
-                        /*if(insertedObject instanceof BaseEntityReportDate) {
+                        if(insertedObject instanceof BaseEntityReportDate) {
                             IBaseEntity baseEntity = ((BaseEntityReportDate) insertedObject).getBaseEntity();
                             if(baseEntity.getMeta().isReference())
                                 refRepository.invalidate(baseEntity);
-                        }*/
+                        }
 
                     } catch (Exception insertException) {
                         throw new IllegalStateException(Errors.compose(Errors.E76, insertedObject, insertException.getMessage()));
@@ -2462,11 +2462,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     try {
                         persistableDao.update(updatedObject);
 
-                        /*if(updatedObject instanceof BaseEntityReportDate) {
+                        if(updatedObject instanceof BaseEntityReportDate) {
                             IBaseEntity baseEntity = ((BaseEntityReportDate) updatedObject).getBaseEntity();
                             if(baseEntity.getMeta().isReference())
                                 refRepository.invalidate(baseEntity);
-                        }*/
+                        }
 
                     } catch (Exception updateException) {
                         throw new IllegalStateException(Errors.compose(Errors.E77, updatedObject, updateException.getMessage()));
@@ -2485,10 +2485,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     try {
                         persistableDao.delete(deletedObject);
 
-                        /*if(deletedObject instanceof IBaseEntity) {
+                        if(deletedObject instanceof IBaseEntity) {
                             if(((IBaseEntity) deletedObject).getMeta().isReference())
                                 refRepository.invalidate(((IBaseEntity) deletedObject));
-                        }*/
+                        }
                     } catch (Exception deleteException) {
                         throw new IllegalStateException(Errors.compose(Errors.E78, deletedObject, deleteException.getMessage()));
                     }

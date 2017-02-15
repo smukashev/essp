@@ -21,6 +21,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Repository
@@ -49,6 +50,7 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
     Map<CacheEntry, CacheEntry> cache = new ConcurrentHashMap<>();
     private long totalHitCount = 0;
     private long cacheRemoveCount;
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
 
     public class CacheEntry {
         private IBaseEntity baseEntity;
@@ -85,42 +87,47 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
             throw new IllegalStateException(Errors.compose(Errors.E102));
 
         CacheEntry ce = new CacheEntry(entity);
-        CacheEntry ret = cache.get(ce);
+        lock.readLock().lock();
 
-        if(ret == null) {
-            IBaseEntity entityLoaded = loadDao.loadByMaxReportDate(entity.getId(), entity.getReportDate());
-            //refactor null policy
-            if(entityLoaded == null) {
-                throw new RuntimeException("no ref from db");
+        try {
+            CacheEntry ret = cache.get(ce);
+
+            if (ret == null) {
+                IBaseEntity entityLoaded = loadDao.loadByMaxReportDate(entity.getId(), entity.getReportDate());
+                //refactor null policy
+                if (entityLoaded == null) {
+                    throw new RuntimeException("no ref from db");
+                }
+                //entity.getBaseEntityReportDate().setReportDate(entity.getReportDate());
+                ret = new CacheEntry(entityLoaded);
+
+                cache.put(ce, ret);
+            } else {
+                totalHitCount++;
             }
-            //entity.getBaseEntityReportDate().setReportDate(entity.getReportDate());
-            ret = new CacheEntry(entityLoaded);
 
-            cache.put(ce, ret);
-        } else {
-            totalHitCount ++;
+            //queue.add(ce.baseEntity);
+
+            /*if(queue.size() > CACHE_MONITOR_SIZE) {
+                CacheEntry leftEntry = cache.get(new CacheEntry(queue.remove(0)));
+                //System.out.println(leftEntry.hitCount);
+                leftEntry.hitCount--;
+
+                if(leftEntry.hitCount == 0) {
+                    cache.remove(leftEntry);
+                    cacheRemoveCount++;
+                }
+
+                if(leftEntry.hitCount < 0 )
+                    throw new RuntimeException("negative value !!! " + leftEntry.hitCount);
+            }*/
+
+            ret.hitCount++;
+            return ret.baseEntity;
+        } finally {
+            lock.readLock().unlock();
+            sqlStats.put("cache.get() ", (System.currentTimeMillis()- t1) );
         }
-
-        ret.hitCount++;
-        //queue.add(ce.baseEntity);
-
-        /*if(queue.size() > CACHE_MONITOR_SIZE) {
-            CacheEntry leftEntry = cache.get(new CacheEntry(queue.remove(0)));
-            //System.out.println(leftEntry.hitCount);
-            leftEntry.hitCount--;
-
-            if(leftEntry.hitCount == 0) {
-                cache.remove(leftEntry);
-                cacheRemoveCount++;
-            }
-
-            if(leftEntry.hitCount < 0 )
-                throw new RuntimeException("negative value !!! " + leftEntry.hitCount);
-        }*/
-
-        sqlStats.put("cache.get() ", (System.currentTimeMillis()- t1) );
-
-        return ret.baseEntity;
     }
 
     public String getStatus(){
@@ -148,24 +155,15 @@ public class RefRepositoryImpl implements IRefRepository, InitializingBean {
         return "cacheHitCount = "  + totalHitCount + ", cache size = " + cache.size() + ", cacheRemoveCount = " + cacheRemoveCount + "\n" + top10;
     }
 
-    /*@Override
-    public synchronized void invalidate(IBaseEntity baseEntity) {
-        Iterator<IBaseEntity> iterator = queue.iterator();
-
-        while(iterator.hasNext()) {
-            IBaseEntity cachedEntity = iterator.next();
-            if(cachedEntity.getId() == baseEntity.getId()) {
-                iterator.remove();
-                CacheEntry invEntry = cache.get(new CacheEntry(cachedEntity));
-                invEntry.hitCount--;
-
-                if(invEntry.hitCount == 0){
-                    cache.remove(new CacheEntry(cachedEntity));
-                    System.out.println("removed from cache due to invalidate !!!");
-                }
-            }
+    @Override
+    public void invalidate(IBaseEntity baseEntity) {
+        lock.writeLock().lock();
+        for (CacheEntry cacheEntry : cache.keySet()) {
+            if(cacheEntry.baseEntity.getId() == baseEntity.getId())
+                cache.remove(cacheEntry);
         }
-    }*/
+        lock.writeLock().unlock();
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
