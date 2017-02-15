@@ -3,6 +3,7 @@ package kz.bsbnb.usci.core.service.impl;
 import kz.bsbnb.usci.core.service.IBatchService;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.repository.impl.RefRepositoryImpl;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.EntityStatus;
 import kz.bsbnb.usci.eav.model.RefColumnsResponse;
@@ -59,7 +60,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     }
 
     @Override
-    public void process(BaseEntity mockEntity) {
+    public boolean process(BaseEntity mockEntity) {
         long t1 = System.currentTimeMillis();
         try {
             BaseEntity baseEntity = (BaseEntity) baseEntityProcessorDao.process(mockEntity);
@@ -77,6 +78,7 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             entityStatus.setReceiptDate(new Date());
 
             batchService.addEntityStatus(entityStatus);
+            return true;
         } catch (Exception e) {
             stats.put("java::process_error", (System.currentTimeMillis() - t1));
 
@@ -123,6 +125,8 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
 
                 batchService.addEntityStatus(entityStatus);
             }
+
+            return false;
         }
     }
 
@@ -189,5 +193,13 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
     @Override
     public Date getPreviousReportDate(long entityId, Date reportDate) {
         return baseEntityReportDateDao.getPreviousReportDate(entityId, reportDate);
+    }
+
+    @Autowired
+    RefRepositoryImpl refRepository;
+
+    @Override
+    public String getStatus() {
+        return refRepository.getStatus();
     }
 }

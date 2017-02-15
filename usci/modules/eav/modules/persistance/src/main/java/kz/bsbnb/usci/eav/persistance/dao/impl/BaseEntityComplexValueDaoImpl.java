@@ -3,15 +3,18 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityComplexValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
+import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
@@ -40,6 +43,9 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
 
     @Autowired
     private IBaseEntityLoadDao baseEntityLoadDao;
+
+    @Autowired
+    private IRefRepository refRepository;
 
     @Override
     public long insert(IPersistable persistable) {
@@ -113,9 +119,17 @@ public class BaseEntityComplexValueDaoImpl extends JDBCSupport implements IBaseE
         IBaseEntity childBaseEntity;
 
         if (loadingReportDate == null) {
-            childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, reportDate);
+            if(metaType.isReference()) {
+                childBaseEntity = refRepository.get(new BaseEntity(entityValueId, ((MetaClass) metaType), reportDate, 0L));
+            } else {
+                childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, reportDate);
+            }
         } else {
-            childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, loadingReportDate);
+            if(metaType.isReference()) {
+                childBaseEntity = refRepository.get(new BaseEntity(entityValueId, ((MetaClass) metaType), loadingReportDate, 0L));
+            } else {
+                childBaseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, loadingReportDate);
+            }
         }
 
         boolean closed = ((BigDecimal) row.get(EAV_BE_COMPLEX_VALUES.IS_CLOSED.getName())).longValue() == 1;

@@ -6,7 +6,10 @@ import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
+import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaClass;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.*;
@@ -25,6 +28,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -52,6 +56,51 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Autowired
     private IEavOptimizerDao eavOptimizerDao;
+
+    private Map<String, Set<Class> > metaOptimizerMap;
+
+    @PostConstruct
+    public void fillMetaOptimizer() {
+        metaOptimizerMap = new HashMap<>();
+
+        for (MetaClass metaClass : metaClassRepository.getMetaClasses()) {
+            String metaName = metaClass.getClassName();
+            Set<Class> daoSet = new HashSet<>();
+            metaOptimizerMap.put(metaName, daoSet);
+            for (String attribute : metaClass.getAttributeNames()) {
+                IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
+                IMetaType metaType = metaAttribute.getMetaType();
+                if(metaType.isComplex()) {
+                    if(metaType.isSet())
+                        daoSet.add(BaseEntityComplexSetDaoImpl.class);
+                    else
+                        daoSet.add(BaseEntityComplexValueDaoImpl.class);
+                } else {
+                    if(metaType.isSet())
+                        daoSet.add(BaseEntitySimpleSetDaoImpl.class);
+                    else {
+                        switch (((IMetaValue) metaType).getTypeCode()) {
+                            case BOOLEAN:
+                                daoSet.add(BaseEntityBooleanValueDaoImpl.class);
+                                break;
+                            case DATE:
+                                daoSet.add(BaseEntityDateValueDaoImpl.class);
+                                break;
+                            case DOUBLE:
+                                daoSet.add(BaseEntityDoubleValueDaoImpl.class);
+                                break;
+                            case INTEGER:
+                                daoSet.add(BaseEntityIntegerValueDaoImpl.class);
+                                break;
+                            case STRING:
+                                daoSet.add(BaseEntityStringValueDaoImpl.class);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public long insert(IPersistable persistable) {
@@ -113,8 +162,13 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         for (Class<? extends IBaseValue> baseValueClass : baseValueCounts.keySet()) {
             //long baseValuesCount = baseValueCounts.get(baseValueClass);
             //if (baseValuesCount > 0) {
-                IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
-                        .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
+            Set<Class> optimizerClass = metaOptimizerMap.get(baseEntity.getMeta().getClassName());
+
+            IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
+                    .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
+
+            if(optimizerClass != null && !optimizerClass.contains(baseEntityValueDao.getClass()))
+                continue;
 
                 baseEntityValueDao.loadBaseValues(baseEntity, existingReportDate, savingReportDate);
             //}

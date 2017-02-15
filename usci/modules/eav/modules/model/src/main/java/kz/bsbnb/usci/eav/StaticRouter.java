@@ -395,6 +395,19 @@ public final class StaticRouter {
         }
     }
 
+    public static boolean syncOptimizationEnabled() {
+        switch (mode) {
+            case STEND:
+            case DEV:
+            case SOFT:
+                return false;
+            case PROD:
+                return false;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
     public static boolean rulesEnabled() {
         switch (mode) {
             case STEND:
