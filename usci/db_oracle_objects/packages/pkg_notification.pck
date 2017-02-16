@@ -192,11 +192,12 @@ end;
           into v_procedure_name
          from sys.v_$instance;
 
-         v_detail := chr(13) || 'details: ' || chr(13);
+         v_res_text := chr(13) || '<br/>';
+         v_detail := 'details: ' || chr(13) || '<br/>';
 
         for cr in ( select error_code, count(1) cnt, max(id) mid from eav_entity_statuses where error_code is not null and receipt_date > v_scan_time group by error_code)
         loop
-           select v_res_text || cr.error_code ||  ': ' || cr.cnt || ' times' || chr(13)
+           select v_res_text || cr.error_code ||  ': ' || cr.cnt || ' times' || chr(13) || '<br/>'
              into v_res_text
              from dual;
 
@@ -204,7 +205,7 @@ end;
              v_detail:= v_detail || cr.error_code || ': ';
 
           select v_detail || 'batch_id= ' || s.batch_id || ', file_name= ' || b.file_name || ', index=' || s.index_
-                          || ', description = ' || s.description || ',dev_description=' || s.dev_description || chr(13)
+                          || ', description = ' || s.description || ',dev_description=' || s.dev_description || chr(13) || '<br/>'
             into v_detail
             from eav_entity_statuses s,
                  eav_batches b
@@ -222,7 +223,7 @@ end;
       from (select (systimestamp - v_start_time)  diff
              from dual);
 
-        v_res_text := v_res_text || chr(13) || ' executed in ' || v_exec_time || ' ms';
+        v_res_text := v_res_text || chr(13) || '<br/>' || ' executed in ' || v_exec_time || ' ms';
         pkg_notification.send_dev_notification@messp(v_procedure_name, v_res_text);
 
     exception
