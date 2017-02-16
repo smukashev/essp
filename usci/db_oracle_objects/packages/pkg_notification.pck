@@ -12,6 +12,8 @@
 
   procedure approval_scanner;
 
+  procedure error_scanner;
+
 end pkg_notification;
 /
 
@@ -167,6 +169,65 @@ end;
 
             send_dev_notification('approval_scanner ' || v_org_name || ', дата=' || to_char(v_report_date,'dd.MM.yyyy'), 'Количество: ' || v_approved_cnt || '/' || v_total_cnt);
         end loop;
+    end;
+
+    /*
+     Requirement:
+     grant select on v_$instance to core
+    */
+    procedure error_scanner
+    is
+       v_scan_time date;
+       v_procedure_name varchar2(200);
+       v_start_time date;
+       v_res_text varchar2(4000);
+       v_detail varchar2(4000);
+       v_exec_time number;
+    begin
+        v_procedure_name:= 'error_scanner';
+        v_scan_time := sysdate - 1 / 24;
+        v_start_time := systimestamp;
+
+        select v_procedure_name || '@' ||instance_name
+          into v_procedure_name
+         from sys.v_$instance;
+
+         v_detail := chr(13) || 'details: ' || chr(13);
+
+        for cr in ( select error_code, count(1) cnt, max(id) mid from eav_entity_statuses where error_code is not null and receipt_date > v_scan_time group by error_code)
+        loop
+           select v_res_text || cr.error_code ||  ': ' || cr.cnt || ' times' || chr(13)
+             into v_res_text
+             from dual;
+
+
+             v_detail:= v_detail || cr.error_code || ': ';
+
+          select v_detail || 'batch_id= ' || s.batch_id || ', file_name= ' || b.file_name || ', index=' || s.index_
+                          || ', description = ' || s.description || ',dev_description=' || s.dev_description || chr(13)
+            into v_detail
+            from eav_entity_statuses s,
+                 eav_batches b
+            where s.id = cr.mid
+              and s.batch_id = b.id;
+        end loop;
+
+        v_res_text := v_res_text || v_detail;
+
+        select extract( day from diff )*24*60*60*1000 +
+           extract( hour from diff )*60*60*1000 +
+           extract( minute from diff )*60*1000 +
+           round(extract( second from diff )*1000) total_milliseconds
+           into v_exec_time
+      from (select (systimestamp - v_start_time)  diff
+             from dual);
+
+        v_res_text := v_res_text || chr(13) || ' executed in ' || v_exec_time || ' ms';
+        pkg_notification.send_dev_notification@messp(v_procedure_name, v_res_text);
+
+    exception
+    when others then
+        pkg_notification.send_dev_notification@messp(v_procedure_name || ' error ' || SQLERRM, '');
     end;
 
 end pkg_notification;
