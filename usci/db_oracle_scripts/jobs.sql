@@ -45,3 +45,20 @@ begin
                             enabled => true,
                             auto_drop => true);
 end;
+
+
+declare
+  v_job_action VARCHAR2(1000 CHAR);
+begin
+  v_job_action := 'BEGIN ' ||
+                  'PKG_NOTIFICATION.error_scanner; ' ||
+                  'END;';
+
+  dbms_scheduler.create_job(job_name  => 'ES_ERROR_SCANNER',
+                            job_type  => 'PLSQL_BLOCK',
+                            job_action => v_job_action,
+                            start_date => systimestamp,
+                            repeat_interval => 'freq=hourly',
+                            enabled => true,
+                            auto_drop => true);
+end;
