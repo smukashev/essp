@@ -4728,7 +4728,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        SELECT xmlagg(
                  xmlelement("item",
                    pkg_eav_xml_util.get_ref_portfolio_xml(pfmg.portfolio_id, p_report_date, 'portfolio'),
-                   nillable_xml('discounted_value', pfmg.discounted_value),
+                   (select nillable_xml('discounted_value', discounted_value) from portfolio_flow_msfo_old where id = pfmg.mid),
                    (select xmlelement("details",
                              xmlagg(
                                xmlelement("item",
@@ -4740,13 +4740,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                       from portfolio_flow_msfo_old pfmv
                      where pfmv.creditor_id = pfmg.creditor_id
                        and pfmv.rep_date = pfmg.rep_date
-                       and pfmv.portfolio_id = pfmg.portfolio_id
-                       and pfmv.discounted_value = pfmg.discounted_value)
+                       and pfmv.portfolio_id = pfmg.portfolio_id)
                  )
                )
 
         INTO v_xml
-        FROM (select pfm.creditor_id, pfm.portfolio_id, pfm.rep_date, pfm.discounted_value from portfolio_flow_msfo_old pfm group by pfm.creditor_id, pfm.portfolio_id, pfm.rep_date, pfm.discounted_value) pfmg
+        FROM (select pfm.creditor_id, pfm.portfolio_id, pfm.rep_date, max(id) mid from portfolio_flow_msfo_old pfm group by pfm.creditor_id, pfm.portfolio_id, pfm.rep_date) pfmg
        WHERE pfmg.creditor_id = p_creditor_id
          AND pfmg.rep_date = p_report_date;
 
