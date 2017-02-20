@@ -4677,7 +4677,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                                    xmlagg(
                                      xmlelement("item",
                                        pkg_eav_xml_util.get_ref_balance_account_xml(pfv.provision_account_id, p_report_date,  (select subject_type from ref.creditor where id = p_creditor_id), 'balance_account'),
-                                       nillable_xml('value', pfv.provision_value)
+                                       nillable_xml('value', ltrim(to_char(pfv.provision_value, c_number_format, c_nls_numeric_characters)))
                                      )
                                    )
                                  )
@@ -4728,12 +4728,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
        SELECT xmlagg(
                  xmlelement("item",
                    pkg_eav_xml_util.get_ref_portfolio_xml(pfmg.portfolio_id, p_report_date, 'portfolio'),
-                   (select nillable_xml('discounted_value', discounted_value) from portfolio_flow_msfo_old where id = pfmg.mid),
+                   (select nillable_xml('discounted_value', ltrim(to_char(discounted_value, c_number_format, c_nls_numeric_characters))) from portfolio_flow_msfo_old where id = pfmg.mid),
                    (select xmlelement("details",
                              xmlagg(
                                xmlelement("item",
                                  pkg_eav_xml_util.get_ref_balance_account_xml(pfmv.provision_account_id, p_report_date, (select subject_type from ref.creditor where id = p_creditor_id), 'balance_account'),
-                                 nillable_xml('value', pfmv.provision_value)
+                                 nillable_xml('value', ltrim(to_char(pfmv.provision_value, c_number_format, c_nls_numeric_characters)))
                                )
                              )
                            )
