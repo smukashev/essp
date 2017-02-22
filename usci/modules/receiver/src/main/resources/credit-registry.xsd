@@ -1585,7 +1585,7 @@ person-> names -> name-> firstname, person-> names -> name-> lastname, person-> 
 		</xsd:annotation>
 		<xsd:restriction base="xsd:decimal">
 			<xsd:totalDigits value="18"/>
-			<xsd:fractionDigits value="0"/>
+			<xsd:fractionDigits value="2"/>
 			<!-- Максимальная длина (без знака дробной части) -->
 			<!-- Длина дробной части -->
 		</xsd:restriction>
