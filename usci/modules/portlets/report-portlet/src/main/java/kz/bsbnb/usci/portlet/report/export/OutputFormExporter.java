@@ -9,6 +9,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.PropertyResourceBundle;
+import java.util.concurrent.Exchanger;
 import java.util.logging.Level;
 import jxl.CellView;
 import jxl.Workbook;
@@ -136,7 +137,8 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
                     if(exportFilePrefix.contains("CreditsList"))
                         exportFilePrefix = exportFilePrefix.replaceAll("Pledge","");
 
-                    String cleanFilename = String.format("%s%d-%d.xls", exportFilePrefix, startIdIndex, idIndex);
+                    int lastIdIndex = idIndex-1;
+                    String cleanFilename = String.format("%s%d-%d.xls", exportFilePrefix, startIdIndex, lastIdIndex);
                     FileDownloadComponent downloadComponent = new FileDownloadComponent(cleanFilename.replace(".xls", ".zip"), cleanFilename, xlsFile);
                     downloadComponent.setCaption(String.format(Localization.LOAD_RECORDS_FROM_TO.getValue(), startIdIndex, idIndex));
                     downloadComponent.setImmediate(true);
@@ -186,7 +188,13 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             }
             int columnNumber = columnIndex == 1 ? 1 : columnIndex - 1;
             if (rsmd.getColumnType(columnIndex) == Types.NUMERIC) {
-                double value = dataSource.getDouble(columnIndex);
+                double value=0;
+                try {
+                    value = dataSource.getDouble(columnIndex);
+                } catch (SQLException e) {
+                    logger.error("Error at columnIndex: "+columnIndex+" columnName: "+rsmd.getColumnName(columnIndex), e);
+                    throw e;
+                }
                 if (columnNumber == 1) {
                     value = idCounter;
                 }
@@ -194,7 +202,13 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             } else if (rsmd.getColumnType(columnIndex) == Types.TIMESTAMP && dataSource.getDate(columnIndex) != null) {
                 currentSheet.addCell(new jxl.write.DateTime(columnNumber, rowIndex, dataSource.getDate(columnIndex), dateFormat));
             } else {
-                Object value = dataSource.getObject(columnIndex);
+                Object value=null;
+                try {
+                    value = dataSource.getObject(columnIndex);
+                } catch(SQLException e) {
+                    logger.error("Error at columnIndex: "+columnIndex+" columnName: "+rsmd.getColumnName(columnIndex), e);
+                    throw e;
+                }
                 if (value == null) {
                     value = "";
                 }
