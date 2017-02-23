@@ -140,7 +140,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
                     int lastIdIndex = idIndex-1;
                     String cleanFilename = String.format("%s%d-%d.xls", exportFilePrefix, startIdIndex, lastIdIndex);
                     FileDownloadComponent downloadComponent = new FileDownloadComponent(cleanFilename.replace(".xls", ".zip"), cleanFilename, xlsFile);
-                    downloadComponent.setCaption(String.format(Localization.LOAD_RECORDS_FROM_TO.getValue(), startIdIndex, idIndex));
+                    downloadComponent.setCaption(String.format(Localization.LOAD_RECORDS_FROM_TO.getValue(), startIdIndex, lastIdIndex));
                     downloadComponent.setImmediate(true);
                     downloadComponent.zipFile();
                     addFileToLoad(downloadComponent.getLoadedFile());
