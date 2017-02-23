@@ -42,7 +42,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
     WritableCellFormat numberFormat = new WritableCellFormat(new NumberFormat("# ### ##0"));
     WritableCellFormat dateFormat = new WritableCellFormat(jxl.write.DateFormats.DEFAULT);
 
-    private int idIndex = 1;
+    private int idIndex = 0;
     private final Logger logger = Logger.getLogger(OutputFormExporter.class);
     private int firstOutputColumnIndex = 1;
     protected int rowIndex;
@@ -113,7 +113,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             dataSource = getTargetReportComponent().getResultSet(firstRecordNumber, lastRecordNumber);
             ReportApplication.logTime("After query");
             rsmd = dataSource.getMetaData();
-            int startIdIndex = idIndex;
+            int startIdIndex = idIndex+1;
             if(dataSource!=null) {
 
                 while (dataSource.next()) {
@@ -136,16 +136,14 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
                 if (recordCounter >= firstRecordNumber) {
                     if(exportFilePrefix.contains("CreditsList"))
                         exportFilePrefix = exportFilePrefix.replaceAll("Pledge","");
-
-                    int lastIdIndex = idIndex-1;
-                    String cleanFilename = String.format("%s%d-%d.xls", exportFilePrefix, startIdIndex, lastIdIndex);
+                    String cleanFilename = String.format("%s%d-%d.xls", exportFilePrefix, startIdIndex, idIndex);
                     FileDownloadComponent downloadComponent = new FileDownloadComponent(cleanFilename.replace(".xls", ".zip"), cleanFilename, xlsFile);
-                    downloadComponent.setCaption(String.format(Localization.LOAD_RECORDS_FROM_TO.getValue(), startIdIndex, lastIdIndex));
+                    downloadComponent.setCaption(String.format(Localization.LOAD_RECORDS_FROM_TO.getValue(), startIdIndex, idIndex));
                     downloadComponent.setImmediate(true);
                     downloadComponent.zipFile();
                     addFileToLoad(downloadComponent.getLoadedFile());
                     downloadComponents.add(downloadComponent);
-                    idIndex++;
+                    //idIndex++;
                 }
             } else {
                 showProgressLayout.addComponent(new com.vaadin.ui.Label(Localization.NO_RECORDS.getValue(), com.vaadin.ui.Label.CONTENT_XHTML));
