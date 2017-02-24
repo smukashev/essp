@@ -1542,9 +1542,10 @@ person-> names -> name-> firstname, person-> names -> name-> lastname, person-> 
 		<xsd:annotation>
 			<xsd:documentation>Тип "Наименование. Юридическое лицо"</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="st_string">
+		<xsd:restriction base="xsd:string">
 			<xsd:minLength value="1"/>
-			<xsd:maxLength value="200"/>
+			<xsd:maxLength value="250"/>
+			<xsd:pattern value="[\w\-\\ .,&apos;/№():_+|&quot;@#?!;*%\p{Pi}\p{Pf}&amp;$—–\[\]°]+"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="st_value">
@@ -1553,7 +1554,7 @@ person-> names -> name-> firstname, person-> names -> name-> lastname, person-> 
 		</xsd:annotation>
 		<xsd:restriction base="xsd:decimal">
 			<xsd:totalDigits value="18"/>
-			<xsd:fractionDigits value="0"/>
+			<xsd:fractionDigits value="2"/>
 			<!-- Максимальная длина (без знака дробной части) -->
 			<!-- Длина дробной части -->
 		</xsd:restriction>

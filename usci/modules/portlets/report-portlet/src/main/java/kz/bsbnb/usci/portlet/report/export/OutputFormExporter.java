@@ -9,6 +9,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.PropertyResourceBundle;
+import java.util.concurrent.Exchanger;
 import java.util.logging.Level;
 import jxl.CellView;
 import jxl.Workbook;
@@ -41,7 +42,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
     WritableCellFormat numberFormat = new WritableCellFormat(new NumberFormat("# ### ##0"));
     WritableCellFormat dateFormat = new WritableCellFormat(jxl.write.DateFormats.DEFAULT);
 
-    private int idIndex = 1;
+    private int idIndex = 0;
     private final Logger logger = Logger.getLogger(OutputFormExporter.class);
     private int firstOutputColumnIndex = 1;
     protected int rowIndex;
@@ -112,7 +113,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             dataSource = getTargetReportComponent().getResultSet(firstRecordNumber, lastRecordNumber);
             ReportApplication.logTime("After query");
             rsmd = dataSource.getMetaData();
-            int startIdIndex = idIndex;
+            int startIdIndex = idIndex+1;
             if(dataSource!=null) {
 
                 while (dataSource.next()) {
@@ -135,7 +136,6 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
                 if (recordCounter >= firstRecordNumber) {
                     if(exportFilePrefix.contains("CreditsList"))
                         exportFilePrefix = exportFilePrefix.replaceAll("Pledge","");
-
                     String cleanFilename = String.format("%s%d-%d.xls", exportFilePrefix, startIdIndex, idIndex);
                     FileDownloadComponent downloadComponent = new FileDownloadComponent(cleanFilename.replace(".xls", ".zip"), cleanFilename, xlsFile);
                     downloadComponent.setCaption(String.format(Localization.LOAD_RECORDS_FROM_TO.getValue(), startIdIndex, idIndex));
@@ -143,7 +143,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
                     downloadComponent.zipFile();
                     addFileToLoad(downloadComponent.getLoadedFile());
                     downloadComponents.add(downloadComponent);
-                    idIndex++;
+                    //idIndex++;
                 }
             } else {
                 showProgressLayout.addComponent(new com.vaadin.ui.Label(Localization.NO_RECORDS.getValue(), com.vaadin.ui.Label.CONTENT_XHTML));
@@ -186,7 +186,13 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             }
             int columnNumber = columnIndex == 1 ? 1 : columnIndex - 1;
             if (rsmd.getColumnType(columnIndex) == Types.NUMERIC) {
-                double value = dataSource.getDouble(columnIndex);
+                double value=0;
+                try {
+                    value = dataSource.getDouble(columnIndex);
+                } catch (SQLException e) {
+                    logger.error("Error at columnIndex: "+columnIndex+" columnName: "+rsmd.getColumnName(columnIndex), e);
+                    throw e;
+                }
                 if (columnNumber == 1) {
                     value = idCounter;
                 }
@@ -194,7 +200,13 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
             } else if (rsmd.getColumnType(columnIndex) == Types.TIMESTAMP && dataSource.getDate(columnIndex) != null) {
                 currentSheet.addCell(new jxl.write.DateTime(columnNumber, rowIndex, dataSource.getDate(columnIndex), dateFormat));
             } else {
-                Object value = dataSource.getObject(columnIndex);
+                Object value=null;
+                try {
+                    value = dataSource.getObject(columnIndex);
+                } catch(SQLException e) {
+                    logger.error("Error at columnIndex: "+columnIndex+" columnName: "+rsmd.getColumnName(columnIndex), e);
+                    throw e;
+                }
                 if (value == null) {
                     value = "";
                 }
