@@ -3327,8 +3327,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                  )
                -- DISCOUNTED_VALUE
                WHEN dr.type_id = c_drt_discounted_value THEN
-                 get_ref_balance_account_xml(dr.account_id, p_report_date),
                  xmlelement("discounted_value",
+                   get_ref_balance_account_xml(dr.account_id, p_report_date),
                    nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
                  )
                -- LIMIT
