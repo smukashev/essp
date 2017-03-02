@@ -2613,7 +2613,7 @@ public class CLI {
                     try {
                         try {
                             if (conn == null || conn.isClosed())
-                                conn = connectToDB("jdbc:oracle:thin:@10.8.1.200:1521:ESSP", "CORE", "core");
+                                conn = connectToDB("jdbc:oracle:thin:@" +StaticRouter.getDBCoreIP()+ ":1521:ESSP", "CORE", "core");
                         } catch (Exception e) {
                             System.out.println("Can't connect to DB: " + e.getMessage());
                             return;

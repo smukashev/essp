@@ -106,7 +106,7 @@ public final class StaticRouter {
 
     private final static int stendThreadLimit = 20;
     private final static int devThreadLimit = 20;
-    private final static int softThreadLimit = 100;
+    private final static int softThreadLimit = 130;
     private final static int prodThreadLimit = 100;
 
     private final static String[] GODModes = new String[]{"XML_DATA_BY_CID", "XML_PORTFOLIO_DATA_BY_CID", "GGGGODGGG", "XML_DIFF_BY_CID"};
