@@ -427,6 +427,9 @@ public class ZipFilesMonitor {
         if (StaticRouter.isInMode(filename))
             return false;
 
+        if(!StaticRouter.isSignatureEnabled())
+            return false;
+
         String digitalSignArguments = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,
         DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
 
