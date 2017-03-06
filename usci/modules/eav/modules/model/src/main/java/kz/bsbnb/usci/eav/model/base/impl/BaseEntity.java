@@ -423,6 +423,9 @@ public class BaseEntity extends BaseContainer implements IBaseEntity {
 
         BaseEntity that = (BaseEntity) baseEntity;
 
+        if (this.getBaseEntityReportDate().getCreditorId() != that.getBaseEntityReportDate().getCreditorId())
+            return false;
+
         if (!this.getMeta().equals(that.getMeta()))
             return false;
 
