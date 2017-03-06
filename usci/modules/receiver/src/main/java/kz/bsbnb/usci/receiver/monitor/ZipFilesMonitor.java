@@ -388,7 +388,7 @@ public class ZipFilesMonitor {
         }
 
 
-        if (!haveError && !isNB && !StaticRouter.isInMode(filename) && !checkAndFillEavReport(cId, batchInfo, batchId) && StaticRouter.isSignatureEnabled())
+        if (!haveError && !isNB && !StaticRouter.isInMode(filename) && StaticRouter.isSignatureEnabled() && !checkAndFillEavReport(cId, batchInfo, batchId))
             haveError = true;
 
         batch.setCreditorId(isNB ? 0 : cId);
