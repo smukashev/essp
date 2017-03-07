@@ -12,7 +12,7 @@ public final class StaticRouter {
     }
 
     /* Set up before compiling */
-    private static final MODE mode = MODE.SOFT;
+    private static final MODE mode = MODE.PROD;
 
     /* Application Server IP */
     private final static String stendAsIP = "10.10.32.28";
@@ -434,6 +434,21 @@ public final class StaticRouter {
                 throw new IllegalStateException(Errors.compose(Errors.E284));
         }
     }
+
+    public static boolean isSignatureEnabled() {
+        switch (mode) {
+            case STEND:
+            case DEV:
+                return false;
+            case SOFT:
+                return true;
+            case PROD:
+                return false;
+            default:
+                throw new IllegalStateException(Errors.compose(Errors.E284));
+        }
+    }
+
 
     public static boolean isGODMode(String filename) {
         for (String tmpStr : GODModes) {
