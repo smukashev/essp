@@ -28,6 +28,17 @@ create sequence seq_lx_e103_worker_id
   increment by 1
   cache 20
 
+create table lx_e103_log(
+   id number(14) primary key,
+   message varchar2(512))
+
+create sequence seq_e103_log_id
+  minvalue 1
+  maxvalue 9999999999999999
+  start with 1
+  increment by 1
+  cache 20
+
 
  */
 
