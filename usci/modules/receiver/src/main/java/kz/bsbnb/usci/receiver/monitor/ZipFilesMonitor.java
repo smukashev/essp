@@ -68,7 +68,7 @@ public class ZipFilesMonitor {
     SenderThread sender;
 
     public static final int ZIP_BUFFER_SIZE = 1024;
-    public static final int MAX_SYNC_QUEUE_SIZE = 8192;
+    public static final int MAX_SYNC_QUEUE_SIZE = 2048;
 
     private static final String DIGITAL_SIGNING_SETTINGS = "DIGITAL_SIGNING_SETTINGS";
     private static final String DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE = "DIGITAL_SIGNING_ORGANIZATIONS_IDS";
@@ -388,7 +388,7 @@ public class ZipFilesMonitor {
         }
 
 
-        if (!haveError && !isNB && !StaticRouter.isInMode(filename) && !checkAndFillEavReport(cId, batchInfo, batchId))
+        if (!haveError && !isNB && !StaticRouter.isInMode(filename) && StaticRouter.isSignatureEnabled() && !checkAndFillEavReport(cId, batchInfo, batchId))
             haveError = true;
 
         batch.setCreditorId(isNB ? 0 : cId);
@@ -425,6 +425,9 @@ public class ZipFilesMonitor {
 
     boolean waitForSignature(String filename, Batch batch, BatchInfo batchInfo) {
         if (StaticRouter.isInMode(filename))
+            return false;
+
+        if(!StaticRouter.isSignatureEnabled())
             return false;
 
         String digitalSignArguments = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,

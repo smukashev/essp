@@ -1286,7 +1286,7 @@ public class CLI {
                     PreparedStatement preparedStatement;
                     PreparedStatement preparedStatementDone;
                     try {
-                        preparedStatement = conn.prepareStatement("SELECT conn, login, pass, dir, rep_date from r_import where sent=0 order by rowid asc");
+                        preparedStatement = conn.prepareStatement("SELECT conn, login, pass, dir, rep_date from r_import where sent=0 order by to_date(rep_date, 'dd.mm.yyyy') asc");
                         preparedStatementDone = conn.prepareStatement("UPDATE r_import ri \n" +
                                 "   SET ri.sent = ? \n" +
                                 " WHERE ri.rep_date = ?");
@@ -2613,7 +2613,7 @@ public class CLI {
                     try {
                         try {
                             if (conn == null || conn.isClosed())
-                                conn = connectToDB("jdbc:oracle:thin:@10.8.1.200:1521:ESSP", "CORE", "core");
+                                conn = connectToDB("jdbc:oracle:thin:@" +StaticRouter.getDBCoreIP()+ ":1521:ESSP", "CORE", "core");
                         } catch (Exception e) {
                             System.out.println("Can't connect to DB: " + e.getMessage());
                             return;

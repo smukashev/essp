@@ -3306,6 +3306,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                -- INTEREST_WRITE_OFF
                WHEN dr.type_id = c_drt_interest_write_off THEN
                  xmlelement("write_off",
+                   get_ref_balance_account_xml(dr.account_id, p_report_date),
                    nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters))),
                    nillable_xml('value_currency', ltrim(to_char(dr.value_currency, c_number_format, c_nls_numeric_characters))),
                    nillable_xml('date', to_char(dr.write_off_date, 'dd.MM.yyyy'))
@@ -3327,6 +3328,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_EAV_XML_UTIL IS
                -- DISCOUNTED_VALUE
                WHEN dr.type_id = c_drt_discounted_value THEN
                  xmlelement("discounted_value",
+                   get_ref_balance_account_xml(dr.account_id, p_report_date),
                    nillable_xml('value', ltrim(to_char(dr.value, c_number_format, c_nls_numeric_characters)))
                  )
                -- LIMIT

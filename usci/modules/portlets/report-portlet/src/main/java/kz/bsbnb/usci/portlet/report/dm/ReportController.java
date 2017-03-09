@@ -87,6 +87,8 @@ public class ReportController {
                 catch (SQLException e){
                     logger.warn("REPORT_INPUT_PARAMETER: ", e);
                     throw e;
+                } finally {
+                    stmt2.close();
                 }
                 String query3 = "select ep.* from report_export_type rep, export_type ep    where rep.export_type_id=ep.id and rep.report_id="+rs.getLong("ID");
                 try
@@ -109,6 +111,8 @@ public class ReportController {
                 catch(SQLException e)
                 {
                     logger.error(e.getMessage(),e);
+                } finally {
+                    stmt3.close();
                 }
 
                 reports.add(rep);
@@ -163,7 +167,8 @@ public class ReportController {
     }
 
     public void insertOrUpdateReportLoad(ReportLoad reportLoad) {
-        EntityManager em = getEntityManager();
+
+        EntityManager em= getEntityManager();
         EntityTransaction transaction = null;
         try {
             transaction = em.getTransaction();
