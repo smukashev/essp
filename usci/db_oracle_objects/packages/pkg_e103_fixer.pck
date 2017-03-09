@@ -2,6 +2,7 @@
 create table lx_e103_fixer(
   id number (14) primary key,
   cv_id number (14) not null,
+  entity_id number (14) not null,
   attribute_id number (14) not null,
   creditor_id number (14) not null,
   report_date date)
@@ -49,13 +50,20 @@ create or replace package PKG_E103_FIX is
   procedure run_as_job;
   procedure run_interval (p_start_index number,
                           p_end_index   number);
+  procedure write_log(p_message in varchar2);
 
 end PKG_E103_FIX;
 /
 
 
-
 create or replace PACKAGE BODY PKG_E103_FIX IS
+
+  procedure write_log(p_message in varchar2) is
+  begin
+    insert into lx_e103_log
+            values (seq_e103_log_id.nextval, p_message);
+  end;
+
   procedure run_as_job is
   begin
     delete from lx_e103_worker;
@@ -114,7 +122,7 @@ create or replace PACKAGE BODY PKG_E103_FIX IS
         insert into lx_e103_worker(id, start_id, end_id,status, start_date)
               values (seq_lx_e103_worker_id.nextval, v_start_Id, v_end_id, 'RUNNING', systimestamp);
 
-        dbms_scheduler.create_job( job_name => 'ES_JOB_E103_' || v_start_id || '_' || v_end_id,
+        dbms_scheduler.create_job( job_name => 'ES_JOB_E103_' || v_end_id,
                               job_type => 'PLSQL_BLOCK',
                               job_action => 'BEGIN
                                               PKG_E103_FIX.run_interval(p_start_index => '|| v_start_Id ||', p_end_index => '|| v_end_id || ');
@@ -128,13 +136,18 @@ create or replace PACKAGE BODY PKG_E103_FIX IS
       end if;
 
     end loop;
+
+    exception
+      when others then
+        write_log(p_message => SQLERRM);
+
   end;
 
   procedure run_interval( p_start_index number,
                           p_end_index number) is
   begin
-    insert into lx_e103_fixer (id, cv_id, attribute_id, creditor_id, report_date)
-      select seq_lxe103_fixer_id.nextval id, t.id as cv_id, t.attribute_id, t.creditor_id, t.report_date
+    insert into lx_e103_fixer (id, cv_id, entity_id, attribute_id, creditor_id, report_date)
+      select seq_lxe103_fixer_id.nextval id, t.id as cv_id, t.entity_value_id entity_Id, t.attribute_id, t.creditor_id, t.report_date
         from eav_be_complex_values t
        where not exists (select 1 from eav_be_entity_report_dates where entity_id = t.entity_value_id)
          and t.id >= p_start_index
