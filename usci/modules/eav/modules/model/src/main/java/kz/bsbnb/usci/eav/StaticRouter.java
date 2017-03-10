@@ -12,7 +12,7 @@ public final class StaticRouter {
     }
 
     /* Set up before compiling */
-    private static final MODE mode = MODE.PROD;
+    private static final MODE mode = MODE.SOFT;
 
     /* Application Server IP */
     private final static String stendAsIP = "10.10.32.28";
