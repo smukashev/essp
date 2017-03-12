@@ -38,6 +38,12 @@ public class DataUtils {
         }
     }
 
+    public static void takeMonth(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+            cal.add(Calendar.MONTH, -1);
+            date.setTime(cal.getTime().getTime());
+    }
     public static void toBeginningOfTheDay(final Date date) {
         final long oldTime = date.getTime();
         final long timeZoneOffset = TimeZone.getDefault().getOffset(oldTime);
