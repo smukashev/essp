@@ -274,6 +274,7 @@ public class CortegeDaoImpl extends CommonDao {
 
             if (!showCase.isFinal()) {
                 Date maxOpenDate;
+                // gets max open date from actual
                 try {
                     sql = "SELECT MAX(open_date) AS open_date FROM %s WHERE " + historyKeyElement.queryKeys;
                     sql = String.format(sql, getActualTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName().toUpperCase());
@@ -311,10 +312,10 @@ public class CortegeDaoImpl extends CommonDao {
                     }
                 } else if (entity.getReportDate().compareTo(maxOpenDate) < 0) { // backward
                     /* Closest upper date */
-                    sql = "SELECT MIN(open_date) as open_date FROM %s WHERE " + historyKeyElement.queryKeys + " AND open_date > ? ";
+                    sql = "SELECT MIN(open_date) as open_date FROM %s WHERE " + historyKeyElement.queryKeys + " AND open_date >= ? ";
                     sql = String.format(sql, getHistoryTableName(showCase), COLUMN_PREFIX, showCase.getRootClassName());
 
-                    Date historyMin = (Date) jdbcTemplateSC.queryForMap("SELECT MIN(open_date) as open_date FROM %s WHERE + historyKeyElement.queryKeys + AND open_date > ?",
+                    Date historyMin = (Date) jdbcTemplateSC.queryForMap("SELECT MIN(open_date) as open_date FROM %s WHERE + historyKeyElement.queryKeys + AND open_date >= ?",
                             sql, getObjectArray(false, historyKeyElement.values, entity.getReportDate())).get("OPEN_DATE");
 
                     /* Closest lower date */

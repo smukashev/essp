@@ -21,6 +21,7 @@ public enum DataTypes {
     private static final DateFormat dateFormatSlash = new SimpleDateFormat(DATE_FORMAT_SLASH);
     private static final DateFormat dateFormatDot = new SimpleDateFormat(DATE_FORMAT_DOT);
 
+    // todo: new instance of date format
     public synchronized static Date parseDate(String s) throws ParseException {
         try {
             return dateFormatDot.parse(s);
