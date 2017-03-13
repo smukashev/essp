@@ -100,8 +100,10 @@ public class ShowcaseMessageConsumer implements MessageListener {
                     if (entityFound)
                         Thread.sleep(50);
 
-                    if (entityFound && failCounter++ >= 1000)
-                        throw new IllegalStateException(Errors.compose(Errors.E288));
+                    if (entityFound && (failCounter %  1000) == 0) {
+                        //throw new IllegalStateException(Errors.compose(Errors.E288));
+                        System.out.println("failCounter = " + failCounter);
+                    }
                 } while(entityFound);
 
                 boolean found = false;
