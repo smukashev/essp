@@ -1551,7 +1551,7 @@ public class CLI {
                             System.out.println("Error can't mark sent file: " + id);
                         }
 
-                        Thread.sleep(30000);
+                        Thread.sleep(240000);
                     } else {
                         System.out.println("Nothing to do.");
                         Thread.sleep(10000);
