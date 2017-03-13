@@ -185,6 +185,9 @@ public final class DataJob extends AbstractDataJob {
                 if (!found)
                     throw new IllegalStateException(Errors.compose(Errors.E280));
 
+                if(processJob.getClearJobsIndex() < clearJobsIndex)
+                    clearJobsIndex = 0;
+
                 processJobIterator.remove();
             }
         }
@@ -229,6 +232,7 @@ public final class DataJob extends AbstractDataJob {
     private boolean processNewEntities() {
         final BaseEntity entity = getClearEntity();
         final ProcessJob processJob = new ProcessJob(entityService, entity);
+        processJob.setClearJobsIndex(clearJobsIndex);
 
         if (entity != null) {
             logger.debug("Starting job");
