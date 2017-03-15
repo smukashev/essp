@@ -10,6 +10,7 @@ public class ProcessJob extends Thread {
     private final BaseEntity baseEntity;
     private final IEntityService entityService;
     public boolean statusCode;
+    private int clearJobsIndex;
 
     private long timeSpent = 0;
 
@@ -31,5 +32,13 @@ public class ProcessJob extends Thread {
 
     long getTimeSpent() {
         return timeSpent;
+    }
+
+    public int getClearJobsIndex() {
+        return clearJobsIndex;
+    }
+
+    public void setClearJobsIndex(int cleanJobsIndex) {
+        this.clearJobsIndex = cleanJobsIndex;
     }
 }
