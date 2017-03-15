@@ -333,10 +333,10 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
           insert into lx_pledge_keys_worker(id, start_id, end_id,status, start_date)
           values (seq_lx_pledge_keys_worker_id.nextval, v_start_Id, v_end_id, 'RUNNING', systimestamp);
 
-          dbms_scheduler.create_job( job_name => 'ES_PL_SH_' || v_end_id,
+          dbms_scheduler.create_job( job_name => 'ES_PL_KEYS_' || v_end_id,
                                      job_type => 'PLSQL_BLOCK',
                                      job_action => 'BEGIN
-                                              PKG_PLEDGE_BUILDER.build_pledge_keys(p_start_index => '|| v_start_Id ||', p_end_index => '|| v_end_id || ');
+                                              PKG_PLEDGE_BUILDER.build_pledge_keys(p_start_id => '|| v_start_Id ||', p_end_id => '|| v_end_id || ');
                                             END;',
                                      start_date => systimestamp,
                                      repeat_interval => null,
@@ -372,7 +372,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
               and cv.id < p_end_id;
 
       update lx_pledge_keys_worker
-      set status = 'COMPLETED'
+      set status = 'COMPLETED', end_date = systimestamp
       where start_id = p_start_id
             and end_id = p_end_id;
     end;
@@ -419,7 +419,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
           dbms_scheduler.create_job( job_name => 'ES_PL_SETV_' || v_end_id,
                                      job_type => 'PLSQL_BLOCK',
                                      job_action => 'BEGIN
-                                              PKG_PLEDGE_BUILDER.build_pledge_setv(p_start_index => '|| v_start_Id ||', p_end_index => '|| v_end_id || ');
+                                              PKG_PLEDGE_BUILDER.build_pledge_setv(p_start_id => '|| v_start_Id ||', p_end_id => '|| v_end_id || ');
                                             END;',
                                      start_date => systimestamp,
                                      repeat_interval => null,
@@ -452,7 +452,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
               and is_closed = 0;
 
       update lx_pledge_setv_worker
-      set status = 'COMPLETED'
+      set status = 'COMPLETED', end_date = systimestamp
       where start_id = p_start_id
             and end_id = p_end_id;
     end;
@@ -500,7 +500,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
           dbms_scheduler.create_job( job_name => 'ES_PL_SH_' || v_end_id,
                                      job_type => 'PLSQL_BLOCK',
                                      job_action => 'BEGIN
-                                              PKG_PLEDGE_BUILDER.build_pledge_credit(p_start_index => '|| v_start_Id ||', p_end_index => '|| v_end_id || ');
+                                              PKG_PLEDGE_BUILDER.build_pledge_credit(p_start_id => '|| v_start_Id ||', p_end_id => '|| v_end_id || ');
                                             END;',
                                      start_date => systimestamp,
                                      repeat_interval => null,
@@ -534,7 +534,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
               and s.id < p_end_id;
 
       update lx_pledge_credit_worker
-      set status = 'COMPLETED'
+      set status = 'COMPLETED', end_date = systimestamp
       where start_id = p_start_id
             and end_id = p_end_id;
     end;
