@@ -149,7 +149,7 @@ create sequence seq_pledge_builder_log_id
  */
 
 create or replace package PKG_PLEDGE_BUILDER is
-  c_default_job_max_count constant number := 20;
+  c_default_job_max_count constant number := 5;
   c_default_job_size constant number := 1000000;
   --procedure run;
   procedure run_as_job;
@@ -157,6 +157,9 @@ create or replace package PKG_PLEDGE_BUILDER is
                           p_end_index   number);*/
   procedure write_log(p_message in varchar2);
 
+  procedure RUN_HISTORY_VALUE;
+
+  procedure build_pledge_value(p_start_id number, p_end_id number);
   procedure build_pledge_keys(p_start_id number, p_end_id number);
   procedure build_pledge_setv(p_start_id number, p_end_id number);
   procedure build_pledge_credit(p_start_id number, p_end_id number);
@@ -169,19 +172,22 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
 
   procedure write_log(p_message in varchar2) is
     begin
-      insert into lx_pledge_build_log
-      values (seq_pledge_build_log_id.nextval, p_message);
+      insert into lx_pledge_builder_log
+      values (seq_pledge_builder_log_id.nextval, p_message);
     end;
 
   procedure run_as_job is
     begin
       --delete from lx_pledge_his_worker;
       --delete from lx_pbuild_fixer;
+      truncate table lx_history_value_worker;
+      truncate table lx_pledge_his;
+      truncate table lx_pledge_builder_log;
 
       dbms_scheduler.create_job(job_name => 'ES_pbuild_job_runner',
                                 job_type => 'PLSQL_BLOCK',
                                 job_action => 'BEGIN
-                                              PKG_pbuild_FIX.RUN;
+                                              PKG_PLEDGE_BUILDER.RUN_HISTORY_VALUE;
                                             END;',
                                 start_date => systimestamp,
                                 repeat_interval => null,
@@ -212,12 +218,13 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
             v_start_id := 1;
           end;
 
-          select max(entity_id)
-            into v_end_id
-            from (select entity_id
-                from eav_be_double_values
+          select max(id)
+          into v_end_id
+          from (select id
+                from eav_be_entities
                 where id >= v_start_Id
-                order by entity_id)
+                  and class_id = 56
+                order by id)
           where rownum <= c_default_job_size;
 
           if(v_start_id = v_end_id) then
@@ -230,7 +237,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
           dbms_scheduler.create_job( job_name => 'ES_HV_' || v_end_id,
                                      job_type => 'PLSQL_BLOCK',
                                      job_action => 'BEGIN
-                                              PKG_PLEDGE_BUILDER.build_history_value(p_start_index => '|| v_start_Id ||', p_end_index => '|| v_end_id || ');
+                                              PKG_PLEDGE_BUILDER.build_pledge_value(p_start_id => '|| v_start_Id ||', p_end_id => '|| v_end_id || ');
                                             END;',
                                      start_date => systimestamp,
                                      repeat_interval => null,
@@ -246,7 +253,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
       write_log(p_message => SQLERRM);
     end;
 
-  procedure build_history_value(p_start_id number,
+  procedure build_pledge_value(p_start_id number,
                                 p_end_id number) is
     begin
 
@@ -268,7 +275,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
         select t1.id, t1.pledge_id, /*t1.contract_no, t1.type_id,*/ t1.value, t1.open_date,
           case
           when t2.open_date is null and t1.open_date < setv.report_date then setv.report_date
-          else null
+          else t2.open_date
           end close_date,
           t1.h_id
         from lx_pledge_his# t1
@@ -276,9 +283,14 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
           left outer join eav_be_complex_set_values setv on (entity_value_id = t1.pledge_id and is_closed = 1);
 
       update lx_history_value_worker
-      set status = 'COMPLETED'
+      set status = 'COMPLETED', end_date = systimestamp
       where start_id = p_start_id
             and end_id = p_end_id;
+
+      exception
+      when others then
+            write_log(p_message => SQLERRM);
+
     end;
 
 
@@ -393,6 +405,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
           from (select id
                 from eav_be_complex_set_values
                 where id >= v_start_Id
+                      and is_closed = 0
                 order by id)
           where rownum <= c_default_job_size;
 
@@ -435,7 +448,8 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
         from eav_be_complex_set_values setv
           join lx_pledge_keys his on (setv.entity_value_id = his.pledge_id)
         where setv.id >= p_start_id
-              and setv.id < p_end_id;
+              and setv.id < p_end_id
+              and is_closed = 0;
 
       update lx_pledge_setv_worker
       set status = 'COMPLETED'
