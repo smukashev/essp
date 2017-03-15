@@ -1263,6 +1263,26 @@ Ext.onReady(function() {
                 value: (givenEntityId == "null" ? "" : givenEntityId)
             },
             {
+                fieldLabel: 'Поиск элементов справочника:',
+                id: 'findCodName',
+                name: 'findCodName',
+                xtype: 'textfield',
+                listeners: {
+                    'change': function() {
+                            var val = this.getRawValue();
+                            refStore.clearFilter();
+                            refStore.filter(function (me) {
+                                val = val.toLowerCase();
+                                return (me.data.name    == null ? "" : me.data.name.toLowerCase().indexOf(val) > -1)
+                                    || (me.data.name_ru == null ? "" : me.data.name_ru.toLowerCase().indexOf(val) > -1)
+                                    || (me.data.name_kz == null ? "" : me.data.name_kz.toLowerCase().indexOf(val) > -1)
+                                    || (me.data.code    == null ? "" : me.data.code.indexOf(val) > -1)
+                                    || (me.data.no_     == null ? "" : me.data.no_.indexOf(val) > -1);
+                            });
+                    }
+                }
+            },
+            {
                 xtype: 'container',
                 layout: 'hbox',
                 items: [
