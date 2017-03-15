@@ -113,6 +113,22 @@ create sequence seq_lx_pledge_showcase_id
   increment by 1
   cache 20
 
+create table lx_pledge_credit_worker (
+    id number(14) primary key,
+    start_id number(14) not null,
+    end_id number(14) not null,
+    status varchar(35),
+    start_date date,
+    end_date date
+)
+
+create sequence seq_lx_pledge_credit_worker_id
+  minvalue 1
+  maxvalue 9999999999999999
+  start with 1
+  increment by 1
+  cache 20
+
 create table lx_pledge_builder_log (
    id number(14) primary key,
    message varchar2(512))
@@ -401,6 +417,65 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
           join lx_pledge_keys his on (setv.entity_value_id = his.pledge_id)
         where setv.id >= p_start_id
               and setv.id < p_end_id;
+    end;
+
+
+  procedure run_pledge_credit is
+    v_job_count   number;
+    v_start_id    number;
+    v_end_id     number;
+    begin
+      while(true)
+      loop
+        select count(*)
+        into v_job_count
+        from lx_pledge_credit_worker
+        where status = 'RUNNING';
+
+        if(v_job_count < c_default_job_max_count) then
+          begin
+            select nvl(max(end_id), 1)
+            into v_start_id
+            from lx_pledge_credit_worker;
+
+            exception
+            when no_data_found then
+            v_start_id := 1;
+          end;
+
+          select max(id)
+          into v_end_id
+          from (select id
+                from eav_be_entity_complex_sets
+                where id >= v_start_Id
+                      and attribute_id = 14
+                order by id)
+          where rownum <= c_default_job_size;
+
+          if(v_start_id = v_end_id) then
+            exit;
+          end if;
+
+          insert into lx_pledge_credit_worker(id, start_id, end_id,status, start_date)
+          values (seq_lx_pledge_credit_worker_id.nextval, v_start_Id, v_end_id, 'RUNNING', systimestamp);
+
+          dbms_scheduler.create_job( job_name => 'ES_PL_SH_' || v_end_id,
+                                     job_type => 'PLSQL_BLOCK',
+                                     job_action => 'BEGIN
+                                              PKG_PLEDGE_BUILDER.build_pledge_credit(p_start_index => '|| v_start_Id ||', p_end_index => '|| v_end_id || ');
+                                            END;',
+                                     start_date => systimestamp,
+                                     repeat_interval => null,
+                                     enabled =>true,
+                                     auto_drop => true);
+        else
+          dbms_lock.sleep(3);
+        end if;
+      end loop;
+
+      exception
+      when others then
+      write_log(p_message => SQLERRM);
     end;
 
   procedure build_pledge_credit(p_start_id number,
