@@ -9,6 +9,7 @@ public class EntityStatus extends Persistable {
     private long batchId;
     private long entityId;
     private long statusId;
+    private String operation;
     private String description;
     private String errorCode;
     private String devDescription;
@@ -51,6 +52,14 @@ public class EntityStatus extends Persistable {
     public EntityStatus setStatusId(long statusId) {
         this.statusId = statusId;
         return this;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 
     public String getDescription() {
