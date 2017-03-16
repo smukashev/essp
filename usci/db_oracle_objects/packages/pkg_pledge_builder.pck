@@ -15,6 +15,7 @@ create table lx_pledge_his (
     close_date date,
     h_id number(14))
 
+create index ind_lx_pledge_his on lx_pledge_his (pledge_id)
 
 create table lx_history_value_worker (
     id number(14) primary key,
@@ -41,6 +42,8 @@ create table lx_pledge_keys (
     value number(17,3),
     open_date date,
     close_date date)
+
+create index ind_lx_pledge_keys on lx_pledge_keys (pledge_id)
 
 create sequence seq_lx_pledge_keys_id
   minvalue 1
@@ -76,6 +79,8 @@ create table lx_pledge_setv (
     value number(17,3),
     open_date date,
     close_date date)
+
+create index ind_lx_pledge_setv on lx_pledge_setv (set_id)
 
 create sequence seq_lx_pledge_setv_id
   minvalue 1
@@ -151,13 +156,17 @@ create sequence seq_pledge_builder_log_id
 create or replace package PKG_PLEDGE_BUILDER is
   c_default_job_max_count constant number := 5;
   c_default_job_size constant number := 1000000;
-  --procedure run;
+  procedure run;
   procedure run_as_job;
+  procedure clear_all;
   /*procedure run_interval (p_start_index number,
                           p_end_index   number);*/
   procedure write_log(p_message in varchar2);
 
   procedure RUN_HISTORY_VALUE;
+  procedure run_pledge_keys;
+  procedure run_pledge_setv;
+  procedure run_pledge_credit;
 
   procedure build_pledge_value(p_start_id number, p_end_id number);
   procedure build_pledge_keys(p_start_id number, p_end_id number);
@@ -180,20 +189,50 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
     begin
       --delete from lx_pledge_his_worker;
       --delete from lx_pbuild_fixer;
-      truncate table lx_history_value_worker;
-      truncate table lx_pledge_his;
-      truncate table lx_pledge_builder_log;
+      --truncate table lx_history_value_worker;
+      --truncate table lx_pledge_his;
+      --truncate table lx_pledge_builder_log;
 
       dbms_scheduler.create_job(job_name => 'ES_pbuild_job_runner',
                                 job_type => 'PLSQL_BLOCK',
                                 job_action => 'BEGIN
-                                              PKG_PLEDGE_BUILDER.RUN_HISTORY_VALUE;
+                                              PKG_PLEDGE_BUILDER.RUN;
                                             END;',
                                 start_date => systimestamp,
                                 repeat_interval => null,
                                 enabled => true,
                                 auto_drop => true);
     end;
+
+
+  procedure run is
+    begin
+      run_history_value;
+      execute immediate 'alter index ind_lx_pledge_his rebuild compute statistics';
+
+      run_pledge_keys;
+      execute immediate 'alter index ind_lx_pledge_keys rebuild compute statistics';
+
+
+      run_pledge_setv;
+      execute immediate 'alter index ind_lx_pledge_setv rebuild compute statistics';
+
+      run_pledge_credit;
+    END;
+
+  procedure clear_all is
+    begin
+      execute immediate 'truncate table lx_pledge_his';
+      execute immediate 'truncate table lx_history_value_worker';
+      execute immediate 'truncate table lx_pledge_keys';
+      execute immediate 'truncate table lx_pledge_keys_worker';
+      execute immediate 'truncate table lx_pledge_setv';
+      execute immediate 'truncate table lx_pledge_setv_worker';
+      execute immediate 'truncate table lx_pledge_showcase';
+      execute immediate 'truncate table lx_pledge_credit_worker';
+      execute immediate 'truncate table lx_pledge_builder_log';
+    END;
+
 
   procedure run_history_value is
     v_job_count   number;
@@ -319,7 +358,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
 
           select max(id)
           into v_end_id
-          from (select id
+          from (select /*+ PARALLEL(15) */ id
                 from eav_be_complex_values
                 where id >= v_start_Id
                       and attribute_id = 53
@@ -393,7 +432,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
           begin
             select nvl(max(end_id), 1)
             into v_start_id
-            from lx_pledge_keys_worker;
+            from lx_pledge_setv_worker;
 
             exception
             when no_data_found then
@@ -402,7 +441,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
 
           select max(id)
           into v_end_id
-          from (select id
+          from (select /*+ PARALLEL(15) */ id
                 from eav_be_complex_set_values
                 where id >= v_start_Id
                       and is_closed = 0
@@ -483,7 +522,7 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
 
           select max(id)
           into v_end_id
-          from (select id
+          from (select /*+ PARALLEL(15) */ id
                 from eav_be_entity_complex_sets
                 where id >= v_start_Id
                       and attribute_id = 14
