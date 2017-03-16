@@ -208,15 +208,8 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
   procedure run is
     begin
       run_history_value;
-      execute immediate 'alter index ind_lx_pledge_his rebuild compute statistics';
-
       run_pledge_keys;
-      execute immediate 'alter index ind_lx_pledge_keys rebuild compute statistics';
-
-
       run_pledge_setv;
-      execute immediate 'alter index ind_lx_pledge_setv rebuild compute statistics';
-
       run_pledge_credit;
     END;
 
@@ -266,8 +259,12 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
                 order by id)
           where rownum <= c_default_job_size;
 
-          if(v_start_id = v_end_id) then
+          if(v_end_id is null) then
             exit;
+          end if;
+
+          if(v_start_id = v_end_id) then
+            v_end_id := v_end_id + 1;
           end if;
 
           insert into lx_history_value_worker(id, start_id, end_id,status, start_date)
@@ -284,6 +281,22 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
                                      auto_drop => true);
         else
           dbms_lock.sleep(3);
+        end if;
+      end loop;
+
+
+      --wait jobs to finish
+      while(true)
+      loop
+        select count(*)
+        into v_job_count
+        from lx_history_value_worker
+        where status = 'RUNNING';
+
+        if(v_job_count > 0) then
+          dbms_lock.sleep(3);
+        else
+          exit;
         end if;
       end loop;
 
@@ -365,8 +378,12 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
                 order by id)
           where rownum <= c_default_job_size;
 
-          if(v_start_id = v_end_id) then
+          if(v_end_id is null) then
             exit;
+          end if;
+
+          if(v_start_id = v_end_id) then
+            v_end_id := v_end_id + 1;
           end if;
 
           insert into lx_pledge_keys_worker(id, start_id, end_id,status, start_date)
@@ -385,6 +402,22 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
           dbms_lock.sleep(3);
         end if;
       end loop;
+
+      --wait jobs to finish
+      while(true)
+      loop
+        select count(*)
+        into v_job_count
+        from lx_pledge_keys_worker
+        where status = 'RUNNING';
+
+        if(v_job_count > 0) then
+          dbms_lock.sleep(3);
+        else
+          exit;
+        end if;
+      end loop;
+
 
       exception
       when others then
@@ -448,8 +481,12 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
                 order by id)
           where rownum <= c_default_job_size;
 
-          if(v_start_id = v_end_id) then
+          if(v_end_id is null) then
             exit;
+          end if;
+
+          if(v_start_id = v_end_id) then
+            v_end_id := v_end_id + 1;
           end if;
 
           insert into lx_pledge_setv_worker(id, start_id, end_id,status, start_date)
@@ -468,6 +505,23 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
           dbms_lock.sleep(3);
         end if;
       end loop;
+
+
+      --wait jobs to finish
+      while(true)
+      loop
+        select count(*)
+        into v_job_count
+        from lx_pledge_setv_worker
+        where status = 'RUNNING';
+
+        if(v_job_count > 0) then
+          dbms_lock.sleep(3);
+        else
+          exit;
+        end if;
+      end loop;
+
 
       exception
       when others then
@@ -529,8 +583,12 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
                 order by id)
           where rownum <= c_default_job_size;
 
-          if(v_start_id = v_end_id) then
+          if(v_end_id is null) then
             exit;
+          end if;
+
+          if(v_start_id = v_end_id) then
+            v_end_id := v_end_id + 1;
           end if;
 
           insert into lx_pledge_credit_worker(id, start_id, end_id,status, start_date)
@@ -549,6 +607,23 @@ create or replace PACKAGE BODY PKG_PLEDGE_BUILDER IS
           dbms_lock.sleep(3);
         end if;
       end loop;
+
+
+      --wait jobs to finish
+      while(true)
+      loop
+        select count(*)
+        into v_job_count
+        from lx_pledge_credit_worker
+        where status = 'RUNNING';
+
+        if(v_job_count > 0) then
+          dbms_lock.sleep(3);
+        else
+          exit;
+        end if;
+      end loop;
+
 
       exception
       when others then
