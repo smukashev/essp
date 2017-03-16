@@ -3,6 +3,7 @@ package kz.bsbnb.usci.core.service.impl;
 import kz.bsbnb.usci.core.service.IBatchService;
 import kz.bsbnb.usci.core.service.IEntityService;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.repository.impl.RefRepositoryImpl;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.EntityStatus;
@@ -76,6 +77,10 @@ public class EntityServiceImpl extends UnicastRemoteObject implements IEntitySer
             entityStatus.setDescription(StatusProperties.getSpecificParams(baseEntity));
             entityStatus.setIndex(baseEntity.getBatchIndex());
             entityStatus.setReceiptDate(new Date());
+
+            if (baseEntity.getOperation() == OperationType.INSERT || baseEntity.getOperation() == OperationType.UPDATE) {
+                entityStatus.setOperation(baseEntity.getOperation().name());
+            }
 
             batchService.addEntityStatus(entityStatus);
             return true;

@@ -8,6 +8,7 @@ import kz.bsbnb.usci.cr.model.Protocol;
 import kz.bsbnb.usci.cr.model.Shared;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.EntityStatus;
+import kz.bsbnb.usci.eav.model.base.impl.OperationType;
 import kz.bsbnb.usci.eav.util.EntityStatuses;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.mvel2.ast.Proto;
@@ -118,8 +119,18 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
             protocol.setNote("" + batch.getActualCount());
         } else {
             if (COMPLETED == entityStatus.getStatus()) {
-                message.setNameRu("Идентификатор сущности:");
-                message.setNameKz("Идентификатор сущности:");
+
+                if (entityStatus.getOperation() != null && entityStatus.getOperation().equals(OperationType.INSERT.name())) {
+                    message.setNameRu("Информация по займу успешно загружена");
+                    message.setNameKz("Информация по займу успешно загружена");
+                } else if (entityStatus.getOperation() != null && entityStatus.getOperation().equals(OperationType.UPDATE.name())) {
+                    message.setNameRu("Информация по займу успешно обновлена");
+                    message.setNameKz("Информация по займу успешно обновлена");
+                }else{
+                    message.setNameRu("Без операций");
+                    message.setNameKz("Без операций:");
+                }
+
                 protocol.setNote(entityStatus.getEntityId() + "");
             }
 
