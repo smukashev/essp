@@ -894,6 +894,7 @@
 		<column name="receipt_date" primaryKey="false" required="true" type="TIMESTAMP" autoIncrement="false"/>
 		<column name="index_" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
 		<column name="status_id" primaryKey="false" required="false" type="NUMERIC" size="14,0" autoIncrement="false"/>
+		<column name="operation" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<column name="description" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<column name="error_code" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>
 		<column name="dev_description" primaryKey="false" required="false" type="VARCHAR" size="512" autoIncrement="false"/>

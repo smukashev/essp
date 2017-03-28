@@ -406,6 +406,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         processLogicControl(baseEntityApplied);
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
+                    baseEntityApplied.setOperation(OperationType.INSERT);
                     break;
                 case UPDATE:
                     if (baseEntityPostPrepared.getId() <= 0)
@@ -420,6 +421,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     }
 
                     baseEntityApplyDao.applyToDb(baseEntityManager);
+                    baseEntityApplied.setOperation(OperationType.UPDATE);
                     break;
                 default:
                     throw new UnsupportedOperationException(Errors.compose(Errors.E118, baseEntityPostPrepared.getOperation()));

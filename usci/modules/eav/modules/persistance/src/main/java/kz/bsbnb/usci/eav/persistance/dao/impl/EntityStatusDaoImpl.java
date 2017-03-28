@@ -32,6 +32,7 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
                         EAV_ENTITY_STATUSES.BATCH_ID,
                         EAV_ENTITY_STATUSES.ENTITY_ID,
                         EAV_ENTITY_STATUSES.STATUS_ID,
+                        EAV_ENTITY_STATUSES.OPERATION,
                         EAV_ENTITY_STATUSES.DESCRIPTION,
                         EAV_ENTITY_STATUSES.ERROR_CODE,
                         EAV_ENTITY_STATUSES.DEV_DESCRIPTION,
@@ -40,6 +41,7 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
                 .values(entityStatus.getBatchId(),
                         entityStatus.getEntityId(),
                         entityStatus.getStatusId(),
+                        entityStatus.getOperation(),
                         entityStatus.getDescription(),
                         entityStatus.getErrorCode(),
                         entityStatus.getDevDescription(),
@@ -52,7 +54,7 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
     @Override
     public List<EntityStatus> getList(long batchId) {
         Select select = context
-                .select(EAV_ENTITY_STATUSES.ID, EAV_ENTITY_STATUSES.BATCH_ID, EAV_ENTITY_STATUSES.ENTITY_ID, EAV_ENTITY_STATUSES.STATUS_ID, EAV_ENTITY_STATUSES.DESCRIPTION, EAV_ENTITY_STATUSES.ERROR_CODE, EAV_ENTITY_STATUSES.DEV_DESCRIPTION, EAV_ENTITY_STATUSES.RECEIPT_DATE, EAV_ENTITY_STATUSES.INDEX_, EAV_GLOBAL.CODE, EAV_BE_STRING_VALUES.VALUE)
+                .select(EAV_ENTITY_STATUSES.ID, EAV_ENTITY_STATUSES.BATCH_ID, EAV_ENTITY_STATUSES.ENTITY_ID, EAV_ENTITY_STATUSES.STATUS_ID,EAV_ENTITY_STATUSES.OPERATION, EAV_ENTITY_STATUSES.DESCRIPTION, EAV_ENTITY_STATUSES.ERROR_CODE, EAV_ENTITY_STATUSES.DEV_DESCRIPTION, EAV_ENTITY_STATUSES.RECEIPT_DATE, EAV_ENTITY_STATUSES.INDEX_, EAV_GLOBAL.CODE, EAV_BE_STRING_VALUES.VALUE)
                 .from(EAV_ENTITY_STATUSES
                                 .join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID))
                                 .leftOuterJoin(EAV_BE_STRING_VALUES)
@@ -148,6 +150,7 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
         entityStatus.setBatchId(((BigDecimal) row.get(EAV_ENTITY_STATUSES.BATCH_ID.getName())).longValue());
         entityStatus.setEntityId(((BigDecimal) row.get(EAV_ENTITY_STATUSES.ENTITY_ID.getName())).longValue());
         entityStatus.setStatusId(((BigDecimal) row.get(EAV_ENTITY_STATUSES.STATUS_ID.getName())).longValue());
+        entityStatus.setOperation((String) row.get(EAV_ENTITY_STATUSES.OPERATION.getName()));
         entityStatus.setDescription((String) row.get(EAV_ENTITY_STATUSES.DESCRIPTION.getName()));
         entityStatus.setErrorCode((String) row.get(EAV_ENTITY_STATUSES.ERROR_CODE.getName()));
         entityStatus.setDevDescription((String) row.get(EAV_ENTITY_STATUSES.DEV_DESCRIPTION.getName()));
