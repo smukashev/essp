@@ -157,18 +157,6 @@ $$$
 
 rule save
 
-rule read $$$
-title: Вид экономической деятельности
-rule "econ_trade"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit" 
-            && getEls("{setString(17,18)}credit_type.code") == 0
-            && getEls("{count}subject[is_organization=true]organization_info[country.code_numeric=398][econ_trade.code=null]") > 0)
-then
-  $entity.addValidationError("Не заполнен вид экономической деятельности");
-end
-$$$
-
 rule save
 
 rule read $$$
