@@ -1,0 +1,1 @@
+E83: BaseIntegerValue (6 times = strange)
