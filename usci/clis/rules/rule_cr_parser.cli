@@ -491,10 +491,10 @@ rule read $$$
 title: проверка документов руководителя
 rule "проверка документов руководителя"
 when:
-$entity: BaseEntity( getMeta().getClassName == "credit"
-      && (getEls("{setString(07,10,15,16,18)}subject[is_organization=true][organization_info.is_se=false].organization_info.head.docs.doc_type.code") > 0 ))
+    $entity: BaseEntity(getMeta().getClassName == "credit"
+      && (getEls("{setString(07,10,15,16,18)}subject[is_organization=true][organization_info.is_se=false]organization_info.head.docs.doc_type.code") > 0 ))
 then
-$entity.addValidationError("Вид документа не соответствует руководителю юридического лица");
+    $entity.addValidationError("Вид документа не соответствует руководителю юридического лица");
 end
 $$$
 
