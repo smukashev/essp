@@ -89,6 +89,22 @@ IS
           dbms_lock.sleep(5);
         END IF;
       END LOOP;
+
+      --wait jobs to finish
+      while(true)
+      loop
+        select count(*)
+        into v_job_count
+        from lx_e92_worker
+        where status = 'RUNNING';
+
+        if(v_job_count > 0) then
+          dbms_lock.sleep(3);
+        else
+          exit;
+        end if;
+      end loop;
+
       EXCEPTION
       WHEN OTHERS THEN
       write_log(p_message => SQLERRM);
