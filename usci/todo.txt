@@ -1,1 +1,2 @@
 E83: BaseIntegerValue (6 times = strange)
+  Example(prod): select  *from eav_be_string_values where entity_id = 91470149 and attribute_id = 33 order by report_date desc
