@@ -1077,7 +1077,7 @@
 	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
 	  <column name="mail_message_id" required="true" type="NUMERIC" size="14,0" />
 	  <column name="mail_template_parameter_id" required="true" type="NUMERIC" size="14,0" />
-	  <column name="value"  type="VARCHAR" size="1000" />
+	  <column name="value"  type="VARCHAR" size="2048" />
 	</table>
 	<table name="mail_user_mail_template">
 	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
