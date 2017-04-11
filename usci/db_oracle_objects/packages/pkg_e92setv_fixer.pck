@@ -123,13 +123,17 @@ IS
         set_id,
         creditor_id,
         report_date,
-        entity_value_id
+        entity_value_id,
+        is_closed,
+        is_last
       )
         SELECT seq_lxE92_fixer_id.nextval id,
                t.id AS set_id,
           t.creditor_id,
           t.report_date,
-          t.entity_value_id
+          t.entity_value_id,
+          t.is_closed,
+          t.is_last
         FROM eav_be_complex_set_values t
         WHERE NOT EXISTS
         (SELECT 1 FROM eav_be_entities WHERE id = t.entity_value_id
@@ -142,5 +146,9 @@ IS
       WHERE start_id = p_start_index
             AND end_id     = p_end_index;
       COMMIT;
+
+      EXCEPTION
+        WHEN OTHERS THEN
+            write_log(p_message => SQLERRM);
     END;
 END PKG_E92SETV_FIX;
