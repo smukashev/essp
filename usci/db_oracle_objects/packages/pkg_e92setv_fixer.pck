@@ -127,7 +127,7 @@ IS
         is_closed,
         is_last
       )
-        SELECT seq_lxE92_fixer_id.nextval id,
+        SELECT t.id,
                t.set_id,
           t.creditor_id,
           t.report_date,
