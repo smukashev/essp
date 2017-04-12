@@ -148,6 +148,24 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
         //если таковых нет, то пропускаем всех остальных
         if (priorityCreditorsFiles.isEmpty()) {
             priorityCreditorsFiles = new ArrayList<>(firstFilesByEachCreditor.values());
+
+            //если есть файлы для лотания
+            boolean hashPatch = false;
+
+            for (JobInfo priorityCreditorsFile : priorityCreditorsFiles) {
+                if (priorityCreditorsFile.getBatchInfo().getBatchName().contains("DIFF")) {
+                    hashPatch = true;
+                    break;
+                }
+            }
+
+            if(hashPatch) {
+                Iterator<JobInfo> iterator = priorityCreditorsFiles.iterator();
+                while(iterator.hasNext()) {
+                    if(!iterator.next().getBatchInfo().getBatchName().contains("DIFF"))
+                        iterator.remove();
+                }
+            }
         }
 
         return order.getNextFile(priorityCreditorsFiles);
