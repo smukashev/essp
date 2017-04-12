@@ -38,6 +38,7 @@ public class BatchInfo {
         setCreditorId(batch.getCreditorId());
         setContentSize(batch.getContent() == null ? 0 : batch.getContent().length);
         setReceiptDate(batch.getReceiptDate());
+        setBatchName(batch.getFileName());
     }
 
     public long getBatchId() {
