@@ -128,7 +128,7 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
                 firstFilesByEachCreditor.put(jobInfo.getBatchInfo().getCreditorId(), jobInfo);
             } else {
                 JobInfo o = firstFilesByEachCreditor.get(jobInfo.getBatchInfo().getCreditorId());
-                if(order.compare(jobInfo, o) < 0 || (!o.getBatchInfo().getBatchName().contains("DIFF") && jobInfo.getBatchInfo().getBatchName().contains("DIFF"))) {
+                if(order.compare(jobInfo, o) < 0) {
                     firstFilesByEachCreditor.put(jobInfo.getBatchInfo().getCreditorId(), jobInfo);
                 }
             }
