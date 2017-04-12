@@ -118,7 +118,11 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
         /*List<JobInfo> firstFilesByEachCreditor = new ArrayList<JobInfo>();
         Set<Long> creditorIds = new HashSet<>();*/
         Map<Long, JobInfo> firstFilesByEachCreditor = new HashMap<>();
+        boolean hasPatch = false;
+
         for (JobInfo jobInfo : queue) {
+            if(jobInfo.getBatchInfo().getBatchName().contains("DIFF"))
+                hasPatch = true;
 
             //Уникальность кредитора должна быть сохранена
             if(activeCreditors.contains(jobInfo.getBatchInfo().getCreditorId()))
@@ -150,16 +154,7 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
             priorityCreditorsFiles = new ArrayList<>(firstFilesByEachCreditor.values());
 
             //если есть файлы для лотания
-            boolean hashPatch = false;
-
-            for (JobInfo priorityCreditorsFile : priorityCreditorsFiles) {
-                if (priorityCreditorsFile.getBatchInfo().getBatchName().contains("DIFF")) {
-                    hashPatch = true;
-                    break;
-                }
-            }
-
-            if(hashPatch) {
+            if(hasPatch) {
                 Iterator<JobInfo> iterator = priorityCreditorsFiles.iterator();
                 while(iterator.hasNext()) {
                     if(!iterator.next().getBatchInfo().getBatchName().contains("DIFF"))
