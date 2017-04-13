@@ -122,6 +122,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 if (baseValue == null || baseValue.getValue() == null) {
                     if(metaAttribute.isNullableKey()) {
                         condition = DSL.notExists(DSL.selectFrom(simpleTable).where(simpleTable.field("ENTITY_ID").eq(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                .and(simpleTable.field("CREDITOR_ID").eq(creditorId))
                                 .and(simpleTable.field("ATTRIBUTE_ID").eq(metaAttribute.getId())));
                     }
                     continue;
