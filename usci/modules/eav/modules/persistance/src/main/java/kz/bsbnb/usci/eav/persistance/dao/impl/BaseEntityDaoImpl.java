@@ -126,7 +126,19 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
     @Override
     public void delete(IPersistable persistable) {
-        deleteRecursive(persistable.getId());
+        String tableAlias = "e";
+        Delete delete = context
+                .delete(EAV_BE_ENTITIES.as(tableAlias))
+                .where(EAV_BE_ENTITIES.as(tableAlias).ID.equal(persistable.getId()));
+
+        logger.debug(delete.toString());
+        int count = updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
+
+        if (count > 1)
+            throw new IllegalStateException(Errors.compose(Errors.E89, persistable.getId()));
+
+        if (count < 1)
+            throw new IllegalStateException(Errors.compose(Errors.E90, persistable.getId()));
     }
 
     public IBaseEntity loadMock(long id) {

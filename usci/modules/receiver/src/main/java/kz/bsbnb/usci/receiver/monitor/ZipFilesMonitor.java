@@ -778,8 +778,10 @@ public class ZipFilesMonitor {
         BatchInfo batchInfo = new BatchInfo();
         batchInfo.setBatchId(batch.getId());
 
+        ZipFile zipFile = null;
+
         try {
-            ZipFile zipFile = new ZipFile(filename);
+            zipFile = new ZipFile(filename);
             ZipEntry manifestEntry = zipFile.getEntry("manifest.xml");
 
             if (manifestEntry == null) { // credit-registry
@@ -856,7 +858,6 @@ public class ZipFilesMonitor {
                 }
 
 
-                zipFile.close();
                 saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
             } else { // usci
                 InputStream inManifest = zipFile.getInputStream(manifestEntry);
@@ -889,7 +890,6 @@ public class ZipFilesMonitor {
 
                 batchInfo.setAdditionalParams(manifestData.getAdditionalParams());
 
-                zipFile.close();
                 saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
             }
         } catch (Exception e) {
@@ -897,6 +897,12 @@ public class ZipFilesMonitor {
                 failFast(batch.getId(), "Ошибка I/O: " + e.getMessage() );
             } else {
                 failFast(batch.getId(), "Не корректный XML файл");
+            }
+        } finally {
+            try {
+                if (zipFile != null) zipFile.close();
+            } catch (IOException ex) {
+                logger.error(ex.getMessage());
             }
         }
     }

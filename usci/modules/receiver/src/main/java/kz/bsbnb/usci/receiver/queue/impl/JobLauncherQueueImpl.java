@@ -118,7 +118,11 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
         /*List<JobInfo> firstFilesByEachCreditor = new ArrayList<JobInfo>();
         Set<Long> creditorIds = new HashSet<>();*/
         Map<Long, JobInfo> firstFilesByEachCreditor = new HashMap<>();
+        boolean hasPatch = false;
+
         for (JobInfo jobInfo : queue) {
+            if(jobInfo.getBatchInfo().getBatchName().contains("DIFF"))
+                hasPatch = true;
 
             //Уникальность кредитора должна быть сохранена
             if(activeCreditors.contains(jobInfo.getBatchInfo().getCreditorId()))
@@ -128,7 +132,7 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
                 firstFilesByEachCreditor.put(jobInfo.getBatchInfo().getCreditorId(), jobInfo);
             } else {
                 JobInfo o = firstFilesByEachCreditor.get(jobInfo.getBatchInfo().getCreditorId());
-                if(order.compare(jobInfo, o) < 0) {
+                if(order.compare(jobInfo, o) < 0 || (!o.getBatchInfo().getBatchName().contains("DIFF") && jobInfo.getBatchInfo().getBatchName().contains("DIFF"))) {
                     firstFilesByEachCreditor.put(jobInfo.getBatchInfo().getCreditorId(), jobInfo);
                 }
             }
@@ -148,6 +152,15 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
         //если таковых нет, то пропускаем всех остальных
         if (priorityCreditorsFiles.isEmpty()) {
             priorityCreditorsFiles = new ArrayList<>(firstFilesByEachCreditor.values());
+
+            //если есть файлы для лотания
+            if(hasPatch) {
+                Iterator<JobInfo> iterator = priorityCreditorsFiles.iterator();
+                while(iterator.hasNext()) {
+                    if(!iterator.next().getBatchInfo().getBatchName().contains("DIFF"))
+                        iterator.remove();
+                }
+            }
         }
 
         return order.getNextFile(priorityCreditorsFiles);

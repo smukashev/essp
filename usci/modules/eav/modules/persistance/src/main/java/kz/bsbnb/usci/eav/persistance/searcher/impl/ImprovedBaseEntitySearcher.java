@@ -116,13 +116,20 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
             IBaseValue baseValue = entity.getBaseValue(name);
 
             if (metaAttribute.isOptionalKey() || metaAttribute.isNullableKey()) {
-                if (baseValue == null || baseValue.getValue() == null)
+                MetaValue metaValue = (MetaValue) memberType;
+                Table simpleTable = StructType.getSimpleTableName(metaValue.getTypeCode());
+
+                if (baseValue == null || baseValue.getValue() == null) {
+                    if(metaAttribute.isNullableKey()) {
+                        condition = DSL.notExists(DSL.selectFrom(simpleTable).where(simpleTable.field("ENTITY_ID").eq(EAV_BE_ENTITIES.as(entityAlias).ID))
+                                .and(simpleTable.field("CREDITOR_ID").eq(creditorId))
+                                .and(simpleTable.field("ATTRIBUTE_ID").eq(metaAttribute.getId())));
+                    }
                     continue;
+                }
 
                 generateJoins(joins, entityAlias, name, memberType, creditorId, metaAttribute);
 
-                MetaValue metaValue = (MetaValue) memberType;
-                Table simpleTable = StructType.getSimpleTableName(metaValue.getTypeCode());
                 Object simpleValue = StructType.getSimpleValue(metaValue.getTypeCode(), baseValue.getValue());
 
                 String valueAlias = "v_" + name;
