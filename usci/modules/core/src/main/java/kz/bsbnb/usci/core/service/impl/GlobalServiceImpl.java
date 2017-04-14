@@ -40,4 +40,9 @@ public class GlobalServiceImpl implements IGlobalService {
     public String getValue(String type, String code){
         return eavGlobalRepository.getValue(type, code);
     }
+
+    @Override
+    public String getValueFromDb(String queueSetting, String queueLoadEnabled) {
+        return "false";
+    }
 }

@@ -24,6 +24,7 @@ import java.util.*;
 @Scope(value = "singleton")
 public class JobLauncherQueueImpl implements JobLauncherQueue {
 
+    private static final String QUEUE_LOAD_ENABLED = "QUEUE_LOAD_ENABLED";
     Logger logger = LoggerFactory.getLogger(JobLauncherQueueImpl.class);
 
     @Autowired
@@ -117,6 +118,9 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
         //Сначала определяем первые файлы по каждому кредитору
         /*List<JobInfo> firstFilesByEachCreditor = new ArrayList<JobInfo>();
         Set<Long> creditorIds = new HashSet<>();*/
+
+        globalService.getValueFromDb(QUEUE_SETTING, QUEUE_LOAD_ENABLED);
+
         Map<Long, JobInfo> firstFilesByEachCreditor = new HashMap<>();
         boolean hasPatch = false;
 

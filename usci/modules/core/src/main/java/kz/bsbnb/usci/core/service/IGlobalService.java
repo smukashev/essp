@@ -17,4 +17,6 @@ public interface IGlobalService {
     void updateValue(EavGlobal global);
 
     String getValue(String type, String code);
+
+    String getValueFromDb(String queueSetting, String queueLoadEnabled);
 }
