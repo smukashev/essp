@@ -51,6 +51,7 @@ global add --type=QUEUE_ALGO_OPTION --code=MINIMUM_WEIGHT --value=MINIMUM_WEIGHT
 
 global add --type=QUEUE_SETTING --code=QUEUE_ALGO --value=CHRONOLOGICAL --desc=Алгоритм_очереди
 global add --type=QUEUE_SETTING --code=PRIORITY_CREDITOR_IDS --value=-1 --desc=Список_приоритетных_организаций
+global add --type=QUEUE_SETTING --code=QUEUE_LOAD_ENABLED --value=1 --desc=Загрузка_включена
 
 #
 # REF SETTINGS

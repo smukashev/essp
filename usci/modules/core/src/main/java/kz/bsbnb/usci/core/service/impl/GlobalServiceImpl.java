@@ -43,6 +43,6 @@ public class GlobalServiceImpl implements IGlobalService {
 
     @Override
     public String getValueFromDb(String queueSetting, String queueLoadEnabled) {
-        return "false";
+        return eavGlobalRepository.getValueFromDb(queueSetting, queueLoadEnabled);
     }
 }

@@ -13,4 +13,6 @@ public interface IEavGlobalRepository {
     void update(String type, String code, String value);
 
     String getValue(String type, String code);
+
+    String getValueFromDb(String queueSetting, String queueLoadEnabled);
 }
