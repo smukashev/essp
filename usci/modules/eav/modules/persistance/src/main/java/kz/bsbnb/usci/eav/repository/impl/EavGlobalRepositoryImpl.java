@@ -70,4 +70,9 @@ public class EavGlobalRepositoryImpl implements IEavGlobalRepository, Initializi
             return null;
         }
     }
+
+    @Override
+    public String getValueFromDb(String queueSetting, String queueLoadEnabled) {
+        return eavGlobalDao.getValue(queueSetting, queueLoadEnabled);
+    }
 }

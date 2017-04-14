@@ -119,7 +119,9 @@ public class JobLauncherQueueImpl implements JobLauncherQueue {
         /*List<JobInfo> firstFilesByEachCreditor = new ArrayList<JobInfo>();
         Set<Long> creditorIds = new HashSet<>();*/
 
-        globalService.getValueFromDb(QUEUE_SETTING, QUEUE_LOAD_ENABLED);
+        if(!globalService.getValueFromDb(QUEUE_SETTING, QUEUE_LOAD_ENABLED).equals("1")){
+            return null;
+        }
 
         Map<Long, JobInfo> firstFilesByEachCreditor = new HashMap<>();
         boolean hasPatch = false;
