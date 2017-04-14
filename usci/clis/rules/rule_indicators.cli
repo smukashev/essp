@@ -157,8 +157,6 @@ $$$
 
 rule save
 
-rule save
-
 rule read $$$
 title: Субъект кредитной истории
 rule "credit subject"
