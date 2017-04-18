@@ -119,11 +119,13 @@ IS
       (
         id,
         creditor_id,
+        meta_id,
         entity_id,
         key_string
       )
         SELECT t.id,
           t.creditor_id,
+          t.meta_id,
           t.entity_id,
           t.key_string
         FROM eav_optimizer t
