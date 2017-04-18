@@ -1,12 +1,10 @@
 /*
 CREATE TABLE LX_E92EO_FIXER (
   "ID" NUMBER(14,0) primary key,
-  "SET_ID" NUMBER(14,0),
   "CREDITOR_ID" NUMBER(14,0),
-  "REPORT_DATE" DATE NOT NULL,
-  "ENTITY_VALUE_ID" NUMBER(14,0),
-  "IS_CLOSED" NUMBER(1,0) NOT NULL,
-  "IS_LAST" NUMBER(1,0) NOT NULL)
+  "META_ID" NUMBER(14,0),
+  "ENTITY_ID" NUMBER(14,0),
+  "KEY_STRING" VARCHAR2(128) NOT NULL)
 */
 
 CREATE OR REPLACE PACKAGE PKG_E92EO_FIX
@@ -120,20 +118,14 @@ IS
       INTO lx_E92EO_fixer
       (
         id,
-        set_id,
         creditor_id,
-        report_date,
-        entity_value_id,
-        is_closed,
-        is_last
+        entity_id,
+        key_string
       )
         SELECT t.id,
-          t.set_id,
           t.creditor_id,
-          t.report_date,
-          t.entity_value_id,
-          t.is_closed,
-          t.is_last
+          t.entity_id,
+          t.key_string
         FROM eav_optimizer t
         WHERE NOT EXISTS
         (SELECT 1 FROM eav_be_entities WHERE id = t.entity_id
