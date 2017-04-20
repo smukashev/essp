@@ -82,24 +82,33 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         protocol.setId(1L);
         protocol.setPackNo(entityStatus.getIndex() != null ? entityStatus.getIndex() : -1l);
         protocol.setInputInfo(inputInfoId);
-        String err="";
 
-        if(entityStatus.getErrorCode()!=null) {
-            if(entityStatus.getDevDescription()!=null)
-                err = Errors.decompose(entityStatus.getErrorCode()+"|~~~|"+entityStatus.getDevDescription());
-            else
-                err = Errors.decompose(entityStatus.getErrorCode());
+        String errTitle = "";
+        String errDescription = "";
+
+        if (entityStatus.getErrorCode() != null) {
+            errTitle = Errors.getTitle(entityStatus.getErrorCode());
+
+            if (entityStatus.getDevDescription() != null) {
+                errDescription = Errors.decompose(entityStatus.getErrorCode() + "|~~~|" + entityStatus.getDevDescription());
+            } else {
+                errDescription = Errors.decompose(entityStatus.getErrorCode());
+            }
         }
+
         Message message = new Message();
         message.setCode("A");
 
-        if (err == null) {
+        if (errTitle == null) {
             message.setNameKz(entityStatus.getErrorCode());
             message.setNameRu(entityStatus.getErrorCode());
         } else {
-            message.setNameKz(err);
-            message.setNameRu(err);
+            message.setNameKz(errTitle);
+            message.setNameRu(errTitle);
         }
+
+        protocol.setMessage(message);
+        protocol.setNote(errDescription);
 
         Shared type = new Shared();
 
@@ -107,7 +116,6 @@ public class ProtocolBeanRemoteBusinessImpl implements ProtocolBeanRemoteBusines
         type.setNameRu(entityStatus.getStatusDescription());
         type.setNameKz(entityStatus.getStatusDescription());
 
-        protocol.setMessage(message);
         protocol.setProtocolType(type);
         protocol.setMessageType(type);
 
