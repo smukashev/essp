@@ -432,60 +432,6 @@ rule save
 
 
 
-rule read $$$
-title: actual_issue_date
-rule "actual_issue_date"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-            && getEls("{setString(12,15,25)}credit_type.code") == 0
-            && getEl("actual_issue_date") == null)
-then
-  $entity.addValidationError("Не заполнена фактическая дата выдачи");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: interest_rate_yearly
-rule "interest_rate_yearly"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-            && getEls("{setString(12,13,14,15,24,25)}credit_type.code") == 0
-            && getEl("interest_rate_yearly") == null)
-then
-  $entity.addValidationError("Не заполнена годовая ставка вознаграждения по договору");
-end
-$$$
-
-rule save
-
-
-rule read $$$
-title: region_of_organization
-rule "region_of_organization"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-            && getEls("{count}subject.organization_info[country.code_numeric=398]addresses[region.code=null]") > 0)
-then
-  $entity.addValidationError("Не заполнена область в адресе субъекта");
-end
-$$$
-
-rule save
-
-rule read $$$
-title: region_of_person
-rule "region_of_person"
-when
-  $entity: BaseEntity(getMeta().getClassName() == "credit"
-            && getEls("{count}subject.person_info[country.code_numeric=398]addresses[region.code=null]") > 0)
-then
-  $entity.addValidationError("Не заполнена область в адресе физического лица");
-end
-$$$
-
-rule save
 
 rule read $$$
 title: проверка документов руководителя
