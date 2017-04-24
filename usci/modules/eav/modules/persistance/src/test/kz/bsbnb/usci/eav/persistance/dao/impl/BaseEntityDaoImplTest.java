@@ -17,11 +17,11 @@ import java.util.Date;
 /**
  * Created by dtulendiyev on 3/28/16.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/applicationContextEAVPersistance.xml")
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration("/applicationContextEAVPersistance.xml")
 public class BaseEntityDaoImplTest {
 
-    @Autowired
+    /*@Autowired
     private IBaseEntityDao baseEntityDao;
 
     @Test
@@ -35,5 +35,5 @@ public class BaseEntityDaoImplTest {
             e.printStackTrace();
         }
 
-    }
+    }*/
 }
