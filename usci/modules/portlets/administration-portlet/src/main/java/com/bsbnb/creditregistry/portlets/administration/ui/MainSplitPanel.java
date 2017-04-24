@@ -43,7 +43,7 @@ public class MainSplitPanel extends HorizontalSplitPanel {
     private BeanItemContainer<User> usersContainer;
     private static final Logger logger = Logger.getLogger(MainSplitPanel.class);
 
-    public MainSplitPanel(ResourceBundle bundle, DataProvider provider) {
+    public MainSplitPanel(ResourceBundle bundle, DataProvider provider, final User user) {
         this.bundle = bundle;
         this.provider = provider;
         setHeight("428px");
@@ -135,14 +135,14 @@ public class MainSplitPanel extends HorizontalSplitPanel {
         addButton = new IconButton(bundle.getString("Add"), PortletIcon.DOWN_ICON, new ClickListener() {
 
             public void buttonClick(ClickEvent event) {
-                addSelectedCreditors();
+                addSelectedCreditors(user);
             }
         });
         addButton.setEnabled(false);
         removeButton = new IconButton(bundle.getString("Remove"), PortletIcon.UP_ICON, new ClickListener() {
 
             public void buttonClick(ClickEvent event) {
-                removeSelectedCreditors();
+                removeSelectedCreditors(user);
             }
         });
         removeButton.setEnabled(false);
@@ -188,7 +188,7 @@ public class MainSplitPanel extends HorizontalSplitPanel {
         return false;
     }
 
-    public void addSelectedCreditors() {
+    public void addSelectedCreditors(User user) {
         User selectedUser = (User) usersTable.getValue();
         if (selectedUser != null) {
             boolean isUserNBEmployee = isNationalBankEmployee(selectedUser);
@@ -198,6 +198,7 @@ public class MainSplitPanel extends HorizontalSplitPanel {
                 if ((isUserNBEmployee) || (!isUserNBEmployee && userCreditorsCount == 0)) {
                     logger.info("Adding creditor: " + creditorToAdd.getName());
                     provider.addUserCreditor(selectedUser, creditorToAdd);
+                    provider.addUserLogs("ADMINISTRATION",user.getFullName(),"ADD: "+selectedUser.getFullName()+" to "+creditorToAdd.getName());
                     userCreditorsCount++;
                 } else {
                     showUnexpectedError(bundle.getString("NAddCreditorCaption"), bundle.getString("NAddCreditorDescrNB"));
@@ -209,12 +210,13 @@ public class MainSplitPanel extends HorizontalSplitPanel {
         }
     }
 
-    public void removeSelectedCreditors() {
+    public void removeSelectedCreditors(User user) {
         Collection<Creditor> creditorsToRemove = (Collection<Creditor>) tableUserCreditors.getValue();
         User selectedUser = (User) usersTable.getValue();
         if (selectedUser != null && creditorsToRemove != null && !creditorsToRemove.isEmpty()) {
             for (Creditor creditorToRemove : creditorsToRemove) {
                 provider.removeUserCreditor(selectedUser, creditorToRemove);
+                provider.removeUserLogs("ADMINISTRATION",user.getFullName(),"REMOVE: "+selectedUser.getFullName()+" "+creditorToRemove.getName());
             }
             tableUserCreditors.setValue(null);
             updateTables();

@@ -1099,4 +1099,11 @@
 	  <column name="stacktrace" primaryKey="false" required="true" type="VARCHAR" size="4000" autoIncrement="false"/>
 	  <column name="RECEIPT_DATE" primaryKey="false" required="true" type="DATE" />
 	</table>
+	<table name="eav_logs">
+	  <column name="id" primaryKey="true" required="true" type="NUMERIC" size="14,0" autoIncrement="true" />
+	  <column name="portletname"  type="VARCHAR" size="4000" autoIncrement="false"/>
+	  <column name="portalusername"  type="VARCHAR" size="4000" autoIncrement="false"/>
+	  <column name="portletcomment"  type="VARCHAR" size="4000" autoIncrement="false"/>
+	  <column name="RECEIPT_DATE" primaryKey="false" required="true" type="DATE" />
+	</table>
 </database>

@@ -72,7 +72,7 @@ public class AdministrationApplication extends Application implements PortletReq
                 setTheme("custom");
                 Window mainWindow = new Window();
                 BeanDataProvider provider = new BeanDataProvider();
-                MainSplitPanel sp = new MainSplitPanel(bundle, provider);
+                MainSplitPanel sp = new MainSplitPanel(bundle, provider,user);
                 mainWindow.addComponent(sp);
                 setMainWindow(mainWindow);
             } catch (Exception e) {
