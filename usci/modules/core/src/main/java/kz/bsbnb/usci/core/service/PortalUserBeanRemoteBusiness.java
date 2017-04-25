@@ -21,4 +21,6 @@ public interface PortalUserBeanRemoteBusiness {
     PortalUser getUser(long userId);
 
     List<PortalUser> getPortalUsersHavingAccessToCreditor(Creditor creditor);
+
+    void insertLogs(String portletname,String username,String comment);
 }

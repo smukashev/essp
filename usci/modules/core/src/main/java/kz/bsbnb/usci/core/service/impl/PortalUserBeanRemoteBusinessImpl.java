@@ -5,6 +5,7 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.cr.model.PortalUser;
 import kz.bsbnb.usci.eav.persistance.dao.IMailDao;
 import kz.bsbnb.usci.eav.persistance.dao.IUserDao;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseLogsDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,9 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
 
     @Autowired
     IMailDao mailDao;
+
+    @Autowired
+    IBaseLogsDao logsDao;
 
     /**
      * Проверяет наличие связи между пользователем портала и БВУ/НО.
@@ -94,4 +98,10 @@ public class PortalUserBeanRemoteBusinessImpl implements PortalUserBeanRemoteBus
     public List<PortalUser> getPortalUsersHavingAccessToCreditor(Creditor creditor) {
         return userDao.getPortalUsersHavingAccessToCreditor(creditor);
     }
+
+    @Override
+    public void insertLogs(String portletname, String username, String comment) {
+        logsDao.insertLogs(portletname,username,comment);
+    }
+
 }

@@ -828,8 +828,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
 
-                            if (!baseEntityLoaded.getMeta().isSearchable())
-                                baseEntityManager.registerAsDeleted(baseEntityLoaded);
+                            //TODO: E92 refactor
+                            //if (!baseEntityLoaded.getMeta().isSearchable())
+                            //    baseEntityManager.registerAsDeleted(baseEntityLoaded);
                         }
 
                         // delete next closed value
@@ -893,8 +894,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
 
-                            if (!baseEntityLoaded.getMeta().isSearchable())
-                                baseEntityManager.registerAsDeleted(baseEntityLoaded);
+                            //TODO: E92 refactor
+                            //if (!baseEntityLoaded.getMeta().isSearchable())
+                            //    baseEntityManager.registerAsDeleted(baseEntityLoaded);
                         }
 
                         // delete next closed value
