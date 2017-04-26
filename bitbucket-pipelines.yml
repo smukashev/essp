@@ -1,4 +1,4 @@
-# This is a sample build configuration for Java – Maven.
+# This is a sample build configuration for Java ï¿½ Maven.
 # Check our guides at https://confluence.atlassian.com/x/zd-5Mw for more examples.
 # Only use spaces to indent your .yml configuration.
 # -----
@@ -10,4 +10,5 @@ pipelines:
     - step:
         script: # Modify the commands below to build your repository.
           - cd usci
+          - mvn install:install-file -Dfile=libs/ddlutils-1.1.jar -DgroupId=kz.bsbnb -DartifactId=ddlutils -Dversion=1.1 -Dpackaging=jar
           - mvn clean install
