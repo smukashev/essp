@@ -14,7 +14,7 @@ import java.util.*;
 
 public class BaseEntityManager implements IBaseEntityManager {
 
-    public final static List<Class<? extends IPersistable>> CLASS_PRIORITY = new ArrayList<>();
+    public static final List<Class<? extends IPersistable>> CLASS_PRIORITY = new ArrayList<>();
 
     static {
         CLASS_PRIORITY.add(BaseEntity.class);

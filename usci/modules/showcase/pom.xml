@@ -165,7 +165,7 @@
             </plugin>
             -->
             <!-- Uncomment this to recreate the database  -->
-            <!--<plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
@@ -196,7 +196,6 @@
                     </arguments>
                 </configuration>
             </plugin>
-            -->
         </plugins>
     </build>
 

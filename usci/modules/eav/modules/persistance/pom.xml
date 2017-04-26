@@ -194,7 +194,6 @@
                 </configuration>
             </plugin>
             <!-- Uncomment this to recreate the database  -->
-            <!--
                          <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
@@ -231,7 +230,6 @@
                             </systemProperties>
                         </configuration>
                     </plugin>
-            -->
         </plugins>
     </build>
 
