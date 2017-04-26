@@ -25,7 +25,7 @@ import java.util.HashMap;
 public class BaseCrawler {
     public static Document document;
     public static String fileName;
-    public static String prefix = "C:\\refs\\";
+    public static String prefix = "C:\\tmp\\usci\\usci\\refs\\";
     protected BaseRepository repositoryInstance;
 
     public static Document getDocument(){
