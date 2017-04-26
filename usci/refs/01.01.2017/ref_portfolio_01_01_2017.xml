@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<batch>
+  <entities>
+    <ref_portfolio>
+      <code>1107</code>
+      <name_kz>Кредитование сельхозтехники </name_kz>
+      <name_ru>Кредитование сельхозтехники </name_ru>
+      <creditor>
+        <name>АО "Аграрная Кредитная корпорация"</name>
+        <short_name>АО "Аграрная Кредитная корпорация"</short_name>
+        <code>999</code>
+        <docs>
+          <item>
+            <no>010340000953</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>620300017049</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Агр КредКорп:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+    <ref_portfolio>
+      <code>1106</code>
+      <name_kz>Агробизнес-2020</name_kz>
+      <name_ru>Агробизнес-2020</name_ru>
+      <creditor>
+        <name>АО "Аграрная Кредитная корпорация"</name>
+        <short_name>АО "Аграрная Кредитная корпорация"</short_name>
+        <code>999</code>
+        <docs>
+          <item>
+            <no>010340000953</no>
+            <doc_type>
+              <name_ru>Бизнес - идентификационный номер </name_ru>
+              <name_kz>Бизнес - идентификационный номер </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>0</is_person_doc>
+              <weight>10</weight>
+              <code>07</code>
+            </doc_type>
+          </item>
+          <item>
+            <no>620300017049</no>
+            <doc_type>
+              <name_ru>Регистрационный номер налогоплательщика </name_ru>
+              <name_kz>Регистрационный номер налогоплательщика </name_kz>
+              <is_identification>1</is_identification>
+              <is_organization_doc>1</is_organization_doc>
+              <is_person_doc>1</is_person_doc>
+              <weight>25</weight>
+              <code>11</code>
+            </doc_type>
+          </item>
+        </docs>
+        <subject_type>
+          <kind_id>31</kind_id>
+          <name_kz>Прочие организации, осуществляющие отдельные виды банковских операций</name_kz>
+          <name_ru>Прочие организации, осуществляющие отдельные виды банковских операций</name_ru>
+          <code>0003</code>
+          <report_period_duration_months>3</report_period_duration_months>
+        </subject_type>
+        <nokbdb_code>J:Агр КредКорп:</nokbdb_code>
+      </creditor>
+    </ref_portfolio>
+  </entities>
+</batch>
