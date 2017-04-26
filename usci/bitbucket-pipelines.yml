@@ -8,4 +8,6 @@ pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
+          - cd usci
+          - mvn install:install-file -Dfile=libs/ddlutils-1.1.jar -DgroupId=kz.bsbnb.ddutils -DartifactId=ddlutils -Dversion=1.1 -Dpackaging=jar
           - mvn clean install
