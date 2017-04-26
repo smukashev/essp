@@ -88,6 +88,17 @@ public class BeanDataProvider implements DataProvider {
         return creditors;
     }
 
+    @Override
+    public void addUserLogs(String portletname, String user, String comment) {
+        portalUserBusiness.insertLogs(portletname,user,comment);
+    }
+
+    @Override
+    public void removeUserLogs(String portletname, String user, String comment) {
+        portalUserBusiness.insertLogs(portletname,user,comment);
+    }
+
+
     private PortalUser convert(User liferayUser) throws IllegalArgumentException {
         if (liferayUser == null)
             throw new IllegalArgumentException(Errors.compose(Errors.E200));
@@ -119,4 +130,6 @@ public class BeanDataProvider implements DataProvider {
             logger.error("Failed to synchronize portal users with database", e);
         }
     }
+
+
 }

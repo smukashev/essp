@@ -18,4 +18,8 @@ public interface DataProvider {
     public void removeUserCreditor(User user, Creditor creditor);
 
     public List<Creditor> getUsersCreditors(User user);
+
+    public void addUserLogs(String portletname,String user,String comment);
+
+    public void removeUserLogs(String portletname,String user,String comment);
 }

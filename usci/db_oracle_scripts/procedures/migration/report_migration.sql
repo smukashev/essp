@@ -15,7 +15,7 @@ BEGIN
        r.username username,
        r.last_manual_edit_date last_manual_edit_date,
 
-       map.REF_CREDITOR_ID creditor_id,
+       map.id creditor_id,
        r.report_date report_date,
        gl.id status_id
 
