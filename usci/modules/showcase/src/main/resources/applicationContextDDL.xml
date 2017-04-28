@@ -19,7 +19,7 @@
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
         <property name="url" value="jdbc:oracle:thin:@10.8.1.206:1521:SHOWCASE"/>
-        <property name="username" value="c##showcase"/>
+        <property name="username" value="showcase"/>
         <property name="password" value="showcase"/>
         <property name="initialSize" value="4"/>
         <property name="minIdle" value="4"/>
