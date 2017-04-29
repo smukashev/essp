@@ -2,15 +2,6 @@
 <batch>
   <entities>
     <ref_doc_type>
-      <name_ru>Регистрационный номер налогоплательщика</name_ru>
-      <name_kz>Регистрационный номер налогоплательщика</name_kz>
-      <is_identification>1</is_identification>
-      <is_organization_doc>1</is_organization_doc>
-      <is_person_doc>1</is_person_doc>
-      <weight>25</weight>
-      <code>11</code>
-    </ref_doc_type>
-    <ref_doc_type>
       <name_ru>Банковский идентификационный код </name_ru>
       <name_kz>Банковский идентификационный код </name_kz>
       <is_identification>0</is_identification>
@@ -47,6 +38,15 @@
       <code>14</code>
     </ref_doc_type>
     <ref_doc_type>
+      <name_ru>Регистрационный номер налогоплательщика </name_ru>
+      <name_kz>Регистрационный номер налогоплательщика </name_kz>
+      <is_identification>1</is_identification>
+      <is_organization_doc>1</is_organization_doc>
+      <is_person_doc>1</is_person_doc>
+      <weight>25</weight>
+      <code>11</code>
+    </ref_doc_type>
+    <ref_doc_type>
       <name_ru>Паспорт гражданина иностранного государства</name_ru>
       <name_kz>Паспорт гражданина иностранного государства</name_kz>
       <is_identification>0</is_identification>
@@ -59,7 +59,7 @@
       <name_ru>Вид на жительство иностранца в Республике Казахстан</name_ru>
       <name_kz>Вид на жительство иностранца в Республике Казахстан</name_kz>
       <is_identification>0</is_identification>
-      <is_organization_doc>1</is_organization_doc>
+      <is_organization_doc>0</is_organization_doc>
       <is_person_doc>1</is_person_doc>
       <weight>60</weight>
       <code>03</code>
@@ -68,7 +68,7 @@
       <name_ru>Удостоверение личности</name_ru>
       <name_kz>Удостоверение личности</name_kz>
       <is_identification>0</is_identification>
-      <is_organization_doc>1</is_organization_doc>
+      <is_organization_doc>0</is_organization_doc>
       <is_person_doc>1</is_person_doc>
       <weight>35</weight>
       <code>02</code>
@@ -77,7 +77,7 @@
       <name_ru>Паспорт гражданина Республики Казахстан</name_ru>
       <name_kz>Паспорт гражданина Республики Казахстан</name_kz>
       <is_identification>0</is_identification>
-      <is_organization_doc>1</is_organization_doc>
+      <is_organization_doc>0</is_organization_doc>
       <is_person_doc>1</is_person_doc>
       <weight>40</weight>
       <code>01</code>
@@ -104,7 +104,7 @@
       <name_ru>Индивидуальный идентификационный номер </name_ru>
       <name_kz>Индивидуальный идентификационный номер </name_kz>
       <is_identification>1</is_identification>
-      <is_organization_doc>1</is_organization_doc>
+      <is_organization_doc>0</is_organization_doc>
       <is_person_doc>1</is_person_doc>
       <weight>5</weight>
       <code>06</code>

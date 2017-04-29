@@ -2,22 +2,22 @@
 <batch>
   <entities>
     <ref_currency>
-      <code>946</code>
+      <code>943</code>
       <is_convertible>0</is_convertible>
-      <name_ru>Новый румынский лей</name_ru>
-      <short_name>RON</short_name>
-    </ref_currency>
-    <ref_currency>
-      <code>508</code>
-      <is_convertible>0</is_convertible>
-      <name_ru>Метикал</name_ru>
-      <short_name>MZN</short_name>
+      <name_ru>Тунисские динары</name_ru>
+      <short_name>TND</short_name>
     </ref_currency>
     <ref_currency>
       <code>458</code>
       <is_convertible>0</is_convertible>
-      <name_ru>Малайзийский ринггит</name_ru>
+      <name_ru>Малазийские ринггиты</name_ru>
       <short_name>MYR</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>969</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Малагасийские франки</name_ru>
+      <short_name>MGA</short_name>
     </ref_currency>
     <ref_currency>
       <code>944</code>
@@ -28,22 +28,28 @@
     <ref_currency>
       <code>949</code>
       <is_convertible>0</is_convertible>
-      <name_ru>Новая турецкая лира</name_ru>
+      <name_ru>Турецкие лиры</name_ru>
       <rating>B</rating>
       <short_name>TRY</short_name>
     </ref_currency>
     <ref_currency>
-      <code>968</code>
-      <is_convertible>0</is_convertible>
-      <name_ru>Суринамский доллар</name_ru>
-      <short_name>SRD</short_name>
-    </ref_currency>
-    <ref_currency>
       <code>344</code>
       <is_convertible>1</is_convertible>
-      <name_ru>Гонконгский доллар</name_ru>
+      <name_ru>Гонконгские доллары</name_ru>
       <rating>A+</rating>
       <short_name>HKD</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>946</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Румынские леи</name_ru>
+      <short_name>RON</short_name>
+    </ref_currency>
+    <ref_currency>
+      <code>968</code>
+      <is_convertible>0</is_convertible>
+      <name_ru>Суринамские гульдены</name_ru>
+      <short_name>SRD</short_name>
     </ref_currency>
     <ref_currency>
       <code>948</code>
@@ -52,22 +58,16 @@
       <short_name>CHW</short_name>
     </ref_currency>
     <ref_currency>
-      <code>969</code>
+      <code>508</code>
       <is_convertible>0</is_convertible>
-      <name_ru>Малагасийский ариари</name_ru>
-      <short_name>MGA</short_name>
+      <name_ru>Мозамбикские метикалы</name_ru>
+      <short_name>MZN</short_name>
     </ref_currency>
     <ref_currency>
       <code>947</code>
       <is_convertible>0</is_convertible>
       <name_ru>WIR Евро</name_ru>
       <short_name>CHE</short_name>
-    </ref_currency>
-    <ref_currency>
-      <code>943</code>
-      <is_convertible>0</is_convertible>
-      <name_ru>Тунисский динар</name_ru>
-      <short_name>TND</short_name>
     </ref_currency>
   </entities>
 </batch>

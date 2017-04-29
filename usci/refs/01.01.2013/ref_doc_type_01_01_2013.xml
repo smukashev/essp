@@ -10,14 +10,5 @@
       <weight>0</weight>
       <code>18</code>
     </ref_doc_type>
-    <ref_doc_type>
-      <name_ru>Регистрационный номер налогоплательщика </name_ru>
-      <name_kz>Регистрационный номер налогоплательщика </name_kz>
-      <is_identification>1</is_identification>
-      <is_organization_doc>1</is_organization_doc>
-      <is_person_doc>1</is_person_doc>
-      <weight>25</weight>
-      <code>11</code>
-    </ref_doc_type>
   </entities>
 </batch>
