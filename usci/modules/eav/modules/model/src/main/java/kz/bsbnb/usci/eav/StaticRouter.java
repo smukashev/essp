@@ -443,7 +443,7 @@ public final class StaticRouter {
             case SOFT:
                 return true;
             case PROD:
-                return false;
+                return true;
             default:
                 throw new IllegalStateException(Errors.compose(Errors.E284));
         }
