@@ -1,5 +1,5 @@
-CREATE OR REPLACE PACKAGE DATA_VALIDATION is
- -- Author  : Bauyrzhan
+CREATE OR REPLACE PACKAGE "DATA_VALIDATION" is
+  -- Author  : Bauyrzhan
   -- Created : 27.04.2015 11:05:34
   -- Purpose : Пакет межформенного контроля сверяет данные АИП "Кредитный регистр"
   --           с данными АИП "Статистика" и АИП "Небанковские организации"
@@ -16,6 +16,8 @@ CREATE OR REPLACE PACKAGE DATA_VALIDATION is
   g_report_date                date;
   g_creditor_id                number;
   prev_report_date             date;
+  subject_type_code            varchar2(100);
+  pointer                      varchar2(10);
   procedure cross_check(p_creditor in number,
                         p_date     in date,
                         p_user_id  in number,
@@ -25,10 +27,11 @@ CREATE OR REPLACE PACKAGE DATA_VALIDATION is
                             p_user_id in number,
                             Err_Code  OUT INTEGER,
                             Err_Msg   OUT VARCHAR2);
-  FUNCTION get_pastdue_days (p_credit_id in number) return number;
+  FUNCTION get_pastdue_days(p_credit_id in number) return number;
+  FUNCTION get_frsp_value(p_code in varchar2, p_form_code in varchar2) return number;
 end DATA_VALIDATION;
 
-CREATE OR REPLACE PACKAGE BODY DATA_VALIDATION_TEST IS
+CREATE OR REPLACE PACKAGE BODY "DATA_VALIDATION" IS
   FUNCTION get_stat_creditor_bik(g_creditor_id IN NUMBER) RETURN VARCHAR2 IS
     v_bik VARCHAR2(50 CHAR);
   BEGIN
@@ -295,8 +298,7 @@ CREATE OR REPLACE PACKAGE BODY DATA_VALIDATION_TEST IS
     v_sum := 0;
     SELECT ROUND(SUM(NVL(dr.value, 0)) / 1000)
       INTO v_sum
-      FROM v_credit_his   vch,
-           showcase.r_cust_remains_vert dr
+      FROM v_credit_his vch, showcase.r_cust_remains_vert dr
      WHERE vch.credit_id = dr.credit_id
        AND vch.creditor_id = g_creditor_id
        and dr.creditor_id = g_creditor_id
@@ -316,8 +318,7 @@ CREATE OR REPLACE PACKAGE BODY DATA_VALIDATION_TEST IS
     v_sum := 0;
     SELECT ROUND(SUM(NVL(dr.value, 0)) / 1000)
       INTO v_sum
-      FROM v_credit_his vch,
-           showcase.r_cust_remains_vert dr
+      FROM v_credit_his vch, showcase.r_cust_remains_vert dr
      WHERE vch.credit_id = dr.credit_id
        AND vch.creditor_id = g_creditor_id
        and dr.creditor_id = g_creditor_id
@@ -338,8 +339,7 @@ CREATE OR REPLACE PACKAGE BODY DATA_VALIDATION_TEST IS
       v_sum := 0;
       SELECT ROUND(SUM(NVL(dr.value, 0)) / 1000)
         INTO v_sum
-        FROM v_credit_his vch,
-             showcase.r_cust_remains_vert dr
+        FROM v_credit_his vch, showcase.r_cust_remains_vert dr
        WHERE vch.credit_id = dr.credit_id
 
          AND vch.creditor_id = g_creditor_id
@@ -379,11 +379,11 @@ CREATE OR REPLACE PACKAGE BODY DATA_VALIDATION_TEST IS
     END IF;
   END;
 
- /*
+  /*
   * 26.06.2015 - добавлена проверка на договора с неверными датами
   */
 
-   procedure check_wrong_dates is
+  procedure check_wrong_dates is
     v_count number;
   begin
     select count(1)
@@ -418,7 +418,7 @@ CREATE OR REPLACE PACKAGE BODY DATA_VALIDATION_TEST IS
       FROM (SELECT vph.contract_no, vph.pledge_type_id
               FROM v_credit_his vch, v_pledge_his vph
              WHERE vch.creditor_id = g_creditor_id
-               AND vch.open_date <  = g_report_date
+               AND vch.open_date < = g_report_date
                AND (vch.close_date IS NULL OR vch.close_date > g_report_date)
                AND (vch.maturity_date IS NULL OR
                    vch.maturity_date > prev_report_date)
@@ -427,9 +427,9 @@ CREATE OR REPLACE PACKAGE BODY DATA_VALIDATION_TEST IS
                AND vch.credit_id = vph.credit_id
              GROUP BY vph.contract_no, vph.pledge_type_id
             HAVING COUNT(DISTINCT vph.value_) > 1);
-     if v_count > 0 then
+    if v_count > 0 then
       errors_count := errors_count + 1;
-    protocol_write_message_by_code('DUP_PLEDGES', v_count, 0, 0, 1);
+      protocol_write_message_by_code('DUP_PLEDGES', v_count, 0, 0, 1);
     end if;
   END;
 
@@ -441,88 +441,136 @@ CREATE OR REPLACE PACKAGE BODY DATA_VALIDATION_TEST IS
       FROM (SELECT x.contract_no
               FROM (SELECT contract_no,
                            credit_id AS id,
-                           listagg(pledge_type_id, ',') within GROUP(ORDER BY pledge_type_id) types FROM
-                      (SELECT distinct vph.contract_no, vch.credit_id, vph.pledge_type_id
-                      FROM v_credit_his vch, v_pledge_his vph
-                     WHERE vch.creditor_id = g_creditor_id
-                       AND vch.open_date <= g_report_date
-                       AND (vch.close_date IS NULL OR
-                           vch.close_date > g_report_date)
-                       AND (vch.maturity_date IS NULL OR
-                           vch.maturity_date > prev_report_date)
-                       AND vph.open_date <= g_report_date
-                       AND (vph.close_date IS NULL OR
-                           vph.close_date > g_report_date)
-                       AND vch.credit_id = vph.credit_id)
+                           listagg(pledge_type_id, ',') within GROUP(ORDER BY pledge_type_id) types
+                      FROM (SELECT distinct vph.contract_no,
+                                            vch.credit_id,
+                                            vph.pledge_type_id
+                              FROM v_credit_his vch, v_pledge_his vph
+                             WHERE vch.creditor_id = g_creditor_id
+                               AND vch.open_date <= g_report_date
+                               AND (vch.close_date IS NULL OR
+                                   vch.close_date > g_report_date)
+                               AND (vch.maturity_date IS NULL OR
+                                   vch.maturity_date > prev_report_date)
+                               AND vph.open_date <= g_report_date
+                               AND (vph.close_date IS NULL OR
+                                   vph.close_date > g_report_date)
+                               AND vch.credit_id = vph.credit_id)
                      GROUP BY contract_no, credit_id) x
              GROUP BY x.contract_no
             HAVING COUNT(DISTINCT x.types) > 1);
     if v_count > 0 then
       errors_count := errors_count + 1;
-    protocol_write_message_by_code('PLEDGE_LIST', v_count, 0, 0, 1);
+      protocol_write_message_by_code('PLEDGE_LIST', v_count, 0, 0, 1);
     end if;
   END;
 
   PROCEDURE check_pledges IS
   BEGIN
-      check_duplicate_pledges();
-      check_different_pledge_lists();
+    check_duplicate_pledges();
+    check_different_pledge_lists();
+  END;
+
+  FUNCTION get_frsp_value(p_code in varchar2, p_form_code in varchar2) return number is
+    P_result       number;
+    P_Err_Code     number;
+    p_Err_Msg      varchar2(200);
+    p_creditor_doc varchar2(200);
+    ProcName CONSTANT VARCHAR2(30) := 'cross_check';
+  BEGIN
+    select no
+      into p_creditor_doc
+      from showcase.r_ref_creditor_doc d
+     where d.ref_creditor_id = g_creditor_id
+       and d.doc_type_code = '07';
+    frsi.get_report_value@FRSI(v_form_code   => p_form_code,
+
+                                      v_idn         => p_creditor_doc,
+                                      v_report_date => g_report_date,
+                                      v_id          => p_code,
+                                      v_result      => p_result,
+                                      Err_Code      => p_err_code,
+                                      Err_Msg       => p_err_msg);
+
+   return p_result;
+
+
   END;
 
   PROCEDURE check_fs_zpd_msfo IS
-    v_cr_sum NUMBER;
-    v_st_sum NUMBER;
+    v_cr_sum  NUMBER;
+    v_st_sum  NUMBER;
+    v_fs_code varchar2(100);
   BEGIN
     IF g_creditor_id = 10000 THEN
       g_creditor_id := 22;
     END IF;
     DELETE FROM R_TEMP_FS_ZPD;
+    pointer := '6.1.1';
     INSERT INTO R_TEMP_FS_ZPD
       (drt_code, subj_type, is_se, value)
-      select type_code, subj_type, is_se, sum(value) from ( SELECT dr.type_code,
-             (CASE
-               WHEN vdh.IS_PERSON = 1
-                THEN
-                1
-               ELSE
-                2
-             END) subj_type,
-             (case when vdh.is_person=1 then
-             0
-             else nvl((select voh.is_se from v_organization_his         voh where vdh.SUBJECT_ID = voh.org_id(+)
-         AND (voh.close_date > g_report_date OR voh.close_date IS NULL)
-         AND (voh.open_date IS NULL OR voh.open_date <= g_report_date)), 0) end ) is_se,
-             NVL(dr.value, 0) value
-        FROM v_credit_his                   vch,
-             showcase.r_cust_remains_vert                 dr,
-             showcase.r_ref_balance_account ba,
-             v_debtor_his               vdh,
-             showcase.r_ref_credit_type ct
-       WHERE vch.creditor_id = g_creditor_id
-       and dr.creditor_id = g_creditor_id
-         AND (vch.maturity_date >= prev_report_date OR
-             vch.maturity_date IS NULL)
-         AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
-         AND vch.open_date <= g_report_date
-         AND vch.primary_contract_date < g_report_date
-         AND vch.credit_id = dr.credit_id
-         AND dr.rep_date = g_report_date
-         AND dr.account_id = ba.ref_balance_account_id
-         AND ((ba.no_ LIKE '1%') OR
-             (ba.no_ IN ('8911', '8912', '8713', '8714')))
-         AND ba.no_ NOT LIKE '1880%'
-         AND vch.credit_id = vdh.credit_id
-         AND (vdh.close_date > g_report_date OR vdh.close_date IS NULL)
-         AND vdh.open_date <= g_report_date
-         AND vch.credit_type_id = ct.ref_credit_type_id
-         AND ct.code NOT IN ('17', '18'))
-       GROUP BY
-                type_code,
-                subj_type,
-                is_se;
-    FOR cont IN (SELECT *
-                   FROM R_FS_ZPD_CONTROL fzc
-                  ORDER BY fzc.id) LOOP
+      select type_code, subj_type, is_se, sum(value)
+        from (SELECT dr.type_code,
+                     (CASE
+                       WHEN nvl(vdh.IS_PERSON,1)=1 THEN
+                        1
+                       ELSE 2
+                     END) subj_type,
+                     (case
+                       when vdh.is_person = 1 then
+                        0
+                       else
+                        nvl((select voh.is_se
+                              from v_organization_his voh
+                             where vdh.SUBJECT_ID = voh.org_id(+)
+                               AND (voh.close_date > g_report_date OR
+                                   voh.close_date IS NULL)
+                               AND (voh.open_date IS NULL OR
+                                   voh.open_date <= g_report_date)),
+                            0)
+                     end) is_se,
+                     NVL(dr.value, 0) value
+                FROM v_credit_his                   vch,
+                     showcase.r_cust_remains_vert   dr,
+                     showcase.r_ref_balance_account ba,
+                     v_debtor_his                   vdh,
+                     showcase.r_ref_credit_type     ct
+               WHERE vch.creditor_id = g_creditor_id
+                 and dr.creditor_id = g_creditor_id
+                 AND (vch.maturity_date >= prev_report_date OR
+                     vch.maturity_date IS NULL)
+                 AND (vch.close_date > g_report_date OR
+                     vch.close_date IS NULL)
+                 AND vch.open_date <= g_report_date
+                 AND vch.primary_contract_date < g_report_date
+                 AND vch.credit_id = dr.credit_id
+                 AND dr.rep_date = g_report_date
+                 AND dr.account_id = ba.ref_balance_account_id(+)
+                 AND (((((ba.no_ LIKE '1%') OR
+                     (ba.no_ IN ('8911', '8912', '8713', '8714'))) AND
+                     ba.no_ NOT LIKE '1880%') and
+                     subject_type_code in ('0001', '0002')) or
+                     subject_type_code = '0003')
+                 AND vch.credit_id = vdh.credit_id
+                 AND (vdh.close_date > g_report_date OR
+                     vdh.close_date IS NULL)
+                 AND vdh.open_date <= g_report_date
+                 AND vch.credit_type_id = ct.ref_credit_type_id
+                 AND ((ct.code NOT IN ('17', '18') and
+                     subject_type_code in ('0001', '0002')) OR
+                     ((ct.code NOT IN ('11',
+                                        '12',
+                                        '13',
+                                        '14',
+                                        '15',
+                                        '17',
+                                        '18',
+                                        '25',
+                                        '26') and
+                     subject_type_code = '0003'))))
+       GROUP BY type_code, subj_type, is_se;
+    pointer := '6.1.2';
+    FOR cont IN (SELECT * FROM R_FS_ZPD_CONTROL fzc ORDER BY fzc.id) LOOP
       SELECT SUM(tfz.value)
         INTO v_cr_sum
         FROM r_temp_fs_zpd tfz, R_FS_ZPD_DRT fzd
@@ -531,210 +579,286 @@ CREATE OR REPLACE PACKAGE BODY DATA_VALIDATION_TEST IS
          AND fzd.control_id = cont.id
          AND tfz.drt_code = fzd.code;
       v_cr_sum := ROUND(NVL(v_cr_sum, 0) / 1000);
-      SELECT SUM(st.znac)
-        INTO v_st_sum
-        FROM R_STAT_TEMP st, r_fs_zpd_st_code fs
-       WHERE fs.control_id = cont.id
-         AND fs.pokaz_id = st.id_pokaz;
+      pointer  := '6.1.3';
+      IF (subject_type_code = '0002' or subject_type_code = '0003') then
+        SELECT sum(get_frsp_value(fs.code,
+                                  decode(subject_type_code,
+                                         '0002',
+                                         'zpd_msfo',
+                                         '0003',
+                                         'zpd_msfo_apk')))
+          INTO v_st_sum
+          FROM r_fs_zpd_frsp_code fs
+         WHERE fs.message_id = cont.message_id
+           and fs.subject_type = subject_type_code;
+      ELSE
+        SELECT SUM(st.znac)
+          INTO v_st_sum
+          FROM R_STAT_TEMP st, r_fs_zpd_st_code fs
+         WHERE fs.control_id = cont.id
+           AND fs.pokaz_id = st.id_pokaz;
+      END IF;
+
       v_st_sum := NVL(v_st_sum, 0);
       protocol_write_message(cont.message_id, v_cr_sum, v_st_sum);
     END LOOP;
   END;
 
-  FUNCTION get_pastdue_days (p_credit_id in number) return number is
-  pastdue_days number;
+  FUNCTION get_pastdue_days(p_credit_id in number) return number is
+    pastdue_days number;
   BEGIN
-    SELECT MAX(g_report_date - nvl(dr.PASTDUE_OPEN_DATE, g_report_date)) into pastdue_days
-    FROM showcase.r_cust_remains_vert dr
-    WHERE dr.type_code IN (2,5)
-    AND dr.CREDIT_ID    = p_credit_id
-    AND dr.REP_DATE     = g_report_date
-    AND (dr.value      <>0
-    AND dr.value       IS NOT NULL)
-    GROUP BY dr.credit_id;
+    SELECT MAX(g_report_date - nvl(dr.PASTDUE_OPEN_DATE, g_report_date))
+      into pastdue_days
+      FROM showcase.r_cust_remains_vert dr
+     WHERE dr.type_code IN (2, 5)
+       AND dr.CREDIT_ID = p_credit_id
+       AND dr.REP_DATE = g_report_date
+       AND (dr.value <> 0 AND dr.value IS NOT NULL)
+     GROUP BY dr.credit_id;
     return(pastdue_days);
-    exception
-  when no_data_found then
-  return 0;
+  exception
+    when no_data_found then
+      return 0;
   END;
 
   PROCEDURE check_fs_zpd_pastdue is
-   v_essp_sum NUMBER;
-   v_st_sum NUMBER;
-   begin
+    v_essp_sum NUMBER;
+    v_st_sum   NUMBER;
+  begin
     IF g_creditor_id = 10000 THEN
       g_creditor_id := 22;
     END IF;
-     DELETE FROM R_TEMP_FS_ZPD_PASTDUE;
+    DELETE FROM R_TEMP_FS_ZPD_PASTDUE;
+    pointer := '6.2.1';
     INSERT INTO R_TEMP_FS_ZPD_PASTDUE
-    (PASTDUE, VALUE)
-    select (case when cred.co=0 then 1
-                              when cred.co between 1 and 15 then 2
-                              when cred.co between 16 and 30 then 3
-                              when cred.co between 31 and 60 then 4
-                              when cred.co between 61 and 90 then 5
-                              when cred.co between 91 and 180 then 6
-                               else 7 end) co,
-          sum(NVL(cred.value, 0)) value
-from ( SELECT get_pastdue_days(vch.credit_id) as co,
-       dr.value
-  FROM v_credit_his                   vch,
-       v_debtor_his                   vdh,
-       v_organization_his             voh,
-       showcase.r_cust_remains_vert   dr,
-       showcase.r_ref_balance_account ba,
-       showcase.r_ref_credit_type     ct
- WHERE vch.creditor_id = g_creditor_id
-   AND dr.creditor_id = g_creditor_id
-   AND vdh.SUBJECT_ID = voh.org_id(+)
-   AND (vch.maturity_date >= prev_report_date OR vch.maturity_date IS NULL)
-   AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
-   AND vch.open_date <= g_report_date
-   AND vch.primary_contract_date < g_report_date
-   AND vch.credit_id = dr.credit_id
-   AND dr.rep_date = g_report_date
-   AND dr.account_id = ba.ref_balance_account_id
-   AND (ba.no_ LIKE '1%' or ba.no_ like '8%')
-   AND vch.credit_id = vdh.credit_id
-   AND (vdh.close_date > g_report_date OR vdh.close_date IS NULL)
-   AND vdh.open_date <= g_report_date
-   AND (voh.close_date > g_report_date OR voh.close_date IS NULL)
-   AND voh.open_date(+) <= g_report_date
-   AND vch.credit_type_id = ct.ref_credit_type_id
-   AND dr.type_code in (1, 2)
-   AND ct.code NOT IN ('17', '18')) cred
-   group by (case
-      when cred.co=0 then 1
-      when cred.co between 1 and 15 then 2
-      when cred.co between 16 and 30 then 3
-      when cred.co between 31 and 60 then 4
-      when cred.co between 61 and 90 then 5
-      when cred.co between 91 and 180 then 6
-      else 7 end);
-
-    FOR cont IN (SELECT *
-                   FROM R_FS_ZPD_PASTDUE_CONTROL fzc
-                  ORDER BY fzc.id) LOOP
+      (PASTDUE, VALUE)
+      select (case
+               when cred.co = 0 then
+                1
+               when cred.co between 1 and 15 then
+                2
+               when cred.co between 16 and 30 then
+                3
+               when cred.co between 31 and 60 then
+                4
+               when cred.co between 61 and 90 then
+                5
+               when cred.co between 91 and 180 then
+                6
+               else
+                7
+             end) co,
+             sum(NVL(cred.value, 0)) value
+        from (SELECT get_pastdue_days(vch.credit_id) as co, dr.value
+                FROM v_credit_his                   vch,
+                     v_debtor_his                   vdh,
+                     v_organization_his             voh,
+                     showcase.r_cust_remains_vert   dr,
+                     showcase.r_ref_balance_account ba,
+                     showcase.r_ref_credit_type     ct
+               WHERE vch.creditor_id = g_creditor_id
+                 AND dr.creditor_id = g_creditor_id
+                 AND vdh.SUBJECT_ID = voh.org_id(+)
+                 AND (vch.maturity_date >= prev_report_date OR
+                     vch.maturity_date IS NULL)
+                 AND (vch.close_date > g_report_date OR
+                     vch.close_date IS NULL)
+                 AND vch.open_date <= g_report_date
+                 AND vch.primary_contract_date < g_report_date
+                 AND vch.credit_id = dr.credit_id
+                 AND dr.rep_date = g_report_date
+                 AND dr.account_id = ba.ref_balance_account_id(+)
+                 AND (((ba.no_ LIKE '1%' or ba.no_ like '8%') and
+                     subject_type_code in ('0001', '0002')) or
+                     subject_type_code = '0003')
+                 AND vch.credit_id = vdh.credit_id
+                 AND (vdh.close_date > g_report_date OR
+                     vdh.close_date IS NULL)
+                 AND vdh.open_date <= g_report_date
+                 AND (voh.close_date > g_report_date OR
+                     voh.close_date IS NULL)
+                 AND voh.open_date(+) <= g_report_date
+                 AND vch.credit_type_id = ct.ref_credit_type_id
+                 AND dr.type_code in (1, 2)
+                 AND ((ct.code NOT IN ('17', '18') and
+                     subject_type_code in ('0001', '0002')) OR
+                     ((ct.code NOT IN ('11',
+                                        '12',
+                                        '13',
+                                        '14',
+                                        '15',
+                                        '17',
+                                        '18',
+                                        '25',
+                                        '26') and
+                     subject_type_code = '0003')))) cred
+       group by (case
+                  when cred.co = 0 then
+                   1
+                  when cred.co between 1 and 15 then
+                   2
+                  when cred.co between 16 and 30 then
+                   3
+                  when cred.co between 31 and 60 then
+                   4
+                  when cred.co between 61 and 90 then
+                   5
+                  when cred.co between 91 and 180 then
+                   6
+                  else
+                   7
+                end);
+    pointer := '6.2.2';
+    FOR cont IN (SELECT * FROM R_FS_ZPD_PASTDUE_CONTROL fzc ORDER BY fzc.id) LOOP
 
       begin
-        SELECT tfz.value
+        SELECT sum(tfz.value)
           INTO v_essp_sum
           FROM R_TEMP_FS_ZPD_PASTDUE tfz
-        WHERE tfz.pastdue = cont.code;
+         WHERE tfz.pastdue = cont.code
+            or (cont.code = '67' and tfz.pastdue in (6, 7) and
+               subject_type_code in ('0002', '0003'));
         v_essp_sum := ROUND(NVL(v_essp_sum, 0) / 1000);
-         exception
-      when no_data_found then
-      v_essp_sum :=0;
-     end;
-     begin
-       SELECT SUM(st.znac)
-        INTO v_st_sum
-        FROM R_STAT_TEMP st, R_FS_ZPD_PASTDUE_ST_CODE fs
-       WHERE fs.control_id = cont.id
-         AND fs.code = st.code;
-      v_st_sum := NVL(v_st_sum, 0);
-       exception
-    when no_data_found then
-    v_st_sum :=0;
-    end;
-      protocol_write_message(cont.message_id, v_essp_sum, v_st_sum);
+      exception
+        when no_data_found then
+          v_essp_sum := 0;
+      end;
+      pointer := '6.2.3';
+      begin
+        IF subject_type_code = '0002' or subject_type_code = '0003' then
+          SELECT sum(get_frsp_value(fs.code,
+                                    decode(subject_type_code,
+                                           '0002',
+                                           'zpd_msfo',
+                                           '0003',
+                                           'zpd_msfo_apk')))
+            INTO v_st_sum
+            FROM r_fs_zpd_frsp_code fs
+           WHERE fs.message_id = cont.message_id
+             AND fs.subject_type = subject_type_code;
+        ELSE
+          SELECT SUM(st.znac)
+            INTO v_st_sum
+            FROM R_STAT_TEMP st, R_FS_ZPD_PASTDUE_ST_CODE fs
+           WHERE fs.control_id = cont.id
+             AND fs.code = st.code;
+        END IF;
+        v_st_sum := NVL(v_st_sum, 0);
+      exception
+        when no_data_found then
+          v_st_sum := 0;
+      END;
+      if ((cont.code = '67' and subject_type_code not in ('0002', '0003')) or
+         (cont.code in ('6', '7') and
+         subject_type_code in ('0002', '0003'))) then
+        dbms_output.put_line('Nothing to show!');
+      else
+        protocol_write_message(cont.message_id, v_essp_sum, v_st_sum);
+      end if;
     END LOOP;
-
-   end;
-
+  END;
 
   PROCEDURE check_fs_pzo_msfo is
-   v_essp_sum NUMBER;
-   v_st_sum NUMBER;
-   counter number;
-   begin
+    v_essp_sum NUMBER;
+    v_st_sum   NUMBER;
+  begin
     IF g_creditor_id = 10000 THEN
-       g_creditor_id := 22;
+      g_creditor_id := 22;
     END IF;
-     DELETE FROM R_TEMP_FS_PZO;
+    DELETE FROM R_TEMP_FS_PZO;
+    pointer :='6.3.1';
     INSERT INTO R_TEMP_FS_PZO
-    (ECON_TRADE, CREDIT_TYPE, SUBJECT_TYPE, VALUE)
-    select ECON_TRADE_ID, credit_type_code, subj_type, sum(value) from
-      (SELECT voh.ECON_TRADE_id,
-             (CASE
-               WHEN vdh.is_bank_creditor = 1
-                THEN  1
-                ELSE  2
-             END) subj_type,
-             NVL(dr.value, 0) value,
-             ct.code credit_type_code
-        FROM v_credit_his                   vch,
-             showcase.r_cust_remains_vert                 dr,
-             showcase.r_ref_balance_account ba,
-             v_debtor_his               vdh,
-             v_organization_his voh,
-             showcase.r_ref_credit_type ct
-       WHERE vch.creditor_id = g_creditor_id
-         AND dr.creditor_id = g_creditor_id
-         and vdh.SUBJECT_ID = voh.org_id(+)
-         AND (vch.maturity_date >= prev_report_date OR
-             vch.maturity_date IS NULL)
-         AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
-         AND vch.open_date <= g_report_date
-         AND vch.primary_contract_date < g_report_date
-         AND vch.credit_id = dr.credit_id
-         AND dr.rep_date = g_report_date
-         AND dr.account_id = ba.ref_balance_account_id
-         AND (ba.no_ LIKE '1%' or ba.no_ like '8%')
-         AND vch.credit_id = vdh.credit_id(+)
-         AND (vdh.close_date(+) > g_report_date OR vdh.close_date(+) IS NULL)
-         AND vdh.open_date(+) <= g_report_date
-         AND (voh.close_date(+) > g_report_date OR voh.close_date(+) IS NULL)
-         AND voh.open_date(+) <= g_report_date
-         AND vch.credit_type_id = ct.ref_credit_type_id
-         and dr.type_code in (1, 2)) group by ECON_TRADE_ID, subj_type, credit_type_code;
-
-    FOR cont IN (SELECT *
-                   FROM R_FS_PZO_CONTROL fzc
-                  ORDER BY fzc.id) LOOP
-    begin
-        if(cont.code='K') then
-        select sum(value) into v_essp_sum from
-            (select
-               tfp.value
-            from  R_TEMP_FS_PZO tfp, r_fs_pzo_drt fpd, showcase.r_ref_econ_trade et
-            where tfp.econ_trade = et.ref_econ_trade_id
-            and substr(et.code, 1,2) = fpd.code
-            and fpd.control_id = cont.id
-            union
-            select
-                    tfp.value
-            from R_TEMP_FS_PZO tfp
-            where (tfp.credit_type in ('17', '18') or tfp.SUBJECT_TYPE = 1));
+      (ECON_TRADE, CREDIT_TYPE, SUBJECT_TYPE, VALUE)
+      select ECON_TRADE_ID, credit_type_code, subj_type, sum(value)
+        from (SELECT voh.ECON_TRADE_id,
+                     (CASE
+                       WHEN vdh.is_bank_creditor = 1 THEN
+                        1
+                       ELSE
+                        2
+                     END) subj_type,
+                     NVL(dr.value, 0) value,
+                     ct.code credit_type_code
+                FROM v_credit_his                   vch,
+                     showcase.r_cust_remains_vert   dr,
+                     showcase.r_ref_balance_account ba,
+                     v_debtor_his                   vdh,
+                     v_organization_his             voh,
+                     showcase.r_ref_credit_type     ct
+               WHERE vch.creditor_id = g_creditor_id
+                 AND dr.creditor_id = g_creditor_id
+                 and vdh.SUBJECT_ID = voh.org_id(+)
+                 AND (vch.maturity_date >= prev_report_date OR
+                     vch.maturity_date IS NULL)
+                 AND (vch.close_date > g_report_date OR
+                     vch.close_date IS NULL)
+                 AND vch.open_date <= g_report_date
+                 AND vch.primary_contract_date < g_report_date
+                 AND vch.credit_id = dr.credit_id
+                 AND dr.rep_date = g_report_date
+                 AND dr.account_id = ba.ref_balance_account_id
+                 AND (ba.no_ LIKE '1%' or ba.no_ like '8%')
+                 AND vch.credit_id = vdh.credit_id(+)
+                 AND (vdh.close_date(+) > g_report_date OR
+                     vdh.close_date(+) IS NULL)
+                 AND vdh.open_date(+) <= g_report_date
+                 AND (voh.close_date(+) > g_report_date OR
+                     voh.close_date(+) IS NULL)
+                 AND voh.open_date(+) <= g_report_date
+                 AND vch.credit_type_id = ct.ref_credit_type_id
+                 and dr.type_code in (1, 2))
+       group by ECON_TRADE_ID, subj_type, credit_type_code;
+     pointer :='6.3.2';
+    FOR cont IN (SELECT * FROM R_FS_PZO_CONTROL fzc ORDER BY fzc.id) LOOP
+      begin
+        if (cont.code = 'K') then
+          select sum(value)
+            into v_essp_sum
+            from (select tfp.value
+                    from R_TEMP_FS_PZO             tfp,
+                         r_fs_pzo_drt              fpd,
+                         showcase.r_ref_econ_trade et
+                   where tfp.econ_trade = et.ref_econ_trade_id
+                     and substr(et.code, 1, 2) = fpd.code
+                     and fpd.control_id = cont.id
+                  union
+                  select tfp.value
+                    from R_TEMP_FS_PZO tfp
+                   where (tfp.credit_type in ('17', '18') or
+                         tfp.SUBJECT_TYPE = 1));
         else
-            select  sum(tfp.value) into v_essp_sum
-            from  R_TEMP_FS_PZO tfp, r_fs_pzo_drt fpd, showcase.r_ref_econ_trade et
-            where tfp.econ_trade = et.ref_econ_trade_id
-            and substr(et.code, 1,2) = fpd.code
-            and fpd.control_id = cont.id;
+          select sum(tfp.value)
+            into v_essp_sum
+            from R_TEMP_FS_PZO             tfp,
+                 r_fs_pzo_drt              fpd,
+                 showcase.r_ref_econ_trade et
+           where tfp.econ_trade = et.ref_econ_trade_id
+             and substr(et.code, 1, 2) = fpd.code
+             and fpd.control_id = cont.id;
         end if;
         v_essp_sum := ROUND(NVL(v_essp_sum, 0) / 1000);
-    exception
-    when no_data_found then
-    v_essp_sum :=0;
-    end;
-    begin
-       SELECT SUM(st.znac)
-        INTO v_st_sum
-        FROM R_STAT_TEMP st, r_fs_pzo_st_code fs
-       WHERE fs.control_id = cont.id
-         AND fs.code = st.code;
-      v_st_sum := NVL(v_st_sum, 0);
+      exception
+        when no_data_found then
+          v_essp_sum := 0;
+      end;
+      pointer :='6.3.3';
+      begin
+        SELECT SUM(st.znac)
+          INTO v_st_sum
+          FROM R_STAT_TEMP st, r_fs_pzo_st_code fs
+         WHERE fs.control_id = cont.id
+           AND fs.code = st.code;
+        v_st_sum := NVL(v_st_sum, 0);
 
-    exception
-      when no_data_found then
-      v_st_sum :=0;
-    end;
-     protocol_write_message(cont.message_id, v_essp_sum, v_st_sum);
-   END LOOP;
-   end;
+      exception
+        when no_data_found then
+          v_st_sum := 0;
+      end;
+      protocol_write_message(cont.message_id, v_essp_sum, v_st_sum);
+    END LOOP;
+  end;
 
-   /*
+  /*
   * 2015.09.23 - добавлена проверка неоднородных провизий по портфельным займам
   */
   procedure check_portfolio_provisions is
@@ -759,7 +883,7 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
 
     select count(distinct vch.credit_id) as credits_count
       into v_count
-      from showcase.r_cust_remains_vert dr,v_credit_his vch
+      from showcase.r_cust_remains_vert dr, v_credit_his vch
      where dr.credit_id = vch.credit_id
        and dr.type_code in (12, 13)
        and dr.rep_date = g_report_date
@@ -819,7 +943,7 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
             FROM v_statistic_detail od
            WHERE od.mfo = v_mfo
              AND od.pr_period = v_date
-            and od.dat_beg <= g_report_date
+             and od.dat_beg <= g_report_date
              AND (od.dat_end >= g_report_date OR od.dat_end IS NULL);
       END;
     ELSE
@@ -835,11 +959,14 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
       END;
     END IF;
     IF is_brk = 0 AND g_report_date >= to_date('01.11.2014', 'dd.mm.yyyy') THEN
+      pointer :='6.1';
       check_fs_zpd_msfo();
     END IF;
 
-    IF is_brk = 0 and g_report_date >=to_date('01.07.2015', 'dd.mm.yyyy') then
+    IF is_brk = 0 and g_report_date >= to_date('01.07.2015', 'dd.mm.yyyy') then
+      pointer :='6.2';
       check_fs_zpd_pastdue();
+      pointer :='6.3';
       check_fs_pzo_msfo();
     END IF;
 
@@ -866,8 +993,8 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
                       (SELECT bal.id,
                               ROUND(SUM(NVL(d.value, 0)) / 1000) cr_sum
                          FROM showcase.r_cust_remains_vert d,
-                              v_credit_his   vch,
-                              v_bal_act      bal
+                              v_credit_his                 vch,
+                              v_bal_act                    bal
                         WHERE vch.creditor_id = g_creditor_id
                           and d.creditor_id = g_creditor_id
                           AND d.credit_id = vch.credit_id(+)
@@ -885,9 +1012,9 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
                   and vba.id = puo.ba_id(+)
                   and vba.id = pmsfo.ba_id(+)
                   and (vba.open_date is null or
-                  vba.open_date <= g_report_date)
+                      vba.open_date <= g_report_date)
                   and (vba.close_date is null or
-                  vba.close_date >= g_report_date)
+                      vba.close_date >= g_report_date)
                 ORDER BY vba.no) LOOP
       IF (ba.no > '3316' AND v_3316 = 0) THEN
         check_33(0, '3316');
@@ -1114,36 +1241,44 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
     END IF;
   END;
   PROCEDURE ipoteque_check IS
-    nokbdb_val                   NUMBER;
-    cred_val                     NUMBER;
-    n                            NUMBER;
-    nokbdb_provision_credits_sum NUMBER;
-    nokbdb_provision_liab_value  NUMBER;
-    nokbdb_msfo_credits_value    NUMBER;
-    nokbdb_msfo_liab_value       NUMBER;
+    frsp_val                   NUMBER;
+    cred_val                   NUMBER;
+    n                          NUMBER;
+    frsp_provision_credits_sum NUMBER;
+    frsp_provision_liab_value  NUMBER;
+    frsp_msfo_credits_value    NUMBER;
+    frsp_msfo_liab_value       NUMBER;
   BEGIN
     check_sums_without_account_no();
-    nokbdb_msfo_credits_value    := 0;
-    nokbdb_msfo_liab_value       := 0;
-    nokbdb_provision_credits_sum := 0;
-    nokbdb_provision_liab_value  := 0;
-    n                            := 0;
+    frsp_msfo_credits_value    := 0;
+    frsp_msfo_liab_value       := 0;
+    frsp_provision_credits_sum := 0;
+    frsp_provision_liab_value  := 0;
+    n                          := 0;
     INSERT INTO r_stat_temp
       (id, znac, code)
       SELECT rownum, ni.sum, ni.no
-        FROM v_nokbdb_ipoteque ni
+        FROM v_frsp_ipoteque ni
        WHERE ni.rep_date = g_report_date
          AND ni.creditor_id = g_creditor_id;
-    FOR ba IN (SELECT SUBSTR(vba.no, 1, 4) no,
+
+    IF g_report_date >= to_date('01.11.2014', 'dd.mm.yyyy') THEN
+      check_fs_zpd_msfo();
+    END IF;
+    IF g_report_date >= to_date('01.07.2015', 'dd.mm.yyyy') then
+      check_fs_zpd_pastdue();
+    END IF;
+
+    FOR ba IN (SELECT vba.no no,
                       NVL(st.znac, 0) st_sum,
                       NVL(cr.cr_sum, 0) cr_sum
-                 FROM (SELECT DISTINCT SUBSTR(no, 1, 4) no FROM v_bal_act) vba,
+                 FROM (SELECT DISTINCT no FROM v_bal_act) vba,
                       r_stat_temp st,
-                      (SELECT SUBSTR(bal.no, 1, 4) no,
+                      (SELECT bal.no,
                               ROUND(SUM(NVL(d.value, 0)) / 1000) cr_sum
                          FROM showcase.r_cust_remains_vert d,
-                              v_credit_his   vch,
-                              v_bal_act      bal
+                              v_credit_his                 vch,
+                              v_bal_act                    bal
                         WHERE vch.creditor_id = g_creditor_id
                           and d.creditor_id = g_creditor_id
                           AND d.credit_id = vch.credit_id(+)
@@ -1155,73 +1290,70 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
                               vch.close_date IS NULL)
                           AND vch.open_date <= g_report_date
                           AND vch.primary_contract_date < g_report_date
-                        GROUP BY SUBSTR(bal.no, 1, 4)) cr
+                        GROUP BY bal.no) cr
                 WHERE vba.no = st.code(+)
                   AND vba.no = cr.no(+)
                   AND (NVL(st.znac, 0) <> 0 OR NVL(cr.cr_sum, 0) <> 0)
                 ORDER BY vba.no) LOOP
-      nokbdb_val := NVL(ba.st_sum, 0);
-      cred_val   := NVL(ba.cr_sum, 0);
+      frsp_val := NVL(ba.st_sum, 0);
+      cred_val := NVL(ba.cr_sum, 0);
       IF SUBSTR(ba.no, 1, 4) IN ('1319', '1329', '1428', '1463') THEN
-        n                            := n + 1;
-        nokbdb_msfo_credits_value    := nokbdb_msfo_credits_value +
-                                        nokbdb_val;
-        nokbdb_provision_credits_sum := nokbdb_provision_credits_sum +
-                                        nokbdb_val;
+        n                          := n + 1;
+        frsp_msfo_credits_value    := frsp_msfo_credits_value + frsp_val;
+        frsp_provision_credits_sum := frsp_provision_credits_sum + frsp_val;
       ELSE
         IF ba.no IN ('3303', '3304', '3305', '3307') THEN
-          n                            := n + 1;
-          nokbdb_provision_credits_sum := nokbdb_provision_credits_sum -
-                                          nokbdb_val;
-          check_33(nokbdb_val, ba.no);
+          n                          := n + 1;
+          frsp_provision_credits_sum := frsp_provision_credits_sum -
+                                        frsp_val;
+          check_33(frsp_val, ba.no);
         ELSE
           IF ba.no = '7130' OR ba.no = '6675' OR ba.no = '8923' THEN
             n := n + 1;
-            IF cred_val <= nokbdb_val THEN
+            IF cred_val <= frsp_val THEN
               protocol_write(ba.no,
                              cred_val,
-                             nokbdb_val,
-                             cred_val - nokbdb_val,
+                             frsp_val,
+                             cred_val - frsp_val,
                              0);
             ELSE
               protocol_write(ba.no,
                              cred_val,
-                             nokbdb_val,
-                             cred_val - nokbdb_val,
+                             frsp_val,
+                             cred_val - frsp_val,
                              1);
               errors_count := errors_count + 1;
             END IF;
           ELSE
             IF SUBSTR(ba.no, 1, 4) IN
                ('8708', '8709', '8917', '2875', '3315', '3316') THEN
-              n                           := n + 1;
-              nokbdb_provision_liab_value := nokbdb_provision_liab_value +
-                                             nokbdb_val;
+              n                         := n + 1;
+              frsp_provision_liab_value := frsp_provision_liab_value +
+                                           frsp_val;
               IF SUBSTR(ba.no, 1, 4) IN ('3315', '3316') THEN
-                check_33(nokbdb_val, ba.no);
+                check_33(frsp_val, ba.no);
               END IF;
               IF SUBSTR(ba.no, 1, 4) IN ('8917', '2875', '8708', '8709') THEN
-                nokbdb_msfo_liab_value := nokbdb_msfo_liab_value +
-                                          nokbdb_val;
+                frsp_msfo_liab_value := frsp_msfo_liab_value + frsp_val;
               END IF;
             ELSE
-              IF cred_val <> 0 OR nokbdb_val <> 0 THEN
+              IF cred_val <> 0 OR frsp_val <> 0 THEN
                 n := n + 1;
-                protocol_write(ba.no, cred_val, nokbdb_val);
+                protocol_write(ba.no, cred_val, frsp_val);
               END IF;
             END IF;
           END IF;
         END IF;
       END IF;
     END LOOP;
-    nokbdb_msfo_credits_value := ABS(NVL(nokbdb_msfo_credits_value, 0));
-    provisions_msfo_credits_check(nokbdb_msfo_credits_value);
-    nokbdb_msfo_liab_value := ABS(NVL(nokbdb_msfo_liab_value, 0));
-    provisions_msfo_liab_check(nokbdb_msfo_liab_value);
-    nokbdb_provision_credits_sum := ABS(NVL(nokbdb_provision_credits_sum, 0));
-    provisions_uo_credits_check(nokbdb_provision_credits_sum);
-    nokbdb_provision_liab_value := ABS(NVL(nokbdb_provision_liab_value, 0));
-    provisions_uo_liab_check(nokbdb_provision_liab_value);
+    frsp_msfo_credits_value := ABS(NVL(frsp_msfo_credits_value, 0));
+    provisions_msfo_credits_check(frsp_msfo_credits_value);
+    frsp_msfo_liab_value := ABS(NVL(frsp_msfo_liab_value, 0));
+    provisions_msfo_liab_check(frsp_msfo_liab_value);
+    frsp_provision_credits_sum := ABS(NVL(frsp_provision_credits_sum, 0));
+    provisions_uo_credits_check(frsp_provision_credits_sum);
+    frsp_provision_liab_value := ABS(NVL(frsp_provision_liab_value, 0));
+    provisions_uo_liab_check(frsp_provision_liab_value);
     IF n = 0 THEN
       -- no data found
       protocol_write_message_by_code('NO_REMAINS');
@@ -1234,9 +1366,9 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
   BEGIN
     SELECT ROUND(SUM(NVL(dr.value, 0)) / 1000, 0)
       INTO cred_val
-      FROM v_credit_his   vch,
+      FROM v_credit_his                 vch,
            showcase.r_cust_remains_vert dr,
-           showcase.r_ref_credit_type ct
+           showcase.r_ref_credit_type   ct
      WHERE vch.creditor_id = g_creditor_id
        and dr.creditor_id = g_creditor_id
        AND vch.credit_id = dr.credit_id
@@ -1264,9 +1396,9 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
   BEGIN
     SELECT ROUND(SUM(NVL(dr.value, 0)) / 1000, 0)
       INTO cred_val
-      FROM v_credit_his   vch,
+      FROM v_credit_his                 vch,
            showcase.r_cust_remains_vert dr,
-           showcase.r_ref_credit_type ct
+           showcase.r_ref_credit_type   ct
      WHERE vch.creditor_id = g_creditor_id
        and dr.creditor_id = g_creditor_id
        AND vch.credit_id = dr.credit_id
@@ -1296,9 +1428,9 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
   BEGIN
     SELECT ROUND(SUM(NVL(dr.value, 0)) / 1000)
       INTO cred_flow_value
-      FROM v_credit_his   vch,
+      FROM v_credit_his                 vch,
            showcase.r_cust_remains_vert dr,
-           showcase.r_ref_credit_type ct
+           showcase.r_ref_credit_type   ct
      WHERE vch.creditor_id = g_creditor_id
        and dr.creditor_id = g_creditor_id
        AND vch.credit_id = dr.credit_id
@@ -1320,14 +1452,13 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
        AND EXISTS
      (SELECT vch.credit_id
               FROM v_credit_his vch
-             WHERE
-             (vch.portfolio_id = pf.portfolio_id OR
-             vch.inner_portfolio_id = pf.portfolio_id)
-          AND (vch.maturity_date >= prev_report_date OR
-             vch.maturity_date IS NULL)
-          AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
-          AND vch.open_date <= g_report_date
-          AND vch.primary_contract_date < g_report_date);
+             WHERE (vch.portfolio_id = pf.portfolio_id OR
+                   vch.inner_portfolio_id = pf.portfolio_id)
+               AND (vch.maturity_date >= prev_report_date OR
+                   vch.maturity_date IS NULL)
+               AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
+               AND vch.open_date <= g_report_date
+               AND vch.primary_contract_date < g_report_date);
     portfolio_value := NVL(portfolio_value, 0);
     cred_val        := cred_flow_value + portfolio_value;
     SELECT SUM(NVL(vnr.fact_vict, 0))
@@ -1360,9 +1491,9 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
     END;
     SELECT ROUND(SUM(NVL(dr.value, 0)) / 1000, 0)
       INTO od_opd_value
-      FROM v_credit_his   vch,
+      FROM v_credit_his                 vch,
            showcase.r_cust_remains_vert dr,
-           showcase.r_ref_credit_type ct
+           showcase.r_ref_credit_type   ct
      WHERE vch.creditor_id = g_creditor_id
        and dr.creditor_id = g_creditor_id
        AND vch.credit_id = dr.credit_id
@@ -1378,9 +1509,9 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
     od_opd_value := NVL(od_opd_value, 0);
     SELECT ROUND(SUM(NVL(dr.value, 0)) / 1000, 0)
       INTO ov_opv_value
-      FROM v_credit_his   vch,
+      FROM v_credit_his                 vch,
            showcase.r_cust_remains_vert dr,
-           showcase.r_ref_credit_type ct
+           showcase.r_ref_credit_type   ct
      WHERE vch.creditor_id = g_creditor_id
        AND vch.credit_id = dr.credit_id
        AND dr.rep_date = g_report_date
@@ -1395,9 +1526,9 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
     ov_opv_value := NVL(ov_opv_value, 0);
     SELECT ROUND(SUM(NVL(dr.value, 0)) / 1000)
       INTO pnuo_value
-      FROM v_credit_his   vch,
+      FROM v_credit_his                 vch,
            showcase.r_cust_remains_vert dr,
-           showcase.r_ref_credit_type ct
+           showcase.r_ref_credit_type   ct
      WHERE vch.creditor_id = g_creditor_id
        AND vch.credit_id = dr.credit_id
        AND dr.rep_date = g_report_date
@@ -1414,6 +1545,53 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
     protocol_write_message_by_code('CC_CL_OV', ov_opv_value, prem);
     protocol_write_message_by_code('CC_CL_PNUO', pnuo_value, fact_vict);
   END;
+
+  PROCEDURE check_fs_zpd_repo is
+    v_cr_sum NUMBER;
+    v_st_sum NUMBER;
+  BEGIN
+     IF g_creditor_id = 10000 THEN
+      g_creditor_id := 22;
+    END IF;
+    insert into r_temp_repo
+    select type_code, sum(value)
+    from (SELECT dr.type_code,
+                 NVL(dr.value, 0) value
+            FROM v_credit_his                   vch,
+                 showcase.r_cust_remains_vert   dr,
+                 showcase.r_ref_balance_account ba,
+                 showcase.r_ref_credit_type     ct
+           WHERE vch.creditor_id = g_creditor_id
+             and dr.creditor_id = g_creditor_id
+             AND (vch.maturity_date >= prev_report_date OR
+                 vch.maturity_date IS NULL)
+             AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
+             AND vch.open_date <= g_report_date
+             AND vch.primary_contract_date < g_report_date
+             AND vch.credit_id = dr.credit_id
+             AND dr.rep_date = g_report_date
+             AND dr.account_id = ba.ref_balance_account_id(+)
+             AND vch.credit_type_id = ct.ref_credit_type_id
+             AND ct.code IN ('17', '18'))
+    GROUP BY type_code;
+    FOR cont IN (SELECT * FROM R_FS_REPO_CONTROL fzc ORDER BY fzc.id) LOOP
+      SELECT SUM(tfz.value)
+        INTO v_cr_sum
+        FROM r_temp_repo tfz, R_FS_REPO_DRT fzd
+       WHERE fzd.control_id = cont.id
+         AND tfz.drt_code = fzd.code;
+      v_cr_sum := ROUND(NVL(v_cr_sum, 0) / 1000);
+        SELECT sum(get_frsp_value(fs.code, decode(subject_type_code, '0002', 'zpd_msfo', '0003', 'zpd_msfo_apk')))
+          INTO v_st_sum
+          FROM r_fs_zpd_frsp_code fs
+         WHERE fs.message_id = cont.message_id
+               and fs.subject_type = subject_type_code;
+
+      v_st_sum := NVL(v_st_sum, 0);
+      protocol_write_message(cont.message_id, v_cr_sum, v_st_sum);
+    END LOOP;
+  END;
+
   PROCEDURE nokbdb_check IS
     nokbdb_creditor_code VARCHAR2(50);
   BEGIN
@@ -1422,6 +1600,14 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
       FROM showcase.r_ref_creditor crn
      WHERE crn.ref_creditor_id = g_creditor_id
        AND crn.nokbdb_code IS NOT NULL;
+
+    IF g_report_date >= to_date('01.11.2014', 'dd.mm.yyyy') THEN
+      check_fs_zpd_msfo();
+    END IF;
+    IF g_report_date >= to_date('01.07.2015', 'dd.mm.yyyy') then
+      check_fs_zpd_pastdue();
+    END IF;
+    check_fs_zpd_repo();
     nokbdb_od_opd(nokbdb_creditor_code);
     nokbdb_ov_opv(nokbdb_creditor_code);
     nokbdb_pnuo_pouo(nokbdb_creditor_code);
@@ -1433,38 +1619,38 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
     INSERT INTO temp_provisions
       (provision_value, account_no, type, is_portfolio)
       SELECT SUM(NVL(dr.value, 0)), ba.no_, 1, 0
-        FROM v_credit_his   vch,
-             showcase.r_cust_remains_vert dr,
+        FROM v_credit_his                   vch,
+             showcase.r_cust_remains_vert   dr,
              showcase.r_ref_balance_account ba
-       WHERE
-       (vch.maturity_date >= prev_report_date OR vch.maturity_date IS NULL)
-       AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
-       AND vch.open_date <= g_report_date
-       AND vch.primary_contract_date < g_report_date
-       AND vch.credit_id = dr.credit_id
-       AND dr.account_id = ba.ref_balance_account_id
-       AND dr.rep_date = g_report_date
-       AND vch.creditor_id = g_creditor_id
-       and dr.creditor_id = g_creditor_id
-       AND dr.type_code = '11'
+       WHERE (vch.maturity_date >= prev_report_date OR
+             vch.maturity_date IS NULL)
+         AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
+         AND vch.open_date <= g_report_date
+         AND vch.primary_contract_date < g_report_date
+         AND vch.credit_id = dr.credit_id
+         AND dr.account_id = ba.ref_balance_account_id
+         AND dr.rep_date = g_report_date
+         AND vch.creditor_id = g_creditor_id
+         and dr.creditor_id = g_creditor_id
+         AND dr.type_code = '11'
        GROUP BY ba.no_;
     INSERT INTO temp_provisions
       (provision_value, account_no, type, is_portfolio)
       SELECT SUM(NVL(dr.value, 0)), ba.no_, 2, 0
-        FROM v_credit_his   vch,
-             showcase.r_cust_remains_vert dr,
+        FROM v_credit_his                   vch,
+             showcase.r_cust_remains_vert   dr,
              showcase.r_ref_balance_account ba
-       WHERE
-       (vch.maturity_date >= prev_report_date OR vch.maturity_date IS NULL)
-       AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
-       AND vch.open_date <= g_report_date
-       AND vch.primary_contract_date < g_report_date
-       AND vch.credit_id = dr.credit_id
-       AND dr.account_id = ba.ref_balance_account_id
-       AND dr.rep_date = g_report_date
-       AND vch.creditor_id = g_creditor_id
-       and dr.creditor_id = g_creditor_id
-       AND dr.type_code IN ('12', '13')
+       WHERE (vch.maturity_date >= prev_report_date OR
+             vch.maturity_date IS NULL)
+         AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
+         AND vch.open_date <= g_report_date
+         AND vch.primary_contract_date < g_report_date
+         AND vch.credit_id = dr.credit_id
+         AND dr.account_id = ba.ref_balance_account_id
+         AND dr.rep_date = g_report_date
+         AND vch.creditor_id = g_creditor_id
+         and dr.creditor_id = g_creditor_id
+         AND dr.type_code IN ('12', '13')
        GROUP BY ba.no_;
     INSERT INTO temp_provisions
       (provision_value, account_no, type, is_portfolio)
@@ -1474,18 +1660,17 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
        WHERE pf.rep_date = g_report_date
          AND pf.portfolio_creditor_id = g_creditor_id
          AND pf.balance_account_id = ba.ref_balance_account_id
-         AND EXISTS
-       (SELECT vch.credit_id
+         AND EXISTS (SELECT vch.credit_id
                 FROM v_credit_his vch
-               WHERE
-               (vch.portfolio_id = pf.portfolio_id OR
-               vch.inner_portfolio_id = pf.portfolio_id)
-            AND (vch.maturity_date >= prev_report_date OR
-               vch.maturity_date IS NULL)
-            AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
-            AND vch.open_date <= g_report_date
-            AND vch.primary_contract_date < g_report_date
-            AND vch.creditor_id = g_creditor_id)
+               WHERE (vch.portfolio_id = pf.portfolio_id OR
+                     vch.inner_portfolio_id = pf.portfolio_id)
+                 AND (vch.maturity_date >= prev_report_date OR
+                     vch.maturity_date IS NULL)
+                 AND (vch.close_date > g_report_date OR
+                     vch.close_date IS NULL)
+                 AND vch.open_date <= g_report_date
+                 AND vch.primary_contract_date < g_report_date
+                 AND vch.creditor_id = g_creditor_id)
        GROUP BY ba.no_;
     INSERT INTO temp_provisions
       (provision_value, account_no, type, is_portfolio)
@@ -1495,39 +1680,41 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
        WHERE pf.rep_date = g_report_date
          AND pf.portfolio_data_creditor_id = g_creditor_id
          AND pf.balance_account_id = ba.ref_balance_account_id
-         AND EXISTS
-       (SELECT vch.credit_id
+         AND EXISTS (SELECT vch.credit_id
                 FROM v_credit_his vch
-               WHERE
-               vch.portfolio_msfo_id = pf.portfolio_id
-            AND (vch.maturity_date >= prev_report_date OR
-               vch.maturity_date IS NULL)
-            AND (vch.close_date > g_report_date OR vch.close_date IS NULL)
-            AND vch.open_date <= g_report_date
-            AND vch.primary_contract_date < g_report_date
-            AND vch.creditor_id = g_creditor_id)
+               WHERE vch.portfolio_msfo_id = pf.portfolio_id
+                 AND (vch.maturity_date >= prev_report_date OR
+                     vch.maturity_date IS NULL)
+                 AND (vch.close_date > g_report_date OR
+                     vch.close_date IS NULL)
+                 AND vch.open_date <= g_report_date
+                 AND vch.primary_contract_date < g_report_date
+                 AND vch.creditor_id = g_creditor_id)
        GROUP BY ba.no_;
     IF g_report_date < to_date('01.07.2013', 'dd.mm.yyyy') THEN
       FOR empty_port IN (SELECT p.code, SUM(NVL(pf.value, 0)) AS sm
                            FROM showcase.r_core_portfolio_flow_kfn pf,
                                 showcase.r_ref_portfolio           p
                           WHERE pf.rep_date = g_report_date
-                            AND pf.portfolio_data_creditor_id = g_creditor_id
+                            AND pf.portfolio_data_creditor_id =
+                                g_creditor_id
                             AND pf.portfolio_id = p.ref_portfolio_id
                             AND NOT EXISTS
                           (SELECT vch.credit_id
                                    FROM v_credit_his vch
-                                  WHERE
-                                  (vch.portfolio_id = p.ref_portfolio_id OR
-                                  vch.inner_portfolio_id =
-                                  p.ref_portfolio_id)
-                               AND (vch.maturity_date >= prev_report_date OR
-                                  vch.maturity_date IS NULL)
-                               AND (vch.close_date > g_report_date OR
-                                  vch.close_date IS NULL)
-                               AND vch.open_date <= g_report_date
-                               AND vch.primary_contract_date < g_report_date
-                               AND vch.creditor_id = g_creditor_id)
+                                  WHERE (vch.portfolio_id =
+                                        p.ref_portfolio_id OR
+                                        vch.inner_portfolio_id =
+                                        p.ref_portfolio_id)
+                                    AND (vch.maturity_date >=
+                                        prev_report_date OR
+                                        vch.maturity_date IS NULL)
+                                    AND (vch.close_date > g_report_date OR
+                                        vch.close_date IS NULL)
+                                    AND vch.open_date <= g_report_date
+                                    AND vch.primary_contract_date <
+                                        g_report_date
+                                    AND vch.creditor_id = g_creditor_id)
                           GROUP BY p.id, p.code) LOOP
         protocol_write_message_by_code('EMPPORTUO',
                                        'Нет договоров: [' ||
@@ -1541,26 +1728,27 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
                               FROM showcase.r_core_portfolio_flow_msfo pf,
                                    showcase.r_ref_portfolio            p
                              WHERE pf.rep_date = g_report_date
-                               AND pf.portfolio_data_creditor_id = g_creditor_id
+                               AND pf.portfolio_data_creditor_id =
+                                   g_creditor_id
                                AND pf.portfolio_id = p.ref_portfolio_id
                                AND NOT EXISTS
                              (SELECT vch.credit_id
                                       FROM v_credit_his vch
-                                     WHERE
-                                     vch.portfolio_msfo_id =
-                                     p.ref_portfolio_id
-                                  AND (vch.maturity_date >= prev_report_date OR
-                                     vch.maturity_date IS NULL)
-                                  AND (vch.close_date > g_report_date OR
-                                     vch.close_date IS NULL)
-                                  AND vch.open_date <= g_report_date
-                                  AND vch.primary_contract_date <
-                                     g_report_date
-                                  AND vch.creditor_id = g_creditor_id)
+                                     WHERE vch.portfolio_msfo_id =
+                                           p.ref_portfolio_id
+                                       AND (vch.maturity_date >=
+                                           prev_report_date OR
+                                           vch.maturity_date IS NULL)
+                                       AND (vch.close_date > g_report_date OR
+                                           vch.close_date IS NULL)
+                                       AND vch.open_date <= g_report_date
+                                       AND vch.primary_contract_date <
+                                           g_report_date
+                                       AND vch.creditor_id = g_creditor_id)
                              GROUP BY p.id, p.code
                             HAVING SUM(NVL(pf.value, 0)) <> 0) LOOP
       protocol_write_message_by_code('EMPPORTMSF',
-                                     'Нет договоров: [' ||
+                                     'Нет договоров:: [' ||
                                      empty_port_msfo.code || ']',
                                      '0',
                                      ROUND(NVL(empty_port_msfo.sm, 0) / 1000),
@@ -1572,34 +1760,34 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
                             Err_Code   OUT INTEGER,
                             Err_Msg    OUT VARCHAR2) IS
     ProcName CONSTANT VARCHAR2(30) := 'cross_check';
-    report_type_failed_id   INTEGER;
+    --report_type_failed_id   INTEGER;
     report_type_errors_id   INTEGER;
     report_type_success_id  INTEGER;
     report_type_finished_id INTEGER;
     with_error_status_id    INTEGER; --input info status: ""Executed with errors""
     without_error_status_id INTEGER; --input info status: ""Executed withour errors""
-    subject_type_code       INTEGER;
     creditor_code           VARCHAR2(10);
     org_approved_status_id  INTEGER;
     org_approving_status_id INTEGER;
     v_report_period_months  NUMBER;
     v_now                   DATE;
+
   BEGIN
     SELECT st.report_period_duration_months
       INTO v_report_period_months
       FROM showcase.r_ref_creditor c, showcase.r_ref_subject_type st
      WHERE c.ref_creditor_id = p_creditor
        AND c.subject_type_id = st.ref_subject_type_id;
-    v_report_period_months  := NVL(v_report_period_months, 1);
-    g_report_date           := p_date;
-    prev_report_date        := add_months(p_date, -v_report_period_months);
-    g_creditor_id           := p_creditor;
-    report_type_failed_id   := 4;
+    v_report_period_months := NVL(v_report_period_months, 1);
+    g_report_date          := p_date;
+    prev_report_date       := add_months(p_date, -v_report_period_months);
+    g_creditor_id          := p_creditor;
+    --report_type_failed_id   := 4;
     report_type_success_id  := 2;
     report_type_errors_id   := 1;
     report_type_finished_id := 5;
     org_approved_status_id  := 7;
-    org_approving_status_id :=6;
+    org_approving_status_id := 6;
     --Variable initialization
     without_error_status_id      := 2;
     with_error_status_id         := 1;
@@ -1627,20 +1815,28 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
        with_error_status_id);
     COMMIT;
     errors_count := 0;
+    pointer :='1';
     check_pledges();
     -- check_not_approved_contracts();
+        pointer :='2';
     check_wrong_dates();
+        pointer :='3';
     check_portfolio_provisions();
+        pointer :='4';
     build_temp_provisions();
     IF creditor_code = '907' THEN
+          pointer :='5';
       stat_check(1);
     ELSE
       IF subject_type_code = '0001' THEN
+            pointer :='6';
         stat_check(0);
       ELSE
         IF subject_type_code = '0002' THEN
+              pointer :='7';
           ipoteque_check();
         ELSE
+              pointer :='8';
           nokbdb_check();
         END IF;
       END IF;
@@ -1666,7 +1862,7 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
          AND r.report_date = g_report_date
          AND r.status_id <> report_type_finished_id
          AND r.status_id <> org_approved_status_id
-         and r.status_id <>org_approving_status_id;
+         and r.status_id <> org_approving_status_id;
     ELSE
       UPDATE eav_report@core r
          SET r.status_id = report_type_errors_id
@@ -1674,7 +1870,7 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
          AND r.report_date = g_report_date
          AND r.status_id <> report_type_finished_id
          AND r.status_id <> org_approved_status_id
-         and r.status_id <>org_approving_status_id;
+         and r.status_id <> org_approving_status_id;
       COMMIT;
     END IF;
     COMMIT;
@@ -1685,7 +1881,7 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
       Err_Code := SQLCODE;
       Err_Msg  := ProcName || ' - ' || '/E\' || SUBSTR(SQLERRM, 1, 255) ||
 
-                  '/R\' || 'Ошибка в контроле';
+                  '/R\' || 'Ошибка в контроле на точке '|| pointer;
       BEGIN
         protocol_write('ERROR ' || Err_Code || ': ' || Err_Msg);
         COMMIT;
@@ -1729,4 +1925,3 @@ from ( SELECT get_pastdue_days(vch.credit_id) as co,
                   '/R\' || 'Procedure error';
   END;
 END DATA_VALIDATION;
-
