@@ -491,7 +491,7 @@ public class MainPortlet extends MVCPortlet {
                         if(date == null)
                             date = new Date();
 
-                        BaseEntity entity = entityService.load(Integer.parseInt(entityId), date);
+                        BaseEntity entity = entityService.load(Long.parseLong(entityId), date);
 
                         sJson = "{\"text\":\".\",\"children\": [\n" +
                                 entityToJson(entity, entity.getMeta().getClassTitle(),
