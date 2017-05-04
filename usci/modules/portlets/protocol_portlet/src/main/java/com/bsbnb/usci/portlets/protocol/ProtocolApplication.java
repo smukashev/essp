@@ -78,6 +78,7 @@ public class ProtocolApplication extends Application {
                 Window mainWindow = new Window();
                 PortletEnvironmentFacade.set(new ProtocolPortletEnvironmentFacade(user, isNB));
                 DataProvider provider = new BeanDataProvider();
+                provider.setNb(isNB);
                 mainWindow.addComponent(new ProtocolLayout(provider));
                 setMainWindow(mainWindow);
 

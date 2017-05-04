@@ -27,4 +27,8 @@ public interface DataProvider {
     List<InputInfoDisplayBean> loadFiles(List<Creditor> creditors, Date reportDate, int firstIndex, int count);
 
     List<ProtocolDisplayBean> getProtocolStatisticsByInputInfo(InputInfoDisplayBean inputInfo);
+
+    void setNb(boolean isNB);
+
+    boolean isNb();
 }

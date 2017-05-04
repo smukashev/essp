@@ -215,8 +215,12 @@ public class ProtocolLayout extends VerticalLayout {
 
         filesTable.addListener(new Property.ValueChangeListener() {
             public void valueChange(ValueChangeEvent event) {
-                if (event.getProperty().getValue() != null)
+                if (event.getProperty().getValue() != null) {
+                    if(((InputInfoDisplayBean) event.getProperty().getValue()).getInputInfo().getUserId() == 100500L
+                        && !provider.isNb())
+                        return;
                     showProtocol((InputInfoDisplayBean) event.getProperty().getValue());
+                }
             }
         });
 
