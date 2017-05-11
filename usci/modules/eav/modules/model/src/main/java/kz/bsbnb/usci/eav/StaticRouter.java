@@ -30,13 +30,13 @@ public final class StaticRouter {
     private final static String stendDBShowcaseIP = "170.7.15.69";
     private final static String devDBShowcaseIP = "localhost";
     private final static String softDBShowcaseIP = "10.8.1.206";
-    private final static String prodDBShowcaseIP = "10.8.1.201";
+    private final static String prodDBShowcaseIP = "10.8.1.223";
 
     /* Reporter Schema IP */
     private final static String stendDBReporterIP = "170.7.15.69";
     private final static String devDBReporterIP = "localhost";
     private final static String softDBReporterIP = "10.8.1.206";
-    private final static String prodDBReporterIP = "10.8.1.201";
+    private final static String prodDBReporterIP = "10.8.1.223";
 
     /* Portal URL */
     private final static String stendPortalUrl = "10.10.32.28";
@@ -60,7 +60,7 @@ public final class StaticRouter {
     private final static String stendShowcaseSchemaName = "SHOWCASE";
     private final static String devShowcaseSchemaName = "SHOWCASE";
     private final static String softShowcaseSchemaName = "SHOWCASE";
-    private final static String prodShowcaseSchemaName = "SHOWCASE";
+    private final static String prodShowcaseSchemaName = "SHCASE";
 
     /* Credit Registry DB IP */
     private final static String stendCRDBIP = "10.8.1.250";
