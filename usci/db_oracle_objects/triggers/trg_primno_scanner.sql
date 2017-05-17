@@ -4,7 +4,7 @@ before DELETE
 DECLARE
   v_control number;
 BEGIN
-  if(:OLD.attribute_id = 153)
+  if(:OLD.attribute_id = 153) then
     raise_application_error(-20002,'Нельзая удалить номер документа договора');
   end if;
 end;
