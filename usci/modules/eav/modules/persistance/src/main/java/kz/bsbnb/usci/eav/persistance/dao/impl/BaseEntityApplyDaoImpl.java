@@ -2057,20 +2057,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseValueClosed.setBaseContainer(baseEntity);
                     baseValueClosed.setMetaAttribute(metaAttribute);
 
-                    IBaseValue baseValueDeleted = BaseValueFactory.create(
-                            MetaContainerTypes.META_CLASS,
-                            metaType,
-                            baseValueClosed.getId(),
-                            baseValueClosed.getCreditorId(),
-                            new Date(baseValueClosed.getRepDate().getTime()),
-                            childBaseSetApplied,
-                            baseValueClosed.isClosed(),
-                            baseValueClosed.isLast());
-
-                    baseValueDeleted.setBaseContainer(baseEntity);
-                    baseValueDeleted.setMetaAttribute(metaAttribute);
-
-                    baseEntityManager.registerAsDeleted(baseValueDeleted);
+                    baseEntityManager.registerAsDeleted(baseValueClosed);
 
                     reportDateLoaded = baseValueClosed.getRepDate();
 
@@ -2083,7 +2070,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     baseValuePrevious.setMetaAttribute(metaAttribute);
 
                     childBaseSetLoaded = (IBaseSet) baseValueClosed.getValue();
-                    childBaseSetApplied = new BaseSet(childBaseSetLoaded.getId(), childMetaType, creditorId);
+                    childBaseSetApplied = new BaseSet(baseValuePrevious.getId(), childMetaType, creditorId);
 
                     IBaseValue baseValueApplied = BaseValueFactory.create(
                             MetaContainerTypes.META_CLASS,
