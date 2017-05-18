@@ -50,7 +50,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
     protected ResultSetMetaData rsmd;
     private boolean isIdTheSame;
     private int firstRecordNumber;
-    private int previousId;
+    private long previousId;
     private int previousIdRowIndex;
     private int idCounter = 0;
 
@@ -173,7 +173,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
     }
 
     protected void writeRow(ResultSet dataSource, WritableSheet currentSheet) throws SQLException, WriteException {
-        handleNewId(dataSource.getInt(2), currentSheet, dataSource);
+        handleNewId(dataSource.getLong(2), currentSheet, dataSource);
         for (int columnIndex = 1; columnIndex <= rsmd.getColumnCount(); columnIndex++) {
             if (columnIndex == 2) {
                 //Пропускаем id
@@ -215,7 +215,7 @@ public class OutputFormExporter extends TemplatedPagedXlsReportExporter {
 
         }
     }
-    private void handleNewId(int id, WritableSheet currentSheet, ResultSet dataSource) throws WriteException, SQLException {
+    private void handleNewId(long id, WritableSheet currentSheet, ResultSet dataSource) throws WriteException, SQLException {
         if (previousId == id) {
             isIdTheSame = true;
             return;

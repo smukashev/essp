@@ -343,7 +343,7 @@ public class MainPortlet extends MVCPortlet {
 
         if(isNb){
             for(Creditor creditor : creditors){
-                if(creditor.getBIK() != null && creditor.getBIN().equals(NBRK_BIN)){
+                if(creditor.getBIN() != null && creditor.getBIN().equals(NBRK_BIN)){
                     return creditor;
                 }
             }

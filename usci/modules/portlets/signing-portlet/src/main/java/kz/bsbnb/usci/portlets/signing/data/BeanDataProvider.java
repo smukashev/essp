@@ -78,7 +78,7 @@ public class BeanDataProvider implements DataProvider {
     }
 
     public String getBaseUrl() {
-        return StaticRouter.isDevMode() ? "http://localhost:8083" : "http://essp.nationalbank.kz";
+        return StaticRouter.isDevMode() ? "http://localhost:8083" : "https://essp.nationalbank.kz";
     }
 
     @Override
