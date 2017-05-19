@@ -14,7 +14,7 @@ public class ShowcaseDrop {
         try {
             Class.forName("oracle.jdbc.OracleDriver");
 
-            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl","showcase","showcase");
+            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@10.8.1.201:1521:SHCASE","showcase","showcase");
             Statement stmt = conn.createStatement();
             Statement ddlStmnt = conn.createStatement();
 
