@@ -17,6 +17,8 @@ public class Batch extends Persistable {
     private byte[] content;
     private String hash;
     private String sign;
+    private String signInfo;
+    private Date signTime;
     private String batchType;
     private Long totalCount;
     private Long actualCount;
@@ -168,6 +170,22 @@ public class Batch extends Persistable {
 
     public void setSign(String sign) {
         this.sign = sign;
+    }
+
+    public String getSignInfo() {
+        return signInfo;
+    }
+
+    public void setSignInfo(String signInfo) {
+        this.signInfo = signInfo;
+    }
+
+    public Date getSignTime() {
+        return signTime;
+    }
+
+    public void setSignTime(Date signTime) {
+        this.signTime = signTime;
     }
 
     public String getBatchType() {

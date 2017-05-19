@@ -239,6 +239,25 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
         return ((BigDecimal) rows.get(0).get("batch_count")).intValue();
     }
 
+    @Override
+    public String getSignInfo(long batchId) {
+        Select select = context
+                .select(EAV_BATCHES.SIGN_INFO)
+                .from(EAV_BATCHES)
+                .where(EAV_BATCHES.ID.equal(batchId));
+
+        logger.debug(select.toString());
+        List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
+
+        if (rows.size() > 1)
+            throw new IllegalArgumentException(Errors.compose(Errors.E151));
+
+        if (rows.size() < 1)
+            throw new IllegalStateException(Errors.compose(Errors.E152, batchId));
+
+        return (String) rows.get(0).get(EAV_BATCHES.SIGN_INFO.getName());
+    }
+
     private long insertBatch(Batch batch) {
         Insert insert = context.insertInto(EAV_BATCHES,
                 EAV_BATCHES.USER_ID,
@@ -246,6 +265,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 EAV_BATCHES.FILE_NAME,
                 EAV_BATCHES.HASH,
                 EAV_BATCHES.SIGN,
+                EAV_BATCHES.SIGN_INFO,
+                EAV_BATCHES.SIGN_TIME,
                 EAV_BATCHES.REP_DATE,
                 EAV_BATCHES.RECEIPT_DATE,
                 EAV_BATCHES.BATCH_TYPE,
@@ -258,6 +279,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 batch.getFileName(),
                 batch.getHash(),
                 batch.getSign(),
+                batch.getSignInfo(),
+                DataUtils.convertToTimestamp(batch.getSignTime()),
                 DataUtils.convert(batch.getRepDate()),
                 DataUtils.convertToTimestamp(batch.getReceiptDate()),
                 batch.getBatchType(),
@@ -283,6 +306,8 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 .set(EAV_BATCHES.FILE_NAME, batch.getFileName())
                 .set(EAV_BATCHES.HASH, batch.getHash())
                 .set(EAV_BATCHES.SIGN, batch.getSign())
+                .set(EAV_BATCHES.SIGN_INFO, batch.getSignInfo())
+                .set(EAV_BATCHES.SIGN_TIME, DataUtils.convertToTimestamp(batch.getSignTime()))
                 .set(EAV_BATCHES.REP_DATE, DataUtils.convert(batch.getRepDate()))
                 .set(EAV_BATCHES.RECEIPT_DATE, DataUtils.convertToTimestamp(batch.getReceiptDate()))
                 .set(EAV_BATCHES.BATCH_TYPE, batch.getBatchType())

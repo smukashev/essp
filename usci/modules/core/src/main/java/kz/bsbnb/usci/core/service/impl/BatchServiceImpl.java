@@ -205,9 +205,11 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
-    public void signBatch(long batchId, String sign) {
+    public void signBatch(long batchId, String sign, String signInfo, Date signTime) {
         Batch batch = batchDao.load(batchId);
         batch.setSign(sign);
+        batch.setSignInfo(signInfo);
+        batch.setSignTime(signTime);
         batchDao.save(batch);
     }
 
@@ -286,5 +288,10 @@ public class BatchServiceImpl implements IBatchService {
     public int getErrorEntityStatusCount(Batch batch)
     {
         return entityStatusDao.getErrorCount(batch.getId());
+    }
+
+    @Override
+    public String getSignatureInfo(long batchId) {
+        return batchDao.getSignInfo(batchId);
     }
 }
