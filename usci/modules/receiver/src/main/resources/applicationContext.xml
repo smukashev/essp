@@ -80,7 +80,7 @@
     <batch:job id="batchJob">
         <batch:step id="workflow">
             <batch:tasklet>
-                <batch:chunk reader="staxEventEntityReader" writer="rmiEventEntityWriter" processor="entityProcessor" commit-interval="100"/>
+                <batch:chunk reader="staxEventEntityReader" writer="rmiEventEntityWriter" processor="entityProcessor" commit-interval="50"/>
             </batch:tasklet>
         </batch:step>
         <batch:listeners>

@@ -28,6 +28,7 @@ public class BeanDataProvider implements DataProvider {
     private ProtocolBeanRemoteBusiness protocolBusiness;
     private InputInfoBeanRemoteBusiness inputInfoBusiness;
     private PortalUserBeanRemoteBusiness portalUserBusiness;
+    private boolean isNb;
 
     private static final String ENTITY_EDITOR_PAGE = "http://" + StaticRouter.getPortalUrl() + ":" +
             StaticRouter.getPortalPort() + "/entity_editor";
@@ -162,5 +163,14 @@ public class BeanDataProvider implements DataProvider {
         }
 
         return result;
+    }
+
+    @Override
+    public void setNb(boolean nb) {
+        isNb = nb;
+    }
+
+    public boolean isNb() {
+        return isNb;
     }
 }

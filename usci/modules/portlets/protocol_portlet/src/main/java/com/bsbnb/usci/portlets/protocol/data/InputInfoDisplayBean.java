@@ -84,6 +84,9 @@ public class InputInfoDisplayBean implements Button.ClickListener {
 
         final BigInteger batchId = inputInfo.getId();
 
+        if(inputInfo.getUserId() == 100500L && !provider.isNb())
+            return;
+
         final BatchFullJModel batchFullJModel =  provider.getBatchFullModel(batchId);
 
         final File batchFile = new File("batch_" + batchId + ".zip");
