@@ -1,6 +1,8 @@
 package kz.bsbnb.usci.portlet.report.ui;
 
 import com.vaadin.data.Property;
+import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.gwt.client.ui.AlignmentInfo;
 import com.vaadin.ui.*;
 import kz.bsbnb.usci.portlet.report.dm.ValuePair;
 
@@ -13,15 +15,13 @@ import java.util.List;
  */
 public class FilterComponent extends VerticalLayout  {
     List<ValuePair> values;
-    Component oldComponent;
 
-public void createNewFilter() {
+    public void createNewFilter() {
     final HorizontalLayout horizontalLayout = new HorizontalLayout();
     horizontalLayout.setSpacing(true);
-    horizontalLayout.setMargin(true);
     addComponent(horizontalLayout);
     ComboBox attributes = new ComboBox();
-    attributes.setCaption("Столбцы");
+    attributes.setCaption("Показатель");
     attributes.setDescription("attributes");
     attributes.setImmediate(true);
     attributes.setNewItemsAllowed(false);
@@ -29,14 +29,16 @@ public void createNewFilter() {
     attributes.setFilteringMode(ComboBox.FILTERINGMODE_CONTAINS);
     attributes.removeAllItems();
     for (ValuePair value : values) {
+        if(!value.toString().equals("OPEN_DATE") && !value.toString().equals("CLOSE_DATE") && !value.toString().equals("REP_DATE"))
         attributes.addItem(value);
     }
     final ComboBox filters = new ComboBox();
     filters.setCaption("Фильтр");
     filters.setDescription("filter");
+    filters.setNullSelectionAllowed(false);
     final Button deleteButton = new Button("Удалить фильтр");
     final Component component = new TextField();
-    oldComponent = component;
+    component.setCaption("Значение");
     attributes.addListener(new Property.ValueChangeListener() {
         @Override
         public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
@@ -51,16 +53,22 @@ public void createNewFilter() {
                 ((ComboBox)valueComponent).addItem(booleanValues.TRUE);
             } else valueComponent = new TextField();
             setFilters(type, filters);
-            horizontalLayout.replaceComponent(oldComponent, valueComponent);
-            oldComponent = valueComponent;
+            valueComponent.setCaption("Значение");
+            horizontalLayout.replaceComponent(horizontalLayout.getComponent(2), valueComponent);
+            horizontalLayout.setComponentAlignment(valueComponent, new Alignment(AlignmentInfo.Bits.ALIGNMENT_BOTTOM | AlignmentInfo.Bits.ALIGNMENT_HORIZONTAL_CENTER));
             horizontalLayout.removeComponent(deleteButton);
             horizontalLayout.addComponent(deleteButton);
+            horizontalLayout.setComponentAlignment(deleteButton, new Alignment(AlignmentInfo.Bits.ALIGNMENT_BOTTOM | AlignmentInfo.Bits.ALIGNMENT_HORIZONTAL_CENTER));
         }
     });
     horizontalLayout.addComponent(attributes);
+    horizontalLayout.setComponentAlignment(attributes, new Alignment(AlignmentInfo.Bits.ALIGNMENT_VERTICAL_CENTER | AlignmentInfo.Bits.ALIGNMENT_HORIZONTAL_CENTER));
     horizontalLayout.addComponent(filters);
+    horizontalLayout.setComponentAlignment(filters, new Alignment(AlignmentInfo.Bits.ALIGNMENT_VERTICAL_CENTER | AlignmentInfo.Bits.ALIGNMENT_HORIZONTAL_CENTER));
     horizontalLayout.addComponent(component);
+    horizontalLayout.setComponentAlignment(component, new Alignment(AlignmentInfo.Bits.ALIGNMENT_BOTTOM | AlignmentInfo.Bits.ALIGNMENT_HORIZONTAL_CENTER));
     horizontalLayout.addComponent(deleteButton);
+    horizontalLayout.setComponentAlignment(deleteButton, new Alignment(AlignmentInfo.Bits.ALIGNMENT_BOTTOM | AlignmentInfo.Bits.ALIGNMENT_HORIZONTAL_CENTER));
     deleteButton.addListener(new Button.ClickListener() {
         @Override
         public void buttonClick(Button.ClickEvent clickEvent) {
@@ -83,7 +91,11 @@ public void createNewFilter() {
             for(int j=0; j<layout.getComponentCount(); j++) {
                Component component = layout.getComponent(j);
                 if(component instanceof ComboBox) {
-                    s = s+" "+((ComboBox)component).getValue().toString();
+                    if(((ComboBox)component).getValue() instanceof filter) {
+                        s = s+" "+((filter)((ComboBox)component).getValue()).getValue();
+                    } else {
+                        s = s + " " + ((ComboBox) component).getValue().toString();
+                    }
                 } else if (component instanceof TextField) {
                     s = s+" "+((TextField)component).getValue().toString();
                 } else if (component instanceof DateField) {
@@ -106,7 +118,11 @@ public void createNewFilter() {
                 if(component instanceof ComboBox) {
                     if(((ComboBox)component).getDescription().equals("attributes"))
                         s = s+" AND ";
-                    s = s+" "+((ComboBox)component).getValue().toString();
+                    if(((ComboBox)component).getValue() instanceof filter) {
+                        s = s+" "+((filter)((ComboBox)component).getValue()).getValue();
+                    } else {
+                        s = s + " " + ((ComboBox) component).getValue().toString();
+                    }
                 } else if (component instanceof TextField) {
                     s = s+" \'"+((TextField)component).getValue().toString()+"\'";
                 } else if (component instanceof DateField) {
@@ -120,7 +136,8 @@ public void createNewFilter() {
     }
 
     public void setFilters(String type, Component component) {
-       if(type.equals("VARCHAR2")) {
+        ((ComboBox)component).removeAllItems();
+        if(type.equals("VARCHAR2")) {
            ((ComboBox)component).addItem(stringFilter.EQUAL);
            ((ComboBox)component).addItem(stringFilter.NOTEQUAL);
        } else if(type.equals("BOOLEAN")) {
@@ -135,62 +152,102 @@ public void createNewFilter() {
        }
     }
 
-    public enum stringFilter {
-        EQUAL("="), NOTEQUAL("<>");
+    public enum stringFilter implements filter {
+        EQUAL("EQUAL", "="), NOTEQUAL("NOTEQUAL", "<>");
 
-        private String name;
-        stringFilter (String name) {
-            this.name = name;
+        private String description;
+        private String value;
+
+        stringFilter (String description, String value) {
+            this.description = description;
+            this.value = value;
         }
 
         @Override
         public String toString() {
-            return name;
+            return description;
         }
 
-    }
-    public enum booleanFilter {
-        IS("=");
-        private String name;
-        booleanFilter (String name) {
-            this.name = name;
+        public String getValue() {
+            return value;
         }
 
-        @Override
-        public String toString() {
-            return name;
+        public String getDescription() {
+            return description;
         }
     }
 
-    public enum booleanValues {
-        TRUE("TRUE"),
-        FALSE("FALSE");
-        private String name;
-        booleanValues (String name) {
-            this.name = name;
+    public enum booleanFilter implements filter{
+        IS("IS", "=");
+        private String value;
+        private String description;
+        booleanFilter (String description, String value) {
+            this.description = description;
+            this.value = value;
+        }
+        public String getValue() {
+            return value;
         }
 
+        public String getDescription() {
+            return description;
+        }
         @Override
         public String toString() {
-            return name;
+            return description;
         }
     }
-    public enum dateAndNumberFilter {
-        EQUAL("="),
-        NOTEQUAL("<>"),
-        MORE(">"),
-        LESS("<"),
-        MOREOREQUAL(">="),
-        LESSOREQUAL("<=");
 
-        private String name;
-        dateAndNumberFilter (String name) {
-            this.name = name;
+    public enum booleanValues implements filter {
+        TRUE("TRUE","TRUE"),
+        FALSE("FALSE", "FALSE");
+        private String value;
+        private String description;
+        booleanValues (String description, String value) {
+            this.description = description;
+            this.value = value;
+        }
+        public String getValue() {
+            return value;
         }
 
+        public String getDescription() {
+            return description;
+        }
         @Override
         public String toString() {
-            return name;
+            return description;
         }
+    }
+    public enum dateAndNumberFilter implements filter {
+        EQUAL("EQUAL","="),
+        NOTEQUAL("NOTEQUAL", "<>"),
+        MORE("MORE",">"),
+        LESS("LESS","<"),
+        MOREOREQUAL("MOREOREQUAL", ">="),
+        LESSOREQUAL("LESSOREQUAL", "<=");
+
+        private String value;
+        private String description;
+        dateAndNumberFilter (String description, String value) {
+            this.description = description;
+            this.value = value;
+        }
+        public String getValue() {
+            return value;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+        @Override
+        public String toString() {
+            return description;
+        }
+    }
+
+    public interface filter {
+        public String getDescription();
+        public String getValue();
     }
 }
