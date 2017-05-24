@@ -11,9 +11,11 @@ import kz.bsbnb.usci.eav.model.searchForm.ISearchResult;
 import kz.bsbnb.usci.eav.model.searchForm.impl.NonPaginableSearchResult;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
+import kz.bsbnb.usci.eav.persistance.dao.IEavOptimizerDao;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.pool.IBaseEntitySearcherPool;
 import kz.bsbnb.usci.eav.repository.IMetaClassRepository;
+import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,9 @@ public class SubjectDocFormImpl extends JDBCSupport implements ISearcherForm {
 
     @Autowired
     IBaseEntityLoadDao baseEntityLoadDao;
+
+    @Autowired
+    IEavOptimizerDao eavOptimizerDao;
 
     @Override
     public List<Pair> getMetaClasses(long userId) {
@@ -64,15 +69,20 @@ public class SubjectDocFormImpl extends JDBCSupport implements ISearcherForm {
         for(int i=0;i<numDocs;i++) {
             IBaseEntity document = new BaseEntity(metaClassRepository.getMetaClass("document"), reportDate, creditorId);
             IBaseEntity docType = baseEntityLoadDao.load(Long.parseLong(parameters.get("doc_type" + i)));
-            document.put("doc_type", new BaseValue(creditorId, reportDate, docType));
-            document.put("no", new BaseValue(creditorId, reportDate, parameters.get("no" + i)));
-            //if(docType.getEl("is_identification") == true) {
-            Long docId = searcherPool.getSearcher("document").findSingle((BaseEntity) document, creditorId);
-            if(docId != null) {
-                document.setId(docId);
-                docs.put(new BaseValue(creditorId, reportDate, document));
-                successfullDocCount ++;
-            }
+            /*if(docType.getBaseValue("code").toString().equals("06") ||
+               docType.getBaseValue("code").toString().equals("07") ||
+               docType.getBaseValue("code").toString().equals("11") ||
+               docType.getBaseValue("code").toString().equals("17")) {*/
+                document.put("doc_type", new BaseValue(creditorId, reportDate, docType));
+                document.put("no", new BaseValue(creditorId, reportDate, parameters.get("no" + i)));
+                //if(docType.getEl("is_identification") == true) {
+                Long docId = searcherPool.getSearcher("document").findSingle((BaseEntity) document, creditorId);
+                if (docId != null) {
+                    document.setId(docId);
+                    docs.put(new BaseValue(creditorId, reportDate, document));
+                    successfullDocCount++;
+                }
+            //}
         }
 
         boolean isCreditor = parameters.get("subjectType").equals("isCreditor");
@@ -87,7 +97,8 @@ public class SubjectDocFormImpl extends JDBCSupport implements ISearcherForm {
         ISearchResult ret = new NonPaginableSearchResult();
 
         if(successfullDocCount > 0) {
-            Long id = searcherPool.getSearcher("subject").findSingle(subject, creditorId);
+            //Long id = searcherPool.getSearcher("subject").findSingle(subject, creditorId);
+            Long id = eavOptimizerDao.find(creditorId,subject.getMeta().getId(), BasicOptimizer.getKeyString(subject));
             if (id != null) {
                 entities.add((BaseEntity) baseEntityLoadDao.loadByMaxReportDate(id, reportDate));
             }
