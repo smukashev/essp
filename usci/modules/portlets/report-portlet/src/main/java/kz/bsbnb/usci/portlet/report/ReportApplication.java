@@ -98,8 +98,8 @@ public class ReportApplication extends Application {
                     }
                 }
 
-                if (!hasRights)
-                    throw new AccessControlException(Errors.compose(Errors.E238));
+                /*if (!hasRights)
+                    throw new AccessControlException(Errors.compose(Errors.E238));*/
 
                 String portletInstanceId = (String) request.getAttribute(WebKeys.PORTLET_ID);
 

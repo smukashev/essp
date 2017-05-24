@@ -819,7 +819,7 @@ function insertForm(node){
     }
 }
 
-function escape(xmlStr){
+function es_escape(xmlStr){
     return xmlStr.replace(new RegExp('&','g'), '&amp;');
 }
 
@@ -1110,7 +1110,7 @@ Ext.onReady(function () {
                 url: dataUrl,
                 method: 'POST',
                 params: {
-                    xml_data: escape(xmlStr),
+                    xml_data: es_escape(xmlStr),
                     date: Ext.getCmp('edDate').value,
                     op: 'RUN_RULE',
                     creditorId: Ext.getCmp('edCreditor').value
@@ -1179,7 +1179,7 @@ Ext.onReady(function () {
                     url: dataUrl,
                     method: 'POST',
                     params: {
-                        xml_data: escape(xmlStr),
+                        xml_data: es_escape(xmlStr),
                         date: Ext.getCmp('edDate').value,
                         op: 'SAVE_XML',
                         creditorId: Ext.getCmp('edCreditor').value,
@@ -1559,7 +1559,11 @@ Ext.onReady(function () {
                             if (node.data.ref)
                                 editorAction.aquire(node, refPicker(node));
                             else {
-                                editorAction.aquire(node, editorForm(node));
+                                if(node.parentNode.data.ref)
+                                    editorAction.aquire(node.parentNode, refPicker(node.parentNode))
+                                else {
+                                    editorAction.aquire(node, editorForm(node));
+                                }
                             }
                         },
                         disabled: !editorAction.canEdit() || !(node.data.ref || node.data.simple)
@@ -1575,7 +1579,7 @@ Ext.onReady(function () {
                                     Ext.MessageBox.alert("", "Нельзя удалить на разные отчетные даты");
                                 });
                             },
-                            disabled: !editorAction.canDelete() || (node.data.isKey)
+                            disabled: !editorAction.canDelete() || (node.data.isKey) || (node.parentNode.data.ref)
                         });
                     }
 

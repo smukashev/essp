@@ -58,6 +58,16 @@ public class ParametersComponent extends VerticalLayout {
     @Override
     public void attach() {
         setSpacing(true);
+        final Button filterButton = new Button("Добавить фильтр");
+        final FilterComponent filterComponent = new FilterComponent();
+        filterButton.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+
+                addComponent(filterComponent);
+                filterComponent.createNewFilter();
+            }
+        });
         for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
             ReportInputParameter parameter = parameters[parameterIndex];
             String localizedParameterName = parameter.getLocalizedName();
@@ -85,9 +95,12 @@ public class ParametersComponent extends VerticalLayout {
                     break;
                 case STRING:
                     break;
+                case FILTER:
+                    parameterComponent = filterComponent;
+                    break;
                 case OPTION:
-                    optiongroup.setMultiSelect(true);
 
+                    optiongroup.setMultiSelect(true);
                     List<ValuePair> v_values = connect.getValueListFromStoredProcedure(parameter.getProcedureName(), "");
                     for (ValuePair value : v_values) {
                         optiongroup.addItem(value);
@@ -95,7 +108,7 @@ public class ParametersComponent extends VerticalLayout {
                     parameterComponent = optiongroup;
                     break;
                 case LIST:
-                    List<ValuePair> values = connect.getValueListFromStoredProcedure(parameter.getProcedureName(), null);
+                    final List<ValuePair> values = connect.getValueListFromStoredProcedure(parameter.getProcedureName(), null);
                     if (values.size() == 1) {
                         final ValuePair value = values.get(0);
                         value.setDisplayName("<h1>" + value.getDisplayName() + "</h1>");
@@ -128,18 +141,24 @@ public class ParametersComponent extends VerticalLayout {
                         comboBox.setWidth("200px");
                         comboBox.setCaption(localizedParameterName);
                         parameterComponent = comboBox;
+                        addComponent(filterComponent);
                         if(parameter.getProcedureName().equals("reporter.INPUT_PARAMETER_SHOWCASES")) {
                             comboBox.addListener(new Property.ValueChangeListener() {
 
                                 public void valueChange(Property.ValueChangeEvent event) {
                                     optiongroup.removeAllItems();
+                                    List<ValuePair> v_values = null;
                                     if (comboBox.getValue() != null) {
-                                        List<ValuePair> v_values = connect.getValueListFromStoredProcedure("INPUT_PARAMETER_SC_FIELDS", ((ValuePair) event.getProperty().getValue()).getValue());
+                                            v_values = connect.getValueListFromStoredProcedure("INPUT_PARAMETER_SC_FIELDS", ((ValuePair) event.getProperty().getValue()).getValue());
                                         for (ValuePair value : v_values) {
                                             optiongroup.addItem(value);
                                         }
-
                                     }
+                                    removeComponent(filterButton);
+                                    filterComponent.removeAllComponents();
+                                    addComponent(filterButton);
+                                    filterComponent.setAttributes(v_values);
+
                                 }
                             });
                         }
@@ -193,6 +212,10 @@ public class ParametersComponent extends VerticalLayout {
                     SimpleDateFormat sdf = new SimpleDateFormat(dateField.getDateFormat());
                     result.add(sdf.format(value));
                 }
+            } else if (parameterComponent instanceof FilterComponent) {
+                FilterComponent filterComponent = (FilterComponent) parameterComponent;
+                result.add(filterComponent.getParameterCaption());
+
             } else if (parameterComponent instanceof ComboBox) {
                 ComboBox comboBox = (ComboBox) parameterComponent;
                 result.add(comboBox.getItemCaption(comboBox.getValue()));
@@ -234,6 +257,8 @@ public class ParametersComponent extends VerticalLayout {
                     item = getValue((Label) parameterComponent);
                 } else if (parameterComponent instanceof  OptionGroup) {
                     item = getValue((OptionGroup) parameterComponent);
+                } else if (parameterComponent instanceof FilterComponent) {
+                    item = ((FilterComponent)parameterComponent).getValue();
                 }
                 result.add(item);
             } catch (ParameterException pe) {

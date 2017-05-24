@@ -2613,7 +2613,7 @@ public class CLI {
                     try {
                         try {
                             if (conn == null || conn.isClosed())
-                                conn = connectToDB("jdbc:oracle:thin:@" +StaticRouter.getDBCoreIP()+ ":1521:ESSP", "CORE", "core");
+                                conn = connectToDB("jdbc:oracle:thin:@" +StaticRouter.getDBCoreIP()+ ":1521:ESSPNEW", "CORE", "core");
                         } catch (Exception e) {
                             System.out.println("Can't connect to DB: " + e.getMessage());
                             return;
@@ -2784,7 +2784,7 @@ public class CLI {
         }
 
         String sourceFolder = args.get(0);
-        String targetFolder = "E:\\Zips";
+        String targetFolder = "D:\\Zips";
 
         if (args.size() > 1)
             targetFolder = args.get(1);
