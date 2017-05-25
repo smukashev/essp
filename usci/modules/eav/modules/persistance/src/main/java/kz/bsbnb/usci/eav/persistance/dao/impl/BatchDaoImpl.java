@@ -280,7 +280,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 batch.getHash(),
                 batch.getSign(),
                 batch.getSignInfo(),
-                DataUtils.convertToTimestamp(batch.getSignTime()),
+                DataUtils.convert(batch.getSignTime()),
                 DataUtils.convert(batch.getRepDate()),
                 DataUtils.convertToTimestamp(batch.getReceiptDate()),
                 batch.getBatchType(),
@@ -307,7 +307,7 @@ public class BatchDaoImpl extends JDBCSupport implements IBatchDao {
                 .set(EAV_BATCHES.HASH, batch.getHash())
                 .set(EAV_BATCHES.SIGN, batch.getSign())
                 .set(EAV_BATCHES.SIGN_INFO, batch.getSignInfo())
-                .set(EAV_BATCHES.SIGN_TIME, DataUtils.convertToTimestamp(batch.getSignTime()))
+                .set(EAV_BATCHES.SIGN_TIME, DataUtils.convert(batch.getSignTime()))
                 .set(EAV_BATCHES.REP_DATE, DataUtils.convert(batch.getRepDate()))
                 .set(EAV_BATCHES.RECEIPT_DATE, DataUtils.convertToTimestamp(batch.getReceiptDate()))
                 .set(EAV_BATCHES.BATCH_TYPE, batch.getBatchType())
