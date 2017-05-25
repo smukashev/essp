@@ -232,7 +232,7 @@ Ext.onReady(function() {
                         Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(error));
                     }
                     if(records && records.length == 0)
-                        Ext.MessageBox.alert(label_INFO, 'Не удалось найти идентификационный документ');
+                        Ext.MessageBox.alert(label_INFO, 'Необходимо указать хотя бы один идентификационный документ');
 
                     Ext.getCmp('entityEditorShowBtn').enable();
                 }});
