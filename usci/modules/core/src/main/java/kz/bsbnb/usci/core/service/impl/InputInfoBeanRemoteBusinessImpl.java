@@ -377,4 +377,9 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
     public int countInputInfos(List<Creditor> creditors, Date reportDate) {
         return batchService.getBatchCount(creditors, reportDate);
     }
+
+    @Override
+    public String getSignatureInfo(InputInfo inputInfo) {
+        return batchService.getSignatureInfo(inputInfo.getId().longValue());
+    }
 }

@@ -73,8 +73,8 @@ public class BeanDataProvider implements DataProvider {
         return resultList;
     }
 
-    public void signFile(long fileId, String sign) {
-        inputFileBusiness.signFile(fileId, sign);
+    public void signFile(long fileId, String sign, String signInfo, Date signTime) {
+        inputFileBusiness.signFile(fileId, sign, signInfo, signTime);
     }
 
     public String getBaseUrl() {
@@ -123,20 +123,7 @@ public class BeanDataProvider implements DataProvider {
 
 
     public void addInputFileToQueue(FileSignatureRecord record) {
-        signFile(record.getInputFile().getId(), record.getSignature());
+        signFile(record.getInputFile().getId(), record.getSignature(), record.getInformation(), record.getSigningTime());
         batchProcessService.restartBatch(record.getInputFile().getId());
-        /*try {
-            final InputFileSignature inputFileSignature = new InputFileSignature();
-            inputFileSignature.setSignature(record.getSignature());
-            final InputFile inputFile = record.getInputFile();
-            inputFileBusiness.addSignatureToFile(inputFile, inputFileSignature);
-            InputInfo inputInfo = inputFile.getInputInfo();
-            inputInfo.setStatus(sharedBusiness.findByC_T(InputInfoStatus.IN_QUEUE.getCode(), SharedType.INPUT_INFO_STATUS.getType()));
-            inputInfoBusiness.update(inputInfo);
-        } catch (ResultInconsistentException rie) {
-            //log.log(Level.SEVERE, null, rie);
-        } catch (ResultNotFoundException rnfe) {
-            //log.log(Level.SEVERE, null, rnfe);
-        }*/
     }
 }

@@ -33,7 +33,7 @@ public interface IBatchService {
 
     List<Batch> getBatchListToSign(long userId);
 
-    void signBatch(long batchId, String sign);
+    void signBatch(long batchId, String sign, String signInfo, Date signTime);
 
     List<Batch> getAll(Date repDate);
 

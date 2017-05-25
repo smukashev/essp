@@ -2,6 +2,7 @@ package kz.bsbnb.usci.portlets.signing.data;
 
 import kz.bsbnb.usci.cr.model.Creditor;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public interface DataProvider {
     
     void addInputFileToQueue(FileSignatureRecord record);
 
-    void signFile(long fileId, String sign);
+    void signFile(long fileId, String sign, String signInfo, Date signTime);
 
     public String getCreditorsBinNumber(Creditor creditor);
 
