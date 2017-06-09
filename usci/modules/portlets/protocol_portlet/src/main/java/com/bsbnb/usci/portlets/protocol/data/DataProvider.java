@@ -31,4 +31,6 @@ public interface DataProvider {
     void setNb(boolean isNB);
 
     boolean isNb();
+
+    String getSignatureInformation(InputInfoDisplayBean ii);
 }

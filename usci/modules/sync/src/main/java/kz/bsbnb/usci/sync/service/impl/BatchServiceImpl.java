@@ -82,8 +82,8 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     @Override
-    public void signBatch(long batchId, String sign) {
-        remoteBatchService.signBatch(batchId, sign);
+    public void signBatch(long batchId, String sign, String signInfo, Date signTime) {
+        remoteBatchService.signBatch(batchId, sign, signInfo, signTime);
     }
 
     @Override

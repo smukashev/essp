@@ -84,6 +84,7 @@ public class ProtocolLayout extends VerticalLayout {
     private FormattedTable tableProtocol;
     private VerticalLayout protocolLayout;
     private Label noProtocolsLabel;
+    private VerticalLayout fileSignatureDisplayLayout;
 
     public final Logger logger = Logger.getLogger(ProtocolLayout.class);
 
@@ -364,7 +365,10 @@ public class ProtocolLayout extends VerticalLayout {
         noProtocolsLabel.setVisible(false);
         noProtocolsLabel.setImmediate(true);
 
+        fileSignatureDisplayLayout = new VerticalLayout();
+
         protocolLayout = new VerticalLayout();
+        protocolLayout.addComponent(fileSignatureDisplayLayout);
         protocolLayout.addComponent(headerProtocolLabel);
         protocolLayout.addComponent(headerProtocolLayout);
         protocolLayout.addComponent(layoutOfProtocolTable);
@@ -426,6 +430,18 @@ public class ProtocolLayout extends VerticalLayout {
     }
 
     private void showProtocol(InputInfoDisplayBean ii) throws UnsupportedOperationException {
+        String signatureInformation = provider.getSignatureInformation(ii);
+        String signatureCaption;
+        if (signatureInformation == null) {
+            signatureCaption = Localization.NO_SIGNATURE_CAPTION.getValue();
+        } else {
+            String signatureCaptionTemplate = Localization.SIGNATURE_CAPTION.getValue();
+            signatureCaption = String.format(signatureCaptionTemplate, signatureInformation);
+        }
+        Label signatureInfoLabel = new Label(signatureCaption, Label.CONTENT_XHTML);
+        fileSignatureDisplayLayout.removeAllComponents();
+        fileSignatureDisplayLayout.addComponent(signatureInfoLabel);
+
         groupsOfProtocolTree.removeAllItems();
         protocolsContainer.removeAllItems();
         typesOfProtocolLayout.removeAllComponents();

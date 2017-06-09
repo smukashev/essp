@@ -173,4 +173,9 @@ public class BeanDataProvider implements DataProvider {
     public boolean isNb() {
         return isNb;
     }
+
+    @Override
+    public String getSignatureInformation(InputInfoDisplayBean ii) {
+        return inputInfoBusiness.getSignatureInfo(ii.getInputInfo());
+    }
 }

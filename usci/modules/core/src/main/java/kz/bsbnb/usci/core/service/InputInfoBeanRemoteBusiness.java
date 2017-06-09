@@ -24,4 +24,6 @@ public interface InputInfoBeanRemoteBusiness {
     void declineMaintenance(List<Long> declinedInputInfos);
 
     int countInputInfos(List<Creditor> selectedCreditors, Date date);
+
+    String getSignatureInfo(InputInfo inputInfo);
 }

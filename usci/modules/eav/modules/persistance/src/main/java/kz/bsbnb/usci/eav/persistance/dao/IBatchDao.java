@@ -35,4 +35,5 @@ public interface IBatchDao {
 
     int getBatchCount(List<Creditor> creditors, Date reportDate);
 
+    String getSignInfo(long batchId);
 }
