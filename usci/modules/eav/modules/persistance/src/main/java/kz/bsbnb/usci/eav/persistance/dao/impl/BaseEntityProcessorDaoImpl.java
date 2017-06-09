@@ -390,7 +390,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntityManager.registerAsDeleted(baseEntityPostPrepared);
                     baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(baseEntityPostPrepared.getId(), baseEntityPostPrepared.getReportDate());
                     baseEntityApplied.setOperation(OperationType.DELETE);
-
+                    eavOptimizerDao.delete(baseEntityApplied.getId());
                     baseEntityApplyDao.applyToDb(baseEntityManager);
 
                     break;
