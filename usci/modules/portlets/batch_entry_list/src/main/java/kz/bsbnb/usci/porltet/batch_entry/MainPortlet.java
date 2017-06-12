@@ -229,7 +229,7 @@ public class MainPortlet extends MVCPortlet {
 
                                 Date prevReportDate = null;
                                 if (batchEntry.getEntityId() != null)
-                                    entityService.getPreviousReportDate(batchEntry.getEntityId(), batchEntry.getRepDate());
+                                    prevReportDate = entityService.getPreviousReportDate(batchEntry.getEntityId(), batchEntry.getRepDate());
 
                                 if ((batchEntry.getMaintenance() && prevReportDate != null
                                         || batchEntry.getRepDate().compareTo(reportDate) < 0) && !isNB) {
