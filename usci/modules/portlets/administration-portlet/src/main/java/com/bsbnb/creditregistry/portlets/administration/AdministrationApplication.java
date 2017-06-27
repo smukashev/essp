@@ -41,7 +41,7 @@ public class AdministrationApplication extends Application implements PortletReq
     }
 
     public void onRequestStart(PortletRequest request, PortletResponse response) {
-        bundle = ResourceBundle.getBundle("content.Language", new Locale("ru", "RU"));
+        bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
     }
 
     public void onRequestEnd(PortletRequest request, PortletResponse response) {

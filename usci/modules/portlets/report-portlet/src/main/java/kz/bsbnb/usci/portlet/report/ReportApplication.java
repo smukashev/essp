@@ -115,7 +115,7 @@ public class ReportApplication extends Application {
                 }
                 logger.info("Items view type: " + viewType);
 
-                bundle = ResourceBundle.getBundle("content.Language", new Locale("ru", "RU"));
+                bundle = ResourceBundle.getBundle("content.Language", user.getLocale());
                 DatabaseConnect connect = new DatabaseConnect(user);
                 MainLayout layout = new MainLayout(connect);
                 layout.setWidth("100%");

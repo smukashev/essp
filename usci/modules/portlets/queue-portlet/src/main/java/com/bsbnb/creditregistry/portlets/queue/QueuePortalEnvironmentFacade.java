@@ -25,7 +25,7 @@ public class QueuePortalEnvironmentFacade extends PortalEnvironmentFacade {
 
     public QueuePortalEnvironmentFacade(User user) {
         this.user = user;
-        this.locale = new Locale("ru", "RU");
+        this.locale = user.getLocale();
         this.bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
         try {
             for (Role role : user.getRoles()) {
