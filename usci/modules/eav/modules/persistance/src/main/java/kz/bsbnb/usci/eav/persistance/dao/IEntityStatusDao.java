@@ -15,7 +15,7 @@ public interface IEntityStatusDao {
 
     List<EntityStatus> getList(long batchId, int firstIndex, int count);
 
-    int getCount(long batchId);
+    int getEntityCount(long batchId);
 
     int getErrorCount(long id);
 }

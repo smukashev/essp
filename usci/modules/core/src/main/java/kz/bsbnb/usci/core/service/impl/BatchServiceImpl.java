@@ -281,7 +281,7 @@ public class BatchServiceImpl implements IBatchService {
 
     @Override
     public int getEntityStatusCount(long batchId) {
-        return entityStatusDao.getCount(batchId);
+        return entityStatusDao.getEntityCount(batchId);
     }
 
     @Override
