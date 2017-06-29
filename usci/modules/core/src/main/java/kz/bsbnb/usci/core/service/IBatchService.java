@@ -56,7 +56,7 @@ public interface IBatchService {
 
     int getBatchCount(List<Creditor> creditors, Date reportDate);
 
-    int getEntityStatusCount(long batchId);
+    int getSuccessEntityCount(long batchId);
 
     int getErrorEntityStatusCount(Batch batch);
 

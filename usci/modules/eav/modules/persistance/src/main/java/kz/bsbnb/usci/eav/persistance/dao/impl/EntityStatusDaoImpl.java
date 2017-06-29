@@ -111,12 +111,12 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
     }
 
     @Override
-    public int getEntityCount(long batchId) {
+    public int getSuccessEntityCount(long batchId) {
         Select select = context
                 .select(DSL.count(EAV_ENTITY_STATUSES.ID).as("entity_status_count"))
                 .from(EAV_ENTITY_STATUSES.join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID)))
                 .where(EAV_ENTITY_STATUSES.BATCH_ID.eq(batchId))
-                .and(EAV_GLOBAL.CODE.notIn("ACTUAL_COUNT", "TOTAL_COUNT"));
+                .and(EAV_GLOBAL.CODE.eq("COMPLETED"));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 

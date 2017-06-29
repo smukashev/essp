@@ -83,8 +83,8 @@ public class InputInfoDisplayBean implements Button.ClickListener {
         return inputInfo.getActualCount();
     }
 
-    public int getProcessedCount(){
-        return inputInfo.getProcessedCount();
+    public int getSuccessCount(){
+        return inputInfo.getSuccessCount();
     }
 
     public void buttonClick(ClickEvent event) {
