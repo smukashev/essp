@@ -82,12 +82,12 @@ public final class StaticRouter {
     /* Report files catalog */
     private final static String stendReportFilesCatalog = "/home/essp/Portal_afn/Report/";
     private final static String devReportFilesCatalog = "/home/essp/Portal_afn/Report/";
-    private final static String prodReportFilesCatalog = "C:\\Portal_afn\\Report\\";
+    private final static String prodReportFilesCatalog = "D:\\Portal_afn\\Report\\";
 
     /* Report files folder */
     private final static String stendReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
     private final static String devReportFilesFolder = "/home/essp/Portal_afn/generated_reports/";
-    private final static String prodReportFilesFolder = "C:\\Portal_afn\\generated_reports\\";
+    private final static String prodReportFilesFolder = "D:\\Portal_afn\\generated_reports\\";
 
 
     private final static String stendXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";//todo: change that path
