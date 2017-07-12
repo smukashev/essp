@@ -14,7 +14,6 @@ import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.persistance.searcher.IBaseEntitySearcher;
 import kz.bsbnb.usci.eav.tool.struct.StructType;
-import kz.bsbnb.usci.eav.util.DataUtils;
 import kz.bsbnb.usci.eav.util.Errors;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -285,9 +284,7 @@ public class ImprovedBaseEntitySearcher extends JDBCSupport implements IBaseEnti
                 joins.join(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs)).on(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs).ENTITY_ID.eq(entity.getAddInfo().parentEntity.getId()))
                         .and(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs).ATTRIBUTE_ID.eq(entity.getAddInfo().attributeId))
                         .join(EAV_BE_COMPLEX_SET_VALUES.as(cv)).on(EAV_BE_ENTITY_COMPLEX_SETS.as(ecs).ID.eq(EAV_BE_COMPLEX_SET_VALUES.as(cv).SET_ID))
-                            .and(EAV_BE_COMPLEX_SET_VALUES.as(cv).ENTITY_VALUE_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID)
-                            .and(EAV_BE_COMPLEX_SET_VALUES.as(cv).IS_CLOSED.equal(DataUtils.convert(false)))
-                            .and(EAV_BE_COMPLEX_SET_VALUES.as(cv).IS_LAST.equal(DataUtils.convert(true))));
+                            .and(EAV_BE_COMPLEX_SET_VALUES.as(cv).ENTITY_VALUE_ID.eq(EAV_BE_ENTITIES.as(entityAlias).ID));
             } else {
                 final String cv = "ebcv";
                 joins.join(EAV_BE_COMPLEX_VALUES.as(cv)).on(EAV_BE_COMPLEX_VALUES.as(cv).ENTITY_ID.eq(entity.getAddInfo().parentEntity.getId()))
