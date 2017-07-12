@@ -79,6 +79,14 @@ public class InputInfoDisplayBean implements Button.ClickListener {
                 : inputInfo.getStatus().getNameRu();
     }
 
+    public int getActualCount(){
+        return inputInfo.getActualCount();
+    }
+
+    public int getSuccessCount(){
+        return inputInfo.getSuccessCount();
+    }
+
     public void buttonClick(ClickEvent event) {
         Button button = event.getButton();
 
