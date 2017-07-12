@@ -75,6 +75,8 @@ public class AdministrationApplication extends Application implements PortletReq
                 MainSplitPanel sp = new MainSplitPanel(bundle, provider,user);
                 mainWindow.addComponent(sp);
                 setMainWindow(mainWindow);
+
+                response.setTitle(bundle.getString("AdministrationApplication"));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
