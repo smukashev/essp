@@ -21,7 +21,7 @@ public class UploadPortletEnvironmentFacade implements PortletEnvironmentFacade{
     public UploadPortletEnvironmentFacade(User user, boolean isNB) {
         this.user = user;
         bundle = ResourceBundle.getBundle(BUNDLE_NAME, user.getLocale());
-        isKazakh = "kz".equals(user.getLocale().getLanguage());
+        isKazakh = "kk".equals(user.getLocale().getLanguage());
         this.isNB = isNB;
     }
 
