@@ -30,3 +30,6 @@ var label_DATA_PANEL = 'Панель метаданных';
 var label_CLASS_ST = 'Структура класса';
 var label_UNFOLD = 'Раскрыть всё';
 var label_FOLD = 'Свернуть всё';
+var label_DOWNLOAD_XSD = 'Скачать схему';
+var label_ACTIVITY_TYPE="Признак активности";
+var label_CLASS_TYPE="Тип класса";

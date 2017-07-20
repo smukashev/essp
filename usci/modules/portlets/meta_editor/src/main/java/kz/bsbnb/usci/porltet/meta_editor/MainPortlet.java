@@ -29,10 +29,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.AccessControlException;
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class MainPortlet extends MVCPortlet {
     private XSDGenerator xsdGenerator = new XSDGenerator();
     private IMetaFactoryService metaFactoryService;
+    private ResourceBundle bundle;
     private Logger logger = Logger.getLogger(MainPortlet.class);
     private Exception currentException;
 
@@ -72,6 +74,9 @@ public class MainPortlet extends MVCPortlet {
         } catch (Exception e) {
             currentException = e;
         }
+
+        bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
+        renderResponse.setTitle(bundle.getString("WindowsTitle"));
 
         super.doView(renderRequest, renderResponse);
     }

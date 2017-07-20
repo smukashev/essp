@@ -12,7 +12,7 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
 
     var buttonSave = Ext.create('Ext.button.Button', {
         id: "createMCAttrFormOK",
-        text: 'Сохранить',
+        text: label_SAVE,
         handler : function (){
             var form = Ext.getCmp('createMCAttrForm').getForm();
             if(form.isValid()){
@@ -66,7 +66,7 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
 
     var buttonClose = Ext.create('Ext.button.Button', {
         id: "createMCAttrFormCancel",
-        text: 'Отмена',
+        text: label_CANCEL,
         handler : function (){
             Ext.getCmp('createMCAttrFormWin').destroy();
         }
@@ -336,7 +336,7 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                 queryMode:'local'
             },
             {
-                fieldLabel: 'Признак активности',
+                fieldLabel: label_ACTIVITY_TYPE,
                 id: 'is_Disabled',
                 name: 'is_Disabled',
                 xtype: 'combobox',
