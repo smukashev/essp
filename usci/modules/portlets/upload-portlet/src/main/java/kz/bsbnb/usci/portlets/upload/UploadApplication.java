@@ -26,10 +26,13 @@ import com.vaadin.ui.Window.Notification;
 import org.apache.log4j.Logger;
 
 import java.security.AccessControlException;
+import java.util.ResourceBundle;
 
 public class UploadApplication extends Application {
 
     private static final long serialVersionUID = 2096197512742005243L;
+
+    private ResourceBundle bundle;
 
     private final Logger logger = Logger.getLogger(UploadApplication.class);
 
@@ -80,6 +83,9 @@ public class UploadApplication extends Application {
                 mainWindow.addComponent(new MainLayout(
                         new UploadPortletEnvironmentFacade(PortalUtil.getUser(request), isNB)));
                 setMainWindow(mainWindow);
+
+                bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
+                response.setTitle(bundle.getString("WINDOW-TITLE"));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
