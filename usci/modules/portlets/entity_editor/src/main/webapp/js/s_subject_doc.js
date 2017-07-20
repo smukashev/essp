@@ -143,17 +143,17 @@ Ext.onReady(function() {
                 //renderTo: 'us-search-area',
                 columns: [{
                     xtype: 'treecolumn',
-                    text: 'title',
+                    text: label_TITLE,
                     flex: 2,
                     sortable: true,
                     dataIndex: 'title'
                 },{
-                    text: 'code',
+                    text: label_CODE,
                     flex: 1,
                     dataIndex: 'code',
                     sortable: true
                 },{
-                    text: 'value',
+                    text: label_VALUE,
                     flex: 4,
                     dataIndex: 'value',
                     sortable: true
@@ -174,12 +174,12 @@ Ext.onReady(function() {
                     sortable: true
                 }],
                 tbar: [{
-                    text: 'добавить документ поиска',
+                    text: label_SEARCH_BY_DOC,
                     handler: function(){
                             subjectTypeModalWindow.show();
                     }
                 }, {
-                    text: 'Очистить',
+                    text: label_CLEAN,
                     handler: function(){
                         Ext.getCmp('s_person_doc_tree').getRootNode().getChildAt(0).removeAll();
                     }

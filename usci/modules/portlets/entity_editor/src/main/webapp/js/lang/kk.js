@@ -26,6 +26,21 @@ var label_date = 'Күні';
 var label_CONFIRM_CHANGES = "Подтвердить изменения";
 var label_REQUIRED_FIELD = "Обязательное поле";
 var label_LOADING = "Жүктеп жатыр...";
+var label_SEARCH_TYPE="Іздеу турі";
+var label_CREDITOR="Кредитор";
+var label_SUBJECT_NAME = "Жылдам қарау";
+var label_OPEN_DATE="Ашылу күні";
+var label_CLOSE_DATE="Жабылу күні";
+var label_CONTRUCT_NO="Келісім номері";
+var label_CONTRUCT_DATE="Келісім күні";
+var label_FIRSTNAME="Аты";
+var label_LASTNAME="Тегі";
+var label_MIDDLENAME="Әкесінің аты";
+var label_SEARCH_BY_DOC="Құжатпен іздеу";
+var label_CLEAN="Тазалау";
+var label_FOUND_RESULT="Нәтиже";
+var label_DIFFERENCE="Өзгеріс";
+
 
 var errors = {
     "communication failure" : "уакыт шамадан тыс, суракты толыктыру мумкиндигин карастырыныз"

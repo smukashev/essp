@@ -115,7 +115,7 @@ Ext.onReady(function () {
                                             simple: true
                                         }),
                                         Ext.create('entityModel', {
-                                            title: 'Дата',
+                                            title: label_DATE,
                                             code: 'date',
                                             format: 'd.m.Y',
                                             value: '04.11.2016',

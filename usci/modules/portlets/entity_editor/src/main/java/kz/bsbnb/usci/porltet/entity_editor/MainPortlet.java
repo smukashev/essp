@@ -48,6 +48,7 @@ public class MainPortlet extends MVCPortlet {
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private ReportBeanRemoteBusiness reportBusiness;
     private IBatchProcessService batchProcessService;
+    private ResourceBundle bundle;
     private final Logger logger = Logger.getLogger(MainPortlet.class);
     private boolean retry;
 
@@ -157,6 +158,10 @@ public class MainPortlet extends MVCPortlet {
         } catch (Exception e) {
             renderRequest.setAttribute("error",Errors.decompose(e.getMessage()));
         }
+
+        bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
+        renderResponse.setTitle(bundle.getString("WindowsTitle"));
+
         super.doView(renderRequest, renderResponse);
     }
 

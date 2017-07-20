@@ -27,6 +27,20 @@ var label_date = 'Дата';
 var label_CONFIRM_CHANGES = "Подтвердить изменения";
 var label_REQUIRED_FIELD = "Обязательное поле";
 var label_LOADING = "Идет загрузка...";
+var label_SEARCH_TYPE="Вид поиска";
+var label_CREDITOR="Кредитор";
+var label_SUBJECT_NAME = "Быстрый просмотр";
+var label_OPEN_DATE="Дата открытия";
+var label_CLOSE_DATE="Дата закрытия";
+var label_CONTRUCT_NO="Номер договора";
+var label_CONTRUCT_DATE="Дата договора";
+var label_FIRSTNAME="Имя";
+var label_LASTNAME="Фамилия";
+var label_MIDDLENAME="Отчество";
+var label_SEARCH_BY_DOC="Добавить документ поиска";
+var label_CLEAN="Очистить";
+var label_FOUND_RESULT="Всего результатов";
+var label_DIFFERENCE="Изменение";
 
 var errors = {
     "communication failure" : "превышен таймаут, попробуйте указать больше данных"
