@@ -7,3 +7,4 @@ var label_DEL = 'Удалить';
 var label_CLOSE = 'Закрыть';
 var LABEL_SEND_APPROVAL = 'Изменения успешно отправлены. Статус смотрите в протоколе';
 var LABEL_SUCCESS = 'Успешное завершение операции';
+var label_RECORDS="Записи";

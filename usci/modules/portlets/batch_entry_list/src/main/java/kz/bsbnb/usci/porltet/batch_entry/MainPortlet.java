@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -41,6 +42,7 @@ public class MainPortlet extends MVCPortlet {
 
     private IBatchEntryService batchEntryService;
     private IEntityService entityService;
+    private ResourceBundle bundle;
     private Logger logger = Logger.getLogger(MainPortlet.class);
     private Exception currentException;
     private boolean retry;
@@ -116,6 +118,10 @@ public class MainPortlet extends MVCPortlet {
         } catch (Exception e) {
             currentException = e;
         }
+
+        bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
+        renderResponse.setTitle(bundle.getString("WindowsTitle"));
+
         super.doView(renderRequest, renderResponse);
     }
 
