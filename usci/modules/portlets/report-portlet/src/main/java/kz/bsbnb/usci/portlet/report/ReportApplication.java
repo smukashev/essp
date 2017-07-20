@@ -121,6 +121,8 @@ public class ReportApplication extends Application {
                 layout.setWidth("100%");
                 mainWindow.addComponent(layout);
                 setMainWindow(mainWindow);
+
+                response.setTitle(bundle.getString("WINDOW-TITLE"));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
