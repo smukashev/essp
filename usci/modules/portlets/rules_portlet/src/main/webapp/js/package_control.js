@@ -49,7 +49,7 @@ function packageControlForm(){
     var packageVersionGrid = Ext.create('Ext.grid.Panel',{
         store: packageVersionStore,
         columns: [{
-            text     : 'Дата',
+            text     : label_DATE,
             dataIndex: 'name'
         }],
         forceFit: true,
@@ -88,7 +88,7 @@ function packageControlForm(){
                     Ext.create('Ext.form.Panel',{
                         tbar: [
                             {
-                                text: 'Добавить',
+                                text: label_ADD,
                                 id: 'btnPackageControlAdd',
                                 //disabled: true,
                                 handler: function(){
@@ -125,12 +125,12 @@ function packageControlForm(){
                                 }
                             },
                             {
-                                text: 'Удалить',
+                                text: label_DEL,
                                 id: 'btnPackageControlDelete',
                                 disabled: true
                             },
                             {
-                                text: 'Обновить',
+                                text: label_REFRESH,
                                 id: 'btnPackageControlUpdate',
                                 disabled: true
                             }

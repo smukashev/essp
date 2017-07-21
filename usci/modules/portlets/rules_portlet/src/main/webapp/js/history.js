@@ -29,13 +29,13 @@ function historyForm(ruleId){
         store: historyStore,
         columns: [
             {
-                text: 'Дата открытия',
+                text: label_OPEN_DATE,
                 width: '50%',
                 dataIndex: 'openDate',
                 renderer: Ext.util.Format.dateRenderer('d.m.Y')
             },
             {
-                text: 'Дата закрытия',
+                text: label_CLOSE_DATE,
                 width: '50%',
                 dataIndex: 'closeDate',
                 renderer: Ext.util.Format.dateRenderer('d.m.Y')
@@ -51,7 +51,7 @@ function historyForm(ruleId){
     return new Ext.Window({
         id: 'historyForm',
         modal: 'true',
-        title: 'История',
+        title: label_HISTORY,
         items: [
             Ext.create('Ext.form.Panel',{
                 region: 'center',
