@@ -25,11 +25,14 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import java.security.AccessControlException;
+import java.util.ResourceBundle;
 
 public class QueueApplication extends Application {
 
     private static final long serialVersionUID = 2096197512742005243L;
+    private ResourceBundle bundle;
     public final Logger logger = Logger.getLogger(QueueApplication.class);
+
     @Override
     public void init() {
         setTheme("custom");
@@ -74,6 +77,9 @@ public class QueueApplication extends Application {
                 BeanDataProvider dataProvider = new BeanDataProvider();
                 mainWindow.addComponent(new MainLayout(queuePortalEnvironmentFacade, dataProvider));
                 setMainWindow(mainWindow);
+
+                bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
+                response.setTitle(bundle.getString("WINDOW-TITLE"));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
