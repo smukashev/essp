@@ -18,8 +18,8 @@
 
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="oracle.jdbc.OracleDriver"/>
-        <property name="url" value="jdbc:oracle:thin:@10.8.1.201:1521:SHCASE"/>
-        <property name="username" value="showcase"/>
+        <property name="url" value="jdbc:oracle:thin:@10.10.32.120:1521:dwun"/>
+        <property name="username" value="showcase_e"/>
         <property name="password" value="showcase"/>
         <property name="initialSize" value="64"/>
         <property name="minIdle" value="64"/>
