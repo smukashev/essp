@@ -85,14 +85,13 @@ public class ProtocolLayout extends VerticalLayout {
     private List<Creditor> selectedCreditors = new ArrayList<Creditor>();
 
     private static final String[] FILES_TABLE_VISIBLE_COLUMNS = new String[]{
-        "creditorName", "fileLink", "receiverDate", "startDate", "completionDate", "statusName", "reportDate"};
+        "creditorName", "fileLink", "receiverDate", "startDate", "completionDate", "statusName", "actualCount", "successCount", "reportDate"};
 
     private static final String[] FILES_TABLE_VISIBLE_COLUMNS_FOR_BANK_USER = new String[]{
             "fileLink", "receiverDate", "startDate", "completionDate", "statusName", "reportDate"};
 
     private static final String[] FILES_TABLE_COLUMN_NAMES = new String[]{
-        "creditorName", "fileLink", "fileName", "receiverDate", "completionDate", "statusName", "startDate",
-            "reportDate"};
+        "creditorName", "fileLink", "fileName", "receiverDate", "completionDate", "statusName", "startDate", "actualCount", "successCount", "reportDate"};
 
     private static final String[] FILES_TABLE_COLUMNS_TO_EXPORT = new String[]{
         "creditorName", "fileName", "receiverDate", "startDate", "completionDate", "statusName", "reportDate"};

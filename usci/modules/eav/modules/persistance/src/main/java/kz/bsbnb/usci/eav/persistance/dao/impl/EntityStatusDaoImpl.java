@@ -111,19 +111,12 @@ public class EntityStatusDaoImpl extends JDBCSupport implements IEntityStatusDao
     }
 
     @Override
-    public int getCount(long batchId) {
+    public int getSuccessEntityCount(long batchId) {
         Select select = context
                 .select(DSL.count(EAV_ENTITY_STATUSES.ID).as("entity_status_count"))
-                .from(EAV_ENTITY_STATUSES
-                        .join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID))
-                        .leftOuterJoin(EAV_BE_STRING_VALUES)
-                        .on((EAV_BE_STRING_VALUES.ENTITY_ID.eq(EAV_ENTITY_STATUSES.ENTITY_ID)))
-                        .leftOuterJoin(EAV_M_SIMPLE_ATTRIBUTES)
-                        .on(EAV_M_SIMPLE_ATTRIBUTES.ID.eq(EAV_BE_STRING_VALUES.ATTRIBUTE_ID))
-                        .leftOuterJoin(EAV_M_CLASSES)
-                        .on((EAV_M_CLASSES.ID.eq(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID)).and(EAV_M_CLASSES.TITLE.eq("primary_contract")))
-                )
-                .where(EAV_ENTITY_STATUSES.BATCH_ID.eq(batchId));
+                .from(EAV_ENTITY_STATUSES.join(EAV_GLOBAL).on(EAV_GLOBAL.ID.eq(EAV_ENTITY_STATUSES.STATUS_ID)))
+                .where(EAV_ENTITY_STATUSES.BATCH_ID.eq(batchId))
+                .and(EAV_GLOBAL.CODE.eq("COMPLETED"));
 
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 

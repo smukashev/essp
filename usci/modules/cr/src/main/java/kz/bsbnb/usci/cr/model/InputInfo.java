@@ -32,6 +32,8 @@ public class InputInfo implements Serializable {
 
 	private int actualCount;
 
+    private int successCount;
+
     private long totalInserted;
 
     private long totalUpdated;
@@ -195,6 +197,14 @@ public class InputInfo implements Serializable {
 				this.actualCount = Integer.MAX_VALUE;
 		else this.actualCount = (int) actualCount;
 	}
+
+    public int getSuccessCount() {
+        return successCount;
+    }
+
+    public void setSuccessCount(int successCount) {
+        this.successCount = successCount;
+    }
 
     public void setBatchStatuses(List<Protocol> batchStatuses) {
         this.batchStatuses = batchStatuses;

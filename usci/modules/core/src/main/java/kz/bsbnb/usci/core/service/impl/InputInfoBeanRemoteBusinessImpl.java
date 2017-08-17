@@ -163,6 +163,8 @@ public class InputInfoBeanRemoteBusinessImpl implements InputInfoBeanRemoteBusin
         ii.setReportDate(batch.getRepDate());
 
         ii.setTotal(batch.getTotalCount());
+        ii.setActualCount(batch.getActualCount());
+        ii.setSuccessCount(batchService.getSuccessEntityCount(batch.getId()));
 
         ii.setId(BigInteger.valueOf(batch.getId()));
 
