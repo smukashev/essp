@@ -68,7 +68,11 @@ public class ApprovalPortletEnvironmentFacade implements PortletEnvironmentFacad
 
     @Override
     public String getResourceString(Localization localization) {
+        try {
         return bundle.getString(localization.getKey());
+        } catch (Exception e) {
+        }
+        return "";
     }
 
     @Override

@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 
 import javax.portlet.*;
 import java.security.AccessControlException;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
@@ -76,7 +75,10 @@ public class AdministrationApplication extends Application implements PortletReq
                 mainWindow.addComponent(sp);
                 setMainWindow(mainWindow);
 
-                response.setTitle(bundle.getString("AdministrationApplication"));
+                try {
+                    response.setTitle(bundle.getString("AdministrationApplication"));
+                } catch (Exception e) {
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();

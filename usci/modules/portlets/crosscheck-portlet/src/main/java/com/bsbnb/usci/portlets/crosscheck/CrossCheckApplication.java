@@ -94,8 +94,11 @@ public class CrossCheckApplication extends Application {
                 }
                 setMainWindow(mainWindow);
 
-                bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
-                response.setTitle(bundle.getString("WindowsTitle"));
+                try {
+                    bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
+                    response.setTitle(bundle.getString("WindowsTitle"));
+                } catch (Exception e) {
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage(),e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
