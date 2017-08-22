@@ -17,7 +17,8 @@ import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.base.impl.*;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
@@ -159,8 +160,11 @@ public class MainPortlet extends MVCPortlet {
             renderRequest.setAttribute("error",Errors.decompose(e.getMessage()));
         }
 
-        bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
-        renderResponse.setTitle(bundle.getString("WindowsTitle"));
+        try {
+            bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
+            renderResponse.setTitle(bundle.getString("WindowsTitle"));
+        } catch (Exception e) {
+        }
 
         super.doView(renderRequest, renderResponse);
     }

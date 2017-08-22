@@ -102,8 +102,11 @@ public class ProtocolApplication extends Application {
                 getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
             }
 
-            bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
-            response.setTitle(bundle.getString("WindowsTitle"));
+            try {
+                bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
+                response.setTitle(bundle.getString("WindowsTitle"));
+            } catch (Exception e) {
+            }
         }
 
         private void DownloadBatch(final Window mainWindow, DataProvider provider, String batchIdString) {

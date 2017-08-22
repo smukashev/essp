@@ -37,7 +37,7 @@ public class MainPortlet extends MVCPortlet {
 
     //должен быть отличен от C:/zips (т.е папки receiver-а)
     //private final static String TMP_FILE_DIR = "\\\\" + StaticRouter.getAsIP() + "\\batch_entry_list_temp_folder";
-    private final static String TMP_FILE_DIR = StaticRouter.isDevMode() ? "/home/usci_data/batch_entry_list_temp_folder" :
+    private final static String TMP_FILE_DIR = StaticRouter.isDevMode() ? "/opt/batch_entry_list_temp_folder" :
             "\\\\" + StaticRouter.getAsIP() + "\\download$\\batch_entry_list_temp_folder";
 
     private IBatchEntryService batchEntryService;
@@ -119,8 +119,11 @@ public class MainPortlet extends MVCPortlet {
             currentException = e;
         }
 
-        bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
-        renderResponse.setTitle(bundle.getString("WindowsTitle"));
+        try {
+            bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
+            renderResponse.setTitle(bundle.getString("WindowsTitle"));
+        } catch (Exception e) {
+        }
 
         super.doView(renderRequest, renderResponse);
     }

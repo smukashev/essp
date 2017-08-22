@@ -6,7 +6,6 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -75,8 +74,11 @@ public class MainPortlet extends MVCPortlet {
             currentException = e;
         }
 
-        bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
-        renderResponse.setTitle(bundle.getString("WindowsTitle"));
+        try {
+            bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
+            renderResponse.setTitle(bundle.getString("WindowsTitle"));
+        } catch (Exception e) {
+        }
 
         super.doView(renderRequest, renderResponse);
     }

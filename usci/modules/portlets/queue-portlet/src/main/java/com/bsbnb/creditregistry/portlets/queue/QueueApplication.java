@@ -78,8 +78,11 @@ public class QueueApplication extends Application {
                 mainWindow.addComponent(new MainLayout(queuePortalEnvironmentFacade, dataProvider));
                 setMainWindow(mainWindow);
 
-                bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
-                response.setTitle(bundle.getString("WINDOW-TITLE"));
+                try {
+                    bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
+                    response.setTitle(bundle.getString("WINDOW-TITLE"));
+                } catch (Exception e) {
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();

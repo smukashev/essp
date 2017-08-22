@@ -127,8 +127,11 @@ public class MainPortlet extends MVCPortlet {
             currentException = e;
         }
 
-        bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
-        renderResponse.setTitle(bundle.getString("WindowsTitle"));
+        try {
+            bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
+            renderResponse.setTitle(bundle.getString("WindowsTitle"));
+        } catch (Exception e) {
+        }
         super.doView(renderRequest, renderResponse);
     }
 

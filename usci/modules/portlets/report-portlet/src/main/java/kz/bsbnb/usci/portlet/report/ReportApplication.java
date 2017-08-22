@@ -122,7 +122,10 @@ public class ReportApplication extends Application {
                 mainWindow.addComponent(layout);
                 setMainWindow(mainWindow);
 
-                response.setTitle(bundle.getString("WINDOW-TITLE"));
+                try {
+                    response.setTitle(bundle.getString("WINDOW-TITLE"));
+                } catch (Exception e) {
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();

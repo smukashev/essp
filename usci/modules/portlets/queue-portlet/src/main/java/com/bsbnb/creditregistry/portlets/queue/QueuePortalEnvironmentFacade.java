@@ -49,7 +49,11 @@ public class QueuePortalEnvironmentFacade extends PortalEnvironmentFacade {
 
     @Override
     public String getString(String key) {
+        try {
         return bundle.getString(key);
+        } catch (Exception e) {
+        }
+        return "";
     }
 
     @Override
@@ -68,7 +72,11 @@ public class QueuePortalEnvironmentFacade extends PortalEnvironmentFacade {
     }
 
     public String getResourceString(String key) {
-        return bundle.getString(key);
+        try {
+            return bundle.getString(key);
+        } catch (Exception e) {
+        }
+        return "";
     }
 
     @Override
