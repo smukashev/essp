@@ -17,7 +17,8 @@ import kz.bsbnb.usci.eav.model.BatchEntry;
 import kz.bsbnb.usci.eav.model.RefListResponse;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.base.impl.*;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
@@ -48,6 +49,7 @@ public class MainPortlet extends MVCPortlet {
     private PortalUserBeanRemoteBusiness portalUserBusiness;
     private ReportBeanRemoteBusiness reportBusiness;
     private IBatchProcessService batchProcessService;
+    private ResourceBundle bundle;
     private final Logger logger = Logger.getLogger(MainPortlet.class);
     private boolean retry;
 
@@ -157,6 +159,13 @@ public class MainPortlet extends MVCPortlet {
         } catch (Exception e) {
             renderRequest.setAttribute("error",Errors.decompose(e.getMessage()));
         }
+
+        try {
+            bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
+            renderResponse.setTitle(bundle.getString("WindowsTitle"));
+        } catch (Exception e) {
+        }
+
         super.doView(renderRequest, renderResponse);
     }
 

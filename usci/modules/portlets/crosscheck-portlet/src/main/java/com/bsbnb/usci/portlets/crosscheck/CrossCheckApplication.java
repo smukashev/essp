@@ -21,13 +21,14 @@ import java.security.AccessControlException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ResourceBundle;
 
 public class CrossCheckApplication extends Application {
 
     private static final long serialVersionUID = 2096197512742005243L;
     public static final String CONTEXT_NAME = "usci-crosscheck-portlet";
     private final Logger logger = Logger.getLogger(CrossCheckApplication.class);
-
+    private ResourceBundle bundle;
     DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
 
     @Override
@@ -86,14 +87,18 @@ public class CrossCheckApplication extends Application {
 
                 Window mainWindow = new Window(portletData.getResourceString("CrossCheckApplication"));
                 try {
-                    mainWindow.addComponent(new CrossCheckLayout(viewType, portletData,
-                            new BeanDataProvider(portletData)));
-                    
+                    mainWindow.addComponent(new CrossCheckLayout(viewType, portletData, new BeanDataProvider(portletData), request.getLocale()));
                 } catch (DataException de) {
                     logger.error(Errors.decompose(de.getMessage()));
                     mainWindow.addComponent(new Label(de.getMessage().replaceAll("\n", "<br/>")));
                 }
                 setMainWindow(mainWindow);
+
+                try {
+                    bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
+                    response.setTitle(bundle.getString("WindowsTitle"));
+                } catch (Exception e) {
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage(),e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.getClass().getName();

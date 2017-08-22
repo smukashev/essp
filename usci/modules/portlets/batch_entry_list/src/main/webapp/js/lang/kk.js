@@ -1,0 +1,10 @@
+var label_SEND = 'Жіберу';
+var label_VIEW = 'Көру';
+var label_REP_DATE = 'Есепті күн';
+var label_DATE = 'Жасалған күн';
+var label_CODE = 'Код';
+var label_DEL = 'Өшіру';
+var label_CLOSE = 'Жабу';
+var LABEL_SEND_APPROVAL = 'Өзгерістер сәтті жіберілді. Мәртебесі қараңыз хаттамада';
+var LABEL_SUCCESS = 'Операциялар сәтті аяқталды';
+var label_RECORDS="Жазбалар";

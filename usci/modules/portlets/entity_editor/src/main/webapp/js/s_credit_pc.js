@@ -5,7 +5,7 @@ Ext.onReady(function() {
         panel.add(Ext.create("Ext.form.field.Text",
             {
                 id: 'edPrimaryContractNO',
-                fieldLabel: 'Номер договора',
+                fieldLabel: label_CONTRUCT_NO,
                 width: '40%',
                 margin: 10
             }));
@@ -13,7 +13,7 @@ Ext.onReady(function() {
         panel.add(Ext.create("Ext.form.field.Date",
             {
                 id: 'edPrimaryContractDate',
-                fieldLabel: 'Дата договора',
+                fieldLabel: label_CONTRUCT_DATE,
                 width: '40%',
                 format: 'd.m.Y',
                 margin: 10

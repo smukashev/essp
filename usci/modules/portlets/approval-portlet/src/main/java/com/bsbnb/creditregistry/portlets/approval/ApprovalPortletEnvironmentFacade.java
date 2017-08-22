@@ -11,6 +11,8 @@ import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil;
 import org.apache.log4j.Logger;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -22,7 +24,7 @@ import java.util.ResourceBundle;
 public class ApprovalPortletEnvironmentFacade implements PortletEnvironmentFacade {
 
     private static final String BUNDLE_NAME = "content.Language";
-    private final ResourceBundle bundle;
+    private ResourceBundle bundle;
     private final boolean isKazakh;
     private final User user;
     private boolean isBankUser;
@@ -34,7 +36,7 @@ public class ApprovalPortletEnvironmentFacade implements PortletEnvironmentFacad
     public ApprovalPortletEnvironmentFacade(User user) {
         this.user = user;
         readUserProperties(user);
-        bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
+        bundle = ResourceBundle.getBundle(BUNDLE_NAME, user.getLocale());
         isKazakh = "kz".equals(user.getLocale().getLanguage());
     }
 
@@ -66,7 +68,11 @@ public class ApprovalPortletEnvironmentFacade implements PortletEnvironmentFacad
 
     @Override
     public String getResourceString(Localization localization) {
+        try {
         return bundle.getString(localization.getKey());
+        } catch (Exception e) {
+        }
+        return "";
     }
 
     @Override

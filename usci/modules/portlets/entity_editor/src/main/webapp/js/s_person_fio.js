@@ -5,7 +5,7 @@ Ext.onReady(function() {
         panel.add(Ext.create("Ext.form.field.Text",
             {
                 id: 'edFirstName',
-                fieldLabel: 'Имя',
+                fieldLabel: label_FIRSTNAME,
                 width: '40%',
                 margin: 10
             }));
@@ -13,7 +13,7 @@ Ext.onReady(function() {
         panel.add(Ext.create("Ext.form.field.Text",
             {
                 id: 'edLastName',
-                fieldLabel: 'Фамилия',
+                fieldLabel: label_LASTNAME,
                 width: '40%',
                 margin: 10
             }));
@@ -21,7 +21,7 @@ Ext.onReady(function() {
         panel.add(Ext.create("Ext.form.field.Text",
             {
                 id: 'edMiddleName',
-                fieldLabel: 'Отчество',
+                fieldLabel: label_MIDDLENAME,
                 width: '40%',
                 margin: 10
             }));

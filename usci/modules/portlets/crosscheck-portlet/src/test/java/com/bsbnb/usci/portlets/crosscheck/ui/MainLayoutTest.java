@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -28,7 +29,7 @@ public class MainLayoutTest extends CrossCheckLayout {
     
 
     public MainLayoutTest() {
-        super("WORK", facade, null);
+        super("WORK", facade, null, new Locale("ru", "RU"));
     }
 
     @BeforeClass
@@ -79,7 +80,7 @@ public class MainLayoutTest extends CrossCheckLayout {
             DataProvider providerMock = EasyMock.createMock(DataProvider.class);
             EasyMock.expect(providerMock.getCreditorsList(facade.getCreditorId())).andReturn(sampleCreditors);
             EasyMock.replay(providerMock);
-            CrossCheckLayout instance = new CrossCheckLayout("WORK", facade, providerMock);
+            CrossCheckLayout instance = new CrossCheckLayout("WORK", facade, providerMock, new Locale("ru", "RU"));
             Window window = new Window();
             window.addComponent(instance);
             window.attach();

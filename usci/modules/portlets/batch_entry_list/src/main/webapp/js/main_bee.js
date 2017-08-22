@@ -225,7 +225,7 @@ Ext.onReady(function() {
                 flex:1
             }
         ],
-        title: 'Записи',
+        title: label_RECORDS,
         listeners : {
             itemdblclick: function(dv, record, item, index, e) {
 

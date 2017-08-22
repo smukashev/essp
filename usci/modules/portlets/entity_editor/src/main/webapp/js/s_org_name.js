@@ -5,7 +5,7 @@ Ext.onReady(function() {
         panel.add(Ext.create("Ext.form.field.Text",
             {
                 id: 'edName',
-                fieldLabel: 'Наименование',
+                fieldLabel: label_TITLE,
                 width: '40%',
                 margin: 10
             }));

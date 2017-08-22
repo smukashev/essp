@@ -407,7 +407,7 @@ function addField(form, attr, idSuffix, node) {
 function addArrayElementButton(form) {
     form.add(Ext.create('Ext.button.Button', {
         id: "btnFormAddArrayElement",
-        text: "Добавить элемент",
+        text: label_ADD_ELEMENT,
         margin: '0 0 5 0',
 
         handler : function () {
@@ -619,10 +619,10 @@ function handleError(operation) {
 
     if(error) {
         if(error.toLowerCase().indexOf('connect') > -1) {
-            error = 'Сбой при подключении к сервисам, возможно идут технические работы';
+            error = label_CONNECTION_LOST;
         }
     } else {
-        error = 'Неизвестная ошибка';
+        error = label_UNKNOWN_EXCEPTION;
     }
 
     Ext.MessageBox.alert(label_ERROR, label_ERROR_NO_DATA_FOR.format(error));
@@ -630,10 +630,10 @@ function handleError(operation) {
 
 function handleErrorByMessage(errorMessage){
     if(!errorMessage) {
-        errorMessage = 'Неизвестная ошибка';
+        errorMessage = label_UNKNOWN_EXCEPTION;
     } else {
         if(errorMessage.toLowerCase().indexOf('connect') > -1) {
-            errorMessage = 'Сбой при подключении к сервисам, возможно идут технические работы';
+            errorMessage = label_CONNECTION_LOST;
         }
     }
 
@@ -806,7 +806,7 @@ Ext.onReady(function() {
                     if(!json.success) {
                         handleErrorByMessage(json.errorMessage);
                     } else {
-                        Ext.MessageBox.alert("", "Сохранено успешно");
+                        Ext.MessageBox.alert("", label_SUCCESS_SAVE);
                     }
                 }
             });
@@ -895,7 +895,7 @@ Ext.onReady(function() {
                     if(!json.success) {
                         handleErrorByMessage(json.errorMessage);
                     } else {
-                        Ext.MessageBox.alert("", "Операция выполнена успешно");
+                        Ext.MessageBox.alert("", label_SUCCESS_PROCESS);
                     }
                 }
             });
@@ -925,7 +925,7 @@ Ext.onReady(function() {
                     op: 'SAVE_XML'
                 },
                 success: function(response) {
-                    Ext.MessageBox.alert("", "Операция на открытия отправлено успешно.");
+                    Ext.MessageBox.alert("", label_SUCCESS_OPEN_PROCESS);
                 }
             });
         }
@@ -954,7 +954,7 @@ Ext.onReady(function() {
                     op: 'SAVE_XML'
                 },
                 success: function(response) {
-                    Ext.MessageBox.alert("", "Операция выполнена успешно");
+                    Ext.MessageBox.alert("", label_SUCCESS_PROCESS);
                 }
             });
         }
@@ -987,7 +987,7 @@ Ext.onReady(function() {
     });
 
     modalWindow = Ext.create("Ext.Window",{
-        title : 'Добавление записи',
+        title : label_ADD_DATA,
         width : 400,
         modal : true,
         closable : true,
@@ -1015,7 +1015,7 @@ Ext.onReady(function() {
     });
 
     arrayElWindow = Ext.create("Ext.Window",{
-        title : 'Добавление элемента массива',
+        title : label_ADD_ELEMENT_TO_MASSIVE,
         width : 400,
         modal : true,
         closable : true,
@@ -1044,7 +1044,7 @@ Ext.onReady(function() {
 
     var buttonAdd = Ext.create('Ext.button.Button', {
         id: "entityEditorAddBtn",
-        text: 'Добавить',
+        text: label_ADD,
         hidden:!isNb,
         handler : function (){
             nextArrayIndex = 0;
@@ -1054,7 +1054,7 @@ Ext.onReady(function() {
             var metaId = classesCombo.getValue();
 
             if (!metaId) {
-                Ext.MessageBox.alert(label_ERROR, "Выберите справочник");
+                Ext.MessageBox.alert(label_ERROR, label_SELECT_REF);
                 return;
             }
 
@@ -1263,7 +1263,7 @@ Ext.onReady(function() {
                 value: (givenEntityId == "null" ? "" : givenEntityId)
             },
             {
-                fieldLabel: 'Поиск элементов справочника:',
+                fieldLabel: label_SEARCH_ELEMENT,
                 id: 'findCodName',
                 name: 'findCodName',
                 xtype: 'textfield',
@@ -1287,7 +1287,7 @@ Ext.onReady(function() {
                 layout: 'hbox',
                 items: [
                     {
-                        fieldLabel: label_Date,
+                        fieldLabel: label_DATE,
                         id: 'edDate',
                         xtype: 'datefield',
                         format: 'd.m.Y',
@@ -1302,7 +1302,7 @@ Ext.onReady(function() {
                     {
                         xtype: 'button',
                         id: "checkboxHistory",
-                        text: 'Отображать историю',
+                        text: label_SHOW_HISTORY,
                         pressed: false,
                         enableToggle: true,
                         listeners: {

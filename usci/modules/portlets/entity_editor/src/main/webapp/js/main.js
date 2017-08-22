@@ -73,7 +73,7 @@ function getForm() {
                 var info = all[i].id.match(regex);
                 Ext.create('Ext.form.DateField', {
                     renderTo: all[i].id,
-                    fieldLabel: 'дата',
+                    fieldLabel: label_DATE,
                     labelWidth: 27,
                     id: 'inp-' + info[1],
                     format: 'd.m.Y',
@@ -1156,7 +1156,7 @@ Ext.onReady(function () {
                 return subjectName;
             }
         },{
-            text: 'Дата',
+            text: label_DATE,
             flex: 1,
             dataIndex: 'date',
             sortable: true
@@ -1279,7 +1279,7 @@ Ext.onReady(function () {
                     store: types,
                     labelWidth: 70,
                     valueField: 'searchName',
-                    fieldLabel: 'Вид поиска',
+                    fieldLabel: label_SEARCH_TYPE,
                     editable: false,
                     listeners: {
                         change: function (a, key, prev) {
@@ -1295,12 +1295,12 @@ Ext.onReady(function () {
                     store: creditors,
                     labelWidth: 70,
                     valueField: 'id',
-                    fieldLabel: 'Кредитор',
+                    fieldLabel: label_CREDITOR,
                     editable: false
                 }, {
                     xtype: 'datefield',
                     id: 'edDate',
-                    fieldLabel: 'Дата',
+                    fieldLabel: label_DATE,
                     listeners: {
                         change: function () {
                             console.log('datefield changed');
@@ -1342,7 +1342,7 @@ Ext.onReady(function () {
                         Ext.getCmp('form-area').doSearch();
                     }
                 },
-                {xtype: 'label', text: 'Всего результатов:'},
+                {xtype: 'label', text: label_FOUND_RESULT+':'},
                 {xtype: 'label', text: '0', id: 'totalCount'}
             ]
         }, {
