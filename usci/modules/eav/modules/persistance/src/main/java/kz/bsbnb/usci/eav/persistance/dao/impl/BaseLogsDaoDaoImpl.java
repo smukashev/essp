@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseLogsDao;
 
+import java.util.Date;
+
 /**
  * Created by Yerlan.Zhumashev on 24.04.2017.
  */
@@ -24,6 +26,7 @@ public class BaseLogsDaoDaoImpl extends JDBCSupport implements IBaseLogsDao {
     public void insertLogs(String portletname, String username, String comment) {
 
         Insert insert = context.insertInto(EAV_LOGS)
+                .set(EAV_LOGS.RECEIPT_DATE, new java.sql.Timestamp(new Date().getTime()))
                .set(EAV_LOGS.PORTLETNAME, portletname)
                .set(EAV_LOGS.PORTALUSERNAME, username)
                .set(EAV_LOGS.PORTLETCOMMENT, comment);
