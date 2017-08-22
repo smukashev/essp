@@ -370,7 +370,7 @@ public enum Errors {
 
         for (int i = 0; i < params.length; i++) {
             try {
-                error = error.replaceFirst(matches.get(i), (String) params[i]);
+                error = error.replaceFirst(matches.get(i), ((String) params[i]).replace("\\", "\\\\"));
             } catch (Exception ex) {
                 throw new RuntimeException(compose(E199));
             }
