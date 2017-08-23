@@ -20,22 +20,26 @@ import java.util.Date;
 /**
  * Created by emles on 22.08.17
  */
-class MemorizingTool {
+class ApplyHistoryFactory {
 
-    long creditorId;
-    IBaseEntity baseEntityApplied;
-    IBaseValue baseValueSaving;
-    IBaseValue baseValueLoaded;
-    IBaseEntityManager baseEntityManager;
-    IMetaAttribute metaAttribute;
-    IMetaType metaType;
-    IMetaValue metaValue;
-    IBaseValueDao valueDao;
     @Autowired
     private IPersistableDaoPool persistableDaoPool;
 
-    MemorizingTool(long creditorId, IBaseEntity baseEntityApplied, IBaseValue baseValueSaving,
-                   IBaseValue baseValueLoaded, IBaseEntityManager baseEntityManager) {
+    protected long creditorId;
+    protected IBaseEntity baseEntityApplied;
+    protected IBaseValue baseValueSaving;
+    protected IBaseValue baseValueLoaded;
+    protected IBaseEntityManager baseEntityManager;
+
+    protected IMetaAttribute metaAttribute;
+    protected IMetaType metaType;
+    protected IMetaValue metaValue;
+
+    protected IBaseValueDao valueDao;
+
+    public ApplyHistoryFactory(long creditorId,
+                               IBaseEntity baseEntityApplied, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
+                               IBaseEntityManager baseEntityManager) {
 
         this.creditorId = creditorId;
         this.baseEntityApplied = baseEntityApplied;
@@ -52,29 +56,28 @@ class MemorizingTool {
 
     }
 
-    private Object returnCastedValue(IMetaValue metaValue, IBaseValue baseValue) {
-        return metaValue.getTypeCode() == DataTypes.DATE ?
-                new Date(((Date) baseValue.getValue()).getTime()) : baseValue.getValue();
+    public BaseValueDSLFactory initialize() {
+        return new BaseValueDSLFactory(this).initialize();
     }
 
-    void initialize() {
+    public HistoricalBaseValueDSLFactory existing(IBaseValue value) {
+        return new HistoricalBaseValueDSLFactory(this).fromExisting(value);
+    }
 
-        IBaseValue baseValueApplied = BaseValueFactory.create(
-                MetaContainerTypes.META_CLASS,
-                metaType,
-                baseValueLoaded.getId(),
-                creditorId,
-                new Date(baseValueLoaded.getRepDate().getTime()),
-                returnCastedValue(metaValue, baseValueSaving),
-                baseValueLoaded.isClosed(),
-                baseValueLoaded.isLast());
+    public HistoricalBaseValueDSLFactory closed(IBaseValue value) {
+        return new HistoricalBaseValueDSLFactory(this).fromClosed(value);
+    }
 
-        baseValueApplied.setBaseContainer(baseEntityApplied);
-        baseValueApplied.setMetaAttribute(metaAttribute);
+    public HistoricalBaseValueDSLFactory previous(IBaseValue value) {
+        return new HistoricalBaseValueDSLFactory(this).fromPrevious(value);
+    }
 
-        baseEntityApplied.put(metaAttribute.getName(), baseValueApplied);
-        baseEntityManager.registerAsUpdated(baseValueApplied);
+    public HistoricalBaseValueDSLFactory next(IBaseValue value) {
+        return new HistoricalBaseValueDSLFactory(this).fromNext(value);
+    }
 
+    public HistoricalBaseValueDSLFactory last(IBaseValue value) {
+        return new HistoricalBaseValueDSLFactory(this).fromLast(value);
     }
 
     void deleted(Boolean closed, Boolean last) {
@@ -282,195 +285,9 @@ class MemorizingTool {
 
     }
 
-    IBaseValue getExisting(IBaseValue baseValue) {
-
-        IBaseValue out = valueDao.getExistingBaseValue(baseValue);
-
-        if (out != null) {
-
-            out.setMetaAttribute(metaAttribute);
-            out.setBaseContainer(baseEntityApplied);
-
-        }
-
-        return out;
-
-    }
-
-    IBaseValue getClosed(IBaseValue baseValue) {
-
-        IBaseValue out = valueDao.getClosedBaseValue(baseValue);
-
-        if (out != null) {
-
-            out.setMetaAttribute(metaAttribute);
-            out.setBaseContainer(baseEntityApplied);
-
-        }
-
-        return out;
-
-    }
-
-    IBaseValue getPrevious(IBaseValue baseValue) {
-
-        IBaseValue out = valueDao.getPreviousBaseValue(baseValue);
-
-        if (out != null) {
-
-            out.setMetaAttribute(metaAttribute);
-            out.setBaseContainer(baseEntityApplied);
-
-        }
-
-        return out;
-
-    }
-
-    IBaseValue getNext(IBaseValue baseValue) {
-
-        IBaseValue out = valueDao.getNextBaseValue(baseValue);
-
-        if (out != null) {
-
-            out.setMetaAttribute(metaAttribute);
-            out.setBaseContainer(baseEntityApplied);
-
-        }
-
-        return out;
-
-    }
-
-    IBaseValue getLast(IBaseValue baseValue) {
-
-        IBaseValue out = valueDao.getLastBaseValue(baseValue);
-
-        if (out != null) {
-
-            out.setMetaAttribute(metaAttribute);
-            out.setBaseContainer(baseEntityApplied);
-
-        }
-
-        return out;
-
-    }
-
-    class MemorizingBaseValue {
-
-        final int PERSISTANCE_INSERTED = 1;
-        final int PERSISTANCE_UPDATED = 2;
-        final int PERSISTANCE_DELETED = 3;
-        final int PERSISTANCE_PROCESSED = 4;
-
-        IBaseValue from = null;
-
-        Long id;
-        Date date;
-        Boolean closed;
-        Boolean last;
-
-        Boolean parent = true;
-        Boolean attribute = false;
-        Integer persistence = 0;
-
-        IBaseValue value = null;
-
-        public MemorizingBaseValue(IBaseValue baseValue) {
-            this.value = baseValue;
-        }
-
-        public MemorizingBaseValue() {
-        }
-
-        MemorizingBaseValue initialize() {
-            return this;
-        }
-
-        MemorizingBaseValue from(IBaseValue from) {
-            this.from = from;
-            return this;
-        }
-
-        MemorizingBaseValue parent(Boolean parent) {
-            this.parent = parent;
-            return this;
-        }
-
-        MemorizingBaseValue attribute(Boolean attribute) {
-            this.attribute = attribute;
-            return this;
-        }
-
-        MemorizingBaseValue inserted() {
-            this.persistence = PERSISTANCE_INSERTED;
-            return this;
-        }
-
-        MemorizingBaseValue updated() {
-            this.persistence = PERSISTANCE_UPDATED;
-            return this;
-        }
-
-        MemorizingBaseValue deleted() {
-            this.persistence = PERSISTANCE_DELETED;
-            return this;
-        }
-
-        MemorizingBaseValue processed() {
-            this.persistence = PERSISTANCE_PROCESSED;
-            return this;
-        }
-
-        MemorizingBaseValue create() {
-
-            value = BaseValueFactory.create(
-                    MetaContainerTypes.META_CLASS,
-                    metaType,
-                    id == null
-                            ? (from == null ? 0L : from.getId())
-                            : id,
-                    creditorId,
-                    new Date((
-                            date == null
-                                    ? (from == null ? new Date() : from.getRepDate())
-                                    : date
-                    ).getTime()),
-                    returnCastedValue(metaValue, baseValueSaving),
-                    closed == null
-                            ? from != null && from.isClosed()
-                            : closed,
-                    last == null
-                            ? from != null && from.isLast()
-                            : last);
-
-            if (parent) {
-                value.setBaseContainer(baseEntityApplied);
-                value.setMetaAttribute(metaAttribute);
-            }
-
-            if (attribute) baseEntityApplied.put(metaAttribute.getName(), value);
-
-            switch (persistence) {
-                case (PERSISTANCE_INSERTED):
-                    baseEntityManager.registerAsInserted(value);
-                    break;
-                case (PERSISTANCE_UPDATED):
-                    baseEntityManager.registerAsUpdated(value);
-                    break;
-                case (PERSISTANCE_DELETED):
-                    baseEntityManager.registerAsDeleted(value);
-                    break;
-                case (PERSISTANCE_PROCESSED):
-                    baseEntityManager.registerProcessedBaseEntity(baseEntityApplied);
-                    break;
-            }
-
-            return this;
-
-        }
-
+    private Object returnCastedValue(IMetaValue metaValue, IBaseValue baseValue) {
+        return metaValue.getTypeCode() == DataTypes.DATE ?
+                new Date(((Date) baseValue.getValue()).getTime()) : baseValue.getValue();
     }
 
 }
