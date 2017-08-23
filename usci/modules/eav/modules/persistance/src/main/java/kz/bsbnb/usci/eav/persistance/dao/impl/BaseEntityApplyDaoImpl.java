@@ -369,8 +369,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public void applySimpleValue(long creditorId, IBaseEntity baseEntityApplied, IBaseValue baseValueSaving,
                                  IBaseValue baseValueLoaded, IBaseEntityManager baseEntityManager) {
 
-        final MemorizingTool memTool =
-                new MemorizingTool(creditorId, baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
+        final ApplyHistoryFactory memTool =
+                new ApplyHistoryFactory(creditorId, baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
 
         if (baseValueLoaded != null) {
             if (baseValueSaving.getValue() == null) {
@@ -434,7 +434,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
             if (!memTool.metaAttribute.isFinal()) {
 
-                IBaseValue baseValueClosed = memTool.getClosed(baseValueSaving);
+                IBaseValue baseValueClosed = memTool.closed(baseValueSaving).value();
 
                 if (baseValueClosed != null) {
 
@@ -442,7 +442,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         baseEntityManager.registerAsDeleted(baseValueClosed);
 
-                        IBaseValue baseValuePrevious = memTool.getPrevious(baseValueClosed);
+                        IBaseValue baseValuePrevious = memTool.previous(baseValueClosed).value();
 
                         if (baseValuePrevious == null)
                             throw new IllegalStateException(Errors.compose(Errors.E70, baseValueClosed.getMetaAttribute().getName()));
@@ -460,7 +460,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
                 } else {
 
-                    IBaseValue baseValueNext = memTool.getNext(baseValueSaving);
+                    IBaseValue baseValueNext = memTool.next(baseValueSaving).value();
 
                     if (baseValueNext != null) {
                         memTool.update3(baseValueNext, null, null, null);
@@ -469,7 +469,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     }
                 }
             } else {
-                IBaseValue baseValueLast =  memTool.getLast(baseValueSaving);
+                IBaseValue baseValueLast =  memTool.last(baseValueSaving).value();
 
                 if (baseValueLast == null) {
                     memTool.insert(false, false, true);
