@@ -2,9 +2,8 @@ package kz.bsbnb.usci.eav.persistance.dao.impl.apply;
 
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
-import kz.bsbnb.usci.eav.model.meta.IMetaValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
-import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 import java.util.Date;
 
@@ -13,11 +12,12 @@ import java.util.Date;
  */
 public class InitializingBaseValueDSLFactory extends BaseValueDSLFactory {
 
-    private Long id;
-    private Date date;
+    protected IMetaType metaType;
 
     public InitializingBaseValueDSLFactory(ApplyHistoryFactory memorizingTool) {
         super(memorizingTool);
+        this.parent = true;
+        this.attribute = true;
     }
 
     public InitializingBaseValueDSLFactory initialize() {
@@ -44,13 +44,8 @@ public class InitializingBaseValueDSLFactory extends BaseValueDSLFactory {
         return this;
     }
 
-    public InitializingBaseValueDSLFactory id(Long id) {
-        this.id = id;
-        return this;
-    }
-
-    public InitializingBaseValueDSLFactory date(Date date) {
-        this.date = date;
+    public BaseValueDSLFactory metaType(IMetaType metaType) {
+        this.metaType = metaType;
         return this;
     }
 
@@ -73,11 +68,13 @@ public class InitializingBaseValueDSLFactory extends BaseValueDSLFactory {
 
     }
 
-    public InitializingBaseValueDSLFactory create() {
+    public InitializingBaseValueDSLFactory execute() {
 
-        value = BaseValueFactory.create(
+        result = BaseValueFactory.create(
                 MetaContainerTypes.META_CLASS,
-                memorizingTool.metaType,
+                metaType == null
+                        ? memorizingTool.metaType
+                        : metaType,
                 id == null
                         ? (from == null ? 0L : from.getId())
                         : id,
@@ -87,7 +84,9 @@ public class InitializingBaseValueDSLFactory extends BaseValueDSLFactory {
                                 ? (from == null ? new Date() : from.getRepDate())
                                 : date
                 ).getTime()),
-                castedValue(memorizingTool.metaValue, memorizingTool.baseValueSaving),
+                value == null
+                        ? (from == null ? null : memorizingTool.castedValue(from))
+                        : value,
                 closed == null
                         ? from != null && from.isClosed()
                         : closed,
@@ -95,21 +94,15 @@ public class InitializingBaseValueDSLFactory extends BaseValueDSLFactory {
                         ? from != null && from.isLast()
                         : last);
 
-        super.create();
+        super.execute();
 
         return this;
 
     }
 
-    public IBaseValue value() {
-        if (value == null) this.create();
-        return value;
-    }
-
-    private Object castedValue(IMetaValue metaValue, IBaseValue baseValue) {
-        return metaValue.getTypeCode() == DataTypes.DATE
-                ? new Date(((Date) baseValue.getValue()).getTime())
-                : baseValue.getValue();
+    public IBaseValue result() {
+        if (result == null) this.execute();
+        return result;
     }
 
 }

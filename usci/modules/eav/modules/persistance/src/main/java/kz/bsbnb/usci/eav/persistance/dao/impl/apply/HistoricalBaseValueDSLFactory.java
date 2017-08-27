@@ -2,6 +2,8 @@ package kz.bsbnb.usci.eav.persistance.dao.impl.apply;
 
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 
+import java.sql.Date;
+
 /**
  * Created by emles on 23.08.17
  */
@@ -17,6 +19,8 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
 
     public HistoricalBaseValueDSLFactory(ApplyHistoryFactory memorizingTool) {
         super(memorizingTool);
+        this.parent = false;
+        this.attribute = false;
     }
 
     public HistoricalBaseValueDSLFactory fromExisting(IBaseValue from) {
@@ -67,40 +71,43 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
 
     }
 
-    public HistoricalBaseValueDSLFactory create() {
+    public HistoricalBaseValueDSLFactory execute() {
 
         switch (historical) {
             case (HISTORICAL_EXISTING):
-                value = memorizingTool.valueDao.getExistingBaseValue(from);
+                result = memorizingTool.valueDao.getExistingBaseValue(from);
                 break;
             case (HISTORICAL_CLOSED):
-                value = memorizingTool.valueDao.getClosedBaseValue(from);
+                result = memorizingTool.valueDao.getClosedBaseValue(from);
                 break;
             case (HISTORICAL_PREVIOUS):
-                value = memorizingTool.valueDao.getPreviousBaseValue(from);
+                result = memorizingTool.valueDao.getPreviousBaseValue(from);
                 break;
             case (HISTORICAL_NEXT):
-                value = memorizingTool.valueDao.getNextBaseValue(from);
+                result = memorizingTool.valueDao.getNextBaseValue(from);
                 break;
             case (HISTORICAL_LAST):
-                value = memorizingTool.valueDao.getLastBaseValue(from);
+                result = memorizingTool.valueDao.getLastBaseValue(from);
                 break;
         }
 
-        if (value == null) return this;
+        if (result == null) return this;
 
-        if (closed != null) value.setClosed(closed);
-        if (last != null) value.setLast(last);
+        if (id != null) result.setId(id);
+        if (date != null) result.setRepDate(new Date(date.getTime()));
+        if (value != null) result.setValue(value);
+        if (closed != null) result.setClosed(closed);
+        if (last != null) result.setLast(last);
 
-        super.create();
+        super.execute();
 
         return this;
 
     }
 
-    public IBaseValue value() {
-        if (value == null) this.create();
-        return value;
+    public IBaseValue result() {
+        if (result == null) this.execute();
+        return result;
     }
 
 }
