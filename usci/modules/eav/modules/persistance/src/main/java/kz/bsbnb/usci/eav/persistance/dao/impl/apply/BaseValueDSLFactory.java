@@ -1,7 +1,10 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl.apply;
 
+import kz.bsbnb.usci.eav.model.base.IBaseContainer;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
 import java.util.Date;
 
@@ -27,16 +30,31 @@ public class BaseValueDSLFactory {
     protected Boolean last;
 
     protected Boolean parent = false;
+    protected IBaseValue parentFrom = null;
+    protected Boolean container = false;
+    protected IBaseValue containerFrom = null;
+    protected IBaseContainer containerValue = null;
     protected Boolean attribute = false;
+    protected IPersistable attributeBase;
     protected Integer persistence = 0;
 
-    protected IBaseValue result;
+    protected IPersistable result;
 
     public BaseValueDSLFactory(ApplyHistoryFactory memorizingTool) {
         this.memorizingTool = memorizingTool;
     }
 
+    public BaseValueDSLFactory from() {
+        this.result = null;
+        return this;
+    }
+
     public BaseValueDSLFactory from(IBaseValue from) {
+        this.result = from;
+        return this;
+    }
+
+    public BaseValueDSLFactory from(IBaseSet from) {
         this.result = from;
         return this;
     }
@@ -101,8 +119,43 @@ public class BaseValueDSLFactory {
         return this;
     }
 
+    public BaseValueDSLFactory parentFrom(IBaseValue value) {
+        this.parent = true;
+        this.parentFrom = value;
+        return this;
+    }
+
+    public BaseValueDSLFactory container(Boolean containing) {
+        this.container = containing;
+        return this;
+    }
+
+    public BaseValueDSLFactory containerFrom(IBaseValue value) {
+        this.container = true;
+        this.containerFrom = value;
+        return this;
+    }
+
+    public BaseValueDSLFactory containerValue(IBaseContainer value) {
+        this.container = true;
+        this.containerValue = value;
+        return this;
+    }
+
     public BaseValueDSLFactory attribute(Boolean attribute) {
         this.attribute = attribute;
+        return this;
+    }
+
+    public BaseValueDSLFactory attribute(IBaseSet base) {
+        this.attributeBase = base;
+        this.attribute = true;
+        return this;
+    }
+
+    public BaseValueDSLFactory attribute(IBaseEntity base) {
+        this.attributeBase = base;
+        this.attribute = true;
         return this;
     }
 
@@ -155,11 +208,35 @@ public class BaseValueDSLFactory {
             }
 
             if (parent) {
-                result.setBaseContainer(memorizingTool.baseEntityApplied);
-                result.setMetaAttribute(memorizingTool.metaAttribute);
+                if (parentFrom == null) {
+                    ((IBaseValue) result).setBaseContainer(memorizingTool.baseEntityApplied);
+                    ((IBaseValue) result).setMetaAttribute(memorizingTool.metaAttribute);
+                } else {
+                    ((IBaseValue) result).setBaseContainer(parentFrom.getBaseContainer());
+                    ((IBaseValue) result).setMetaAttribute(parentFrom.getMetaAttribute());
+                }
             }
 
-            if (attribute) memorizingTool.baseEntityApplied.put(memorizingTool.metaAttribute.getName(), result);
+            if (container) {
+                if (containerFrom != null) {
+                    ((IBaseValue) result).setBaseContainer(containerFrom.getBaseContainer());
+                } else if (containerValue != null) {
+                    ((IBaseValue) result).setBaseContainer(containerValue);
+                } else {
+                    ((IBaseValue) result).setBaseContainer(memorizingTool.baseEntityApplied);
+                }
+            }
+
+            if (attribute) {
+                if (attributeBase != null) {
+                    if (attributeBase instanceof IBaseSet) {
+                        ((IBaseSet) attributeBase).put((IBaseValue) result);
+                    } else if (attributeBase instanceof IBaseEntity) {
+                        ((IBaseEntity) attributeBase).put(memorizingTool.metaAttribute.getName(), (IBaseValue) result);
+                    }
+                } else
+                    memorizingTool.baseEntityApplied.put(memorizingTool.metaAttribute.getName(), (IBaseValue) result);
+            }
 
         }
 
@@ -169,7 +246,9 @@ public class BaseValueDSLFactory {
 
     public IBaseValue result() {
         if (result == null) this.execute();
-        return result;
+        if (result instanceof IBaseValue)
+            return (IBaseValue) result;
+        else return null;
     }
 
 }

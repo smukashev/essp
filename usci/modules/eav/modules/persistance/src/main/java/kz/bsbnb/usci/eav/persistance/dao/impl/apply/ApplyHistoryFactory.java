@@ -2,42 +2,46 @@ package kz.bsbnb.usci.eav.persistance.dao.impl.apply;
 
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
-import kz.bsbnb.usci.eav.model.meta.IMetaValue;
+import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by emles on 22.08.17
  */
 public class ApplyHistoryFactory {
 
+    public IBaseSet childBaseSetSaving;
+    public IBaseSet childBaseSetLoaded;
+    public IBaseSet childBaseSetApplied;
     @Autowired
     protected IPersistableDaoPool persistableDaoPool;
-
     protected long creditorId;
-
     protected IBaseEntity baseEntityApplied;
     protected IBaseValue baseValueSaving;
     protected IBaseValue baseValueLoaded;
-
     protected IBaseEntity baseEntityLoaded;
     protected IBaseEntity baseEntitySaving;
-
     protected IBaseEntityManager baseEntityManager;
-
     protected IMetaAttribute metaAttribute;
     protected IMetaType metaType;
     protected IMetaClass metaClass;
     protected IMetaValue metaValue;
+    protected IMetaSet metaSet;
+    protected IMetaType childMetaType;
+    protected IMetaValue childMetaValue;
+    protected Boolean isBaseSetDeleted;
 
     protected IBaseValueDao valueDao;
 
@@ -54,6 +58,12 @@ public class ApplyHistoryFactory {
     private HistoricalBaseValueDSLFactory lastNext = null;
 
     private HistoricalBaseValueDSLFactory lastLast = null;
+
+    private Boolean with = false;
+    private IBaseValue withPersistable = null;
+    private Class withPersistableDaoClass = null;
+
+    private Set<UUID> processed = new HashSet<>();
 
 
     public ApplyHistoryFactory(long creditorId,
@@ -81,14 +91,98 @@ public class ApplyHistoryFactory {
             this.metaClass = (IMetaClass) metaType;
         } catch (Exception e) {
         }
+        try {
+            this.metaSet = (IMetaSet) metaType;
+            this.childMetaType = metaSet.getMemberType();
+            this.childMetaValue = (IMetaValue) childMetaType;
+        } catch (Exception e) {
+        }
 
-        valueDao = persistableDaoPool
+        this.childBaseSetSaving = savingBaseSetFrom(baseValueSaving);
+        this.childBaseSetLoaded = null;
+        this.childBaseSetApplied = null;
+
+        this.isBaseSetDeleted = false;
+
+        this.valueDao = persistableDaoPool
                 .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
     }
 
+    public IBaseSet savingBaseSetFrom(IBaseValue value) {
+        try {
+            return (childBaseSetSaving = (IBaseSet) value.getValue());
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public IBaseSet savingBaseSetFrom(IBaseSet value) {
+        try {
+            return (childBaseSetSaving = new BaseSet(value.getId(), childMetaType, creditorId));
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public IBaseSet savingBaseSetFrom() {
+        try {
+            return (childBaseSetSaving = new BaseSet(childMetaType, creditorId));
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public IBaseSet loadedBaseSetFrom(IBaseValue value) {
+        try {
+            return (childBaseSetLoaded = (IBaseSet) value.getValue());
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public IBaseSet loadedBaseSetFrom(IBaseSet value) {
+        try {
+            return (childBaseSetLoaded = new BaseSet(value.getId(), childMetaType, creditorId));
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public IBaseSet loadedBaseSetFrom() {
+        try {
+            return (childBaseSetLoaded = new BaseSet(childMetaType, creditorId));
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public IBaseSet appliedBaseSetFrom(IBaseValue value) {
+        try {
+            return (childBaseSetApplied = (IBaseSet) value.getValue());
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public IBaseSet appliedBaseSetFrom(IBaseSet value) {
+        try {
+            return (childBaseSetApplied = new BaseSet(value.getId(), childMetaType, creditorId));
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public IBaseSet appliedBaseSetFrom() {
+        try {
+            return (childBaseSetApplied = new BaseSet(childMetaType, creditorId));
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
     public BaseValueDSLFactory base() {
-        BaseValueDSLFactory base = new BaseValueDSLFactory(this).from(null);
+        BaseValueDSLFactory base = new BaseValueDSLFactory(this).from();
         this.lastBase = base;
         return base;
     }
@@ -97,6 +191,24 @@ public class ApplyHistoryFactory {
         BaseValueDSLFactory base = new BaseValueDSLFactory(this).from(from);
         this.lastBase = base;
         return base;
+    }
+
+    public BaseValueDSLFactory base(IBaseSet from) {
+        BaseValueDSLFactory base = new BaseValueDSLFactory(this).from(from);
+        this.lastBase = base;
+        return base;
+    }
+
+    public void withValueDao(IBaseValue persistable, Class<?> persistableDaoClass) {
+        this.with = true;
+        this.withPersistable = persistable;
+        this.withPersistableDaoClass = persistableDaoClass;
+    }
+
+    public void noWith() {
+        this.with = false;
+        this.withPersistable = null;
+        this.withPersistableDaoClass = null;
     }
 
     public InitializingBaseValueDSLFactory applied(IBaseValue from) {
@@ -119,30 +231,35 @@ public class ApplyHistoryFactory {
 
     public HistoricalBaseValueDSLFactory existing(IBaseValue value) {
         HistoricalBaseValueDSLFactory historical = new HistoricalBaseValueDSLFactory(this).fromExisting(value);
+        if (with) historical.withValueDao(withPersistable, withPersistableDaoClass);
         this.lastExisting = historical;
         return historical;
     }
 
     public HistoricalBaseValueDSLFactory closed(IBaseValue value) {
         HistoricalBaseValueDSLFactory historical = new HistoricalBaseValueDSLFactory(this).fromClosed(value);
+        if (with) historical.withValueDao(withPersistable, withPersistableDaoClass);
         this.lastClosed = historical;
         return historical;
     }
 
     public HistoricalBaseValueDSLFactory previous(IBaseValue value) {
         HistoricalBaseValueDSLFactory historical = new HistoricalBaseValueDSLFactory(this).fromPrevious(value);
+        if (with) historical.withValueDao(withPersistable, withPersistableDaoClass);
         this.lastPrevious = historical;
         return historical;
     }
 
     public HistoricalBaseValueDSLFactory next(IBaseValue value) {
         HistoricalBaseValueDSLFactory historical = new HistoricalBaseValueDSLFactory(this).fromNext(value);
+        if (with) historical.withValueDao(withPersistable, withPersistableDaoClass);
         this.lastNext = historical;
         return historical;
     }
 
     public HistoricalBaseValueDSLFactory last(IBaseValue value) {
         HistoricalBaseValueDSLFactory historical = new HistoricalBaseValueDSLFactory(this).fromLast(value);
+        if (with) historical.withValueDao(withPersistable, withPersistableDaoClass);
         this.lastLast = historical;
         return historical;
     }
@@ -203,8 +320,12 @@ public class ApplyHistoryFactory {
         return lastLast.result();
     }
 
-    public interface IEachAttribute {
-        void execute(IBaseEntity baseEntityLoaded, IBaseEntity baseEntitySaving, String attributeName, IMetaAttribute childMetaAttribute, IMetaType childMetaType);
+    public void processed(IBaseValue value) {
+        processed.add(value.getUuid());
+    }
+
+    public Boolean contains(IBaseValue value) {
+        return processed.contains(value.getUuid());
     }
 
     public void eachAttribute(IEachAttribute attribute) {
@@ -216,25 +337,26 @@ public class ApplyHistoryFactory {
             IMetaAttribute childMetaAttribute = metaClass.getMetaAttribute(attributeName);
             IMetaType childMetaType = childMetaAttribute.getMetaType();
 
-            attribute.execute(baseEntityLoaded, baseEntitySaving, attributeName, childMetaAttribute, childMetaType);
+            attribute.execute(new EachAttributeBinding(baseEntitySaving, baseEntityLoaded, attributeName, childMetaAttribute, childMetaType));
 
         }
 
     }
 
-    public interface IGetFunction {
-        IBaseEntity execute(IBaseEntity baseEntityLoaded, IBaseEntity baseEntitySaving, IMetaClass metaClass, IMetaAttribute metaAttribute);
-    }
-
     public IBaseEntity get(IGetFunction function, IBaseEntity baseEntityLoaded, IBaseEntity baseEntitySaving) {
-        return function.execute(baseEntityLoaded, baseEntitySaving, metaClass, metaAttribute);
+        return function.execute(new IGetFunctionBinding(baseEntitySaving, baseEntityLoaded, metaClass, metaAttribute));
     }
 
     public IBaseEntity get(IGetFunction function) {
-        return function.execute(baseEntityLoaded, baseEntitySaving, metaClass, metaAttribute);
+        return function.execute(new IGetFunctionBinding(baseEntitySaving, baseEntityLoaded, metaClass, metaAttribute));
     }
 
     public Object castedValue(IBaseValue value) {
+        return metaValue.getTypeCode() == DataTypes.DATE ?
+                new Date(((Date) value.getValue()).getTime()) : value.getValue();
+    }
+
+    public Object castedValue(IMetaValue metaValue, IBaseValue value) {
         return metaValue.getTypeCode() == DataTypes.DATE ?
                 new Date(((Date) value.getValue()).getTime()) : value.getValue();
     }
@@ -243,6 +365,52 @@ public class ApplyHistoryFactory {
         if (value.getNewBaseValue() != null)
             return value.getNewBaseValue().getValue();
         else return null;
+    }
+
+    public void isBaseSetDeleted(Boolean isBaseSetDeleted) {
+        this.isBaseSetDeleted = isBaseSetDeleted;
+    }
+
+    public interface IEachAttribute {
+        void execute(EachAttributeBinding binding);
+    }
+
+    public interface IGetFunction {
+        IBaseEntity execute(IGetFunctionBinding binding);
+    }
+
+    public class EachAttributeBinding {
+
+        public IBaseEntity baseEntitySaving;
+        public IBaseEntity baseEntityLoaded;
+        public String attributeName;
+        public IMetaAttribute childMetaAttribute;
+        public IMetaType childMetaType;
+
+        public EachAttributeBinding(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, String attributeName, IMetaAttribute childMetaAttribute, IMetaType childMetaType) {
+            this.baseEntitySaving = baseEntitySaving;
+            this.baseEntityLoaded = baseEntityLoaded;
+            this.attributeName = attributeName;
+            this.childMetaAttribute = childMetaAttribute;
+            this.childMetaType = childMetaType;
+        }
+
+    }
+
+    public class IGetFunctionBinding {
+
+        public IBaseEntity baseEntitySaving;
+        public IBaseEntity baseEntityLoaded;
+        public IMetaClass metaClass;
+        public IMetaAttribute metaAttribute;
+
+        public IGetFunctionBinding(IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IMetaClass metaClass, IMetaAttribute metaAttribute) {
+            this.baseEntitySaving = baseEntitySaving;
+            this.baseEntityLoaded = baseEntityLoaded;
+            this.metaClass = metaClass;
+            this.metaAttribute = metaAttribute;
+        }
+
     }
 
 }

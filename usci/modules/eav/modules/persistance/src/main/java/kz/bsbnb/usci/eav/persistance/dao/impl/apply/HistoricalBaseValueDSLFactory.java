@@ -1,6 +1,10 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl.apply;
 
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.persistable.IPersistable;
+import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
+import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Date;
 
@@ -15,7 +19,13 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
     private final int HISTORICAL_NEXT = 4;
     private final int HISTORICAL_LAST = 5;
 
+    @Autowired
+    private IPersistableDaoPool persistableDaoPool;
+
     private int historical = 0;
+    private Boolean with = false;
+    private IBaseValue withPersistable;
+    private Class withPersistableDaoClass;
 
     public HistoricalBaseValueDSLFactory(ApplyHistoryFactory memorizingTool) {
         super(memorizingTool);
@@ -53,6 +63,13 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
         return this;
     }
 
+    public HistoricalBaseValueDSLFactory withValueDao(IBaseValue persistable, Class<?> persistableDaoClass) {
+        this.with = true;
+        this.withPersistable = persistable;
+        this.withPersistableDaoClass = persistableDaoClass;
+        return this;
+    }
+
     public HistoricalBaseValueDSLFactory clone() throws CloneNotSupportedException {
 
         HistoricalBaseValueDSLFactory cloneValue = new HistoricalBaseValueDSLFactory(memorizingTool);
@@ -73,31 +90,39 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
 
     public HistoricalBaseValueDSLFactory execute() {
 
+        IBaseValueDao valueDao = memorizingTool.valueDao;
+
+        if (with)
+            valueDao = (IBaseValueDao) persistableDaoPool
+                    .getPersistableDao(withPersistable.getClass(), withPersistableDaoClass);
+
         switch (historical) {
             case (HISTORICAL_EXISTING):
-                result = memorizingTool.valueDao.getExistingBaseValue(from);
+                result = valueDao.getExistingBaseValue(from);
                 break;
             case (HISTORICAL_CLOSED):
-                result = memorizingTool.valueDao.getClosedBaseValue(from);
+                result = valueDao.getClosedBaseValue(from);
                 break;
             case (HISTORICAL_PREVIOUS):
-                result = memorizingTool.valueDao.getPreviousBaseValue(from);
+                result = valueDao.getPreviousBaseValue(from);
                 break;
             case (HISTORICAL_NEXT):
-                result = memorizingTool.valueDao.getNextBaseValue(from);
+                result = valueDao.getNextBaseValue(from);
                 break;
             case (HISTORICAL_LAST):
-                result = memorizingTool.valueDao.getLastBaseValue(from);
+                result = valueDao.getLastBaseValue(from);
                 break;
         }
 
         if (result == null) return this;
 
-        if (id != null) result.setId(id);
-        if (date != null) result.setRepDate(new Date(date.getTime()));
-        if (value != null) result.setValue(value);
-        if (closed != null) result.setClosed(closed);
-        if (last != null) result.setLast(last);
+        IBaseValue rs = (IBaseValue) result;
+
+        if (id != null) rs.setId(id);
+        if (date != null) rs.setRepDate(new Date(date.getTime()));
+        if (value != null) rs.setValue(value);
+        if (closed != null) rs.setClosed(closed);
+        if (last != null) rs.setLast(last);
 
         super.execute();
 
@@ -107,7 +132,7 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
 
     public IBaseValue result() {
         if (result == null) this.execute();
-        return result;
+        return (IBaseValue) result;
     }
 
 }
