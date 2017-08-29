@@ -1,6 +1,7 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl.apply;
 
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
+import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
@@ -34,14 +35,15 @@ public class ApplyHistoryFactory {
     protected IBaseEntity baseEntityLoaded;
     protected IBaseEntity baseEntitySaving;
     protected IBaseEntityManager baseEntityManager;
+    protected IBaseContainer baseContainer;
     protected IMetaAttribute metaAttribute;
     protected IMetaType metaType;
     protected IMetaClass metaClass;
     protected IMetaValue metaValue;
-    protected IMetaSet metaSet;
     protected IMetaType childMetaType;
     protected IMetaValue childMetaValue;
-    protected Boolean isBaseSetDeleted;
+    protected IMetaSet childMetaSet;
+    protected IMetaClass childMetaClass;
 
     protected IBaseValueDao valueDao;
 
@@ -76,11 +78,18 @@ public class ApplyHistoryFactory {
         this.baseValueSaving = baseValueSaving;
         this.baseValueLoaded = baseValueLoaded;
 
-        this.baseEntitySaving = (IBaseEntity) baseValueSaving.getValue();
-        this.baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
+        try {
+            this.baseEntitySaving = (IBaseEntity) baseValueSaving.getValue();
+        } catch (Exception e) {
+        }
+        try {
+            this.baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
+        } catch (Exception e) {
+        }
 
         this.baseEntityManager = baseEntityManager;
 
+        this.baseContainer = baseValueSaving.getBaseContainer();
         this.metaAttribute = baseValueSaving.getMetaAttribute();
         this.metaType = metaAttribute.getMetaType();
         try {
@@ -92,24 +101,29 @@ public class ApplyHistoryFactory {
         } catch (Exception e) {
         }
         try {
-            this.metaSet = (IMetaSet) metaType;
-            this.childMetaType = metaSet.getMemberType();
+            this.childMetaSet = (IMetaSet) metaType;
+            this.childMetaType = childMetaSet.getMemberType();
+        } catch (Exception e) {
+        }
+        try {
             this.childMetaValue = (IMetaValue) childMetaType;
         } catch (Exception e) {
         }
+        try {
+            this.childMetaClass = (IMetaClass) childMetaType;
+        } catch (Exception e) {
+        }
 
-        this.childBaseSetSaving = savingBaseSetFrom(baseValueSaving);
+        this.childBaseSetSaving = null;
         this.childBaseSetLoaded = null;
         this.childBaseSetApplied = null;
-
-        this.isBaseSetDeleted = false;
 
         this.valueDao = persistableDaoPool
                 .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
     }
 
-    public IBaseSet savingBaseSetFrom(IBaseValue value) {
+    public IBaseSet savingChildFrom(IBaseValue value) {
         try {
             return (childBaseSetSaving = (IBaseSet) value.getValue());
         } catch (Exception e) {
@@ -117,7 +131,7 @@ public class ApplyHistoryFactory {
         return null;
     }
 
-    public IBaseSet savingBaseSetFrom(IBaseSet value) {
+    public IBaseSet savingChildNew(IBaseValue value) {
         try {
             return (childBaseSetSaving = new BaseSet(value.getId(), childMetaType, creditorId));
         } catch (Exception e) {
@@ -125,7 +139,15 @@ public class ApplyHistoryFactory {
         return null;
     }
 
-    public IBaseSet savingBaseSetFrom() {
+    public IBaseSet savingChildNew(IBaseSet value) {
+        try {
+            return (childBaseSetSaving = new BaseSet(value.getId(), childMetaType, creditorId));
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public IBaseSet savingChildNew() {
         try {
             return (childBaseSetSaving = new BaseSet(childMetaType, creditorId));
         } catch (Exception e) {
@@ -133,7 +155,7 @@ public class ApplyHistoryFactory {
         return null;
     }
 
-    public IBaseSet loadedBaseSetFrom(IBaseValue value) {
+    public IBaseSet loadedChildFrom(IBaseValue value) {
         try {
             return (childBaseSetLoaded = (IBaseSet) value.getValue());
         } catch (Exception e) {
@@ -141,7 +163,7 @@ public class ApplyHistoryFactory {
         return null;
     }
 
-    public IBaseSet loadedBaseSetFrom(IBaseSet value) {
+    public IBaseSet loadedChildNew(IBaseValue value) {
         try {
             return (childBaseSetLoaded = new BaseSet(value.getId(), childMetaType, creditorId));
         } catch (Exception e) {
@@ -149,7 +171,15 @@ public class ApplyHistoryFactory {
         return null;
     }
 
-    public IBaseSet loadedBaseSetFrom() {
+    public IBaseSet loadedChildNew(IBaseSet value) {
+        try {
+            return (childBaseSetLoaded = new BaseSet(value.getId(), childMetaType, creditorId));
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public IBaseSet loadedChildNew() {
         try {
             return (childBaseSetLoaded = new BaseSet(childMetaType, creditorId));
         } catch (Exception e) {
@@ -157,7 +187,7 @@ public class ApplyHistoryFactory {
         return null;
     }
 
-    public IBaseSet appliedBaseSetFrom(IBaseValue value) {
+    public IBaseSet appliedChildFrom(IBaseValue value) {
         try {
             return (childBaseSetApplied = (IBaseSet) value.getValue());
         } catch (Exception e) {
@@ -165,7 +195,7 @@ public class ApplyHistoryFactory {
         return null;
     }
 
-    public IBaseSet appliedBaseSetFrom(IBaseSet value) {
+    public IBaseSet appliedChildNew(IBaseValue value) {
         try {
             return (childBaseSetApplied = new BaseSet(value.getId(), childMetaType, creditorId));
         } catch (Exception e) {
@@ -173,7 +203,15 @@ public class ApplyHistoryFactory {
         return null;
     }
 
-    public IBaseSet appliedBaseSetFrom() {
+    public IBaseSet appliedChildNew(IBaseSet value) {
+        try {
+            return (childBaseSetApplied = new BaseSet(value.getId(), childMetaType, creditorId));
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public IBaseSet appliedChildNew() {
         try {
             return (childBaseSetApplied = new BaseSet(childMetaType, creditorId));
         } catch (Exception e) {
@@ -365,10 +403,6 @@ public class ApplyHistoryFactory {
         if (value.getNewBaseValue() != null)
             return value.getNewBaseValue().getValue();
         else return null;
-    }
-
-    public void isBaseSetDeleted(Boolean isBaseSetDeleted) {
-        this.isBaseSetDeleted = isBaseSetDeleted;
     }
 
     public interface IEachAttribute {

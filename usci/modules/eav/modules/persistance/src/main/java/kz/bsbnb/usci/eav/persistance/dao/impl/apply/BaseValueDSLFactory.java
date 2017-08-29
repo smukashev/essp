@@ -4,6 +4,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 
 import java.util.Date;
@@ -86,6 +87,11 @@ public class BaseValueDSLFactory {
 
     public BaseValueDSLFactory castedValue(IBaseValue value) {
         this.value = memorizingTool.castedValue(value);
+        return this;
+    }
+
+    public BaseValueDSLFactory castedValue(IMetaValue metaValue, IBaseValue value) {
+        this.value = memorizingTool.castedValue(metaValue, value);
         return this;
     }
 

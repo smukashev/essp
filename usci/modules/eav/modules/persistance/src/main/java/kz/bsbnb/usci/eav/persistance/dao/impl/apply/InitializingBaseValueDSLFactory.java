@@ -17,6 +17,8 @@ public class InitializingBaseValueDSLFactory extends BaseValueDSLFactory {
     protected IMetaType metaType;
     protected IMetaValue metaValue;
     protected Boolean child = false;
+    protected Long creditorId;
+    protected IBaseValue creditorIdFrom;
 
     public InitializingBaseValueDSLFactory(ApplyHistoryFactory memorizingTool) {
         super(memorizingTool);
@@ -68,6 +70,16 @@ public class InitializingBaseValueDSLFactory extends BaseValueDSLFactory {
         return this;
     }
 
+    public InitializingBaseValueDSLFactory creditorId(Long creditorId) {
+        this.creditorId = creditorId;
+        return this;
+    }
+
+    public InitializingBaseValueDSLFactory creditorIdFrom(IBaseValue creditorIdFrom) {
+        this.creditorIdFrom = creditorIdFrom;
+        return this;
+    }
+
     public InitializingBaseValueDSLFactory clone() throws CloneNotSupportedException {
 
         InitializingBaseValueDSLFactory cloneValue = new InitializingBaseValueDSLFactory(memorizingTool).initialize();
@@ -111,7 +123,9 @@ public class InitializingBaseValueDSLFactory extends BaseValueDSLFactory {
                 id == null
                         ? (from == null ? 0L : from.getId())
                         : id,
-                memorizingTool.creditorId,
+                creditorId == null
+                        ? (creditorIdFrom == null ? memorizingTool.creditorId : creditorIdFrom.getCreditorId())
+                        : creditorId,
                 new Date((
                         date == null
                                 ? (from == null ? new Date() : from.getRepDate())
