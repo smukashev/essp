@@ -1,7 +1,8 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl.apply;
 
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
-import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
     private final int HISTORICAL_PREVIOUS = 3;
     private final int HISTORICAL_NEXT = 4;
     private final int HISTORICAL_LAST = 5;
+    private final int HISTORICAL_BASE = 6;
 
     @Autowired
     private IPersistableDaoPool persistableDaoPool;
@@ -31,6 +33,30 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
         super(memorizingTool);
         this.parent = false;
         this.attribute = false;
+    }
+
+    public HistoricalBaseValueDSLFactory fromBase() {
+        this.result = null;
+        historical = HISTORICAL_BASE;
+        return this;
+    }
+
+    public HistoricalBaseValueDSLFactory fromBase(IBaseValue from) {
+        this.result = from;
+        historical = HISTORICAL_BASE;
+        return this;
+    }
+
+    public HistoricalBaseValueDSLFactory fromBase(IBaseSet from) {
+        this.result = from;
+        historical = HISTORICAL_BASE;
+        return this;
+    }
+
+    public HistoricalBaseValueDSLFactory fromBase(IBaseEntity from) {
+        this.result = from;
+        historical = HISTORICAL_BASE;
+        return this;
     }
 
     public HistoricalBaseValueDSLFactory fromExisting(IBaseValue from) {
@@ -112,17 +138,27 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
             case (HISTORICAL_LAST):
                 result = valueDao.getLastBaseValue(from);
                 break;
+            case (HISTORICAL_BASE):
+                break;
         }
 
         if (result == null) return this;
 
-        IBaseValue rs = (IBaseValue) result;
-
-        if (id != null) rs.setId(id);
-        if (date != null) rs.setRepDate(new Date(date.getTime()));
-        if (value != null) rs.setValue(value);
-        if (closed != null) rs.setClosed(closed);
-        if (last != null) rs.setLast(last);
+        if (result instanceof IBaseValue) {
+            IBaseValue rs = (IBaseValue) result;
+            if (id != null) rs.setId(id);
+            if (date != null) rs.setRepDate(new Date(date.getTime()));
+            if (value != null) rs.setValue(value);
+            if (closed != null) rs.setClosed(closed);
+            if (last != null) rs.setLast(last);
+        } else if (result instanceof IBaseEntity) {
+            IBaseEntity rs = (IBaseEntity) result;
+            if (id != null) rs.setId(id);
+        } else if (result instanceof IBaseSet) {
+            IBaseSet rs = (IBaseSet) result;
+            if (id != null) rs.setId(id);
+            if (last != null) rs.setLast(last);
+        }
 
         super.execute();
 
@@ -132,7 +168,9 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
 
     public IBaseValue result() {
         if (result == null) this.execute();
-        return (IBaseValue) result;
+        if (result instanceof IBaseValue)
+            return (IBaseValue) result;
+        return null;
     }
 
 }

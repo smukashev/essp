@@ -23,9 +23,6 @@ import java.util.UUID;
  */
 public class ApplyHistoryFactory {
 
-    public IBaseSet childBaseSetSaving;
-    public IBaseSet childBaseSetLoaded;
-    public IBaseSet childBaseSetApplied;
     @Autowired
     protected IPersistableDaoPool persistableDaoPool;
     protected long creditorId;
@@ -47,7 +44,7 @@ public class ApplyHistoryFactory {
 
     protected IBaseValueDao valueDao;
 
-    private BaseValueDSLFactory lastBase = null;
+    private HistoricalBaseValueDSLFactory lastBase = null;
 
     private InitializingBaseValueDSLFactory lastApplied = null;
 
@@ -65,7 +62,8 @@ public class ApplyHistoryFactory {
     private IBaseValue withPersistable = null;
     private Class withPersistableDaoClass = null;
 
-    private Set<UUID> processed = new HashSet<>();
+    private Set<UUID> processedValue = new HashSet<>();
+    private Set<Long> processedEntity = new HashSet<>();
 
 
     public ApplyHistoryFactory(long creditorId,
@@ -114,125 +112,73 @@ public class ApplyHistoryFactory {
         } catch (Exception e) {
         }
 
-        this.childBaseSetSaving = null;
-        this.childBaseSetLoaded = null;
-        this.childBaseSetApplied = null;
-
         this.valueDao = persistableDaoPool
                 .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
     }
 
-    public IBaseSet savingChildFrom(IBaseValue value) {
+    public IBaseEntity childEntityFrom(IBaseValue value) {
         try {
-            return (childBaseSetSaving = (IBaseSet) value.getValue());
+            return (IBaseEntity) value.getValue();
         } catch (Exception e) {
         }
         return null;
     }
 
-    public IBaseSet savingChildNew(IBaseValue value) {
+    public IBaseSet childFrom(IBaseValue value) {
         try {
-            return (childBaseSetSaving = new BaseSet(value.getId(), childMetaType, creditorId));
+            return (IBaseSet) value.getValue();
         } catch (Exception e) {
         }
         return null;
     }
 
-    public IBaseSet savingChildNew(IBaseSet value) {
+    public IBaseSet childNew(IBaseValue value) {
         try {
-            return (childBaseSetSaving = new BaseSet(value.getId(), childMetaType, creditorId));
+            return new BaseSet(value.getId(), childMetaType, creditorId);
         } catch (Exception e) {
         }
         return null;
     }
 
-    public IBaseSet savingChildNew() {
+    public IBaseSet childNew(IBaseSet value) {
         try {
-            return (childBaseSetSaving = new BaseSet(childMetaType, creditorId));
+            return new BaseSet(value.getId(), childMetaType, creditorId);
         } catch (Exception e) {
         }
         return null;
     }
 
-    public IBaseSet loadedChildFrom(IBaseValue value) {
+    public IBaseSet childNew() {
         try {
-            return (childBaseSetLoaded = (IBaseSet) value.getValue());
+            return new BaseSet(childMetaType, creditorId);
         } catch (Exception e) {
         }
         return null;
     }
 
-    public IBaseSet loadedChildNew(IBaseValue value) {
-        try {
-            return (childBaseSetLoaded = new BaseSet(value.getId(), childMetaType, creditorId));
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    public IBaseSet loadedChildNew(IBaseSet value) {
-        try {
-            return (childBaseSetLoaded = new BaseSet(value.getId(), childMetaType, creditorId));
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    public IBaseSet loadedChildNew() {
-        try {
-            return (childBaseSetLoaded = new BaseSet(childMetaType, creditorId));
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    public IBaseSet appliedChildFrom(IBaseValue value) {
-        try {
-            return (childBaseSetApplied = (IBaseSet) value.getValue());
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    public IBaseSet appliedChildNew(IBaseValue value) {
-        try {
-            return (childBaseSetApplied = new BaseSet(value.getId(), childMetaType, creditorId));
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    public IBaseSet appliedChildNew(IBaseSet value) {
-        try {
-            return (childBaseSetApplied = new BaseSet(value.getId(), childMetaType, creditorId));
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    public IBaseSet appliedChildNew() {
-        try {
-            return (childBaseSetApplied = new BaseSet(childMetaType, creditorId));
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    public BaseValueDSLFactory base() {
-        BaseValueDSLFactory base = new BaseValueDSLFactory(this).from();
+    public HistoricalBaseValueDSLFactory base() {
+        if (this.lastBase != null)
+            return this.lastBase;
+        HistoricalBaseValueDSLFactory base = new HistoricalBaseValueDSLFactory(this).fromBase();
         this.lastBase = base;
         return base;
     }
 
-    public BaseValueDSLFactory base(IBaseValue from) {
-        BaseValueDSLFactory base = new BaseValueDSLFactory(this).from(from);
+    public HistoricalBaseValueDSLFactory base(IBaseValue from) {
+        HistoricalBaseValueDSLFactory base = new HistoricalBaseValueDSLFactory(this).fromBase(from);
         this.lastBase = base;
         return base;
     }
 
-    public BaseValueDSLFactory base(IBaseSet from) {
-        BaseValueDSLFactory base = new BaseValueDSLFactory(this).from(from);
+    public HistoricalBaseValueDSLFactory base(IBaseEntity from) {
+        HistoricalBaseValueDSLFactory base = new HistoricalBaseValueDSLFactory(this).fromBase(from);
+        this.lastBase = base;
+        return base;
+    }
+
+    public HistoricalBaseValueDSLFactory base(IBaseSet from) {
+        HistoricalBaseValueDSLFactory base = new HistoricalBaseValueDSLFactory(this).fromBase(from);
         this.lastBase = base;
         return base;
     }
@@ -359,11 +305,19 @@ public class ApplyHistoryFactory {
     }
 
     public void processed(IBaseValue value) {
-        processed.add(value.getUuid());
+        processedValue.add(value.getUuid());
     }
 
     public Boolean contains(IBaseValue value) {
-        return processed.contains(value.getUuid());
+        return processedValue.contains(value.getUuid());
+    }
+
+    public void processed(IBaseEntity value) {
+        processedEntity.add(value.getId());
+    }
+
+    public Boolean contains(IBaseEntity value) {
+        return processedEntity.contains(value.getUuid());
     }
 
     public void eachAttribute(IEachAttribute attribute) {

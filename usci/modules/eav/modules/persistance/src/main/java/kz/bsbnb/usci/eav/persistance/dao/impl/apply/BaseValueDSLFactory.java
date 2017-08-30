@@ -31,7 +31,7 @@ public class BaseValueDSLFactory {
     protected Boolean last;
 
     protected Boolean parent = false;
-    protected IBaseValue parentFrom = null;
+    protected IPersistable parentFrom = null;
     protected Boolean container = false;
     protected IBaseValue containerFrom = null;
     protected IBaseContainer containerValue = null;
@@ -131,6 +131,12 @@ public class BaseValueDSLFactory {
         return this;
     }
 
+    public BaseValueDSLFactory parentFrom(IBaseSet value) {
+        this.parent = true;
+        this.parentFrom = value;
+        return this;
+    }
+
     public BaseValueDSLFactory container(Boolean containing) {
         this.container = containing;
         return this;
@@ -194,7 +200,6 @@ public class BaseValueDSLFactory {
 
         block:
         {
-
             switch (persistence) {
                 case (PERSISTANCE_INSERTED):
                     memorizingTool.baseEntityManager.registerAsInserted(result);
@@ -218,8 +223,14 @@ public class BaseValueDSLFactory {
                     ((IBaseValue) result).setBaseContainer(memorizingTool.baseEntityApplied);
                     ((IBaseValue) result).setMetaAttribute(memorizingTool.metaAttribute);
                 } else {
-                    ((IBaseValue) result).setBaseContainer(parentFrom.getBaseContainer());
-                    ((IBaseValue) result).setMetaAttribute(parentFrom.getMetaAttribute());
+                    if (parentFrom instanceof IBaseValue) {
+                        ((IBaseValue) result).setBaseContainer(((IBaseValue) parentFrom).getBaseContainer());
+                        ((IBaseValue) result).setMetaAttribute(((IBaseValue) parentFrom).getMetaAttribute());
+                    } else if (parentFrom instanceof IBaseSet) {
+                        ((IBaseValue) result).setBaseContainer(((IBaseSet) parentFrom));
+                        ((IBaseValue) result).setMetaAttribute(memorizingTool.metaAttribute);
+                    }
+
                 }
             }
 
@@ -254,7 +265,12 @@ public class BaseValueDSLFactory {
         if (result == null) this.execute();
         if (result instanceof IBaseValue)
             return (IBaseValue) result;
-        else return null;
+        return null;
+    }
+
+    public BaseValueDSLFactory result(IPersistable result) {
+        this.result = result;
+        return this;
     }
 
 }
