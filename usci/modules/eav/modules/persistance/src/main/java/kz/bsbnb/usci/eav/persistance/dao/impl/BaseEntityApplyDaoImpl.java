@@ -12,6 +12,12 @@ import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.impl.apply.ApplyHistoryFactory;
+import kz.bsbnb.usci.eav.persistance.dao.impl.apply.ApplyHistoryFactory.EachAttributeBinding;
+import kz.bsbnb.usci.eav.persistance.dao.impl.apply.ApplyHistoryFactory.IEachAttribute;
+import kz.bsbnb.usci.eav.persistance.dao.impl.apply.ApplyHistoryFactory.IGetFunction;
+import kz.bsbnb.usci.eav.persistance.dao.impl.apply.ApplyHistoryFactory.IGetFunctionBinding;
+import kz.bsbnb.usci.eav.persistance.dao.impl.apply.CompareFactory;
+import kz.bsbnb.usci.eav.persistance.dao.impl.apply.CompareFactory.DATE;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
@@ -24,67 +30,74 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import static kz.bsbnb.usci.eav.persistance.dao.impl.apply.CompareFactory.DATE.DATE_LESS;
 
 @Repository
 public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityApplyDao {
+
     @Autowired
     IRefRepository refRepository;
+
     @Autowired
     private IPersistableDaoPool persistableDaoPool;
+
     @Autowired
     private IBaseEntityLoadDao baseEntityLoadDao;
+
     @Autowired
     private IBaseEntityReportDateDao baseEntityReportDateDao;
+
     @Autowired
     private IEavOptimizerDao eavOptimizerDao;
+
     @Autowired
     private ErrorHandler errorHandler;
 
     @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
-        IBaseEntity baseEntityApplied;
 
-        // Новые сущности или сущности не имеющие ключевые атрибуты
-        if (baseEntitySaving.getId() < 1 || !baseEntitySaving.getMeta().isSearchable()) {
-            baseEntityApplied = applyBaseEntityBasic(creditorId, baseEntitySaving, baseEntityManager);
-        } else {
-            if (baseEntityLoaded == null) {
-                Date reportDateSaving = baseEntitySaving.getReportDate();
+        final CompareFactory IS = new CompareFactory(null);
 
-                // Получение максимальной отчетной даты из прошедших периодов
-                Date maxReportDate = baseEntityReportDateDao.getMaxReportDate(baseEntitySaving.getId(), reportDateSaving);
+        block:
+        {
 
-                if (maxReportDate == null) {
-                    // Получение минимальной отчетной даты из будущих периодов
-                    Date minReportDate = baseEntityReportDateDao.getMinReportDate(baseEntitySaving.getId(), reportDateSaving);
+            /* Новые сущности или сущности не имеющие ключевые атрибуты */
+            if (IS.NEW(baseEntitySaving) || IS.NOT_SEARCHABLE(baseEntitySaving))
+                return applyBaseEntityBasic(creditorId, baseEntitySaving, baseEntityManager);
 
-                    if (minReportDate == null)
-                        throw new UnsupportedOperationException(Errors.compose(Errors.E56, baseEntitySaving.getId()));
+            if (baseEntityLoaded != null) break block;
 
-                    baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), minReportDate, reportDateSaving);
+            Date reportDateSaving = baseEntitySaving.getReportDate();
 
-                    if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
-                        throw new UnsupportedOperationException(Errors.compose(Errors.E57,
-                                baseEntityLoaded.getId(), baseEntityLoaded.getBaseEntityReportDate().getReportDate()));
-                } else {
-                    baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), maxReportDate, reportDateSaving);
+            /* Получение максимальной отчетной даты из прошедших периодов */
+            Date reportDate = baseEntityReportDateDao.getMaxReportDate(baseEntitySaving.getId(), reportDateSaving);
 
-                    if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
-                        throw new UnsupportedOperationException(Errors.compose(Errors.E57, baseEntityLoaded.getId(),
-                                baseEntityLoaded.getBaseEntityReportDate().getReportDate()));
+            /* Получение минимальной отчетной даты из будущих периодов */
+            if (reportDate == null)
+                reportDate = baseEntityReportDateDao.getMinReportDate(baseEntitySaving.getId(), reportDateSaving);
 
-                }
-            }
+            if (reportDate == null)
+                throw new UnsupportedOperationException(Errors.compose(Errors.E56, baseEntitySaving.getId()));
 
-            baseEntityApplied = applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
+            baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), reportDate, reportDateSaving);
+
+            if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
+                throw new UnsupportedOperationException(Errors.compose(Errors.E57,
+                        baseEntityLoaded.getId(), baseEntityLoaded.getBaseEntityReportDate().getReportDate()));
+
         }
 
-        return baseEntityApplied;
+        return applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
+
     }
 
     @Override
     public IBaseEntity applyBaseEntityBasic(long creditorId, IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager) {
+
         IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
 
         if (foundProcessedBaseEntity != null)
@@ -98,7 +111,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         for (String attribute : baseEntitySaving.getAttributes()) {
             IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attribute);
 
-            // Пропускает закрытые теги на новые сущности <tag/>
+            /* Пропускает закрытые теги на новые сущности <tag/> */
             if (baseValueSaving.getValue() == null)
                 continue;
 
@@ -113,6 +126,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         baseEntityManager.registerProcessedBaseEntity(baseEntityApplied);
 
         return baseEntityApplied;
+
     }
 
     @Override
@@ -120,6 +134,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntityApplied, baseValueSaving,
                 null, baseEntityManager);
+
+        final CompareFactory IS = new CompareFactory(history);
 
         IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
         if (metaAttribute == null)
@@ -210,6 +226,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public IBaseEntity applyBaseEntityAdvanced(long creditorId, IBaseEntity baseEntitySaving,
                                                IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
+
         IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
 
         if (foundProcessedBaseEntity != null)
@@ -296,120 +313,116 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntityApplied, baseValueSaving,
                 baseValueLoaded, baseEntityManager);
 
-        if (baseValueLoaded != null) {
-            if (baseValueSaving.getValue() == null) {
-                Date reportDateSaving = baseValueSaving.getRepDate();
-                Date reportDateLoaded = baseValueLoaded.getRepDate();
+        final CompareFactory IS = new CompareFactory(history);
 
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
-
-                if (compare == 0) {
-                    if (metaAttribute.isFinal()) {
-                        history.applied(baseValueLoaded).deleted().attribute(false).execute();
-                        if (baseValueLoaded.isLast()) {
-                            history.previous(baseValueLoaded).last(true).updated().execute();
-                        }
-                        IBaseValue baseValueNext = history.next(baseValueLoaded).result();
-                        if (baseValueNext != null && baseValueNext.isClosed()) {
-                            history.next().deleted().execute();
-                        }
-                    } else {
-                        history.applied(baseValueLoaded).closed(true).attribute(false).deleted().execute();
-                        if (baseValueLoaded.isLast()) {
-                            history.previous(baseValueLoaded).last(true).updated().execute();
-                        }
-                        IBaseValue baseValueNext = history.next(baseValueLoaded).result();
-                        if (baseValueNext != null && baseValueNext.isClosed()) {
-                            history.next().deleted().execute();
-                        }
-                    }
-                } else if (compare == 1) {
-                    if (metaAttribute.isFinal())
-                        throw new IllegalStateException(Errors.compose(Errors.E66, metaAttribute.getName()));
-
-                    if (baseValueLoaded.isLast()) {
-                        history.applied(baseValueLoaded).last(false).attribute(false).updated().execute();
-                    }
-
-                    IBaseValue baseValueNext = history.next(baseValueLoaded).result();
-                    if (baseValueNext != null)
-                        if (baseValueNext.isClosed()) {
-                            history.next().dateFrom(baseValueSaving).updated().execute();
+        if (IS.NOT_EMPTY(baseValueLoaded)) {
+            if (IS.VALUE_EMPTY(baseValueSaving)) {
+                switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
+                    case DATE_EQUAL:
+                        if (IS.FINAL()) {
+                            history.applied(baseValueLoaded).deleted().attribute(false).execute();
+                            if (IS.LAST(baseValueLoaded)) {
+                                history.previous(baseValueLoaded).last(true).updated().execute();
+                            }
+                            IBaseValue baseValueNext = history.next(baseValueLoaded).result();
+                            if (IS.NOT_EMPTY(baseValueNext) && IS.CLOSED(baseValueNext)) {
+                                history.next().deleted().execute();
+                            }
                         } else {
-                            if (StaticRouter.exceptionOnForbiddenCloseE299())
-                                throw new UnsupportedOperationException(Errors.compose(Errors.E299, DataTypes.formatDate(baseValueNext.getRepDate()), baseValueNext.getValue()));
+                            history.applied(baseValueLoaded).closed(true).attribute(false).deleted().execute();
+                            if (IS.LAST(baseValueLoaded)) {
+                                history.previous(baseValueLoaded).last(true).updated().execute();
+                            }
+                            IBaseValue baseValueNext = history.next(baseValueLoaded).result();
+                            if (IS.NOT_EMPTY(baseValueNext) && IS.CLOSED(baseValueNext)) {
+                                history.next().deleted().execute();
+                            }
                         }
-                    else {
-                        history.applied(baseValueLoaded, true, true).id(0L).attribute(false).inserted().execute();
-                    }
-                } else {
-                    //throw new UnsupportedOperationException(Errors.compose(Errors.E75, baseValueSaving.getMetaAttribute().getName()));
+                        break;
+                    case DATE_MORE:
+                        if (IS.FINAL())
+                            throw new IllegalStateException(Errors.compose(Errors.E66, metaAttribute.getName()));
+                        if (IS.LAST(baseValueLoaded)) {
+                            history.applied(baseValueLoaded).last(false).attribute(false).updated().execute();
+                        }
+                        IBaseValue baseValueNext = history.next(baseValueLoaded).result();
+                        if (IS.NOT_EMPTY(baseValueNext))
+                            if (IS.CLOSED(baseValueNext)) {
+                                history.next().dateFrom(baseValueSaving).updated().execute();
+                            } else {
+                                if (StaticRouter.exceptionOnForbiddenCloseE299())
+                                    throw new UnsupportedOperationException(Errors.compose(Errors.E299, DataTypes.formatDate(baseValueNext.getRepDate()), baseValueNext.getValue()));
+                            }
+                        else {
+                            history.applied(baseValueLoaded, true, true).id(0L).attribute(false).inserted().execute();
+                        }
+                        break;
+                    case DATE_LESS:
+                        //throw new UnsupportedOperationException(Errors.compose(Errors.E75, baseValueSaving.getMetaAttribute().getName()));
+                        break;
                 }
                 return;
             }
 
-            if (baseValueSaving.equalsByValue(baseValueLoaded)) {
-                Date reportDateSaving = baseValueSaving.getRepDate();
-                Date reportDateLoaded = baseValueLoaded.getRepDate();
-
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+            if (IS.VALUE_EQUALS(baseValueSaving, baseValueLoaded)) {
 
                 // Именение ключевых полей
                 // <tag operation="new" data="new_value">old_value</tag>
                 Object baseValue;
-                if (baseValueSaving.getNewBaseValue() != null) {
+                if (IS.NEW_VALUE_NOT_EMPTY(baseValueSaving)) {
                     baseValue = history.newValue(baseValueSaving);
                     history.base().optimizer().execute();
                 } else {
                     baseValue = history.castedValue(baseValueLoaded);
                 }
 
-                if (compare == 0 || compare == 1) {
-                    history.applied(baseValueLoaded).value(baseValue).execute();
-                    // Запуск на изменение ключевого поля
-                    if (baseValueSaving.getNewBaseValue() != null)
-                        history.from().updated().execute();
-                } else if (compare == -1) {
-                    history.applied(baseValueLoaded).value(baseValue).dateFrom(baseValueSaving).updated().execute();
+                switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
+                    case DATE_EQUAL:
+                    case DATE_MORE:
+                        history.applied(baseValueLoaded).value(baseValue).execute();
+                        // Запуск на изменение ключевого поля
+                        if (IS.NEW_VALUE_NOT_EMPTY(baseValueSaving))
+                            history.from().updated().execute();
+                        break;
+                    case DATE_LESS:
+                        history.applied(baseValueLoaded).value(baseValue).dateFrom(baseValueSaving).updated().execute();
                 }
 
             } else {
-                Date reportDateSaving = baseValueSaving.getRepDate();
-                Date reportDateLoaded = baseValueLoaded.getRepDate();
+                switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
+                    case DATE_EQUAL:
+                        history.applied(baseValueLoaded).castedValue(baseValueSaving).updated().execute();
+                        break;
+                    case DATE_MORE:
+                        if (IS.FINAL())
+                            throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
 
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+                        history.applied(baseValueLoaded).id(0L).dateFrom(baseValueSaving).inserted().execute();
 
-                if (compare == 0) {
-                    history.applied(baseValueLoaded).castedValue(baseValueSaving).updated().execute();
-                } else if (compare == 1) {
-                    if (metaAttribute.isFinal())
-                        throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
-
-                    history.applied(baseValueLoaded).id(0L).dateFrom(baseValueSaving).inserted().execute();
-
-                    if (baseValueLoaded.isLast()) {
-                        history.applied(baseValueLoaded).last(false).updated().execute();
-                    }
-                } else if (compare == -1) {
-                    history.applied(baseValueSaving).id(0L).closed(false).last(false).inserted().execute();
+                        if (IS.LAST(baseValueLoaded)) {
+                            history.applied(baseValueLoaded).last(false).updated().execute();
+                        }
+                        break;
+                    case DATE_LESS:
+                        history.applied(baseValueSaving).id(0L).closed(false).last(false).inserted().execute();
                 }
             }
         } else {
-            if (baseValueSaving.getValue() == null) {
+            if (IS.VALUE_EMPTY(baseValueSaving)) {
                 return;
                 /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
                         baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
             }
 
-            if (!metaAttribute.isFinal()) {
+            if (IS.NOT_FINAL()) {
                 IBaseValue baseValueClosed = history.closed(baseValueSaving).parent(true).result();
-                if (baseValueClosed != null) {
-                    if (baseValueClosed.equalsByValue(baseValueSaving)) {
+                if (IS.NOT_CLOSED(baseValueClosed)) {
+                    if (IS.VALUE_EQUALS(baseValueClosed, baseValueSaving)) {
                         baseValueClosed = history.closed().deleted().result();
 
                         IBaseValue baseValuePrevious = history.previous(baseValueClosed).result();
 
-                        if (baseValuePrevious == null)
+                        if (IS.EMPTY(baseValuePrevious))
                             throw new IllegalStateException(Errors.compose(Errors.E70, baseValueClosed.getMetaAttribute().getName()));
 
                         history.previous().last(true).parent(true).updated().execute();
@@ -419,7 +432,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 } else {
                     IBaseValue baseValueNext = history.closed(baseValueSaving).result();
 
-                    if (baseValueNext != null) {
+                    if (IS.NOT_EMPTY(baseValueNext)) {
                         history.applied(baseValueSaving).idFrom(baseValueNext).closedFrom(baseValueNext).lastFrom(baseValueNext).parent(false).updated().execute();
                     } else {
                         history.applied(baseValueSaving).id(0L).closed(false).last(true).parent(false).inserted().execute();
@@ -428,16 +441,15 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             } else {
                 IBaseValue baseValueLast = history.closed(baseValueSaving).result();
 
-                if (baseValueLast == null) {
+                if (IS.EMPTY(baseValueLast)) {
                     history.applied(baseValueSaving).id(0L).closed(false).last(true).parent(false).inserted().execute();
                 } else {
-                    Date reportDateSaving = baseValueSaving.getRepDate();
-                    Date reportDateLast = baseValueLast.getRepDate();
-
-                    boolean last = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLast) != -1;
-
-                    if (last) {
-                        history.closed().last(true).parent(true).updated().execute();
+                    boolean last = false;
+                    switch (IS.COMPARE_DATE(baseValueSaving, baseValueLast)) {
+                        case DATE_EQUAL:
+                        case DATE_MORE:
+                            history.closed().last(true).parent(true).updated().execute();
+                            last = true;
                     }
 
                     history.applied(baseValueSaving).id(0L).closed(false).last(last).parent(false).inserted().execute();
@@ -447,14 +459,17 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     }
 
     @Override
-    public void applyComplexValue(final long creditorId, final IBaseEntity baseEntity, final IBaseValue baseValueSaving,
+    public void applyComplexValue(final long creditorId, final IBaseEntity baseEntity,
+                                  final IBaseValue baseValueSaving,
                                   final IBaseValue baseValueLoaded, final IBaseEntityManager baseEntityManager) {
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager);
 
-        ApplyHistoryFactory.IGetFunction getEntityApplied = new ApplyHistoryFactory.IGetFunction() {
+        final CompareFactory IS = new CompareFactory(history);
+
+        IGetFunction getEntityApplied = new IGetFunction() {
             @Override
-            public IBaseEntity execute(ApplyHistoryFactory.IGetFunctionBinding binding) {
+            public IBaseEntity execute(IGetFunctionBinding binding) {
                 IBaseEntity baseEntityApplied = null;
                 if (binding.metaAttribute.isImmutable()) {
                     if (binding.metaAttribute.getMetaType().isReference()) {
@@ -469,221 +484,221 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         };
 
-        ApplyHistoryFactory.IGetFunction getEntityAppliedAdvanced = new ApplyHistoryFactory.IGetFunction() {
+        IGetFunction getEntityAppliedAdvanced = new IGetFunction() {
             @Override
-            public IBaseEntity execute(ApplyHistoryFactory.IGetFunctionBinding binding) {
+            public IBaseEntity execute(IGetFunctionBinding binding) {
                 return applyBaseEntityAdvanced(creditorId, binding.baseEntitySaving, binding.baseEntityLoaded, baseEntityManager);
             }
         };
 
-        if (baseValueLoaded != null) {
-            if (baseValueSaving.getValue() == null) {
-                Date reportDateSaving = baseValueSaving.getRepDate();
-                Date reportDateLoaded = baseValueLoaded.getRepDate();
+        if (IS.NOT_EMPTY(baseValueLoaded)) {
+            if (IS.VALUE_EMPTY(baseValueSaving)) {
 
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+                switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
+                    case DATE_EQUAL:
+                        if (IS.FINAL()) {
 
-                if (compare == 0) {
-                    if (metaAttribute.isFinal()) {
+                            history.applied(baseValueLoaded).attribute(false).deleted().execute();
 
-                        history.applied(baseValueLoaded).attribute(false).deleted().execute();
+                            if (IS.LAST(baseValueLoaded)) {
+                                IBaseValue baseValuePrevious = history.previous(baseValueLoaded).result();
 
-                        if (baseValueLoaded.isLast()) {
-                            IBaseValue baseValuePrevious = history.previous(baseValueLoaded).result();
-
-                            if (baseValuePrevious != null) {
-                                history.previous().last(true).parent(true).updated().execute();
-                            }
-                        }
-
-                        if (!metaClass.isSearchable() && !metaAttribute.isImmutable()) {
-
-                            history.eachAttribute(new ApplyHistoryFactory.IEachAttribute() {
-                                @Override
-                                public void execute(ApplyHistoryFactory.EachAttributeBinding binding) {
-                                    binding.baseEntitySaving.put(
-                                            binding.attributeName,
-                                            history.applied(baseValueSaving).metaType(binding.childMetaType).id(0L).value(null).closed(false).last(true).result()
-                                    );
+                                if (IS.NOT_EMPTY(baseValuePrevious)) {
+                                    history.previous().last(true).parent(true).updated().execute();
                                 }
-                            });
-
-                            history.get(getEntityAppliedAdvanced);
-
-                            //TODO: E92 refactor
-                            //if (!baseEntityLoaded.getMeta().isSearchable())
-                            //    baseEntityManager.registerAsDeleted(baseEntityLoaded);
-                        }
-
-                        // delete next closed value
-                        IBaseValue baseValueNext = history.next(baseValueLoaded).result();
-
-                        if (baseValueNext != null && baseValueNext.isClosed()) {
-                            history.next().parent(true).deleted().execute();
-                        }
-
-                        return;
-                    } else {
-
-                        history.applied(baseValueLoaded).deleted().execute();
-
-                        if (baseValueLoaded.isLast()) {
-                            IBaseValue baseValuePrevious = history.previous(baseValueLoaded).result();
-                            if (baseValuePrevious != null) {
-                                history.previous().last(true).parent(true).updated().execute();
                             }
-                        }
 
-                        if (!metaClass.isSearchable() && !metaAttribute.isImmutable()) {
+                            if (IS.NOT_SEARCHABLE() && IS.NOT_IMMUTABLE()) {
 
-                            history.eachAttribute(new ApplyHistoryFactory.IEachAttribute() {
-                                @Override
-                                public void execute(ApplyHistoryFactory.EachAttributeBinding binding) {
-                                    binding.baseEntitySaving.put(
-                                            binding.attributeName,
-                                            history.applied(baseValueSaving).metaType(binding.childMetaType).id(0L).value(null).closed(false).last(true).result()
-                                    );
-                                }
-                            });
+                                history.eachAttribute(new IEachAttribute() {
+                                    public void execute(EachAttributeBinding binding) {
+                                        binding.baseEntitySaving.put(
+                                                binding.attributeName,
+                                                history.applied(baseValueSaving).metaType(binding.childMetaType).id(0L).value(null).closed(false).last(true).result()
+                                        );
+                                    }
+                                });
 
-                            history.get(getEntityAppliedAdvanced);
+                                history.get(getEntityAppliedAdvanced);
 
-                            //TODO: E92 refactor
-                            //if (!baseEntityLoaded.getMeta().isSearchable())
-                            //    baseEntityManager.registerAsDeleted(baseEntityLoaded);
-                        }
+                                //TODO: E92 refactor
+                                //if (!baseEntityLoaded.getMeta().isSearchable())
+                                //    baseEntityManager.registerAsDeleted(baseEntityLoaded);
+                            }
 
-                        // delete next closed value
-                        IBaseValue baseValueNext = history.next(baseValueLoaded).result();
+                            // delete next closed value
+                            IBaseValue baseValueNext = history.next(baseValueLoaded).result();
 
-                        if (baseValueNext != null && baseValueNext.isClosed()) {
-                            history.previous().parent(true).deleted().execute();
-                        }
-                    }
-                } else if (compare == 1) {
-                    if (metaAttribute.isFinal())
-                        throw new IllegalStateException(Errors.compose(Errors.E66, metaAttribute.getName()));
+                            if (IS.NOT_EMPTY(baseValueNext) && IS.CLOSED(baseValueNext)) {
+                                history.next().parent(true).deleted().execute();
+                            }
 
-                    if (baseValueLoaded.isLast()) {
-                        history.last(baseValueLoaded).last(false).updated().execute();
-                    }
-
-                    IBaseValue baseValueNext = history.next(baseValueLoaded).result();
-
-                    // check for next closed value
-                    if (baseValueNext != null)
-                        if (baseValueNext.isClosed()) {
-                            history.next().dateFrom(baseValueSaving).parent(true).updated().execute();
+                            return;
                         } else {
-                            if (StaticRouter.exceptionOnForbiddenCloseE299())
-                                throw new UnsupportedOperationException(Errors.compose(Errors.E299,
-                                        DataTypes.formatDate(baseValueNext.getRepDate()), ((IBaseEntity) baseValueNext.getValue()).getId()));
+
+                            history.applied(baseValueLoaded).deleted().execute();
+
+                            if (IS.LAST(baseValueLoaded)) {
+                                IBaseValue baseValuePrevious = history.previous(baseValueLoaded).result();
+                                if (IS.NOT_EMPTY(baseValuePrevious)) {
+                                    history.previous().last(true).parent(true).updated().execute();
+                                }
+                            }
+
+                            if (IS.NOT_SEARCHABLE() && IS.NOT_IMMUTABLE()) {
+
+                                history.eachAttribute(new IEachAttribute() {
+                                    public void execute(EachAttributeBinding binding) {
+                                        binding.baseEntitySaving.put(
+                                                binding.attributeName,
+                                                history.applied(baseValueSaving).metaType(binding.childMetaType).id(0L).value(null).closed(false).last(true).result()
+                                        );
+                                    }
+                                });
+
+                                history.get(getEntityAppliedAdvanced);
+
+                                //TODO: E92 refactor
+                                //if (!baseEntityLoaded.getMeta().isSearchable())
+                                //    baseEntityManager.registerAsDeleted(baseEntityLoaded);
+                            }
+
+                            // delete next closed value
+                            IBaseValue baseValueNext = history.next(baseValueLoaded).result();
+
+                            if (IS.NOT_EMPTY(baseValueNext) && IS.CLOSED(baseValueNext)) {
+                                history.previous().parent(true).deleted().execute();
+                            }
                         }
-                    else {
-                        history.applied(baseValueLoaded).id(0L).dateFrom(baseValueSaving).closed(true).last(true).inserted().execute();
-                    }
-                }/* else if (compare == -1) {
-                    throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
-                            + ". " + baseValueSaving.getMetaAttribute().getName() + ";");
-                }*/
+                        break;
+                    case DATE_MORE:
+                        if (IS.FINAL())
+                            throw new IllegalStateException(Errors.compose(Errors.E66, metaAttribute.getName()));
+
+                        if (IS.LAST(baseValueLoaded)) {
+                            history.last(baseValueLoaded).last(false).updated().execute();
+                        }
+
+                        IBaseValue baseValueNext = history.next(baseValueLoaded).result();
+
+                        // check for next closed value
+                        if (IS.NOT_EMPTY(baseValueNext))
+                            if (IS.CLOSED(baseValueNext)) {
+                                history.next().dateFrom(baseValueSaving).parent(true).updated().execute();
+                            } else {
+                                if (StaticRouter.exceptionOnForbiddenCloseE299())
+                                    throw new UnsupportedOperationException(Errors.compose(Errors.E299,
+                                            DataTypes.formatDate(baseValueNext.getRepDate()), ((IBaseEntity) baseValueNext.getValue()).getId()));
+                            }
+                        else {
+                            history.applied(baseValueLoaded).id(0L).dateFrom(baseValueSaving).closed(true).last(true).inserted().execute();
+                        }
+                        break;
+                    case DATE_LESS:
+                        /*throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
+                                + ". " + baseValueSaving.getMetaAttribute().getName() + ";");*/
+                }
 
                 return;
             }
 
-            IBaseEntity baseEntitySaving = (IBaseEntity) baseValueSaving.getValue();
-            IBaseEntity baseEntityLoaded = (IBaseEntity) baseValueLoaded.getValue();
+            IBaseEntity baseEntitySaving = history.childEntityFrom(baseValueSaving);
+            IBaseEntity baseEntityLoaded = history.childEntityFrom(baseValueLoaded);
 
-            if (metaAttribute.isImmutable() && baseEntitySaving.getId() == 0)
+            if (IS.IMMUTABLE() && IS.NEW(baseEntitySaving))
                 throw new ImmutableElementException(baseEntitySaving);
 
-            if (baseEntitySaving.getId() == baseEntityLoaded.getId() || !metaClass.isSearchable()) {
+            if (IS.ID_EQUALS(baseEntitySaving, baseEntityLoaded) || IS.NOT_SEARCHABLE()) {
 
                 IBaseEntity baseEntityApplied = history.get(getEntityApplied, baseEntityLoaded, baseEntitySaving);
-                if (!metaAttribute.isImmutable()) {
-                    baseEntityApplied = metaClass.isSearchable() ?
+                if (IS.NOT_IMMUTABLE()) {
+                    baseEntityApplied = IS.SEARCHABLE() ?
                             apply(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager) :
                             applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
                 }
 
-                int compare = DataUtils.compareBeginningOfTheDay(baseValueSaving.getRepDate(), baseValueLoaded.getRepDate());
-
                 history.applied(baseValueLoaded).value(baseEntityApplied);
-                if (compare == -1) history.applied().dateFrom(baseValueSaving);
-                if (compare == -1) history.applied().updated().execute();
+                switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
+                    case DATE_LESS:
+                        history.applied().dateFrom(baseValueSaving);
+                        history.applied().updated().execute();
+                }
             } else {
                 IBaseEntity baseEntityApplied = history.get(getEntityApplied, baseEntityLoaded, baseEntitySaving);
-                if (!metaAttribute.isImmutable()) {
+                if (IS.NOT_IMMUTABLE()) {
                     baseEntityApplied = apply(creditorId, baseEntitySaving, null, baseEntityManager);
                 }
 
-                Date reportDateSaving = baseValueSaving.getRepDate();
-                Date reportDateLoaded = baseValueLoaded.getRepDate();
+                switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
 
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+                    case DATE_EQUAL:
+                        history.applied(baseValueLoaded).value(baseEntityApplied).updated().execute();
+                        break;
 
-                if (compare == 0) {
-                    history.applied(baseValueLoaded).value(baseEntityApplied).updated().execute();
-                } else if (compare == 1) {
-                    if (metaAttribute.isFinal())
-                        throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
+                    case DATE_MORE:
+                        if (IS.FINAL())
+                            throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
 
-                    history.applied(baseValueSaving).id(0L).value(baseEntityApplied).closed(false).last(true).inserted().execute();
+                        history.applied(baseValueSaving).id(0L).value(baseEntityApplied).closed(false).last(true).inserted().execute();
 
-                    if (baseValueLoaded.isLast()) {
-                        history.previous(baseValueLoaded).last(false).parent(true).updated().execute();
-                    }
-                } else if (compare == -1) {
-                    if (metaAttribute.isFinal())
-                        throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
+                        if (IS.LAST(baseValueLoaded)) {
+                            history.previous(baseValueLoaded).last(false).parent(true).updated().execute();
+                        }
+                        break;
 
-                    history.applied(baseValueSaving).id(0L).value(baseEntityApplied).closed(false).last(false).parent(false).inserted().execute();
+                    case DATE_LESS:
 
+                        if (IS.FINAL())
+                            throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
+
+                        history.applied(baseValueSaving).id(0L).value(baseEntityApplied).closed(false).last(false).parent(false).inserted().execute();
                 }
+
             }
         } else {
-            IBaseEntity baseEntitySaving = (IBaseEntity) baseValueSaving.getValue();
-            if (baseEntitySaving == null) {
+            IBaseEntity baseEntitySaving = history.childEntityFrom(baseValueSaving);
+            if (IS.EMPTY(baseEntitySaving)) {
                 return;
                 /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
                         baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
             }
 
-            if (metaAttribute.isImmutable() && baseEntitySaving.getId() == 0)
+            if (IS.IMMUTABLE() && IS.NEW(baseEntitySaving))
                 throw new IllegalStateException(Errors.compose(Errors.E71, metaAttribute.getName()));
 
-            if (!metaAttribute.isFinal()) {
+            if (IS.NOT_FINAL()) {
                 IBaseValue baseValueClosed = history.closed(baseValueSaving).parent(true).result();
 
-                if (baseValueClosed != null) {
+                if (IS.NOT_EMPTY(baseValueClosed)) {
 
-                    IBaseEntity baseEntityClosed = (IBaseEntity) baseValueClosed.getValue();
+                    IBaseEntity baseEntityClosed = history.childEntityFrom(baseValueClosed);
 
-                    if (baseValueClosed.equalsByValue(baseValueSaving)) {
+                    if (IS.VALUE_EQUALS(baseValueClosed, baseValueSaving)) {
                         history.closed().deleted().execute();
 
                         IBaseValue baseValuePrevious = history.previous(baseValueClosed).parent(true).result();
 
-                        if (baseValuePrevious == null)
+                        if (IS.EMPTY(baseValuePrevious))
                             throw new IllegalStateException(Errors.compose(Errors.E70, baseValueClosed.getMetaAttribute().getName()));
 
                         IBaseEntity baseEntityApplied = history.get(getEntityApplied, null, baseEntitySaving);
-                        if (!metaAttribute.isImmutable()) {
-                            baseEntityApplied = metaClass.isSearchable() ?
+                        if (IS.NOT_IMMUTABLE()) {
+                            baseEntityApplied = IS.SEARCHABLE() ?
                                     apply(creditorId, baseEntitySaving, null, baseEntityManager) :
                                     applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityClosed, baseEntityManager);
                         }
 
                         history.previous().value(baseEntityApplied);
 
-                        if (baseValueClosed.isLast()) {
+                        if (IS.LAST(baseValueClosed)) {
                             history.previous().last(true).attribute(true).updated().execute();
                         } else {
                             history.previous().attribute(true);
                         }
                     } else {
                         IBaseEntity baseEntityApplied = history.get(getEntityApplied, null, baseEntitySaving);
-                        if (!metaAttribute.isImmutable()) {
-                            baseEntityApplied = metaClass.isSearchable() ?
+                        if (IS.NOT_IMMUTABLE()) {
+                            baseEntityApplied = IS.SEARCHABLE() ?
                                     apply(creditorId, baseEntitySaving, baseEntityClosed, baseEntityManager) :
                                     applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityClosed, baseEntityManager);
                         }
@@ -693,10 +708,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 } else {
                     IBaseValue<IBaseEntity> baseValueNext = history.next(baseValueSaving).parent(true).result();
 
-                    if (baseValueNext != null) {
+                    if (IS.NOT_EMPTY(baseValueNext)) {
                         IBaseEntity baseEntityApplied = history.get(getEntityApplied, null, baseEntitySaving);
-                        if (!metaAttribute.isImmutable()) {
-                            baseEntityApplied = metaClass.isSearchable() ?
+                        if (IS.NOT_IMMUTABLE()) {
+                            baseEntityApplied = IS.SEARCHABLE() ?
                                     apply(creditorId, baseEntitySaving, baseValueNext.getValue(), baseEntityManager) :
                                     applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseValueNext.getValue(), baseEntityManager);
                         }
@@ -705,7 +720,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     } else {
                         IBaseEntity baseEntityApplied = history.get(getEntityApplied, null, baseEntitySaving);
-                        if (!metaAttribute.isImmutable()) {
+                        if (IS.NOT_IMMUTABLE()) {
                             baseEntityApplied = apply(creditorId, baseEntitySaving, null, baseEntityManager);
                         }
 
@@ -716,26 +731,25 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseValue baseValueLast = history.last(baseValueSaving).result();
 
                 IBaseEntity baseEntityApplied = history.get(getEntityApplied, null, baseEntitySaving);
-                if (!metaAttribute.isImmutable()) {
+                if (IS.NOT_IMMUTABLE()) {
                     baseEntityApplied = apply(creditorId, baseEntitySaving, null, baseEntityManager);
 
                     IBaseValue previousBaseValue = history.previous(baseValueSaving).result();
 
-                    if (previousBaseValue != null && previousBaseValue.isLast()) {
+                    if (IS.NOT_EMPTY(previousBaseValue) && IS.LAST(previousBaseValue)) {
                         history.applied(previousBaseValue).last(false).attribute(true).updated().execute();
                     }
                 }
 
-                if (baseValueLast == null) {
+                if (IS.EMPTY(baseValueLast)) {
                     history.applied(baseValueSaving).id(0L).value(baseEntityApplied).closed(false).last(true).attribute(true).inserted().execute();
                 } else {
-                    Date reportDateSaving = baseValueSaving.getRepDate();
-                    Date reportDateLast = baseValueLast.getRepDate();
-
-                    boolean last = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLast) != -1;
-
-                    if (last) {
-                        history.last().last(false).parent(true).updated().execute();
+                    boolean last = false;
+                    switch (IS.COMPARE_DATE(baseValueSaving, baseValueLast)) {
+                        case DATE_EQUAL:
+                        case DATE_MORE:
+                            history.last().last(false).parent(true).updated().execute();
+                            last = true;
                     }
 
                     history.applied(baseValueSaving).id(0L).value(baseEntityApplied).closed(false).last(last).attribute(true).inserted().execute();
@@ -751,79 +765,83 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager);
 
+        final CompareFactory IS = new CompareFactory(history);
+
         IBaseSet childBaseSetSaving = history.childFrom(baseValueSaving);
         IBaseSet childBaseSetLoaded = null;
         IBaseSet childBaseSetApplied = null;
 
         Boolean isBaseSetDeleted = false;
 
-        if (metaAttribute.isFinal())
+        if (IS.FINAL())
             throw new UnsupportedOperationException(Errors.compose(Errors.E2));
 
-        if (baseValueLoaded != null) {
+        if (IS.NOT_EMPTY(baseValueLoaded)) {
             childBaseSetLoaded = history.childFrom(baseValueLoaded);
 
-            if (childBaseSetSaving == null || childBaseSetSaving.getValueCount() == 0) {
+            if (IS.EMPTY(childBaseSetSaving) || IS.VALUE_COUNT_EMPTY(childBaseSetSaving)) {
                 childBaseSetApplied = history.childNew(childBaseSetLoaded);
 
-                Date reportDateSaving = baseValueSaving.getRepDate();
-                Date reportDateLoaded = baseValueLoaded.getRepDate();
+                switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
 
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+                    IBaseValue baseValueNext;
 
-                // case#1
-                if (compare == 0) {
-                    history.applied(baseValueLoaded).value(childBaseSetLoaded).deleted().execute();
+                    case DATE_EQUAL: /* case#1 */
+                        history.applied(baseValueLoaded).value(childBaseSetLoaded).deleted().execute();
 
-                    if (baseValueLoaded.isLast()) {
-                        history.previous(baseValueLoaded).last(true).parent(true).updated().execute();
-                    }
-
-                    // delete next closed value
-                    IBaseValue baseValueNext = history.next(baseValueLoaded).parent(true).result();
-                    if (baseValueNext != null && baseValueNext.isClosed()) {
-                        history.next().deleted().execute();
-                    }
-
-                    isBaseSetDeleted = true;
-                    // case#2
-                } else if (compare == 1) {
-                    IBaseValue baseValueNext = history.next(baseValueLoaded).parent(true).result();
-
-                    // check for next closed value
-                    if (baseValueNext != null && baseValueNext.isClosed()) {
-                        history.next().dateFrom(baseValueSaving).updated().execute();
-                    } else {
-                        history.applied(baseValueSaving).id(0L).value(childBaseSetLoaded).closed(true).last(true).attribute(false).inserted().execute();
-
-                        if (baseValueLoaded.isLast()) {
-                            history.applied(baseValueLoaded).value(childBaseSetLoaded).last(false).attribute(false).updated().execute();
+                        if (IS.LAST(baseValueLoaded)) {
+                            history.previous(baseValueLoaded).last(true).parent(true).updated().execute();
                         }
-                    }
 
-                    isBaseSetDeleted = true; // todo: check for cumulative arrays
-                } else {
-                    throw new IllegalStateException(Errors.compose(Errors.E72, metaAttribute.getName()));
+                        // delete next closed value
+                        baseValueNext = history.next(baseValueLoaded).parent(true).result();
+                        if (IS.NOT_EMPTY(baseValueNext) && IS.CLOSED(baseValueNext)) {
+                            history.next().deleted().execute();
+                        }
+
+                        isBaseSetDeleted = true;
+                        break;
+
+                    case DATE_MORE: /* case#2 */
+                        baseValueNext = history.next(baseValueLoaded).parent(true).result();
+
+                        // check for next closed value
+                        if (IS.NOT_EMPTY(baseValueNext) && IS.CLOSED(baseValueNext)) {
+                            history.next().dateFrom(baseValueSaving).updated().execute();
+                        } else {
+                            history.applied(baseValueSaving).id(0L).value(childBaseSetLoaded).closed(true).last(true).attribute(false).inserted().execute();
+
+                            if (IS.LAST(baseValueLoaded)) {
+                                history.applied(baseValueLoaded).value(childBaseSetLoaded).last(false).attribute(false).updated().execute();
+                            }
+                        }
+
+                        isBaseSetDeleted = true; // todo: check for cumulative arrays
+                        break;
+
+                    case DATE_LESS:
+                        throw new IllegalStateException(Errors.compose(Errors.E72, metaAttribute.getName()));
+
                 }
+
             } else {
-                Date reportDateSaving = baseValueSaving.getRepDate();
-                Date reportDateLoaded = baseValueLoaded.getRepDate();
 
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+                switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
+                    case DATE_EQUAL:
+                    case DATE_MORE:
+                        /* case#3 */
+                        childBaseSetApplied = history.childNew(childBaseSetLoaded);
 
-                // case#3
-                if (compare == 0 || compare == 1) {
-                    childBaseSetApplied = history.childNew(childBaseSetLoaded);
-
-                    history.applied(baseValueLoaded).value(childBaseSetApplied).parent(false).execute();
-                    // case#4
-                } else if (compare == -1) {
-                    childBaseSetApplied = history.childNew(childBaseSetLoaded);
-                    history.applied(baseValueLoaded).dateFrom(baseValueSaving).value(childBaseSetApplied).parent(false).updated().execute();
+                        history.applied(baseValueLoaded).value(childBaseSetApplied).parent(false).execute();
+                        break;
+                    case DATE_LESS: /* case#4 */
+                        childBaseSetApplied = history.childNew(childBaseSetLoaded);
+                        history.applied(baseValueLoaded).dateFrom(baseValueSaving).value(childBaseSetApplied).parent(false).updated().execute();
                 }
+
             }
         } else {
-            if (childBaseSetSaving == null) {
+            if (IS.EMPTY(childBaseSetSaving)) {
                 return;
                 /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
                         baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
@@ -832,14 +850,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseValue baseValueClosed = history.closed(baseValueSaving).result();
 
             // case#5
-            if (baseValueClosed != null) {
+            if (IS.NOT_EMPTY(baseValueClosed)) {
                 history.closed().parentFrom(baseValueSaving).execute();
 
                 history.applied(baseValueClosed).value(null).parent(false).attribute(false).deleted().execute();
 
                 IBaseValue baseValuePrevious = history.previous(baseValueClosed).result();
 
-                if (baseValuePrevious == null)
+                if (IS.EMPTY(baseValuePrevious))
                     throw new IllegalStateException(Errors.compose(Errors.E70, baseValueClosed.getMetaAttribute().getName()));
 
                 baseValuePrevious = history.previous().parentFrom(baseValueSaving).result();
@@ -852,7 +870,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             } else {
                 IBaseValue baseValueNext = history.next(baseValueSaving).result();
 
-                if (baseValueNext != null) {
+                if (IS.NOT_EMPTY(baseValueNext)) {
                     childBaseSetLoaded = history.childFrom(baseValueNext);
                     childBaseSetApplied = history.childNew(childBaseSetLoaded);
 
@@ -860,7 +878,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 } else {
                     IBaseValue baseValueExisting = history.existing(baseValueSaving).result();
 
-                    if (baseValueExisting != null) {
+                    if (IS.NOT_EMPTY(baseValueExisting)) {
                         childBaseSetLoaded = history.childFrom(baseValueExisting);
                         childBaseSetApplied = history.childNew(childBaseSetLoaded);
 
@@ -876,33 +894,33 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
-        if (childBaseSetSaving != null && childBaseSetSaving.getValueCount() > 0) {
+        if (IS.NOT_EMPTY(childBaseSetSaving) && IS.VALUE_COUNT_NOT_EMPTY(childBaseSetSaving)) {
             boolean baseValueFound;
 
             for (IBaseValue childBaseValueSaving : childBaseSetSaving.get()) {
 
                 history.withValueDao(childBaseValueSaving, IBaseSetValueDao.class);
 
-                if (childBaseSetLoaded != null) {
+                if (IS.NOT_EMPTY(childBaseSetLoaded)) {
                     baseValueFound = false;
 
                     for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
                         if (history.contains(childBaseValueLoaded))
                             continue;
 
-                        if (childBaseValueSaving.equalsByValue(childMetaValue, childBaseValueLoaded)) {
+                        if (childBaseValueSaving.equalsByValue(history.childMetaValue, childBaseValueLoaded)) {
                             history.processed(childBaseValueLoaded);
                             baseValueFound = true;
 
-                            int compareBaseValueRepDate = DataUtils.compareBeginningOfTheDay(
-                                    childBaseValueSaving.getRepDate(), childBaseValueLoaded.getRepDate());
-
-                            if (compareBaseValueRepDate == -1) {
-                                history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).dateFrom(childBaseValueSaving).parent(false).attribute(false).updated();
-                            } else {
-                                history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).parent(false).attribute(false);
+                            switch (IS.COMPARE_DATE(childBaseValueSaving, childBaseValueLoaded)) {
+                                case DATE_LESS:
+                                    history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).dateFrom(childBaseValueSaving).parent(false).attribute(false).updated();
+                                    break;
+                                default:
+                                    history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).parent(false).attribute(false);
                             }
                             history.applied().attribute(childBaseSetApplied).execute();
+
                             break;
                         }
                     }
@@ -916,11 +934,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 IBaseValue childBaseValueClosed = history.closed(baseValueForSearch).result();
 
-                if (childBaseValueClosed != null) {
+                if (IS.NOT_EMPTY(childBaseValueClosed)) {
                     history.closed().containerValue(childBaseSetApplied).deleted().execute();
 
                     IBaseValue childBaseValuePrevious = history.previous(childBaseValueClosed).result();
-                    if (childBaseValuePrevious != null) {
+                    if (IS.NOT_EMPTY(childBaseValuePrevious)) {
                         if (childBaseValueClosed.isLast()) {
                             history.previous().attribute(childBaseSetApplied).last(true).updated().execute();
                         } else {
@@ -935,20 +953,19 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 // Check next value
                 IBaseValue childBaseValueNext = history.next(childBaseValueSaving).result();
-                if (childBaseValueNext != null) {
+                if (IS.NOT_EMPTY(childBaseValueNext)) {
                     history.next().dateFrom(childBaseValueSaving).attribute(childBaseSetApplied).updated().execute();
                     continue;
                 }
 
                 IBaseValue childBaseValueLast = history.last(childBaseValueSaving).result();
-                if (childBaseValueLast != null) {
-                    int compareValueRepDate = DataUtils.compareBeginningOfTheDay(childBaseValueSaving.getRepDate(),
-                            childBaseValueLast.getRepDate());
-
-                    if (compareValueRepDate == -1) {
-                        history.applied(childBaseValueSaving).containerType(MetaContainerTypes.META_SET).child(true).id(0L).closed(false).last(false).attribute(childBaseSetApplied).parent(false).attribute(false).inserted().execute();
-                    } else {
-                        throw new IllegalStateException(Errors.compose(Errors.E74));
+                if (IS.NOT_EMPTY(childBaseValueLast)) {
+                    switch (IS.COMPARE_DATE(childBaseValueSaving, childBaseValueLast)) {
+                        case DATE_LESS:
+                            history.applied(childBaseValueSaving).containerType(MetaContainerTypes.META_SET).child(true).id(0L).closed(false).last(false).attribute(childBaseSetApplied).parent(false).attribute(false).inserted().execute();
+                            break;
+                        default:
+                            throw new IllegalStateException(Errors.compose(Errors.E74));
                     }
 
                     continue;
@@ -960,37 +977,39 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
 
         /* Удаляет элементы массива, если массив не накопительный или массив накопительный и родитель был удалён */
-        if (childBaseSetLoaded != null &&
-                ((metaAttribute.isCumulative() && isBaseSetDeleted) || !metaAttribute.isCumulative())) {
+        if (IS.NOT_EMPTY(childBaseSetLoaded) &&
+                ((IS.CUMULATIVE() && isBaseSetDeleted) || IS.NOT_CUMULATIVE())) {
+            LOOP:
             for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
                 if (history.contains(childBaseValueLoaded))
                     continue;
 
-                Date reportDateSaving = baseValueSaving.getRepDate();
-                Date reportDateLoaded = childBaseValueLoaded.getRepDate();
-
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
-
-                if (compare == -1)
-                    continue;
-
                 history.withValueDao(childBaseValueLoaded, IBaseSetValueDao.class);
 
-                if (compare == 0) {
-                    history.base(childBaseValueLoaded).deleted().execute();
+                switch (IS.COMPARE_DATE(baseValueSaving, childBaseValueLoaded)) {
 
-                    if (childBaseValueLoaded.isLast()) {
-                        IBaseValue childBaseValuePrevious = history.previous(childBaseValueLoaded).result();
+                    case DATE_LESS:
+                        continue LOOP;
 
-                        if (childBaseValuePrevious != null) {
-                            history.previous().containerValue(childBaseSetApplied).last(true).updated().execute();
+                    case DATE_EQUAL:
+                        history.base(childBaseValueLoaded).deleted().execute();
+
+                        if (IS.LAST(childBaseValueLoaded)) {
+                            IBaseValue childBaseValuePrevious = history.previous(childBaseValueLoaded).result();
+
+                            if (IS.NOT_EMPTY(childBaseValuePrevious)) {
+                                history.previous().containerValue(childBaseSetApplied).last(true).updated().execute();
+                            }
                         }
-                    }
-                } else if (compare == 1) {
-                    history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).id(0L).dateFrom(baseValueSaving).closed(true).containerValue(childBaseSetApplied).parent(false).attribute(false).inserted().execute();
-                    if (childBaseValueLoaded.isLast()) {
-                        history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).last(false).containerValue(childBaseSetApplied).parent(false).attribute(false).updated().execute();
-                    }
+                        break;
+
+                    case DATE_MORE:
+                        history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).id(0L).dateFrom(baseValueSaving).closed(true).containerValue(childBaseSetApplied).parent(false).attribute(false).inserted().execute();
+                        if (IS.LAST(childBaseValueLoaded)) {
+                            history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).last(false).containerValue(childBaseSetApplied).parent(false).attribute(false).updated().execute();
+                        }
+                        break;
+
                 }
             }
             history.noWith();
@@ -998,139 +1017,137 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     }
 
     @Override
-    public void applyComplexSet(final long creditorId, final IBaseEntity baseEntity, final IBaseValue baseValueSaving,
+    public void applyComplexSet(final long creditorId, final IBaseEntity baseEntity,
+                                final IBaseValue baseValueSaving,
                                 final IBaseValue baseValueLoaded, final IBaseEntityManager baseEntityManager) {
 
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager);
 
+        CompareFactory IS = new CompareFactory(history);
+
         IBaseSet childBaseSetSaving = history.childFrom(baseValueSaving);
         IBaseSet childBaseSetLoaded = null;
         IBaseSet childBaseSetApplied = null;
 
-        Date reportDateSaving = null;
-        Date reportDateLoaded = null;
-
         boolean isBaseSetDeleted = false;
 
-        if (baseValueLoaded != null) {
-            reportDateLoaded = baseValueLoaded.getRepDate();
+        if (IS.NOT_EMPTY(baseValueLoaded)) {
             childBaseSetLoaded = history.childFrom(baseValueLoaded);
 
-            if (childBaseSetSaving == null || childBaseSetSaving.getValueCount() <= 0) {
+            if (IS.EMPTY(childBaseSetSaving) || IS.VALUE_COUNT_EMPTY(childBaseSetSaving)) {
                 childBaseSetApplied = history.childNew(childBaseSetLoaded);
-                reportDateSaving = baseValueSaving.getRepDate();
 
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+                switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
+                    case DATE_EQUAL:
+                        /* case#1 */
+                        if (IS.FINAL()) {
+                            history.applied(baseValueLoaded).creditorIdFrom(baseValueLoaded).attribute(false).deleted().execute();
 
-                if (compare == 0) {
-                    // case#1
-                    if (metaAttribute.isFinal()) {
-                        history.applied(baseValueLoaded).creditorIdFrom(baseValueLoaded).attribute(false).deleted().execute();
+                            if (IS.LAST(baseValueLoaded)) {
 
-                        if (baseValueLoaded.isLast()) {
+                                IBaseValue baseValuePrevious = history.previous(baseValueLoaded).result();
 
-                            IBaseValue baseValuePrevious = history.previous(baseValueLoaded).result();
+                                if (IS.NOT_EMPTY(baseValuePrevious)) {
+                                    history.previous().last(true).parent(true).updated().execute();
+                                }
+                            }
 
-                            if (baseValuePrevious != null) {
-                                history.previous().last(true).parent(true).updated().execute();
+                            // delete next closed value
+                            IBaseValue baseValueNext = history.next(baseValueLoaded).result();
+
+                            if (IS.NOT_EMPTY(baseValueNext) && IS.CLOSED(baseValueNext)) {
+                                history.next().parent(true).deleted().execute();
+                            }
+
+                            isBaseSetDeleted = true;
+
+                        }
+                        /* case#2 */
+                        if (IS.NOT_FINAL()) {
+                            history.applied(baseValueLoaded).creditorIdFrom(baseValueLoaded).value(childBaseSetLoaded).closed(true).attribute(false).deleted().execute();
+
+                            if (IS.LAST(baseValueLoaded)) {
+
+                                IBaseValue baseValuePrevious = history.previous(baseValueLoaded).result();
+
+                                if (IS.NOT_EMPTY(baseValuePrevious)) {
+                                    history.previous().parent(true).last(true).updated();
+                                }
+                            }
+
+                            // delete next closed value
+                            IBaseValue baseValueNext = history.next(baseValueLoaded).result();
+
+                            if (IS.NOT_EMPTY(baseValueNext) && IS.LAST(baseValueNext)) {
+                                history.next().parent(true).deleted().execute();
+                            }
+
+                            isBaseSetDeleted = true;
+                        }
+                        break;
+                    case DATE_MORE:
+                        /* case#3 */
+                        if (IS.FINAL())
+                            throw new IllegalStateException(Errors.compose(Errors.E66, metaAttribute.getName()));
+
+                        IBaseValue baseValueNext = history.next(baseValueLoaded).result();
+
+                        // check for next closed value
+                        if (IS.NOT_EMPTY(baseValueNext) && IS.CLOSED(baseValueNext)) {
+                            history.next().parent(true).dateFrom(baseValueSaving).updated().execute();
+                        } else {
+                            history.applied(baseValueSaving).creditorIdFrom(baseValueSaving).id(0L).value(childBaseSetLoaded).closed(true).attribute(false).inserted().execute();
+
+                            if (IS.LAST(baseValueLoaded)) {
+                                history.applied(baseValueLoaded).creditorIdFrom(baseValueLoaded).value(childBaseSetLoaded).last(false).attribute(false).updated().execute();
                             }
                         }
 
-                        // delete next closed value
-                        IBaseValue baseValueNext = history.next(baseValueLoaded).result();
-
-                        if (baseValueNext != null && baseValueNext.isClosed()) {
-                            history.next().parent(true).deleted().execute();
-                        }
-
                         isBaseSetDeleted = true;
-                        // case#2
-                    } else {
-                        history.applied(baseValueLoaded).creditorIdFrom(baseValueLoaded).value(childBaseSetLoaded).closed(true).attribute(false).deleted().execute();
+                        break;
+                    case DATE_LESS:
+                        //  throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
+                        //       + "( " + baseValueSaving.getMetaAttribute().getName() + ");");
 
-                        if (baseValueLoaded.isLast()) {
+                }
 
-                            IBaseValue baseValuePrevious = history.previous(baseValueLoaded).result();
-
-                            if (baseValuePrevious != null) {
-                                history.previous().parent(true).last(true).updated();
-                            }
-                        }
-
-                        // delete next closed value
-                        IBaseValue baseValueNext = history.next(baseValueLoaded).result();
-
-                        if (baseValueNext != null && baseValueNext.isClosed()) {
-                            history.next().parent(true).deleted().execute();
-                        }
-
-                        isBaseSetDeleted = true;
-                    }
-                    // case#3
-                } else if (compare == 1) {
-                    if (metaAttribute.isFinal())
-                        throw new IllegalStateException(Errors.compose(Errors.E66, metaAttribute.getName()));
-
-                    IBaseValue baseValueNext = history.next(baseValueLoaded).result();
-
-                    // check for next closed value
-                    if (baseValueNext != null && baseValueNext.isClosed()) {
-                        history.next().parent(true).dateFrom(baseValueSaving).updated().execute();
-                    } else {
-                        history.applied(baseValueSaving).creditorIdFrom(baseValueSaving).id(0L).value(childBaseSetLoaded).closed(true).attribute(false).inserted().execute();
-
-                        if (baseValueLoaded.isLast()) {
-                            history.applied(baseValueLoaded).creditorIdFrom(baseValueLoaded).value(childBaseSetLoaded).last(false).attribute(false).updated().execute();
-                        }
-                    }
-
-                    isBaseSetDeleted = true;
-                }/* else if (compare == -1) {
-                    throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
-                            + "( " + baseValueSaving.getMetaAttribute().getName() + ");");
-                }*/
                 // case#4
             } else {
-                reportDateSaving = baseValueSaving.getRepDate();
+                DATE compare = IS.COMPARE_DATE(baseValueSaving, baseValueLoaded);
 
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
-
-                if (metaAttribute.isFinal() && compare != 0)
+                if (IS.NOT_EQUAL(compare) && IS.FINAL())
                     throw new IllegalStateException(Errors.compose(Errors.E67, metaAttribute.getName()));
 
-                if (compare == 0 || compare == 1) {
+                if (IS.EQUAL_MORE(compare)) {
                     childBaseSetApplied = history.childNew(childBaseSetLoaded);
 
                     history.applied(baseValueLoaded).creditorIdFrom(baseValueLoaded).value(childBaseSetApplied).execute();
-                } else if (compare == -1) {
+                }
+                if (IS.LESS(compare)) {
                     childBaseSetApplied = history.childNew(childBaseSetLoaded);
 
                     history.applied(baseValueLoaded).creditorIdFrom(baseValueLoaded).dateFrom(baseValueSaving).value(childBaseSetApplied).updated().execute();
                 }
             }
         } else {
-            if (childBaseSetSaving == null) {
+            if (IS.EMPTY(childBaseSetSaving)) {
                 return;
                 /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
                         baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
             }
 
-            reportDateSaving = baseValueSaving.getRepDate();
-
             IBaseValue baseValueClosed = null;
             // case#5
-            if (!metaAttribute.isFinal()) {
+            if (IS.NOT_FINAL()) {
                 baseValueClosed = history.closed(baseValueSaving).result();
 
-                if (baseValueClosed != null) {
+                if (IS.NOT_EMPTY(baseValueClosed)) {
                     history.closed().parent(true).deleted().execute();
-
-                    reportDateLoaded = baseValueClosed.getRepDate();
 
                     IBaseValue baseValuePrevious = history.previous(baseValueClosed).result();
 
-                    if (baseValuePrevious == null)
+                    if (IS.EMPTY(baseValuePrevious))
                         throw new IllegalStateException(Errors.compose(Errors.E68, metaAttribute.getName()));
 
                     baseValuePrevious = history.previous().parent(true).result();
@@ -1142,12 +1159,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 }
 
                 // case#6
-                if (baseValueClosed == null) {
+                if (IS.EMPTY(baseValueClosed)) {
                     IBaseValue baseValueNext = history.next(baseValueSaving).result();
 
-                    if (baseValueNext != null) {
-                        reportDateLoaded = baseValueNext.getRepDate();
-
+                    if (IS.NOT_EMPTY(baseValueNext)) {
                         childBaseSetLoaded = history.childFrom(baseValueNext);
                         childBaseSetApplied = history.childNew(baseValueNext);
 
@@ -1167,16 +1182,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         }
 
-        if (childBaseSetSaving != null && childBaseSetSaving.getValueCount() > 0) {
+        if (IS.NOT_EMPTY(childBaseSetSaving) && IS.VALUE_COUNT_NOT_EMPTY(childBaseSetSaving)) {
             boolean baseValueFound;
 
             for (IBaseValue childBaseValueSaving : childBaseSetSaving.get()) {
                 IBaseEntity childBaseEntitySaving = history.childEntityFrom(childBaseValueSaving);
 
-                if (childBaseSetLoaded != null) {
-                    int compareDates = DataUtils.compareBeginningOfTheDay(reportDateSaving, reportDateLoaded);
+                if (IS.NOT_EMPTY(childBaseSetLoaded)) {
+                    DATE compare = IS.COMPARE_DATE(baseValueSaving, baseValueLoaded);
 
-                    if (!metaAttribute.isFinal() || (metaAttribute.isFinal() && compareDates == 0)) {
+                    if (IS.NOT_FINAL() || (IS.FINAL() && IS.EQUAL(compare))) {
                         baseValueFound = false;
 
                         for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
@@ -1185,7 +1200,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             IBaseEntity childBaseEntityLoaded = history.childEntityFrom(childBaseValueLoaded);
 
-                            if (childBaseValueSaving.equals(childBaseValueLoaded) || childBaseEntitySaving.getId() == childBaseEntityLoaded.getId()) {
+                            if (IS.EQUALS(childBaseValueSaving, childBaseValueLoaded) || IS.ID_EQUALS(childBaseEntitySaving, childBaseEntityLoaded)) {
                                 history.processed(childBaseValueLoaded);
                                 baseValueFound = true;
 
@@ -1197,9 +1212,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                                 history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).creditorIdFrom(childBaseValueLoaded).value(baseEntityApplied).attribute(childBaseSetApplied).parent(false);
 
-                                int compareValueDates = DataUtils.compareBeginningOfTheDay(childBaseValueSaving.getRepDate(), childBaseValueLoaded.getRepDate());
-
-                                if (compareValueDates == -1) {
+                                if (IS.COMPARE_DATE(childBaseValueSaving, childBaseValueLoaded) == DATE_LESS) {
                                     history.applied().dateFrom(childBaseValueSaving).parent(false).updated().execute();
                                 }
 
@@ -1213,29 +1226,29 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 }
 
                 // Если значение было закрыто и оно не ключевое, элемент массива не будет идентифицирован.
-                if (childBaseEntitySaving.getId() > 0) {
+                if (IS.NEW(childBaseEntitySaving)) {
                     history.withValueDao(childBaseValueSaving, IBaseSetValueDao.class);
 
-                    if (!metaAttribute.isFinal()) {
-                        IBaseValue baseValueForSearch = history.applied(childBaseValueSaving).containerType(MetaContainerTypes.META_SET).creditorIdFrom(childBaseValueSaving).id(0L).attribute(false).parent(false).result();
+                    if (IS.NOT_FINAL()) {
+                        IBaseValue baseValueForSearch = history.applied(childBaseValueSaving).containerType(MetaContainerTypes.META_SET).child(true).creditorIdFrom(childBaseValueSaving).id(0L).attribute(false).parent(false).result();
 
                         IBaseValue childBaseValueClosed = history.closed(baseValueForSearch).result();
 
-                        if (childBaseValueClosed != null) {
+                        if (IS.NOT_EMPTY(childBaseValueClosed)) {
                             history.closed().containerValue(childBaseSetApplied).deleted().execute();
 
                             // todo: UNQ_CONST
                             IBaseValue childBaseValuePrevious = history.base(childBaseValueClosed).result(); //setValueDao.getPreviousBaseValue(childBaseValueClosed);
 
-                            IBaseEntity childBaseEntityPrevious = (IBaseEntity) childBaseValuePrevious.getValue();
+                            IBaseEntity childBaseEntityPrevious = history.childEntityFrom(childBaseValuePrevious);
 
-                            if (childBaseValuePrevious != null && childBaseEntityPrevious != null) {
+                            if (IS.NOT_EMPTY(childBaseValuePrevious) && IS.NOT_EMPTY(childBaseEntityPrevious)) {
                                 history.base().parentFrom(childBaseSetApplied);
 
                                 history.base().value(applyBaseEntityAdvanced(creditorId,
                                         childBaseEntitySaving, childBaseEntityPrevious, baseEntityManager));
 
-                                if (childBaseValueClosed.isLast()) {
+                                if (IS.LAST(childBaseValueClosed)) {
                                     history.base().last(true).attribute(childBaseSetApplied).updated().execute();
                                 } else {
                                     history.base().attribute(childBaseSetApplied).execute();
@@ -1247,8 +1260,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                         // Check next value
                         IBaseValue childBaseValueNext = history.next(childBaseValueSaving).result();
-                        if (childBaseValueNext != null) {
-                            IBaseEntity childBaseEntityNext = (IBaseEntity) childBaseValueNext.getValue();
+                        if (IS.NOT_EMPTY(childBaseValueNext)) {
+                            IBaseEntity childBaseEntityNext = history.childEntityFrom(childBaseValueNext);
 
                             history.next().dateFrom(childBaseValueSaving).value(applyBaseEntityAdvanced(creditorId, childBaseEntitySaving,
                                     childBaseEntityNext, baseEntityManager)).attribute(childBaseSetApplied).updated().execute();
@@ -1264,8 +1277,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
 
         /* Удаляет элементы массива, если массив не накопительный или массив накопительный и родитель был удалён */
-        if (childBaseSetLoaded != null &&
-                ((metaAttribute.isCumulative() && isBaseSetDeleted) || !metaAttribute.isCumulative())) {
+        if (IS.NOT_EMPTY(childBaseSetLoaded) &&
+                ((IS.CUMULATIVE() && isBaseSetDeleted) || IS.NOT_CUMULATIVE())) {
             //одно закрытие на несколько одинаковых записей
 
             for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
@@ -1274,73 +1287,74 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 history.withValueDao(childBaseValueLoaded, IBaseSetValueDao.class);
 
-                int compare = DataUtils.compareBeginningOfTheDay(reportDateSaving, childBaseValueLoaded.getRepDate());
+                switch (IS.COMPARE_DATE(baseValueSaving, childBaseValueLoaded)) {
 
-                if (compare == -1)
-                    continue;
+                    case DATE_LESS:
+                        continue;
 
-                IBaseEntity childBaseEntityLoaded = history.childEntityFrom(childBaseValueLoaded);
+                    case DATE_EQUAL:
+                        IBaseEntity childBaseEntityLoaded = history.childEntityFrom(childBaseValueLoaded);
 
-                if (compare == 0) {
-                    baseEntityManager.registerAsDeleted(childBaseValueLoaded);
+                        history.base(childBaseValueLoaded).deleted().execute();
 
-                    if (childBaseEntityLoaded != null && !childMetaClass.isSearchable())
-                        history.base(childBaseEntityLoaded).deleted().execute();
+                        if (IS.NOT_EMPTY(childBaseEntityLoaded) && IS.CHILD_NOT_SEARCHABLE())
+                            history.base(childBaseEntityLoaded).deleted().execute();
 
-                    boolean last = childBaseValueLoaded.isLast();
+                        boolean last = IS.LAST(childBaseValueLoaded);
 
-                    if (!metaAttribute.isFinal()) {
+                        if (IS.NOT_FINAL()) {
+                            IBaseValue childBaseValueNext = history.next(childBaseValueLoaded).result();
+
+                            if (childBaseValueNext != null && childBaseValueNext.isClosed()) {
+                                last = history.next().deleted().result().isLast();
+                            }
+                        }
+
+                        if (last && !(IS.FINAL() && IS.CHILD_NOT_SEARCHABLE())) {
+                            IBaseValue childBaseValuePrevious = history.previous(childBaseValueLoaded).result();
+                            if (IS.NOT_EMPTY(childBaseValuePrevious)) {
+                                history.previous().last(true).containerValue(childBaseSetApplied).updated().execute();
+                            }
+                        }
+                        break;
+                    case DATE_MORE:
                         IBaseValue childBaseValueNext = history.next(childBaseValueLoaded).result();
 
-                        if (childBaseValueNext != null && childBaseValueNext.isClosed()) {
-                            last = history.next().deleted().result().isLast();
-                        }
-                    }
-
-                    if (last && !(metaAttribute.isFinal() && !childMetaClass.isSearchable())) {
-                        IBaseValue childBaseValuePrevious = history.previous(childBaseValueLoaded).result();
-                        if (childBaseValuePrevious != null) {
-                            history.previous().last(true).containerValue(childBaseSetApplied).updated().execute();
-                        }
-                    }
-                } else if (compare == 1) {
-                    IBaseValue childBaseValueNext = history.next(childBaseValueLoaded).result();
-
-                    if (childBaseValueNext == null || !childBaseValueNext.isClosed()) {
+                        if (IS.NOT_EMPTY(childBaseValueNext) || IS.NOT_CLOSED(childBaseValueNext)) {
 
                         /* Не идентифицируемый элемент массива не может быт закрыт если не указан как закрываемый*/
-                        if (!childMetaClass.isSearchable() && !childMetaClass.isClosable()) {
-                            history.base(childBaseValueLoaded).attribute(childBaseSetApplied).execute();
-                            continue;
-                        }
+                            if (IS.CHILD_NOT_SEARCHABLE() && IS.CHILD_NOT_CLOSABLE()) {
+                                history.base(childBaseValueLoaded).attribute(childBaseSetApplied).execute();
+                                continue;
+                            }
 
-                        IBaseEntity closedChildBaseEntity = history.childEntityFrom(childBaseValueLoaded);
-                        if (!history.contains(closedChildBaseEntity)) {
-                            history.processed(closedChildBaseEntity);
+                            IBaseEntity closedChildBaseEntity = history.childEntityFrom(childBaseValueLoaded);
+                            if (!history.contains(closedChildBaseEntity)) {
+                                history.processed(closedChildBaseEntity);
 
-                            history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).creditorIdFrom(baseValueSaving).id(0L).dateFrom(baseValueSaving).value(childBaseEntityLoaded).closed(true)
-                                    .parent(false).attribute(false).containerValue(childBaseSetApplied).inserted().execute();
-                        }
+                                history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).creditorIdFrom(baseValueSaving).id(0L).dateFrom(baseValueSaving).value(childBaseEntityLoaded).closed(true)
+                                        .parent(false).attribute(false).containerValue(childBaseSetApplied).inserted().execute();
+                            }
 
-                        if (childBaseValueLoaded.isLast()) {
-                            history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).creditorIdFrom(childBaseValueLoaded).value(childBaseEntityLoaded).last(false)
-                                    .parent(false).attribute(false).containerValue(childBaseSetApplied).updated().execute();
+                            if (childBaseValueLoaded.isLast()) {
+                                history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).creditorIdFrom(childBaseValueLoaded).value(childBaseEntityLoaded).last(false)
+                                        .parent(false).attribute(false).containerValue(childBaseSetApplied).updated().execute();
+                            }
+                        } else {
+                            history.next().dateFrom(baseValueSaving).containerValue(childBaseSetApplied).updated().execute();
                         }
-                    } else {
-                        history.next().dateFrom(baseValueSaving).containerValue(childBaseSetApplied).updated().execute();
-                    }
                 }
             }
             history.noWith();
         }
 
         /* Обработка накопительных массивов для витрин */
-        if (metaAttribute.isCumulative() && !isBaseSetDeleted && childBaseSetLoaded != null) {
+        if (IS.CUMULATIVE() && !isBaseSetDeleted && IS.NOT_EMPTY(childBaseSetLoaded)) {
             for (IBaseValue childBaseValueLoaded : childBaseSetLoaded.get()) {
                 if (history.contains(childBaseValueLoaded))
                     continue;
 
-                if (childBaseSetApplied != null) childBaseSetApplied.put(childBaseValueLoaded);
+                if (IS.NOT_EMPTY(childBaseSetApplied)) childBaseSetApplied.put(childBaseValueLoaded);
             }
         }
     }

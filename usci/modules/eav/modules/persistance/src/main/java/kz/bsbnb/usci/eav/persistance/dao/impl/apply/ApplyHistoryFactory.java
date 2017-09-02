@@ -37,10 +37,11 @@ public class ApplyHistoryFactory {
     protected IMetaType metaType;
     protected IMetaClass metaClass;
     protected IMetaValue metaValue;
+    protected IMetaSet metaSet;
     protected IMetaType childMetaType;
     protected IMetaValue childMetaValue;
-    protected IMetaSet childMetaSet;
     protected IMetaClass childMetaClass;
+    protected IMetaSet childMetaSet;
 
     protected IBaseValueDao valueDao;
 
@@ -99,8 +100,11 @@ public class ApplyHistoryFactory {
         } catch (Exception e) {
         }
         try {
-            this.childMetaSet = (IMetaSet) metaType;
-            this.childMetaType = childMetaSet.getMemberType();
+            this.metaSet = (IMetaSet) metaType;
+        } catch (Exception e) {
+        }
+        try {
+            this.childMetaType = metaSet.getMemberType();
         } catch (Exception e) {
         }
         try {
@@ -109,6 +113,10 @@ public class ApplyHistoryFactory {
         }
         try {
             this.childMetaClass = (IMetaClass) childMetaType;
+        } catch (Exception e) {
+        }
+        try {
+            this.childMetaSet = (IMetaSet) childMetaType;
         } catch (Exception e) {
         }
 
