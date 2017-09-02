@@ -26,10 +26,12 @@ public class CompareFactory {
     protected IMetaSet childMetaSet;
 
     public CompareFactory(ApplyHistoryFactory history) {
-        this(history.baseValueSaving);
+        this(history == null ? null : history.baseValueSaving);
     }
 
     public CompareFactory(IBaseValue baseValue) {
+
+        if (baseValue == null) return;
 
         this.baseContainer = baseValue.getBaseContainer();
         this.metaAttribute = baseValue.getMetaAttribute();
@@ -135,12 +137,20 @@ public class CompareFactory {
         return !SET();
     }
 
-    public boolean BASE_CONTAINER_NULL() {
+    public boolean META_ATTRIBUTE_EMPTY() {
+        return metaAttribute == null;
+    }
+
+    public boolean META_ATTRIBUTE_NOT_EMPTY() {
+        return !META_ATTRIBUTE_EMPTY();
+    }
+
+    public boolean BASE_CONTAINER_EMPTY() {
         return baseContainer == null;
     }
 
-    public boolean BASE_CONTAINER_NOT_NULL() {
-        return !BASE_CONTAINER_NULL();
+    public boolean BASE_CONTAINER_NOT_EMPTY() {
+        return !BASE_CONTAINER_EMPTY();
     }
 
     public boolean BASE_CONTAINER_ENTITY() {
@@ -328,7 +338,7 @@ public class CompareFactory {
     }
 
     public boolean VALUE_EQUALS_BY_CHILD_META(IBaseValue first, IBaseValue second) {
-        return first.equalsByValue(second);
+        return first.equalsByValue(childMetaValue, second);
     }
 
     public DATE COMPARE_DATE(IBaseEntity first, IBaseEntity second) {

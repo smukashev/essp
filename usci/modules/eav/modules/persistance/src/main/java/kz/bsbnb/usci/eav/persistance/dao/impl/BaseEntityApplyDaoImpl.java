@@ -3,13 +3,15 @@ package kz.bsbnb.usci.eav.persistance.dao.impl;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
-import kz.bsbnb.usci.eav.model.base.*;
-import kz.bsbnb.usci.eav.model.base.impl.*;
-import kz.bsbnb.usci.eav.model.exceptions.ImmutableElementException;
-import kz.bsbnb.usci.eav.model.meta.*;
+import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
+import kz.bsbnb.usci.eav.model.base.IBaseSet;
+import kz.bsbnb.usci.eav.model.base.IBaseValue;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
+import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
+import kz.bsbnb.usci.eav.model.meta.IMetaClass;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
-import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.impl.apply.ApplyHistoryFactory;
 import kz.bsbnb.usci.eav.persistance.dao.impl.apply.ApplyHistoryFactory.EachAttributeBinding;
@@ -23,9 +25,6 @@ import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
 import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.tool.optimizer.EavOptimizerData;
 import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
-import kz.bsbnb.usci.eav.util.DataUtils;
-import kz.bsbnb.usci.eav.util.ErrorHandler;
-import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,13 +53,13 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Autowired
     private IEavOptimizerDao eavOptimizerDao;
 
-    @Autowired
-    private ErrorHandler errorHandler;
 
     @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
 
-        final CompareFactory IS = new CompareFactory(null);
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
+
+        final CompareFactory IS = history.getCompareFactory();
 
         block:
         {
@@ -69,7 +68,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             if (IS.NEW(baseEntitySaving) || IS.NOT_SEARCHABLE(baseEntitySaving))
                 return applyBaseEntityBasic(creditorId, baseEntitySaving, baseEntityManager);
 
-            if (baseEntityLoaded != null) break block;
+            if (IS.NOT_EMPTY(baseEntityLoaded)) break block;
 
             Date reportDateSaving = baseEntitySaving.getReportDate();
 
@@ -77,17 +76,16 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             Date reportDate = baseEntityReportDateDao.getMaxReportDate(baseEntitySaving.getId(), reportDateSaving);
 
             /* Получение минимальной отчетной даты из будущих периодов */
-            if (reportDate == null)
+            if (IS.EMPTY(reportDate))
                 reportDate = baseEntityReportDateDao.getMinReportDate(baseEntitySaving.getId(), reportDateSaving);
 
-            if (reportDate == null)
-                throw new UnsupportedOperationException(Errors.compose(Errors.E56, baseEntitySaving.getId()));
+            if (IS.EMPTY(reportDate))
+                throw history.Error56();
 
             baseEntityLoaded = baseEntityLoadDao.load(baseEntitySaving.getId(), reportDate, reportDateSaving);
 
             if (baseEntityLoaded.getBaseEntityReportDate().isClosed())
-                throw new UnsupportedOperationException(Errors.compose(Errors.E57,
-                        baseEntityLoaded.getId(), baseEntityLoaded.getBaseEntityReportDate().getReportDate()));
+                throw history.Error57();
 
         }
 
@@ -135,32 +133,28 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntityApplied, baseValueSaving,
                 null, baseEntityManager);
 
-        final CompareFactory IS = new CompareFactory(history);
+        final CompareFactory IS = history.getCompareFactory();
 
-        IMetaAttribute metaAttribute = baseValueSaving.getMetaAttribute();
-        if (metaAttribute == null)
-            throw new IllegalStateException(Errors.compose(Errors.E60));
+        if (IS.META_ATTRIBUTE_EMPTY())
+            throw history.Error60();
 
-        IBaseContainer baseContainer = baseValueSaving.getBaseContainer();
-        if (baseContainer != null && baseContainer.getBaseContainerType() != BaseContainerType.BASE_ENTITY)
-            throw new IllegalStateException(Errors.compose(Errors.E59, metaAttribute.getName()));
+        if (IS.BASE_CONTAINER_NOT_EMPTY() && IS.BASE_CONTAINER_SET())
+            throw history.Error59();
 
-        IMetaType metaType = metaAttribute.getMetaType();
-        if (metaType.isComplex()) {
-            if (metaType.isSet()) {
-                IMetaSet childMetaSet = (IMetaSet) metaType;
-                IBaseSet childBaseSet = (IBaseSet) baseValueSaving.getValue();
+        if (IS.COMPLEX()) {
+            if (IS.SET()) {
+                IBaseSet childBaseSet = history.childFrom(baseValueSaving);
 
-                IBaseSet childBaseSetApplied = new BaseSet(childMetaSet.getMemberType(), creditorId);
+                IBaseSet childBaseSetApplied = history.childNew();
                 for (IBaseValue childBaseValue : childBaseSet.get()) {
                     IBaseEntity childBaseEntity = (IBaseEntity) childBaseValue.getValue();
 
-                    if (metaAttribute.isImmutable() && childBaseEntity.getValueCount() != 0 && childBaseEntity.getId() < 1)
-                        throw new ImmutableElementException(childBaseEntity);
+                    if (IS.IMMUTABLE() && IS.VALUE_COUNT_NOT_EMPTY(childBaseEntity) && IS.NEW(childBaseEntity))
+                        throw history.ErrorIE(childBaseEntity);
 
                     IBaseEntity childBaseEntityApplied = apply(creditorId, childBaseEntity, null, baseEntityManager);
 
-                    history.applied(baseValueSaving).containerType(MetaContainerTypes.META_SET).metaType(childMetaSet.getMemberType()).id(0L).value(childBaseEntityApplied).closed(false).last(true)
+                    history.applied(baseValueSaving).containerType(MetaContainerTypes.META_SET).child(true).id(0L).value(childBaseEntityApplied).closed(false).last(true)
                             .parent(false).attribute(childBaseSetApplied).inserted().execute();
                 }
 
@@ -168,49 +162,46 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 history.applied(baseValueSaving).id(0L).value(childBaseSetApplied).closed(false).last(true).parent(false).inserted().execute();
             } else {
-                if (metaAttribute.isImmutable()) {
-                    IBaseEntity childBaseEntity = (IBaseEntity) baseValueSaving.getValue();
+                if (IS.IMMUTABLE()) {
+                    IBaseEntity childBaseEntity = history.childEntityFrom(baseValueSaving);
 
-                    if (childBaseEntity.getValueCount() != 0) {
-                        if (childBaseEntity.getId() < 1)
-                            throw new ImmutableElementException(childBaseEntity);
+                    if (IS.VALUE_COUNT_NOT_EMPTY(childBaseEntity)) {
+                        if (IS.NEW(childBaseEntity))
+                            throw history.ErrorIE(childBaseEntity);
 
                         IBaseEntity childBaseEntityImmutable;
 
-                        if (metaAttribute.getMetaType().isReference()) {
+                        if (IS.REFERENCE()) {
                             childBaseEntityImmutable = refRepository.get(childBaseEntity);
                         } else {
                             childBaseEntityImmutable = baseEntityLoadDao.loadByMaxReportDate(
                                     childBaseEntity.getId(), childBaseEntity.getReportDate());
                         }
 
-                        if (childBaseEntityImmutable == null)
-                            throw new RuntimeException(Errors.compose(Errors.E63, childBaseEntity.getId(),
-                                    childBaseEntity.getReportDate()));
+                        if (IS.EMPTY(childBaseEntityImmutable))
+                            throw history.Error63(childBaseEntity);
 
                         if (childBaseEntityImmutable.getBaseEntityReportDate().isClosed())
-                            errorHandler.throwClosedExceptionForImmutable(childBaseEntityImmutable);
+                            throw history.ErrorCEFI(childBaseEntityImmutable);
 
                         history.applied(baseValueSaving).id(0L).value(childBaseEntityImmutable).closed(false).last(true).parent(false).inserted().execute();
                     } else {
-                        throw new IllegalStateException(Errors.compose(Errors.E64, childBaseEntity.getMeta().getClassName()));
+                        throw history.Error64(childBaseEntity);
                     }
                 } else {
-                    IBaseEntity childBaseEntity = (IBaseEntity) baseValueSaving.getValue();
+                    IBaseEntity childBaseEntity = history.childEntityFrom(baseValueSaving);
                     IBaseEntity childBaseEntityApplied = apply(creditorId, childBaseEntity, null, baseEntityManager);
 
                     history.applied(baseValueSaving).id(0L).value(childBaseEntityApplied).closed(false).last(true).parent(false).inserted().execute();
                 }
             }
         } else {
-            if (metaType.isSet()) {
-                IMetaSet childMetaSet = (IMetaSet) metaType;
-                IBaseSet childBaseSet = (IBaseSet) baseValueSaving.getValue();
-                IMetaValue metaValue = (IMetaValue) childMetaSet.getMemberType();
+            if (IS.SET()) {
+                IBaseSet childBaseSet = history.childFrom(baseValueSaving);
 
-                IBaseSet childBaseSetApplied = new BaseSet(childMetaSet.getMemberType(), creditorId);
+                IBaseSet childBaseSetApplied = history.childNew();
                 for (IBaseValue childBaseValue : childBaseSet.get()) {
-                    history.applied(baseValueSaving).containerType(MetaContainerTypes.META_SET).metaType(childMetaSet.getMemberType()).id(0L).castedValue(metaValue, childBaseValue).closed(false).last(true)
+                    history.applied(childBaseValue).containerType(MetaContainerTypes.META_SET).child(true).dateFrom(baseValueSaving).id(0L).closed(false).last(true)
                             .parent(false).attribute(childBaseSetApplied).inserted().execute();
                 }
 
@@ -227,9 +218,13 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public IBaseEntity applyBaseEntityAdvanced(long creditorId, IBaseEntity baseEntitySaving,
                                                IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
 
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
+
+        final CompareFactory IS = history.getCompareFactory();
+
         IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
 
-        if (foundProcessedBaseEntity != null)
+        if (IS.NOT_EMPTY(foundProcessedBaseEntity))
             return foundProcessedBaseEntity;
 
         IMetaClass metaClass = baseEntitySaving.getMeta();
@@ -239,7 +234,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         baseEntityApplied.setBatchId(baseEntitySaving.getBatchId());
 
         // Устанавливает ID для !metaClass.isSearchable()
-        if (baseEntitySaving.getId() < 1 && baseEntityLoaded.getId() > 0)
+        if (IS.NEW(baseEntitySaving) && IS.NOT_NEW(baseEntityLoaded))
             baseEntitySaving.setId(baseEntityLoaded.getId());
 
 
@@ -250,46 +245,44 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         }
 
         for (String attrName : metaClass.getAttributeNames()) {
+
+            history.initFromChild(attrName);
+
             IBaseValue baseValueSaving = baseEntitySaving.getBaseValue(attrName);
             IBaseValue baseValueLoaded = baseEntityLoaded.getBaseValue(attrName);
 
-            final IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attrName);
-            final IMetaType metaType = metaAttribute.getMetaType();
-
-            if (baseValueSaving == null && baseValueLoaded != null && !metaAttribute.isNullable())
+            if (IS.EMPTY(baseValueSaving) && IS.NOT_EMPTY(baseValueLoaded) && IS.NOT_NULLABLE())
                 baseEntityApplied.put(attrName, baseValueLoaded);
 
-            if (baseValueSaving == null && metaAttribute.isNullable()) {
-                baseValueSaving = BaseValueFactory.create(baseEntitySaving.getBaseContainerType(), metaType,
-                        0, creditorId, baseEntitySaving.getReportDate(), null, false, true);
-                baseValueSaving.setBaseContainer(baseEntitySaving);
-                baseValueSaving.setMetaAttribute(metaAttribute);
+            if (IS.EMPTY(baseValueSaving) && IS.NULLABLE()) {
+                baseValueSaving = history.applied(null)
+                        .containerType(baseEntitySaving.getBaseContainerType().getValue()).id(0L).dateFrom(baseEntitySaving).value(null).closed(false).last(true).parentFrom(baseEntitySaving).attribute(false).result();
             }
 
-            if (baseValueSaving == null)
+            if (IS.EMPTY(baseValueSaving))
                 continue;
 
-            if (metaType.isComplex()) {
-                if (metaType.isSet())
+            if (IS.COMPLEX()) {
+                if (IS.SET())
                     applyComplexSet(creditorId, baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
                 else
                     applyComplexValue(creditorId, baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
             } else {
-                if (metaType.isSet())
+                if (IS.SET())
                     applySimpleSet(creditorId, baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
                 else
                     applySimpleValue(creditorId, baseEntityApplied, baseValueSaving, baseValueLoaded, baseEntityManager);
             }
         }
 
-        int compare = DataUtils.compareBeginningOfTheDay(baseEntitySaving.getReportDate(), baseEntityLoaded.getReportDate());
-
-        if (compare == 0 || compare == 1) {
-            baseEntityApplied.calculateValueCount(baseEntityLoaded);
-        } else {
-            baseEntityApplied.calculateValueCount(null);
+        switch (IS.COMPARE_DATE(baseEntitySaving, baseEntityLoaded)) {
+            case DATE_MORE:
+            case DATE_EQUAL:
+                baseEntityApplied.calculateValueCount(baseEntityLoaded);
+                break;
+            case DATE_LESS:
+                baseEntityApplied.calculateValueCount(null);
         }
-
         if (baseEntitySaving.getAddInfo() != null)
             baseEntityApplied.setAddInfo(baseEntitySaving.getAddInfo().parentEntity, baseEntitySaving.getAddInfo().isSet,
                     baseEntitySaving.getAddInfo().attributeId);
@@ -313,7 +306,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntityApplied, baseValueSaving,
                 baseValueLoaded, baseEntityManager);
 
-        final CompareFactory IS = new CompareFactory(history);
+        final CompareFactory IS = history.getCompareFactory();
 
         if (IS.NOT_EMPTY(baseValueLoaded)) {
             if (IS.VALUE_EMPTY(baseValueSaving)) {
@@ -341,7 +334,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         break;
                     case DATE_MORE:
                         if (IS.FINAL())
-                            throw new IllegalStateException(Errors.compose(Errors.E66, metaAttribute.getName()));
+                            throw history.Error66();
                         if (IS.LAST(baseValueLoaded)) {
                             history.applied(baseValueLoaded).last(false).attribute(false).updated().execute();
                         }
@@ -351,14 +344,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 history.next().dateFrom(baseValueSaving).updated().execute();
                             } else {
                                 if (StaticRouter.exceptionOnForbiddenCloseE299())
-                                    throw new UnsupportedOperationException(Errors.compose(Errors.E299, DataTypes.formatDate(baseValueNext.getRepDate()), baseValueNext.getValue()));
+                                    throw history.Error299(baseValueNext);
                             }
                         else {
                             history.applied(baseValueLoaded, true, true).id(0L).attribute(false).inserted().execute();
                         }
                         break;
                     case DATE_LESS:
-                        //throw new UnsupportedOperationException(Errors.compose(Errors.E75, baseValueSaving.getMetaAttribute().getName()));
+                        // throw history.Error75();
                         break;
                 }
                 return;
@@ -395,7 +388,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         break;
                     case DATE_MORE:
                         if (IS.FINAL())
-                            throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
+                            throw history.Error69();
 
                         history.applied(baseValueLoaded).id(0L).dateFrom(baseValueSaving).inserted().execute();
 
@@ -410,8 +403,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         } else {
             if (IS.VALUE_EMPTY(baseValueSaving)) {
                 return;
-                /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
-                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
+                // throw history.ErrorUO();
             }
 
             if (IS.NOT_FINAL()) {
@@ -423,7 +415,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseValue baseValuePrevious = history.previous(baseValueClosed).result();
 
                         if (IS.EMPTY(baseValuePrevious))
-                            throw new IllegalStateException(Errors.compose(Errors.E70, baseValueClosed.getMetaAttribute().getName()));
+                            throw history.Error70(baseValueClosed);
 
                         history.previous().last(true).parent(true).updated().execute();
                     } else {
@@ -465,20 +457,20 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager);
 
-        final CompareFactory IS = new CompareFactory(history);
+        final CompareFactory IS = history.getCompareFactory();
 
         IGetFunction getEntityApplied = new IGetFunction() {
             @Override
-            public IBaseEntity execute(IGetFunctionBinding binding) {
+            public IBaseEntity execute(IGetFunctionBinding binding, ApplyHistoryFactory history, CompareFactory IS) {
                 IBaseEntity baseEntityApplied = null;
-                if (binding.metaAttribute.isImmutable()) {
-                    if (binding.metaAttribute.getMetaType().isReference()) {
+                if (IS.IMMUTABLE()) {
+                    if (IS.REFERENCE()) {
                         baseEntityApplied = refRepository.get(binding.baseEntitySaving);
                     } else {
                         baseEntityApplied = baseEntityLoadDao.loadByMaxReportDate(binding.baseEntitySaving.getId(), binding.baseEntitySaving.getReportDate());
                     }
                     if (baseEntityApplied.getBaseEntityReportDate().isClosed())
-                        errorHandler.throwClosedExceptionForImmutable(baseEntityApplied);
+                        throw history.ErrorCEFI(baseEntityApplied);
                 }
                 return baseEntityApplied;
             }
@@ -486,7 +478,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         IGetFunction getEntityAppliedAdvanced = new IGetFunction() {
             @Override
-            public IBaseEntity execute(IGetFunctionBinding binding) {
+            public IBaseEntity execute(IGetFunctionBinding binding, ApplyHistoryFactory history, CompareFactory IS) {
                 return applyBaseEntityAdvanced(creditorId, binding.baseEntitySaving, binding.baseEntityLoaded, baseEntityManager);
             }
         };
@@ -511,7 +503,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             if (IS.NOT_SEARCHABLE() && IS.NOT_IMMUTABLE()) {
 
                                 history.eachAttribute(new IEachAttribute() {
-                                    public void execute(EachAttributeBinding binding) {
+                                    public void execute(EachAttributeBinding binding, ApplyHistoryFactory history, CompareFactory IS) {
                                         binding.baseEntitySaving.put(
                                                 binding.attributeName,
                                                 history.applied(baseValueSaving).metaType(binding.childMetaType).id(0L).value(null).closed(false).last(true).result()
@@ -548,7 +540,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             if (IS.NOT_SEARCHABLE() && IS.NOT_IMMUTABLE()) {
 
                                 history.eachAttribute(new IEachAttribute() {
-                                    public void execute(EachAttributeBinding binding) {
+                                    public void execute(EachAttributeBinding binding, ApplyHistoryFactory history, CompareFactory IS) {
                                         binding.baseEntitySaving.put(
                                                 binding.attributeName,
                                                 history.applied(baseValueSaving).metaType(binding.childMetaType).id(0L).value(null).closed(false).last(true).result()
@@ -573,7 +565,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         break;
                     case DATE_MORE:
                         if (IS.FINAL())
-                            throw new IllegalStateException(Errors.compose(Errors.E66, metaAttribute.getName()));
+                            throw history.Error66();
 
                         if (IS.LAST(baseValueLoaded)) {
                             history.last(baseValueLoaded).last(false).updated().execute();
@@ -587,16 +579,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 history.next().dateFrom(baseValueSaving).parent(true).updated().execute();
                             } else {
                                 if (StaticRouter.exceptionOnForbiddenCloseE299())
-                                    throw new UnsupportedOperationException(Errors.compose(Errors.E299,
-                                            DataTypes.formatDate(baseValueNext.getRepDate()), ((IBaseEntity) baseValueNext.getValue()).getId()));
+                                    throw history.Error299(baseValueNext);
                             }
                         else {
                             history.applied(baseValueLoaded).id(0L).dateFrom(baseValueSaving).closed(true).last(true).inserted().execute();
                         }
                         break;
                     case DATE_LESS:
-                        /*throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
-                                + ". " + baseValueSaving.getMetaAttribute().getName() + ";");*/
+                        // throw history.ErrorUO();
                 }
 
                 return;
@@ -606,7 +596,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseEntity baseEntityLoaded = history.childEntityFrom(baseValueLoaded);
 
             if (IS.IMMUTABLE() && IS.NEW(baseEntitySaving))
-                throw new ImmutableElementException(baseEntitySaving);
+                throw history.ErrorIE(baseEntitySaving);
 
             if (IS.ID_EQUALS(baseEntitySaving, baseEntityLoaded) || IS.NOT_SEARCHABLE()) {
 
@@ -637,7 +627,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                     case DATE_MORE:
                         if (IS.FINAL())
-                            throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
+                            throw history.Error69();
 
                         history.applied(baseValueSaving).id(0L).value(baseEntityApplied).closed(false).last(true).inserted().execute();
 
@@ -649,7 +639,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     case DATE_LESS:
 
                         if (IS.FINAL())
-                            throw new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
+                            throw history.Error69();
 
                         history.applied(baseValueSaving).id(0L).value(baseEntityApplied).closed(false).last(false).parent(false).inserted().execute();
                 }
@@ -659,12 +649,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             IBaseEntity baseEntitySaving = history.childEntityFrom(baseValueSaving);
             if (IS.EMPTY(baseEntitySaving)) {
                 return;
-                /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
-                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
+                // throw history.ErrorUO();
             }
 
             if (IS.IMMUTABLE() && IS.NEW(baseEntitySaving))
-                throw new IllegalStateException(Errors.compose(Errors.E71, metaAttribute.getName()));
+                throw history.Error71();
 
             if (IS.NOT_FINAL()) {
                 IBaseValue baseValueClosed = history.closed(baseValueSaving).parent(true).result();
@@ -679,7 +668,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         IBaseValue baseValuePrevious = history.previous(baseValueClosed).parent(true).result();
 
                         if (IS.EMPTY(baseValuePrevious))
-                            throw new IllegalStateException(Errors.compose(Errors.E70, baseValueClosed.getMetaAttribute().getName()));
+                            throw history.Error70(baseValueClosed);
 
                         IBaseEntity baseEntityApplied = history.get(getEntityApplied, null, baseEntitySaving);
                         if (IS.NOT_IMMUTABLE()) {
@@ -765,7 +754,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager);
 
-        final CompareFactory IS = new CompareFactory(history);
+        final CompareFactory IS = history.getCompareFactory();
 
         IBaseSet childBaseSetSaving = history.childFrom(baseValueSaving);
         IBaseSet childBaseSetLoaded = null;
@@ -774,7 +763,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         Boolean isBaseSetDeleted = false;
 
         if (IS.FINAL())
-            throw new UnsupportedOperationException(Errors.compose(Errors.E2));
+            throw history.Error02();
 
         if (IS.NOT_EMPTY(baseValueLoaded)) {
             childBaseSetLoaded = history.childFrom(baseValueLoaded);
@@ -782,9 +771,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             if (IS.EMPTY(childBaseSetSaving) || IS.VALUE_COUNT_EMPTY(childBaseSetSaving)) {
                 childBaseSetApplied = history.childNew(childBaseSetLoaded);
 
-                switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
+                IBaseValue baseValueNext;
 
-                    IBaseValue baseValueNext;
+                switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
 
                     case DATE_EQUAL: /* case#1 */
                         history.applied(baseValueLoaded).value(childBaseSetLoaded).deleted().execute();
@@ -820,7 +809,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         break;
 
                     case DATE_LESS:
-                        throw new IllegalStateException(Errors.compose(Errors.E72, metaAttribute.getName()));
+                        throw history.Error72();
 
                 }
 
@@ -843,8 +832,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         } else {
             if (IS.EMPTY(childBaseSetSaving)) {
                 return;
-                /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
-                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
+                // throw history.ErrorUO();
             }
 
             IBaseValue baseValueClosed = history.closed(baseValueSaving).result();
@@ -858,7 +846,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 IBaseValue baseValuePrevious = history.previous(baseValueClosed).result();
 
                 if (IS.EMPTY(baseValuePrevious))
-                    throw new IllegalStateException(Errors.compose(Errors.E70, baseValueClosed.getMetaAttribute().getName()));
+                    throw history.Error70(baseValueClosed);
 
                 baseValuePrevious = history.previous().parentFrom(baseValueSaving).result();
 
@@ -908,7 +896,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         if (history.contains(childBaseValueLoaded))
                             continue;
 
-                        if (childBaseValueSaving.equalsByValue(history.childMetaValue, childBaseValueLoaded)) {
+                        if (IS.VALUE_EQUALS_BY_CHILD_META(childBaseValueSaving, childBaseValueLoaded)) {
                             history.processed(childBaseValueLoaded);
                             baseValueFound = true;
 
@@ -945,7 +933,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             history.previous().attribute(childBaseSetApplied).execute();
                         }
                     } else {
-                        throw new IllegalStateException(Errors.compose(Errors.E73, metaAttribute.getName()));
+                        throw history.Error73();
                     }
 
                     continue;
@@ -965,7 +953,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                             history.applied(childBaseValueSaving).containerType(MetaContainerTypes.META_SET).child(true).id(0L).closed(false).last(false).attribute(childBaseSetApplied).parent(false).attribute(false).inserted().execute();
                             break;
                         default:
-                            throw new IllegalStateException(Errors.compose(Errors.E74));
+                            throw history.Error74();
                     }
 
                     continue;
@@ -1024,7 +1012,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager);
 
-        CompareFactory IS = new CompareFactory(history);
+        final CompareFactory IS = history.getCompareFactory();
 
         IBaseSet childBaseSetSaving = history.childFrom(baseValueSaving);
         IBaseSet childBaseSetLoaded = null;
@@ -1089,7 +1077,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     case DATE_MORE:
                         /* case#3 */
                         if (IS.FINAL())
-                            throw new IllegalStateException(Errors.compose(Errors.E66, metaAttribute.getName()));
+                            throw history.Error66();
 
                         IBaseValue baseValueNext = history.next(baseValueLoaded).result();
 
@@ -1107,8 +1095,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         isBaseSetDeleted = true;
                         break;
                     case DATE_LESS:
-                        //  throw new UnsupportedOperationException("Закрытие атрибута за прошлый период не является возможным"
-                        //       + "( " + baseValueSaving.getMetaAttribute().getName() + ");");
+                        // throw history.ErrorUO();
 
                 }
 
@@ -1117,7 +1104,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 DATE compare = IS.COMPARE_DATE(baseValueSaving, baseValueLoaded);
 
                 if (IS.NOT_EQUAL(compare) && IS.FINAL())
-                    throw new IllegalStateException(Errors.compose(Errors.E67, metaAttribute.getName()));
+                    throw history.Error67();
 
                 if (IS.EQUAL_MORE(compare)) {
                     childBaseSetApplied = history.childNew(childBaseSetLoaded);
@@ -1133,8 +1120,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         } else {
             if (IS.EMPTY(childBaseSetSaving)) {
                 return;
-                /*throw new UnsupportedOperationException("Новое и старое значения являются NULL(" +
-                        baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");*/
+                // throw history.ErrorUO();
             }
 
             IBaseValue baseValueClosed = null;
@@ -1148,7 +1134,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                     IBaseValue baseValuePrevious = history.previous(baseValueClosed).result();
 
                     if (IS.EMPTY(baseValuePrevious))
-                        throw new IllegalStateException(Errors.compose(Errors.E68, metaAttribute.getName()));
+                        throw history.Error68();
 
                     baseValuePrevious = history.previous().parent(true).result();
 
@@ -1287,14 +1273,14 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 history.withValueDao(childBaseValueLoaded, IBaseSetValueDao.class);
 
+                IBaseEntity childBaseEntityLoaded = history.childEntityFrom(childBaseValueLoaded);
+
                 switch (IS.COMPARE_DATE(baseValueSaving, childBaseValueLoaded)) {
 
                     case DATE_LESS:
                         continue;
 
                     case DATE_EQUAL:
-                        IBaseEntity childBaseEntityLoaded = history.childEntityFrom(childBaseValueLoaded);
-
                         history.base(childBaseValueLoaded).deleted().execute();
 
                         if (IS.NOT_EMPTY(childBaseEntityLoaded) && IS.CHILD_NOT_SEARCHABLE())
@@ -1362,6 +1348,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     @Transactional
     public void applyToDb(IBaseEntityManager baseEntityManager) {
+
+        final ApplyHistoryFactory history = new ApplyHistoryFactory();
+
         long applyToDbTime = System.currentTimeMillis();
 
 
@@ -1391,7 +1380,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         }
 
                     } catch (Exception insertException) {
-                        throw new IllegalStateException(Errors.compose(Errors.E76, insertedObject, insertException.getMessage()));
+                        throw history.Error76(insertedObject, insertException);
                     }
                 }
             }
@@ -1414,7 +1403,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         }
 
                     } catch (Exception updateException) {
-                        throw new IllegalStateException(Errors.compose(Errors.E77, updatedObject, updateException.getMessage()));
+                        throw history.Error77(updatedObject, updateException);
                     }
                 }
             }
@@ -1435,7 +1424,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 refRepository.invalidate(((IBaseEntity) deletedObject));
                         }
                     } catch (Exception deleteException) {
-                        throw new IllegalStateException(Errors.compose(Errors.E78, deletedObject, deleteException.getMessage()));
+                        throw history.Error78(deletedObject, deleteException);
                     }
                 }
             }

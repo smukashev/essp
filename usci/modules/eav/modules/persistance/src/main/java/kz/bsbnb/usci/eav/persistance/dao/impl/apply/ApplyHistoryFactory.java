@@ -7,10 +7,14 @@ import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
+import kz.bsbnb.usci.eav.model.exceptions.ImmutableElementException;
+import kz.bsbnb.usci.eav.model.exceptions.KnownException;
 import kz.bsbnb.usci.eav.model.meta.*;
+import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
+import kz.bsbnb.usci.eav.util.Errors;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
@@ -25,6 +29,7 @@ public class ApplyHistoryFactory {
 
     @Autowired
     protected IPersistableDaoPool persistableDaoPool;
+
     protected long creditorId;
     protected IBaseEntity baseEntityApplied;
     protected IBaseValue baseValueSaving;
@@ -32,6 +37,7 @@ public class ApplyHistoryFactory {
     protected IBaseEntity baseEntityLoaded;
     protected IBaseEntity baseEntitySaving;
     protected IBaseEntityManager baseEntityManager;
+
     protected IBaseContainer baseContainer;
     protected IMetaAttribute metaAttribute;
     protected IMetaType metaType;
@@ -44,6 +50,8 @@ public class ApplyHistoryFactory {
     protected IMetaSet childMetaSet;
 
     protected IBaseValueDao valueDao;
+
+    protected CompareFactory compareFactory;
 
     private HistoricalBaseValueDSLFactory lastBase = null;
 
@@ -66,6 +74,22 @@ public class ApplyHistoryFactory {
     private Set<UUID> processedValue = new HashSet<>();
     private Set<Long> processedEntity = new HashSet<>();
 
+
+    public ApplyHistoryFactory() {
+    }
+
+    public ApplyHistoryFactory(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
+
+        this.creditorId = creditorId;
+
+        this.baseEntitySaving = baseEntitySaving;
+        this.baseEntityLoaded = baseEntityLoaded;
+
+        this.metaClass = baseEntitySaving.getMeta();
+
+        this.baseEntityManager = baseEntityManager;
+
+    }
 
     public ApplyHistoryFactory(long creditorId,
                                IBaseEntity baseEntityApplied, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
@@ -123,6 +147,34 @@ public class ApplyHistoryFactory {
         this.valueDao = persistableDaoPool
                 .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
+    }
+
+    public void initFromChild(String attrName) {
+
+        this.baseValueSaving = baseEntitySaving.getBaseValue(attrName);
+        this.baseValueLoaded = baseEntityLoaded.getBaseValue(attrName);
+
+        this.baseContainer = baseValueSaving.getBaseContainer();
+        this.metaAttribute = metaClass.getMetaAttribute(attrName);
+        this.metaType = metaAttribute.getMetaType();
+        try {
+            this.metaValue = (IMetaValue) metaType;
+        } catch (Exception e) {
+        }
+        try {
+            this.metaClass = (IMetaClass) metaType;
+        } catch (Exception e) {
+        }
+        try {
+            this.metaSet = (IMetaSet) metaType;
+        } catch (Exception e) {
+        }
+
+    }
+
+    public CompareFactory getCompareFactory() {
+        if(compareFactory == null) compareFactory = new CompareFactory(this);
+        return compareFactory;
     }
 
     public IBaseEntity childEntityFrom(IBaseValue value) {
@@ -337,18 +389,18 @@ public class ApplyHistoryFactory {
             IMetaAttribute childMetaAttribute = metaClass.getMetaAttribute(attributeName);
             IMetaType childMetaType = childMetaAttribute.getMetaType();
 
-            attribute.execute(new EachAttributeBinding(baseEntitySaving, baseEntityLoaded, attributeName, childMetaAttribute, childMetaType));
+            attribute.execute(new EachAttributeBinding(baseEntitySaving, baseEntityLoaded, attributeName, childMetaAttribute, childMetaType), this, this.getCompareFactory());
 
         }
 
     }
 
     public IBaseEntity get(IGetFunction function, IBaseEntity baseEntityLoaded, IBaseEntity baseEntitySaving) {
-        return function.execute(new IGetFunctionBinding(baseEntitySaving, baseEntityLoaded, metaClass, metaAttribute));
+        return function.execute(new IGetFunctionBinding(baseEntitySaving, baseEntityLoaded, metaClass, metaAttribute), this, this.getCompareFactory());
     }
 
     public IBaseEntity get(IGetFunction function) {
-        return function.execute(new IGetFunctionBinding(baseEntitySaving, baseEntityLoaded, metaClass, metaAttribute));
+        return function.execute(new IGetFunctionBinding(baseEntitySaving, baseEntityLoaded, metaClass, metaAttribute), this, this.getCompareFactory());
     }
 
     public Object castedValue(IBaseValue value) {
@@ -367,12 +419,125 @@ public class ApplyHistoryFactory {
         else return null;
     }
 
+    public RuntimeException ErrorIE(IBaseEntity baseEntity) {
+        return new ImmutableElementException(baseEntity);
+    }
+
+    public RuntimeException ErrorCEFI(IBaseEntity baseEntity) {
+        if (baseEntity.getMeta().isReference()) {
+            String keyValue = null;
+            String[] possibleKeys = new String[]{"no_", "short_name", "code"};
+            for (int i = 0; i < possibleKeys.length && keyValue == null; i++) {
+                if (baseEntity.getMeta().hasAttribute(possibleKeys[i])) {
+                    keyValue = ((String) baseEntity.getEl(possibleKeys[i]));
+                }
+            }
+            if (keyValue != null)
+                return new KnownException(Errors.compose(Errors.E298, baseEntity.getMeta().getClassTitle(), keyValue, baseEntity.getReportDate()));
+        }
+        return new KnownException(Errors.compose(Errors.E57, baseEntity.getId(), baseEntity.getReportDate()));
+    }
+
+    public RuntimeException Error02() {
+        return new UnsupportedOperationException(Errors.compose(Errors.E2));
+    }
+
+    public RuntimeException ErrorUO() {
+        return new UnsupportedOperationException("Новое и старое значения являются NULL(" +
+                baseValueSaving.getMetaAttribute().getName() + "). Недопустимая операция;");
+    }
+
+    public RuntimeException Error56() {
+        return new UnsupportedOperationException(Errors.compose(Errors.E56, baseEntitySaving.getId()));
+    }
+
+    public RuntimeException Error57() {
+        return new UnsupportedOperationException(Errors.compose(Errors.E57,
+                baseEntityLoaded.getId(), baseEntityLoaded.getBaseEntityReportDate().getReportDate()));
+    }
+
+    public RuntimeException Error59() {
+        return new IllegalStateException(Errors.compose(Errors.E59, metaAttribute.getName()));
+    }
+
+    public RuntimeException Error60() {
+        return new IllegalStateException(Errors.compose(Errors.E60));
+    }
+
+    public RuntimeException Error63(IBaseEntity baseEntity) {
+        return new RuntimeException(Errors.compose(Errors.E63, baseEntity.getId(),
+                baseEntity.getReportDate()));
+    }
+
+    public RuntimeException Error64(IBaseEntity baseEntity) {
+        return new IllegalStateException(Errors.compose(Errors.E64, baseEntity.getMeta().getClassName()));
+    }
+
+    public RuntimeException Error66() {
+        return new IllegalStateException(Errors.compose(Errors.E66, metaAttribute.getName()));
+    }
+
+    public RuntimeException Error67() {
+        return new IllegalStateException(Errors.compose(Errors.E67, metaAttribute.getName()));
+    }
+
+    public RuntimeException Error68() {
+        return new IllegalStateException(Errors.compose(Errors.E68, metaAttribute.getName()));
+    }
+
+    public RuntimeException Error69() {
+        return new RuntimeException(Errors.compose(Errors.E69, metaAttribute.getName()));
+    }
+
+    public RuntimeException Error70(IBaseValue baseValue) {
+        return new IllegalStateException(Errors.compose(Errors.E70, baseValue.getMetaAttribute().getName()));
+    }
+
+    public RuntimeException Error71() {
+        return new IllegalStateException(Errors.compose(Errors.E71, metaAttribute.getName()));
+    }
+
+    public RuntimeException Error72() {
+        return new IllegalStateException(Errors.compose(Errors.E72, metaAttribute.getName()));
+    }
+
+    public RuntimeException Error73() {
+        return new IllegalStateException(Errors.compose(Errors.E73, metaAttribute.getName()));
+    }
+
+    public RuntimeException Error74() {
+        return new IllegalStateException(Errors.compose(Errors.E74));
+    }
+
+    public RuntimeException Error75() {
+        return new UnsupportedOperationException(Errors.compose(Errors.E75, baseValueSaving.getMetaAttribute().getName()));
+    }
+
+    public RuntimeException Error76(IPersistable persistable, Exception exception) {
+        return new IllegalStateException(Errors.compose(Errors.E76, persistable, exception.getMessage()));
+    }
+
+    public RuntimeException Error77(IPersistable persistable, Exception exception) {
+        return new IllegalStateException(Errors.compose(Errors.E77, persistable, exception.getMessage()));
+    }
+
+    public RuntimeException Error78(IPersistable persistable, Exception exception) {
+        return new IllegalStateException(Errors.compose(Errors.E78, persistable, exception.getMessage()));
+    }
+
+    public RuntimeException Error299(IBaseValue baseValue) {
+        if (baseValue.getValue() instanceof IBaseEntity)
+            return new UnsupportedOperationException(Errors.compose(Errors.E299, DataTypes.formatDate(baseValue.getRepDate()), ((IBaseEntity) baseValue.getValue()).getId()));
+        else
+            return new UnsupportedOperationException(Errors.compose(Errors.E299, DataTypes.formatDate(baseValue.getRepDate()), baseValue.getValue()));
+    }
+
     public interface IEachAttribute {
-        void execute(EachAttributeBinding binding);
+        void execute(EachAttributeBinding binding, ApplyHistoryFactory history, CompareFactory IS);
     }
 
     public interface IGetFunction {
-        IBaseEntity execute(IGetFunctionBinding binding);
+        IBaseEntity execute(IGetFunctionBinding binding, ApplyHistoryFactory history, CompareFactory IS);
     }
 
     public class EachAttributeBinding {

@@ -80,6 +80,11 @@ public class BaseValueDSLFactory {
         return this;
     }
 
+    public BaseValueDSLFactory dateFrom(IBaseEntity value) {
+        this.date = value.getReportDate();
+        return this;
+    }
+
     public BaseValueDSLFactory value(Object value) {
         this.value = value;
         return this;
@@ -126,6 +131,12 @@ public class BaseValueDSLFactory {
     }
 
     public BaseValueDSLFactory parentFrom(IBaseValue value) {
+        this.parent = true;
+        this.parentFrom = value;
+        return this;
+    }
+
+    public BaseValueDSLFactory parentFrom(IBaseEntity value) {
         this.parent = true;
         this.parentFrom = value;
         return this;
@@ -226,6 +237,9 @@ public class BaseValueDSLFactory {
                     if (parentFrom instanceof IBaseValue) {
                         ((IBaseValue) result).setBaseContainer(((IBaseValue) parentFrom).getBaseContainer());
                         ((IBaseValue) result).setMetaAttribute(((IBaseValue) parentFrom).getMetaAttribute());
+                    } else if (parentFrom instanceof IBaseEntity) {
+                        ((IBaseValue) result).setBaseContainer(((IBaseEntity) parentFrom));
+                        ((IBaseValue) result).setMetaAttribute(memorizingTool.metaAttribute);
                     } else if (parentFrom instanceof IBaseSet) {
                         ((IBaseValue) result).setBaseContainer(((IBaseSet) parentFrom));
                         ((IBaseValue) result).setMetaAttribute(memorizingTool.metaAttribute);
