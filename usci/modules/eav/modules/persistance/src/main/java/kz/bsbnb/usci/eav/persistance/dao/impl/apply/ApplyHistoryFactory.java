@@ -15,7 +15,7 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.util.Errors;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -25,9 +25,9 @@ import java.util.UUID;
 /**
  * Created by emles on 22.08.17
  */
+@Repository
 public class ApplyHistoryFactory {
 
-    @Autowired
     protected IPersistableDaoPool persistableDaoPool;
 
     protected long creditorId;
@@ -78,7 +78,7 @@ public class ApplyHistoryFactory {
     public ApplyHistoryFactory() {
     }
 
-    public ApplyHistoryFactory(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
+    public ApplyHistoryFactory(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager, IPersistableDaoPool persistableDaoPool) {
 
         this.creditorId = creditorId;
 
@@ -89,11 +89,17 @@ public class ApplyHistoryFactory {
 
         this.baseEntityManager = baseEntityManager;
 
+        this.persistableDaoPool = persistableDaoPool;
+
+        if (baseValueSaving != null)
+            this.valueDao = persistableDaoPool
+                    .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
+
     }
 
     public ApplyHistoryFactory(long creditorId,
                                IBaseEntity baseEntityApplied, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
-                               IBaseEntityManager baseEntityManager) {
+                               IBaseEntityManager baseEntityManager, IPersistableDaoPool persistableDaoPool) {
 
         this.creditorId = creditorId;
 
@@ -144,6 +150,8 @@ public class ApplyHistoryFactory {
         } catch (Exception e) {
         }
 
+        this.persistableDaoPool = persistableDaoPool;
+
         this.valueDao = persistableDaoPool
                 .getPersistableDao(baseValueSaving.getClass(), IBaseValueDao.class);
 
@@ -173,7 +181,7 @@ public class ApplyHistoryFactory {
     }
 
     public CompareFactory getCompareFactory() {
-        if(compareFactory == null) compareFactory = new CompareFactory(this);
+        if (compareFactory == null) compareFactory = new CompareFactory(this);
         return compareFactory;
     }
 
