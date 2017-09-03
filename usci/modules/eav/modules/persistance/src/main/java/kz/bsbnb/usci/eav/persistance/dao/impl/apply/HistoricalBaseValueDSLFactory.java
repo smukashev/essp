@@ -21,9 +21,6 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
     private final int HISTORICAL_LAST = 5;
     private final int HISTORICAL_BASE = 6;
 
-    @Autowired
-    private IPersistableDaoPool persistableDaoPool;
-
     private int historical = 0;
     private Boolean with = false;
     private IBaseValue withPersistable;
@@ -119,7 +116,7 @@ public class HistoricalBaseValueDSLFactory extends BaseValueDSLFactory {
         IBaseValueDao valueDao = memorizingTool.valueDao;
 
         if (with)
-            valueDao = (IBaseValueDao) persistableDaoPool
+            valueDao = (IBaseValueDao) memorizingTool.persistableDaoPool
                     .getPersistableDao(withPersistable.getClass(), withPersistableDaoClass);
 
         switch (historical) {

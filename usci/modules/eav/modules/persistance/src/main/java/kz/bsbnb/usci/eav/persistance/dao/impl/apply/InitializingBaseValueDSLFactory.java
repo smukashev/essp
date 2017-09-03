@@ -118,7 +118,9 @@ public class InitializingBaseValueDSLFactory extends BaseValueDSLFactory {
         }
 
         result = BaseValueFactory.create(
-                MetaContainerTypes.META_CLASS,
+                containerType == null
+                        ? MetaContainerTypes.META_CLASS
+                        : containerType,
                 mt,
                 id == null
                         ? (from == null ? 0L : from.getId())

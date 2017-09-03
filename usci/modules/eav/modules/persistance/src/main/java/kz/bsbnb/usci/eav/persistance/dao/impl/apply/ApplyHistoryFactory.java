@@ -28,8 +28,11 @@ import java.util.UUID;
 @Repository
 public class ApplyHistoryFactory {
 
+    public IMetaAttribute metaAttribute;
+    public IMetaType metaType;
+    public IMetaValue metaValue;
+    public IMetaSet childMetaSet;
     protected IPersistableDaoPool persistableDaoPool;
-
     protected long creditorId;
     protected IBaseEntity baseEntityApplied;
     protected IBaseValue baseValueSaving;
@@ -37,18 +40,12 @@ public class ApplyHistoryFactory {
     protected IBaseEntity baseEntityLoaded;
     protected IBaseEntity baseEntitySaving;
     protected IBaseEntityManager baseEntityManager;
-
     protected IBaseContainer baseContainer;
-    protected IMetaAttribute metaAttribute;
-    protected IMetaType metaType;
     protected IMetaClass metaClass;
-    protected IMetaValue metaValue;
     protected IMetaSet metaSet;
     protected IMetaType childMetaType;
     protected IMetaValue childMetaValue;
     protected IMetaClass childMetaClass;
-    protected IMetaSet childMetaSet;
-
     protected IBaseValueDao valueDao;
 
     protected CompareFactory compareFactory;
@@ -162,7 +159,11 @@ public class ApplyHistoryFactory {
         this.baseValueSaving = baseEntitySaving.getBaseValue(attrName);
         this.baseValueLoaded = baseEntityLoaded.getBaseValue(attrName);
 
-        this.baseContainer = baseValueSaving.getBaseContainer();
+        try {
+            this.baseContainer = baseValueSaving.getBaseContainer();
+        } catch (Exception e) {
+        }
+        this.metaClass = baseEntitySaving.getMeta();
         this.metaAttribute = metaClass.getMetaAttribute(attrName);
         this.metaType = metaAttribute.getMetaType();
         try {
@@ -181,7 +182,17 @@ public class ApplyHistoryFactory {
     }
 
     public CompareFactory getCompareFactory() {
-        if (compareFactory == null) compareFactory = new CompareFactory(this);
+        if (compareFactory == null) createCompareFactory();
+        return compareFactory;
+    }
+
+    public CompareFactory createCompareFactory() {
+        compareFactory = new CompareFactory(this);
+        return compareFactory;
+    }
+
+    public CompareFactory createCompareFactory(String attrName) {
+        compareFactory = new CompareFactory(baseEntitySaving, attrName);
         return compareFactory;
     }
 
@@ -412,11 +423,13 @@ public class ApplyHistoryFactory {
     }
 
     public Object castedValue(IBaseValue value) {
+        if (metaValue == null) return value.getValue();
         return metaValue.getTypeCode() == DataTypes.DATE ?
                 new Date(((Date) value.getValue()).getTime()) : value.getValue();
     }
 
     public Object castedValue(IMetaValue metaValue, IBaseValue value) {
+        if (metaValue == null) return value.getValue();
         return metaValue.getTypeCode() == DataTypes.DATE ?
                 new Date(((Date) value.getValue()).getTime()) : value.getValue();
     }

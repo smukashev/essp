@@ -67,6 +67,49 @@ public class CompareFactory {
 
     }
 
+    public CompareFactory(IBaseEntity baseEntity, String attrName) {
+
+        IBaseValue baseValueSaving = baseEntity.getBaseValue(attrName);
+
+        try {
+            this.baseContainer = baseValueSaving.getBaseContainer();
+        } catch (Exception e) {
+        }
+        this.metaClass = baseEntity.getMeta();
+        this.metaAttribute = metaClass.getMetaAttribute(attrName);
+        this.metaType = metaAttribute.getMetaType();
+        try {
+            this.metaValue = (IMetaValue) metaType;
+        } catch (Exception e) {
+        }
+        try {
+            this.metaClass = (IMetaClass) metaType;
+        } catch (Exception e) {
+        }
+        try {
+            this.metaSet = (IMetaSet) metaType;
+        } catch (Exception e) {
+        }
+
+        try {
+            this.childMetaType = metaSet.getMemberType();
+        } catch (Exception e) {
+        }
+        try {
+            this.childMetaValue = (IMetaValue) childMetaType;
+        } catch (Exception e) {
+        }
+        try {
+            this.childMetaClass = (IMetaClass) childMetaType;
+        } catch (Exception e) {
+        }
+        try {
+            this.childMetaSet = (IMetaSet) childMetaType;
+        } catch (Exception e) {
+        }
+
+    }
+
     public boolean NEW(IPersistable value) {
         return value.getId() < 1;
     }
