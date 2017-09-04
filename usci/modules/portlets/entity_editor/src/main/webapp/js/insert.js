@@ -405,7 +405,7 @@ function insertNewCredit() {
                         simple: true
                     }),
                     Ext.create('entityModel', {
-                        title: label_DATE,
+                        title: 'Дата',
                         code: 'date',
                         format: 'd.m.Y',
                         value: Ext.getCmp('edPrimaryContractDate').getSubmitValue(),

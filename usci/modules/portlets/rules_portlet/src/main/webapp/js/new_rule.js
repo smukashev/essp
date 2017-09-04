@@ -19,21 +19,21 @@ function newRuleForm(){
                     }),
                     Ext.create('Ext.form.DateField', {
                         id: 'elemNewRuleDate',
-                        fieldLabel: label_DATE,
+                        fieldLabel: 'дата',
                         labelWidth: 55,
                         format: 'd.m.Y',
                         padding: 3
                     }),
                     Ext.create('Ext.form.TextField', {
                         id: 'txtTitle',
-                        fieldLabel: label_NAME,
+                        fieldLabel: 'название',
                         labelWidth: 55,
                         padding: 3
                     }),
                     Ext.create('Ext.form.Panel',{
                         tbar: [
                             {
-                                text: label_ADD,
+                                text: 'Добавить',
                                 id: 'btnNewRuleSubmit',
                                 //disabled: true,
                                 handler: function(){

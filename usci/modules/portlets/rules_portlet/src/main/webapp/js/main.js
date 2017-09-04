@@ -102,7 +102,7 @@ function initGrid(){
                 }]
             },*/
             {
-                text     : label_NAME,
+                text     : 'Название',
                 dataIndex: 'name',
                 width: 200,
                 flex: 1,
@@ -212,7 +212,7 @@ function initGrid(){
         dockedItems: [{
             xtype: 'toolbar',
             items: [{
-                text: label_ADD,
+                text: 'добавить',
                 icon: contextPathUrl + '/pics/add.png',
                 id: 'btnNewRule',
                 hidden: readOnly,
@@ -320,7 +320,7 @@ function initGrid(){
                     }, this, false, this.lastValue);
                 }
             }*/,{
-                text: label_RESTORE,
+                text: 'сброс',
                 icon: contextPathUrl + '/pics/bin.png',
                 hidden: readOnly,
                 id: 'btnFlush',
@@ -339,15 +339,15 @@ function initGrid(){
                             root: 'data'
                         },
                         success: function(response, opts) {
-                            Ext.Msg.alert(label_INFORMATION,label_CACHE_CLEANED);
+                            Ext.Msg.alert("Информация","Кэш очищен");
                         },
                         failure: function(response, opts) {
-                            Ext.Msg.alert(label_INFORMATION,label_CACHE_NOT_CLEANED);
+                            Ext.Msg.alert("Информация","Кэш не очищен");
                         }
                     });
                 }
             },{
-                text: label_HISTORY,
+                text: 'история',
                 id: 'btnHistory',
                 icon: contextPathUrl + '/pics/copy2.png',
                 hidden: readOnly,
@@ -357,7 +357,7 @@ function initGrid(){
                     historyForm(ruleListGrid.getSelectionModel().getLastSelected().data.id).show();
                 }
             },{
-                text: label_REFRESH,
+                text: 'обновить',
                 id: 'btnRefresh',
                 icon: contextPathUrl + '/pics/refresh.png',
                 handler: function(){
@@ -461,7 +461,7 @@ function updateRules(searchText){
             },
             callback: function(a,b,success){
                 if(success == false){
-                    Ext.Msg.alert('',label_VERSION_NOT_FOUND);
+                    Ext.Msg.alert('','Нет версии пакета');
                     reset();
                 }else{
                     editor.batchVersionId = Ext.decode(b.response.responseText).batchVersionId;
@@ -595,11 +595,11 @@ Ext.onReady(function(){
                     html: "<div id='bkeditor'>function(){}</div>",
                     tbar: [
                         {
-                            text : label_CANCEL,
+                            text : 'отменить',
                             hidden: readOnly,
                             id: 'btnCancel',  icon: contextPathUrl + '/pics/undo.png', handler: function(){ editor.setValue(editor.backup, -1); }, disabled: true},
                         {
-                            text: label_SAVE,
+                            text: 'сохранить',
                             //scope: this,
                             id: 'btnSave',
                             icon: contextPathUrl + '/pics/save.png',
@@ -659,7 +659,7 @@ Ext.onReady(function(){
                                 });
                             }
                         },
-                        {text: label_DEL,
+                        {text: 'удалить',
                             id: 'btnDel',
                             icon: contextPathUrl + '/pics/crop2.png',
                             disabled: true,
@@ -697,7 +697,7 @@ Ext.onReady(function(){
                                     store: packageStore,
                                     valueField:'id',
                                     displayField:'name',
-                                    fieldLabel: label_SELECT_PACKAGE,
+                                    fieldLabel: 'Выберите пакет',
                                     listeners: {
                                         change: function(){
                                             //updateRules();
@@ -723,7 +723,7 @@ Ext.onReady(function(){
                                     store: packageVersionStore,
                                     displayField: 'name',
                                     valueField: 'name',
-                                    fieldLabel: label_DATE,
+                                    fieldLabel: 'дата',
                                     listeners: {
                                         change: function(){
                                             updateRules();

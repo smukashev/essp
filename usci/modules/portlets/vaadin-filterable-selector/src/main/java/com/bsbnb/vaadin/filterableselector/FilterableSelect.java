@@ -1,6 +1,13 @@
 package com.bsbnb.vaadin.filterableselector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.bsbnb.vaadin.messagebox.MessageBox;
 import com.bsbnb.vaadin.messagebox.MessageBoxButtons;
@@ -41,16 +48,6 @@ public class FilterableSelect<T> extends VerticalLayout {
         for(T item : aCreditorsList) {
             this.itemsList.add(new FilterableItem<T>(item, selector));
         }
-
-        Localization.setLocale( new Locale("ru", "RU"));
-    }
-
-    public FilterableSelect(List<T> aCreditorsList, Selector<T> selector, Locale locale) {
-        this.itemsList = new ArrayList<FilterableItem<T>>(aCreditorsList.size());
-        for(T item : aCreditorsList) {
-            this.itemsList.add(new FilterableItem<T>(item, selector));
-        }
-        Localization.setLocale(locale);
     }
 
     @Override

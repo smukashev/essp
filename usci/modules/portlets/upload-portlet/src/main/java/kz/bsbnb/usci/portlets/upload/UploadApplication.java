@@ -12,29 +12,26 @@ import javax.portlet.ResourceResponse;
 
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
+import com.vaadin.ui.*;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.portlets.upload.ui.MainLayout;
-import kz.bsbnb.usci.portlets.upload.ui.SingleUploadComponent;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.util.PortalUtil;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2;
 import com.vaadin.terminal.gwt.server.PortletApplicationContext2.PortletListener;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
 import org.apache.log4j.Logger;
 
 import java.security.AccessControlException;
-import java.util.ResourceBundle;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class UploadApplication extends Application {
 
     private static final long serialVersionUID = 2096197512742005243L;
 
-    private ResourceBundle bundle;
-
     private final Logger logger = Logger.getLogger(UploadApplication.class);
+    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
 
     @Override
     public void init() {
@@ -54,6 +51,9 @@ public class UploadApplication extends Application {
     private class SamplePortletListener implements PortletListener {
 
         private static final long serialVersionUID = -5984011853767129565L;
+
+        private Label systemDatelabel;
+
 
         @Override
         public void handleRenderRequest(RenderRequest request, RenderResponse response, Window window) {
@@ -80,15 +80,36 @@ public class UploadApplication extends Application {
                     throw new AccessControlException(Errors.compose(Errors.E238));
 
                 Window mainWindow = new Window();
+                HorizontalLayout autoUpdateLayout = new HorizontalLayout();
+
+                ProgressIndicator indicator = new ProgressIndicator();
+                indicator.setPollingInterval(1000);
+                indicator.setHeight(0);
+                indicator.setWidth(0);
+                autoUpdateLayout.addComponent(indicator);
+
+                systemDatelabel = new Label("");
+                autoUpdateLayout.addComponent(systemDatelabel);
+
+                Thread updateThread = new Thread(new Runnable() {
+
+                    public void run() {
+                        while (true) {
+                            systemDatelabel.setCaption("Системное время : "+TIME_FORMAT.format(new Date()));
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException ie) {
+                                logger.warn(null, ie);
+                            }
+                        }
+                    }
+                });
+                updateThread.start();
+
+                mainWindow.addComponent(autoUpdateLayout);
                 mainWindow.addComponent(new MainLayout(
                         new UploadPortletEnvironmentFacade(PortalUtil.getUser(request), isNB)));
                 setMainWindow(mainWindow);
-
-                try {
-                    bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
-                    response.setTitle(bundle.getString("WINDOW-TITLE"));
-                } catch (Exception e) {
-                }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();

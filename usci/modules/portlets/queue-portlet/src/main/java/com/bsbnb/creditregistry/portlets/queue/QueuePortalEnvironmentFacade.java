@@ -25,7 +25,7 @@ public class QueuePortalEnvironmentFacade extends PortalEnvironmentFacade {
 
     public QueuePortalEnvironmentFacade(User user) {
         this.user = user;
-        this.locale = user.getLocale();
+        this.locale = new Locale("ru", "RU");
         this.bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
         try {
             for (Role role : user.getRoles()) {
@@ -49,11 +49,7 @@ public class QueuePortalEnvironmentFacade extends PortalEnvironmentFacade {
 
     @Override
     public String getString(String key) {
-        try {
         return bundle.getString(key);
-        } catch (Exception e) {
-        }
-        return "";
     }
 
     @Override
@@ -72,11 +68,7 @@ public class QueuePortalEnvironmentFacade extends PortalEnvironmentFacade {
     }
 
     public String getResourceString(String key) {
-        try {
-            return bundle.getString(key);
-        } catch (Exception e) {
-        }
-        return "";
+        return bundle.getString(key);
     }
 
     @Override

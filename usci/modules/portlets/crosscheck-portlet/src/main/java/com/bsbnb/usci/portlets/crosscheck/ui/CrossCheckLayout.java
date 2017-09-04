@@ -71,14 +71,12 @@ public class CrossCheckLayout extends VerticalLayout {
     private String viewType;
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private final Logger logger = Logger.getLogger(CrossCheckLayout.class);
-    private final Locale locale;
 
-    public CrossCheckLayout(String viewType, PortletEnvironmentFacade facade, DataProvider provider, Locale locale) {
+    public CrossCheckLayout(String viewType, PortletEnvironmentFacade facade, DataProvider provider) {
         this.viewType = viewType;
         this.facade = facade;
         this.provider = provider;
         logger.info("User ID: "+ facade.getUserID());
-        this.locale = locale;
     }
    
     @Override
@@ -86,7 +84,7 @@ public class CrossCheckLayout extends VerticalLayout {
         creditorsList = provider.getCreditorsList(facade.getCreditorId());
         creditorsSelector = new FilterableSelect<Creditor>(creditorsList, new Selector<Creditor>() {
 
-            private boolean isKz = "kk".equalsIgnoreCase(facade.getCurrentLanguage());
+            private boolean isKz = "KZ".equalsIgnoreCase(facade.getCurrentLanguage());
 
             public String getCaption(Creditor item) {
                 return item.getName();
@@ -104,7 +102,7 @@ public class CrossCheckLayout extends VerticalLayout {
                     return isKz ? subjectType.getNameKz() : subjectType.getNameRu();
                 }
             }
-        }, locale);
+        });
 
         creditorsSelector.setImmediate(true);
 

@@ -1478,12 +1478,12 @@ Ext.onReady(function () {
                 return name;
             }
         },{
-            text: label_OPEN_DATE,
+            text: 'Дата открытия',
             flex: 5,
             dataIndex: 'date',
             sortable: true
         },{
-            text: label_CLOSE_DATE,
+            text: 'Дата закрытия',
             flex: 6,
             dataIndex: 'closeDate',
             sortable: true
@@ -1666,7 +1666,7 @@ Ext.onReady(function () {
                     store: types,
                     labelWidth: 70,
                     valueField: 'searchName',
-                    fieldLabel: label_SEARCH_TYPE,
+                    fieldLabel: 'Вид поиска',
                     editable: false,
                     listeners: {
                         change: function (a, key, prev) {
@@ -1682,12 +1682,12 @@ Ext.onReady(function () {
                     store: creditors,
                     labelWidth: 70,
                     valueField: 'id',
-                    fieldLabel: label_CREDITOR,
+                    fieldLabel: 'Кредитор',
                     editable: false
                 }, {
                     xtype: 'datefield',
                     id: 'edDate',
-                    fieldLabel: label_DATE,
+                    fieldLabel: 'Дата',
                     listeners: {
                         change: function () {
                             console.log('datefield changed');
@@ -1729,11 +1729,11 @@ Ext.onReady(function () {
                         Ext.getCmp('form-area').doSearch();
                     }
                 },
-                {xtype: 'label', text: label_FOUND_RESULT+':'},
+                {xtype: 'label', text: 'Всего результатов:'},
                 {xtype: 'label', text: '0', id: 'totalCount'},
                 /*{xtype: 'label', text: ', Отчетная дата:'},
                 {xtype: 'label', text: 'Не выбрана', id: 'lblReportDate'},*/
-                {xtype: 'label', text: label_DIFFERENCE+':'},
+                {xtype: 'label', text: ', Изменение:'},
                 {xtype: 'label', text: 'нет', id: 'lblOperation'},
             ]
         }, devModule]

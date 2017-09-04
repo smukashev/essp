@@ -17,13 +17,12 @@ import org.apache.log4j.Logger;
 
 import javax.portlet.*;
 import java.security.AccessControlException;
-import java.util.ResourceBundle;
 
 public class ApprovalApplication extends Application {
-
     private static final long serialVersionUID = 2096197512742005243L;
-    private ResourceBundle bundle;
+
     private final Logger logger = org.apache.log4j.Logger.getLogger(ApprovalApplication.class);
+    private Exception currentException;
 
     @Override
     public void init() {
@@ -65,11 +64,6 @@ public class ApprovalApplication extends Application {
                         new ApprovalPortletEnvironmentFacade(user)));
                 setMainWindow(mainWindow);
 
-                try {
-                    bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
-                    response.setTitle(bundle.getString("WINDOW-TITLE"));
-                } catch (Exception e) {
-                }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();

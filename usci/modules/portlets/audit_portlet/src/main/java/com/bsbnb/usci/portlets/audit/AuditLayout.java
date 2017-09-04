@@ -37,11 +37,7 @@ public class AuditLayout extends VerticalLayout {
     }
     
     public String getString(String key) {
-        try {
         return bundle.getString(key);
-        } catch (Exception e) {
-        }
-        return "";
     }
     
     @Override

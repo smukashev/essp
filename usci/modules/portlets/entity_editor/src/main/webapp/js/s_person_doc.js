@@ -96,7 +96,7 @@ Ext.onReady(function() {
                     sortable: true
                 }],
                 tbar: [{
-                    text: label_SEARCH_BY_DOC,
+                    text: 'добавить документ поиска',
                     handler: function(){
                         var tree = Ext.getCmp('s_person_doc_tree');
                         var docNode = tree.getRootNode().getChildAt(0);
@@ -106,7 +106,7 @@ Ext.onReady(function() {
                         Ext.getCmp('modalDocSearchWindow').show();
                     }
                 }, {
-                    text: label_CLEAN,
+                    text: 'Очистить',
                     handler: function(){
                         Ext.getCmp('s_person_doc_tree').getRootNode().getChildAt(0).removeAll();
                     }

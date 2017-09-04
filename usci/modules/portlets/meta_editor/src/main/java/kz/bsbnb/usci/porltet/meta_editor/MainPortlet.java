@@ -6,6 +6,7 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import kz.bsbnb.usci.bconv.xsd.XSDGenerator;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
@@ -28,12 +29,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.AccessControlException;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class MainPortlet extends MVCPortlet {
     private XSDGenerator xsdGenerator = new XSDGenerator();
     private IMetaFactoryService metaFactoryService;
-    private ResourceBundle bundle;
     private Logger logger = Logger.getLogger(MainPortlet.class);
     private Exception currentException;
 
@@ -72,12 +71,6 @@ public class MainPortlet extends MVCPortlet {
 
         } catch (Exception e) {
             currentException = e;
-        }
-
-        try {
-            bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
-            renderResponse.setTitle(bundle.getString("WindowsTitle"));
-        } catch (Exception e) {
         }
 
         super.doView(renderRequest, renderResponse);

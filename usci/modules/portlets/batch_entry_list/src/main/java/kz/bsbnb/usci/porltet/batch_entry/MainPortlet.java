@@ -26,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -37,12 +36,11 @@ public class MainPortlet extends MVCPortlet {
 
     //должен быть отличен от C:/zips (т.е папки receiver-а)
     //private final static String TMP_FILE_DIR = "\\\\" + StaticRouter.getAsIP() + "\\batch_entry_list_temp_folder";
-    private final static String TMP_FILE_DIR = StaticRouter.isDevMode() ? "/opt/batch_entry_list_temp_folder" :
+    private final static String TMP_FILE_DIR = StaticRouter.isDevMode() ? "/home/usci_data/batch_entry_list_temp_folder" :
             "\\\\" + StaticRouter.getAsIP() + "\\download$\\batch_entry_list_temp_folder";
 
     private IBatchEntryService batchEntryService;
     private IEntityService entityService;
-    private ResourceBundle bundle;
     private Logger logger = Logger.getLogger(MainPortlet.class);
     private Exception currentException;
     private boolean retry;
@@ -118,13 +116,6 @@ public class MainPortlet extends MVCPortlet {
         } catch (Exception e) {
             currentException = e;
         }
-
-        try {
-            bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
-            renderResponse.setTitle(bundle.getString("WindowsTitle"));
-        } catch (Exception e) {
-        }
-
         super.doView(renderRequest, renderResponse);
     }
 

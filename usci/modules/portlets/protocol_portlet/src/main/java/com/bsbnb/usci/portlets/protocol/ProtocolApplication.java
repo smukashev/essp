@@ -21,12 +21,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.math.BigInteger;
 import java.security.AccessControlException;
-import java.util.ResourceBundle;
 
 public class ProtocolApplication extends Application {
     private static final long serialVersionUID = 2096197512742005243L;
     public static final String CONTEXT_NAME = "protocol_portlet";
-    private ResourceBundle bundle;
     public final Logger logger = Logger.getLogger(ProtocolApplication.class);
 
     @Override
@@ -81,7 +79,7 @@ public class ProtocolApplication extends Application {
                 PortletEnvironmentFacade.set(new ProtocolPortletEnvironmentFacade(user, isNB));
                 DataProvider provider = new BeanDataProvider();
                 provider.setNb(isNB);
-                mainWindow.addComponent(new ProtocolLayout(provider, request.getLocale()));
+                mainWindow.addComponent(new ProtocolLayout(provider));
                 setMainWindow(mainWindow);
 
                 if (user != null) {
@@ -100,12 +98,6 @@ public class ProtocolApplication extends Application {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();
                 getMainWindow().showNotification(Errors.decompose(exceptionMessage), Window.Notification.TYPE_ERROR_MESSAGE);
-            }
-
-            try {
-                bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
-                response.setTitle(bundle.getString("WindowsTitle"));
-            } catch (Exception e) {
             }
         }
 

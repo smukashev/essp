@@ -7,12 +7,12 @@ function createMCForm(classId, className, grid, record)
 {
     var buttonSave = Ext.create('Ext.button.Button', {
         id: "createMCFormOK",
-        text: label_SAVE,
+        text: 'Сохранить',
         handler : function (){
             var form = Ext.getCmp('createMCForm').getForm();
             if(form.isValid()){
                 form.submit({
-                    waitMsg: label_SENDING,
+                    waitMsg:'Идет отправка...',
                     url: dataUrl,
                     params : {op : "SAVE_CLASS"},
                     actionMethods: {
@@ -31,11 +31,11 @@ function createMCForm(classId, className, grid, record)
                         }
                     },
                     failure : function(){
-                        Ext.Msg.alert(label_LISTEN, action.result.errorMessage);
+                        Ext.Msg.alert('Внимание', action.result.errorMessage);
                     }
                 });
             }else{
-                Ext.Msg.alert(label_LISTEN, label_FILL_ALL);
+                Ext.Msg.alert('Внимание', 'Заполните ВСЕ поля');
             }
         }
     });
@@ -62,11 +62,11 @@ function createMCForm(classId, className, grid, record)
         defaultType: 'textfield',
         bodyPadding: '5 5 0',
         items: [{
-            fieldLabel: label_CODE,
+            fieldLabel: 'Код',
             name: 'classId',
             value: classId
         }, {
-            fieldLabel: label_TITLE,
+            fieldLabel: 'Наименование',
             name: 'className',
             value: className
         }],

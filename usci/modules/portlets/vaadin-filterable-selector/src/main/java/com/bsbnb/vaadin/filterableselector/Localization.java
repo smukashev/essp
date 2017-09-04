@@ -21,7 +21,7 @@ public enum Localization {
     private static ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
 
     public static void setLocale(Locale locale) {
-        bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+        bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
     }
     private String key;
 

@@ -33,7 +33,6 @@ public class RulesPortlet extends MVCPortlet{
     private IPackageService batchService;
     private IEntityService entityService;
     private boolean retry;
-    private ResourceBundle bundle;
     private static final Logger logger = Logger.getLogger(RulesPortlet.class);
 
     public void connectToServices() throws PortletException {
@@ -91,12 +90,6 @@ public class RulesPortlet extends MVCPortlet{
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             renderRequest.setAttribute("error", "Нет прав для просмотра");
-        }
-
-        try {
-            bundle = ResourceBundle.getBundle("content.Language", renderRequest.getLocale());
-            renderResponse.setTitle(bundle.getString("WindowsTitle"));
-        } catch (Exception e) {
         }
 
         super.doView(renderRequest, renderResponse);

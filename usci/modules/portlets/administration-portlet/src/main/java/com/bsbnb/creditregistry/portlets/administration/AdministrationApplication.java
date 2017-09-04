@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import javax.portlet.*;
 import java.security.AccessControlException;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
@@ -40,7 +41,7 @@ public class AdministrationApplication extends Application implements PortletReq
     }
 
     public void onRequestStart(PortletRequest request, PortletResponse response) {
-        bundle = ResourceBundle.getBundle("content.Language", request.getLocale());
+        bundle = ResourceBundle.getBundle("content.Language", new Locale("ru", "RU"));
     }
 
     public void onRequestEnd(PortletRequest request, PortletResponse response) {
@@ -74,11 +75,6 @@ public class AdministrationApplication extends Application implements PortletReq
                 MainSplitPanel sp = new MainSplitPanel(bundle, provider,user);
                 mainWindow.addComponent(sp);
                 setMainWindow(mainWindow);
-
-                try {
-                    response.setTitle(bundle.getString("AdministrationApplication"));
-                } catch (Exception e) {
-                }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 String exceptionMessage = e.getMessage() != null ? e.getMessage() : e.toString();

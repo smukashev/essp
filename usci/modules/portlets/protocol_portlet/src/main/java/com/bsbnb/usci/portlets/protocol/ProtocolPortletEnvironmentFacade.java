@@ -19,7 +19,7 @@ public class ProtocolPortletEnvironmentFacade extends PortletEnvironmentFacade{
 
     public ProtocolPortletEnvironmentFacade(User user, boolean isNB) {
         this.user = user;
-        bundle = ResourceBundle.getBundle(BUNDLE_NAME, user.getLocale());
+        bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
         isKazakh = "kz".equals(user.getLocale().getLanguage());
         this.isNB = isNB;
     }

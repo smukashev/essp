@@ -51,7 +51,7 @@ public class LocalizationTest {
     @Test
     public void testSetLocale() throws IOException {
         System.out.println("setLocale");
-        Enumeration<URL> urls = Localization.class.getClassLoader().getResources("content/Language_kk.properties");
+        Enumeration<URL> urls = Localization.class.getClassLoader().getResources("content/Language_kz.properties");
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
             System.out.println("URL: " + url.getFile());

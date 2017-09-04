@@ -17,7 +17,7 @@ function createMCForm(classId, className, PisDisabled,PisReference, grid, record
 
     var buttonSave = Ext.create('Ext.button.Button', {
         id: "createMCFormOK",
-        text: label_SAVE,
+        text: 'Сохранить',
         handler : function (){
             var form = Ext.getCmp('createMCForm').getForm();
             if(form.isValid()){
@@ -54,7 +54,7 @@ function createMCForm(classId, className, PisDisabled,PisReference, grid, record
 
     var buttonClose = Ext.create('Ext.button.Button', {
         id: "createMCFormCancel",
-        text: label_CANCEL,
+        text: 'Отмена',
         handler : function (){
             Ext.getCmp('createMCFormWin').destroy();
         }
@@ -78,12 +78,12 @@ function createMCForm(classId, className, PisDisabled,PisReference, grid, record
             name: 'classId',
             value: classId
         }, {
-            fieldLabel: label_TITLE,
+            fieldLabel: 'Наименование',
             name: 'className',
             value: className
         },
             {
-                fieldLabel: label_ACTIVITY_TYPE,
+                fieldLabel: 'Признак активности',
                 id: 'isDisabled',
                 name: 'isDisabled',
                 xtype: 'combobox',
@@ -108,7 +108,7 @@ function createMCForm(classId, className, PisDisabled,PisReference, grid, record
                 }
             },
             {
-                fieldLabel: label_CLASS_TYPE,
+                fieldLabel: 'Тип класса',
                 id: 'isReference',
                 name: 'isReference',
                 xtype: 'combobox',

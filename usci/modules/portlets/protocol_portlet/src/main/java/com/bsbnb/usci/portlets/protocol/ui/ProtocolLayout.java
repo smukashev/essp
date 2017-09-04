@@ -1,8 +1,15 @@
 package com.bsbnb.usci.portlets.protocol.ui;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.bsbnb.usci.portlets.protocol.PortletEnvironmentFacade;
 import com.bsbnb.usci.portlets.protocol.ProtocolApplication;
@@ -79,7 +86,6 @@ public class ProtocolLayout extends VerticalLayout {
     private Label noProtocolsLabel;
     private VerticalLayout fileSignatureDisplayLayout;
 
-    private Locale locale;
     public final Logger logger = Logger.getLogger(ProtocolLayout.class);
 
     private List<Creditor> selectedCreditors = new ArrayList<Creditor>();
@@ -105,9 +111,8 @@ public class ProtocolLayout extends VerticalLayout {
     private static final String[] EXPORT_PROTOCOL_TABLE_COLUMNS = new String[] {
         "description", "primaryContractDate", "typeName", "messageType", "message", "note"};
 
-    public ProtocolLayout(DataProvider provider, Locale locale) {
+    public ProtocolLayout(DataProvider provider) {
         this.provider = provider;
-        this.locale = locale;
     }
 
     @Override
@@ -139,7 +144,7 @@ public class ProtocolLayout extends VerticalLayout {
 
                 return s;
             }
-        }, locale);
+        });
 
         creditorSelector.setImmediate(true);
 

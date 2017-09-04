@@ -7,12 +7,12 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
 {
     var buttonSave = Ext.create('Ext.button.Button', {
         id: "createMCAttrFormOK",
-        text: label_SAVE,
+        text: 'Сохранить',
         handler : function (){
             var form = Ext.getCmp('createMCAttrForm').getForm();
             if(form.isValid()){
                 form.submit({
-                    waitMsg: label_SENDING,
+                    waitMsg:'Идет отправка...',
                     url: dataUrl,
                     params : {op : "SAVE_ATTR"},
                     actionMethods: {
@@ -45,11 +45,11 @@ function createMCAttrForm(classId, parentPath, attrPath, callback)
                         //}
                     },
                     failure : function(){
-                        Ext.Msg.alert(label_LISTEN, label_ERROR_ACC);
+                        Ext.Msg.alert('Внимание', "Произошла ошибка");
                     }
                 });
             }else{
-                Ext.Msg.alert(label_LISTEN, label_FILL_ALL);
+                Ext.Msg.alert('Внимание', 'Заполните ВСЕ поля');
             }
         }
     });

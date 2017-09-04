@@ -76,7 +76,7 @@ public class CreditorsListLayout extends VerticalLayout implements ReportDisplay
             public String getType(Creditor item) {
                 return item.getSubjectType().getNameRu();
             }
-        }, environment.getUser().getLocale());
+        });
         
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);

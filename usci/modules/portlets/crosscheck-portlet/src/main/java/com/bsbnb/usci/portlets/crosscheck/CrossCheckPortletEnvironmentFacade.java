@@ -21,7 +21,7 @@ public class CrossCheckPortletEnvironmentFacade extends PortletEnvironmentFacade
     public CrossCheckPortletEnvironmentFacade(User user, String businessRulesUrl, Date repDate, String CreditorId) {
         this.user = user;
         this.businessRulesUrl = businessRulesUrl;
-        bundle = ResourceBundle.getBundle(BUNDLE_NAME, user.getLocale());
+        bundle = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("ru", "RU"));
         this.repDate=repDate;
         this.CreditorId=CreditorId;
     }
