@@ -31,7 +31,7 @@ public class BeanDataProvider implements DataProvider {
     private boolean isNb;
 
     private static final String ENTITY_EDITOR_PAGE = "http://" + StaticRouter.getPortalUrl() + ":" +
-            StaticRouter.getPortalPort() + "/web/guest/entity_editor";
+            StaticRouter.getPortalPort() + "/entity_editor";
     public final Logger logger = Logger.getLogger(BeanDataProvider.class);
 
     public BeanDataProvider() {

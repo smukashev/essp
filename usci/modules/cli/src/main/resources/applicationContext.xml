@@ -24,12 +24,12 @@
         </property>
     </bean>
 
-    <bean id="dataSourceRef" class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
+    <!--<bean id="dataSourceRef" class="org.springframework.jdbc.datasource.DriverManagerDataSource" >
         <property name="driverClassName" value="${jdbc.ref.driver}" />
         <property name="url" value="${jdbc.ref.url}" />
         <property name="username" value="${jdbc.ref.user}" />
         <property name="password" value="${jdbc.ref.password}" />
-    </bean>
+    </bean>-->
 
     <bean id="remotePackageService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl" value="rmi://127.0.0.1:1099/packageService"/>
