@@ -11,17 +11,37 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 public class BaseEntityOutput {
     public static String toString(BaseEntity entity) {
-        return toString(entity, "");
+        BaseEntityOutput output = new BaseEntityOutput();
+        return output.toString("", entity, "");
     }
 
-    public static String toString(BaseEntity entity, String prefix) {
+    private String complexSet(String suffix, BaseSet set, String prefix, MetaSet metaSet) {
+        String str = "";
+
+        for (IBaseValue value : set.get()) {
+            if (metaSet.isSet()) {
+                if (metaSet.isComplex()) {
+                    str += "\n" + prefix + toString(suffix(value), (BaseEntity) value.getValue(), prefix + "\t");
+                } else {
+                    str += suffix(value) + " " + value.getValue().toString();
+                }
+            }
+        }
+
+        return str;
+    }
+
+    public String toString(String suffix, BaseEntity entity, String prefix) {
+
         if (entity == null) return "null";
 
         String str = entity.getMeta().getClassName() + "(" + entity.getId() + ", ";
         try {
-            str += entity.getReportDate() == null ? "-)" : DataTypes.formatDate(entity.getReportDate()) + ");";
+            str += entity.getReportDate() == null ? "-" : DataTypes.formatDate(entity.getReportDate()) + "";
+            str += suffix == null ? "-)" : " " + suffix;
+            str += ");";
         } catch (Exception e) {
-            if(entity.getMeta().getClassName().equals("credit")) {
+            if (entity.getMeta().getClassName().equals("credit")) {
                 System.out.println(entity.getEl("primary_contract.no"));
                 System.out.println(entity.getEl("primary_contract.date"));
             }
@@ -53,21 +73,26 @@ public class BaseEntityOutput {
                 }
             }
 
+            String chSuffix = suffix(value);
+
             if (value != null && value.getValue() != null) {
                 if (type.isComplex()) {
                     if (!type.isSet()) {
-                        valueToString = toString((BaseEntity) value.getValue(), prefix + "\t");
+                        valueToString = "";
+                        valueToString += toString(chSuffix, (BaseEntity) value.getValue(), prefix + "\t");
                     } else {
-                        valueToString = complexSet((BaseSet) value.getValue(), prefix + "\t", (MetaSet) type);
+                        valueToString = "";
+                        valueToString += complexSet(chSuffix, (BaseSet) value.getValue(), prefix + "\t", (MetaSet) type);
                     }
                 } else {
-                    valueToString = value.getValue().toString();
+                    valueToString = "";
+                    valueToString += value.getValue().toString();
                 }
             }
 
             if (!valueIsNull) {
                 if (attribute.isKey() || attribute.isOptionalKey()) {
-                    str += "\n" + prefix +  memberName  + " : ";
+                    str += "\n" + prefix + memberName + " : ";
                 } else {
                     str += "\n" + prefix + memberName + " : ";
                 }
@@ -75,26 +100,15 @@ public class BaseEntityOutput {
                 if (type.isSet())
                     str += value.getId() + " : ";
 
-                    str += DataTypes.formatDate(value.getRepDate()) + " : " + valueToString;
+                str += DataTypes.formatDate(value.getRepDate()) + " - " + chSuffix + " : " + valueToString;
             }
         }
 
         return str;
     }
 
-    private static String complexSet(BaseSet set, String prefix, MetaSet metaSet) {
-        String str = "";
-
-        for (IBaseValue value : set.get()) {
-            if (metaSet.isSet()) {
-                if (metaSet.isComplex()) {
-                    str += "\n" + prefix + toString((BaseEntity) value.getValue(), prefix + "\t");
-                } else {
-                    str += value.getValue().toString();
-                }
-            }
-        }
-
-        return str;
+    private String suffix(IBaseValue value) {
+        if (value == null) return "";
+        return Boolean.toString(value.isClosed());
     }
 }
