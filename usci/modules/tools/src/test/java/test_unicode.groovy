@@ -4,7 +4,7 @@ import org.junit.Test
 /**
  * Created by emles on 04.09.17
  */
-class TestUnicode {
+class test_unicode {
 
     @Test
     void testUnescapeJava() {
