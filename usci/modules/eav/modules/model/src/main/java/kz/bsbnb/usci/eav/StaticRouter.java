@@ -12,7 +12,7 @@ public final class StaticRouter {
     }
 
     /* Set up before compiling */
-    private static final MODE mode = MODE.PROD;
+    private static final MODE mode = MODE.DEV;
 
     /* Application Server IP */
     private final static String stendAsIP = "10.10.32.28";
@@ -46,19 +46,19 @@ public final class StaticRouter {
 
     /* Portal port */
     private final static String stendPortalPort = "8080";
-    private final static String devPortalPort = "80";
+    private final static String devPortalPort = "8080";
     private final static String softPortalPort = "80";
     private final static String prodPortalPort = "80";
 
     /* Core Schema name */
     private final static String stendCoreSchemaName = "CORE";
-    private final static String devCoreSchemaName = "CORE";
+    private final static String devCoreSchemaName = "CORE_E";
     private final static String softCoreSchemaName = "CORE";
     private final static String prodCoreSchemaName = "CORE";
 
     /* Showcase Schema name */
     private final static String stendShowcaseSchemaName = "SHOWCASE";
-    private final static String devShowcaseSchemaName = "SHOWCASE";
+    private final static String devShowcaseSchemaName = "SHOWCASE_E";
     private final static String softShowcaseSchemaName = "SHOWCASE";
     private final static String prodShowcaseSchemaName = "SHCASE";
 
@@ -91,12 +91,12 @@ public final class StaticRouter {
 
 
     private final static String stendXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";//todo: change that path
-    private final static String devXSDSourceFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/src/main/resources/usci.xsd";
+    private final static String devXSDSourceFilePath = "/opt/projects/usci/usci/modules/receiver/src/main/resources/usci.xsd";
     private final static String softXSDSourceFilePath = "C:\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd";
     private final static String prodXSDSourceFilePath = "C:\\usci\\usci\\modules\\receiver\\src\\main\\resources\\usci.xsd";
 
     private final static String stendXSDTargetFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/target/classes/usci.xsd"; //todo: change that path
-    private final static String devXSDTargetFilePath = "/home/baur/IdeaProjects/usci/usci/modules/receiver/target/classes/usci.xsd";
+    private final static String devXSDTargetFilePath = "/opt/projects/usci/usci/modules/receiver/target/classes/usci.xsd";
     private final static String softXSDTargetFilePath = "C:\\usci\\usci\\modules\\receiver\\target\\classes\\usci.xsd";
     private final static String prodXSDTargetFilePath = "C:\\usci\\usci\\modules\\receiver\\target\\classes\\usci.xsd";
 
