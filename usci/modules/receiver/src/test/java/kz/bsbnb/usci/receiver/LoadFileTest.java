@@ -4,6 +4,7 @@ import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
+import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
 import kz.bsbnb.usci.receiver.queue.JobLauncherQueue;
 import org.junit.Test;
@@ -21,9 +22,7 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by emles on 06.09.17
@@ -57,9 +56,7 @@ public class LoadFileTest {
         this.jdbcTemplate_SHOWCASE_E = new JdbcTemplate(dataSource_SHOWCASE_E);
     }
 
-    protected void printInfo(DB db, String title, String sql, Object[] params) {
-
-        List<Map<String, Object>> rows = (db == DB.CORE ? jdbcTemplate_CORE_E : db == DB.SHOWCASE ? jdbcTemplate_SHOWCASE_E : null).queryForList(sql, params);
+    protected void printRows(String title, List<Map<String, Object>> rows) {
 
         StringBuffer buffer = new StringBuffer(title);
         for (Map<String, Object> row : rows) {
@@ -70,6 +67,14 @@ public class LoadFileTest {
         }
 
         logger.info(buffer.toString());
+
+    }
+
+    protected void printInfo(DB db, String title, String sql, Object[] params) {
+
+        List<Map<String, Object>> rows = (db == DB.CORE ? jdbcTemplate_CORE_E : db == DB.SHOWCASE ? jdbcTemplate_SHOWCASE_E : null).queryForList(sql, params);
+
+        printRows(title, rows);
 
     }
 
@@ -151,19 +156,38 @@ public class LoadFileTest {
                 "WHERE es.BATCH_ID = ?";
         Object[] params = new Object[]{batchId};
 
-        printInfo(DB.CORE, title, sql, params);
+        List<Map<String, Object>> rows = jdbcTemplate_CORE_E.queryForList(sql, params);
+
+        for (Map<String, Object> row : rows) {
+            String errDescription = null;
+            try {
+                String errCode = row.get("ERROR_CODE").toString().trim();
+                errDescription = Errors.replaceTags(Errors.valueOf(errCode), new Object[]{row.get("DEV_DESCRIPTION")});
+            } catch (Exception e) {
+            }
+            row.put("ERROR_DESCRIPTION", errDescription);
+        }
+
+        printRows(title, rows);
 
     }
 
     private void printBatchEntitiesInfo(long batchId, String[] reportDates) {
 
-        StringBuffer buffer = new StringBuffer("Entities history: \n");
+        StringBuffer buffer = new StringBuffer("Entities history: ");
 
         List<Map<String, Object>> rows = getBatchEntitiesInfo(batchId);
 
+        SortedSet<Long> ids = new TreeSet<>();
+
         for (Map<String, Object> row : rows) {
             Long entityId = ((BigDecimal) row.get("ENTITY_ID")).longValue();
+            if (ids.contains(entityId)) continue;
+            ids.add(entityId);
             for (String reportDate : reportDates) {
+                buffer.append("\n");
+                buffer.append("BATCH ID: ").append(batchId)
+                        .append(" REPORT DATE: ").append(reportDate);
                 buffer.append("\n");
                 for (int i = 0; i < 64; i++) {
                     buffer.append("=");
@@ -247,7 +271,7 @@ public class LoadFileTest {
         };
 
         logger.info("Loading file...");
-        Batch batch = filesMonitor.readFiles("/opt/projects/info/batches/in/1/GGGDEVILGGG1.zip", 10196L, false);
+        Batch batch = filesMonitor.readFiles("/opt/projects/info/batches/in/1/TEST1.zip", 10196L, false);
         if (batch == null) {
             logger.info("Finished loading, no batches...");
             return;

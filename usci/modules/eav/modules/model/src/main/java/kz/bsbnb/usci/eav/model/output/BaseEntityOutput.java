@@ -17,12 +17,14 @@ public class BaseEntityOutput {
 
     private String complexSet(String suffix, BaseSet set, String prefix, MetaSet metaSet) {
         String str = "";
-
+        //str += suffix;
         for (IBaseValue value : set.get()) {
             if (metaSet.isSet()) {
                 if (metaSet.isComplex()) {
+                    //str += " [ComSet]";
                     str += "\n" + prefix + toString(suffix(value), (BaseEntity) value.getValue(), prefix + "\t");
                 } else {
+                    //str += " [SimSet]";
                     str += suffix(value) + " " + value.getValue().toString();
                 }
             }
@@ -36,8 +38,19 @@ public class BaseEntityOutput {
         if (entity == null) return "null";
 
         String str = entity.getMeta().getClassName() + "(" + entity.getId() + ", ";
+        if (entity.getMeta().isSet()) {
+            if (entity.getMeta().isComplex())
+                str += "[ComSet] ";
+            else
+                str += "[SimSet] ";
+        } else {
+            if (entity.getMeta().isComplex())
+                str += "[ComAtr] ";
+            else
+                str += "[SimAtr] ";
+        }
         try {
-            str += entity.getReportDate() == null ? "-" : DataTypes.formatDate(entity.getReportDate()) + "";
+            str += "/RP " + (entity.getReportDate() == null ? "NO/" : DataTypes.formatDate(entity.getReportDate())) + "/";
             str += suffix == null ? "-)" : " " + suffix;
             str += ");";
         } catch (Exception e) {
@@ -62,11 +75,9 @@ public class BaseEntityOutput {
             IBaseValue value = entity.getBaseValue(memberName);
 
             String valueToString = "null";
-            boolean valueIsNull = false;
 
             if (value == null) {
                 valueToString = "not set";
-                valueIsNull = true;
             } else {
                 if (value.getValue() == null) {
                     valueToString = "null";
@@ -90,7 +101,7 @@ public class BaseEntityOutput {
                 }
             }
 
-            if (!valueIsNull) {
+            if (value != null) {
                 if (attribute.isKey() || attribute.isOptionalKey()) {
                     str += "\n" + prefix + memberName + " : ";
                 } else {
@@ -100,7 +111,19 @@ public class BaseEntityOutput {
                 if (type.isSet())
                     str += value.getId() + " : ";
 
-                str += DataTypes.formatDate(value.getRepDate()) + " - " + chSuffix + " : " + valueToString;
+                if (value.getMetaAttribute().getMetaType().isSet()) {
+                    if (value.getMetaAttribute().getMetaType().isComplex())
+                        str += "[ComSet] ";
+                    else
+                        str += "[SimSet] ";
+                } else {
+                    if (value.getMetaAttribute().getMetaType().isComplex())
+                        str += "[ComAtr] ";
+                    else
+                        str += "[SimAtr] ";
+                }
+
+                str += "/RP " + DataTypes.formatDate(value.getRepDate()) + "/ " + chSuffix + " : " + valueToString;
             }
         }
 
@@ -109,6 +132,10 @@ public class BaseEntityOutput {
 
     private String suffix(IBaseValue value) {
         if (value == null) return "";
-        return Boolean.toString(value.isClosed());
+        return " /CL " + (value.getCloseDate() != null ? "" + DataTypes.formatDate(value.getCloseDate()) : "NO ") + Boolean.toString(value.isClosed()) + "/";
     }
+
 }
+
+
+
