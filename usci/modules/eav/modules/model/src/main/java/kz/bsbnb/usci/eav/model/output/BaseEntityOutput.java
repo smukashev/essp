@@ -10,6 +10,8 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 public class BaseEntityOutput {
+    protected final boolean PRINT_CLOSE = false;
+
     public static String toString(BaseEntity entity) {
         BaseEntityOutput output = new BaseEntityOutput();
         return output.toString("", entity, "");
@@ -131,6 +133,7 @@ public class BaseEntityOutput {
     }
 
     private String suffix(IBaseValue value) {
+        if (!PRINT_CLOSE) return "";
         if (value == null) return "";
         return " /CL " + (value.getCloseDate() != null ? "" + DataTypes.formatDate(value.getCloseDate()) : "NO ") + Boolean.toString(value.isClosed()) + "/";
     }

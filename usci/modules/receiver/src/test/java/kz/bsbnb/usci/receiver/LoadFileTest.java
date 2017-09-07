@@ -31,7 +31,7 @@ import java.util.*;
 @ContextConfiguration("/applicationContext.xml")
 public class LoadFileTest {
 
-    protected final Logger logger = LoggerFactory.getLogger(LoadFileTest.class);
+    protected Logger logger = LoggerFactory.getLogger(LoadFileTest.class);
 
     @Autowired
     protected ZipFilesMonitor filesMonitor;
@@ -263,6 +263,10 @@ public class LoadFileTest {
     @Test
     public void loadFile() throws InterruptedException {
 
+        String zipPath = "/opt/projects/info/batches/in/";
+
+        String caseFraze = "-CASE-2";
+
         String[] reportDates = new String[]{
                 "01.07.2017",
                 "01.08.2017",
@@ -270,8 +274,12 @@ public class LoadFileTest {
                 "01.10.2017"
         };
 
+        String year = "2017";
+
+        String zipFileName = zipPath + year + caseFraze + ".ZIP";
+
         logger.info("Loading file...");
-        Batch batch = filesMonitor.readFiles("/opt/projects/info/batches/in/1/TEST1.zip", 10196L, false);
+        Batch batch = filesMonitor.readFiles(zipFileName, 10196L, false);
         if (batch == null) {
             logger.info("Finished loading, no batches...");
             return;
