@@ -3,6 +3,7 @@ package kz.bsbnb.usci.receiver;
 import kz.bsbnb.usci.cr.model.Creditor;
 import kz.bsbnb.usci.eav.model.Batch;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
+import kz.bsbnb.usci.eav.model.output.BaseToShortTool;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityLoadDao;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.receiver.monitor.ZipFilesMonitor;
@@ -256,6 +257,11 @@ public class LoadFileTest {
             buffer.append("No such entity with id: ").append(id).append("\n");
         } else {
             buffer.append(entity.toString().trim()).append("\n");
+            for (int i = 0; i < 64; i++) {
+                buffer.append("=");
+            }
+            BaseToShortTool.print(buffer, entity);
+            buffer.append("\n");
         }
 
     }
@@ -265,7 +271,7 @@ public class LoadFileTest {
 
         String zipPath = "/opt/projects/info/batches/in/";
 
-        String caseFraze = "-CASE-2";
+        String caseFraze = "-CASE-4";
 
         String[] reportDates = new String[]{
                 "01.07.2017",
