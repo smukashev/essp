@@ -22,6 +22,12 @@ class BaseToShortTool {
     protected static Logger logger = LoggerFactory.getLogger(BaseToShortTool.class)
 
 
+    protected List<Closure> filters = []
+
+    void addFilter(Closure closure) {
+        filters.add(closure)
+    }
+
     class TObject {
 
         protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd")
@@ -40,12 +46,24 @@ class BaseToShortTool {
             this.baseValue = baseValue
         }
 
-        String toString(Integer level = 0, StringBuffer buffer) {
+        protected Boolean filterFlag = null
 
-            if (meta?.isReference() && !(attribute?.isKey() || attribute?.isOptionalKey()))
-                return
+        boolean doFilters() {
+            if (filterFlag == null) {
+                filterFlag = false
+                for (Closure closure : filters) {
+                    if (!closure.call(name: name, meta: meta, attribute: attribute, persistable: persistable)) {
+                        filterFlag = true
+                        break
+                    }
+                }
+            }
+            return filterFlag
+        }
 
-            (0..level).each {
+        void toString(Integer level = 0, StringBuffer buffer) {
+
+            for (def i = 0; i < level; i++) {
                 buffer.append "\t"
             }
             if (baseValue && (attribute?.isKey() || attribute?.isOptionalKey()) && (meta.isComplex() || meta.isSet())) {
@@ -72,13 +90,32 @@ class BaseToShortTool {
             this.childs = childs
         }
 
-        String toString(Integer level = 0, StringBuffer buffer) {
+        void headToString(Integer level = 0, StringBuffer buffer) {
+
+            if (super.doFilters()) return
+
             super.toString(level, buffer)
             buffer
                     .append(" ")
                     .append(dateFormat.format(baseEntity?.getReportDate()))
                     .append("\n")
+
+        }
+
+        void childsToString(Integer level = 0, StringBuffer buffer) {
+
+            if (super.doFilters()) return
+
             childs?.each { TObject child -> if (child) child.toString(level + 1, buffer) }
+
+        }
+
+        void toString(Integer level = 0, StringBuffer buffer) {
+
+            headToString(level, buffer)
+
+            childsToString(level, buffer)
+
         }
 
     }
@@ -100,13 +137,32 @@ class BaseToShortTool {
             this.childs = childs
         }
 
-        String toString(Integer level = 0, StringBuffer buffer) {
+        void headToString(Integer level = 0, StringBuffer buffer) {
+
+            if (super.doFilters()) return
+
             super.toString(level, buffer)
             buffer
                     .append(" ")
                     .append(dateFormat.format(baseValue?.getRepDate()))
                     .append("\n")
+
+        }
+
+        void childsToString(Integer level = 0, StringBuffer buffer) {
+
+            if (super.doFilters()) return
+
             childs?.each { TObject child -> if (child) child.toString(level + 1, buffer) }
+
+        }
+
+        void toString(Integer level = 0, StringBuffer buffer) {
+
+            headToString(level, buffer)
+
+            childsToString(level, buffer)
+
         }
 
     }
@@ -125,16 +181,35 @@ class BaseToShortTool {
             this.value = value
         }
 
-        String toString(Integer level = 0, StringBuffer buffer) {
+        void headToString(Integer level = 0, StringBuffer buffer) {
+
+            if (super.doFilters()) return
+
             super.toString(level, buffer)
             buffer
                     .append(" ")
                     .append(dateFormat.format(baseValue?.getRepDate()))
                     .append("\n")
-            (0..(level + 1)).each {
+
+        }
+
+        void childsToString(Integer level = 0, StringBuffer buffer) {
+
+            if (super.doFilters()) return
+
+            for (def i = 0; i < level + 1; i++) {
                 buffer.append "\t"
             }
             buffer.append(value).append("\n")
+
+        }
+
+        void toString(Integer level = 0, StringBuffer buffer) {
+
+            headToString(level, buffer)
+
+            childsToString(level, buffer)
+
         }
 
     }
@@ -217,9 +292,14 @@ class BaseToShortTool {
     }
 
     static synchronized String print(IBaseEntity baseEntity) {
+        Closure filter = { Map binding ->
+            return !(binding.meta?.isReference() && !(binding.attribute?.isKey() || binding.attribute?.isOptionalKey()))
+        }
+        BaseToShortTool tool = new BaseToShortTool()
+        tool.addFilter filter
         StringBuffer buffer = new StringBuffer("")
         try {
-            new BaseToShortTool().getBase(persistable: baseEntity).toString(buffer)
+            tool.getBase(persistable: baseEntity).toString(0, buffer)
         } catch (Exception e) {
             logger.error("", e)
         }
@@ -227,8 +307,13 @@ class BaseToShortTool {
     }
 
     static synchronized void print(StringBuffer buffer, IBaseEntity baseEntity) {
+        Closure filter = { Map binding ->
+            return !(binding.meta?.isReference() && !(binding.attribute?.isKey() || binding.attribute?.isOptionalKey()))
+        }
+        BaseToShortTool tool = new BaseToShortTool()
+        tool.addFilter filter
         try {
-            new BaseToShortTool().getBase(persistable: baseEntity).toString(buffer)
+            tool.getBase(persistable: baseEntity).toString(0, buffer)
         } catch (Exception e) {
             logger.error("", e)
         }

@@ -57,17 +57,29 @@ public class LoadFileTest {
         this.jdbcTemplate_SHOWCASE_E = new JdbcTemplate(dataSource_SHOWCASE_E);
     }
 
+    protected String preTag(String in) {
+        return in;
+    }
+
     protected void printRows(String title, List<Map<String, Object>> rows) {
 
         StringBuffer buffer = new StringBuffer(title);
-        for (Map<String, Object> row : rows) {
-            for (Map.Entry<String, Object> entry : row.entrySet()) {
-                buffer.append(entry.getKey()).append(" = <").append(entry.getValue()).append("> ");
+        buffer.append("<table><tr>");
+        if (rows.size() > 0)
+            for (Map.Entry<String, Object> entry : rows.get(0).entrySet()) {
+                buffer.append("<th>").append(entry.getKey()).append("</th>");
             }
-            buffer.append("\n");
+        buffer.append("</tr>");
+        for (Map<String, Object> row : rows) {
+            buffer.append("<tr>");
+            for (Map.Entry<String, Object> entry : row.entrySet()) {
+                buffer.append("<td>").append(entry.getValue()).append("</td>");
+            }
+            buffer.append("</tr>");
         }
+        buffer.append("</table>");
 
-        logger.info(buffer.toString());
+        logger.info(preTag(buffer.toString()));
 
     }
 
@@ -83,12 +95,12 @@ public class LoadFileTest {
 
         StringBuffer buffer = new StringBuffer("Creditor info:\n");
 
-        buffer.append("batch creditor ID: ").append(creditor.getId()).append("\n");
-        buffer.append("batch creditor BIN: ").append(creditor.getBIN()).append("\n");
-        buffer.append("batch creditor BIK: ").append(creditor.getBIK()).append("\n");
-        buffer.append("batch creditor Code: ").append(creditor.getCode()).append("\n");
+        buffer.append("batch creditor ID: ").append(creditor.getId()).append("<br>");
+        buffer.append("batch creditor BIN: ").append(creditor.getBIN()).append("<br>");
+        buffer.append("batch creditor BIK: ").append(creditor.getBIK()).append("<br>");
+        buffer.append("batch creditor Code: ").append(creditor.getCode()).append("<br>");
 
-        logger.info(buffer.toString());
+        logger.info(preTag(buffer.toString()));
 
     }
 
@@ -185,23 +197,23 @@ public class LoadFileTest {
             Long entityId = ((BigDecimal) row.get("ENTITY_ID")).longValue();
             if (ids.contains(entityId)) continue;
             ids.add(entityId);
+            buffer.append("<table><tr>");
             for (String reportDate : reportDates) {
-                buffer.append("\n");
+                buffer.append("<th>");
                 buffer.append("BATCH ID: ").append(batchId)
                         .append(" REPORT DATE: ").append(reportDate);
-                buffer.append("\n");
-                for (int i = 0; i < 64; i++) {
-                    buffer.append("=");
-                }
-                buffer.append("\n");
-                printEntity(buffer, entityId, reportDate);
-                for (int i = 0; i < 64; i++) {
-                    buffer.append("-");
-                }
+                buffer.append("</th>");
             }
+            buffer.append("</tr><tr>");
+            for (String reportDate : reportDates) {
+                buffer.append("<td align=\"left\" valign=\"top\"><pre>");
+                printEntity(buffer, entityId, reportDate);
+                buffer.append("</pre></td>");
+            }
+            buffer.append("</tr></table>");
         }
 
-        logger.info(buffer.toString());
+        logger.info(preTag(buffer.toString()));
 
     }
 
@@ -236,7 +248,6 @@ public class LoadFileTest {
                 break BLOCK;
             }
 
-
             DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
             Date date;
 
@@ -256,12 +267,10 @@ public class LoadFileTest {
         if (entity == null) {
             buffer.append("No such entity with id: ").append(id).append("\n");
         } else {
-            buffer.append(entity.toString().trim()).append("\n");
-            for (int i = 0; i < 64; i++) {
-                buffer.append("=");
-            }
-            BaseToShortTool.print(buffer, entity);
-            buffer.append("\n");
+            if (true)
+                BaseToShortTool.print(buffer, entity);
+            else
+                buffer.append(entity.toString().trim()).append("\n");
         }
 
     }
@@ -271,7 +280,7 @@ public class LoadFileTest {
 
         String zipPath = "/opt/projects/info/batches/in/";
 
-        String caseFraze = "-CASE-4";
+        String caseFraze = "-CASE-2";
 
         String[] reportDates = new String[]{
                 "01.07.2017",
