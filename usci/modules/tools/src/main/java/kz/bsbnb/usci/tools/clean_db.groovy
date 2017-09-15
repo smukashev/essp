@@ -1,3 +1,5 @@
+package kz.bsbnb.usci.tools
+
 import groovy.sql.Sql
 
 /**

@@ -187,6 +187,12 @@
         <property name="servicePort" value="59300"/>
     </bean>
 
+    <bean id="remoteEntityManagerHistoryService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="refreshStubOnConnectFailure" value="true"/>
+        <property name="serviceUrl" value="rmi://127.0.0.1:1091/baseEntityManagerHistoryService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.eav.manager.IBaseEntityManagerHistory"/>
+    </bean>
+
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>

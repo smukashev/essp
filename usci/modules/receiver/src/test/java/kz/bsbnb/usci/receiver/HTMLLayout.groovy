@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-package kz.bsbnb.usci.receiver;
+package kz.bsbnb.usci.receiver
 
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
-import org.apache.log4j.helpers.Transform;
-import org.apache.log4j.spi.LocationInfo;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.log4j.Layout
+import org.apache.log4j.Level
+import org.apache.log4j.helpers.Transform
+import org.apache.log4j.spi.LocationInfo
+import org.apache.log4j.spi.LoggingEvent
 
 /**
  * Created by emles on 12.09.17
  */
-public class HTMLLayout extends Layout {
+class HTMLLayout extends Layout {
 
     /**
      * A string constant used in naming the option for setting the the
@@ -39,14 +39,17 @@ public class HTMLLayout extends Layout {
      * This constant is not longer needed and will be removed in the
      * <em>near</em> term.
      */
-    public static final String LOCATION_INFO_OPTION = "LocationInfo";
+    static final String LOCATION_INFO_OPTION = "LocationInfo"
+
     /**
      * A string constant used in naming the option for setting the the
      * HTML document title.  Current value of this string
      * constant is <b>Title</b>.
      */
-    public static final String TITLE_OPTION = "Title";
-    static String TRACE_PREFIX = "<br>&nbsp;&nbsp;&nbsp;&nbsp;";
+    static final String TITLE_OPTION = "Title"
+
+    static String TRACE_PREFIX = "<br>&nbsp;&nbsp;&nbsp;&nbsp;"
+
     /**
      * This layout outputs events in a HTML table.
      * <p>
@@ -55,23 +58,29 @@ public class HTMLLayout extends Layout {
      * non ASCII characters could result in corrupted
      * log files.
      *
-     * @author Ceki G&uuml;lc&uuml;
+     * @author Ceki G&uuml;lc&uuml
      */
 
+    protected final int BUF_SIZE = 256
 
-    protected final int BUF_SIZE = 256;
-    protected final int MAX_CAPACITY = 1024;
+    protected final int MAX_CAPACITY = 1024
+
+    // Print no logger name by default
+    boolean escapedLogger = false
+
     // Print no location info by default
-    boolean locationInfo = false;
-    String title = "Log4J Log Messages";
+    boolean locationInfo = false
+
+    String title = "Log4J Log Messages"
+
     // output buffer appended to when format() is invoked
-    private StringBuffer sbuf = new StringBuffer(BUF_SIZE);
+    private StringBuffer sbuf = new StringBuffer(BUF_SIZE)
 
     /**
      * Returns the current value of the <b>LocationInfo</b> option.
      */
-    public boolean getLocationInfo() {
-        return locationInfo;
+    boolean getLocationInfo() {
+        return locationInfo
     }
 
     /**
@@ -85,15 +94,15 @@ public class HTMLLayout extends Layout {
      * org.apache.log4j.net.SMTPAppender} then make sure to set the
      * <b>LocationInfo</b> option of that appender as well.
      */
-    public void setLocationInfo(boolean flag) {
-        locationInfo = flag;
+    void setLocationInfo(boolean flag) {
+        locationInfo = flag
     }
 
     /**
      * Returns the current value of the <b>Title</b> option.
      */
-    public String getTitle() {
-        return title;
+    String getTitle() {
+        return title
     }
 
     /**
@@ -102,103 +111,105 @@ public class HTMLLayout extends Layout {
      * <p>
      * <p>Defaults to 'Log4J Log Messages'.
      */
-    public void setTitle(String title) {
-        this.title = title;
+    void setTitle(String title) {
+        this.title = title
     }
 
     /**
      * Returns the content type output by this layout, i.e "text/html".
      */
-    public String getContentType() {
-        return "text/html";
+    String getContentType() {
+        return "text/html"
     }
 
     /**
      * No options to activate.
      */
-    public void activateOptions() {
+    void activateOptions() {
     }
 
-    public String format(LoggingEvent event) {
+    String format(LoggingEvent event) {
 
         if (sbuf.capacity() > MAX_CAPACITY) {
-            sbuf = new StringBuffer(BUF_SIZE);
+            sbuf = new StringBuffer(BUF_SIZE)
         } else {
-            sbuf.setLength(0);
+            sbuf.setLength(0)
         }
 
-        sbuf.append(Layout.LINE_SEP + "<tr>" + Layout.LINE_SEP);
+        sbuf.append(Layout.LINE_SEP + "<tr>" + Layout.LINE_SEP)
 
-        sbuf.append("<td>");
-        sbuf.append(event.timeStamp - LoggingEvent.getStartTime());
-        sbuf.append("</td>" + Layout.LINE_SEP);
+        sbuf.append("<td>")
+        sbuf.append(event.timeStamp - LoggingEvent.getStartTime())
+        sbuf.append("</td>" + Layout.LINE_SEP)
 
-        String escapedThread = Transform.escapeTags(event.getThreadName());
-        sbuf.append("<td>");
-        sbuf.append(escapedThread);
-        sbuf.append("</td>" + Layout.LINE_SEP);
+        String escapedThread = Transform.escapeTags(event.getThreadName())
+        sbuf.append("<td>")
+        sbuf.append(escapedThread)
+        sbuf.append("</td>" + Layout.LINE_SEP)
 
-        sbuf.append("<td>");
+        sbuf.append("<td>")
         if (event.getLevel().equals(Level.DEBUG)) {
-            sbuf.append("<font color=\"#339933\">");
-            sbuf.append(Transform.escapeTags(String.valueOf(event.getLevel())));
-            sbuf.append("</font>");
+            sbuf.append("<font color=\"#339933\">")
+            sbuf.append(Transform.escapeTags(String.valueOf(event.getLevel())))
+            sbuf.append("</font>")
         } else if (event.getLevel().isGreaterOrEqual(Level.WARN)) {
-            sbuf.append("<font color=\"#993300\"><strong>");
-            sbuf.append(Transform.escapeTags(String.valueOf(event.getLevel())));
-            sbuf.append("</strong></font>");
+            sbuf.append("<font color=\"#993300\"><strong>")
+            sbuf.append(Transform.escapeTags(String.valueOf(event.getLevel())))
+            sbuf.append("</strong></font>")
         } else {
-            sbuf.append(Transform.escapeTags(String.valueOf(event.getLevel())));
+            sbuf.append(Transform.escapeTags(String.valueOf(event.getLevel())))
         }
-        sbuf.append("</td>" + Layout.LINE_SEP);
+        sbuf.append("</td>" + Layout.LINE_SEP)
 
-        String escapedLogger = Transform.escapeTags(event.getLoggerName());
-        sbuf.append("<td>");
-        sbuf.append(escapedLogger);
-        sbuf.append("</td>" + Layout.LINE_SEP);
+        if (escapedLogger) {
+            String escLogger = Transform.escapeTags(event.getLoggerName())
+            sbuf.append("<td>")
+            sbuf.append(escLogger)
+            sbuf.append("</td>" + Layout.LINE_SEP)
+        }
 
         if (locationInfo) {
-            LocationInfo locInfo = event.getLocationInformation();
-            sbuf.append("<td>");
-            sbuf.append(Transform.escapeTags(locInfo.getFileName()));
-            sbuf.append(':');
-            sbuf.append(locInfo.getLineNumber());
-            sbuf.append("</td>" + Layout.LINE_SEP);
+            LocationInfo locInfo = event.getLocationInformation()
+            sbuf.append("<td>")
+            sbuf.append(Transform.escapeTags(locInfo.getFileName()))
+            sbuf.append(':')
+            sbuf.append(locInfo.getLineNumber())
+            sbuf.append("</td>" + Layout.LINE_SEP)
         }
 
-        sbuf.append("<td title=\"Message\">");
-        //sbuf.append(Transform.escapeTags(event.getRenderedMessage()));
-        sbuf.append(event.getRenderedMessage());
-        sbuf.append("</td>" + Layout.LINE_SEP);
-        sbuf.append("</tr>" + Layout.LINE_SEP);
+        sbuf.append("<td title=\"Message\">")
+        //sbuf.append(Transform.escapeTags(event.getRenderedMessage()))
+        sbuf.append(event.getRenderedMessage())
+        sbuf.append("</td>" + Layout.LINE_SEP)
+        sbuf.append("</tr>" + Layout.LINE_SEP)
 
         if (event.getNDC() != null) {
-            sbuf.append("<tr><td bgcolor=\"#EEEEEE\" style=\"font-size : xx-small;\" colspan=\"6\" title=\"Nested Diagnostic Context\">");
-            sbuf.append("NDC: " + Transform.escapeTags(event.getNDC()));
-            sbuf.append("</td></tr>" + Layout.LINE_SEP);
+            sbuf.append("<tr><td bgcolor=\"#EEEEEE\" style=\"font-size : xx-small;\" colspan=\"6\" title=\"Nested Diagnostic Context\">")
+            sbuf.append("NDC: " + Transform.escapeTags(event.getNDC()))
+            sbuf.append("</td></tr>" + Layout.LINE_SEP)
         }
 
-        String[] s = event.getThrowableStrRep();
+        String[] s = event.getThrowableStrRep()
         if (s != null) {
-            sbuf.append("<tr><td bgcolor=\"#993300\" style=\"color:White; font-size : xx-small;\" colspan=\"6\">");
-            appendThrowableAsHTML(s, sbuf);
-            sbuf.append("</td></tr>" + Layout.LINE_SEP);
+            sbuf.append("<tr><td bgcolor=\"#993300\" style=\"color:White; font-size : xx-small;\" colspan=\"6\">")
+            appendThrowableAsHTML(s, sbuf)
+            sbuf.append("</td></tr>" + Layout.LINE_SEP)
         }
 
-        return sbuf.toString();
+        return sbuf.toString()
     }
 
     void appendThrowableAsHTML(String[] s, StringBuffer sbuf) {
         if (s != null) {
-            int len = s.length;
+            int len = s.length
             if (len == 0)
-                return;
-            sbuf.append(Transform.escapeTags(s[0]));
-            sbuf.append(Layout.LINE_SEP);
+                return
+            sbuf.append(Transform.escapeTags(s[0]))
+            sbuf.append(Layout.LINE_SEP)
             for (int i = 1; i < len; i++) {
-                sbuf.append(TRACE_PREFIX);
-                sbuf.append(Transform.escapeTags(s[i]));
-                sbuf.append(Layout.LINE_SEP);
+                sbuf.append(TRACE_PREFIX)
+                sbuf.append(Transform.escapeTags(s[i]))
+                sbuf.append(Layout.LINE_SEP)
             }
         }
     }
@@ -206,9 +217,8 @@ public class HTMLLayout extends Layout {
     /**
      * Returns appropriate HTML headers.
      */
-    public String getHeader() {
-        StringBuffer sbuf = new StringBuffer();
-        sbuf.append """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+    String getHeader() {
+        return """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta charset="UTF-8">
@@ -226,37 +236,25 @@ td { text-align: left; vertical-align: top; }
 Log session start time Tue Sep 12 10:26:07 ALMT 2017<br>
 <br>
 <table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">"""
-//        sbuf.append """<tr>
-//<th>Time</th>
-//<th>Thread</th>
-//<th>Level</th>
-//<th>Category</th>
-//<th>Message</th>"""
-//        if (locationInfo) {
-//            sbuf.append("<th>File:Line</th>" + Layout.LINE_SEP);
-//        }
-//        sbuf.append("<th>Message</th>" + Layout.LINE_SEP);
-//        sbuf.append("</tr>" + Layout.LINE_SEP);
-        return sbuf.toString();
     }
 
     /**
      * Returns the appropriate HTML footers.
      */
-    public String getFooter() {
-        StringBuffer sbuf = new StringBuffer();
-        sbuf.append("</table>" + Layout.LINE_SEP);
-        sbuf.append("<br>" + Layout.LINE_SEP);
-        sbuf.append("</body></html>");
-        return sbuf.toString();
+    String getFooter() {
+        StringBuffer sbuf = new StringBuffer()
+        sbuf.append("</table>" + Layout.LINE_SEP)
+        sbuf.append("<br>" + Layout.LINE_SEP)
+        sbuf.append("</body></html>")
+        return sbuf.toString()
     }
 
     /**
      * The HTML layout handles the throwable contained in logging
      * events. Hence, this method return <code>false</code>.
      */
-    public boolean ignoresThrowable() {
-        return false;
+    boolean ignoresThrowable() {
+        return false
     }
 
 }

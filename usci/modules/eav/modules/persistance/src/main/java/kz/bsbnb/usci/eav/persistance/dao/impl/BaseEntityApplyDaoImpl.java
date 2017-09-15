@@ -60,6 +60,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
 
+        baseEntityManager.addHistory("APPLY for " + baseEntitySaving.getId() + ": " + baseEntitySaving.getMeta().getClassName());
+
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
@@ -99,6 +101,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public IBaseEntity applyBaseEntityBasic(long creditorId, IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager) {
 
+        baseEntityManager.addHistory("APPLY BaseEntityBasic for " + baseEntitySaving.getId() + ": " + baseEntitySaving.getMeta().getClassName());
+
         IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
 
         if (foundProcessedBaseEntity != null)
@@ -132,6 +136,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
     @Override
     public void applyBaseValueBasic(long creditorId, IBaseEntity baseEntityApplied, IBaseValue baseValueSaving, IBaseEntityManager baseEntityManager) {
+
+        baseEntityManager.addHistory("APPLY BaseValueBasic for " + baseEntityApplied.getId() + ": " + baseValueSaving.getMetaAttribute().getName());
 
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntityApplied, baseValueSaving,
                 null, baseEntityManager, persistableDaoPool);
@@ -277,6 +283,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public IBaseEntity applyBaseEntityAdvanced(long creditorId, IBaseEntity baseEntitySaving,
                                                IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
 
+        baseEntityManager.addHistory("APPLY BaseEntityAdvanced for " + baseEntitySaving.getId() + ": " + baseEntitySaving.getMeta().getClassName());
+
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager, persistableDaoPool);
 
         CompareFactory IS = history.getCompareFactory();
@@ -365,6 +373,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public void applySimpleValue(final long creditorId, final IBaseEntity baseEntityApplied, final IBaseValue baseValueSaving,
                                  final IBaseValue baseValueLoaded, final IBaseEntityManager baseEntityManager) {
+
+        baseEntityManager.addHistory("APPLY SimpleValue for " + baseEntityApplied.getId() + ": " + baseValueSaving.getMetaAttribute().getName());
 
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntityApplied, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
@@ -517,6 +527,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public void applyComplexValue(final long creditorId, final IBaseEntity baseEntity,
                                   final IBaseValue baseValueSaving,
                                   final IBaseValue baseValueLoaded, final IBaseEntityManager baseEntityManager) {
+
+        baseEntityManager.addHistory("APPLY ComplexValue for " + baseValueSaving.getId() + ": " + baseValueSaving.getMetaAttribute().getName());
+
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
 
@@ -827,6 +840,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public void applySimpleSet(long creditorId, IBaseEntity baseEntity, IBaseValue baseValueSaving,
                                IBaseValue baseValueLoaded, IBaseEntityManager baseEntityManager) {
 
+        baseEntityManager.addHistory("APPLY SimpleSet for " + baseValueSaving.getId() + ": " + baseValueSaving.getMetaAttribute().getName());
+
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
 
@@ -1084,6 +1099,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public void applyComplexSet(final long creditorId, final IBaseEntity baseEntity,
                                 final IBaseValue baseValueSaving,
                                 final IBaseValue baseValueLoaded, final IBaseEntityManager baseEntityManager) {
+
+        baseEntityManager.addHistory("APPLY ComplexSet for " + baseValueSaving.getId() + ": " + baseValueSaving.getMetaAttribute().getName());
 
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
@@ -1428,6 +1445,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     @Transactional
     public void applyToDb(IBaseEntityManager baseEntityManager) {
+
+        baseEntityManager.addHistory("APPLY ToDb");
 
         final ApplyHistoryFactory history = new ApplyHistoryFactory();
 

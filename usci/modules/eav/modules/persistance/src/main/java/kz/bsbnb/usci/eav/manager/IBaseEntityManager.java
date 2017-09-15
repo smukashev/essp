@@ -11,6 +11,10 @@ public interface IBaseEntityManager {
 
     Map<Long, IBaseEntity> getOptimizerEntities();
 
+    List<String> getHistory();
+
+    void addHistory(String age);
+
     void registerAsInserted(IPersistable persistableObject);
 
     void registerAsUpdated(IPersistable persistableObject);

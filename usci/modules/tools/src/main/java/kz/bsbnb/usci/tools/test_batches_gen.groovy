@@ -1,3 +1,4 @@
+package kz.bsbnb.usci.tools
 /**
  * Created by emles on 07.09.17
  */
@@ -32,7 +33,7 @@ def getPledges = { List pledges ->
     buffer.toString()
 }
 
-getBatchXml = { reportDate, action, allPledges ->
+getBatchXml = { contractNo, contractDate, reportDate, action, allPledges ->
 
     """<?xml version="1.0" encoding="UTF-8"?>
 <batch>
@@ -51,8 +52,8 @@ getBatchXml = { reportDate, action, allPledges ->
     <packages>
         <package operation_type="${action}" no="1247">
             <primary_contract>
-                <no>test1</no>
-                <date>2017-03-18</date>
+                <no>test-7</no>
+                <date>2017-03-20</date>
             </primary_contract>
             <credit credit_type="12">
                 <currency>KZT</currency>
@@ -96,7 +97,7 @@ def zipBatch = { zipFileName, batchFileName, String batchXml ->
 
 def zipPath = "/opt/projects/info/batches/in/"
 
-def genBatch = { caseFraze, reportDate, action, pledgesList ->
+def genBatch = { contractNo, contractDate, caseFraze, reportDate, action, pledgesList ->
 
     def year = reportDate.split("-")[0]
     def month = reportDate.split("-")[1]
@@ -104,21 +105,22 @@ def genBatch = { caseFraze, reportDate, action, pledgesList ->
     def zipFileName = year + caseFraze + ".ZIP"
     def batchFileName = "cred_reg_file_${year}.${month}.xml"
 
-    def batchXml = getBatchXml(reportDate, action, pledgesList) as String
+    def batchXml = getBatchXml(contractNo, contractDate, reportDate, action, pledgesList) as String
 
     zipBatch(zipPath + zipFileName, batchFileName, batchXml)
 
 }
 
 
-
 def batchsInfo = [
 
         [
-                caseFraze  : "-CASE-1",
-                reportDate : "2017-07-01",
-                action     : "insert",
-                pledgesList: [
+                contractNo  : "test-8",
+                contractDate: "2017-03-20",
+                caseFraze   : "-CASE-1",
+                reportDate  : "2017-07-01",
+                action      : "insert",
+                pledgesList : [
                         [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
                         /*[pledgeType: 10, contractNo: "pledge-2", value: "333222"],
                         [pledgeType: 10, contractNo: "pledge-3", value: "222111"],*/
@@ -127,10 +129,12 @@ def batchsInfo = [
         ],
 
         [
-                caseFraze  : "-CASE-2",
-                reportDate : "2017-08-01",
-                action     : "update",
-                pledgesList: [
+                contractNo  : "test-7",
+                contractDate: "2017-03-20",
+                caseFraze   : "-CASE-2",
+                reportDate  : "2017-08-01",
+                action      : "update",
+                pledgesList : [
                         /*[pledgeType: 22, contractNo: "pledge-1", value: "444333"],*/
                         [pledgeType: 10, contractNo: "pledge-2", value: "333222"],
                         [pledgeType: 10, contractNo: "pledge-3", value: "222111"],
@@ -139,10 +143,12 @@ def batchsInfo = [
         ],
 
         [
-                caseFraze  : "-CASE-3",
-                reportDate : "2017-09-01",
-                action     : "update",
-                pledgesList: [
+                contractNo  : "test-7",
+                contractDate: "2017-03-20",
+                caseFraze   : "-CASE-3",
+                reportDate  : "2017-09-01",
+                action      : "update",
+                pledgesList : [
                         [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
                         /*[pledgeType: 10, contractNo: "pledge-2", value: "333222"],*/
                         [pledgeType: 10, contractNo: "pledge-3", value: "222111"],
@@ -151,10 +157,12 @@ def batchsInfo = [
         ],
 
         [
-                caseFraze  : "-CASE-4",
-                reportDate : "2017-10-01",
-                action     : "update",
-                pledgesList: [
+                contractNo  : "test-7",
+                contractDate: "2017-03-20",
+                caseFraze   : "-CASE-4",
+                reportDate  : "2017-10-01",
+                action      : "update",
+                pledgesList : [
                         [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
                         /*[pledgeType: 10, contractNo: "pledge-2", value: "333222"],*/
                         [pledgeType: 10, contractNo: "pledge-3", value: "222111"],
@@ -167,6 +175,8 @@ def batchsInfo = [
 
 batchsInfo.each { batchInfo ->
     genBatch(
+            batchInfo.contractNo,
+            batchInfo.contractDate,
             batchInfo.caseFraze,
             batchInfo.reportDate,
             batchInfo.action,

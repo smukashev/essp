@@ -1,13 +1,10 @@
 package kz.bsbnb.usci.eav.model.output
 
 import kz.bsbnb.usci.eav.model.base.IBaseEntity
+import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate
 import kz.bsbnb.usci.eav.model.base.IBaseSet
 import kz.bsbnb.usci.eav.model.base.IBaseValue
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute
-import kz.bsbnb.usci.eav.model.meta.IMetaClass
-import kz.bsbnb.usci.eav.model.meta.IMetaSet
-import kz.bsbnb.usci.eav.model.meta.IMetaType
-import kz.bsbnb.usci.eav.model.meta.IMetaValue
+import kz.bsbnb.usci.eav.model.meta.*
 import kz.bsbnb.usci.eav.model.persistable.IPersistable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,6 +23,29 @@ class BaseToShortTool {
 
     void addFilter(Closure closure) {
         filters.add(closure)
+    }
+
+    protected tab = "  "
+    protected nl = "\n"
+
+    class NodeInfo {
+        Boolean list = true
+        Integer level
+        String path
+        TObject node
+    }
+
+    def treeListsSearch = { int level = 0, String path = "", final List<NodeInfo> map ->
+        if (this_.doFilters()) return
+        def info = NodeInfo.newInstance(level: level, path: (path = "$path.$name<${persistable?.getId()}>"), node: this_)
+        map.add(info)
+        if (level >= 2) return
+        childs.each { TObject child ->
+            if (child instanceof TEntity || child instanceof TSet) {
+                info.list = false
+                child.treeListsSearch(level + 1, path, map)
+            }
+        }
     }
 
     class TObject {
@@ -64,12 +84,12 @@ class BaseToShortTool {
         void toString(Integer level = 0, StringBuffer buffer) {
 
             for (def i = 0; i < level; i++) {
-                buffer.append "\t"
+                buffer.append tab
             }
             if (baseValue && (attribute?.isKey() || attribute?.isOptionalKey()) && (meta.isComplex() || meta.isSet())) {
                 buffer.append "${attribute?.getName()} /ID ${baseValue.getId()}/ >> "
             }
-            buffer.append "$name /ID ${persistable ? persistable.getId() : ""} ${meta.isComplex() ? "COM" : "SIM"} ${meta.isSet() ? "SET" : "ATR"}/"
+            buffer.append "$name /ID ${persistable ? persistable?.getId() : ""} ${meta?.isComplex() ? "COM" : "SIM"} ${meta?.isSet() ? "SET" : "ATR"}${persistable instanceof IBaseEntityReportDate ? " TRepDate" : ""}/"
 
         }
 
@@ -83,11 +103,14 @@ class BaseToShortTool {
 
         List<TObject> childs
 
+        TEntity this_
+
         TEntity(String name, IBaseValue baseValue, IMetaAttribute attribute, IMetaClass metaClazz, IBaseEntity baseEntity, List<TObject> childs) {
             super(name, attribute, (IMetaType) metaClazz, (IPersistable) baseEntity, baseValue)
             this.metaClazz = metaClazz
             this.baseEntity = baseEntity
             this.childs = childs
+            this_ = this
         }
 
         void headToString(Integer level = 0, StringBuffer buffer) {
@@ -98,7 +121,7 @@ class BaseToShortTool {
             buffer
                     .append(" ")
                     .append(dateFormat.format(baseEntity?.getReportDate()))
-                    .append("\n")
+                    .append(nl)
 
         }
 
@@ -129,12 +152,15 @@ class BaseToShortTool {
 
         List<TObject> childs
 
+        TSet this_
+
         TSet(String name, IBaseValue baseValue, IMetaAttribute attribute, IMetaSet metaSet, IBaseSet baseSet, List<TObject> childs) {
             super(name, attribute, (IMetaType) metaSet, (IPersistable) baseSet, baseValue)
             this.attribute = attribute
             this.metaSet = metaSet
             this.baseSet = baseSet
             this.childs = childs
+            this_ = this
         }
 
         void headToString(Integer level = 0, StringBuffer buffer) {
@@ -144,8 +170,8 @@ class BaseToShortTool {
             super.toString(level, buffer)
             buffer
                     .append(" ")
-                    .append(dateFormat.format(baseValue?.getRepDate()))
-                    .append("\n")
+                    .append(baseValue ? dateFormat.format(baseValue.getRepDate()) : "")
+                    .append(nl)
 
         }
 
@@ -189,7 +215,7 @@ class BaseToShortTool {
             buffer
                     .append(" ")
                     .append(dateFormat.format(baseValue?.getRepDate()))
-                    .append("\n")
+                    .append(nl)
 
         }
 
@@ -198,9 +224,53 @@ class BaseToShortTool {
             if (super.doFilters()) return
 
             for (def i = 0; i < level + 1; i++) {
-                buffer.append "\t"
+                buffer.append tab
             }
-            buffer.append(value).append("\n")
+            buffer.append("[").append(value).append("]").append(nl)
+
+        }
+
+        void toString(Integer level = 0, StringBuffer buffer) {
+
+            headToString(level, buffer)
+
+            childsToString(level, buffer)
+
+        }
+
+    }
+
+    {
+        TEntity.metaClass.treeListsSearch = treeListsSearch
+        TSet.metaClass.treeListsSearch = treeListsSearch
+    }
+
+    class TReportDate extends TObject {
+
+        IBaseEntityReportDate reportDate
+        IBaseEntity baseEntity
+
+        TReportDate(String name, IBaseEntityReportDate reportDate, IBaseEntity baseEntity, IMetaType metaType) {
+            super(name, null, metaType, reportDate, null)
+            this.reportDate = reportDate
+            this.baseEntity = baseEntity
+        }
+
+        void headToString(Integer level = 0, StringBuffer buffer) {
+
+            if (super.doFilters()) return
+
+            super.toString(level, buffer)
+            buffer
+                    .append(" ")
+                    .append(dateFormat.format(reportDate?.getReportDate()))
+                    .append(nl)
+
+        }
+
+        void childsToString(Integer level = 0, StringBuffer buffer) {
+
+            if (super.doFilters()) return
 
         }
 
@@ -223,6 +293,7 @@ class BaseToShortTool {
         IPersistable persistable = params.persistable
         IMetaAttribute metaAttribute = params.metaAttribute
         IMetaType metaType = params.metaType
+        IBaseEntityReportDate reportDate = params.reportDate
 
         switch (persistable) {
 
@@ -238,9 +309,9 @@ class BaseToShortTool {
                             buffer: buffer,
                             name: attrName,
                             baseValue: null,
-                            persistable: baseEntity.getBaseValue(attrName),
-                            metaAttribute: baseEntity.getMetaAttribute(attrName),
-                            metaType: baseEntity.getMemberType(attrName)
+                            persistable: baseEntity?.getBaseValue(attrName),
+                            metaAttribute: baseEntity?.getMetaAttribute(attrName),
+                            metaType: baseEntity?.getMemberType(attrName)
                     )
                 }
 
@@ -266,12 +337,12 @@ class BaseToShortTool {
             case IBaseValue:
 
                 baseValue = (IBaseValue) persistable
-                if (!metaType) metaType = baseValue.getMetaAttribute().getMetaType()
+                if (!metaType) metaType = baseValue?.getMetaAttribute()?.getMetaType()
 
                 if (baseValue.getValue() instanceof IPersistable)
                     return getBase(
                             buffer: buffer,
-                            name: baseValue.getMetaAttribute()?.getName(),
+                            name: baseValue?.getMetaAttribute()?.getName(),
                             baseValue: baseValue,
                             persistable: (IPersistable) baseValue?.getValue(),
                             metaAttribute: baseValue?.getMetaAttribute(),
@@ -283,7 +354,20 @@ class BaseToShortTool {
 
                 break
 
+            case IBaseEntityReportDate:
+
+                reportDate = (IBaseEntityReportDate) persistable
+
+                return new TReportDate(reportDate?.baseEntity?.meta?.className, reportDate, reportDate?.baseEntity, reportDate?.baseEntity?.meta)
+
+                break
+
             default:
+
+                try {
+                    if (persistable) println "NO sach CLASS: <${persistable}> <${persistable?.class}> <${persistable?.class?.name}>"
+                } catch (e) {
+                }
 
                 break
 
@@ -306,14 +390,36 @@ class BaseToShortTool {
         return buffer.toString()
     }
 
-    static synchronized void print(StringBuffer buffer, IBaseEntity baseEntity) {
+    static synchronized void print(StringBuffer buffer, IPersistable persistable) {
         Closure filter = { Map binding ->
             return !(binding.meta?.isReference() && !(binding.attribute?.isKey() || binding.attribute?.isOptionalKey()))
         }
         BaseToShortTool tool = new BaseToShortTool()
         tool.addFilter filter
         try {
-            tool.getBase(persistable: baseEntity).toString(0, buffer)
+            tool.getBase(persistable: persistable).toString(0, buffer)
+        } catch (Exception e) {
+            logger.error("", e)
+        }
+    }
+
+    static synchronized void print(Map<String, String> map, IPersistable persistable) {
+        final List<NodeInfo> list = new ArrayList<>()
+        Closure filter = { Map binding ->
+            return !(binding.meta?.isReference() && !(binding.attribute?.isKey() || binding.attribute?.isOptionalKey()))
+        }
+        BaseToShortTool tool = new BaseToShortTool()
+        tool.addFilter filter
+        try {
+            tool.getBase(persistable: persistable).treeListsSearch(list)
+            list.each { NodeInfo info ->
+                StringBuffer buffer = new StringBuffer("")
+                if (info.list)
+                    info.node.toString(info.level, buffer)
+                else
+                    info.node.headToString(info.level, buffer)
+                map.put(info.path, buffer.toString())
+            }
         } catch (Exception e) {
             logger.error("", e)
         }

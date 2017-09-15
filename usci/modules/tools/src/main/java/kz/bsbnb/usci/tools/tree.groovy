@@ -1,4 +1,4 @@
-package eav
+package kz.bsbnb.usci.tools
 
 import groovy.sql.Sql
 import org.junit.Test

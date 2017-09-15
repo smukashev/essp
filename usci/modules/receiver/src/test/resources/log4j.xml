@@ -18,7 +18,7 @@
 
         <param name="file" value="logs/receiver/test-receiver.html"/>
 
-        <param name="append" value="true"/>
+        <param name="append" value="false"/>
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="ALL"/>
 

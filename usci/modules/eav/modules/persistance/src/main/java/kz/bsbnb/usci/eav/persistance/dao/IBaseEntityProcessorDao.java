@@ -25,4 +25,6 @@ public interface IBaseEntityProcessorDao {
     IBaseEntityLoadDao getBaseEntityLoadDao();
 
     void prepareClosedDates(IBaseEntity entity, long creditorId);
+
+    List<String> getHistory();
 }
