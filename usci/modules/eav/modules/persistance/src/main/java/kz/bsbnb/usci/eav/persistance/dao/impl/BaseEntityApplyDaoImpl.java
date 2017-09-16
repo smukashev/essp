@@ -15,7 +15,6 @@ import kz.bsbnb.usci.eav.model.meta.IMetaSet;
 import kz.bsbnb.usci.eav.model.meta.IMetaValue;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
-import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.*;
 import kz.bsbnb.usci.eav.persistance.dao.impl.apply.ApplyHistoryFactory;
 import kz.bsbnb.usci.eav.persistance.dao.impl.apply.ApplyHistoryFactory.EachAttributeBinding;
@@ -60,18 +59,21 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
 
-        baseEntityManager.addHistory("APPLY for " + baseEntitySaving.getId() + ": " + baseEntitySaving.getMeta().getClassName());
-
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
+
+        history.beginApply();
 
         block:
         {
 
             /* Новые сущности или сущности не имеющие ключевые атрибуты */
-            if (IS.NEW(baseEntitySaving) || IS.NOT_SEARCHABLE(baseEntitySaving))
-                return applyBaseEntityBasic(creditorId, baseEntitySaving, baseEntityManager);
+            if (IS.NEW(baseEntitySaving) || IS.NOT_SEARCHABLE(baseEntitySaving)) {
+                IBaseEntity baseEntity = applyBaseEntityBasic(creditorId, baseEntitySaving, baseEntityManager);
+                history.end();
+                return baseEntity;
+            }
 
             if (IS.NOT_EMPTY(baseEntityLoaded)) break block;
 
@@ -94,19 +96,25 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         }
 
-        return applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
+        IBaseEntity baseEntity = applyBaseEntityAdvanced(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager);
+        history.end();
+        return baseEntity;
 
     }
 
     @Override
     public IBaseEntity applyBaseEntityBasic(long creditorId, IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager) {
 
-        baseEntityManager.addHistory("APPLY BaseEntityBasic for " + baseEntitySaving.getId() + ": " + baseEntitySaving.getMeta().getClassName());
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntitySaving, null, baseEntityManager, persistableDaoPool);
+
+        history.beginApplyBaseEntityBasic();
 
         IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
 
-        if (foundProcessedBaseEntity != null)
+        if (foundProcessedBaseEntity != null) {
+            history.end();
             return foundProcessedBaseEntity;
+        }
 
         IBaseEntity baseEntityApplied = new BaseEntity(baseEntitySaving.getMeta(), baseEntitySaving.getReportDate(), creditorId);
         if (baseEntitySaving.getAddInfo() != null)
@@ -130,6 +138,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         baseEntityManager.registerAsInserted(baseEntityReportDate);
         baseEntityManager.registerProcessedBaseEntity(baseEntityApplied);
 
+        history.end();
         return baseEntityApplied;
 
     }
@@ -137,12 +146,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public void applyBaseValueBasic(long creditorId, IBaseEntity baseEntityApplied, IBaseValue baseValueSaving, IBaseEntityManager baseEntityManager) {
 
-        baseEntityManager.addHistory("APPLY BaseValueBasic for " + baseEntityApplied.getId() + ": " + baseValueSaving.getMetaAttribute().getName());
-
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntityApplied, baseValueSaving,
                 null, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
+
+        history.beginApplyBaseValueBasic();
 
         if (IS.META_ATTRIBUTE_EMPTY())
             throw history.Error60();
@@ -277,22 +286,27 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 history.applied(baseValueSaving).id(0L).closed(false).last(true).parent(false).inserted().execute();
             }
         }
+
+        history.end();
+
     }
 
     @Override
     public IBaseEntity applyBaseEntityAdvanced(long creditorId, IBaseEntity baseEntitySaving,
                                                IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
 
-        baseEntityManager.addHistory("APPLY BaseEntityAdvanced for " + baseEntitySaving.getId() + ": " + baseEntitySaving.getMeta().getClassName());
-
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager, persistableDaoPool);
 
         CompareFactory IS = history.getCompareFactory();
 
+        history.beginApplyBaseEntityAdvanced();
+
         IBaseEntity foundProcessedBaseEntity = baseEntityManager.getProcessed(baseEntitySaving);
 
-        if (IS.NOT_EMPTY(foundProcessedBaseEntity))
+        if (IS.NOT_EMPTY(foundProcessedBaseEntity)) {
+            history.end();
             return foundProcessedBaseEntity;
+        }
 
         IMetaClass metaClass = baseEntitySaving.getMeta();
 
@@ -366,6 +380,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         baseEntityManager.registerProcessedBaseEntity(baseEntityApplied);
 
+        history.end();
         return baseEntityApplied;
 
     }
@@ -374,12 +389,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public void applySimpleValue(final long creditorId, final IBaseEntity baseEntityApplied, final IBaseValue baseValueSaving,
                                  final IBaseValue baseValueLoaded, final IBaseEntityManager baseEntityManager) {
 
-        baseEntityManager.addHistory("APPLY SimpleValue for " + baseEntityApplied.getId() + ": " + baseValueSaving.getMetaAttribute().getName());
-
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntityApplied, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
+
+        history.beginApplySimpleValue();
 
         if (IS.NOT_EMPTY(baseValueLoaded)) {
             if (IS.VALUE_EMPTY(baseValueSaving)) {
@@ -427,6 +442,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         // throw history.Error75();
                         break;
                 }
+                history.end();
                 return;
             }
 
@@ -475,6 +491,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         } else {
             if (IS.VALUE_EMPTY(baseValueSaving)) {
+                history.end();
                 return;
                 // throw history.ErrorUO();
             }
@@ -521,6 +538,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 }
             }
         }
+        history.end();
     }
 
     @Override
@@ -528,12 +546,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                   final IBaseValue baseValueSaving,
                                   final IBaseValue baseValueLoaded, final IBaseEntityManager baseEntityManager) {
 
-        baseEntityManager.addHistory("APPLY ComplexValue for " + baseValueSaving.getId() + ": " + baseValueSaving.getMetaAttribute().getName());
-
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
+
+        history.beginApplyComplexValue();
 
         IGetFunction getEntityApplied = new IGetFunction() {
             @Override
@@ -601,6 +619,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 history.next().parent(true).deleted().execute();
                             }
 
+                            history.end();
                             return;
                         } else {
 
@@ -666,6 +685,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         // throw history.ErrorUO();
                 }
 
+                history.end();
                 return;
             }
 
@@ -731,6 +751,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
         } else {
             IBaseEntity baseEntitySaving = history.childEntityFrom(baseValueSaving);
             if (IS.EMPTY(baseEntitySaving)) {
+                history.end();
                 return;
                 // throw history.ErrorUO();
             }
@@ -834,18 +855,19 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 }
             }
         }
+        history.end();
     }
 
     @Override
     public void applySimpleSet(long creditorId, IBaseEntity baseEntity, IBaseValue baseValueSaving,
                                IBaseValue baseValueLoaded, IBaseEntityManager baseEntityManager) {
 
-        baseEntityManager.addHistory("APPLY SimpleSet for " + baseValueSaving.getId() + ": " + baseValueSaving.getMetaAttribute().getName());
-
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
+
+        history.beginApplySimpleSet();
 
         IBaseSet childBaseSetSaving = history.childFrom(baseValueSaving);
         IBaseSet childBaseSetLoaded = null;
@@ -922,6 +944,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         } else {
             if (IS.EMPTY(childBaseSetSaving)) {
+                history.end();
                 return;
                 // throw history.ErrorUO();
             }
@@ -1093,6 +1116,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
             history.noWith();
         }
+        history.end();
     }
 
     @Override
@@ -1100,12 +1124,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 final IBaseValue baseValueSaving,
                                 final IBaseValue baseValueLoaded, final IBaseEntityManager baseEntityManager) {
 
-        baseEntityManager.addHistory("APPLY ComplexSet for " + baseValueSaving.getId() + ": " + baseValueSaving.getMetaAttribute().getName());
-
         final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
+
+        history.beginApplyComplexSet();
 
         IBaseSet childBaseSetSaving = history.childFrom(baseValueSaving);
         IBaseSet childBaseSetLoaded = null;
@@ -1214,6 +1238,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             }
         } else {
             if (IS.EMPTY(childBaseSetSaving)) {
+                history.end();
                 return;
                 // throw history.ErrorUO();
             }
@@ -1440,15 +1465,18 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 if (IS.NOT_EMPTY(childBaseSetApplied)) childBaseSetApplied.put(childBaseValueLoaded);
             }
         }
+
+        history.end();
+
     }
 
     @Override
     @Transactional
     public void applyToDb(IBaseEntityManager baseEntityManager) {
 
-        baseEntityManager.addHistory("APPLY ToDb");
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(baseEntityManager);
 
-        final ApplyHistoryFactory history = new ApplyHistoryFactory();
+        history.beginApplyToDb();
 
         long applyToDbTime = System.currentTimeMillis();
 
@@ -1541,11 +1569,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
             eavOptimizerDao.update(eod);
         }
         sqlStats.put("java::applyToDb", (System.currentTimeMillis() - applyToDbTime));
-    }
 
-    private Object returnCastedValue(IMetaValue metaValue, IBaseValue baseValue) {
-        return metaValue.getTypeCode() == DataTypes.DATE ?
-                new Date(((Date) baseValue.getValue()).getTime()) : baseValue.getValue();
+        history.end();
+
     }
 
 }

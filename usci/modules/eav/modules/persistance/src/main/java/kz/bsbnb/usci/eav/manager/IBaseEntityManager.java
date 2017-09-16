@@ -11,6 +11,12 @@ public interface IBaseEntityManager {
 
     Map<Long, IBaseEntity> getOptimizerEntities();
 
+    void increment();
+
+    void decrement();
+
+    int level();
+
     List<String> getHistory();
 
     void addHistory(String age);

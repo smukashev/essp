@@ -57,15 +57,20 @@ public class BaseEntityManager implements IBaseEntityManager {
 
     private IEAVLoggerDao deleteLogger;
     private List<String> history = new ArrayList<>();
+    private int level = 0;
 
     private void history(String operation, IPersistable persistable) {
         if (persistable == null) return;
+        String tabs = "";
+        for (int i = 0; i <= level; i++) tabs += "|\t";
         StringBuffer buffer = new StringBuffer(operation.toUpperCase() + ": ");
         if (false)
             BaseToShortTool.print(buffer, persistable);
         else
             buffer.append(persistable.toString());
-        history.add(buffer.toString());
+        String output = tabs + buffer.toString();
+        output = output.replaceAll("\n", "\n" + tabs);
+        history.add(output);
     }
 
     private void registerEntity(Map<Class, List<IPersistable>> objects, IPersistable persistable) {
@@ -151,6 +156,21 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public Map<Long, IBaseEntity> getOptimizerEntities() {
         return optimizerEntities;
+    }
+
+    @Override
+    public void increment() {
+        level++;
+    }
+
+    @Override
+    public void decrement() {
+        level--;
+    }
+
+    @Override
+    public int level() {
+        return level;
     }
 
     @Override

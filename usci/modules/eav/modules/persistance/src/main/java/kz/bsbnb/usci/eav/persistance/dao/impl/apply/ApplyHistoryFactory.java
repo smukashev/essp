@@ -15,17 +15,12 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.util.Errors;
-import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by emles on 22.08.17
  */
-@Repository
 public class ApplyHistoryFactory {
 
     public IMetaAttribute metaAttribute;
@@ -70,9 +65,10 @@ public class ApplyHistoryFactory {
 
     private Set<UUID> processedValue = new HashSet<>();
     private Set<Long> processedEntity = new HashSet<>();
+    private Map<Integer, EventsChainInfo> chain = new TreeMap<>();
 
-
-    public ApplyHistoryFactory() {
+    public ApplyHistoryFactory(IBaseEntityManager baseEntityManager) {
+        this.baseEntityManager = baseEntityManager;
     }
 
     public ApplyHistoryFactory(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager, IPersistableDaoPool persistableDaoPool) {
@@ -440,6 +436,65 @@ public class ApplyHistoryFactory {
         else return null;
     }
 
+    private void addSimpleHistory(String method) {
+        baseEntityManager.increment();
+        chain.put(baseEntityManager.level(), new EventsChainInfo(baseEntityManager.level(), method, null, null, null));
+        baseEntityManager.addHistory(chain.get(baseEntityManager.level()).getBegin());
+    }
+
+    private void addValueHistory(String method) {
+        baseEntityManager.increment();
+        chain.put(baseEntityManager.level(), new EventsChainInfo(baseEntityManager.level(), method, baseValueSaving.getId(), baseValueSaving.getMetaAttribute().getName(), baseValueSaving.getMetaAttribute().getHistoryType()));
+        baseEntityManager.addHistory(chain.get(baseEntityManager.level()).getBegin());
+    }
+
+    private void addEntityHistory(String method) {
+        baseEntityManager.increment();
+        chain.put(baseEntityManager.level(), new EventsChainInfo(baseEntityManager.level(), method, baseEntitySaving.getId(), baseEntitySaving.getMeta().getClassName()));
+        baseEntityManager.addHistory(chain.get(baseEntityManager.level()).getBegin());
+    }
+
+    public void beginApply() {
+        addEntityHistory("Apply");
+    }
+
+    public void beginApplyBaseEntityBasic() {
+        addEntityHistory("Apply BaseEntity Basic");
+    }
+
+    public void beginApplyBaseValueBasic() {
+        addValueHistory("Apply BaseValue Basic");
+    }
+
+    public void beginApplyBaseEntityAdvanced() {
+        addEntityHistory("Apply BaseEntity Advanced");
+    }
+
+    public void beginApplySimpleValue() {
+        addValueHistory("Apply SimpleValue");
+    }
+
+    public void beginApplyComplexValue() {
+        addValueHistory("Apply ComplexValue");
+    }
+
+    public void beginApplySimpleSet() {
+        addValueHistory("Apply SimpleSet");
+    }
+
+    public void beginApplyComplexSet() {
+        addValueHistory("Apply ComplexSet");
+    }
+
+    public void beginApplyToDb() {
+        addSimpleHistory("Apply To Db");
+    }
+
+    public void end() {
+        baseEntityManager.addHistory(chain.get(baseEntityManager.level()).getEnd());
+        baseEntityManager.decrement();
+    }
+
     public RuntimeException ErrorIE(IBaseEntity baseEntity) {
         return new ImmutableElementException(baseEntity);
     }
@@ -559,6 +614,40 @@ public class ApplyHistoryFactory {
 
     public interface IGetFunction {
         IBaseEntity execute(IGetFunctionBinding binding, ApplyHistoryFactory history, CompareFactory IS);
+    }
+
+    class EventsChainInfo {
+
+        Integer level;
+        String method;
+        Long id;
+        String name;
+        HistoryType historyType;
+
+        EventsChainInfo(Integer level, String method, Long id, String name) {
+            this.level = level;
+            this.method = method;
+            this.id = id;
+            this.name = name;
+        }
+
+        EventsChainInfo(Integer level, String method, Long id, String name, HistoryType historyType) {
+            this(level, method, id, name);
+            this.historyType = historyType;
+        }
+
+        String getBegin() {
+            String tabs = "";
+            for (int i = 0; i < level; i++) tabs += "|\t";
+            return tabs + "BEGIN [" + method + "]" + (id == null ? "" : " FOR /" + name + ": " + Long.toString(id) + "/ " + (historyType == null ? "" : historyType.toString()));
+        }
+
+        String getEnd() {
+            String tabs = "";
+            for (int i = 0; i < level; i++) tabs += "|\t";
+            return tabs + "END [" + method + "]";
+        }
+
     }
 
     public class EachAttributeBinding {
