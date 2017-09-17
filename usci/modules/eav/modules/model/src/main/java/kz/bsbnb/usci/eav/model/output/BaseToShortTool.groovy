@@ -120,8 +120,18 @@ class BaseToShortTool {
             super.toString(level, buffer)
             buffer
                     .append(" ")
-                    .append(dateFormat.format(baseEntity?.getReportDate()))
-                    .append(nl)
+                    .append(dateFormat.format(baseEntity?.reportDate))
+                    .append(" RD ")
+            buffer.append(dateFormat.format(baseEntity?.baseEntityReportDate?.reportDate))
+                    .append(" ")
+            buffer.append(baseEntity?.baseEntityReportDate?.closed)
+            if (false) {
+                buffer.append(" BV ")
+                if (baseValue != null && baseValue.repDate != null) buffer.append(dateFormat.format(baseValue?.repDate))
+                        .append(" ")
+                buffer.append(baseValue?.closed)
+            }
+            buffer.append(nl)
 
         }
 
@@ -170,7 +180,7 @@ class BaseToShortTool {
             super.toString(level, buffer)
             buffer
                     .append(" ")
-                    .append(baseValue ? dateFormat.format(baseValue.getRepDate()) : "")
+                    .append(baseValue ? dateFormat.format(baseValue.repDate) : "")
                     .append(nl)
 
         }
@@ -214,7 +224,7 @@ class BaseToShortTool {
             super.toString(level, buffer)
             buffer
                     .append(" ")
-                    .append(dateFormat.format(baseValue?.getRepDate()))
+                    .append(dateFormat.format(baseValue?.repDate))
                     .append(nl)
 
         }

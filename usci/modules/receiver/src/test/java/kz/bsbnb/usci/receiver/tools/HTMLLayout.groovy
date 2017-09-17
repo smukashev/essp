@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package kz.bsbnb.usci.receiver
+package kz.bsbnb.usci.receiver.tools
 
 import org.apache.log4j.Layout
 import org.apache.log4j.Level

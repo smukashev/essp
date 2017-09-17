@@ -22,11 +22,15 @@
         <param name="encoding" value="UTF-8"/>
         <param name="threshold" value="ALL"/>
 
-        <layout class="kz.bsbnb.usci.receiver.HTMLLayout"/>
+        <layout class="kz.bsbnb.usci.receiver.tools.HTMLLayout"/>
 
     </appender>
 
     <logger name="kz.bsbnb.usci.receiver.LoadFileTest">
+        <level value="DEBUG"/>
+    </logger>
+
+    <logger name="kz.bsbnb.usci.receiver.tools.PrintUtils">
         <level value="DEBUG"/>
     </logger>
 

@@ -16,6 +16,7 @@ import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.util.Errors;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -23,6 +24,7 @@ import java.util.*;
  */
 public class ApplyHistoryFactory {
 
+    private final SimpleDateFormat REP_DATES_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
     public IMetaAttribute metaAttribute;
     public IMetaType metaType;
     public IMetaValue metaValue;
@@ -42,27 +44,17 @@ public class ApplyHistoryFactory {
     protected IMetaValue childMetaValue;
     protected IMetaClass childMetaClass;
     protected IBaseValueDao valueDao;
-
     protected CompareFactory compareFactory;
-
     private HistoricalBaseValueDSLFactory lastBase = null;
-
     private InitializingBaseValueDSLFactory lastApplied = null;
-
     private HistoricalBaseValueDSLFactory lastExisting = null;
-
     private HistoricalBaseValueDSLFactory lastClosed = null;
-
     private HistoricalBaseValueDSLFactory lastPrevious = null;
-
     private HistoricalBaseValueDSLFactory lastNext = null;
-
     private HistoricalBaseValueDSLFactory lastLast = null;
-
     private Boolean with = false;
     private IBaseValue withPersistable = null;
     private Class withPersistableDaoClass = null;
-
     private Set<UUID> processedValue = new HashSet<>();
     private Set<Long> processedEntity = new HashSet<>();
     private Map<Integer, EventsChainInfo> chain = new TreeMap<>();
@@ -493,6 +485,42 @@ public class ApplyHistoryFactory {
     public void end() {
         baseEntityManager.addHistory(chain.get(baseEntityManager.level()).getEnd());
         baseEntityManager.decrement();
+    }
+
+    public void event(String message) {
+        String tabs = "";
+        for (int i = 0; i <= baseEntityManager.level(); i++) tabs += "|\t";
+        baseEntityManager.addHistory(tabs + "EVENT [" + message + "]");
+    }
+
+    public void persistable(String name, IPersistable persistable) {
+        String tabs = "";
+        for (int i = 0; i <= baseEntityManager.level(); i++) tabs += "|\t";
+        String sPersistable = persistable.toString().replaceAll("\n", "\n" + tabs);
+        baseEntityManager.addHistory(tabs + "PERSISTABLE " + name + ": " + sPersistable);
+    }
+
+    private String date_info(IPersistable persistable) {
+        String sPersistable = Long.toString(persistable.getId()) + " ";
+        if (persistable instanceof IBaseEntity) {
+            IBaseEntity entity = (IBaseEntity) persistable;
+            if (entity.getMeta() != null) sPersistable += entity.getMeta().getClassName() + " ";
+            sPersistable += REP_DATES_DATE_FORMAT.format(entity.getReportDate());
+        } else if (persistable instanceof IBaseSet) {
+        } else if (persistable instanceof IBaseValue) {
+            IBaseValue value = (IBaseValue) persistable;
+            if (value.getMetaAttribute() != null) sPersistable += value.getMetaAttribute().getName() + " ";
+            sPersistable += REP_DATES_DATE_FORMAT.format((value).getRepDate());
+        }
+        return sPersistable;
+    }
+
+    public void rep_dates(String firstName, IPersistable first, String secondName, IPersistable second) {
+        String tabs = "";
+        for (int i = 0; i <= baseEntityManager.level(); i++) tabs += "|\t";
+        String sFirst = firstName + " " + date_info(first);
+        String sSecond = secondName + " " + date_info(second);
+        baseEntityManager.addHistory(tabs + "COMPARE DATES [" + sFirst + "] <> [" + sSecond + "]");
     }
 
     public RuntimeException ErrorIE(IBaseEntity baseEntity) {

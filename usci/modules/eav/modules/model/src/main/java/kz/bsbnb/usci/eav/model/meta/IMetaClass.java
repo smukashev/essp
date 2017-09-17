@@ -18,4 +18,8 @@ public interface IMetaClass extends IMetaContainer {
     Set<String> getAttributeNames();
 
     boolean hasAttribute(String name);
+
+    HistoryType getHistoryType();
+
+    void setHistoryType(HistoryType historyType);
 }

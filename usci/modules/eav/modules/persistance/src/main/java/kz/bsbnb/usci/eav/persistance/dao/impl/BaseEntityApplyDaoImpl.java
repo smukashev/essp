@@ -1219,17 +1219,22 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 // case#4
             } else {
+                history.rep_dates("baseValueSaving", baseValueSaving, "baseValueLoaded", baseValueLoaded);
                 DATE compare = IS.COMPARE_DATE(baseValueSaving, baseValueLoaded);
 
-                if (IS.NOT_EQUAL(compare) && IS.FINAL())
+                if (IS.NOT_EQUAL(compare) && IS.FINAL()) {
+                    history.event("RepDate of baseValueSaving EQUAL to baseValueLoaded");
                     throw history.Error67();
+                }
 
                 if (IS.EQUAL_MORE(compare)) {
+                    history.event("RepDate of baseValueSaving MORE when baseValueLoaded");
                     childBaseSetApplied = history.childNew(childBaseSetLoaded);
 
                     history.applied(baseValueLoaded).creditorIdFrom(baseValueLoaded).value(childBaseSetApplied).execute();
                 }
                 if (IS.LESS(compare)) {
+                    history.event("RepDate of baseValueSaving LESS when baseValueLoaded");
                     childBaseSetApplied = history.childNew(childBaseSetLoaded);
 
                     history.applied(baseValueLoaded).creditorIdFrom(baseValueLoaded).dateFrom(baseValueSaving).value(childBaseSetApplied).updated().execute();
@@ -1307,7 +1312,12 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                             IBaseEntity childBaseEntityLoaded = history.childEntityFrom(childBaseValueLoaded);
 
+                            history.event("Befor compare childBaseValueSaving to childBaseValueLoaded");
+                            history.persistable("childBaseValueSaving", childBaseValueSaving);
+                            history.persistable("childBaseValueLoaded", childBaseValueLoaded);
+
                             if (IS.EQUALS(childBaseValueSaving, childBaseValueLoaded) || IS.ID_EQUALS(childBaseEntitySaving, childBaseEntityLoaded)) {
+                                history.event("childBaseValueSaving EQUALS to childBaseValueLoaded");
                                 history.processed(childBaseValueLoaded);
                                 baseValueFound = true;
 
@@ -1319,7 +1329,9 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                                 history.applied(childBaseValueLoaded).containerType(MetaContainerTypes.META_SET).child(true).creditorIdFrom(childBaseValueLoaded).value(baseEntityApplied).attribute(childBaseSetApplied).parent(false);
 
+                                history.rep_dates("childBaseValueSaving", childBaseValueSaving, "childBaseValueLoaded", childBaseValueLoaded);
                                 if (IS.COMPARE_DATE(childBaseValueSaving, childBaseValueLoaded) == DATE_LESS) {
+                                    history.event("RepDate of childBaseValueSaving LESS to childBaseValueLoaded");
                                     history.applied().dateFrom(childBaseValueSaving).parent(false).updated().execute();
                                 }
 
@@ -1397,12 +1409,17 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
                 IBaseEntity childBaseEntityLoaded = history.childEntityFrom(childBaseValueLoaded);
 
+                history.rep_dates("baseValueSaving", baseValueSaving, "childBaseValueLoaded", childBaseValueLoaded);
                 switch (IS.COMPARE_DATE(baseValueSaving, childBaseValueLoaded)) {
 
                     case DATE_LESS:
+                        history.event("RepDate of baseValueSaving LESS when childBaseValueLoaded");
+                        history.persistable("childBaseValueLoaded", childBaseValueLoaded);
                         continue;
 
                     case DATE_EQUAL:
+                        history.event("RepDate of baseValueSaving EQUAL to childBaseValueLoaded");
+                        history.persistable("childBaseValueLoaded", childBaseValueLoaded);
                         history.base(childBaseValueLoaded).deleted().execute();
 
                         if (IS.NOT_EMPTY(childBaseEntityLoaded) && IS.CHILD_NOT_SEARCHABLE())
@@ -1426,6 +1443,8 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                         }
                         break;
                     case DATE_MORE:
+                        history.event("RepDate of baseValueSaving MORE when childBaseValueLoaded");
+                        history.persistable("childBaseValueLoaded", childBaseValueLoaded);
                         IBaseValue childBaseValueNext = history.next(childBaseValueLoaded).result();
 
                         if (IS.EMPTY(childBaseValueNext) || IS.NOT_CLOSED(childBaseValueNext)) {
