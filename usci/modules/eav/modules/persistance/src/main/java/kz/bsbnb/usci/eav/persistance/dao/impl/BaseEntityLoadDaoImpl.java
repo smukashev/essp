@@ -28,7 +28,6 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
         if (maxReportDate == null)
             throw new RuntimeException(Errors.compose(Errors.E103, id, DataTypes.formatDate(savingReportDate)));
 
-        // return load(id, maxReportDate, savingReportDate);
         return load(id, maxReportDate, maxReportDate);
     }
 

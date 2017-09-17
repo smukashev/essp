@@ -166,10 +166,6 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
         baseValueCounts.put(BaseEntitySimpleSet.class, baseEntityReportDate.getSimpleSetsCount());
         baseValueCounts.put(BaseEntityComplexSet.class, baseEntityReportDate.getComplexSetsCount());
 
-        System.out.println("/BaseEntityDaoImpl/ baseEntity: " + baseEntity.getMeta().getClassName() +
-                " existingReportDate: " + (existingReportDate == null ? "null" : simpleDateFormat.format(existingReportDate)) +
-                " savingReportDate: " + (savingReportDate == null ? "null" : simpleDateFormat.format(savingReportDate)));
-
         for (Class<? extends IBaseValue> baseValueClass : baseValueCounts.keySet()) {
             //long baseValuesCount = baseValueCounts.get(baseValueClass);
             //if (baseValuesCount > 0) {

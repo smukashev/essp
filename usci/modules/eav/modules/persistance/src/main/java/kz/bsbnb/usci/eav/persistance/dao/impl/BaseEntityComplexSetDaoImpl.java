@@ -426,15 +426,10 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
-        System.out.println("/BaseEntityComplexSetDaoImpl/ HistoryType: " + baseEntity.getMeta().getHistoryType());
-
         for (Map<String, Object> row : rows) {
             String attribute = (String) row.get(EAV_M_COMPLEX_SET.NAME.getName());
             IMetaAttribute metaAttribute = baseEntity.getMetaAttribute(attribute);
             Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName()));
-            System.out.println("/BaseEntityComplexSetDaoImpl/ Loading entity for complex set. attribute: " + attribute +
-                    ", loadingDate: " + (loadingDate == null ? "null" : simpleDateFormat.format(loadingDate)) +
-                    ", reportDate: " + (reportDate == null ? "null" : simpleDateFormat.format(reportDate)));
             baseEntity.put(attribute, constructValue(row, baseEntity.getMeta(), baseEntity.getMemberType(attribute), metaAttribute, loadingDate));
         }
     }
@@ -452,9 +447,6 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
 
     private IBaseValue constructValue(final Map<String, Object> row, final IMetaClass metaClass, final IMetaType metaType, final IMetaAttribute metaAttribute, final Date loadingDate) {
         IMetaSet metaSet = (IMetaSet) metaType;
-
-        System.out.println("/BaseEntityComplexSetDaoImpl.constructValue/ HistoryType: " + metaClass.getHistoryType());
-        System.out.println("/BaseEntityComplexSetDaoImpl.constructValue/ HistoryType: " + metaAttribute.getHistoryType());
 
         long id = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();
 

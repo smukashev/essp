@@ -413,18 +413,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Date repDate = baseEntity.getBaseEntityReportDate().getReportDate();
 
-            System.out.println("/BaseSetComplexValueDaoImpl/ Loading entity for set. entityValueId: " + entityValueId +
-                    ", existingReportDate: " + (existingReportDate == null ? "null" : simpleDateFormat.format(existingReportDate)) +
-                    ", savingReportDate: " + (savingReportDate == null ? "null" : simpleDateFormat.format(savingReportDate)) +
-                    ", loadingDate: " + (loadingDate == null ? "null" : simpleDateFormat.format(loadingDate)) +
-                    ", reportDate: " + (reportDate == null ? "null" : simpleDateFormat.format(reportDate)) +
-                    ", repDate: " + (repDate == null ? "null" : simpleDateFormat.format(repDate))
-            );
-
-            System.out.println("/BaseSetComplexValueDaoImpl/ ClassName: " + baseEntity.getMeta().getClassName() +
-                    " HistoryType: " + baseEntity.getMeta().getHistoryType()
-            );
-
             if (true && baseEntity.getMeta().getHistoryType().equals(HistoryType.ADVANCED) && !repDate.equals(loadingDate))
                 continue;
 
