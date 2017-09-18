@@ -78,7 +78,7 @@ class LoadFileTest {
 
         baseEntityManagerHistoryRmiServiceExporter = (IBaseEntityManagerHistory) rmiProxyFactoryBean.getObject()
 
-        ["-CASE-1", "-CASE-2", "-CASE-3", "-CASE-4"].each { String caseFraze ->
+        ["-CASE-1", "-CASE-2", "-CASE-3", "-CASE-4", "-CASE-5", "-CASE-6", "-CASE-7"].each { String caseFraze ->
 
             String[] reportDates = [
                     "01.07.2017",

@@ -168,6 +168,48 @@ def batchsInfo = [
                         [pledgeType: 10, contractNo: "pledge-3", value: "222111"],
                         /*[pledgeType: 47],*/
                 ]
+        ],
+
+        [
+                contractNo  : "test-7",
+                contractDate: "2017-03-20",
+                caseFraze   : "-CASE-5",
+                reportDate  : "2017-08-01",
+                action      : "update",
+                pledgesList : [
+                        [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
+                        [pledgeType: 10, contractNo: "pledge-2", value: "333222"],
+                        /*[pledgeType: 10, contractNo: "pledge-3", value: "222111"],*/
+                        /*[pledgeType: 47],*/
+                ]
+        ],
+
+        [
+                contractNo  : "test-7",
+                contractDate: "2017-03-20",
+                caseFraze   : "-CASE-6",
+                reportDate  : "2017-07-01",
+                action      : "update",
+                pledgesList : [
+                        [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
+                        [pledgeType: 10, contractNo: "pledge-2", value: "333222"],
+                        /*[pledgeType: 10, contractNo: "pledge-3", value: "222111"],*/
+                        /*[pledgeType: 47],*/
+                ]
+        ],
+
+        [
+                contractNo  : "test-7",
+                contractDate: "2017-03-20",
+                caseFraze   : "-CASE-7",
+                reportDate  : "2017-08-01",
+                action      : "update",
+                pledgesList : [
+                        [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
+                        [pledgeType: 10, contractNo: "pledge-2", value: "666555"],
+                        /*[pledgeType: 10, contractNo: "pledge-3", value: "222111"],*/
+                        /*[pledgeType: 47],*/
+                ]
         ]
 
 ]
