@@ -15,6 +15,9 @@ import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseValueDao;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.util.Errors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -45,6 +48,7 @@ public class ApplyHistoryFactory {
     protected IMetaClass childMetaClass;
     protected IBaseValueDao valueDao;
     protected CompareFactory compareFactory;
+    private Boolean testMode = false;
     private HistoricalBaseValueDSLFactory lastBase = null;
     private InitializingBaseValueDSLFactory lastApplied = null;
     private HistoricalBaseValueDSLFactory lastExisting = null;
@@ -59,11 +63,17 @@ public class ApplyHistoryFactory {
     private Set<Long> processedEntity = new HashSet<>();
     private Map<Integer, EventsChainInfo> chain = new TreeMap<>();
 
-    public ApplyHistoryFactory(IBaseEntityManager baseEntityManager) {
+    public ApplyHistoryFactory(Boolean testMode, IBaseEntityManager baseEntityManager) {
+
+        this.testMode = testMode;
+
         this.baseEntityManager = baseEntityManager;
+
     }
 
-    public ApplyHistoryFactory(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager, IPersistableDaoPool persistableDaoPool) {
+    public ApplyHistoryFactory(Boolean testMode, long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager, IPersistableDaoPool persistableDaoPool) {
+
+        this.testMode = testMode;
 
         this.creditorId = creditorId;
 
@@ -82,9 +92,11 @@ public class ApplyHistoryFactory {
 
     }
 
-    public ApplyHistoryFactory(long creditorId,
+    public ApplyHistoryFactory(Boolean testMode, long creditorId,
                                IBaseEntity baseEntityApplied, IBaseValue baseValueSaving, IBaseValue baseValueLoaded,
                                IBaseEntityManager baseEntityManager, IPersistableDaoPool persistableDaoPool) {
+
+        this.testMode = testMode;
 
         this.creditorId = creditorId;
 
@@ -447,53 +459,65 @@ public class ApplyHistoryFactory {
     }
 
     public void beginApply() {
+        if (!testMode) return;
         addEntityHistory("Apply");
     }
 
     public void beginApplyBaseEntityBasic() {
+        if (!testMode) return;
         addEntityHistory("Apply BaseEntity Basic");
     }
 
     public void beginApplyBaseValueBasic() {
+        if (!testMode) return;
         addValueHistory("Apply BaseValue Basic");
     }
 
     public void beginApplyBaseEntityAdvanced() {
+        if (!testMode) return;
         addEntityHistory("Apply BaseEntity Advanced");
     }
 
     public void beginApplySimpleValue() {
+        if (!testMode) return;
         addValueHistory("Apply SimpleValue");
     }
 
     public void beginApplyComplexValue() {
+        if (!testMode) return;
         addValueHistory("Apply ComplexValue");
     }
 
     public void beginApplySimpleSet() {
+        if (!testMode) return;
         addValueHistory("Apply SimpleSet");
     }
 
     public void beginApplyComplexSet() {
+        if (!testMode) return;
         addValueHistory("Apply ComplexSet");
     }
 
     public void beginApplyToDb() {
+        if (!testMode) return;
         addSimpleHistory("Apply To Db");
     }
 
     public void end() {
+        if (!testMode) return;
         baseEntityManager.addHistory(chain.get(baseEntityManager.level()).getEnd());
         baseEntityManager.decrement();
     }
 
     public void event(String message) {
+        if (!testMode) return;
         String tabs = "";
         for (int i = 0; i <= baseEntityManager.level(); i++) tabs += "|\t";
         baseEntityManager.addHistory(tabs + "EVENT [" + message + "]");
     }
 
     public void persistable(String name, IPersistable persistable) {
+        if (!testMode) return;
         String tabs = "";
         for (int i = 0; i <= baseEntityManager.level(); i++) tabs += "|\t";
         String sPersistable = persistable.toString().replaceAll("\n", "\n" + tabs);
@@ -516,6 +540,7 @@ public class ApplyHistoryFactory {
     }
 
     public void rep_dates(String firstName, IPersistable first, String secondName, IPersistable second) {
+        if (!testMode) return;
         String tabs = "";
         for (int i = 0; i <= baseEntityManager.level(); i++) tabs += "|\t";
         String sFirst = firstName + " " + date_info(first);

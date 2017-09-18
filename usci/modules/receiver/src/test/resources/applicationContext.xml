@@ -198,7 +198,7 @@
             <list>
                 <value>classpath:properties/oracle.properties</value>
                 <value>classpath:properties/main.properties</value>
-                <value>classpath:properties/refs.properties</value>
+                <value>classpath:properties/test.properties</value>
             </list>
         </property>
     </bean>

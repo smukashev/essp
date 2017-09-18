@@ -42,7 +42,7 @@ ORDER BY TYPE, ID
 
     def static getSql = {
 
-        def (url, user, password, driver) = [props.getProperty('jdbc.url'), props.getProperty('jdbc.user'), props.getProperty('jdbc.password'), props.getProperty('jdbc.driver')]
+        def (url, user, password, driver) = [props.getProperty('jdbc.core.url'), props.getProperty('jdbc.core.user'), props.getProperty('jdbc.core.password'), props.getProperty('jdbc.core.driver')]
 
         return Sql.newInstance(url, user, password, driver)
 
@@ -65,7 +65,7 @@ ORDER BY TYPE, ID
     }
 
     final Boolean TO_PRINT_A = false
-    final Boolean TO_PRINT_B = false
+    final Boolean TO_PRINT_B = true
 
     @Test
     void doTest() {
@@ -160,6 +160,7 @@ ORDER BY TYPE, ID
             node
         }
 
+
         def searchNodes = {
 
             List nodes = []
@@ -199,15 +200,13 @@ ORDER BY TYPE, ID
 
         }
 
-        def treeNode = {
+        def treeNode = { List nodes ->
 
             List roots = []
 
             nodes
                     .sort { a, b -> (a.ID <=> b.ID) }
                     .eachWithIndex { node, i ->
-
-
 
             }
 
@@ -229,7 +228,7 @@ ORDER BY TYPE, ID
             }
         }
 
-        List roots = treeNode()
+        //List roots = treeNode(nodes)
 
     }
 

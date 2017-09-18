@@ -22,4 +22,6 @@ public interface IBaseEntityApplyDao {
     void applyComplexValue(long creditorId, IBaseEntity baseEntity, IBaseValue baseValueSaving, IBaseValue baseValueLoaded, IBaseEntityManager baseEntityManager);
 
     void applyToDb(IBaseEntityManager baseEntityManager);
+
+    Boolean isTestMode();
 }

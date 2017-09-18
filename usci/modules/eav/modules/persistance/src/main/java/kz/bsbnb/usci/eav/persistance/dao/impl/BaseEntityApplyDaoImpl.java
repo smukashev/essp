@@ -29,6 +29,7 @@ import kz.bsbnb.usci.eav.repository.IRefRepository;
 import kz.bsbnb.usci.eav.tool.optimizer.EavOptimizerData;
 import kz.bsbnb.usci.eav.tool.optimizer.impl.BasicOptimizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,23 +44,21 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
     @Autowired
     IRefRepository refRepository;
-
+    @Value("${testMode}")
+    private Boolean testMode = false;
     @Autowired
     private IPersistableDaoPool persistableDaoPool;
-
     @Autowired
     private IBaseEntityLoadDao baseEntityLoadDao;
-
     @Autowired
     private IBaseEntityReportDateDao baseEntityReportDateDao;
-
     @Autowired
     private IEavOptimizerDao eavOptimizerDao;
 
     @Override
     public IBaseEntity apply(long creditorId, IBaseEntity baseEntitySaving, IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
 
-        final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager, persistableDaoPool);
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(testMode, creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
 
@@ -105,7 +104,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public IBaseEntity applyBaseEntityBasic(long creditorId, IBaseEntity baseEntitySaving, IBaseEntityManager baseEntityManager) {
 
-        final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntitySaving, null, baseEntityManager, persistableDaoPool);
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(testMode, creditorId, baseEntitySaving, null, baseEntityManager, persistableDaoPool);
 
         history.beginApplyBaseEntityBasic();
 
@@ -146,7 +145,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Override
     public void applyBaseValueBasic(long creditorId, IBaseEntity baseEntityApplied, IBaseValue baseValueSaving, IBaseEntityManager baseEntityManager) {
 
-        final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntityApplied, baseValueSaving,
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(testMode, creditorId, baseEntityApplied, baseValueSaving,
                 null, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
@@ -295,7 +294,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public IBaseEntity applyBaseEntityAdvanced(long creditorId, IBaseEntity baseEntitySaving,
                                                IBaseEntity baseEntityLoaded, IBaseEntityManager baseEntityManager) {
 
-        final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager, persistableDaoPool);
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(testMode, creditorId, baseEntitySaving, baseEntityLoaded, baseEntityManager, persistableDaoPool);
 
         CompareFactory IS = history.getCompareFactory();
 
@@ -389,7 +388,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public void applySimpleValue(final long creditorId, final IBaseEntity baseEntityApplied, final IBaseValue baseValueSaving,
                                  final IBaseValue baseValueLoaded, final IBaseEntityManager baseEntityManager) {
 
-        final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntityApplied, baseValueSaving,
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(testMode, creditorId, baseEntityApplied, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
@@ -546,7 +545,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                   final IBaseValue baseValueSaving,
                                   final IBaseValue baseValueLoaded, final IBaseEntityManager baseEntityManager) {
 
-        final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(testMode, creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
@@ -862,7 +861,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     public void applySimpleSet(long creditorId, IBaseEntity baseEntity, IBaseValue baseValueSaving,
                                IBaseValue baseValueLoaded, IBaseEntityManager baseEntityManager) {
 
-        final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(testMode, creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
@@ -1124,7 +1123,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                                 final IBaseValue baseValueSaving,
                                 final IBaseValue baseValueLoaded, final IBaseEntityManager baseEntityManager) {
 
-        final ApplyHistoryFactory history = new ApplyHistoryFactory(creditorId, baseEntity, baseValueSaving,
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(testMode, creditorId, baseEntity, baseValueSaving,
                 baseValueLoaded, baseEntityManager, persistableDaoPool);
 
         final CompareFactory IS = history.getCompareFactory();
@@ -1493,7 +1492,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
     @Transactional
     public void applyToDb(IBaseEntityManager baseEntityManager) {
 
-        final ApplyHistoryFactory history = new ApplyHistoryFactory(baseEntityManager);
+        final ApplyHistoryFactory history = new ApplyHistoryFactory(testMode, baseEntityManager);
 
         history.beginApplyToDb();
 
@@ -1591,6 +1590,11 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         history.end();
 
+    }
+
+    @Override
+    public Boolean isTestMode() {
+        return testMode;
     }
 
 }

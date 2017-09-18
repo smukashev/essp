@@ -391,7 +391,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     long applyTime = System.currentTimeMillis();
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
-                    baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+                    if (baseEntityApplyDao.isTestMode()) baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
                     sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
                     if (rulesEnabledForUser(baseEntity))
@@ -406,7 +406,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     applyTime = System.currentTimeMillis();
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
-                    baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+                    history = baseEntityManager.getHistory();
+                    if (baseEntityApplyDao.isTestMode()) baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
                     sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
                     if (rulesEnabledForUser(baseEntity)) {
@@ -422,7 +423,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         } else {
             long applyTime = System.currentTimeMillis();
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
-            baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+            history = baseEntityManager.getHistory();
+            if (baseEntityApplyDao.isTestMode()) baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
             sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
             if (rulesEnabledForUser(baseEntity)) {
