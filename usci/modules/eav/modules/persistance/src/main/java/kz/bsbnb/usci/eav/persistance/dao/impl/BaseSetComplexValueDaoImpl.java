@@ -413,6 +413,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             Date repDate = baseEntity.getBaseEntityReportDate().getReportDate();
 
+            /* INFO: 18.09.17 Отключить advenced history для загрузки данных можно здесь. */
             if (true && baseEntity.getMeta().getHistoryType().equals(HistoryType.ADVANCED) && !repDate.equals(loadingDate))
                 continue;
 
