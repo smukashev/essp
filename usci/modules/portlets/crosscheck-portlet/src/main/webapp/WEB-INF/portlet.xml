@@ -16,6 +16,10 @@
             <value>com.bsbnb.usci.portlets.crosscheck.CrossCheckApplication</value>
         </init-param>
 
+       <init-param>
+        <name>view-jsp</name>
+        <value>/view.jsp</value>
+       </init-param>
         <expiration-cache>0</expiration-cache>
 
         <supports>
