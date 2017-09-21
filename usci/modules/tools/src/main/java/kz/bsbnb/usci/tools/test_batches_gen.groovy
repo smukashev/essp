@@ -6,15 +6,17 @@ package kz.bsbnb.usci.tools
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-def pledge47 = {
-    """
+class test_batches_gen {
+
+    def pledge47 = {
+        """
                 <pledge>
                     <pledge_type>47</pledge_type>
                 </pledge>"""
-}
+    }
 
-def pledge = { pledgeType, contractNo, value ->
-    """
+    def pledge = { pledgeType, contractNo, value ->
+        """
                 <pledge>
                     <pledge_type>${pledgeType}</pledge_type>
                     <contract>
@@ -22,20 +24,21 @@ def pledge = { pledgeType, contractNo, value ->
                     </contract>
                     <value>${value}</value>
                 </pledge>"""
-}
-
-def getPledges = { List pledges ->
-    StringBuffer buffer = new StringBuffer("")
-    pledges.each { Map pledgeMap ->
-        if (pledgeMap.pledgeType == 47) buffer.append(pledge47())
-        else buffer.append(pledge(pledgeMap.pledgeType, pledgeMap.contractNo, pledgeMap.value))
     }
-    buffer.toString()
-}
 
-getBatchXml = { contractNo, contractDate, reportDate, action, allPledges ->
+    def getPledges = { List pledges ->
+        StringBuffer buffer = new StringBuffer("")
+        pledges.each { Map pledgeMap ->
+            if (pledgeMap.pledgeType == 47) buffer.append(pledge47())
+            else buffer.append(pledge(pledgeMap.pledgeType, pledgeMap.contractNo, pledgeMap.value))
+        }
+        buffer.toString()
+    }
 
-    """<?xml version="1.0" encoding="UTF-8"?>
+    def getBatchXml = {
+        contractNo, contractDate, reportDate, action, allPledges ->
+
+            """<?xml version="1.0" encoding="UTF-8"?>
 <batch>
     <info>
         <creditor>
@@ -80,150 +83,49 @@ getBatchXml = { contractNo, contractDate, reportDate, action, allPledges ->
 </batch>
 """
 
-}
+    }
 
-def zipBatch = { zipFileName, batchFileName, String batchXml ->
+    def zipBatch = { zipFileName, batchFileName, String batchXml ->
 
-    byte[] batchXmlBytes = batchXml.getBytes("UTF-8")
+        byte[] batchXmlBytes = batchXml.getBytes("UTF-8")
 
-    ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(zipFileName))
-    zipFile.putNextEntry(new ZipEntry(batchFileName))
-    zipFile.write(batchXmlBytes)
-    zipFile.closeEntry()
-    zipFile.flush()
-    zipFile.close()
+        ZipOutputStream zipFile = new ZipOutputStream(new FileOutputStream(zipFileName))
+        zipFile.putNextEntry(new ZipEntry(batchFileName))
+        zipFile.write(batchXmlBytes)
+        zipFile.closeEntry()
+        zipFile.flush()
+        zipFile.close()
 
-}
+    }
 
-def zipPath = "/opt/projects/info/batches/in/"
+    def genBatch = { zipPath, contractNo, contractDate, caseFraze, reportDate, action, pledgesList ->
 
-def genBatch = { contractNo, contractDate, caseFraze, reportDate, action, pledgesList ->
+        def year = reportDate.split("-")[0]
+        def month = reportDate.split("-")[1]
 
-    def year = reportDate.split("-")[0]
-    def month = reportDate.split("-")[1]
+        def zipFileName = year + caseFraze + ".ZIP"
+        def batchFileName = "cred_reg_file_${year}.${month}.xml"
 
-    def zipFileName = year + caseFraze + ".ZIP"
-    def batchFileName = "cred_reg_file_${year}.${month}.xml"
+        def batchXml = getBatchXml(contractNo, contractDate, reportDate, action, pledgesList) as String
 
-    def batchXml = getBatchXml(contractNo, contractDate, reportDate, action, pledgesList) as String
+        zipBatch(zipPath + zipFileName, batchFileName, batchXml)
 
-    zipBatch(zipPath + zipFileName, batchFileName, batchXml)
+    }
 
-}
+    def genAllBatches = { zipPath, batchsInfo ->
+        batchsInfo.each { batchInfo ->
+            genBatch(
+                    zipPath,
+                    batchInfo.contractNo,
+                    batchInfo.contractDate,
+                    batchInfo.caseFraze,
+                    batchInfo.reportDate,
+                    batchInfo.action,
+                    batchInfo.pledgesList
+            )
+        }
+    }
 
-
-def batchsInfo = [
-
-        [
-                contractNo  : "test-8",
-                contractDate: "2017-03-20",
-                caseFraze   : "-CASE-1",
-                reportDate  : "2017-07-01",
-                action      : "insert",
-                pledgesList : [
-                        [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
-                        /*[pledgeType: 10, contractNo: "pledge-2", value: "333222"],
-                        [pledgeType: 10, contractNo: "pledge-3", value: "222111"],*/
-                        /*[pledgeType: 47],*/
-                ]
-        ],
-
-        [
-                contractNo  : "test-7",
-                contractDate: "2017-03-20",
-                caseFraze   : "-CASE-2",
-                reportDate  : "2017-08-01",
-                action      : "update",
-                pledgesList : [
-                        /*[pledgeType: 22, contractNo: "pledge-1", value: "444333"],*/
-                        [pledgeType: 10, contractNo: "pledge-2", value: "333222"],
-                        [pledgeType: 10, contractNo: "pledge-3", value: "222111"],
-                        /*[pledgeType: 47],*/
-                ]
-        ],
-
-        [
-                contractNo  : "test-7",
-                contractDate: "2017-03-20",
-                caseFraze   : "-CASE-3",
-                reportDate  : "2017-09-01",
-                action      : "update",
-                pledgesList : [
-                        [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
-                        /*[pledgeType: 10, contractNo: "pledge-2", value: "333222"],*/
-                        [pledgeType: 10, contractNo: "pledge-3", value: "222111"],
-                        /*[pledgeType: 47],*/
-                ]
-        ],
-
-        [
-                contractNo  : "test-7",
-                contractDate: "2017-03-20",
-                caseFraze   : "-CASE-4",
-                reportDate  : "2017-10-01",
-                action      : "update",
-                pledgesList : [
-                        [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
-                        /*[pledgeType: 10, contractNo: "pledge-2", value: "333222"],*/
-                        [pledgeType: 10, contractNo: "pledge-3", value: "222111"],
-                        /*[pledgeType: 47],*/
-                ]
-        ],
-
-        [
-                contractNo  : "test-7",
-                contractDate: "2017-03-20",
-                caseFraze   : "-CASE-5",
-                reportDate  : "2017-08-01",
-                action      : "update",
-                pledgesList : [
-                        [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
-                        [pledgeType: 10, contractNo: "pledge-2", value: "333222"],
-                        /*[pledgeType: 10, contractNo: "pledge-3", value: "222111"],*/
-                        /*[pledgeType: 47],*/
-                ]
-        ],
-
-        [
-                contractNo  : "test-7",
-                contractDate: "2017-03-20",
-                caseFraze   : "-CASE-6",
-                reportDate  : "2017-07-01",
-                action      : "update",
-                pledgesList : [
-                        [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
-                        [pledgeType: 10, contractNo: "pledge-2", value: "333222"],
-                        /*[pledgeType: 10, contractNo: "pledge-3", value: "222111"],*/
-                        /*[pledgeType: 47],*/
-                ]
-        ],
-
-        [
-                contractNo  : "test-7",
-                contractDate: "2017-03-20",
-                caseFraze   : "-CASE-7",
-                reportDate  : "2017-08-01",
-                action      : "update",
-                pledgesList : [
-                        [pledgeType: 22, contractNo: "pledge-1", value: "444333"],
-                        [pledgeType: 10, contractNo: "pledge-2", value: "666555"],
-                        /*[pledgeType: 10, contractNo: "pledge-3", value: "222111"],*/
-                        /*[pledgeType: 47],*/
-                ]
-        ]
-
-]
-
-
-batchsInfo.each { batchInfo ->
-    genBatch(
-            batchInfo.contractNo,
-            batchInfo.contractDate,
-            batchInfo.caseFraze,
-            batchInfo.reportDate,
-            batchInfo.action,
-            batchInfo.pledgesList
-    )
 }
 
 
