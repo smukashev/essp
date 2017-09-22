@@ -18,6 +18,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.*;
+import kz.bsbnb.usci.eav.persistance.dao.impl.apply.ApplyHistoryFactory;
 import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
@@ -32,9 +33,7 @@ import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
-import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -391,7 +390,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     long applyTime = System.currentTimeMillis();
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
-                    if (baseEntityApplyDao.isTestMode()) baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+                    if (baseEntityApplyDao.isTestMode()) {
+                        baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+                        new ApplyHistoryFactory(baseEntityApplyDao.isTestMode(), baseEntityManager).persistable("baseEntityApplied (for showcase)", baseEntityApplied);
+                    }
                     sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
                     if (rulesEnabledForUser(baseEntity))
@@ -407,7 +409,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     applyTime = System.currentTimeMillis();
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
                     history = baseEntityManager.getHistory();
-                    if (baseEntityApplyDao.isTestMode()) baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+                    if (baseEntityApplyDao.isTestMode()) {
+                        baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+                        new ApplyHistoryFactory(baseEntityApplyDao.isTestMode(), baseEntityManager).persistable("baseEntityApplied (for showcase)", baseEntityApplied);
+                    }
                     sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
                     if (rulesEnabledForUser(baseEntity)) {
@@ -424,7 +429,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
             long applyTime = System.currentTimeMillis();
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
             history = baseEntityManager.getHistory();
-            if (baseEntityApplyDao.isTestMode()) baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+            if (baseEntityApplyDao.isTestMode()) {
+                baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+                new ApplyHistoryFactory(baseEntityApplyDao.isTestMode(), baseEntityManager).persistable("baseEntityApplied (for showcase)", baseEntityApplied);
+            }
             sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
             if (rulesEnabledForUser(baseEntity)) {

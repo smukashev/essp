@@ -28,7 +28,7 @@
 
     </appender>
 
-    <logger name="kz.bsbnb.usci.receiver.LoadFileTest">
+    <logger name="kz.bsbnb.usci.receiver.LoadPledgesTest">
         <level value="DEBUG"/>
         <!--<appender-ref ref="STDOUT"/>-->
         <!--<appender-ref ref="ROLL"/>-->

@@ -395,6 +395,10 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
         history.beginApplySimpleValue();
 
+        history.persistable("baseValueSaving", baseValueSaving);
+        history.persistable("baseValueLoaded", baseValueLoaded);
+        history.persistable("baseEntityApplied", baseEntityApplied);
+
         if (IS.NOT_EMPTY(baseValueLoaded)) {
             if (IS.VALUE_EMPTY(baseValueSaving)) {
                 switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
@@ -470,21 +474,25 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
                 }
 
             } else {
+                history.rep_dates("baseValueSaving", baseValueSaving, "baseValueLoaded", baseValueLoaded);
                 switch (IS.COMPARE_DATE(baseValueSaving, baseValueLoaded)) {
                     case DATE_EQUAL:
+                        history.event("RepDate of baseValueSaving EQUAL to baseValueLoaded");
                         history.applied(baseValueLoaded).castedValue(baseValueSaving).updated().execute();
                         break;
                     case DATE_MORE:
+                        history.event("RepDate of baseValueSaving MORE when baseValueLoaded");
                         if (IS.FINAL())
                             throw history.Error69();
 
-                        history.applied(baseValueLoaded).id(0L).dateFrom(baseValueSaving).inserted().execute();
+                        history.applied(baseValueSaving).id(0L).closedFrom(baseValueLoaded).lastFrom(baseValueLoaded).inserted().execute();
 
                         if (IS.LAST(baseValueLoaded)) {
                             history.applied(baseValueLoaded).last(false).updated().execute();
                         }
                         break;
                     case DATE_LESS:
+                        history.event("RepDate of baseValueSaving LESS when baseValueLoaded");
                         history.applied(baseValueSaving).id(0L).closed(false).last(false).inserted().execute();
                 }
             }
