@@ -184,7 +184,6 @@
         <property name="service" ref="batchProcessServiceImpl"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.receiver.service.IBatchProcessService"/>
         <property name="registryPort" value="1093"/>
-        <property name="servicePort" value="59300"/>
     </bean>
 
     <bean id="remoteEntityManagerHistoryService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
