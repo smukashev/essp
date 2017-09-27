@@ -505,7 +505,7 @@ public class BaseEntityApplyDaoImpl extends JDBCSupport implements IBaseEntityAp
 
             if (IS.NOT_FINAL()) {
                 IBaseValue baseValueClosed = history.closed(baseValueSaving).parent(true).result();
-                if (IS.NOT_CLOSED(baseValueClosed)) {
+                if (IS.NOT_EMPTY(baseValueClosed)) {
                     if (IS.VALUE_EQUALS(baseValueClosed, baseValueSaving)) {
                         baseValueClosed = history.closed().deleted().result();
 
