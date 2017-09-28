@@ -3,6 +3,7 @@ target
 *.iml
 *.log
 *.war
+temp
 logs
 
 

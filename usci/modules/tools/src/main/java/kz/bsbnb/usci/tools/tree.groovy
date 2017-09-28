@@ -1,9 +1,8 @@
 package kz.bsbnb.usci.tools
 
 import groovy.sql.Sql
-import org.junit.Test
 
-class tree {
+class GenTree {
 
     final static def propertiesPath = 'properties/oracle.properties'
     final static Properties props = new Properties()
@@ -66,9 +65,9 @@ ORDER BY TYPE, ID
 
     final Boolean TO_PRINT_A = false
     final Boolean TO_PRINT_B = true
+    final Boolean TO_PRINT_C = true
 
-    @Test
-    void doTest() {
+    void doGen(final String outFilePath) {
 
         final Sql sql = getSql()
 
@@ -124,6 +123,7 @@ ORDER BY TYPE, ID
             buffer.append ", id: ${id}"
             buffer.append ", name: ${name}"
             buffer.append ", title: ${title}"
+            if (_this.complex) buffer.append ", complex"
             if (_this.complex && type != META_INFO_TYPE.CLASS) {
                 buffer.append ", classId: ${classId}"
                 buffer.append ", className: ${className}"
@@ -133,7 +133,7 @@ ORDER BY TYPE, ID
             print buffer.toString()
         }
 
-        def simpleNode = { META_INFO_TYPE type, id, String name, String title = null ->
+        def simpleNode = { META_INFO_TYPE type, id, String name, String title = null, String typeCode ->
             java.lang.Object node = java.lang.Object.newInstance()
             node.metaClass._this = node
             node.metaClass.type = type
@@ -141,6 +141,7 @@ ORDER BY TYPE, ID
             node.metaClass.name = name
             node.metaClass.title = title
             node.metaClass.complex = false
+            node.metaClass.typeCode = typeCode
             node.metaClass.print = nodePrint
             node
         }
@@ -169,7 +170,7 @@ ORDER BY TYPE, ID
                     .findAll { it.TYPE == META_INFO_TYPE.CLASS.type }
                     .sort { a, b -> a.ID <=> b.ID }
                     .eachWithIndex { rowCl, i ->
-                def node = simpleNode(META_INFO_TYPE.valueOf(rowCl.TYPE), rowCl.ID, rowCl.NAME, rowCl.TITLE)
+                def node = simpleNode(META_INFO_TYPE.valueOf(rowCl.TYPE), rowCl.ID, rowCl.NAME, rowCl.TITLE, rowCl.TYPE_CODE)
                 List childs = []
                 if (TO_PRINT_A) println "TYPE: \"$rowCl.TYPE\", ID: $rowCl.ID, NAME: $rowCl.NAME. "
                 metaInfo
@@ -180,7 +181,7 @@ ORDER BY TYPE, ID
                         .eachWithIndex { rowCmSt, j ->
                     if (false) println "rowCl.ID: $rowCl.ID, rowCmSt.CONTAINING_ID: $rowCmSt.CONTAINING_ID"
                     if (rowCl.ID == rowCmSt.CONTAINING_ID) {
-                        def child = simpleNode(META_INFO_TYPE.valueOf(rowCmSt.TYPE), rowCmSt.ID, rowCmSt.NAME, rowCmSt.TITLE)
+                        def child = simpleNode(META_INFO_TYPE.valueOf(rowCmSt.TYPE), rowCmSt.ID, rowCmSt.NAME, rowCmSt.TITLE, rowCmSt.TYPE_CODE)
                         if (TO_PRINT_A) print "\tTYPE: \"$rowCmSt.TYPE\", ID: $rowCmSt.ID, NAME: $rowCmSt.NAME"
                         switch (rowCmSt.TYPE) {
                             case META_INFO_TYPE.COMPLEX_SET.type:
@@ -200,17 +201,96 @@ ORDER BY TYPE, ID
 
         }
 
-        def treeNode = { List nodes ->
+        def generate = { List nodes ->
 
-            List roots = []
 
-            nodes
-                    .sort { a, b -> (a.ID <=> b.ID) }
-                    .eachWithIndex { node, i ->
+            final Tools tools = Tools.getInstance()
+
+            final Map<String, Class> classes = [:]
+
+            final Map<String, Association> associations = [:]
+
+            nodes.each { node ->
+
+                def putClass = { nd ->
+
+                    def code = nd.id as String
+                    def name = "$nd.id / $nd.name / $nd.title"
+                    def typeCode
+
+                    classes.put(
+                            code,
+                            Class.newInstance(name: name, code: code, attributes:
+                                    nd.childs
+                                            .findAll { child -> !child.complex }
+                                            .collect { child ->
+                                        code = child.id
+                                        name = "$child.id / $child.name / $child.title"
+                                        typeCode = child.typeCode
+                                        Attribute.newInstance(name: name, code: code, dataType: typeCode, visibility: "")
+                                    }
+                            )
+                    )
+
+                }
+
+                if (node.complex) putClass(node)
 
             }
 
+            if (TO_PRINT_C) classes.each { key, value ->
+                println "$key ==> $value"
+            }
+
+            nodes
+                    .findAll { it.complex }
+                    .each { parent ->
+
+                parent.childs
+                        .findAll { it.complex }
+                        .each { child ->
+
+                    def roleAId = parent.id as String
+                    def roleBId = child.classId as String
+
+                    def code = "$roleAId > $roleBId"
+                    def name = "$parent.name > $child.name"
+                    def typeCode = child.typeCode
+                    def roleAName = "$parent.id:$parent.name", roleBName = "$child.id:$child.name ($typeCode)"
+
+                    def roleAMultiplicity = "", roleBMultiplicity = "0..1"
+
+                    switch (child.type) {
+                        case META_INFO_TYPE.COMPLEX_SET.type:
+                            roleBMultiplicity = "0..*"
+                    }
+
+                    Class classA = classes.get(roleAId)
+                    Class classB = classes.get(roleBId)
+
+                    /*println "roleAId: $roleAId; roleBId: $roleBId"
+                    println "classA: $classA; classB: $classB"
+
+                    if (!classA || !classB) throw new Exception("NULL ($code / $name)")*/
+
+                    associations.put(
+                            code,
+                            Association.newInstance(name: name, code: code,
+                                    roleAIndicator: "C", roleBIndicator: null,
+                                    roleAName: roleAName, roleBName: roleBName,
+                                    roleAMultiplicity: roleAMultiplicity, roleBMultiplicity: roleBMultiplicity,
+                                    roleAObject: classA, roleBObject: classB
+                            )
+                    )
+
+                }
+
+            }
+
+            tools.generate(outFilePath, classes, associations)
+
         }
+
 
         getMetaInfo()
 
@@ -228,11 +308,17 @@ ORDER BY TYPE, ID
             }
         }
 
-        //List roots = treeNode(nodes)
+        generate(nodes)
 
     }
 
 }
+
+
+final String outFilePath = "/opt/projects/usci/usci/modules/tools/src/main/temp/class_diagram_output.oom"
+
+GenTree.newInstance()
+        .doGen(outFilePath)
 
 
 
