@@ -161,6 +161,11 @@ ORDER BY TYPE, ID
             node
         }
 
+        def paramsNode = { Object node, params ->
+            node.metaClass.params = params
+            node
+        }
+
 
         def searchNodes = {
 
@@ -171,6 +176,7 @@ ORDER BY TYPE, ID
                     .sort { a, b -> a.ID <=> b.ID }
                     .eachWithIndex { rowCl, i ->
                 def node = simpleNode(META_INFO_TYPE.valueOf(rowCl.TYPE), rowCl.ID, rowCl.NAME, rowCl.TITLE, rowCl.TYPE_CODE)
+                paramsNode(node, rowCl)
                 List childs = []
                 if (TO_PRINT_A) println "TYPE: \"$rowCl.TYPE\", ID: $rowCl.ID, NAME: $rowCl.NAME. "
                 metaInfo
@@ -182,6 +188,7 @@ ORDER BY TYPE, ID
                     if (false) println "rowCl.ID: $rowCl.ID, rowCmSt.CONTAINING_ID: $rowCmSt.CONTAINING_ID"
                     if (rowCl.ID == rowCmSt.CONTAINING_ID) {
                         def child = simpleNode(META_INFO_TYPE.valueOf(rowCmSt.TYPE), rowCmSt.ID, rowCmSt.NAME, rowCmSt.TITLE, rowCmSt.TYPE_CODE)
+                        paramsNode(child, rowCmSt)
                         if (TO_PRINT_A) print "\tTYPE: \"$rowCmSt.TYPE\", ID: $rowCmSt.ID, NAME: $rowCmSt.NAME"
                         switch (rowCmSt.TYPE) {
                             case META_INFO_TYPE.COMPLEX_SET.type:
@@ -214,8 +221,11 @@ ORDER BY TYPE, ID
 
                 def putClass = { nd ->
 
+                    def isParentKey = nd.params.PARENT_IS_KEY == 1
+                    def isReference = nd.params.IS_REFERENCE == 1
+
                     def code = nd.id as String
-                    def name = "$nd.id / $nd.name / $nd.title"
+                    def name = "${isParentKey ? "^ " : ""}${isReference ? "# " : ""}$nd.id / $nd.name / $nd.title"
                     def typeCode
 
                     classes.put(
@@ -224,8 +234,9 @@ ORDER BY TYPE, ID
                                     nd.childs
                                             .findAll { child -> !child.complex }
                                             .collect { child ->
+                                        def isChildKey = child.params.IS_KEY == 1
                                         code = child.id
-                                        name = "$child.id / $child.name / $child.title"
+                                        name = "${isChildKey ? "* " : ""}$child.id / $child.name / $child.title"
                                         typeCode = child.typeCode
                                         Attribute.newInstance(name: name, code: code, dataType: typeCode, visibility: "")
                                     }
@@ -250,28 +261,49 @@ ORDER BY TYPE, ID
                         .findAll { it.complex }
                         .each { child ->
 
+                    def isSet = child.type == META_INFO_TYPE.COMPLEX_SET
+                    def isNullable = child.params.IS_NULLABLE == 1
+
+                    def isChildKey = child.params.IS_KEY == 1
+                    def isParentKey = parent.params.PARENT_IS_KEY == 1
+
+                    def isReference = child.params.IS_REFERENCE == 1
+
                     def roleAId = parent.id as String
                     def roleBId = child.classId as String
 
                     def code = "$roleAId > $roleBId"
                     def name = "$parent.name > $child.name"
                     def typeCode = child.typeCode
-                    def roleAName = "$parent.id:$parent.name", roleBName = "$child.id:$child.name ($typeCode)"
+                    def roleAName = "$parent.id / $parent.name", roleBName = "${isChildKey ? "* " : ""}${isReference ? "# " : ""}$child.id / $child.name"
 
                     def roleAMultiplicity = "", roleBMultiplicity = "0..1"
 
-                    switch (child.type) {
-                        case META_INFO_TYPE.COMPLEX_SET.type:
-                            roleBMultiplicity = "0..*"
+                    if (isSet && isNullable) {
+                        roleBMultiplicity = "0..*"
+                    } else if (isSet && !isNullable) {
+                        roleBMultiplicity = "1..*"
+                    } else if (!isSet && isNullable) {
+                        roleBMultiplicity = "0..1"
+                    } else if (!isSet && !isNullable) {
+                        roleBMultiplicity = "1"
                     }
 
                     Class classA = classes.get(roleAId)
                     Class classB = classes.get(roleBId)
 
-                    /*println "roleAId: $roleAId; roleBId: $roleBId"
-                    println "classA: $classA; classB: $classB"
+                    if (TO_PRINT_C) {
+                        println "roleAId: $roleAId; roleBId: $roleBId"
+                        println "classA: ${classA}; classB: ${classB}"
+                        println "IS_KEY_A: ${parent.params.PARENT_IS_KEY}; IS_KEY_B: ${child.params.IS_KEY}"
+                        println "IS_NULLABLE_A: ${parent.params.IS_NULLABLE}; IS_NULLABLE_B: ${child.params.IS_NULLABLE}"
+                        println "IS_REFERENCE_A: ${parent.params.IS_REFERENCE}; IS_REFERENCE_B: ${child.params.IS_REFERENCE}"
+                        println "TYPE_A: ${parent.type}; TYPE_B: ${child.type}"
+                        println "TYPE_A: ${parent.type}; TYPE_B: ${child.type}"
+                        println "roleAMultiplicity: ${roleAMultiplicity}; roleBMultiplicity: ${roleBMultiplicity}"
+                    }
 
-                    if (!classA || !classB) throw new Exception("NULL ($code / $name)")*/
+                    if (!classA || !classB) throw new Exception("NULL ($code / $name)")
 
                     associations.put(
                             code,
