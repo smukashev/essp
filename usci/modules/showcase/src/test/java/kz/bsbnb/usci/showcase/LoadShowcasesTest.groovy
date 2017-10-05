@@ -1,9 +1,10 @@
 package kz.bsbnb.usci.showcase
 
 import groovy.json.JsonBuilder
+import kz.bsbnb.usci.core.service.IMetaFactoryService
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass as MC
 import kz.bsbnb.usci.eav.showcase.ShowCase
-import kz.bsbnb.usci.showcase.dao.impl.CortegeDaoImpl
-import kz.bsbnb.usci.showcase.dao.impl.ShowcaseDaoImpl
+import kz.bsbnb.usci.showcase.service.ShowcaseService
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,15 +19,27 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 class LoadShowcasesTest {
 
     @Autowired
-    private ShowcaseDaoImpl showcaseDao
+    private IMetaFactoryService metaFactory
 
     @Autowired
-    private CortegeDaoImpl cortegeDao
+    private ShowcaseService showcaseService
 
     @Test
-    void loadEntity() {
+    void print$MetaClasses$ShowCases() {
 
-        final List<ShowCase> showCases = showcaseDao.getShowCases()
+        final List<MC> metaClasses = metaFactory.getMetaClasses()
+
+        final List<ShowCase> showCases = showcaseService.list()
+
+        metaClasses.each { MC metaClass ->
+
+            (1..64).each { print '#' }
+
+            print """
+metaClass: ${new JsonBuilder(metaClass).toPrettyString()}
+
+"""
+        }
 
         showCases.findAll { it.downPath }.each { ShowCase showCase ->
 
@@ -47,12 +60,33 @@ historyKeyFieldsList: ${new JsonBuilder(showCase.historyKeyFieldsList).toPrettyS
 rootKeyFieldsList: ${new JsonBuilder(showCase.rootKeyFieldsList).toPrettyString()}
 
 indexes: ${new JsonBuilder(showCase.indexes).toPrettyString()}
-
-meta: ${/*new JsonBuilder(showCase.meta).toPrettyString()*/}
+${
+                false ?
+                        """
+meta: ${new JsonBuilder(showCase.meta).toPrettyString()}""" :
+                        ""
+            }
+${
+                true ?
+                        """
+actualMeta: ${new JsonBuilder(showCase.actualMeta).toPrettyString()}""" :
+                        ""
+            }
+${
+                false ?
+                        """
+showCase: ${new JsonBuilder(showCase).toPrettyString()}""" :
+                        ""
+            }
 
 """
 
         }
+
+    }
+
+    @Test
+    void view$MetaClasses$ShowCases() {
 
     }
 
