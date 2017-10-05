@@ -3,7 +3,7 @@ package kz.bsbnb.usci.showcase
 import groovy.json.JsonBuilder
 import kz.bsbnb.usci.core.service.IMetaFactoryService
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass as MC
-import kz.bsbnb.usci.eav.showcase.ShowCase
+import kz.bsbnb.usci.eav.showcase.ShowCase as SC
 import kz.bsbnb.usci.showcase.service.ShowcaseService
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,32 +24,71 @@ class LoadShowcasesTest {
     @Autowired
     private ShowcaseService showcaseService
 
-    @Test
-    void print$MetaClasses$ShowCases() {
+    private Closure iterateMetaClasses
 
-        final List<MC> metaClasses = metaFactory.getMetaClasses()
+    {
+        iterateMetaClasses = { Set<String> set, mCs, Closure closure ->
+            mCs
+                    .findAll { MC metaClazz -> if (set.contains(metaClazz.className)) return false; else set.add(metaClazz.className); return true }
+                    .each { MC metaClazz ->
 
-        final List<ShowCase> showCases = showcaseService.list()
+                List childMCs = []
 
-        metaClasses.each { MC metaClass ->
+                metaClazz.getAttributeNames().each { String name ->
+                    def meta = metaClazz.getMemberType(name)
+                    if (meta instanceof MC) childMCs.add(meta)
+                }
 
-            (1..64).each { print '#' }
+                if (true) iterateMetaClasses(set, childMCs, closure)
 
-            print """
-metaClass: ${new JsonBuilder(metaClass).toPrettyString()}
+                closure(metaClazz)
 
-"""
+            }
         }
+    }
 
-        showCases.findAll { it.downPath }.each { ShowCase showCase ->
+    private Closure iterateShowCases
+
+    {
+        iterateShowCases = { Set<String> set, sCs, Closure closure ->
+            sCs
+                    .findAll { it.downPath }
+                    .findAll { SC showCase -> if (set.contains(showCase.name)) return false; else set.add(showCase.name); return true }
+                    .each { SC showCase ->
+
+                if (true) iterateShowCases(set, showCase.childShowCases, closure)
+
+                closure(showCase)
+
+            }
+        }
+    }
+
+    @Test
+    void print$ShowCases() {
+
+        final List<SC> showCases = showcaseService.list()
+
+        Integer count = 0
+
+        Set<String> set = new TreeSet<>()
+
+        iterateShowCases(set, showCases) { SC showCase ->
 
             (1..64).each { print '#' }
 
-            print """
+            /*print """
+count: ${++count}
 name: $showCase.name
-className: $showCase.meta.className
+className: $showCase.actualMeta.className
 tableName: $showCase.tableName
 downPath: $showCase.downPath
+
+final: $showCase.isFinal
+child: $showCase.isChild
+
+searchable: $showCase.actualMeta.searchable
+parentIsKey: $showCase.actualMeta.parentIsKey
 
 fieldsList: ${new JsonBuilder(showCase.fieldsList).toPrettyString()}
 
@@ -79,6 +118,24 @@ showCase: ${new JsonBuilder(showCase).toPrettyString()}""" :
                         ""
             }
 
+"""*/
+
+            print """
+count: ${++count}
+name: $showCase.name
+className: $showCase.actualMeta.className
+
+searchable: $showCase.actualMeta.searchable
+parentIsKey: $showCase.actualMeta.parentIsKey
+
+rootKeyFieldsList: ${new JsonBuilder(showCase.rootKeyFieldsList).toPrettyString()}
+
+historyKeyFieldsList: ${new JsonBuilder(showCase.historyKeyFieldsList).toPrettyString()}
+
+customFieldsList: ${new JsonBuilder(showCase.customFieldsList).toPrettyString()}
+
+fieldsList: ${new JsonBuilder(showCase.fieldsList).toPrettyString()}
+
 """
 
         }
@@ -86,7 +143,29 @@ showCase: ${new JsonBuilder(showCase).toPrettyString()}""" :
     }
 
     @Test
-    void view$MetaClasses$ShowCases() {
+    void print$MetaClasses() {
+
+        final List<MC> metaClasses = metaFactory.getMetaClasses()
+
+        Integer count = 0
+
+        Set<String> set = new TreeSet<>()
+
+        iterateMetaClasses(set, metaClasses) { MC metaClazz ->
+
+            (1..64).each { print '#' }
+
+            print """
+count: ${++count}
+metaClass: ${new JsonBuilder(metaClazz).toPrettyString()}
+
+"""
+        }
+
+    }
+
+    @Test
+    void print$Tables() {
 
     }
 
