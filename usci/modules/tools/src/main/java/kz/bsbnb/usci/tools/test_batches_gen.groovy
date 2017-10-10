@@ -98,7 +98,19 @@ class test_batches_gen {
 
     }
 
-    def genBatch = { zipPath, contractNo, contractDate, caseFraze, reportDate, action, pledgesList ->
+    def genBatch(zipPath, caseFraze, batchXml) {
+
+        def year = new Date().format("yyyy")
+        def month = new Date().format("MM")
+
+        def zipFileName = year + caseFraze + ".ZIP"
+        def batchFileName = "cred_reg_file_${year}.${month}.xml"
+
+        zipBatch(zipPath + zipFileName, batchFileName, batchXml)
+
+    }
+
+    def genBatch(zipPath, contractNo, contractDate, caseFraze, reportDate, action, pledgesList) {
 
         def year = reportDate.split("-")[0]
         def month = reportDate.split("-")[1]
@@ -114,15 +126,22 @@ class test_batches_gen {
 
     def genAllBatches = { zipPath, batchsInfo ->
         batchsInfo.each { batchInfo ->
-            genBatch(
-                    zipPath,
-                    batchInfo.contractNo,
-                    batchInfo.contractDate,
-                    batchInfo.caseFraze,
-                    batchInfo.reportDate,
-                    batchInfo.action,
-                    batchInfo.pledgesList
-            )
+            if (batchInfo.xml)
+                genBatch(
+                        zipPath,
+                        batchInfo.caseFraze,
+                        batchInfo.xml
+                )
+            else
+                genBatch(
+                        zipPath,
+                        batchInfo.contractNo,
+                        batchInfo.contractDate,
+                        batchInfo.caseFraze,
+                        batchInfo.reportDate,
+                        batchInfo.action,
+                        batchInfo.pledgesList
+                )
         }
     }
 

@@ -69,6 +69,9 @@ class LoadShowcasesTest {
 
         final List<SC> showCases = showcaseService.list()
 
+        final Map<String, Integer> allRootKeys = [:]
+        final Map<String, Integer> allCustomKeys = [:]
+
         Integer count = 0
 
         Set<String> set = new TreeSet<>()
@@ -77,7 +80,7 @@ class LoadShowcasesTest {
 
             (1..64).each { print '#' }
 
-            /*print """
+            print """
 count: ${++count}
 name: $showCase.name
 className: $showCase.actualMeta.className
@@ -118,9 +121,9 @@ showCase: ${new JsonBuilder(showCase).toPrettyString()}""" :
                         ""
             }
 
-"""*/
+"""
 
-            print """
+            /*print """
 count: ${++count}
 name: $showCase.name
 className: $showCase.actualMeta.className
@@ -136,10 +139,64 @@ customFieldsList: ${new JsonBuilder(showCase.customFieldsList).toPrettyString()}
 
 fieldsList: ${new JsonBuilder(showCase.fieldsList).toPrettyString()}
 
+"""*/
+
+            /*print """
+count: ${++count}
+name: $showCase.name
+className: $showCase.actualMeta.className
+
+searchable: $showCase.actualMeta.searchable
+parentIsKey: $showCase.actualMeta.parentIsKey
+
+rootKeyFieldsList: ${new JsonBuilder(showCase.rootKeyFieldsList).toPrettyString()}
+
+historyKeyFieldsList: ${new JsonBuilder(showCase.historyKeyFieldsList).toPrettyString()}
+
+customFieldsList: ${new JsonBuilder(showCase.customFieldsList).toPrettyString()}
+
+fieldsList: ${new JsonBuilder(showCase.fieldsList).toPrettyString()}
+
+"""*/
+
+            List rootKeys = []
+            List childKeys = []
+
+            showCase.rootKeyFieldsList.each { filed ->
+                rootKeys.add([attributeId  : filed.attributeId,
+                              attributePath: filed.attributePath,
+                              columnName   : filed.columnName,
+                              className    : filed.columnName.replaceAll("_id", "")
+                ])
+                Integer value = allRootKeys.get(filed.columnName)
+                if (!value) value = 0
+                allRootKeys.put(filed.columnName, ++value)
+            }
+
+            showCase.customFieldsList
+                    .findAll { custom -> !rootKeys.find { root -> root.columnName.equals(custom.columnName) } }
+                    .each { filed ->
+                childKeys.add([attributeId  : filed.attributeId,
+                               attributePath: filed.attributePath,
+                               columnName   : filed.columnName,
+                               className    : filed.columnName.replaceAll("_id", "")
+                ])
+                Integer value = allCustomKeys.get(filed.columnName)
+                if (!value) value = 0
+                allCustomKeys.put(filed.columnName, ++value)
+            }
+
+            print """
+rootKeys: ${def out = ""; rootKeys.each { out += "$it\n" }; out}
+childKeys: ${def out = ""; childKeys.each { out += "$it\n" }; out}
 """
 
         }
 
+        print """
+allRootKeys: $allRootKeys
+allCustomKeys: $allCustomKeys 
+"""
     }
 
     @Test

@@ -42,6 +42,9 @@ class PrintUtils {
         this.jdbcTemplate_SHOWCASE_E = new JdbcTemplate(dataSource_SHOWCASE_E)
     }
 
+    @Autowired
+    JustDao batchInfo
+
     enum DB {
         CORE,
         SHOWCASE
@@ -388,4 +391,43 @@ class PrintUtils {
 
     }
 
+    Map<Long, Set<Long>> getBatchInfo$creditIds$subjectIds(Long batchId) {
+        Map<Long, Set<Long>> map = new TreeMap<>()
+        Set<Long> creditIds = batchInfo.getCreditIds(batchId)
+        creditIds.each { creditId ->
+            Set<Long> subjectIds = batchInfo.getSubjectIds(creditId)
+            map.put(creditId, subjectIds)
+        }
+        return map
+    }
+
+    void printBatchInfo$creditIds$subjectIds(Long batchId) {
+
+        StringBuffer buffer = new StringBuffer("Batch Info: ")
+
+        Map<Long, Set<Long>> rows = getBatchInfo$creditIds$subjectIds(batchId)
+
+        SortedSet<Long> ids = new TreeSet<>()
+
+        for (Map.Entry<Long, Set<Long>> row : rows) {
+            Long entityId = row.key
+            if (ids.contains(entityId)) continue
+            ids.add(entityId)
+            buffer.append("<table><tr>")
+            buffer.append("<td align=\"left\" valign=\"top\"><pre>")
+            buffer.append(entityId)
+            buffer.append("</pre></td>")
+            buffer.append("<td align=\"left\" valign=\"top\"><pre>")
+            buffer.append(row.value)
+            buffer.append("</pre></td>")
+            buffer.append("</tr></table>")
+        }
+
+        logger.info(preTag(buffer.toString()))
+
+    }
+
 }
+
+
+

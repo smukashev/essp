@@ -21,6 +21,8 @@
     <context:component-scan base-package="kz.bsbnb.usci.eav" />
     <context:component-scan base-package="kz.bsbnb.usci.bconv" />
     <context:component-scan base-package="kz.bsbnb.usci.receiver" />
+    <!--<context:component-scan base-package="kz.bsbnb.usci.showcase" />-->
+    <!--<context:component-scan base-package="kz.bsbnb.usci.core.service"/>-->
     <context:component-scan base-package="kz.bsbnb.usci.tool.status" />
 
     <bean id="context" class="org.jooq.impl.DSL" factory-method="using">
@@ -30,18 +32,7 @@
         <!-- <constructor-arg index="0" value="${jooq.executor.constructor.args.first}"/> -->
     </bean>
 
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="${jdbcReceiver.driver}"/>
-        <property name="url" value="${jdbcReceiver.url}"/>
-        <property name="username" value="${jdbcReceiver.user}"/>
-        <property name="password" value="${jdbcReceiver.password}"/>
-        <property name="initialSize" value="${jdbcReceiver.initialSize}"/>
-        <property name="minIdle" value="${jdbcReceiver.minIdle}"/>
-        <property name="maxActive" value="${jdbcReceiver.maxActive}"/>
-        <property name="maxIdle" value="${jdbcReceiver.maxIdle}"/>
-    </bean>
-
-    <bean id="dataSource_CORE_E" class="org.apache.commons.dbcp.BasicDataSource">
+    <bean id="DS_CR" name="dataSource, dataSource_CORE_E, dataSourceCR" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${jdbc.core.driver}"/>
         <property name="url" value="${jdbc.core.url}"/>
         <property name="username" value="${jdbc.core.user}"/>
@@ -52,7 +43,7 @@
         <property name="maxIdle" value="${jdbc.core.maxIdle}"/>
     </bean>
 
-    <bean id="dataSource_SHOWCASE_E" class="org.apache.commons.dbcp.BasicDataSource">
+    <bean id="DS_SC" name="dataSource_SHOWCASE_E, dataSourceSC" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${jdbc.showcase.driver}"/>
         <property name="url" value="${jdbc.showcase.url}"/>
         <property name="username" value="${jdbc.showcase.user}"/>
@@ -63,6 +54,11 @@
         <property name="maxIdle" value="${jdbc.showcase.maxIdle}"/>
     </bean>
 
+    <!-- spring transaction manager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource_CORE_E"/>
+    </bean>
+
     <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="staticMethod" value="org.springframework.util.Log4jConfigurer.initLogging"/>
         <property name="arguments">
@@ -70,11 +66,6 @@
                 <value>classpath:log4j.xml</value>
             </list>
         </property>
-    </bean>
-
-    <!-- spring transaction manager -->
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource_CORE_E"/>
     </bean>
 
     <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
@@ -156,6 +147,12 @@
         <property name="refreshStubOnConnectFailure" value="true"/>
         <property name="serviceUrl" value="rmi://127.0.0.1:1099/remoteCreditorBusiness"/>
         <property name="serviceInterface" value="kz.bsbnb.usci.core.service.RemoteCreditorBusiness"/>
+    </bean>
+
+    <bean id="remoteShowcaseService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="refreshStubOnConnectFailure" value="true"/>
+        <property name="serviceUrl" value="rmi://127.0.0.1:1095/showcaseService"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.showcase.service.ShowcaseService"/>
     </bean>
 
     <!--

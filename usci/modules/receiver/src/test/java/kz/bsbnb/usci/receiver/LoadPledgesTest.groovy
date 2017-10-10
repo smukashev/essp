@@ -201,6 +201,12 @@ class LoadPledgesTest {
 
             List<String> history = baseEntityManagerHistoryRmiServiceExporter.getHistory()
 
+            Map<Long, Set<Long>> batchInfo = printUtils.getBatchInfo$creditIds$subjectIds(batch.getId())
+
+
+            printUtils.getBatchInfo()
+
+            printUtils.printBatchInfo$creditIds$subjectIds(batch.getId())
 
             printUtils.printCreditorInfo(batch.getCreditor())
 
