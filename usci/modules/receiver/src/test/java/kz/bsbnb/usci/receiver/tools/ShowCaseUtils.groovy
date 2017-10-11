@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.tools
 
+import kz.bsbnb.usci.eav.model.meta.impl.MetaClass
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass as MC
 import kz.bsbnb.usci.eav.showcase.ShowCase as SC
 import kz.bsbnb.usci.eav.showcase.ShowCaseField
@@ -102,6 +103,8 @@ class ShowCaseUtils {
     class Table {
 
         String name
+
+        MetaClass meta
 
         List<org.jooq.Table> tables = []
 
@@ -218,6 +221,8 @@ class ShowCaseUtils {
             listColumnsKeys.each { filed ->
                 columns.add Column.newInstance(type: filed.type, name: filed.name)
             }
+
+            meta = showCase.actualMeta
 
         }
 

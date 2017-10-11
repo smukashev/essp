@@ -204,8 +204,6 @@ class LoadPledgesTest {
             Map<Long, Set<Long>> batchInfo = printUtils.getBatchInfo$creditIds$subjectIds(batch.getId())
 
 
-            printUtils.getBatchInfo()
-
             printUtils.printBatchInfo$creditIds$subjectIds(batch.getId())
 
             printUtils.printCreditorInfo(batch.getCreditor())
@@ -216,10 +214,17 @@ class LoadPledgesTest {
 
             printUtils.printEntitiesInfo(batch.getId())
 
-            if (true)
-                printUtils.printBatchEntitiesInfoDetailed(batch.getId(), reportDates)
-            else
-                printUtils.printBatchEntitiesInfo(batch.getId(), reportDates)
+            switch ("DetailedWithShowCases") {
+                case "DetailedWithShowCases":
+                    printUtils.printBatchEntitiesInfoDetailedWithShowCases(batch.getId(), reportDates)
+                    break
+                case "Detailed":
+                    printUtils.printBatchEntitiesInfoDetailed(batch.getId(), reportDates)
+                    break
+                default:
+                    printUtils.printBatchEntitiesInfo(batch.getId(), reportDates)
+                    break
+            }
 
             printUtils.printHistory(history)
 

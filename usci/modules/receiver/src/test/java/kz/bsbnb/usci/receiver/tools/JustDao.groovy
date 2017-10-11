@@ -201,7 +201,7 @@ class JustDao {
             rowsByCredit["$k"] = []
         }
 
-        def closure = { String key, Long value, Table table ->
+        def closure = { String key, Long value, ShowCaseUtils.Table showcase, Table table ->
 
             String tableAlias = "t"
             Select select =
@@ -219,6 +219,16 @@ class JustDao {
 
             out.each {
                 rowsByCredit["$value"] << it
+                String idKey = "${showcase.meta.className}_id"
+                String idValue = it.find { it.key ==~ /(?i)${idKey}/ }?.value
+                it["META_CLASS"] = showcase.meta.className
+                if (idValue && !idValue.isEmpty()) {
+                    it["ID_KEY"] = idKey
+                    it["ID_VALUE"] = idValue
+                } else {
+                    it["ID_KEY"] = null
+                    it["ID_VALUE"] = null
+                }
             }
 
         }
@@ -229,9 +239,9 @@ class JustDao {
                     it.key ==~ /(?i)$key/
                 }
                 .each { String field, List<ShowCaseUtils.Table> showcases ->
-                    showcases.each { showcase ->
+                    showcases.each { ShowCaseUtils.Table showcase ->
                         showcase.tables.each { Table table ->
-                            closure(key, creditId, table)
+                            closure(key, creditId, showcase, table)
                         }
                     }
                 }

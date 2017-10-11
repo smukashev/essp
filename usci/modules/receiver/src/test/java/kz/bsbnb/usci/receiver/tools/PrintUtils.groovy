@@ -1,5 +1,6 @@
 package kz.bsbnb.usci.receiver.tools
 
+import com.google.gson.GsonBuilder
 import kz.bsbnb.usci.cr.model.Creditor
 import kz.bsbnb.usci.eav.model.base.IBaseEntity
 import kz.bsbnb.usci.eav.model.output.BaseToShortTool
@@ -43,7 +44,7 @@ class PrintUtils {
     }
 
     @Autowired
-    JustDao batchInfo
+    JustDao justDao
 
     enum DB {
         CORE,
@@ -249,7 +250,7 @@ class PrintUtils {
 
     }
 
-    private void printBatchEntitiesInfoDetailed(long batchId, String[] reportDates) {
+    void printBatchEntitiesInfoDetailed(long batchId, String[] reportDates) {
 
         StringBuffer buffer = new StringBuffer("Entities history: ")
 
@@ -299,6 +300,121 @@ class PrintUtils {
                     buffer.append("<td><pre>")
                     buffer.append(map.get(header))
                     buffer.append("</pre></td>")
+                }
+
+                buffer.append("</tr>")
+
+            }
+
+            buffer.append("</table>")
+
+        }
+
+        logger.info(preTag(buffer.toString()))
+
+    }
+
+    void printBatchEntitiesInfoDetailedWithShowCases(long batchId, String[] reportDates) {
+
+        StringBuffer buffer = new StringBuffer("Entities history: ")
+
+        final List<Map<String, Object>> rows = getBatchEntitiesInfo(batchId)
+
+        final def keys = ["CREDIT_ID", "SUBJECT_ID"] as String[]
+        final Map<Long, Set<Long>> searchIds = getBatchInfo$creditIds$subjectIds(batchId)
+
+        Map<Long, List<Map<String, Object>>> rowsByIds = justDao.getDataForShowcases(searchIds, keys)
+
+        SortedSet<Long> ids = new TreeSet<>()
+
+        for (Map<String, Object> row : rows) {
+
+            Long entityId = ((BigDecimal) row.get("ENTITY_ID")).longValue()
+            if (ids.contains(entityId)) continue
+            ids.add(entityId)
+
+            Set<String> headers = []
+            Map<String, Map<String, String>> maps = [:]
+
+            for (String reportDate : reportDates) {
+                Map<String, String> map = printEntityDetailed(entityId, reportDate)
+                maps.put(reportDate, map)
+                map.each { key, value ->
+                    headers.add(key)
+                }
+            }
+            headers = headers.sort { String a, String b -> a.compareTo(b) }
+
+            buffer.append("<table>")
+
+            buffer.append("<tr>")
+            buffer.append("<th></th>")
+            for (String reportDate : reportDates) {
+                buffer.append("<th>")
+                buffer.append("EAV BATCH ID: ").append(batchId)
+                        .append(" REPORT DATE: ").append(reportDate)
+                buffer.append("</th>")
+                buffer.append("<th>")
+                buffer.append("SHOWCASE BATCH ID: ").append(batchId)
+                        .append(" REPORT DATE: ").append(reportDate)
+                buffer.append("</th>")
+            }
+            buffer.append("</tr>")
+
+            for (String header : headers) {
+
+                buffer.append("<tr>")
+
+                buffer.append("<th align=\"left\" valign=\"top\">")
+                buffer.append(header)
+                buffer.append("</th>")
+
+                maps.each { String reportDate, Map<String, String> map ->
+
+                    Date report = new Date().parse("dd.MM.yyyy", reportDate)
+
+                    buffer.append("<td><pre>")
+                    buffer.append(map.get(header))
+                    buffer.append("</pre></td>")
+
+                    buffer.append("<td><pre>")
+
+                    String vMetaClass
+                    Long vEntityId
+                    block:
+                    {
+                        List hdPath = header.split("\\.")
+                        String last = hdPath.last()
+                        (last =~ /(\w+)<(\d+)>/).each { exp, cl, id ->
+                            vMetaClass = cl
+                            vEntityId = id as Long
+                        }
+                    }
+
+                    rowsByIds.each { ky, rowById ->
+                        rowById.findAll {
+
+                            def date = { k ->
+                                String val
+                                (val = it["$k"]) && !val.isEmpty() ? new Date().parse("yyyy-MM-dd HH:mm:SS", val) : null
+                            }
+
+                            Long id = it["ID_VALUE"] as Long
+
+                            Date cdc = date("CDC")
+                            Date open = date("OPEN_DATE")
+                            Date close = date("CLOSE_DATE")
+
+                            !(id != vEntityId || (open != null && open.after(report)) || (close != null && close.before(report)))
+
+                        }
+                        .each { Map<String, Object> r ->
+                            buffer.append(GsonBuilder.newInstance().setPrettyPrinting().create().toJson(r))
+                        }
+                    }
+
+                    buffer.append("</pre></td>")
+
                 }
 
                 buffer.append("</tr>")
@@ -393,9 +509,9 @@ class PrintUtils {
 
     Map<Long, Set<Long>> getBatchInfo$creditIds$subjectIds(Long batchId) {
         Map<Long, Set<Long>> map = new TreeMap<>()
-        Set<Long> creditIds = batchInfo.getCreditIds(batchId)
+        Set<Long> creditIds = justDao.getCreditIds(batchId)
         creditIds.each { creditId ->
-            Set<Long> subjectIds = batchInfo.getSubjectIds(creditId)
+            Set<Long> subjectIds = justDao.getSubjectIds(creditId)
             map.put(creditId, subjectIds)
         }
         return map
