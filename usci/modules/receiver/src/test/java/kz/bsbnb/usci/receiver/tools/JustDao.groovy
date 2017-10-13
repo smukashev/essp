@@ -212,12 +212,15 @@ class JustDao {
                             table.as(tableAlias).field(key).eq(value))
                             .orderBy(table.as(tableAlias).field("ID").desc())
 
-
             logger.info(select.toString())
 
             List<Map<String, Object>> out = jdbcTemplateSC.queryForList(select.getSQL(), select.getBindValues().toArray())
 
             out.each {
+                it.clone().each { e ->
+                    if (e.value && e.value instanceof Date)
+                        it["S_${e.key}"] = new Date(e.value.getTime()).format("yyyy.MM.dd HH:mm:SS")
+                }
                 rowsByCredit["$value"] << it
                 String idKey = "${showcase.meta.className}_id"
                 String idValue = it.find { it.key ==~ /(?i)${idKey}/ }?.value
@@ -241,7 +244,11 @@ class JustDao {
                 .each { String field, List<ShowCaseUtils.Table> showcases ->
                     showcases.each { ShowCaseUtils.Table showcase ->
                         showcase.tables.each { Table table ->
-                            closure(key, creditId, showcase, table)
+                            List ids = [creditId]
+                            subjectIds.each { ids << it }
+                            ids.each { id ->
+                                closure(key, id, showcase, table)
+                            }
                         }
                     }
                 }

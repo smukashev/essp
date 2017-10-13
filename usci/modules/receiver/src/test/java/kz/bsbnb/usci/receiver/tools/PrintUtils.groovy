@@ -350,13 +350,14 @@ class PrintUtils {
             buffer.append("<tr>")
             buffer.append("<th></th>")
             for (String reportDate : reportDates) {
+                Date report = new Date().parse("dd.MM.yyyy", reportDate)
                 buffer.append("<th>")
                 buffer.append("EAV BATCH ID: ").append(batchId)
-                        .append(" REPORT DATE: ").append(reportDate)
+                        .append(" REPORT DATE: ").append(report.format("yyyy.MM.dd"))
                 buffer.append("</th>")
                 buffer.append("<th>")
                 buffer.append("SHOWCASE BATCH ID: ").append(batchId)
-                        .append(" REPORT DATE: ").append(reportDate)
+                        .append(" REPORT DATE: ").append(report.format("yyyy.MM.dd"))
                 buffer.append("</th>")
             }
             buffer.append("</tr>")
@@ -381,14 +382,9 @@ class PrintUtils {
 
                     String vMetaClass
                     Long vEntityId
-                    block:
-                    {
-                        List hdPath = header.split("\\.")
-                        String last = hdPath.last()
-                        (last =~ /(\w+)<(\d+)>/).each { exp, cl, id ->
-                            vMetaClass = cl
-                            vEntityId = id as Long
-                        }
+                    (header.split("\\.").last() =~ /(\w+)<(\d+)>/).each { exp, cl, id ->
+                        vMetaClass = cl
+                        vEntityId = id as Long
                     }
 
                     rowsByIds.each { ky, rowById ->
@@ -409,7 +405,19 @@ class PrintUtils {
 
                         }
                         .each { Map<String, Object> r ->
-                            buffer.append(GsonBuilder.newInstance().setPrettyPrinting().create().toJson(r))
+                            List k = [
+                                    "META_CLASS",
+                                    "ID_KEY",
+                                    "ID_VALUE",
+                                    "S_OPEN_DATE",
+                                    "S_CLOSE_DATE",
+                                    "S_CDC"
+                            ]
+                            Map mh = [:]
+                            k.each { mh["$it"] = r["$it"] }
+                            Map mf = r.findAll { !k.contains(it.key) }
+                            buffer.append(GsonBuilder.newInstance().setPrettyPrinting().create().toJson(mh))
+                            buffer.append(GsonBuilder.newInstance().setPrettyPrinting().create().toJson(mf))
                         }
                     }
 
