@@ -46,7 +46,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_CLASSES.PARENT_IS_KEY,
                 EAV_M_CLASSES.IS_CLOSABLE,
                 EAV_M_CLASSES.IS_DISABLED,
-                EAV_M_CLASSES.IS_REFERENCE)
+                EAV_M_CLASSES.IS_REFERENCE,
+                EAV_M_CLASSES.HISTORY_TYPE)
                 .from(EAV_M_CLASSES)
                 .orderBy(EAV_M_CLASSES.BEGIN_DATE.desc());
 
@@ -74,6 +75,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
         metaClass.setReference(((BigDecimal) row.get("is_reference")).longValue() == 1);
         metaClass.setParentIsKey(((BigDecimal) row.get("parent_is_key")).longValue() == 1);
         metaClass.setClosable(((BigDecimal) row.get("is_closable")).longValue() == 1);
+        metaClass.setHistoryType(DataUtils.convertToHistoryType((BigDecimal) row.get("history_type")));
     }
 
     public List<MetaClass> loadAll() {
@@ -100,7 +102,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
                         EAV_M_CLASSES.IS_CLOSABLE,
-                        EAV_M_CLASSES.IS_REFERENCE)
+                        EAV_M_CLASSES.IS_REFERENCE,
+                        EAV_M_CLASSES.HISTORY_TYPE)
                         .from(EAV_M_CLASSES)
                         .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
                         .and(EAV_M_CLASSES.BEGIN_DATE.equal(DataUtils.convert(metaClass.getBeginDate())))
@@ -116,7 +119,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
                         EAV_M_CLASSES.IS_CLOSABLE,
-                        EAV_M_CLASSES.IS_REFERENCE)
+                        EAV_M_CLASSES.IS_REFERENCE,
+                        EAV_M_CLASSES.HISTORY_TYPE)
                         .from(EAV_M_CLASSES)
                         .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
                         .and(EAV_M_CLASSES.BEGIN_DATE.le(DataUtils.convert(metaClass.getBeginDate())))
@@ -134,7 +138,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                     EAV_M_CLASSES.PARENT_IS_KEY,
                     EAV_M_CLASSES.IS_CLOSABLE,
-                    EAV_M_CLASSES.IS_REFERENCE)
+                    EAV_M_CLASSES.IS_REFERENCE,
+                    EAV_M_CLASSES.HISTORY_TYPE)
                     .from(EAV_M_CLASSES)
                     .where(EAV_M_CLASSES.ID.equal(metaClass.getId()));
         }
@@ -175,7 +180,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
                         EAV_M_CLASSES.IS_CLOSABLE,
-                        EAV_M_CLASSES.IS_REFERENCE)
+                        EAV_M_CLASSES.IS_REFERENCE,
+                        EAV_M_CLASSES.HISTORY_TYPE)
                         .from(EAV_M_CLASSES)
                         .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
                         .and(EAV_M_CLASSES.BEGIN_DATE.eq(DataUtils.convert(metaClass.getBeginDate())))
@@ -192,7 +198,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                         EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                         EAV_M_CLASSES.PARENT_IS_KEY,
                         EAV_M_CLASSES.IS_CLOSABLE,
-                        EAV_M_CLASSES.IS_REFERENCE)
+                        EAV_M_CLASSES.IS_REFERENCE,
+                        EAV_M_CLASSES.HISTORY_TYPE)
                         .from(EAV_M_CLASSES)
                         .where(EAV_M_CLASSES.NAME.equal(metaClass.getClassName()))
                         .and(EAV_M_CLASSES.BEGIN_DATE.le(DataUtils.convert(metaClass.getBeginDate())))
@@ -209,7 +216,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_CLASSES.COMPLEX_KEY_TYPE,
                     EAV_M_CLASSES.PARENT_IS_KEY,
                     EAV_M_CLASSES.IS_CLOSABLE,
-                    EAV_M_CLASSES.IS_REFERENCE)
+                    EAV_M_CLASSES.IS_REFERENCE,
+                    EAV_M_CLASSES.HISTORY_TYPE)
                     .from(EAV_M_CLASSES)
                     .where(EAV_M_CLASSES.ID.equal(metaClass.getId()))
                     .limit(1)
@@ -244,14 +252,16 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_CLASSES.IS_DISABLED,
                 EAV_M_CLASSES.PARENT_IS_KEY,
                 EAV_M_CLASSES.IS_CLOSABLE,
-                EAV_M_CLASSES.IS_REFERENCE
+                EAV_M_CLASSES.IS_REFERENCE,
+                EAV_M_CLASSES.HISTORY_TYPE
         ).values(metaClass.getClassName(), metaClass.getClassTitle(),
                 metaClass.getComplexKeyType().toString(),
                 DataUtils.convert(metaClass.getBeginDate()),
                 DataUtils.convert(metaClass.isDisabled()),
                 DataUtils.convert(metaClass.parentIsKey()),
                 DataUtils.convert(metaClass.isClosable()),
-                DataUtils.convert(metaClass.isReference()));
+                DataUtils.convert(metaClass.isReference()),
+                DataUtils.convert(metaClass.getHistoryType()));
 
         logger.debug(insert.toString());
         long metaId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -277,6 +287,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 set(EAV_M_CLASSES.IS_REFERENCE, DataUtils.convert(metaClass.isReference())).
                 set(EAV_M_CLASSES.PARENT_IS_KEY, DataUtils.convert(metaClass.parentIsKey())).
                 set(EAV_M_CLASSES.IS_CLOSABLE, DataUtils.convert(metaClass.isClosable())).
+                set(EAV_M_CLASSES.HISTORY_TYPE, DataUtils.convert(metaClass.getHistoryType())).
                 where(EAV_M_CLASSES.ID.eq(metaClass.getId()));
 
         jdbcTemplate.update(update.getSQL(), update.getBindValues().toArray());
@@ -309,7 +320,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     .set(EAV_M_COMPLEX_SET.CLASS_ID, innerId)
                     .set(EAV_M_COMPLEX_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
                     .set(EAV_M_COMPLEX_SET.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
-                    .set(EAV_M_COMPLEX_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
+                    .set(EAV_M_COMPLEX_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()))
+                    .set(EAV_M_COMPLEX_SET.HISTORY_TYPE, DataUtils.convert(metaAttribute.getHistoryType()));
         } else {
             insert = context
                     .insertInto(EAV_M_SIMPLE_SET)
@@ -326,7 +338,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
                     .set(EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE, metaSet.getArrayKeyType().toString())
                     .set(EAV_M_SIMPLE_SET.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
-                    .set(EAV_M_SIMPLE_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()));
+                    .set(EAV_M_SIMPLE_SET.IS_REFERENCE, DataUtils.convert(metaSet.isReference()))
+                    .set(EAV_M_SIMPLE_SET.HISTORY_TYPE, DataUtils.convert(metaAttribute.getHistoryType()));
         }
 
         id = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -360,6 +373,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL,
                     EAV_M_COMPLEX_ATTRIBUTES.IS_REQUIRED,
                     EAV_M_COMPLEX_ATTRIBUTES.IS_DISABLED,
+                    EAV_M_COMPLEX_ATTRIBUTES.HISTORY_TYPE,
                     EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID
             ).values(
                     parentId,
@@ -375,6 +389,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     DataUtils.convert(metaAttribute.isFinal()),
                     DataUtils.convert(metaAttribute.isRequired()),
                     DataUtils.convert(metaAttribute.isDisabled()),
+                    DataUtils.convert(metaAttribute.getHistoryType()),
                     innerId);
         } else {
             insert = context.insertInto(
@@ -391,7 +406,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     EAV_M_SIMPLE_ATTRIBUTES.IS_IMMUTABLE,
                     EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL,
                     EAV_M_SIMPLE_ATTRIBUTES.IS_REQUIRED,
-                    EAV_M_SIMPLE_ATTRIBUTES.IS_DISABLED
+                    EAV_M_SIMPLE_ATTRIBUTES.IS_DISABLED,
+                    EAV_M_SIMPLE_ATTRIBUTES.HISTORY_TYPE
             ).values(parentId,
                     parentType,
                     attributeName,
@@ -404,7 +420,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                     DataUtils.convert(metaAttribute.isImmutable()),
                     DataUtils.convert(metaAttribute.isFinal()),
                     DataUtils.convert(metaAttribute.isRequired()),
-                    DataUtils.convert(metaAttribute.isDisabled()));
+                    DataUtils.convert(metaAttribute.isDisabled()),
+                    DataUtils.convert(metaAttribute.getHistoryType()));
         }
 
         return insertWithId(insert.getSQL(), insert.getBindValues().toArray());
@@ -450,6 +467,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                             .set(EAV_M_COMPLEX_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
                             .set(EAV_M_COMPLEX_SET.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
                             .set(EAV_M_COMPLEX_SET.IS_REQUIRED, DataUtils.convert(metaAttribute.isRequired()))
+                            .set(EAV_M_COMPLEX_SET.HISTORY_TYPE, DataUtils.convert(metaAttribute.getHistoryType()))
                             .where(EAV_M_COMPLEX_SET.CONTAINING_ID.eq(dbMeta.getId()))
                             .and(EAV_M_COMPLEX_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
                             .and(EAV_M_COMPLEX_SET.NAME.eq(typeName));
@@ -463,6 +481,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                             .set(EAV_M_SIMPLE_SET.IS_IMMUTABLE, DataUtils.convert(metaAttribute.isImmutable()))
                             .set(EAV_M_SIMPLE_SET.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
                             .set(EAV_M_SIMPLE_SET.IS_REQUIRED, DataUtils.convert(metaAttribute.isRequired()))
+                            .set(EAV_M_SIMPLE_SET.HISTORY_TYPE, DataUtils.convert(metaAttribute.getHistoryType()))
                             .where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(dbMeta.getId()))
                             .and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
                             .and(EAV_M_SIMPLE_SET.NAME.eq(typeName));
@@ -479,6 +498,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                             .set(EAV_M_COMPLEX_ATTRIBUTES.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
                             .set(EAV_M_COMPLEX_ATTRIBUTES.IS_REQUIRED, DataUtils.convert(metaAttribute.isRequired()))
                             .set(EAV_M_COMPLEX_ATTRIBUTES.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
+                            .set(EAV_M_COMPLEX_ATTRIBUTES.HISTORY_TYPE, DataUtils.convert(metaAttribute.getHistoryType()))
                             .where(EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId()))
                             .and(EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
                             .and(EAV_M_COMPLEX_ATTRIBUTES.NAME.eq(typeName));
@@ -493,6 +513,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                             .set(EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL, DataUtils.convert(metaAttribute.isFinal()))
                             .set(EAV_M_SIMPLE_ATTRIBUTES.IS_REQUIRED, DataUtils.convert(metaAttribute.isRequired()))
                             .set(EAV_M_SIMPLE_ATTRIBUTES.IS_DISABLED, DataUtils.convert(metaAttribute.isDisabled()))
+                            .set(EAV_M_SIMPLE_ATTRIBUTES.HISTORY_TYPE, DataUtils.convert(metaAttribute.getHistoryType()))
                             .where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.eq(dbMeta.getId()))
                             .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.eq(MetaContainerTypes.META_CLASS))
                             .and(EAV_M_SIMPLE_ATTRIBUTES.NAME.eq(typeName));
@@ -569,7 +590,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_SIMPLE_ATTRIBUTES.IS_IMMUTABLE,
                 EAV_M_SIMPLE_ATTRIBUTES.IS_FINAL,
                 EAV_M_SIMPLE_ATTRIBUTES.IS_REQUIRED,
-                EAV_M_SIMPLE_ATTRIBUTES.IS_DISABLED)
+                EAV_M_SIMPLE_ATTRIBUTES.IS_DISABLED,
+                EAV_M_SIMPLE_ATTRIBUTES.HISTORY_TYPE)
                 .from(EAV_M_SIMPLE_ATTRIBUTES)
                 .where(EAV_M_SIMPLE_ATTRIBUTES.CONTAINING_ID.equal(meta.getId()))
                 .and(EAV_M_SIMPLE_ATTRIBUTES.CONTAINER_TYPE.equal(meta.getType()));
@@ -580,7 +602,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(select.getSQL(), select.getBindValues().toArray());
 
-       sqlStats.put(select.getSQL(), (System.currentTimeMillis() - t));
+        sqlStats.put(select.getSQL(), (System.currentTimeMillis() - t));
 
         for (Map<String, Object> row : rows) {
             MetaAttribute metaAttribute = new MetaAttribute(
@@ -596,6 +618,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
             metaAttribute.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
             metaAttribute.setMetaType(new MetaValue(DataTypes.valueOf((String) row.get("type_code"))));
             metaAttribute.setTitle((String) row.get("title"));
+            metaAttribute.setHistoryType(DataUtils.convertToHistoryType((BigDecimal) row.get("history_type")));
 
             meta.setMetaAttribute((String) row.get("name"), metaAttribute);
         }
@@ -616,7 +639,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_SIMPLE_SET.TYPE_CODE,
                 EAV_M_SIMPLE_SET.ARRAY_KEY_TYPE,
                 EAV_M_SIMPLE_SET.IS_REFERENCE,
-                EAV_M_SIMPLE_SET.IS_DISABLED)
+                EAV_M_SIMPLE_SET.IS_DISABLED,
+                EAV_M_SIMPLE_SET.HISTORY_TYPE)
                 .from(EAV_M_SIMPLE_SET)
                 .where(EAV_M_SIMPLE_SET.CONTAINING_ID.eq(meta.getId()))
                 .and(EAV_M_SIMPLE_SET.CONTAINER_TYPE.eq(meta.getType()));
@@ -650,6 +674,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
             metaAttribute.setMetaType(metaSet);
             metaAttribute.setTitle((String) row.get("title"));
 
+            metaAttribute.setHistoryType(DataUtils.convertToHistoryType((BigDecimal) row.get("history_type")));
+
             meta.setMetaAttribute((String) row.get("name"), metaAttribute);
         }
     }
@@ -668,6 +694,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_COMPLEX_ATTRIBUTES.TITLE,
                 EAV_M_COMPLEX_ATTRIBUTES.CONTAINER_TYPE,
                 EAV_M_COMPLEX_ATTRIBUTES.CONTAINING_ID,
+                EAV_M_COMPLEX_ATTRIBUTES.HISTORY_TYPE,
                 EAV_M_COMPLEX_ATTRIBUTES.CLASS_ID,
                 EAV_M_CLASSES.NAME.as("cname"),
                 EAV_M_COMPLEX_ATTRIBUTES.IS_DISABLED)
@@ -698,6 +725,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
             metaAttribute.setFinal(((BigDecimal) row.get("is_final")).longValue() == 1);
             metaAttribute.setRequired(((BigDecimal) row.get("is_required")).longValue() == 1);
             metaAttribute.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
+            metaAttribute.setHistoryType(DataUtils.convertToHistoryType((BigDecimal) row.get("history_type")));
             metaAttribute.setMetaType(metaClass);
             metaAttribute.setTitle((String) row.get("title"));
 
@@ -722,7 +750,8 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
                 EAV_M_COMPLEX_SET.CONTAINING_ID,
                 EAV_M_COMPLEX_SET.IS_REFERENCE,
                 EAV_M_CLASSES.NAME.as("cname"),
-                EAV_M_COMPLEX_SET.IS_DISABLED)
+                EAV_M_COMPLEX_SET.IS_DISABLED,
+                EAV_M_COMPLEX_SET.HISTORY_TYPE)
                 .from(EAV_M_COMPLEX_SET)
                 .leftOuterJoin(EAV_M_CLASSES).on(EAV_M_COMPLEX_SET.CLASS_ID.equal(EAV_M_CLASSES.ID))
                 .where(EAV_M_COMPLEX_SET.CONTAINING_ID.equal(meta.getId()))
@@ -749,6 +778,7 @@ public class MetaClassDaoImpl extends JDBCSupport implements IMetaClassDao {
             metaAttribute.setFinal(((BigDecimal) row.get("is_final")).longValue() == 1);
             metaAttribute.setDisabled(((BigDecimal) row.get("is_disabled")).longValue() == 1);
             metaAttribute.setRequired(((BigDecimal) row.get("is_required")).longValue() == 1);
+            metaAttribute.setHistoryType(DataUtils.convertToHistoryType((BigDecimal) row.get("history_type")));
 
             MetaSet metaSet = new MetaSet(metaClass);
             metaSet.setId(((BigDecimal) row.get("id")).longValue());

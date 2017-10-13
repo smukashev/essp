@@ -81,6 +81,14 @@
     <!-- Spring JMS Producer Configuration -->
     <bean id="jmsProducerTemplate" class="org.springframework.jms.core.JmsTemplate" p:connectionFactory-ref="singleConnectionFactory" p:defaultDestination-ref="destination"/>
 
+    <!-- available services -->
+    <bean id="baseEntityManagerHistoryRmiServiceExporter" class="org.springframework.remoting.rmi.RmiServiceExporter">
+        <property name="serviceName" value="baseEntityManagerHistoryService"/>
+        <property name="service" ref="baseEntityManagerHistoryImpl"/>
+        <property name="serviceInterface" value="kz.bsbnb.usci.eav.manager.IBaseEntityManagerHistory"/>
+        <property name="registryPort" value="1091"/>
+    </bean>
+
     <!-- datasource to the database -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">

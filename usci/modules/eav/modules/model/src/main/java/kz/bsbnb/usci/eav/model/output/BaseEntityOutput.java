@@ -10,18 +10,53 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 public class BaseEntityOutput {
+    protected final boolean PRINT_CLOSE = false;
+
     public static String toString(BaseEntity entity) {
-        return toString(entity, "");
+        BaseEntityOutput output = new BaseEntityOutput();
+        return output.toString("", entity, "");
     }
 
-    public static String toString(BaseEntity entity, String prefix) {
+    private String complexSet(String suffix, BaseSet set, String prefix, MetaSet metaSet) {
+        String str = "";
+        //str += suffix;
+        for (IBaseValue value : set.get()) {
+            if (metaSet.isSet()) {
+                if (metaSet.isComplex()) {
+                    //str += " [ComSet]";
+                    str += "\n" + prefix + toString(suffix(value), (BaseEntity) value.getValue(), prefix + "\t");
+                } else {
+                    //str += " [SimSet]";
+                    str += suffix(value) + " " + value.getValue().toString();
+                }
+            }
+        }
+
+        return str;
+    }
+
+    public String toString(String suffix, BaseEntity entity, String prefix) {
+
         if (entity == null) return "null";
 
         String str = entity.getMeta().getClassName() + "(" + entity.getId() + ", ";
+        if (entity.getMeta().isSet()) {
+            if (entity.getMeta().isComplex())
+                str += "[ComSet] ";
+            else
+                str += "[SimSet] ";
+        } else {
+            if (entity.getMeta().isComplex())
+                str += "[ComAtr] ";
+            else
+                str += "[SimAtr] ";
+        }
         try {
-            str += entity.getReportDate() == null ? "-)" : DataTypes.formatDate(entity.getReportDate()) + ");";
+            str += "/RP " + (entity.getReportDate() == null ? "NO/" : DataTypes.formatDate(entity.getReportDate())) + "/";
+            str += suffix == null ? "-)" : " " + suffix;
+            str += ");";
         } catch (Exception e) {
-            if(entity.getMeta().getClassName().equals("credit")) {
+            if (entity.getMeta().getClassName().equals("credit")) {
                 System.out.println(entity.getEl("primary_contract.no"));
                 System.out.println(entity.getEl("primary_contract.date"));
             }
@@ -42,32 +77,35 @@ public class BaseEntityOutput {
             IBaseValue value = entity.getBaseValue(memberName);
 
             String valueToString = "null";
-            boolean valueIsNull = false;
 
             if (value == null) {
                 valueToString = "not set";
-                valueIsNull = true;
             } else {
                 if (value.getValue() == null) {
                     valueToString = "null";
                 }
             }
 
+            String chSuffix = suffix(value);
+
             if (value != null && value.getValue() != null) {
                 if (type.isComplex()) {
                     if (!type.isSet()) {
-                        valueToString = toString((BaseEntity) value.getValue(), prefix + "\t");
+                        valueToString = "";
+                        valueToString += toString(chSuffix, (BaseEntity) value.getValue(), prefix + "\t");
                     } else {
-                        valueToString = complexSet((BaseSet) value.getValue(), prefix + "\t", (MetaSet) type);
+                        valueToString = "";
+                        valueToString += complexSet(chSuffix, (BaseSet) value.getValue(), prefix + "\t", (MetaSet) type);
                     }
                 } else {
-                    valueToString = value.getValue().toString();
+                    valueToString = "";
+                    valueToString += value.getValue().toString();
                 }
             }
 
-            if (!valueIsNull) {
+            if (value != null) {
                 if (attribute.isKey() || attribute.isOptionalKey()) {
-                    str += "\n" + prefix +  memberName  + " : ";
+                    str += "\n" + prefix + memberName + " : ";
                 } else {
                     str += "\n" + prefix + memberName + " : ";
                 }
@@ -75,26 +113,32 @@ public class BaseEntityOutput {
                 if (type.isSet())
                     str += value.getId() + " : ";
 
-                    str += DataTypes.formatDate(value.getRepDate()) + " : " + valueToString;
-            }
-        }
-
-        return str;
-    }
-
-    private static String complexSet(BaseSet set, String prefix, MetaSet metaSet) {
-        String str = "";
-
-        for (IBaseValue value : set.get()) {
-            if (metaSet.isSet()) {
-                if (metaSet.isComplex()) {
-                    str += "\n" + prefix + toString((BaseEntity) value.getValue(), prefix + "\t");
+                if (value.getMetaAttribute().getMetaType().isSet()) {
+                    if (value.getMetaAttribute().getMetaType().isComplex())
+                        str += "[ComSet] ";
+                    else
+                        str += "[SimSet] ";
                 } else {
-                    str += value.getValue().toString();
+                    if (value.getMetaAttribute().getMetaType().isComplex())
+                        str += "[ComAtr] ";
+                    else
+                        str += "[SimAtr] ";
                 }
+
+                str += "/RP " + DataTypes.formatDate(value.getRepDate()) + "/ " + chSuffix + " : " + valueToString;
             }
         }
 
         return str;
     }
+
+    private String suffix(IBaseValue value) {
+        if (!PRINT_CLOSE) return "";
+        if (value == null) return "";
+        return " /CL " + (value.getCloseDate() != null ? "" + DataTypes.formatDate(value.getCloseDate()) : "NO ") + Boolean.toString(value.isClosed()) + "/";
+    }
+
 }
+
+
+

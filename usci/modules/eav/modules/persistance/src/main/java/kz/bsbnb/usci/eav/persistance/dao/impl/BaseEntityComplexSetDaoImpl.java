@@ -6,10 +6,7 @@ import kz.bsbnb.usci.eav.model.base.IBaseSet;
 import kz.bsbnb.usci.eav.model.base.IBaseValue;
 import kz.bsbnb.usci.eav.model.base.impl.BaseSet;
 import kz.bsbnb.usci.eav.model.base.impl.BaseValueFactory;
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
-import kz.bsbnb.usci.eav.model.meta.IMetaSet;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaContainerTypes;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
 import kz.bsbnb.usci.eav.persistance.dao.IBaseEntityComplexSetDao;
@@ -26,18 +23,18 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.*;
 
 @Repository
 public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEntityComplexSetDao {
+    final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
     private final Logger logger = LoggerFactory.getLogger(BaseEntityComplexSetDaoImpl.class);
-
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
-
     @Autowired
     private IBaseSetComplexValueDao baseSetComplexValueDao;
 
@@ -148,7 +145,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            existingValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
+            existingValue = constructValue(rows.get(0), parentEntityMeta, metaType, metaAttribute, null);
 
         return existingValue;
     }
@@ -213,7 +210,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            nextBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
+            nextBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, metaAttribute, null);
 
         return nextBaseValue;
     }
@@ -278,7 +275,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            previousBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
+            previousBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, metaAttribute, null);
 
         return previousBaseValue;
     }
@@ -328,7 +325,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            closedBaseValue = constructValue(rows.get(0), metaClass, metaType, null);
+            closedBaseValue = constructValue(rows.get(0), metaClass, metaType, metaAttribute, null);
 
         return closedBaseValue;
     }
@@ -377,7 +374,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
             throw new IllegalStateException(Errors.compose(Errors.E83, metaAttribute.getName()));
 
         if (rows.size() == 1)
-            lastBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, null);
+            lastBaseValue = constructValue(rows.get(0), parentEntityMeta, metaType, metaAttribute, null);
 
         return lastBaseValue;
     }
@@ -388,7 +385,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         Table tableOfComplexSets = EAV_M_COMPLEX_SET.as("cs");
         Table tableOfEntityComplexSets = EAV_BE_ENTITY_COMPLEX_SETS.as("ecs");
 
-        Date loadingDate = savingReportDate == null ? existingReportDate  : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+        Date loadingDate = savingReportDate == null ? existingReportDate : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
 
         Select select;
 
@@ -424,14 +421,16 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
                         .and(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.IS_CLOSED).eq(false))
                         .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).eq(false)))
                         .or(tableNumbering.field(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE).eq(savingReportDate)
-                        .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).eq(true))));
+                                .and(tableOfComplexSets.field(EAV_M_COMPLEX_SET.IS_FINAL).eq(true))));
 
         logger.debug(select.toString());
         List<Map<String, Object>> rows = queryForListWithStats(select.getSQL(), select.getBindValues().toArray());
 
         for (Map<String, Object> row : rows) {
             String attribute = (String) row.get(EAV_M_COMPLEX_SET.NAME.getName());
-            baseEntity.put(attribute, constructValue(row, baseEntity.getMeta(), baseEntity.getMemberType(attribute), loadingDate));
+            IMetaAttribute metaAttribute = baseEntity.getMetaAttribute(attribute);
+            Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_ENTITY_COMPLEX_SETS.REPORT_DATE.getName()));
+            baseEntity.put(attribute, constructValue(row, baseEntity.getMeta(), baseEntity.getMemberType(attribute), metaAttribute, loadingDate));
         }
     }
 
@@ -446,7 +445,7 @@ public class BaseEntityComplexSetDaoImpl extends JDBCSupport implements IBaseEnt
         updateWithStats(delete.getSQL(), delete.getBindValues().toArray());
     }
 
-    private IBaseValue constructValue(final Map<String, Object> row, final IMetaClass metaClass, final IMetaType metaType, final Date loadingDate) {
+    private IBaseValue constructValue(final Map<String, Object> row, final IMetaClass metaClass, final IMetaType metaType, final IMetaAttribute metaAttribute, final Date loadingDate) {
         IMetaSet metaSet = (IMetaSet) metaType;
 
         long id = ((BigDecimal) row.get(EAV_BE_ENTITY_COMPLEX_SETS.ID.getName())).longValue();

@@ -1,8 +1,9 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
 import kz.bsbnb.usci.eav.StaticRouter;
-import kz.bsbnb.usci.eav.manager.IEAVLoggerDao;
 import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
+import kz.bsbnb.usci.eav.manager.IBaseEntityManagerHistory;
+import kz.bsbnb.usci.eav.manager.IEAVLoggerDao;
 import kz.bsbnb.usci.eav.manager.impl.BaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.IBaseEntityReportDate;
@@ -17,6 +18,7 @@ import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import kz.bsbnb.usci.eav.persistance.dao.*;
+import kz.bsbnb.usci.eav.persistance.dao.impl.apply.ApplyHistoryFactory;
 import kz.bsbnb.usci.eav.persistance.dao.listener.IDaoListener;
 import kz.bsbnb.usci.eav.persistance.dao.pool.IPersistableDaoPool;
 import kz.bsbnb.usci.eav.persistance.db.JDBCSupport;
@@ -39,68 +41,55 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static kz.bsbnb.eav.persistance.generated.Tables.*;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_A_CREDITOR_STATE;
+import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
 
 @Repository
 @Primary
 public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEntityProcessorDao {
-    private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
-
     private static final String LOGIC_RULE_SETTING = "LOGIC_RULE_SETTING";
     private static final String LOGIC_RULE_META = "LOGIC_RULE_META";
     private static final String BVUNO_SETTING = "BVUNO_SETTING";
     private static final String BVUNO_IDS = "BVUNO_IDS";
-
+    private final Logger logger = LoggerFactory.getLogger(BaseEntityProcessorDaoImpl.class);
+    public boolean dbApplyEnabled;
+    protected List<String> history = null;
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
-
     @Autowired
     private IPersistableDaoPool persistableDaoPool;
-
     @Autowired
     private IBaseEntityLoadDao baseEntityLoadDao;
-
     @Autowired
     private IBaseEntityDao baseEntityDao;
-
     @Autowired
     private IBaseEntityApplyDao baseEntityApplyDao;
-
     @Autowired
     private IEavOptimizerDao eavOptimizerDao;
-
     @Autowired
     private IReportDao reportDao;
-
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-
     @Autowired
     private BasicBaseEntitySearcherPool searcherPool;
-
     @Autowired
     private RulesSingleton rulesSingleton;
-
     @Autowired
     private IEavGlobalDao globalDao;
-
     private IDaoListener applyListener;
-
     private Set<String> metaRules;
-
     @Autowired
     private IRefRepository refRepository;
-
     private Set bvunoSet;
-
     @Autowired
     private IEAVLoggerDao eavLoggerDao;
+
+    @Autowired
+    private IBaseEntityManagerHistory baseEntityManagerHistoryImpl;
 
     public void setApplyListener(IDaoListener applyListener) {
         this.applyListener = applyListener;
     }
-
-    public boolean dbApplyEnabled;
 
     public void setDbApplyEnabled(boolean dbApplyEnabled) {
         this.dbApplyEnabled = dbApplyEnabled;
@@ -108,7 +97,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     public long search(IBaseEntity baseEntity, long creditorId) {
-        IBaseEntitySearcher searcher =searcherPool.getSearcher(baseEntity.getMeta().getClassName());
+        IBaseEntitySearcher searcher = searcherPool.getSearcher(baseEntity.getMeta().getClassName());
         Long baseEntityId = searcher.findSingle((BaseEntity) baseEntity, creditorId);
         return baseEntityId == null ? 0 : baseEntityId;
     }
@@ -173,7 +162,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                     baseEntity.setId(baseEntityId);
             }
 
-            if(metaClass.parentIsKey() && baseEntity.getId() == 0) {
+            if (metaClass.parentIsKey() && baseEntity.getId() == 0) {
                 baseEntity.setId(search(baseEntity, creditorId));
             }
         }
@@ -219,8 +208,8 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return baseEntity;
     }
 
-    boolean rulesEnabledForUser(IBaseEntity baseEntity){
-        if(!StaticRouter.rulesEnabled())
+    boolean rulesEnabledForUser(IBaseEntity baseEntity) {
+        if (!StaticRouter.rulesEnabled())
             return false;
         return baseEntity.getUserId() == null || baseEntity.getUserId() != 100500L;
     }
@@ -254,6 +243,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
     @Override
     @Transactional
     public IBaseEntity process(final IBaseEntity baseEntity) {
+        //baseEntityManagerHistoryService = (IBaseEntityManagerHistory) rmiProxyFactoryBean.getObject();
         IBaseEntityManager baseEntityManager = new BaseEntityManager();
         baseEntityManager.setDeleteLogger(eavLoggerDao);
 
@@ -369,7 +359,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
                         throw new KnownException(Errors.compose(Errors.E292));
 
                     Date lastApprovedDate = reportDao.getLastApprovedDate(creditorId);
-                    if(lastApprovedDate != null) {
+                    if (lastApprovedDate != null) {
                         IBaseEntity creditor = baseEntityLoadDao.load(creditorId);
                         Integer period = (Integer) creditor.getEl("subject_type.report_period_duration_months");
                         Calendar cal = Calendar.getInstance();
@@ -400,6 +390,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     long applyTime = System.currentTimeMillis();
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
+                    if (baseEntityApplyDao.isTestMode()) {
+                        baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+                        new ApplyHistoryFactory(baseEntityApplyDao.isTestMode(), baseEntityManager).persistable("baseEntityApplied (for showcase)", baseEntityApplied);
+                    }
                     sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
                     if (rulesEnabledForUser(baseEntity))
@@ -414,6 +408,11 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
                     applyTime = System.currentTimeMillis();
                     baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
+                    history = baseEntityManager.getHistory();
+                    if (baseEntityApplyDao.isTestMode()) {
+                        baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+                        new ApplyHistoryFactory(baseEntityApplyDao.isTestMode(), baseEntityManager).persistable("baseEntityApplied (for showcase)", baseEntityApplied);
+                    }
                     sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
                     if (rulesEnabledForUser(baseEntity)) {
@@ -429,13 +428,18 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         } else {
             long applyTime = System.currentTimeMillis();
             baseEntityApplied = baseEntityApplyDao.apply(creditorId, baseEntityPostPrepared, null, baseEntityManager);
+            history = baseEntityManager.getHistory();
+            if (baseEntityApplyDao.isTestMode()) {
+                baseEntityManagerHistoryImpl.setHistory(baseEntityManager.getHistory());
+                new ApplyHistoryFactory(baseEntityApplyDao.isTestMode(), baseEntityManager).persistable("baseEntityApplied (for showcase)", baseEntityApplied);
+            }
             sqlStats.put("java::apply", (System.currentTimeMillis() - applyTime));
 
             if (rulesEnabledForUser(baseEntity)) {
                 processLogicControl(baseEntityApplied);
             }
 
-            if(dbApplyEnabled)
+            if (dbApplyEnabled)
                 baseEntityApplyDao.applyToDb(baseEntityManager);
         }
 
@@ -450,7 +454,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     private boolean isBvuno(long creditorId) {
 
-        if(bvunoSet == null || bvunoSet.size() < 1) {
+        if (bvunoSet == null || bvunoSet.size() < 1) {
             try {
                 bvunoSet = new HashSet();
                 String[] str = globalDao.get(BVUNO_SETTING, BVUNO_IDS).getValue().split(",");
@@ -466,7 +470,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
         return bvunoSet.contains(creditorId);
     }
 
-    private String convertToDate(Date date){
+    private String convertToDate(Date date) {
         synchronized (dateFormat) {
             return dateFormat.format(date);
         }
@@ -563,7 +567,7 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
     @Override
     public void prepareClosedDates(IBaseEntity baseEntity, long creditorId) {
-        for(String attrName: baseEntity.getAttributes()) {
+        for (String attrName : baseEntity.getAttributes()) {
             IMetaAttribute metaAttribute = baseEntity.getMeta().getMetaAttribute(attrName);
             IMetaType metaType = baseEntity.getMemberType(attrName);
             IBaseValue baseValue = baseEntity.getBaseValue(attrName);
@@ -572,27 +576,27 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
             IBaseValue baseValueClosed = valueDao.getNextBaseValue(baseValue);
 
-            if(baseValueClosed == null)
+            if (baseValueClosed == null)
                 baseValueClosed = valueDao.getClosedBaseValue(baseValue);
 
-            if(baseValueClosed != null) {
+            if (baseValueClosed != null) {
                 baseValue.setCloseDate(baseValueClosed.getRepDate());
             }
 
-            if(metaType.isComplex()) {
-                if(metaType.isSet()) {
+            if (metaType.isComplex()) {
+                if (metaType.isSet()) {
                     IBaseSet childBaseSet = (IBaseSet) baseValue.getValue();
 
-                    for(IBaseValue childBaseValue : childBaseSet.get()) {
+                    for (IBaseValue childBaseValue : childBaseSet.get()) {
                         IBaseSetValueDao setValueDao = persistableDaoPool
                                 .getPersistableDao(childBaseValue.getClass(), IBaseSetValueDao.class);
 
                         IBaseValue childBaseValueClosed = setValueDao.getNextBaseValue(childBaseValue);
 
-                        if(childBaseValueClosed == null)
+                        if (childBaseValueClosed == null)
                             childBaseValueClosed = setValueDao.getClosedBaseValue(childBaseValue);
 
-                        if(childBaseValueClosed != null) {
+                        if (childBaseValueClosed != null) {
                             childBaseValue.setCloseDate(childBaseValueClosed.getRepDate());
                         }
 
@@ -611,5 +615,10 @@ public class BaseEntityProcessorDaoImpl extends JDBCSupport implements IBaseEnti
 
         }
 
+    }
+
+    @Override
+    public List<String> getHistory() {
+        return history;
     }
 }

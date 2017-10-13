@@ -1,9 +1,6 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
-import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
-import kz.bsbnb.usci.eav.model.meta.IMetaClass;
-import kz.bsbnb.usci.eav.model.meta.IMetaSet;
-import kz.bsbnb.usci.eav.model.meta.IMetaType;
+import kz.bsbnb.usci.eav.model.meta.*;
 import kz.bsbnb.usci.eav.model.type.ComplexKeyTypes;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 import kz.bsbnb.usci.eav.util.DataUtils;
@@ -34,6 +31,8 @@ public class MetaClass extends MetaContainer implements IMetaClass {
     private HashMap<String, IMetaAttribute> members = new HashMap<>();
 
     private ComplexKeyTypes complexKeyType = ComplexKeyTypes.ALL;
+
+    private HistoryType historyType = HistoryType.COMMON;
 
     public MetaClass() {
         super(MetaContainerTypes.META_CLASS);
@@ -96,7 +95,7 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         IMetaAttribute metaAttribute = members.get(name);
 
         if (metaAttribute == null)
-            throw new IllegalArgumentException(Errors.compose(Errors.E45,name, this.getClassName()));
+            throw new IllegalArgumentException(Errors.compose(Errors.E45, name, this.getClassName()));
 
         return metaAttribute.getMetaType();
     }
@@ -555,4 +554,12 @@ public class MetaClass extends MetaContainer implements IMetaClass {
         return filteredAttributeNames;
     }
 
+    @Override
+    public HistoryType getHistoryType() {
+        return historyType;
+    }
+
+    public void setHistoryType(HistoryType historyType) {
+        this.historyType = historyType;
+    }
 }
