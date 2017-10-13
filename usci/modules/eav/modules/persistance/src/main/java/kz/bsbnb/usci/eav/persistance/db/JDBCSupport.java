@@ -3,7 +3,6 @@ package kz.bsbnb.usci.eav.persistance.db;
 import kz.bsbnb.usci.eav.StaticRouter;
 import kz.bsbnb.usci.eav.model.stats.SQLQueriesStats;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -25,7 +24,6 @@ public class JDBCSupport {
     protected SQLQueriesStats sqlStats;
 
     @Autowired
-    @Qualifier("dataSource")
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }

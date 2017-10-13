@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_SET_VALUES;
@@ -39,21 +38,26 @@ import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_ENTITIES;
 
 @Repository
 public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
-    final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
     private final Logger logger = LoggerFactory.getLogger(BaseEntityDaoImpl.class);
+
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
+
     @Qualifier("metaClassRepositoryImpl")
     @Autowired
     private IMetaClassRepository metaClassRepository;
+
     @Autowired
     private IPersistableDaoPool persistableDaoPool;
+
     @Autowired
     private IBaseEntityReportDateDao baseEntityReportDateDao;
+
     @Autowired
     private IEavOptimizerDao eavOptimizerDao;
-    private Map<String, Set<Class>> metaOptimizerMap;
+
+    private Map<String, Set<Class> > metaOptimizerMap;
 
     @PostConstruct
     public void fillMetaOptimizer() {
@@ -66,13 +70,13 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
             for (String attribute : metaClass.getAttributeNames()) {
                 IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
                 IMetaType metaType = metaAttribute.getMetaType();
-                if (metaType.isComplex()) {
-                    if (metaType.isSet())
+                if(metaType.isComplex()) {
+                    if(metaType.isSet())
                         daoSet.add(BaseEntityComplexSetDaoImpl.class);
                     else
                         daoSet.add(BaseEntityComplexValueDaoImpl.class);
                 } else {
-                    if (metaType.isSet())
+                    if(metaType.isSet())
                         daoSet.add(BaseEntitySimpleSetDaoImpl.class);
                     else {
                         switch (((IMetaValue) metaType).getTypeCode()) {
@@ -113,6 +117,7 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
 
         return baseEntityId;
     }
+
 
     @Override
     public void update(IPersistable persistable) {
@@ -174,10 +179,10 @@ public class BaseEntityDaoImpl extends JDBCSupport implements IBaseEntityDao {
             IBaseEntityValueDao baseEntityValueDao = persistableDaoPool
                     .getPersistableDao(baseValueClass, IBaseEntityValueDao.class);
 
-            if (optimizerClass != null && !optimizerClass.contains(baseEntityValueDao.getClass()))
+            if(optimizerClass != null && !optimizerClass.contains(baseEntityValueDao.getClass()))
                 continue;
 
-            baseEntityValueDao.loadBaseValues(baseEntity, existingReportDate, savingReportDate);
+                baseEntityValueDao.loadBaseValues(baseEntity, existingReportDate, savingReportDate);
             //}
         }
 

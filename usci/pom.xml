@@ -31,9 +31,6 @@
         <module>modules/cli</module>
         <module>modules/portlets</module>
         <module>modules/manager</module>
-        <module>modules/tools</module>
-        <module>modules/flyway-core</module>
-        <module>modules/flyway-showcase</module>
     </modules>
 
     <build>

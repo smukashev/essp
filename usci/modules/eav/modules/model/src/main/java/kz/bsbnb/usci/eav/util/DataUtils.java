@@ -1,9 +1,7 @@
 package kz.bsbnb.usci.eav.util;
 
-import kz.bsbnb.usci.eav.model.meta.HistoryType;
 import kz.bsbnb.usci.eav.model.type.DataTypes;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -68,18 +66,6 @@ public class DataUtils {
 
     public static java.util.Date convert(Timestamp timestamp) {
         return timestamp == null ? null : new java.util.Date(timestamp.getTime());
-    }
-
-    public static Byte convert(HistoryType historyType) {
-        return historyType == null ? null : HistoryType.valueOf(historyType);
-    }
-
-    public static HistoryType convertToHistoryType(Byte type) {
-        return type == null ? HistoryType.COMMON : HistoryType.valueOf(type);
-    }
-
-    public static HistoryType convertToHistoryType(BigDecimal type) {
-        return type == null ? HistoryType.COMMON : HistoryType.valueOf(type.byteValue());
     }
 
     public static java.sql.Date convertToSQLDate(Timestamp timestamp) {

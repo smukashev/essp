@@ -1,10 +1,7 @@
 .idea
 target
 *.iml
+version.properties
+oracle.properties
 *.log
 *.war
-temp
-logs
-
-
-

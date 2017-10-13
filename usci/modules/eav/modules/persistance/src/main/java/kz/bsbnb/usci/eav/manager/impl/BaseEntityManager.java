@@ -1,23 +1,17 @@
 package kz.bsbnb.usci.eav.manager.impl;
 
 import kz.bsbnb.usci.eav.StaticRouter;
-import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.manager.IEAVLoggerDao;
+import kz.bsbnb.usci.eav.util.Errors;
+import kz.bsbnb.usci.eav.manager.IBaseEntityManager;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntity;
 import kz.bsbnb.usci.eav.model.base.impl.BaseEntityReportDate;
 import kz.bsbnb.usci.eav.model.base.impl.value.*;
-import kz.bsbnb.usci.eav.model.output.BaseToShortTool;
 import kz.bsbnb.usci.eav.model.persistable.IPersistable;
-import kz.bsbnb.usci.eav.util.Errors;
-import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-@Component
 public class BaseEntityManager implements IBaseEntityManager {
 
     public static final List<Class<? extends IPersistable>> CLASS_PRIORITY = new ArrayList<>();
@@ -44,7 +38,6 @@ public class BaseEntityManager implements IBaseEntityManager {
         CLASS_PRIORITY.add(BaseSetComplexValue.class);
     }
 
-
     private Map<Class, List<IPersistable>> insertedObjects = new HashMap<>();
     private Map<Class, List<IPersistable>> updatedObjects = new HashMap<>();
     private Map<Class, List<IPersistable>> deletedObjects = new HashMap<>();
@@ -56,22 +49,6 @@ public class BaseEntityManager implements IBaseEntityManager {
     private Long creditorId;
 
     private IEAVLoggerDao deleteLogger;
-    private List<String> history = new ArrayList<>();
-    private int level = 0;
-
-    private void history(String operation, IPersistable persistable) {
-        if (persistable == null) return;
-        String tabs = "";
-        for (int i = 0; i <= level; i++) tabs += "|\t";
-        StringBuffer buffer = new StringBuffer(operation.toUpperCase() + ": ");
-        if (false)
-            BaseToShortTool.print(buffer, persistable);
-        else
-            buffer.append(persistable.toString());
-        String output = tabs + buffer.toString();
-        output = output.replaceAll("\n", "\n" + tabs);
-        history.add(output);
-    }
 
     private void registerEntity(Map<Class, List<IPersistable>> objects, IPersistable persistable) {
         Class objectClass = persistable.getClass();
@@ -88,45 +65,36 @@ public class BaseEntityManager implements IBaseEntityManager {
 
     @Override
     public void registerAsInserted(IPersistable insertedObject) {
-
         if (insertedObject == null)
             throw new RuntimeException(Errors.compose(Errors.E54));
 
-        history("inserted", insertedObject);
         registerEntity(insertedObjects, insertedObject);
-
     }
 
     @Override
     public void registerAsUpdated(IPersistable updatedObject) {
-
         if (updatedObject == null)
             throw new RuntimeException(Errors.compose(Errors.E55));
 
-        history("updated", updatedObject);
         registerEntity(updatedObjects, updatedObject);
-
     }
 
     @Override
     public void registerAsDeleted(IPersistable deletedObject) {
-
         if (deletedObject == null)
             throw new RuntimeException(Errors.compose(Errors.E53));
 
-        history("deleted", deletedObject);
-
         List<IPersistable> objList = deletedObjects.get(deletedObject.getClass());
 
-        if (objList != null && deletedObject.getId() > 0) {
+        if(objList != null && deletedObject.getId() > 0) {
             for (IPersistable iPersistable : objList) {
-                if (iPersistable.getId() > 0 && iPersistable.getId() == deletedObject.getId())
+                if(iPersistable.getId() > 0 && iPersistable.getId() == deletedObject.getId())
                     return;
             }
         }
 
         try {
-            if (StaticRouter.isDeleteLogEnabled()) {
+            if(StaticRouter.isDeleteLogEnabled()) {
                 deleteLogger.log(deletedObject);
             }
         } catch (Exception e) {
@@ -134,7 +102,6 @@ public class BaseEntityManager implements IBaseEntityManager {
         }
 
         registerEntity(deletedObjects, deletedObject);
-
     }
 
     @Override
@@ -148,6 +115,7 @@ public class BaseEntityManager implements IBaseEntityManager {
         processedEntities.put(processedBaseEntity.getMeta().getClassName(), entityList);
     }
 
+
     @Override
     public void addOptimizerEntity(IBaseEntity entity) {
         optimizerEntities.put(entity.getId(), entity);
@@ -156,31 +124,6 @@ public class BaseEntityManager implements IBaseEntityManager {
     @Override
     public Map<Long, IBaseEntity> getOptimizerEntities() {
         return optimizerEntities;
-    }
-
-    @Override
-    public void increment() {
-        level++;
-    }
-
-    @Override
-    public void decrement() {
-        level--;
-    }
-
-    @Override
-    public int level() {
-        return level;
-    }
-
-    @Override
-    public List<String> getHistory() {
-        return history;
-    }
-
-    @Override
-    public void addHistory(String age) {
-        history.add(age);
     }
 
     @Override

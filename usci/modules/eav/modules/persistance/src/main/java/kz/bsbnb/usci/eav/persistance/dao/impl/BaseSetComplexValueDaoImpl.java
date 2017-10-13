@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.persistance.dao.impl;
 
-import kz.bsbnb.usci.eav.model.meta.HistoryType;
 import kz.bsbnb.usci.eav.util.Errors;
 import kz.bsbnb.usci.eav.model.base.IBaseContainer;
 import kz.bsbnb.usci.eav.model.base.IBaseEntity;
@@ -24,18 +23,18 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static kz.bsbnb.eav.persistance.generated.Tables.EAV_BE_COMPLEX_SET_VALUES;
 
 @Repository
 public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetComplexValueDao {
-    final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
     private final Logger logger = LoggerFactory.getLogger(BaseSetComplexValueDaoImpl.class);
+
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DSLContext context;
+
     @Autowired
     private IBaseEntityLoadDao baseEntityLoadDao;
 
@@ -54,7 +53,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                 .set(EAV_BE_COMPLEX_SET_VALUES.IS_LAST, DataUtils.convert(baseValue.isLast()));
 
         logger.debug(insert.toString());
-        long baseValueId = insertWithId(insert.getSQL(), insert.getBindValues().toArray());
+        long baseValueId =  insertWithId(insert.getSQL(), insert.getBindValues().toArray());
 
         baseValue.setId(baseValueId);
 
@@ -96,7 +95,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
             throw new IllegalStateException(Errors.compose(Errors.E133, count, persistable.getId()));
     }
 
-    private IBaseValue constructValue(Map<String, Object> row, IMetaType metaType, IBaseEntity childBaseEntity) {
+    private IBaseValue constructValue (Map<String, Object> row, IMetaType metaType, IBaseEntity childBaseEntity) {
         long id = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.ID.getName())).longValue();
 
         long creditorId = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID.getName())).longValue();
@@ -105,7 +104,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
         boolean closed = ((BigDecimal) row.get(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED.getName())).longValue() == 1;
 
-        Date reportDate = DataUtils.convertToSQLDate((Timestamp) row.get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
+        Date reportDate = DataUtils.convertToSQLDate((Timestamp) row .get(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE.getName()));
 
         IBaseEntity childBaseEntityLoaded = baseEntityLoadDao.loadByMaxReportDate(childBaseEntity.getId(), reportDate);
 
@@ -213,7 +212,7 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
             throw new IllegalStateException(Errors.compose(Errors.E137, childBaseEntity.getId(), childBaseEntity.getMeta().getClassName()));
 
         if (rows.size() == 1)
-            previousBaseValue = constructValue(rows.get(0), metaType, childBaseEntity);
+           previousBaseValue = constructValue(rows.get(0), metaType, childBaseEntity);
 
         return previousBaseValue;
     }
@@ -366,18 +365,18 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
         Table tableOfValues = EAV_BE_COMPLEX_SET_VALUES.as("csv");
         Select select;
 
-        Date loadingDate = savingReportDate == null ? existingReportDate : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
+        Date loadingDate = savingReportDate == null ? existingReportDate  : savingReportDate.compareTo(existingReportDate) >= 0 ? savingReportDate : existingReportDate;
 
         Table tableNumbering = context
                 .select(DSL.rank().over()
-                                .partitionBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID))
-                                .orderBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
-                        tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ID),
-                        tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID),
-                        tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
-                        tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
-                        tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
-                        tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
+                        .partitionBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID))
+                        .orderBy(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).desc()).as("num_pp"),
+                    tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ID),
+                    tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.CREDITOR_ID),
+                    tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.ENTITY_VALUE_ID),
+                    tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE),
+                    tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_CLOSED),
+                    tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.IS_LAST))
                 .from(tableOfValues)
                 .where(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.SET_ID).eq(baseSet.getId()))
                 .and(tableOfValues.field(EAV_BE_COMPLEX_SET_VALUES.REPORT_DATE).lessOrEqual(DataUtils.convert(loadingDate)))
@@ -411,12 +410,6 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
 
             IBaseEntity baseEntity = baseEntityLoadDao.loadByMaxReportDate(entityValueId, loadingDate);
 
-            Date repDate = baseEntity.getBaseEntityReportDate().getReportDate();
-
-            /* INFO: 18.09.17 Отключить advenced history для загрузки данных можно здесь. */
-            if (true && baseEntity.getMeta().getHistoryType().equals(HistoryType.ADVANCED) && !repDate.equals(loadingDate))
-                continue;
-
             baseSet.put(BaseValueFactory.create(
                     MetaContainerTypes.META_SET,
                     baseSet.getMemberType(),
@@ -426,8 +419,8 @@ public class BaseSetComplexValueDaoImpl extends JDBCSupport implements IBaseSetC
                     baseEntity,
                     false,
                     isLast));
+            }
         }
-    }
 
     @Override
     public void deleteAll(long baseSetId) {

@@ -51,8 +51,4 @@ public interface IMetaAttribute extends IPersistable {
     boolean isNullableKey();
 
     void setNullableKey(boolean isNullableKey);
-
-    HistoryType getHistoryType();
-
-    void setHistoryType(HistoryType historyType);
 }

@@ -28,12 +28,7 @@ public class BaseEntityLoadDaoImpl implements IBaseEntityLoadDao {
         if (maxReportDate == null)
             throw new RuntimeException(Errors.compose(Errors.E103, id, DataTypes.formatDate(savingReportDate)));
 
-        /* INFO: 18.09.17 Отключить advenced history для загрузки данных можно здесь. */
-        if (true)
-            return load(id, maxReportDate, maxReportDate);
-        else
-            return load(id, maxReportDate, savingReportDate);
-
+        return load(id, maxReportDate, savingReportDate);
     }
 
     @Override

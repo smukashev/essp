@@ -45,29 +45,41 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class ZipFilesMonitor {
+    private final Logger logger = LoggerFactory.getLogger(ZipFilesMonitor.class);
+
+    @Autowired
+    private IServiceRepository serviceFactory;
+
+    @Autowired
+    private JobLauncher jobLauncher;
+
+    @Autowired
+    private ReceiverStatusSingleton receiverStatusSingleton;
+
+    @Autowired
+    private JobLauncherQueue jobLauncherQueue;
+
+    private IBatchService batchService;
+
+    private Map<String, Job> jobs;
+
+    private List<Creditor> creditors;
+
+    SenderThread sender;
+
     public static final int ZIP_BUFFER_SIZE = 1024;
     public static final int MAX_SYNC_QUEUE_SIZE = 2048;
+
     private static final String DIGITAL_SIGNING_SETTINGS = "DIGITAL_SIGNING_SETTINGS";
     private static final String DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE = "DIGITAL_SIGNING_ORGANIZATIONS_IDS";
     private static final String ORG_FIRST_DATE_SETTING = "ORG_FIRST_DATE_SETTING";
     private static final String CREDITOR_DATES = "CREDITOR_DATES";
     private static final String DEFAULT_DATE_VALUE = "DEFAULT_DATE_VALUE";
     private static final String WAITING_FOR_SIGNATURE = "WAITING_FOR_SIGNATURE";
+
     private static final long WAIT_TIMEOUT = 360; //in 10 sec units
-    private final Logger logger = LoggerFactory.getLogger(ZipFilesMonitor.class);
-    SenderThread sender;
+
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-    @Autowired
-    private IServiceRepository serviceFactory;
-    @Autowired
-    private JobLauncher jobLauncher;
-    @Autowired
-    private ReceiverStatusSingleton receiverStatusSingleton;
-    @Autowired
-    private JobLauncherQueue jobLauncherQueue;
-    private IBatchService batchService;
-    private Map<String, Job> jobs;
-    private List<Creditor> creditors;
 
     public ZipFilesMonitor(Map<String, Job> jobs) {
         this.jobs = jobs;
@@ -93,7 +105,7 @@ public class ZipFilesMonitor {
             Batch batch = batchService.getBatch(batchId);
             BatchInfo batchInfo = new BatchInfo(batch);
 
-            if (batch.isMaintenance() && !batch.isMaintenanceApproved()) {
+            if(batch.isMaintenance() && !batch.isMaintenanceApproved()) {
                 batchService.addBatchStatus(new BatchStatus()
                         .setBatchId(batchId)
                         .setStatus(BatchStatuses.MAINTENANCE_REQUEST)
@@ -102,7 +114,7 @@ public class ZipFilesMonitor {
 
                 List<Creditor> cList = serviceFactory.getUserService().getPortalUserCreditorList(batchInfo.getUserId());
 
-                if (cList.size() != 1) {
+                if(cList.size() != 1) {
                     logger.error("Неправильное количество кредиторов ожидаемое = 1, " +
                             "получено = " + cList.size() + ", пользователь = " + batchInfo.getUserId());
                 } else {
@@ -111,14 +123,14 @@ public class ZipFilesMonitor {
                 }
                 return false;
             }
-            // EavGlobal signGlobal = serviceFactory.getGlobalService().getGlobal(batch.getStatusId());
+           // EavGlobal signGlobal = serviceFactory.getGlobalService().getGlobal(batch.getStatusId());
 
             //if(signGlobal.getValue().equals(WAITING_FOR_SIGNATURE)) {
 
-            batchService.addBatchStatus(new BatchStatus()
-                    .setBatchId(batchId)
-                    .setStatus(BatchStatuses.WAITING)
-                    .setReceiptDate(new Date()));
+                batchService.addBatchStatus(new BatchStatus()
+                        .setBatchId(batchId)
+                        .setStatus(BatchStatuses.WAITING)
+                        .setReceiptDate(new Date()));
             //}
             System.out.println("Перезагрузка батча : " + batch.getId() + " - " + batch.getFileName());
 
@@ -170,6 +182,102 @@ public class ZipFilesMonitor {
         }
     }
 
+    private class SenderThread extends Thread {
+        private ReceiverStatusSingleton receiverStatusSingleton;
+
+        public ReceiverStatusSingleton getReceiverStatusSingleton() {
+            return receiverStatusSingleton;
+        }
+
+        public void setReceiverStatusSingleton(ReceiverStatusSingleton receiverStatusSingleton) {
+            this.receiverStatusSingleton = receiverStatusSingleton;
+        }
+
+        public void run() {
+            //noinspection InfiniteLoopStatement
+            while (true) {
+                JobInfo nextJob;
+
+                if (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
+                    try {
+                        sleep(1000L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    continue;
+                }
+
+                if(serviceFactory != null) {
+                    Set<Long> finishedBatches = serviceFactory.getEntityService().getFinishedBatches();
+
+                    if(finishedBatches.size() == 0) {
+                        try {
+                            sleep(100L);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    for (Long batchId : finishedBatches) {
+                        jobLauncherQueue.jobFinished(batchId);
+                    }
+                }
+
+                if ((nextJob = jobLauncherQueue.getNextJob()) != null) {
+                    System.out.println("Отправка батча на обработку : " + nextJob.getBatchId());
+
+                    try {
+                        JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+
+                        jobParametersBuilder.addParameter("creditorId", new JobParameter(nextJob.getBatchInfo().getCreditorId()));
+
+                        jobParametersBuilder.addParameter("batchId", new JobParameter(nextJob.getBatchId()));
+
+                        jobParametersBuilder.addParameter("userId", new JobParameter(nextJob.getBatchInfo().getUserId()));
+
+                        jobParametersBuilder.addParameter("reportId", new JobParameter(nextJob.getBatchInfo().getReportId()));
+
+                        jobParametersBuilder.addParameter("actualCount", new JobParameter(nextJob.getBatchInfo().getActualCount()));
+
+                        Job job = jobs.get(nextJob.getBatchInfo().getBatchType());
+
+                        if (job != null) {
+                            jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+                            receiverStatusSingleton.batchStarted();
+                            batchService.clearActualCount(nextJob.getBatchId());
+                            batchService.addBatchStatus(new BatchStatus()
+                                    .setBatchId(nextJob.getBatchId())
+                                    .setStatus(BatchStatuses.PROCESSING)
+                                    .setReceiptDate(new Date()));
+                        } else {
+                            logger.error("Неивестный тип батч файла: " + nextJob.getBatchInfo().getBatchType() +
+                                    " ID: " + nextJob.getBatchId());
+
+                            batchService.addBatchStatus(new BatchStatus()
+                                    .setBatchId(nextJob.getBatchId())
+                                    .setStatus(BatchStatuses.ERROR)
+                                    .setDescription("Неивестный тип батч файла: " +
+                                            nextJob.getBatchInfo().getBatchType())
+                                    .setReceiptDate(new Date()));
+                        }
+
+                        sleep(1000);
+                    } catch (Exception e) {
+                        jobLauncherQueue.jobFinished(nextJob.getBatchId());
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    logger.debug("Нет файлов для отправки");
+                }
+            }
+        }
+    }
+
     public long parseCreditorId(byte[] bytes) {
 
         try {
@@ -208,7 +316,7 @@ public class ZipFilesMonitor {
         }
     }
 
-    public Batch saveData(BatchInfo batchInfo, String filename, byte[] bytes, boolean isNB) {
+    public void saveData(BatchInfo batchInfo, String filename, byte[] bytes, boolean isNB) {
         receiverStatusSingleton.batchReceived();
 
         Batch batch = new Batch();
@@ -290,7 +398,7 @@ public class ZipFilesMonitor {
 
         if (!haveError) {
             if (!waitForSignature(filename, batch, batchInfo)) {
-                if (batchInfo.isMaintenance()) {
+                if(batchInfo.isMaintenance()) {
                     batchService.addBatchStatus(new BatchStatus()
                             .setBatchId(batchId)
                             .setStatus(BatchStatuses.MAINTENANCE_REQUEST)
@@ -298,7 +406,7 @@ public class ZipFilesMonitor {
                     );
 
                     serviceFactory.getMailMessageBeanCommonBusiness().notifyNBMaintenance(batch);
-                    return batch;
+                    return;
                 }
 
                 batchService.addBatchStatus(new BatchStatus()
@@ -313,18 +421,17 @@ public class ZipFilesMonitor {
                 jobLauncherQueue.addJob(batchId, batchInfo);
             }
         }
-        return batch;
     }
 
     boolean waitForSignature(String filename, Batch batch, BatchInfo batchInfo) {
         if (StaticRouter.isInMode(filename))
             return false;
 
-        if (!StaticRouter.isSignatureEnabled())
+        if(!StaticRouter.isSignatureEnabled())
             return false;
 
         String digitalSignArguments = serviceFactory.getGlobalService().getValue(DIGITAL_SIGNING_SETTINGS,
-                DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
+        DIGITAL_SIGNING_ORGANIZATIONS_IDS_CONFIG_CODE);
 
         String[] orgIds = digitalSignArguments.split(",");
         if (batch.getCreditorId() > 0 && Arrays.asList(orgIds).contains(String.valueOf(batch.getCreditorId()))) {
@@ -437,16 +544,16 @@ public class ZipFilesMonitor {
             Date mustDate = null;
 
             //never approved
-            if (lastApprovedDate == null) {
+            if(lastApprovedDate == null) {
                 String creditorDates = serviceFactory.getGlobalService().getValue(ORG_FIRST_DATE_SETTING, CREDITOR_DATES);
                 String creditorFirstDate = serviceFactory.getGlobalService().getValue(ORG_FIRST_DATE_SETTING, DEFAULT_DATE_VALUE);
 
                 String[] pairs = creditorDates.split(",");
-                for (String pair : pairs) {
+                for(String pair: pairs) {
                     String[] record = pair.split("=");
                     Long cId = Long.parseLong(record[0]);
                     String date = record[1];
-                    if (creditorId == cId) {
+                    if(creditorId == cId) {
                         creditorFirstDate = date;
                         break;
                     }
@@ -460,7 +567,7 @@ public class ZipFilesMonitor {
                     errMsg = "Неправильная настройка первой отчетной даты для организации";
                 }
 
-                if (mustDate != null && !mustDate.equals(batchInfo.getRepDate())) {
+                if(mustDate != null && !mustDate.equals(batchInfo.getRepDate())) {
                     errMsg = "Ошибка отчетной даты. Первая отчетная дата для организации = "
                             + dateFormat.format(mustDate) + ", заявлено = " + dateFormat.format(batchInfo.getRepDate());
                 }
@@ -471,7 +578,7 @@ public class ZipFilesMonitor {
                 Integer reportPeriodDurationMonths = null;
 
                 for (Creditor creditor : creditors) {
-                    if (creditor.getId() == creditorId) {
+                    if(creditor.getId() == creditorId) {
                         reportPeriodDurationMonths = creditor.getSubjectType().getReportPeriodDurationMonths();
                         break;
                     }
@@ -479,8 +586,8 @@ public class ZipFilesMonitor {
                 cal.add(Calendar.MONTH, reportPeriodDurationMonths == null ? 1 : reportPeriodDurationMonths);
                 mustDate = cal.getTime();
 
-                if (batchInfo.isMaintenance()) {
-                    if (mustDate.compareTo(batchInfo.getRepDate()) < 0) {
+                if(batchInfo.isMaintenance()) {
+                    if(mustDate.compareTo(batchInfo.getRepDate()) < 0) {
                         errMsg = "Ошибка запроса на изменение за утвержденный период. Последняя утвержденная дата = " +
                                 dateFormat.format(lastApprovedDate) + ", " + " заявлено = " + dateFormat.format(batchInfo.getRepDate())
                                 + ", шаг отчетности = " + reportPeriodDurationMonths;
@@ -489,7 +596,7 @@ public class ZipFilesMonitor {
                         return true;
                     }
                 } else {
-                    if (!mustDate.equals(batchInfo.getRepDate())) {
+                    if(!mustDate.equals(batchInfo.getRepDate())) {
                         errMsg = "Ошибка отчетной даты. Последняя утвержденная дата = " + dateFormat.format(lastApprovedDate) + ", " +
                                 " заявлено = " + dateFormat.format(batchInfo.getRepDate()) + ", шаг отчетности = " + reportPeriodDurationMonths;
                         logger.error(errMsg);
@@ -633,16 +740,15 @@ public class ZipFilesMonitor {
         return buffer.toByteArray();
     }
 
-    public Batch readFiles(String filename) {
-        return readFiles(filename, null);
+    public void readFiles(String filename) {
+        readFiles(filename, null);
     }
 
-    public Batch readFiles(String filename, Long userId) {
-        return readFiles(filename, userId, false);
+    public void readFiles(String filename, Long userId) {
+        readFiles(filename, userId, false);
     }
 
-    public Batch readFiles(String filename, Long userId, boolean isNB) {
-        Batch rBatch = null;
+    public void readFiles(String filename, Long userId, boolean isNB) {
         Batch batch = new Batch();
         batch.setUserId(userId);
         batch.setFileName(filename);
@@ -655,7 +761,7 @@ public class ZipFilesMonitor {
             if (cList.size() == 0) {
                 batch.setId(batchService.save(batch));
                 failFast(batch.getId(), "Нет доступных кредиторов для " + userId);
-                return rBatch;
+                return;
             }
 
             if (cList.size() == 1) {
@@ -663,7 +769,7 @@ public class ZipFilesMonitor {
             } else {
                 batch.setId(batchService.save(batch));
                 failFast(batch.getId(), "Доступно больше одного кредитора для " + userId);
-                return rBatch;
+                return;
             }
         }
 
@@ -752,7 +858,7 @@ public class ZipFilesMonitor {
                 }
 
 
-                rBatch = saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
+                saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
             } else { // usci
                 InputStream inManifest = zipFile.getInputStream(manifestEntry);
 
@@ -784,11 +890,11 @@ public class ZipFilesMonitor {
 
                 batchInfo.setAdditionalParams(manifestData.getAdditionalParams());
 
-                rBatch = saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
+                saveData(batchInfo, filename, inputStreamToByte(new FileInputStream(filename)), isNB);
             }
         } catch (Exception e) {
-            if (e instanceof IOException) {
-                failFast(batch.getId(), "Ошибка I/O: " + e.getMessage());
+            if(e instanceof IOException) {
+                failFast(batch.getId(), "Ошибка I/O: " + e.getMessage() );
             } else {
                 failFast(batch.getId(), "Не корректный XML файл");
             }
@@ -799,12 +905,11 @@ public class ZipFilesMonitor {
                 logger.error(ex.getMessage());
             }
         }
-        return rBatch;
     }
 
     public void monitor(Path path) throws InterruptedException, IOException {
         WatchService watchService = FileSystems.getDefault().newWatchService();
-        path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+        path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,StandardWatchEventKinds.ENTRY_DELETE);
 
         IEntityService entityService = serviceFactory.getEntityService();
 
@@ -832,9 +937,9 @@ public class ZipFilesMonitor {
 
                 if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
                     System.out.println("Поступил батч : " + fileName);
-                } else if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
-                } else if (StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind()) && event.context().toString().contains(".lock")) {
-                    readFiles(path + "/" + fileName.substring(0, fileName.length() - 5));
+                } else if(StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())){
+                } else if(StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind()) && event.context().toString().contains(".lock")){
+                    readFiles(path + "/" + fileName.substring(0,fileName.length()-5));
                 }
 
             }
@@ -851,101 +956,5 @@ public class ZipFilesMonitor {
 
     public JobLauncherQueue getJobLauncherQueue() {
         return jobLauncherQueue;
-    }
-
-    private class SenderThread extends Thread {
-        private ReceiverStatusSingleton receiverStatusSingleton;
-
-        public ReceiverStatusSingleton getReceiverStatusSingleton() {
-            return receiverStatusSingleton;
-        }
-
-        public void setReceiverStatusSingleton(ReceiverStatusSingleton receiverStatusSingleton) {
-            this.receiverStatusSingleton = receiverStatusSingleton;
-        }
-
-        public void run() {
-            //noinspection InfiniteLoopStatement
-            while (true) {
-                JobInfo nextJob;
-
-                if (serviceFactory != null && serviceFactory.getEntityService().getQueueSize() > MAX_SYNC_QUEUE_SIZE) {
-                    try {
-                        sleep(1000L);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    continue;
-                }
-
-                if (serviceFactory != null) {
-                    Set<Long> finishedBatches = serviceFactory.getEntityService().getFinishedBatches();
-
-                    if (finishedBatches.size() == 0) {
-                        try {
-                            sleep(100L);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    for (Long batchId : finishedBatches) {
-                        jobLauncherQueue.jobFinished(batchId);
-                    }
-                }
-
-                if ((nextJob = jobLauncherQueue.getNextJob()) != null) {
-                    System.out.println("Отправка батча на обработку : " + nextJob.getBatchId());
-
-                    try {
-                        JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-
-                        jobParametersBuilder.addParameter("creditorId", new JobParameter(nextJob.getBatchInfo().getCreditorId()));
-
-                        jobParametersBuilder.addParameter("batchId", new JobParameter(nextJob.getBatchId()));
-
-                        jobParametersBuilder.addParameter("userId", new JobParameter(nextJob.getBatchInfo().getUserId()));
-
-                        jobParametersBuilder.addParameter("reportId", new JobParameter(nextJob.getBatchInfo().getReportId()));
-
-                        jobParametersBuilder.addParameter("actualCount", new JobParameter(nextJob.getBatchInfo().getActualCount()));
-
-                        Job job = jobs.get(nextJob.getBatchInfo().getBatchType());
-
-                        if (job != null) {
-                            jobLauncher.run(job, jobParametersBuilder.toJobParameters());
-                            receiverStatusSingleton.batchStarted();
-                            batchService.clearActualCount(nextJob.getBatchId());
-                            batchService.addBatchStatus(new BatchStatus()
-                                    .setBatchId(nextJob.getBatchId())
-                                    .setStatus(BatchStatuses.PROCESSING)
-                                    .setReceiptDate(new Date()));
-                        } else {
-                            logger.error("Неивестный тип батч файла: " + nextJob.getBatchInfo().getBatchType() +
-                                    " ID: " + nextJob.getBatchId());
-
-                            batchService.addBatchStatus(new BatchStatus()
-                                    .setBatchId(nextJob.getBatchId())
-                                    .setStatus(BatchStatuses.ERROR)
-                                    .setDescription("Неивестный тип батч файла: " +
-                                            nextJob.getBatchInfo().getBatchType())
-                                    .setReceiptDate(new Date()));
-                        }
-
-                        sleep(1000);
-                    } catch (Exception e) {
-                        jobLauncherQueue.jobFinished(nextJob.getBatchId());
-                        e.printStackTrace();
-                    }
-                } else {
-                    try {
-                        sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    logger.debug("Нет файлов для отправки");
-                }
-            }
-        }
     }
 }

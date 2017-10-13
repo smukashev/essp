@@ -1,6 +1,5 @@
 package kz.bsbnb.usci.eav.model.meta.impl;
 
-import kz.bsbnb.usci.eav.model.meta.HistoryType;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.persistable.impl.Persistable;
@@ -31,8 +30,6 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
     private boolean isNullable = true;
 
     private boolean isDisabled = false;
-
-    private HistoryType historyType = HistoryType.COMMON;
 
     public MetaAttribute(boolean isKey, boolean isNullable, IMetaType metaType) {
         this.isKey = isKey;
@@ -214,14 +211,5 @@ public class MetaAttribute extends Persistable implements IMetaAttribute {
     @Override
     public void setNullableKey(boolean isNullableKey) {
         this.isNullableKey = isNullableKey;
-    }
-
-    public void setHistoryType(HistoryType historyType) {
-        this.historyType = historyType;
-    }
-
-    @Override
-    public HistoryType getHistoryType() {
-        return historyType;
     }
 }

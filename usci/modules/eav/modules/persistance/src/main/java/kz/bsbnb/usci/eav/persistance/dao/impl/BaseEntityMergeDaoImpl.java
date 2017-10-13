@@ -51,10 +51,10 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 	 *
 	 * @param baseEntityLeft  - left entity
 	 * @param baseEntityRight - right entity
-	 * @param mergeManager    - merge manager container information about how the two entities
+	 * @param mergeManager    - merge manager containing information about how the two entities
 	 *                        are to be merged
 	 * @param choice          - MergeResultChoice object - determines the resulting entity
-	 * @return IBaseEntity container the result of the merge operation. Depending on
+	 * @return IBaseEntity containing the result of the merge operation. Depending on
 	 * choice it is either left or right entity
 	 */
 	public IBaseEntity merge(IBaseEntity baseEntityLeft, IBaseEntity baseEntityRight,
@@ -74,13 +74,13 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 	/**
 	 * @param baseEntityLeft    - first base entity
 	 * @param baseEntityRight   -  second base entity
-	 * @param mergeManager      -  - merge manager container information about how the two entities
+	 * @param mergeManager      -  - merge manager containing information about how the two entities
 	 *                          are to be merged
 	 * @param baseEntityManager - base entity manager which will hold all the changes to database resulting
 	 *                          from the merge operation
 	 * @param choice            - MergeResultChoice object - determines the resulting entity
 	 * @param deleteUnused
-	 * @return IBaseEntity container the result of the merge operation. Depending on
+	 * @return IBaseEntity containing the result of the merge operation. Depending on
 	 * choice it is either left or right entity
 	 * @author dakkuliyev
 	 * Given right and left entities, merge manager object, base entity manager object,
@@ -213,7 +213,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 	 * @param baseEntity        - baseEntity resulting from the merge operation
 	 * @param baseEntityLeft    - first base entity
 	 * @param baseEntityRight   -  second base entity
-	 * @param mergeManager      -  - merge manager container information about how the two entities
+	 * @param mergeManager      -  - merge manager containing information about how the two entities
 	 *                          are to be merged
 	 * @param baseEntityManager - base entity manager which will hold all the changes to database resulting
 	 *                          from the merge operation
@@ -355,7 +355,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 	 * @param baseEntity        - baseEntity resulting from the merge operation
 	 * @param baseValueLeft     - first base entity
 	 * @param baseValueRight    -  second base entity
-	 * @param mergeManager      -  - merge manager container information about how the two entities
+	 * @param mergeManager      -  - merge manager containing information about how the two entities
 	 *                          are to be merged
 	 * @param baseEntityManager - base entity manager which will hold all the changes to database resulting
 	 *                          from the merge operation
@@ -584,7 +584,7 @@ public class BaseEntityMergeDaoImpl implements IBaseEntityMergeDao {
 	 * @param baseEntity        - baseEntity resulting from the merge operation
 	 * @param baseValueLeft     - first base entity
 	 * @param baseValueRight    -  second base entity
-	 * @param mergeManager      -  - merge manager container information about how the two entities
+	 * @param mergeManager      -  - merge manager containing information about how the two entities
 	 *                          are to be merged
 	 * @param baseEntityManager - base entity manager which will hold all the changes to database resulting
 	 *                          from the merge operation
