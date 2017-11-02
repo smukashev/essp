@@ -5,3 +5,8 @@ version.properties
 oracle.properties
 *.log
 *.war
+temp
+logs
+
+
+
