@@ -13,6 +13,8 @@ import java.util.TimeZone;
 public class DataUtils {
     private static final long MILLISECONDS_PER_DAY = 24L * 60 * 60 * 1000;
 
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+
     public static int compareBeginningOfTheDay(final Date comparingDate, final Date anotherDate) {
         final Date newComparingDate = new Date(comparingDate.getTime());
         final Date newAnotherDate = new Date(anotherDate.getTime());
@@ -82,5 +84,16 @@ public class DataUtils {
 
     public static boolean convert(Byte value) {
         return value.equals(Byte.valueOf("1"));
+    }
+
+    public static Date getDate(String date){
+        synchronized(sdf) {
+            try {
+                Date parsed = sdf.parse(date);
+                return parsed;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
