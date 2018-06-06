@@ -18,18 +18,20 @@
 
     <context:annotation-config/>
 
-    <context:component-scan base-package="kz.bsbnb.usci.eav" />
-    <context:component-scan base-package="kz.bsbnb.usci.bconv" />
+    <!--<context:component-scan base-package="kz.bsbnb.usci.eav" />-->
+    <!--<context:component-scan base-package="kz.bsbnb.usci.bconv" />-->
     <context:component-scan base-package="kz.bsbnb.usci.receiver" />
     <context:component-scan base-package="kz.bsbnb.usci.tool.status" />
 
+    <!--
     <bean id="context" class="org.jooq.impl.DSL" factory-method="using">
         <constructor-arg name="dialect">
-            <value type="org.jooq.SQLDialect">${jooqReceiver.executor.constructor.args.first}</value>
+            <value type="org.jooq.SQLDialect">${jooq.executor.constructor.args.first}</value>
         </constructor-arg>
-        <!-- <constructor-arg index="0" value="${jooq.executor.constructor.args.first}"/> -->
-    </bean>
+        <constructor-arg index="0" value="${jooq.executor.constructor.args.first}"/>
+    </bean>-->
 
+    <!--
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${jdbcReceiver.driver}"/>
         <property name="url" value="${jdbcReceiver.url}"/>
@@ -39,7 +41,9 @@
         <property name="minIdle" value="${jdbcReceiver.minIdle}"/>
         <property name="maxActive" value="${jdbcReceiver.maxActive}"/>
         <property name="maxIdle" value="${jdbcReceiver.maxIdle}"/>
-    </bean>
+    </bean>-->
+
+    <import resource="applicationContextProp.xml" ></import>
 
     <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="staticMethod" value="org.springframework.util.Log4jConfigurer.initLogging"/>

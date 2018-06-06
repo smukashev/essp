@@ -7,6 +7,8 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
 
+    <import resource="applicationContextProp.xml" ></import>
+
     <context:annotation-config/>
 
     <bean id="log4jInitializer" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
@@ -17,18 +19,6 @@
             </list>
         </property>
     </bean>
-
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="${jdbcTool.driver}"/>
-        <property name="url" value="${jdbcTool.url}"/>
-        <property name="username" value="${jdbcTool.user}"/>
-        <property name="password" value="${jdbcTool.password}"/>
-        <property name="initialSize" value="${jdbcTool.initialSize}"/>
-        <property name="minIdle" value="${jdbcTool.minIdle}"/>
-        <property name="maxActive" value="${jdbcTool.maxActive}"/>
-        <property name="maxIdle" value="${jdbcTool.maxIdle}"/>
-    </bean>
-
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">

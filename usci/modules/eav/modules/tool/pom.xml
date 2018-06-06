@@ -41,6 +41,11 @@
             <artifactId>commons-beanutils</artifactId>
             <version>1.8.3</version>
         </dependency>
+        <dependency>
+            <groupId>kz.bsbnb</groupId>
+            <artifactId>prop</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <distributionManagement>
