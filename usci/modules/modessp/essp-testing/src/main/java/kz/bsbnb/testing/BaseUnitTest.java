@@ -12,6 +12,7 @@ public class BaseUnitTest {
     protected MetaClass metaCredit;
     protected MetaClass metaCreditor;
     protected MetaClass metaPrimaryContract;
+    protected MetaClass metaContact;
 
     @Before
     public void makeMetaAware() {
@@ -3759,6 +3760,7 @@ public class BaseUnitTest {
         this.metaCredit = metaCredit;
         this.metaCreditor = metaRefCreditor;
         this.metaPrimaryContract = metaPrimaryContract;
+        this.metaContact = metaContact;
 
 
     }
