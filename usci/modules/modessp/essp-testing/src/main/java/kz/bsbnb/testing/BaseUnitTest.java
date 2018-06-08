@@ -1,4 +1,4 @@
-package kz.bsbnb;
+package kz.bsbnb.testing;
 
 import kz.bsbnb.usci.eav.model.meta.impl.MetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;

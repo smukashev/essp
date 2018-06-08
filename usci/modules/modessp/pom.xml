@@ -19,6 +19,8 @@
 
     <modules>
         <module>modelnew</module>
+        <module>creator</module>
+        <module>essp-testing</module>
     </modules>
 
     <build>

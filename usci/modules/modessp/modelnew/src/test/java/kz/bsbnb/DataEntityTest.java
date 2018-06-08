@@ -1,5 +1,6 @@
 package kz.bsbnb;
 
+import kz.bsbnb.testing.BaseUnitTest;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.junit.Assert;
 import org.junit.Test;
