@@ -30,10 +30,10 @@ public class SingleTableCreatorTest extends BaseUnitTest {
         Assert.assertTrue(ddl.contains("HAS_CURRENCY_EARN VARCHAR2(1) DEFAULT '0'"));
 
         ddl = creator.getDDL().getPrimaryKeyPart();
-        Assert.assertTrue(ddl.contains("ALTER TABLE CREDIT ADD CONSTRAINT PK_CREDIT PRIMARY KEY (CREDITOR_ID, REPORT_DATE, ENTITY_ID);"));
+        Assert.assertTrue(ddl.contains("ALTER TABLE CREDIT ADD CONSTRAINT PK_CREDIT PRIMARY KEY (CREDITOR_ID, REPORT_DATE, ENTITY_ID)"));
 
         ddl = creator.getDDL().getForeignKeyPart();
-        Assert.assertTrue(ddl.contains("ALTER TABLE CREDIT ADD CONSTRAINT CREDIT_R1 FOREIGN KEY (CREDITOR_ID, ENTITY_ID) REFERENCES EAV_BE_ENTITIES (CREDITOR_ID, ENTITY_ID);"));
+        Assert.assertTrue(ddl.contains("ALTER TABLE CREDIT ADD CONSTRAINT CREDIT_R1 FOREIGN KEY (CREDITOR_ID, ENTITY_ID) REFERENCES EAV_BE_ENTITIES (CREDITOR_ID, ENTITY_ID)"));
 
         //System.out.println(creator.getDDL().getCompact());
     }
