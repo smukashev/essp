@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SingleTableCreator extends BaseTableCreator {
 
@@ -18,10 +19,13 @@ public class SingleTableCreator extends BaseTableCreator {
 
     public SingleTableCreator(MetaClass metaCredit) {
         super(metaCredit);
-        this.ddl = new DDL(metaCredit);
+        //this.ddl = new DDL(metaCredit, namingSequence);
     }
 
     public DDL getDDL() {
+        if(ddl == null) {
+            ddl = new DDL(metaClass, namingSequence);
+        }
         return ddl;
     }
 
@@ -32,9 +36,8 @@ public class SingleTableCreator extends BaseTableCreator {
         private String dropTable;
         private String primaryKey;
         private String foreignKey;
-        private int ntCount = 0;
 
-        public DDL(MetaClass metaClass) {
+        public DDL(MetaClass metaClass, AtomicInteger namingSequence) {
             String tableName = metaClass.getClassName().toUpperCase();
 
             tableCreationPrefix = String.format("CREATE TABLE %s (\n", tableName);
@@ -62,7 +65,7 @@ public class SingleTableCreator extends BaseTableCreator {
                 if (metaType.isComplex()) {
                     if(metaType.isSet()) {
                         builder.append(columnName + "_IDS TNUMBER\n");
-                        tableCreationSuffix += String.format("NESTED TABLE %s_IDS STORE AS NT_%s%d\n", columnName, columnName, ++ntCount);
+                        tableCreationSuffix += String.format("NESTED TABLE %s_IDS STORE AS NT_%s%d\n", columnName, columnName, namingSequence.incrementAndGet());
                     } else {
                         builder.append(columnName + "_ID NUMBER(14)\n");
                     }
@@ -71,7 +74,7 @@ public class SingleTableCreator extends BaseTableCreator {
                         MetaSet metaSet = (MetaSet) metaType;
                         MetaValue metaValue = (MetaValue) metaSet.getMemberType();
                         builder.append(columnName + " ");
-                        tableCreationSuffix += String.format("NESTED TABLE %s STORE AS NT_%s%d\n", columnName, columnName, ++ntCount);
+                        tableCreationSuffix += String.format("NESTED TABLE %s STORE AS NT_%s%d\n", columnName, columnName, namingSequence.incrementAndGet());
                         switch (metaValue.getTypeCode()) {
                             case STRING:
                                 builder.append("TVARCHAR2\n");
@@ -142,13 +145,20 @@ public class SingleTableCreator extends BaseTableCreator {
         Connection connection = dataSource.getConnection();
         Statement statement = connection.createStatement();
         try {
-            statement.executeUpdate(getDDL().dropIfExists());
+            if(performDrops) {
+                statement.executeUpdate(getDDL().dropIfExists());
+            }
         } catch (Exception e) {
-
+            System.out.println(e.getMessage());
         }
-        statement.executeUpdate(getDDL().getTableCreationPart());
+        try {
+            statement.executeUpdate(getDDL().getTableCreationPart());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
         statement.executeUpdate(getDDL().getPrimaryKeyPart());
-        //statement.executeUpdate(getDDL().getForeignKeyPart());
+        statement.executeUpdate(getDDL().getForeignKeyPart());
         connection.close();
     }
 

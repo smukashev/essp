@@ -9,7 +9,7 @@ public class RecursiveTableCreatorFunctionalTest extends FunctionalTest {
         try {
             BaseTableCreator creator = new RecursiveTableCreator(metaCredit)
                     .withStaticTables()
-                    .performDrops();
+                    .performDrops(true);
 
             creator.execute(dataSource);
         } catch (Exception e) {
