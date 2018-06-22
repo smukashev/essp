@@ -1,12 +1,14 @@
 package kz.bsbnb.creator;
 
 import kz.bsbnb.testing.FunctionalTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Statement;
 
 public class SingleTableCreatorFunctionalTest extends FunctionalTest {
 
+    @Ignore
     @Test
     public void createTable() throws Exception {
         SingleTableCreator creator = new SingleTableCreator(metaCredit);

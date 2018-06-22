@@ -39,6 +39,8 @@ public class SingleTableCreator extends BaseTableCreator {
 
         public DDL(MetaClass metaClass, AtomicInteger namingSequence) {
             String tableName = metaClass.getClassName().toUpperCase();
+            if(namingSequence == null)
+                namingSequence = new AtomicInteger();
 
             tableCreationPrefix = String.format("CREATE TABLE %s (\n", tableName);
             tableCreationSuffix = ")\n";
