@@ -13,7 +13,7 @@ public class RootReaderTest extends FunctionalTest {
     RootReader reader = new RootReader();
 
     @Test
-    public void mustReadSimpleValues() throws Exception {
+    public void mustReadValues() throws Exception {
         InputStream inputStream =  Thread.currentThread().
                 getContextClassLoader().getResourceAsStream("kz/bsbnb/reader/credit.xml");
         reader.withSource(inputStream)
@@ -22,5 +22,7 @@ public class RootReaderTest extends FunctionalTest {
         Assert.assertNotNull(entity);
         Assert.assertEquals(5000.0, entity.getEl("amount"));
         Assert.assertEquals(DataUtils.getDate("01.01.2018"), entity.getEl("maturity_date"));
+        Assert.assertEquals("KZT-001", entity.getEl("primary_contract.no"));
+        Assert.assertEquals(DataUtils.getDate("12.01.2018"), entity.getEl("primary_contract.date"));
     }
 }
