@@ -26,6 +26,7 @@
         <module>modelnew</module>
         <module>creator</module>
         <module>essp-testing</module>
+        <module>reader</module>
     </modules>
 
     <build>

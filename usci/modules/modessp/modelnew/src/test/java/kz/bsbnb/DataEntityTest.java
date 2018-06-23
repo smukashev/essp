@@ -35,4 +35,13 @@ public class DataEntityTest extends BaseUnitTest {
         Assert.assertEquals("KZT-001", credit.getEl("primary_contract.no"));
         Assert.assertEquals(DataUtils.getDate("01.01.2018"), credit.getEl("primary_contract.date"));
     }
+
+    /**
+     * Must not throw NPE
+     */
+    @Test
+    public void testNoValue() throws Exception {
+        DataEntity credit = new DataEntity(metaCredit);
+        Assert.assertNull(credit.getEl("amount"));
+    }
 }

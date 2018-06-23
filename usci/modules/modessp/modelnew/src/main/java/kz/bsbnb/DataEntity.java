@@ -32,12 +32,18 @@ public class DataEntity {
         String[] array = path.split("\\.");
         for (int i = 0; i < array.length; i++) {
             DataValue dataValue = ret.values.get(array[i]);
-            if(i < array.length - 1)
+            if (dataValue == null) {
+                return null;
+            } else if(i < array.length - 1)
                 ret = ((DataEntity) dataValue.getValue());
             else
                 return dataValue.getValue();
         }
 
         return ret;
+    }
+
+    public MetaClass getMeta() {
+        return meta;
     }
 }
