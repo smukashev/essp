@@ -1,26 +1,24 @@
 package kz.bsbnb;
 
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
+import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DataEntity {
     DataOperationType dataOperation;
-    MetaClass meta;
+    MetaClass metaClass;
     Map<String, DataValue> values;
 
 
     public DataEntity(MetaClass metaCredit) {
-        this.meta = metaCredit;
+        this.metaClass = metaCredit;
         values = new HashMap<>();
     }
 
     public void setDataValue(String attribute, DataValue dataDoubleValue) {
-        IMetaAttribute metaAttribute = meta.getMetaAttribute(attribute);
+        IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
         if(metaAttribute == null)
             throw new RuntimeException("no such attribute: " + attribute);
 
@@ -43,7 +41,35 @@ public class DataEntity {
         return ret;
     }
 
+    public List<DataEntity> getEls(String path){
+        List<DataEntity> ret = new LinkedList<>();
+        ret.add(this);
+        String[] array = path.split("\\.");
+        for(String attribute: array) {
+            List<DataEntity> nextArray = new LinkedList<>();
+            for (DataEntity entity : ret) {
+                IMetaAttribute metaAttribute = metaClass.getMetaAttribute(attribute);
+                IMetaType metaType = metaAttribute.getMetaType();
+                if(metaType.isComplex()) {
+                    DataValue dataValue = entity.values.get(attribute);
+                    if(metaType.isSet()) {
+                        DataSet set = (DataSet) dataValue.getValue();
+                        for (DataEntity value : set.values) {
+                            nextArray.add(value);
+                        }
+                    } else {
+                        DataEntity childEntity = ((DataEntity) dataValue.getValue());
+                        nextArray.add(childEntity);
+                    }
+                }
+            }
+            ret = nextArray;
+        }
+
+        return ret;
+    }
+
     public MetaClass getMeta() {
-        return meta;
+        return metaClass;
     }
 }

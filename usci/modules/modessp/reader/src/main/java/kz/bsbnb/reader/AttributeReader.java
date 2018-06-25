@@ -1,13 +1,11 @@
 package kz.bsbnb.reader;
 
-import kz.bsbnb.DataComplexValue;
-import kz.bsbnb.DataEntity;
-import kz.bsbnb.DataValueCreator;
+import kz.bsbnb.*;
 import kz.bsbnb.usci.eav.model.meta.IMetaAttribute;
 import kz.bsbnb.usci.eav.model.meta.IMetaType;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
+import kz.bsbnb.usci.eav.model.meta.impl.MetaSet;
 import kz.bsbnb.usci.eav.model.meta.impl.MetaValue;
-import kz.bsbnb.usci.eav.model.type.DataTypes;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -55,7 +53,13 @@ public class AttributeReader {
                                 .withExitTagName(localPart)
                                 .read();
                     } else {
-                        throw new RuntimeException("not implemented");
+                        IMetaType childType = ((MetaSet) metaType).getMemberType();
+                        DataSet childSet = new DataSet(((MetaClass) childType));
+                        entity.setDataValue(localPart, new DataComplexSet(childSet));
+                        new SetReader(xmlEventReader)
+                                .withRootSet(childSet)
+                                .withExitTagName(localPart)
+                                .read();
                     }
                 }
             } else if(xmlEvent.isEndElement()) {

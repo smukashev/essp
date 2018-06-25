@@ -5,4 +5,20 @@
         <no>KZT-001</no>
         <date>12.01.2018</date>
     </primary_contract>
+    <pledges>
+        <item>
+            <contract>PLG-001</contract>
+            <pledge_type>
+                <code>0001</code>
+            </pledge_type>
+            <value>3000.0</value>
+        </item>
+        <item>
+            <contract>PLG-002</contract>
+            <pledge_type>
+                <code>0002</code>
+            </pledge_type>
+            <value>4000.0</value>
+        </item>
+    </pledges>
 </credit>
