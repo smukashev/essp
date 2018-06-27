@@ -1,6 +1,7 @@
-package kz.bsbnb.reader;
+package kz.bsbnb.test.basic;
 
 import kz.bsbnb.DataEntity;
+import kz.bsbnb.reader.RootReader;
 import kz.bsbnb.testing.FunctionalTest;
 import kz.bsbnb.usci.eav.util.DataUtils;
 import org.junit.Assert;
@@ -14,8 +15,7 @@ public class RootReaderTest extends FunctionalTest {
 
     @Test
     public void mustReadValues() throws Exception {
-        InputStream inputStream =  Thread.currentThread().
-                getContextClassLoader().getResourceAsStream("kz/bsbnb/reader/credit.xml");
+        InputStream inputStream = getInputStream("basic/credit.xml");
         reader.withSource(inputStream)
                 .withMeta(metaCredit);
         DataEntity entity = reader.read();
