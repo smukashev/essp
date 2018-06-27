@@ -10,8 +10,17 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.InputStream;
 
 public class RootReader {
-    XMLEventReader xmlEventReader;
-    private MetaClass meta;
+    protected XMLEventReader xmlEventReader;
+    private MetaClass metaClass;
+    protected String exitTag;
+
+    public RootReader(XMLEventReader xmlEventReader) {
+        this.xmlEventReader = xmlEventReader;
+    }
+
+    public RootReader() {
+        
+    }
 
     public DataEntity read() throws XMLStreamException {
         while (xmlEventReader.hasNext()) {
@@ -20,7 +29,7 @@ public class RootReader {
 
             } else if (xmlEvent.isStartElement()) {
                 String localName = xmlEvent.asStartElement().getName().getLocalPart();
-                DataEntity entity = new DataEntity(meta);
+                DataEntity entity = new DataEntity(metaClass);
                 new AttributeReader(xmlEventReader)
                         .withRootEntity(entity)
                         .withExitTagName(localName)
@@ -40,7 +49,13 @@ public class RootReader {
         return this;
     }
 
-    public void withMeta(MetaClass meta) {
-        this.meta = meta;
+    public RootReader withMeta(MetaClass meta) {
+        this.metaClass = meta;
+        return this;
+    }
+
+    public RootReader withExitTag(String localName) {
+        this.exitTag = localName;
+        return this;
     }
 }

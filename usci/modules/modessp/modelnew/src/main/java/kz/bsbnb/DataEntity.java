@@ -7,6 +7,7 @@ import kz.bsbnb.usci.eav.model.meta.impl.MetaClass;
 import java.util.*;
 
 public class DataEntity {
+    private long id;
     DataOperationType dataOperation;
     MetaClass metaClass;
     Map<String, DataValue> values;
@@ -71,5 +72,9 @@ public class DataEntity {
 
     public MetaClass getMeta() {
         return metaClass;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }
