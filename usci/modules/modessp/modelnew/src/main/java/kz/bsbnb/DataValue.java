@@ -11,11 +11,11 @@ public class DataValue<T> {
     DataValue newDataValue;
     T value;
 
-    private DataValue(){
+    protected DataValue(){
 
     }
 
-    DataValue(T value) {
+    public DataValue(T value) {
         if(value == null)
             throw new RuntimeException("cannot pass null to DataValue");
 

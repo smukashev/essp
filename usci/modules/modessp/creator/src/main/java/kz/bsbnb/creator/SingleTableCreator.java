@@ -160,7 +160,7 @@ public class SingleTableCreator extends BaseTableCreator {
             e.printStackTrace();
         }
         statement.executeUpdate(getDDL().getPrimaryKeyPart());
-        statement.executeUpdate(getDDL().getForeignKeyPart());
+        //statement.executeUpdate(getDDL().getForeignKeyPart());
         connection.close();
     }
 

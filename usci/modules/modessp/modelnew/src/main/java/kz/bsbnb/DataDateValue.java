@@ -9,4 +9,7 @@ public class DataDateValue extends DataValue<Date> {
         super(value);
     }
 
+    public DataDateValue(Object value) {
+        this.value = ((Date) value);
+    }
 }

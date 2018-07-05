@@ -14,4 +14,8 @@
         <property name="maxIdle" value="${jdbc.maxIdle}"/>
     </bean>
 
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
 </beans>

@@ -1,12 +1,31 @@
 package kz.bsbnb.reader.test;
 
 import kz.bsbnb.reader.base.BaseReader;
+import kz.bsbnb.usci.eav.util.DataUtils;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Date;
 
-public class InfoReader extends BaseReader {
+
+public final class InfoReader extends BaseReader {
+
+    private Date reportDate;
+    private long creditorId;
+    private Long userId;
+
+    public long getCreditorId() {
+        return creditorId;
+    }
+
+    public Date getReportDate() {
+        return reportDate;
+    }
+
+    public long getUserId(){
+        return userId;
+    }
 
     public InfoReader(XMLEventReader xmlEventReader) {
         super(xmlEventReader);
@@ -25,13 +44,14 @@ public class InfoReader extends BaseReader {
                 if(localPart.equals("creditor")) {
                     XMLEvent codeEvent = nextStartElement();
                     String code = xmlEventReader.nextEvent().asCharacters().getData();
-                    System.out.println(code);
+                    if(code.equals("TTTTKA"))
+                        creditorId = 4414L;
                 } else if (localPart.equals("report_date")) {
-                    String reportDate = xmlEventReader.nextEvent().asCharacters().getData();
-                    System.out.println(reportDate);
+                    String reportDateStr = xmlEventReader.nextEvent().asCharacters().getData();
+                    reportDate = DataUtils.getDate(reportDateStr);
                 } else if(localPart.equals("userId")) {
-                    String userId = xmlEventReader.nextEvent().asCharacters().getData();
-                    System.out.println(userId);
+                    String userIdStr = xmlEventReader.nextEvent().asCharacters().getData();
+                    userId = Long.valueOf(userIdStr);
                 }
             } else if(xmlEvent.isEndElement()) {
                 String localPart = xmlEvent.asEndElement().getName().getLocalPart();

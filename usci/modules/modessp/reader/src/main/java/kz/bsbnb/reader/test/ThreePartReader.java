@@ -15,6 +15,9 @@ public class ThreePartReader {
     private MetaClass meta;
 
     public DataEntity read() throws XMLStreamException {
+        DataEntity entity = null;
+        InfoReader infoReader = null;
+
         while (xmlEventReader.hasNext()) {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartDocument()) {
@@ -22,16 +25,17 @@ public class ThreePartReader {
             } else if (xmlEvent.isStartElement()) {
                 String localName = xmlEvent.asStartElement().getName().getLocalPart();
                 if(localName.equals("info")) {
-                    new InfoReader(xmlEventReader)
-                            .withExitTag(localName)
-                            .read();
+                    infoReader = new InfoReader(xmlEventReader)
+                            .withExitTag(localName);
+                    infoReader.read();
 
                 } else if(localName.equals("entities")) {
-                    DataEntity entity = new RootReader(xmlEventReader)
+                    entity = new RootReader(xmlEventReader)
                             .withMeta(meta)
                             .withExitTag(localName)
                             .read();
-                    System.out.println(entity);
+                    entity.setCreditorId(infoReader.getCreditorId());
+                    entity.setReportDate(infoReader.getReportDate());
                 } else if(localName.equals("refs")) {
                     new RefsReader(xmlEventReader)
                             .withMeta(meta)
@@ -41,7 +45,7 @@ public class ThreePartReader {
             }
         }
 
-        return null;
+        return entity;
     }
 
     public ThreePartReader withSource(InputStream source) throws XMLStreamException {
