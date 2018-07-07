@@ -27,10 +27,12 @@
         <module>modules/bconv</module>
         <module>modules/cr</module>
         <module>modules/receiver</module>
-        <module>modules/showcase</module>
+        <module>modules/modessp</module>
+        <module>modules/prop</module>
+        <!--<module>modules/showcase</module>-->
         <module>modules/cli</module>
         <module>modules/portlets</module>
-        <module>modules/manager</module>
+        <!--<module>modules/manager</module>-->
     </modules>
 
     <build>

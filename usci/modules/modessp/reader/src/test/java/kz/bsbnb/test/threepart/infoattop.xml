@@ -1,0 +1,49 @@
+<batch>
+    <info>
+        <creditor>
+            <code>TTTTKA</code>
+        </creditor>
+        <report_date>01.01.2018</report_date>
+        <userId>100500</userId>
+    </info>
+    <entities>
+        <credit>
+            <amount>5000.0</amount>
+            <maturity_date>01.01.2018</maturity_date>
+            <primary_contract>
+                <no>KZT-001</no>
+                <date>12.01.2018</date>
+            </primary_contract>
+            <pledges>
+                <item>
+                    <contract>PLG-001</contract>
+                    <pledge_type>
+                        <code>0001</code>
+                    </pledge_type>
+                    <value>3000.0</value>
+                </item>
+                <item>
+                    <contract>PLG-002</contract>
+                    <pledge_type>
+                        <code>0002</code>
+                    </pledge_type>
+                    <value>4000.0</value>
+                </item>
+            </pledges>
+        </credit>
+    </entities>
+    <refs>
+        <balance_account id="1111">
+            <no_>1471000</no_>
+        </balance_account>
+        <creditor id="4414">
+            <code>TTTTKA</code>
+        </creditor>
+        <pledge_type id="1234">
+            <code>0001</code>
+        </pledge_type>
+        <pledge_type id="1235">
+            <code>0002</code>
+        </pledge_type>
+    </refs>
+</batch>

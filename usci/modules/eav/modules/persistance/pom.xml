@@ -40,6 +40,11 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>kz.bsbnb</groupId>
+            <artifactId>prop</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>kz.bsbnb.usci</groupId>
             <artifactId>cr</artifactId>
             <version>0.0.1-SNAPSHOT</version>
@@ -121,7 +126,7 @@
                 </executions>
                 <configuration>
                     <files>
-                        <file>src/main/resources/properties/oracle.properties</file>
+                        <file>../../../prop/src/main/resources/properties/oracle.properties</file>
                     </files>
                 </configuration>
             </plugin>
@@ -145,18 +150,18 @@
                 </dependencies>
                 <configuration>
                     <jdbc>
-                        <driver>${jdbcPersistance.driver}</driver>
-                        <url>${jdbcPersistance.url}</url>
-                        <user>${jdbcPersistance.user}</user>
-                        <password>${jdbcPersistance.password}</password>
+                        <driver>${jdbc.driver}</driver>
+                        <url>${jdbc.url}</url>
+                        <user>${jdbc.user}</user>
+                        <password>${jdbc.password}</password>
                     </jdbc>
                     <generator>
                         <name>org.jooq.util.DefaultGenerator</name>
                         <database>
-                            <name>${jooqPersistance.db.name}</name>
+                            <name>${jooq.db.name}</name>
                             <includes>(SC_.*)|(EAV_.*)|(BATCH_.*)|(LOGIC_.*)|(MNT_.*)|(MAIL_.*)</includes>
                             <excludes>(SYS.*)</excludes>
-                            <inputSchema>${jooqPersistance.db.schema}</inputSchema>
+                            <inputSchema>${jooq.db.schema}</inputSchema>
                             <customTypes>
                                 <customType>
                                     <name>java.lang.Integer</name>
@@ -194,7 +199,7 @@
                 </configuration>
             </plugin>
             <!-- Uncomment this to recreate the database  -->
-                  <!--       <plugin>
+                  <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.2.1</version>
@@ -229,7 +234,7 @@
                                 </systemProperty>
                             </systemProperties>
                         </configuration>
-                    </plugin>-->
+                    </plugin>
         </plugins>
     </build>
 
